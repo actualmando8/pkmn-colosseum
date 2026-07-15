@@ -28,7 +28,7 @@ extern void fn_800D67BC(u16);
 extern void fn_800D892C(u32);
 
 /* GSmem */
-extern u16   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw */
+extern u32   _toolentryAlloc__FUl(u32 size);                    /* GSmemAllocRaw */
 extern void* fn_800E27B0(u16 handle);                  /* GSmemGetPtr */
 
 /* SDK GX functions */

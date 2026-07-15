@@ -5807,6 +5807,17 @@ u32 PPCMffpscr(void) {
     return fpscr.words[1];
 }
 
+void PPCMtfpscr(u32 val) {
+    union {
+        f64 value;
+        u32 words[2];
+    } fpscr;
+
+    fpscr.words[0] = 0;
+    fpscr.words[1] = val;
+    __setflm(fpscr.value);
+}
+
 
 asm u32 PPCMfhid2(void) {
     nofralloc

@@ -140,6 +140,23 @@ extern void menuModelRender(void);
 extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
+/* 0x80101910 | 0xE8 */
+s32 fn_80101910(void* obj) {
+    s32 count;
+    u8* entry = lbl_80402518;
+    s32 i;
+
+    for (i = 0; i < 128; i++, entry += 0x48) {
+        count = *(s32*)(entry + 0x44);
+
+        if (count != 0 && *(u32*)(entry + 0x40) == *(u32*)((u8*)obj + 0x40)) {
+            *(s32*)(entry + 0x44) = count - 1;
+            return 1;
+        }
+    }
+    return 1;
+}
+
 /* 0x801019F8 | 0x30 */
 void fn_801019F8(void) {
     memset(lbl_80402518, 0, 0x2400);

@@ -20,7 +20,7 @@
  * since neither TU calls the other's accessor. */
 typedef struct BattleGridGroupEntry {
     u8* slot;
-    u8 pad_04[8];
+    u8* pokemon[2];
     u16 memberCount;
     u8 arg1;
     u8 arg2;
@@ -54,25 +54,30 @@ u16 battleGridGetNumPokemonsForTrainer(u32 id) {
 }
 
 /**
- * battleGridResetModelVisibilityFlags - Pre-grid update all slot
- * positions (renamed from fn_801C2B2C; confirmed name -- naming pass
+ * battleGridResetModelVisibilityFlags - Apply cached visibility to all grid
+ * models (renamed from fn_801C2B2C; confirmed name -- naming pass
  * 2026-07-07).
  * Address: 0x801C2B2C | Size: 0xB4
  */
 void battleGridResetModelVisibilityFlags(void) {
-    s32 i;
-    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
+    extern BattleGridGroupEntry lbl_80466DE8[];
+    extern u8 lbl_8047B39A;
+    extern u8 lbl_8047B39C[8];
+    extern void fn_801DA4E8(void*, u32);
+    BattleGridGroupEntry* group = lbl_80466DE8;
+    u16 i;
+    u16 j;
+    u16 visibilityIndex = 0;
 
-    for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        BattleGridSceneSlot* slot = &state->slots[i];
-        void* jobj = slot->jobj;
-
-        if (jobj != NULL && slot->active != 0) {
-            f32 x = slot->posX;
-            f32 y = slot->posY;
-            f32 z = slot->posZ;
-            fn_8036A384(jobj, x, y, z);
+    if (lbl_8047B39A != 0) {
+        for (i = 0; i < 4; i++, group++) {
+            fn_801DA4E8(group->slot, lbl_8047B39C[visibilityIndex++]);
+            for (j = 0; j < 2; j++) {
+                fn_801DA4E8(group->pokemon[j],
+                            lbl_8047B39C[visibilityIndex++]);
+            }
         }
+        lbl_8047B39A = 0;
     }
 }
 

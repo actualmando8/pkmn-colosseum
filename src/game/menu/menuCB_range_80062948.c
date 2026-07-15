@@ -65,10 +65,172 @@ void menuCBPokemonEntryLoadTex(void)
 }
 #pragma pop
 
+/* Address: 0x80069944 | Size: 0xC4 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+void menuCBPokemonEntryTexWorkInit(void)
+{
+    typedef struct PokemonEntryTexWork {
+        u8 active;
+        u8 _1[3];
+        u32 value;
+        u8 _8[4];
+    } PokemonEntryTexWork;
+    PokemonEntryTexWork* entry0;
+    PokemonEntryTexWork* entry1;
+    PokemonEntryTexWork* entry2;
+    PokemonEntryTexWork* entry3;
+    PokemonEntryTexWork* entry4;
+    PokemonEntryTexWork* entry5;
+    u8* group;
+    u32 pairs;
+
+    *(u32*) &lbl_803A9F08[0x2C] = 0;
+    lbl_803A9F08[0xCD84] = 0;
+    group = lbl_803A9F08;
+    for (pairs = 0; pairs < 2; pairs++) {
+        entry0 = (PokemonEntryTexWork*) &group[0x30];
+        entry0->active = 0;
+        entry1 = entry0 + 1;
+        entry2 = entry0 + 2;
+        entry3 = entry0 + 3;
+        entry0->value = 0;
+        entry4 = entry0 + 4;
+        entry5 = entry0 + 5;
+        group += 0x48;
+        entry1->active = 0;
+        entry0 = (PokemonEntryTexWork*) &group[0x30];
+        group += 0x48;
+        entry1->value = 0;
+        entry1 = entry0 + 1;
+        entry2->active = 0;
+        entry2->value = 0;
+        entry2 = entry0 + 2;
+        entry3->active = 0;
+        entry3->value = 0;
+        entry3 = entry0 + 3;
+        entry4->active = 0;
+        entry4->value = 0;
+        entry4 = entry0 + 4;
+        entry5->active = 0;
+        entry5->value = 0;
+        entry5 = entry0 + 5;
+        entry0->active = 0;
+        entry0->value = 0;
+        entry1->active = 0;
+        entry1->value = 0;
+        entry2->active = 0;
+        entry2->value = 0;
+        entry3->active = 0;
+        entry3->value = 0;
+        entry4->active = 0;
+        entry4->value = 0;
+        entry5->active = 0;
+        entry5->value = 0;
+    }
+}
+#pragma pop
+
+/* Address: 0x80069A08 | Size: 0x58 */
+#pragma push
+#pragma scheduling off
+#pragma peephole off
+s32 menuCBPokemonEntryDispPokemonFace(void* ctx, UICmdMsg* msg, s32 group, s32 slot)
+{
+    typedef struct PokemonEntryTexWork {
+        u8 active;
+        u8 _1;
+        u16 face;
+        u8 _4[8];
+    } PokemonEntryTexWork;
+    typedef struct PokemonEntryTexState {
+        u8 _0[0x30];
+        PokemonEntryTexWork groups[4][6];
+    } PokemonEntryTexState;
+    PokemonEntryTexWork* entry;
+
+    entry = &((PokemonEntryTexState*) lbl_803A9F08)->groups[group][slot];
+    if (entry->active != 0) {
+        fn_8010B9E8(ctx, msg, entry->face);
+        return 1;
+    }
+    return 0;
+}
+#pragma pop
+
 /* Address: 0x80063D10 | Size: 0x4 */
 void fn_80063D10(void)
 {
 }
+
+/* Address: 0x80064378 | Size: 0x5C */
+void fn_80064378(u8* ctx, UICmdMsg* msg)
+{
+    extern void fn_80063AD4(u8*, UICmdMsg*);
+    extern void fn_800FB680(s32, s32, s32, u32);
+
+    switch (msg->cmd) {
+    case 0xA9E:
+        fn_800FB680(0, 0, ctx[0x8B] | -0x100, 0x3C1A);
+        break;
+    case 0xA88:
+        fn_80063AD4(ctx, msg);
+        break;
+    }
+}
+
+/* Address: 0x80068738 | Size: 0x5C */
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+s32 fn_80068738(void)
+{
+    extern void windowGetKeyInfo(void);
+    extern void fn_80068418(u8*, s32);
+    extern u8 lbl_803A9EA0[];
+    u8* entry;
+    s32 i;
+
+    windowGetKeyInfo();
+    entry = lbl_803A9EA0;
+    for (i = 0; i < 4; i++) {
+        fn_80068418(entry, i + 1);
+        entry += 0x1A;
+    }
+    return 0;
+}
+#pragma pop
+
+/* Address: 0x80068F84 | Size: 0xC4 */
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+void fn_80068F84(void)
+{
+    typedef struct PokemonEntryWork {
+        u8 active;
+        u8 _1[3];
+        u32 value;
+        u8 _8[4];
+    } PokemonEntryWork;
+    PokemonEntryWork* entry;
+    u8* group;
+    s32 i;
+    s32 j;
+
+    *(u32*) &lbl_803A9F08[0x2C] = 0;
+    lbl_803A9F08[0xCD84] = 0;
+    group = lbl_803A9F08;
+    for (i = 0; i < 4; i++, group += 0x48) {
+        entry = (PokemonEntryWork*) &group[0x30];
+        for (j = 0; j < 6; j++) {
+            entry[j].active = 0;
+            entry[j].value = 0;
+        }
+    }
+}
+#pragma pop
 
 /* Address: 0x80065A48 | Size: 0x1CA4 */
 #pragma push

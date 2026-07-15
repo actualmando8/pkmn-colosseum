@@ -94,6 +94,24 @@ void* menuItemBiosGetPtr(s32 idx) {
     return lbl_802EF0A8 + idx * 0x1C;
 }
 
+void menuDataBiosGetXY(s32 idx, s16* x, s16* y) {
+    s16* data;
+
+    if (idx < 0) {
+        idx = 0;
+    }
+    if ((u32)idx >= lbl_80478848) {
+        idx = 1;
+    }
+    data = (s16*)(lbl_802E2DB8 + idx * 0x1C);
+    if (x != NULL) {
+        *x = data[3];
+    }
+    if (y != NULL) {
+        *y = data[4];
+    }
+}
+
 u32 menuDataBiosSetXY(s32 idx, s16 x, s16 y) {
     if (idx < 0) {
         idx = 0;

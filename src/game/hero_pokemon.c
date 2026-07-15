@@ -1607,7 +1607,7 @@ asm void fn_801309A0(void) {
 #include "src/game/gs_field_world_fn_801309A0.inc"
 }
 #else
-void fn_801309A0(u32 arg1) {
+void heroPokemonGetPrasle(u32 arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void pokemonCreate(u8* a, u32 b, u32 c, u32 d);
     extern void pokemonSetStatus(u8* a, u32 b, u32 c, u32 d, u32 e);
@@ -1617,12 +1617,12 @@ void fn_801309A0(u32 arg1) {
     extern void pokemonResetBasisStatus(u8* a);
     extern void memoDataSet(u32 a, u8* b);
     extern void heroGetPokemon(u32 a, u8* b, u32 c);
-    u8 local[0x144];
-    u32 tmp;
+    u8 local[0x13c];
+    u32 msg, tmp;
     pokemonCreate(local, 0x161, 0xd, gamedataGetStatus(0, 1));
     pokemonSetStatus(local, 0, 0x99, 0, 0x46);
-    tmp = GSmsgGetGSchar(0x12ac);
-    pokemonSetCatchStatus(local, 0xfe, 0xd, 4, 0, 0x911D, tmp);
+    msg = GSmsgGetGSchar(0x12ac);
+    pokemonSetCatchStatus(local, 0xfe, 0xd, 4, 0, 0x911D, msg);
     tmp = pokemonCreateRndFit(local, -1, -1, 0, 0x911D);
     pokemonSetStatus(local, 0, 0x6f, 0, tmp);
     pokemonResetBasisStatus(local);

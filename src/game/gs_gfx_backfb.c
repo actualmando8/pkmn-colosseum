@@ -474,18 +474,47 @@ extern u32 lbl_8047AB3C;
 extern u32 GStextureUnlockImage(void*);
 extern u8 lbl_80400EE0[];
 extern u8 lbl_8047AAE0;
-#if 0
-asm void GSgfxEndBackFBCapture(void) {
-#include "src/game/gs_render_GSgfxEndBackFBCapture.inc"
-}
-#else
-void GSgfxEndBackFBCapture(void) {
-    if (lbl_8047AAE0 != 0) {
-        GStextureUnlockImage(lbl_80400EE0);
-        lbl_8047AAE0 = 0;
+typedef struct GSbackFBCapture {
+    u8 active;
+    u8 _pad[3];
+    void* texture;
+    void* callback;
+    void* userData;
+    u32 param;
+} GSbackFBCapture;
+
+u32 GSgfxEndBackFBCapture(void* texture) {
+    GSbackFBCapture* capture;
+    u32 i;
+
+    capture = (GSbackFBCapture*)lbl_80400EE0;
+    if (capture->active != 1 || capture->texture != texture) {
+        capture++;
+        if (capture->active != 1 || capture->texture != texture) {
+            capture++;
+            if (capture->active != 1 || capture->texture != texture) {
+                capture++;
+                if (capture->active != 1 || capture->texture != texture) {
+                    capture = 0;
+                }
+            }
+        }
     }
+    if (capture == 0) {
+        return 0;
+    }
+
+    GStextureUnlockImage(capture->texture);
+    capture->active = 0;
+    lbl_8047AAE0 = 0;
+    for (i = 0; i < 4; i++) {
+        if (((GSbackFBCapture*)lbl_80400EE0)[i].active == 1) {
+            lbl_8047AAE0 = 1;
+            break;
+        }
+    }
+    return 1;
 }
-#endif
 
 extern void GStextureGetFormat(void);
 extern void GStextureSetWrap(void);
@@ -508,6 +537,7 @@ void GSgfxBeginBackFBCapture(void) {
 }
 #endif
 
+
 extern u8 lbl_8047AAE0;
 #if 0
 asm void GSgfxBackFBInit__Fv(void) {
@@ -522,4 +552,3 @@ void GSgfxBackFBInit__Fv(void) {
     lbl_80400EE0[0x3c] = 0;
 }
 #endif
-

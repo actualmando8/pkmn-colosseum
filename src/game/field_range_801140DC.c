@@ -94,8 +94,22 @@ void fn_801141D8(u32 texture, u32 palette, u8 textureSlot) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void EvlogSet__FScUl(void) {
-    /* TODO: match -- 92 bytes at 0x801141F8 */
+#pragma peephole off
+void EvlogSet__FScUl(s8 event, u32 value) {
+#pragma optimization_level 4
+    typedef struct EvlogEntry {
+        s8 event;
+        u8 padding[3];
+        u32 value;
+    } EvlogEntry;
+    extern EvlogEntry lbl_8035B818[];
+    extern s8 lbl_8047AD60;
+    s8 index = lbl_8047AD60;
+
+    lbl_8035B818[index].event = event;
+    lbl_8035B818[index].value = value;
+    lbl_8047AD60++;
+    lbl_8047AD60 %= 10;
 }
 #pragma pop
 

@@ -205,9 +205,28 @@ void fadeEffectHookFunction_boss_Init(s32 slot, f32 z) {
  * fadeEffectHookFunction_yoko_or_tate_or_ball_Init - Grid set slot full position.
  * Address: 0x801C4904 | Size: 0x70
  */
+#pragma scheduling off
 void fadeEffectHookFunction_yoko_or_tate_or_ball_Init(s32 slot, f32 x, f32 y, f32 z) {
-    /* Set full XYZ position for slot */
+    extern s32 fn_801C6908(s32);
+    extern void fn_801C5F6C(void);
+    extern void fn_801C5ED0(void);
+    extern void fn_801C5898(void);
+    s32 result = fn_801C6908(3);
+
+    switch (result) {
+    case 0:
+        fadeSetFunctionOnly((s32)fn_801C5F6C);
+        break;
+    case 1:
+        fadeSetFunctionOnly((s32)fn_801C5ED0);
+        break;
+    case 2:
+    default:
+        fadeSetFunctionOnly((s32)fn_801C5898);
+        break;
+    }
 }
+#pragma scheduling on
 
 /**
  * fadeEffectHookFunction_ball_Init - Grid get slot rotation.

@@ -1125,3 +1125,79 @@ s32 fn_800411EC(void)
 {
     return lbl_803A6818.field_28;
 }
+
+#pragma peephole off
+void fn_80041B5C(PdaSprite* sprite, PdaEvent* event)
+{
+    extern f32 lbl_8047BCA0;
+    extern void fn_800411FC(PdaSprite* sprite, PdaEvent* event);
+
+    sprite->alphaByte = lbl_8047BCA0 * *(f32*)((u8*)&lbl_803A6818 + 0x4c);
+    switch (event->messageId) {
+    case 0x331:
+    case 0x759:
+    case 0x76a:
+    case 0xfbe:
+        break;
+    default:
+        fn_800411FC(sprite, event);
+        break;
+    }
+}
+#pragma peephole reset
+
+#pragma peephole off
+void fn_80043CD8(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern u8 lbl_802EF0A8[];
+    extern f32 lbl_8047BCA0;
+    extern f32 lbl_8047BCF4;
+    f32 f0;
+    f32 f3;
+    s32 count_m1;
+
+    alphaSprite->alphaByte = lbl_8047BCA0 * *(f32*)((u8*)&lbl_803A6818 + 0x4c);
+    if (lbl_803A6818.field_10 > 10) {
+        sprite->flags = sprite->flags | 2;
+    } else {
+        sprite->flags = sprite->flags & ~2;
+        return;
+    }
+    f0 = *(f32*)((u8*)&lbl_803A6818 + 0x30);
+    count_m1 = lbl_803A6818.field_10 - 1;
+    f3 = -f0 / (f32)count_m1;
+    sprite->field_52 = (s16)(f3 / lbl_8047BCF4 *
+                                  *(s16*)(lbl_802EF0A8 + 0x5788) +
+                              *(s16*)(lbl_802EF0A8 + 0x5784));
+}
+#pragma peephole reset
+
+#pragma peephole off
+void fn_80043EC8(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern u8 lbl_802EF0A8[];
+    extern f32 lbl_8047BCA0;
+    extern f32 lbl_8047BCA4;
+    extern f32 lbl_8047BCA8;
+    extern f32 lbl_8047BD0C;
+    extern f64 sin(f64 angle);
+    f32 f0;
+    f32 f1;
+    f32 f3;
+
+    alphaSprite->alphaByte = lbl_8047BCA0 * *(f32*)((u8*)&lbl_803A6818 + 0x4c);
+    if (*(s32*)&lbl_803A6818 != 0) {
+        sprite->flags = sprite->flags | 2;
+    } else {
+        sprite->flags = sprite->flags & ~2;
+        return;
+    }
+    f0 = lbl_8047BCA8 * *(f32*)((u8*)&lbl_803A6818 + 0x40);
+    f0 = lbl_8047BCA8 * f0;
+    f1 = lbl_8047BCA4 * f0 + lbl_8047BCA4;
+    f1 = (f32)sin(f1);
+    f3 = f1;
+    sprite->field_52 = (s16)(lbl_8047BD0C * f3 +
+                              (f32)(s32)*(s16*)(lbl_802EF0A8 + 0x57bc));
+}
+#pragma peephole reset

@@ -8,8 +8,43 @@ extern u32 gDBCommTable[];
 /* "%s\n" */
 extern char lbl_8026FB94[];
 
+/* TRK_main - 0x800C33BC | size 0x58 | scope global */
+void TRK_main(void) {
+    s32 error;
+    extern void MWTRACE(s32 level, const char* fmt, ...);
+    extern s32 TRKInitializeNub(void);
+    extern void TRKNubWelcome(void);
+    extern void TRKNubMainLoop(void);
+    extern s32 TRKTerminateNub(void);
+    extern s32 TRK_mainError[];
+
+    MWTRACE(1, "TRK_Main \n");
+    error = TRKInitializeNub();
+    TRK_mainError[0] = error;
+    if (error == 0) {
+        TRKNubWelcome();
+        TRKNubMainLoop();
+    }
+    error = TRKTerminateNub();
+    TRK_mainError[0] = error;
+}
+
 /* TRKUARTInterruptHandler - 0x800C349C | size 0x4 | scope global (empty, returns void) */
 void TRKUARTInterruptHandler(void) {
+}
+
+/* InitializeProgramEndTrap - 0x800C34A0 | size 0x58 | scope global */
+void InitializeProgramEndTrap(void) {
+    extern void fn_80003488(void* dst, const void* src, u32 size);
+    extern void ICInvalidateRange(void* addr, u32 size);
+    extern void DCFlushRange(void* addr, u32 size);
+    extern void PPCHalt(void);
+    extern u32 EndofProgramInstruction[];
+    u32* halt = (u32*)PPCHalt;
+
+    fn_80003488(halt + 1, EndofProgramInstruction, 4);
+    ICInvalidateRange(halt + 1, 4);
+    DCFlushRange(halt + 1, 4);
 }
 
 /* TRK_board_display - 0x800C34F8 | size 0x30 | scope global */

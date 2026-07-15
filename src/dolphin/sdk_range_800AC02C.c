@@ -17,6 +17,8 @@
 
 typedef void (*CARDCallback)(s32 chan, s32 result);
 
+typedef void (*CARDCallback)(s32 chan, s32 result);
+
 typedef struct AIDmaRegisters {
     /* 0x00 */ u16 startHi;
     /* 0x02 */ u16 startLo;
@@ -1739,6 +1741,7 @@ void __CARDExtHandler(s32 chan) {
 #pragma optimize_for_size on
 void __CARDTxHandler(s32 chan) {
     BOOL error;
+    BOOL unlocked = FALSE;
     CARDControl* card;
     CARDCallback callback;
 

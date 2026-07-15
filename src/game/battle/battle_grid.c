@@ -40,7 +40,7 @@ extern void  fn_80362E40(void* jobj, f32 frame);            /* HSD_JObjReqAnimAl
  * type here too, as in the original monolithic file). */
 typedef struct BattleGridGroupEntry {
     u8* slot;
-    u8 pad_04[8];
+    u8* pokemon[2];
     u16 memberCount;
     u8 arg1;
     u8 arg2;
@@ -49,6 +49,7 @@ typedef struct BattleGridGroupEntry {
 typedef struct BattleGridGroupTable {
     BattleGridGroupEntry entries[4];
     u16 count;
+    u16 pokemonCount;
 } BattleGridGroupTable;
 
 /**
@@ -197,29 +198,25 @@ void battleGridGetNormalisedScale(void) {
  * fn_801C3C98; confirmed name -- naming pass 2026-07-07).
  * Address: 0x801C3C98 | Size: 0xCC
  */
-void battleGridRemovePokemon(s32 slot) {
-    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
-    BattleGridSceneSlot* slotData;
+void battleGridRemovePokemon(u8* pokemon) {
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern void fn_801DA4E8(void*, u32);
+    BattleGridGroupEntry* group = lbl_80466DE8.entries;
+    u16 i;
+    u16 j;
 
-    if (slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
-        return;
-    }
-
-    slotData = &state->slots[slot];
-
-    /* Update slot state: apply position, rotation, and scale to JObj */
-    {
-        void* jobj = slotData->jobj;
-        if (jobj != NULL) {
-            f32 x = slotData->posX;
-            f32 y = slotData->posY;
-            f32 z = slotData->posZ;
-            f32 rot = slotData->rotationY;
-            f32 scale = slotData->scale;
-
-            fn_8036A384(jobj, x, y, z);
-            fn_8036A2D8(jobj, 0.0f, rot, 0.0f);
-            fn_8036A478(jobj, scale, scale, scale);
+    if (pokemon != NULL) {
+        for (i = 0; i < 4; i++, group++) {
+            for (j = 0; j < 2; j++) {
+                if (group->pokemon[j] == pokemon) {
+                    group->pokemon[j] = NULL;
+                    group->memberCount--;
+                    lbl_80466DE8.pokemonCount--;
+                    fn_801DA4E8(pokemon, 0);
+                    pokemon[0x76] = 0;
+                    return;
+                }
+            }
         }
     }
 }
@@ -230,15 +227,30 @@ void battleGridRemovePokemon(s32 slot) {
  * Proposed name from symbols: battleGridReplacePokemon.
  * Removes the current Pokemon model from a slot and loads a new one.
  */
-void battleGridReplacePokemon(void* model) {
-    /* Replace Pokemon model in a grid slot:
-     * 1. Find the slot this model belongs to
-     * 2. Remove the current Pokemon JObj
-     * 3. Load the new Pokemon JObj from model data
-     * 4. Apply the slot's current transform
-     */
-    if (model == NULL) {
+void battleGridReplacePokemon(u8* pokemon, u8* replacement) {
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern char lbl_80275808[];
+    extern void GSlogWrite(const char*, ...);
+    extern void fn_801DA4E8(void*, u32);
+    BattleGridGroupEntry* group = lbl_80466DE8.entries;
+    u16 i;
+    u16 j;
+
+    if (pokemon == NULL || replacement == NULL) {
+        GSlogWrite(lbl_80275808);
         return;
+    }
+
+    for (i = 0; i < 4; i++, group++) {
+        for (j = 0; j < 2; j++) {
+            if (group->pokemon[j] == pokemon) {
+                group->pokemon[j] = replacement;
+                fn_801DA4E8(pokemon, 0);
+                replacement[0x76] = pokemon[0x76];
+                pokemon[0x76] = 0;
+                return;
+            }
+        }
     }
 }
 
@@ -247,24 +259,35 @@ void battleGridReplacePokemon(void* model) {
  * from fn_801C3E3C; confirmed name -- naming pass 2026-07-07).
  * Address: 0x801C3E3C | Size: 0xD4
  */
-void battleGridAddPokemon(s32 slot, s32 animType) {
-    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
-    BattleGridSceneSlot* slotData;
+void battleGridAddPokemon(u8* slot, u8* pokemon) {
+    extern BattleGridGroupTable lbl_80466DE8;
+    BattleGridGroupTable* table = &lbl_80466DE8;
+    BattleGridGroupEntry* group = table->entries;
+    u16 i;
+    u16 j;
 
-    if (slot < 0 || slot >= BATTLE_TOTAL_POKEMON) {
-        return;
-    }
-
-    slotData = &state->slots[slot];
-
-    /* Set animation transition type for the slot model */
-    slotData->animType = animType;
-
-    /* Request the animation on the slot's JObj */
-    {
-        void* jobj = slotData->jobj;
-        if (jobj != NULL) {
-            fn_80362E40(jobj, 0.0f); /* HSD_JObjReqAnimAll */
+    if (slot != NULL) {
+        if (pokemon == NULL) {
+            return;
+        }
+        if (table->pokemonCount >= 8) {
+            return;
+        }
+        for (i = 0; i < 4; i++, group++) {
+            if (group->slot == slot) {
+                if (group->memberCount >= 2) {
+                    return;
+                }
+                for (j = 0; j < 2; j++) {
+                    if (group->pokemon[j] == NULL) {
+                        group->pokemon[j] = pokemon;
+                        group->memberCount++;
+                        table->pokemonCount++;
+                        pokemon[0x76] = group->arg1 != 0 ? -1 : 1;
+                        return;
+                    }
+                }
+            }
         }
     }
 }
@@ -274,12 +297,27 @@ void battleGridAddPokemon(s32 slot, s32 animType) {
  * Address: 0x801C3F10 | Size: 0xAC
  * Proposed name from symbols: battleGridReplaceTrainer.
  */
-void battleGridReplaceTrainer(void* model) {
-    /* Replace trainer model in a grid slot:
-     * Similar to battleGridReplacePokemon but for trainer models.
-     */
-    if (model == NULL) {
+void battleGridReplaceTrainer(u8* trainer, u8* replacement) {
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern char lbl_80275830[];
+    extern void GSlogWrite(const char*, ...);
+    extern void fn_801DA4E8(void*, u32);
+    BattleGridGroupEntry* group = lbl_80466DE8.entries;
+    u16 i;
+
+    if (trainer == NULL || replacement == NULL) {
+        GSlogWrite(lbl_80275830);
         return;
+    }
+
+    for (i = 0; i < 4; i++, group++) {
+        if (group->slot == trainer) {
+            group->slot = replacement;
+            fn_801DA4E8(trainer, 0);
+            replacement[0x76] = trainer[0x76];
+            trainer[0x76] = 0;
+            return;
+        }
     }
 }
 

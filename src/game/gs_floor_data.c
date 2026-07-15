@@ -45,21 +45,50 @@ extern u32 lbl_8047ACA8;
 extern u32 lbl_8047ACB0;
 extern u32 lbl_8047ACB4;
 extern u32 lbl_8047ACB8;
+extern u32 lbl_8047ACC0;
 extern u32 lbl_8047ACC4;
 extern u32 lbl_8047ACC8;
+extern GSFloorResource* lbl_8047ACCC;
 extern u32 lbl_8047ACD8;
 extern u32 lbl_8047ACDC;
 extern u32 lbl_8047ACE0;
 extern GSFloorResHandler lbl_80404918[];
 
 /* 0x800FF0A0 | 0xD8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_800FF0A0(void) {
-    /* TODO: match -- 216 bytes at 0x800FF0A0 */
+void fn_800FF0A0(u32 callback) {
+    GSFloorResource* resource;
+    u32 remaining;
+
+    resource = (GSFloorResource*)lbl_8047ACB0;
+    remaining = lbl_8047ACC0;
+    while (remaining-- != 0) {
+        if ((s32)resource->active == 3 &&
+            resource->callback == (void*)callback) {
+            goto found;
+        }
+        resource++;
+    }
+    resource = NULL;
+
+found:
+    if (resource != NULL) {
+        if ((s32)resource->status == 1 && resource->modelHandle != NULL) {
+            fn_800F7274(resource->textureHandle);
+        }
+        resource->active = 0;
+        if (resource->prev != NULL) {
+            resource->prev->next = resource->next;
+        }
+        if (resource->next != NULL) {
+            resource->next->prev = resource->prev;
+        }
+        if (lbl_8047ACCC == resource) {
+            lbl_8047ACCC = resource->next;
+        }
+        resource->prev = NULL;
+        resource->next = NULL;
+    }
 }
-#pragma pop
 
 /* 0x800FF178 | 0x128 */
 #pragma push

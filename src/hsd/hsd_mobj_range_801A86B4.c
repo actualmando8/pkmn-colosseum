@@ -11,6 +11,7 @@
 /* Object / class helpers (DTK names). */
 extern void  fn_801A6960(void* ptr);   /* HSD_MemFree  */
 extern void* fn_801A6928(s32 size);    /* HSD_MemAlloc */
+extern void  __assert(const char* file, u32 line, const char* expression);
 extern void  hsdInitClassInfo(void* info, void* parent, const char* library,
                               const char* name, u32 size, u32 flags);
 
@@ -19,8 +20,11 @@ extern void* lbl_8047B2E0;           /* free-list pool chain head (sbss) */
 extern u8    lbl_8036CBF0[];         /* data heap descriptor             */
 extern u8    lbl_8036CC00[];         /* data class info                  */
 extern u8    lbl_8036C638[];         /* data parent class info           */
+extern u32   lbl_8036CC40[];         /* performance counters             */
 extern const char lbl_80274EC8[];    /* rodata string                    */
 extern const char lbl_8047DCA0;      /* sdata2 string                    */
+extern const char lbl_8047DCA8;      /* sdata2 string                    */
+extern const char lbl_8047DCB0;      /* sdata2 string                    */
 
 /* Address: 0x801A9570 | Size: 0x1C  -- already-banked (GC/1.3, calibration) */
 void HSD_MtxGetTranslate(f32 mtx[3][4], f32* vec) {
@@ -86,4 +90,13 @@ void ObjInfoInit_801AA568(void)
     hsdInitClassInfo((void*) lbl_8036CC00,
                      (void*) lbl_8036C638, (char*) lbl_80274EC8,
                      (char*) &lbl_8047DCA0, 0x3c, 0x8);
+}
+
+/* Address: 0x801AA5AC | Size: 0x5C */
+void fn_801AA5AC(s32 n)
+{
+    if (n >= 32) {
+        __assert(&lbl_8047DCA8, 0xA4, &lbl_8047DCB0);
+    }
+    lbl_8036CC40[n + 4] += 1;
 }

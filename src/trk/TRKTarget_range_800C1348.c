@@ -119,6 +119,94 @@ void TRKTargetAddStopInfo(s32 arg) {
     TRKAppendBuffer_ui8(arg, buf, 0x40);
 }
 
+/* TRKPostInterruptEvent - 0x800C195C | size 0xAC | scope global */
+void TRKPostInterruptEvent(void) {
+    u32 instruction;
+    u8 event[0xC];
+    s32 eventType;
+
+    extern void fn_800BE464(void* event, s32 type);
+    extern s32 TRKPostEvent(void* event);
+
+    if (*(s32*)&gTRKState[0x9C] != 0) {
+        *(s32*)&gTRKState[0x9C] = 0;
+    } else {
+        s32 exceptionID = *(s32*)&gTRKCPUState[0x2F8] & 0xFFFF;
+
+        switch (exceptionID) {
+        case 0x700:
+        case 0xD00:
+            TRKTargetReadInstruction((u8*)&instruction, *(u32*)&gTRKCPUState[0x80]);
+            if (instruction == 0x0FE00000) {
+                eventType = 5;
+            } else {
+                eventType = 3;
+            }
+            break;
+        default:
+            eventType = 4;
+            break;
+        }
+        fn_800BE464(event, eventType);
+        TRKPostEvent(event);
+    }
+}
+
+/* TRKTargetAccessDefault - 0x800C24BC | size 0xF4 | scope global */
+s32 TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister, s32 buffer,
+                           u32* transferSize, s32 read) {
+    typedef struct TRKExceptionState {
+        u32 words[4];
+    } TRKExceptionState;
+
+    extern s32 TRKAppendBuffer_ui32(s32 buffer, u32* data, u32 count);
+    extern s32 TRKReadBuffer_ui32(s32 buffer, u32* data, u32 count);
+    extern u8 gTRKExceptionStatus_80313824[];
+
+    s32 result;
+    u32 registerCount;
+    u32* registers;
+    TRKExceptionState savedState;
+
+    if (lastRegister > 0x24) {
+        return 0x701;
+    }
+
+    registerCount = lastRegister - firstRegister + 1;
+    savedState = *(TRKExceptionState*)gTRKExceptionStatus_80313824;
+    gTRKExceptionStatus_80313824[0xD] = 0;
+    registers = (u32*)gTRKCPUState + firstRegister;
+    *transferSize = registerCount * sizeof(u32);
+
+    if (read != 0) {
+        result = TRKAppendBuffer_ui32(buffer, registers, registerCount);
+    } else {
+        result = TRKReadBuffer_ui32(buffer, registers, registerCount);
+    }
+
+    if (gTRKExceptionStatus_80313824[0xD] != 0) {
+        *transferSize = 0;
+        result = 0x702;
+    }
+
+    *(TRKExceptionState*)gTRKExceptionStatus_80313824 = savedState;
+    return result;
+}
+
+/* TRKTargetReadInstruction - 0x800C25B0 | size 0x4C | scope global */
+s32 TRKTargetReadInstruction(u8* buf, u32 pc) {
+    extern s32 TRKTargetAccessMemory(u8* buf, u32 address, u32* length,
+                                     s32 memorySpace, s32 read);
+
+    u32 length = sizeof(u32);
+    s32 result = TRKTargetAccessMemory(buf, pc, &length, 0, 1);
+
+    if (result == 0 && length != sizeof(u32)) {
+        result = 0x700;
+    }
+    return result;
+}
+
 /* TRKAccessFile - 0x800C29F0 | size: 0x8 | scope global */
 u32 TRKAccessFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
     (void)cmd;

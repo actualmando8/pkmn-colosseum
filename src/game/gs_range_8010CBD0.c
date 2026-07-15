@@ -536,19 +536,57 @@ void fn_8010F320(void) {
 #pragma pop
 
 /* 0x8010F4B8 | 0xEC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-s32 GScolsys2UtilGetCpPlaneLine(void* a, void* b, void* c, void* d, void* e, void* f) {
-    /* TODO: match -- 236 bytes at 0x8010F4B8 */
+s32 GScolsys2UtilGetCpPlaneLine(Vec3f* out, f32* tOut, Vec3f* normal,
+                               Vec3f* planePoint, Vec3f* lineStart,
+                               Vec3f* lineEnd) {
+    Vec3f direction;
+    f32 denominator;
+    f32 t;
+    extern void PSVECSubtract(void*, void*, void*);
+    extern void PSVECScale(void*, void*, f32);
+    extern void PSVECAdd(void*, void*, void*);
+
+    PSVECSubtract(lineEnd, lineStart, &direction);
+    denominator = normal->x * direction.x + normal->y * direction.y
+                + normal->z * direction.z;
+    if (denominator == 0.0f) {
+        return 0;
+    }
+
+    t = (normal->x * (planePoint->x - lineStart->x)
+       + normal->y * (planePoint->y - lineStart->y)
+       + normal->z * (planePoint->z - lineStart->z)) / denominator;
+    PSVECScale(&direction, &direction, t);
+    PSVECAdd(&direction, lineStart, out);
+    *tOut = t;
+    return 1;
 }
-#pragma pop
 
 /* 0x8010F5A4 | 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-f32 GScolsys2UtilGetCpLinePoint(void* out, void* start, void* end, void* point) {
-    /* TODO: match -- 252 bytes at 0x8010F5A4 */
+f32 GScolsys2UtilGetCpLinePoint(Vec3f* out, Vec3f* start, Vec3f* end,
+                               Vec3f* point) {
+    Vec3f direction;
+    f32 lengthSquared;
+    f32 t;
+    extern void PSVECSubtract(void*, void*, void*);
+    extern void PSVECScale(void*, void*, f32);
+    extern void PSVECAdd(void*, void*, void*);
+    extern const f32 lbl_8047CF10;
+
+    PSVECSubtract(end, start, &direction);
+    lengthSquared = direction.x * direction.x + direction.y * direction.y
+                  + direction.z * direction.z;
+    if (lbl_8047CF10 == lengthSquared) {
+        out->x = start->x;
+        out->y = start->y;
+        out->z = start->z;
+        return lbl_8047CF10;
+    }
+
+    t = (direction.x * (point->x - start->x)
+       + direction.y * (point->y - start->y)
+       + direction.z * (point->z - start->z)) / lengthSquared;
+    PSVECScale(&direction, &direction, t);
+    PSVECAdd(&direction, start, out);
+    return t;
 }
-#pragma pop
