@@ -341,12 +341,16 @@ void _HSD_RandForgetMemory(void)
 #pragma peephole off
 s32 fn_801ADC3C(s32 max)
 {
+    s32* state;
+    volatile s32* state_v;
     s32 rand;
 
-    rand = ((s32*)lbl_80478C94)[0];
-    rand = (rand * 0x343fd) + 0x269fc3;
-    ((s32*)lbl_80478C94)[0] = rand;
-    return (s32)(((s32)max * (s16)(((s32*)lbl_80478C94)[0] >> 16)) / 0x10000);
+    state = (s32*) *(void* volatile*) &lbl_80478C94;
+    state_v = (s32*) *(void* volatile*) &lbl_80478C94;
+    rand = (*state * 0x343fd) + 0x269EC3;
+    *state_v = rand;
+
+    return (s32)(((s32)max * (s32)(*(u32*) *(void* volatile*) &lbl_80478C94 >> 16)) / 0x10000);
 }
 #pragma pop
 
@@ -378,12 +382,12 @@ u32 fn_801ADCD8(void)
     volatile u32* state_v;
     u32 next;
 
-    state = (u32*)lbl_80478C94;
-    state_v = (u32*)lbl_80478C94;
+    state = (u32*) *(void* volatile*) &lbl_80478C94;
+    state_v = (u32*) *(void* volatile*) &lbl_80478C94;
     next = (*state * 0x343fd) + 0x269ec3;
     *state_v = next;
 
-    return *(u32*)lbl_80478C94 >> 16;
+    return *(u32*) *(void* volatile*) &lbl_80478C94 >> 16;
 }
 #pragma pop
 

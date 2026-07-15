@@ -150,22 +150,27 @@ u32 sndStreamAllocLength(u32 num, u32 flags);
 u32 sndStreamActivate(u32 stid);
 void sndStreamDeactivate(u32 stid);
 
-/* PARKED at ~59% (2026-07-02): logic is correct (verified via
- * objdiff instruction dump) but MWCC's loop unroller picks a different
- * exact micro-shape for the tiny `for (i=0;i<voiceNum;++i) state=0;`
- * body than our target: target tracks processed-count and computes the
- * by-8 remainder via `subf` after the unrolled block, ours computes the
- * remainder up front via `andi. r0,voiceNum,7`. Tried: s32 vs u32 loop
- * var, array-index vs pointer-increment body -- neither changes the
- * unroll shape MWCC picks. Everything else in the function (globals,
- * struct offsets, nextPublicID/streamCallCnt/streamCallDelay stores)
- * matches target byte-for-byte; only the remainder-computation sequence
- * inside the unrolled loop differs. */
+/* Improved 2026-07-14 from ~59% to 91.17%: caching `synthInfo->voiceNum`
+ * into a local `s32 n` (declared before the loop var `i`, also s32) up
+ * front makes MWCC's unroller pick the SAME by-8 group-count preamble as
+ * the target (cmpwi/subi/addi/srwi/mtctr chain matches exactly, and the
+ * post-loop `subf`/`cmpw` remainder-tracking sequence now matches too).
+ * Remaining gap is register-allocation only: target reloads
+ * `synthInfo->voiceNum` a second time (fresh `lbz`) after the unrolled
+ * block for the remainder-loop bound instead of reusing the cached
+ * value, plus a handful of r3/r4/r5/r6/r7 swaps in the zero-store
+ * unrolled body. Tried and reverted: u8 loop var (26.91%), scoped
+ * `#pragma peephole off` (36.62%), pointer-bump body via STREAM_INFO*
+ * si (58.3%), i++ vs ++i (no change). Don't re-grind past 91.17% without
+ * a new lever for the compiler-forced double-load of a memory-resident
+ * loop bound. */
 void fn_8014DDD8(void) {
-  u32 i;
+  s32 n;
+  s32 i;
   streamCallCnt = 0;
   streamCallDelay = 3;
-  for (i = 0; i < synthInfo->voiceNum; ++i) {
+  n = synthInfo->voiceNum;
+  for (i = 0; i < n; ++i) {
     streamInfo[i].state = 0;
   }
   nextPublicID = 0;

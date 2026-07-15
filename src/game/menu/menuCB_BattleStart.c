@@ -36,7 +36,7 @@ extern MenuCBBattleStartState lbl_803A9A60;
 extern void fn_8005DFC8(void* arg);
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 void fn_8005E690(MenuCBBattleStartButton* button) {
     extern void menuButtonNormal(void* button);
 
@@ -65,6 +65,8 @@ void fn_8005E730(void* arg) {
     fn_8005DFC8(arg);
 }
 
+#pragma push
+#pragma peephole off
 s32 fn_8005E750(MenuCBBattleStartParams* params) {
     extern void menuCBBattleStartInit(void* params, s32 mode);
     extern void menuSetEnablePort(s32 enabled);
@@ -81,12 +83,13 @@ s32 fn_8005E750(MenuCBBattleStartParams* params) {
     lbl_803A9A60.status = 0;
 
     switch (params->mode) {
-    case 2:
-        return 0xC6;
     default:
         return 0xC4;
+    case 2:
+        return 0xC6;
     }
 }
+#pragma pop
 
 s32 menuCBBattleStartGetStatus(void) {
     MenuCBBattleStartState* state = &lbl_803A9A60;
@@ -210,9 +213,9 @@ s32 fn_80062284(s32 trainer) {
     extern void* toolentryTaisenGetEntryPokemonPtr(s32 trainer, s32 index);
     extern u8 pokemonCheckValid(void* pokemon);
     extern u8 pokemonGetStatus(void* pokemon, s32 index, s32 status, s32 subindex);
+    void* pokemon;
     u16 count;
     s32 i;
-    void* pokemon;
 
     count = toolentryTaisenGetEntryPokemonNum(trainer);
     for (i = 0; i < count; i++) {

@@ -21,7 +21,7 @@ extern const f32 lbl_8047E114;
 
 /* ===== Engine / hero helpers ===== */
 extern void* heroGetStatus(void* ptr, u32 a, u32 b);
-extern void  heroSetStatus(u8* ptr, u32 a, u32 b);
+extern u32   heroSetStatus(u8* ptr, u32 a, u32 b);
 extern void  heroAddPokecoupon(u8* ptr, s32 offset);
 extern void  heroDecPokecoupon(u8* ptr, s32 offset);
 extern void  heroAddPokedoru(u8* ptr, u32 offset);
@@ -32,7 +32,7 @@ extern void* savedataGetStatus(u32 side, u32 slotType);
 
 /* ===== Flag helpers ===== */
 extern s32 fn_801906A0(u32 flag);
-extern void _flagSet(u32 flag, s32 value);
+extern s32  _flagSet(u32 flag, s32 value);
 
 /* ===== Pokemon helpers ===== */
 extern u32  pokemonCheckValid(void* mon);
@@ -68,58 +68,73 @@ extern void etctoolSetPokemonNakigoe();
 u32 scriptAddPokecoupon(s32 delta)
 {
     heroGetStatus((u8*)0, 0xd, 0);
-    if (delta < 0) {
-        heroDecPokecoupon((u8*)0, -delta);
-    } else {
+    if (delta >= 0) {
         heroAddPokecoupon((u8*)0, delta);
+    } else {
+        heroDecPokecoupon((u8*)0, -delta);
     }
     return (u32)heroGetStatus((u8*)0, 0xd, 0);
 }
 
+#pragma push
+#pragma scheduling off
 u32 fn_801CA858(u32 arg)
 {
-    heroSetStatus((u8*)0, 0xd, arg);
-    return arg;
+    return heroSetStatus((u8*)0, 0xd, arg);
 }
+#pragma pop
 
+#pragma push
+#pragma scheduling off
 u32 fn_801CA884(void)
 {
     return (u32)heroGetStatus((u8*)0, 0xd, 0);
 }
+#pragma pop
 
+#pragma push
+#pragma scheduling off
 s32 scriptAddPremium(s32 delta)
 {
     s32 newVal = fn_801906A0(0xa9e) + delta;
     _flagSet(0xa9e, newVal);
     return newVal;
 }
+#pragma pop
 
+#pragma push
+#pragma scheduling off
 s32 scriptSetPremium(s32 value)
 {
-    _flagSet(0xa9e, value);
-    return value;
+    return _flagSet(0xa9e, value);
 }
+#pragma pop
 
+#pragma push
+#pragma scheduling off
 s32 scriptGetPremium(void)
 {
     return fn_801906A0(0xa9e);
 }
+#pragma pop
 
 u32 scriptAddPokedoru(s32 delta)
 {
-    heroGetStatus((u8*)0, 0xc, 0);
-    if (delta < 0) {
-        heroDecPokedoru((u8*)0, -delta);
-    } else {
+    if (delta >= 0) {
         heroAddPokedoru((u8*)0, delta);
+    } else {
+        heroDecPokedoru((u8*)0, -delta);
     }
     return (u32)heroGetStatus((u8*)0, 0xc, 0);
 }
 
+#pragma push
+#pragma scheduling off
 u32 scriptGetPokedoru(void)
 {
     return (u32)heroGetStatus((u8*)0, 0xc, 0);
 }
+#pragma pop
 
 s32 scriptSetEventCol(u8 enable)
 {
@@ -142,18 +157,24 @@ s32 scriptSetEventColID(s32 id)
     return old;
 }
 
+#pragma push
+#pragma scheduling off
 s32 scriptSetCol(s32 index, u8 enable)
 {
     if (index >= 0) {
-        GScolsys2SetObjEnable(index, enable);
+        index = GScolsys2SetObjEnable(index, enable);
     }
     return index;
 }
+#pragma pop
 
+#pragma push
+#pragma scheduling off
 u32 scriptHaveItem(u16 itemId)
 {
     return heroItemCheckHaveItemDataId((u8*)0, itemId) & 0xFF;
 }
+#pragma pop
 
 u32 scriptAddItem(u16 itemId, s32 count)
 {
@@ -166,10 +187,13 @@ u32 scriptAddItem(u16 itemId, s32 count)
     return ret;
 }
 
+#pragma push
+#pragma scheduling off
 u32 scriptGetItem(s32 a, s32 b)
 {
     return floorEventGetTresure(4, a, b);
 }
+#pragma pop
 
 u32 scriptCheckTemochiPokemon(u8* arg)
 {
@@ -228,13 +252,17 @@ void scriptStoreTemochiPokemon(u8* arg)
         {
             void* mon = heroGetStatus(arg, 3, i);
             if (mon != NULL && pokemonCheckValid(mon) != 0) {
-                entry[i].field_4 = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
-                entry[i].field_0 = pokemonGetStatus(mon, 0, 0x6f, 0);
+                u16 nakigoe = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
+                u32 pid = pokemonGetStatus(mon, 0, 0x6f, 0);
+                entry[i].field_4 = nakigoe;
+                entry[i].field_0 = pid;
             }
         }
     }
 }
 
+#pragma push
+#pragma scheduling off
 u32 scriptGetEarthRibbon(void)
 {
     void* status = savedataGetStatus(0, 2);
@@ -248,16 +276,19 @@ u32 scriptGetEarthRibbon(void)
     }
     return 0;
 }
+#pragma pop
 
 u32 fn_801CADA0(void)
 {
     return 0;
 }
 
+#pragma push
+#pragma scheduling off
 void* fn_801CADA8(u8 kind)
 {
-    void* status = savedataGetStatus(0, 2);
     void* result = NULL;
+    void* status = savedataGetStatus(0, 2);
 
     switch (kind) {
         case 1:
@@ -281,13 +312,14 @@ void* fn_801CADA8(u8 kind)
     }
     return result;
 }
+#pragma pop
 
 void scriptSetPokemonNakigoe(void) {
     extern void etctoolSetPokemonNakigoe(void);
     etctoolSetPokemonNakigoe();
 }
 
-u32 scriptGetPokemonNickName(u32 slot)
+u32 scriptGetPokemonNickName(s32 slot)
 {
     void* mon;
 
@@ -303,8 +335,8 @@ u32 scriptGetPokemonNickName(u32 slot)
 
 u32 scriptGetDarkPointZeroPokemonNum(void)
 {
-    void* status = savedataGetStatus(0, 2);
     u16 count = 0;
+    void* status = savedataGetStatus(0, 2);
     u16 i;
     f32 zero = lbl_8047E114;
 
@@ -347,6 +379,8 @@ u32 scriptGetPokemonNum(void)
     return count;
 }
 
+#pragma push
+#pragma scheduling off
 u32 floorCharacterSetPos(u32 id, f32 x, f32 y, f32 z)
 {
     f32 pos[3];
@@ -357,6 +391,7 @@ u32 floorCharacterSetPos(u32 id, f32 x, f32 y, f32 z)
     floorCharacterBiosSetPos(bios, pos);
     return 1;
 }
+#pragma pop
 
 #pragma push
 #pragma scheduling off

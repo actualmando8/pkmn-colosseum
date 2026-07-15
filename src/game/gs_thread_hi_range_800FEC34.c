@@ -31,7 +31,7 @@ void fn_800FEC34(u32 callback) {
     u32 i;
 
     resource = lbl_8047ACB0;
-    for (i = 0; i < lbl_8047ACC0; i++) {
+    for (i = lbl_8047ACC0; i > 0; i--) {
         if ((s32)resource->active == 3) {
             if ((u32)resource->callback == callback) {
                 goto found;
@@ -59,7 +59,7 @@ void fn_800FECB8(u32 callback) {
     u32 i;
 
     resource = lbl_8047ACB0;
-    for (i = 0; i < lbl_8047ACC0; i++) {
+    for (i = lbl_8047ACC0; i > 0; i--) {
         if ((s32)resource->active == 3) {
             if ((u32)resource->callback == callback) {
                 goto found;

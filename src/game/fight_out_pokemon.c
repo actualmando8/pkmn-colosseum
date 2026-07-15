@@ -1667,6 +1667,7 @@ void* fightOutPokemonCreateFightActionAttackWaza(void* ctx, u32 p2, u32 p3, u32 
     extern u8 fightActionCreate();
     extern void fightWazaCreate();
     extern void fightActionBiosSetBuffDataId();
+    u16 zokusei = (u16)p6;
     void* result;
     u8 created;
 
@@ -1674,7 +1675,7 @@ void* fightOutPokemonCreateFightActionAttackWaza(void* ctx, u32 p2, u32 p3, u32 
     if (result == NULL) {
         result = NULL;
     } else {
-        fightWazaCreate(result, p8, (u16)p6, p7, p9);
+        fightWazaCreate(result, p8, zokusei, p7, p9);
         result = pokemonGetStatus(ctx, 0, 0xFE, 0);
         if (result == NULL) {
             result = NULL;
@@ -4364,11 +4365,11 @@ char fightWazaIsMix(u32 ctx)
     extern StatusIdTable7 lbl_80279D08;
     extern u16 fn_80119ED0();
     extern u8 fn_8011B67C();
+    u16 i;
     u16 statusId;
     u16 mixCount;
     u16 statusType;
     u8 isMix;
-    u16 i;
     StatusIdTable7 statusIds;
     u16* idTable;
 

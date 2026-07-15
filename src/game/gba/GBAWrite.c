@@ -128,9 +128,9 @@ u32 GBAWrite(int r3, u32 r4, u32 r5) {
     *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
     result = __GBATransfer(idx, 5, 1, (u32)WriteProc);
   }
-  if (result == 0) {
-    result = __GBASync(idx);
+  if (result != 0) {
+    return result;
   }
-  return result;
+  return __GBASync(idx);
 }
 #pragma pop

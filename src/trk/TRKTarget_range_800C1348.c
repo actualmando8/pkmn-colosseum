@@ -172,10 +172,10 @@ s32 TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister, s32 buffer,
         return 0x701;
     }
 
-    registerCount = lastRegister - firstRegister + 1;
     savedState = *(TRKExceptionState*)gTRKExceptionStatus_80313824;
     gTRKExceptionStatus_80313824[0xD] = 0;
     registers = (u32*)gTRKCPUState + firstRegister;
+    registerCount = lastRegister - firstRegister + 1;
     *transferSize = registerCount * sizeof(u32);
 
     if (read != 0) {

@@ -184,10 +184,8 @@ void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT)
 
     m[0][3] = xT;
     m[1][3] = yT;
-    m[0][1] = zero;
-    m[0][2] = zero;
-    m[2][0] = zero;
-    m[2][1] = zero;
+    *(f64*)&m[0][1] = 0.0;
+    *(f64*)&m[2][0] = 0.0;
     m[1][0] = zero;
     m[1][1] = one;
     m[1][2] = zero;
@@ -210,6 +208,20 @@ void PSMTXTransApply(const Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT)
     dst[0][3] = src[0][3] + xT;
     dst[1][3] = src[1][3] + yT;
     dst[2][3] = src[2][3] + zT;
+}
+
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS)
+{
+    f32 zero = lbl_8047C28C;
+
+    m[0][0] = xS;
+    *(f64*)&m[0][1] = 0.0;
+    *(f64*)&m[0][3] = 0.0;
+    m[1][1] = yS;
+    *(f64*)&m[1][2] = 0.0;
+    *(f64*)&m[2][0] = 0.0;
+    m[2][2] = zS;
+    m[2][3] = zero;
 }
 
 #pragma optimize_for_size on
@@ -307,6 +319,18 @@ void C_MTXLightOrtho(Mtx m, f32 top, f32 bottom, f32 left, f32 right,
     m[2][3] = lbl_8047C288;
 }
 #pragma fp_contract reset
+
+void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst)
+{
+    const f64* mPairs = (const f64*)m;
+    const f64* srcPairs = (const f64*)src;
+    f64 xy = srcPairs[0];
+    f32 z = src->z;
+
+    dst->x = (f32)(mPairs[0] * xy + mPairs[1] * (f64)z);
+    dst->y = (f32)(mPairs[2] * xy + mPairs[3] * (f64)z);
+    dst->z = (f32)(mPairs[4] * xy + mPairs[5] * (f64)z);
+}
 
 void PSMTXMultVecSR(const Mtx m, const Vec* src, Vec* dst)
 {
@@ -493,6 +517,15 @@ f32 PSVECMag(Vec* src)
     return mag;
 }
 #pragma scheduling reset
+
+f32 PSVECSquareMag(Vec* src)
+{
+    const f64* srcPairs = (const f64*)src;
+    f64 xy;
+
+    xy = srcPairs[1] * srcPairs[1];
+    return (f32)(srcPairs[0] * srcPairs[0] + xy);
+}
 
 #pragma peephole off
 f32 PSVECDotProduct(Vec* lhs, Vec* rhs)

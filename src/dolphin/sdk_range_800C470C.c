@@ -174,34 +174,124 @@ u64 __div2u(u32 dividendHi, u32 dividendLo, u32 divisorHi, u32 divisorLo) {
     return ((u64)quotientHi << 32) | quotientLo;
 }
 
+u64 __mod2u(u32 dividendHi, u32 dividendLo, u32 divisorHi, u32 divisorLo) {
+    u32 dividendLeading;
+    u32 dividendLowLeading;
+    u32 divisorLeading;
+    u32 divisorLowLeading;
+    u32 dividendBits;
+    u32 divisorBits;
+    u32 shift;
+    u32 count;
+    u32 quotientHi;
+    u32 quotientLo;
+    u32 remainderHi;
+    u32 remainderLo;
+    u32 carry;
+    u32 borrow;
+
+    dividendLeading = __cntlzw(dividendHi);
+    dividendLowLeading = __cntlzw(dividendLo);
+
+    if ((s32)dividendHi == 0) {
+        dividendLeading = dividendLowLeading + 32;
+    }
+
+    divisorLeading = __cntlzw(divisorHi);
+    divisorLowLeading = __cntlzw(divisorLo);
+    if ((s32)divisorHi == 0) {
+        divisorLeading = divisorLowLeading + 32;
+    }
+
+    dividendBits = 64 - dividendLeading;
+    if (dividendLeading > divisorLeading) {
+        return ((u64)dividendHi << 32) | dividendLo;
+    }
+
+    divisorBits = 64 - (divisorLeading + 1);
+    shift = dividendLeading + divisorBits;
+    count = dividendBits - divisorBits;
+
+    if (count >= 32) {
+        remainderLo = dividendHi >> (count - 32);
+        remainderHi = 0;
+    } else {
+        remainderLo = (dividendLo >> count) |
+                      (dividendHi << (32 - count));
+        remainderHi = dividendHi >> count;
+    }
+
+    if (shift >= 32) {
+        quotientHi = dividendLo << (shift - 32);
+        quotientLo = 0;
+    } else {
+        quotientHi = (dividendHi << shift) |
+                     (dividendLo >> (32 - shift));
+        quotientLo = dividendLo << shift;
+    }
+
+    while (count-- != 0) {
+        carry = quotientHi >> 31;
+        quotientHi = (quotientHi << 1) | (quotientLo >> 31);
+        quotientLo <<= 1;
+        remainderHi = (remainderHi << 1) | (remainderLo >> 31);
+        remainderLo = (remainderLo << 1) | carry;
+
+        if (remainderHi > divisorHi ||
+            (remainderHi == divisorHi && remainderLo >= divisorLo)) {
+            borrow = remainderLo < divisorLo;
+            remainderLo -= divisorLo;
+            remainderHi -= divisorHi + borrow;
+            quotientLo |= 1;
+        }
+    }
+
+    return ((u64)remainderHi << 32) | remainderLo;
+}
+
 /*
  * Left shift for a 64-bit value represented as (r3:r4) by r5.
  */
-void fn_800C4C50(u32 r3, u32 r4, u32 r5) {
+u64 fn_800C4C50(u32 r3, u32 r4, u32 r5) {
     u32 r8 = 0x20 - r5;
     u32 r9 = r5 - 0x20;
     u32 r10 = 0;
+    union { struct { u32 hi, lo; } s; u64 v; } ret;
 
-    r3 = (r3 << r5) | (r4 >> r8);
+    r3 = r3 << r5;
+    r10 = r4 >> r8;
+    r3 = r3 | r10;
     r10 = r4 << r9;
     r3 = r3 | r10;
     r4 = r4 << r5;
+
+    ret.s.hi = r3;
+    ret.s.lo = r4;
+    return ret.v;
 }
 
-void fn_800C4C74(u32 r3, u32 r4, u32 r5) {
+u64 fn_800C4C74(u32 r3, u32 r4, u32 r5) {
     u32 r8 = 0x20 - r5;
     u32 r9 = r5 - 0x20;
     u32 r10 = 0;
+    union { struct { u32 hi, lo; } s; u64 v; } ret;
 
-    r4 = (r4 >> r5) | (r3 << r8);
+    r4 = r4 >> r5;
+    r10 = r3 << r8;
+    r4 = r4 | r10;
     r10 = (u32)(r3 >> r9);
     r4 = r4 | r10;
     r3 = r3 >> r5;
+
+    ret.s.hi = r3;
+    ret.s.lo = r4;
+    return ret.v;
 }
 
-void __shr2i(u32 r3, u32 r4, u32 r5) {
+u64 __shr2i(u32 r3, u32 r4, u32 r5) {
     s32 r9;
     u32 r8 = 0x20 - r5;
+    union { struct { u32 hi, lo; } s; u64 v; } ret;
 
     r4 = (r4 >> r5) | (r3 << r8);
     r9 = (s32)r5 - 0x20;
@@ -210,12 +300,15 @@ void __shr2i(u32 r3, u32 r4, u32 r5) {
         r4 |= (u32)((s32)r3 >> r9);
     }
     r3 = (s32)r3 >> r5;
+
+    ret.s.hi = r3;
+    ret.s.lo = r4;
+    return ret.v;
 }
 
 u64 __cvt_dbl_usll(double value) {
     union {
         double value;
-        u64 result;
         struct {
             u32 high;
             u32 low;
@@ -223,36 +316,63 @@ u64 __cvt_dbl_usll(double value) {
     } bits;
     u32 exponent;
     u32 sign;
-    u64 result;
+    u32 hi;
+    u32 lo;
     s32 shift;
+    u32 t8;
+    u32 t9;
+    u32 t10;
+    union { struct { u32 hi, lo; } s; u64 v; } ret;
 
     bits.value = value;
-    exponent = (bits.words.high >> 20) & 0x7FF;
+    hi = bits.words.high;
+    lo = bits.words.low;
+    exponent = (hi >> 20) & 0x7FF;
     if (exponent < 0x3FF) {
         return 0;
     }
 
-    sign = bits.words.high;
-    result = bits.result;
-    result &= 0x000FFFFFFFFFFFFFULL;
-    result |= 0x0010000000000000ULL;
+    sign = hi;
+    hi = (hi & 0xFFFFF) | 0x100000;
     shift = exponent - 0x433;
+
     if (shift < 0) {
-        result >>= -shift;
+        shift = -shift;
+        t8 = 0x20 - shift;
+        t9 = shift - 0x20;
+        lo = lo >> shift;
+        t10 = hi << t8;
+        lo = lo | t10;
+        t10 = hi >> t9;
+        lo = lo | t10;
+        hi = hi >> shift;
     } else {
         if (shift > 10) {
             if (sign & 0x80000000) {
-                return 0x8000000000000000ULL;
+                ret.s.hi = 0x80000000;
+                ret.s.lo = 0;
+                return ret.v;
             }
-            return 0x7FFFFFFFFFFFFFFFULL;
+            ret.s.hi = 0x7FFFFFFF;
+            ret.s.lo = 0xFFFFFFFF;
+            return ret.v;
         }
-        result <<= shift;
+        t8 = 0x20 - shift;
+        t9 = shift - 0x20;
+        hi = hi << shift;
+        t10 = lo >> t8;
+        hi = hi | t10;
+        t10 = lo << t9;
+        hi = hi | t10;
+        lo = lo << shift;
     }
 
+    ret.s.hi = hi;
+    ret.s.lo = lo;
     if (sign & 0x80000000) {
-        result = -result;
+        ret.v = -ret.v;
     }
-    return result;
+    return ret.v;
 }
 
 #pragma scheduling off

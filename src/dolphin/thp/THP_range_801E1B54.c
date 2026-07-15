@@ -250,12 +250,10 @@ BOOL lbl_8047B488; /* thread C created flag */
 BOOL lbl_8047B48C; /* thread C created flag (2nd, set alongside B488) */
 
 /* ---- Thread A: message queue wrappers ---- */
-#pragma peephole off
 BOOL fn_801E1B54(void *msg)
 {
     return fn_8009F230(lbl_8046A3D0, (u32)msg, 1);
 }
-#pragma peephole reset
 
 u32 fn_801E1B84(void)
 {
@@ -264,12 +262,10 @@ u32 fn_801E1B84(void)
     return msg;
 }
 
-#pragma peephole off
 void fn_801E1BB8(void *msg)
 {
     fn_8009F230(lbl_8046A410, (u32)msg, 1);
 }
-#pragma peephole reset
 
 u32 fn_801E1BE8(void)
 {
@@ -331,10 +327,11 @@ void fn_801E1C1C(void)
 }
 
 /* ---- Thread A: cancel/resume ---- */
+extern OSThread lbl_8046A040;
 void fn_801E1D0C(void)
 {
     if (lbl_8047B460) {
-        OSCancelThread((OSThread *)(lbl_80469040 + 0x1000));
+        OSCancelThread(&lbl_8046A040);
         lbl_8047B460 = FALSE;
     }
 }
@@ -342,7 +339,7 @@ void fn_801E1D0C(void)
 void fn_801E1D48(void)
 {
     if (lbl_8047B460) {
-        OSResumeThread((OSThread *)(lbl_80469040 + 0x1000));
+        OSResumeThread(&lbl_8046A040);
     }
 }
 
@@ -388,22 +385,19 @@ u32 fn_801E4AC4(u32 flags)
 #define lbl_8046AE38 (lbl_8046AE20 + 0x18)
 
 /* Thread B: additional send-only queue wrapper (lbl_8046AE58) */
-#pragma optimize_for_size on
-#pragma peephole off
+#undef lbl_8046AE58
 void fn_801E4B08(u32 msg)
 {
+    extern u8 lbl_8046AE58[];
     fn_8009F230(lbl_8046AE58, msg, 0);
 }
-#pragma optimize_for_size reset
-#pragma peephole reset
+#define lbl_8046AE58 (lbl_8046AE20 + 0x38)
 
 /* ---- Thread A: additional send-only queue wrapper (lbl_8046A4B4) ---- */
-#pragma peephole off
 BOOL fn_801E446C(u32 msg)
 {
     return fn_8009F230(lbl_8046A4B4, msg, 1);
 }
-#pragma peephole reset
 
 /* ---- Thread A: forwarding loop (drains lbl_8046A494, forwards to Thread C's send queue) ---- */
 #pragma peephole off
@@ -441,14 +435,13 @@ u32 fn_801E4EF0(u32 flags)
 }
 #define lbl_8046C1A8 (lbl_8046C190 + 0x18)
 
-#pragma peephole off
-#pragma optimize_for_size off
+#undef lbl_8046C1C8
 BOOL fn_801E4F34(u32 msg)
 {
+    extern u8 lbl_8046C1C8[];
     return fn_8009F230(lbl_8046C1C8, msg, 0);
 }
-#pragma optimize_for_size reset
-#pragma peephole reset
+#define lbl_8046C1C8 (lbl_8046C190 + 0x38)
 
 /* ---- Thread B: cancel/resume ---- */
 extern OSThread lbl_8046BE78;
@@ -464,7 +457,7 @@ void fn_801E4DAC(void)
 void fn_801E4DE8(void)
 {
     if (lbl_8047B480) {
-        OSResumeThread((OSThread *)(lbl_8046AE20 + 0x1058));
+        OSResumeThread(&lbl_8046BE78);
     }
 }
 

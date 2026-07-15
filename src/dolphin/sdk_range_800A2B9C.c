@@ -16,6 +16,21 @@ void __init_user(void) {
     __init_cpp();
 }
 
+typedef void (*PfnCback)(void);
+
+#pragma scheduling off
+#pragma peephole off
+void __init_cpp(void) {
+    extern PfnCback _ctors[];
+    PfnCback* p;
+
+    for (p = _ctors; *p != NULL; p++) {
+        (*p)();
+    }
+}
+#pragma peephole reset
+#pragma scheduling reset
+
 void _ExitProcess(void) {
     PPCHalt();
 }

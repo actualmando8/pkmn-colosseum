@@ -100,7 +100,6 @@ s32 gdev_cc_read(u8* buffer, s32 size) {
 
     MWTRACE(1, lbl_8026FDD4, size, size);
     {
-        s32 requestedSize = size;
         u32 readSize = size;
 
         while (fn_800C41A4(&lbl_803FFA98) < readSize) {
@@ -117,7 +116,7 @@ s32 gdev_cc_read(u8* buffer, s32 size) {
         }
 
         if (error == 0) {
-            CircleBufferReadBytes(&lbl_803FFA98, buffer, requestedSize);
+            CircleBufferReadBytes(&lbl_803FFA98, buffer, readSize);
         } else {
             MWTRACE(8, lbl_8026FDFC, error);
         }

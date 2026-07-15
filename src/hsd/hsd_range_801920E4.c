@@ -26,3 +26,62 @@ HSD_ClassInfo* fn_80193748(const char* class_name)
     }
     return NULL;
 }
+
+BOOL fn_80193788(HSD_ClassInfo* info, HSD_ClassInfo* p)
+{
+    HSD_ClassInfo* c;
+    HSD_ClassInfo* parent;
+
+    if (info == NULL || p == NULL) {
+        return FALSE;
+    }
+
+    c = (HSD_ClassInfo*) info;
+    parent = (HSD_ClassInfo*) p;
+
+    if (!(c->head.flags & 1)) {
+        c->head.info_init();
+    }
+    if (!(parent->head.flags & 1)) {
+        parent->head.info_init();
+    }
+
+    while (c != NULL) {
+        if (c == parent) {
+            return TRUE;
+        }
+        c = c->head.parent;
+    }
+    return FALSE;
+}
+
+void* fn_80193828(HSD_ClassInfo* i)
+{
+    extern void* memset(void* dst, int val, u32 size);
+    HSD_ClassInfo* info;
+    HSD_Class* obj;
+
+    if (!(i->head.flags & 1)) {
+        i->head.info_init();
+    }
+
+    obj = i->alloc(i);
+    if (obj == NULL) {
+        return NULL;
+    }
+
+    info = i;
+    if (!(info->head.flags & 1)) {
+        info->head.info_init();
+    }
+
+    memset(obj, 0, info->head.obj_size);
+    obj->class_info = i;
+
+    if (info->init(obj) < 0) {
+        i->destroy(obj);
+        return NULL;
+    }
+
+    return obj;
+}

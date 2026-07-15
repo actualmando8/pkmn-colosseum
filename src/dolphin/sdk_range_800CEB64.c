@@ -20,6 +20,8 @@ extern u8 lbl_8047AA3C;
 void DBGHandler(s32 interrupt, OSContext* context);
 void MWCallback(void);
 
+volatile u32 EXI_REGS[16] : 0xCC006800;
+
 void DBInitInterrupts(void) {
     __OSMaskInterrupts(0x18000);
     __OSMaskInterrupts(0x40);
@@ -35,14 +37,16 @@ void DBInitComm(u8** comm, void (*callback)(s32)) {
     *comm = lbl_8047AA38;
     lbl_8047AA28 = callback;
     __OSMaskInterrupts(0x18000);
-    *(volatile u32*)0xCC006828 = 0;
+    EXI_REGS[10] = 0;
     OSRestoreInterrupts(interrupts);
 }
 
 extern u8 lbl_8047AA3C;
 
+volatile u32 lbl_CC003000 : 0xCC003000;
+
 void DBGHandler(s32 interrupt, OSContext* context) {
-    *(volatile u32*)0xCC003000 = 0x1000;
+    lbl_CC003000 = 0x1000;
     if (lbl_8047AA2C != NULL) {
         lbl_8047AA2C((__OSInterrupt)interrupt, context);
     }
@@ -55,7 +59,6 @@ void MWCallback(void) {
     }
 }
 
-volatile u32 EXI_REGS[16] : 0xCC006800;
 #define IS_TRUE(value) ((value) != FALSE)
 #define IS_FALSE(value) !IS_TRUE(value)
 
@@ -101,8 +104,10 @@ s32 fn_800CECAC(u32* data) {
 s32 DBGWrite(u32 type, u32* data, s32 length) {
     extern s32 DBGEXIImm(void* buffer, s32 length, s32 write);
     BOOL total;
+    u32* current = data;
     u32 command;
     u32 value;
+    volatile u32 scratch[3];
 
     DBGEXISelect(4);
     command = ((type << 8) & 0x01FFFC00) | 0xA0000000;
@@ -111,7 +116,7 @@ s32 DBGWrite(u32 type, u32* data, s32 length) {
     DBGEXISync();
 
     while (length != 0) {
-        value = *data++;
+        value = *current++;
         total |= IS_FALSE(DBGEXIImm(&value, 4, 1));
         DBGEXISync();
 

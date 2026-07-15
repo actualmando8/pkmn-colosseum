@@ -282,10 +282,7 @@ s32 fn_801E1874(void)
     extern u8 lbl_8047B440;
     extern u8 lbl_8047B441;
 
-    if (lbl_8047B440 == 0) {
-        return 0;
-    }
-    if (lbl_8047B441 == 0) {
+    if (lbl_8047B440 == 0 || lbl_8047B441 == 0) {
         return 0;
     }
     return 1;

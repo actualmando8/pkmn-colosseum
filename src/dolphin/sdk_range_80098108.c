@@ -146,14 +146,8 @@ BOOL fn_80098368(s32 chan, u8* buf, s32 len, volatile u32 type) {
 #pragma optimize_for_size on
 #pragma scheduling off
 u32 fn_800986A0(s32 chan, s32 exi, s32 tc, s32 ext) {
-    u32 csr;
-    u32 oldCsr;
-
-    {
-        volatile u32* regs = (volatile u32*)0xCC006800;
-        csr = regs[chan * 5];
-        oldCsr = csr;
-    }
+    u32 csr = __EXIRegs[chan * 5];
+    u32 oldCsr = csr;
 
     csr &= 0x7F5;
 
@@ -167,10 +161,7 @@ u32 fn_800986A0(s32 chan, s32 exi, s32 tc, s32 ext) {
         csr |= 0x800;
     }
 
-    {
-        volatile u32* regs = (volatile u32*)0xCC006800;
-        regs[chan * 5] = csr;
-    }
+    __EXIRegs[chan * 5] = csr;
     return oldCsr;
 }
 #pragma scheduling reset

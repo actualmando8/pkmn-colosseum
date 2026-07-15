@@ -1526,7 +1526,6 @@ void fn_8007D79C(void* window, u8* param) {
 
 /* 0x8007D89C | size: 0xDC */
 #pragma push
-#pragma scheduling off
 void fn_8007D89C(void* window, u8* param) {
     extern void* windowSearchID(u32 id);
     extern u8** windowGetFreeWork(void* window);

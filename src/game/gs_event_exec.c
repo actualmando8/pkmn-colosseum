@@ -1066,16 +1066,16 @@ typedef struct {
 #pragma push
 #pragma peephole off
 s32 fn_80014234(u8* ctx, u8* tgt) {
+    s32 key;
     u8* walk;
     u8* p;
-    s32 key;
     s32 idx;
     s32 slot;
     s32 species;
     EvEntry* e;
 
-    p    = *(u8**)(ctx + 0x60);
     walk = lbl_80266B58;
+    p    = *(u8**)(ctx + 0x60);
     key  = *(s32*)(p + 4);
     for (idx = 0; idx < 4; idx++) {
         if (key == *(s32*)walk) break;

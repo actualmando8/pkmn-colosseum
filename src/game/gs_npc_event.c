@@ -981,24 +981,20 @@ void fn_800324A0(void) {
     u32 value;
     u32 handle;
     s32 minus_one;
-    s32 zero;
-    s32 one;
 
     fn_80112260(0);
     if (lbl_8047A408 != 0) {
         lbl_8047A408 = 0;
     } else {
-        one = 1;
+        lbl_8047A409 = 0;
         minus_one = -1;
-        zero = 0;
-        lbl_8047A42C = one;
-        lbl_8047A409 = zero;
+        lbl_8047A42C = 1;
         lbl_8047A428 = minus_one;
         lbl_8047A424 = minus_one;
         lbl_8047A420 = minus_one;
-        lbl_8047A410 = one;
-        lbl_8047A41C = one;
-        lbl_8047A40A = one;
+        lbl_8047A410 = 1;
+        lbl_8047A41C = 1;
+        lbl_8047A40A = 1;
         handle = fn_80113F48();
         value = fn_801CBA0C(0x0FFE1000);
         lbl_8047A418 = value;
