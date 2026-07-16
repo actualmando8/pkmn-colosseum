@@ -246,7 +246,7 @@ extern void fn_8018C8F4(void);
 void floorEventCtrlDoor(void);
 extern void EvlogSet__FScUl();
 extern void scriptSetEventColID();
-extern void fn_800F7434();
+extern void fn_800F7434(u32 callback, u32 arg, ...);
 extern u8 lbl_80272708[];
 extern u32 lbl_80478EC4;
 extern u32 lbl_80478EC0;
@@ -1499,7 +1499,7 @@ void floorEventCtrlDoor(void);
 /* 0x80116D30 | 0x13C */
 extern void EvlogSet__FScUl();
 extern void scriptSetEventColID();
-extern void fn_800F7434();
+extern void fn_800F7434(u32 callback, u32 arg, ...);
 extern u8 lbl_80272708[];
 extern u32 lbl_80478EC4;
 extern u32 lbl_80478EC0;
@@ -1518,7 +1518,7 @@ void fn_80116D30(u32 kind, u32 arg)
     u8* text;
 
     text = lbl_80272708;
-    EvlogSet__FScUl(kind, arg, text);
+    EvlogSet__FScUl(kind, arg);
     skind = (s8)kind;
 
     switch (skind) {
