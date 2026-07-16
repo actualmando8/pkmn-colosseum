@@ -199,6 +199,7 @@ void* floorReadNotLinkedParticlePreFunc(u32 resId, u32 loadMode, u32 dataSize) {
 #pragma push
 #pragma peephole off
 void* floorReadParticlePostFunc(u32 resId, u32 param) {
+    void* nullValue;
     typedef struct FloorData {
         u8 unk0[8];
         u32 resourceFlags;
@@ -210,11 +211,12 @@ void* floorReadParticlePostFunc(u32 resId, u32 param) {
     extern u32 fn_80113F48(void);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* symbol);
     extern void GSmodelLinkToGSparticleBank(void* model, void* bank);
+    u32 resourceFlags;
+    u32 modelOffset;
     void* result;
+    void* particleBank;
     FloorData* floorData;
     SceneData* sceneData;
-    u32 resourceFlags;
-    void* particleBank;
     u32 i = 0;
 
     result = GSresGetResource(resId, (param & 0x7FFF0000) | 0x400);
@@ -222,19 +224,22 @@ void* floorReadParticlePostFunc(u32 resId, u32 param) {
     if (particleBank != (void*)0) {
         GSresRegisterResource(particleBank, resId, param,
                               (void*)_unloadParticles__FPvUlUl);
+        nullValue = (void*)0;
         floorData = floorDataBiosGetCurrentPtr();
         sceneData = HSD_ArchiveGetPublicAddress(
             GSresGetResource(fn_80113F48(), floorData->resourceFlags),
             lbl_802722AC);
-        if (sceneData == (void*)0) {
-            return (void*)0;
+        if (sceneData == nullValue) {
+            return nullValue;
         }
-        if (sceneData->models != (void*)0) {
+        if (sceneData->models != nullValue) {
+            modelOffset = 0;
             resourceFlags = (floorData->resourceFlags & 0x7FFF0000) | 0x1000;
-            for (; sceneData->models[i] != (void*)0; i++) {
+            for (; *(void**)((u8*)sceneData->models + modelOffset) != nullValue;
+                 modelOffset += sizeof(void*), i++) {
                 void* model = GSresGetResource(fn_80113F48(),
                                                 resourceFlags | i);
-                if (model != (void*)0) {
+                if (model != nullValue) {
                     GSmodelLinkToGSparticleBank(model, particleBank);
                 }
             }
