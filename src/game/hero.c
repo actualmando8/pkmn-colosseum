@@ -2402,6 +2402,9 @@ void heroBiosSetNamePtr(HeroSaveData* hero, void* src) {
     extern void GScharLenCpy();
     if (hero == NULL) { return; }
     if (src == NULL) {
+        if (hero->name && hero->name) {
+            /* Preserve MWCC register allocation. */
+        }
     } else {
         GScharLenCpy(hero->name, src, 0xB);
     }

@@ -1183,7 +1183,7 @@ void fightMenuAllFightTrainerCloseStatusMenu(u32 wait)
     }
 }
 
-/* Address: 0x80261BEC | Size: 0xD0 | Ghidra import */
+/* Address: 0x80261BEC | Size: 0xD0 */
 u32 _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv(u32 r3,u32 r4,u8 *r5)
 
 {
@@ -1193,16 +1193,18 @@ u32 _fightMenuAllFightTrainerCloseStatusMenuSubCloseCheck__FPvUsPv(u32 r3,u32 r4
   u16 sVar5;
   u32 uVar3;
   u8 result;
+  int new_var;
   u32 found;
   u8 cVar6;
 
-  iVar1 = fightTargetGetPtr(2,r3,r4);
+  new_var = r3;
+  iVar1 = fightTargetGetPtr(2,new_var,r4);
   if (iVar1 == 0) {
     uVar2 = 0;
   }
   else {
     uVar4 = fightSideGetStatus(iVar1,0,5,0);
-    sVar5 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(r3,r4);
+    sVar5 = fightTargetGetTragetPtrToRelativeHostSideFightTargetId(new_var,r4);
     if (sVar5 == 0) {
       uVar2 = 0;
     }

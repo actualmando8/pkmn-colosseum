@@ -1654,7 +1654,7 @@ void fn_80183018(void) {
 void fn_80183350(void) {
 }
 
-/* fn_80183688 -- not recovered, gap in archive campaign (size 0xA8) */
+/* 0x80183688 | size: 0xA8 */
 s32 fn_80183688(void* self) {
     s32 i;
     PeopleEntry* entry;
@@ -1663,6 +1663,9 @@ s32 fn_80183688(void* self) {
         entry = peopleGetEntry(i);
         if (entry->active == 0) continue;
         if (entry->selfPtr != self) continue;
+        if ((entry->flagId && entry->flagId) && entry->flagId) {
+            /* Preserve MWCC register allocation. */
+        }
         goto found;
     }
     entry = NULL;
@@ -1678,15 +1681,20 @@ found:
     return 1;
 }
 
-/* fn_80183730 -- not recovered, gap in archive campaign (size 0xA8) */
+/* 0x80183730 | size: 0xA8 */
 s32 fn_80183730(void* self) {
     s32 i;
+    int new_var;
     PeopleEntry* entry;
 
     for (i = 0; i < peopleGetMaxCount(); i++) {
         entry = peopleGetEntry(i);
-        if (entry->active == 0) continue;
+        new_var = entry->active == 0;
+        if (new_var) continue;
         if (entry->selfPtr != self) continue;
+        if ((entry->flagId && entry->flagId) && entry->flagId) {
+            /* Preserve MWCC register allocation. */
+        }
         goto found;
     }
     entry = NULL;

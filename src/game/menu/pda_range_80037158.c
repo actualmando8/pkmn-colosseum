@@ -982,6 +982,7 @@ void fn_8003C03C(PdaSprite* alphaSprite, PdaSprite* sprite)
     extern u8 lbl_802EF0A8[];
     extern f32 lbl_8047BAF0;
     extern f32 lbl_8047BAF4;
+    volatile int pad;
     extern f64 sin(f64 angle);
     f32 f0;
     f32 f1;
@@ -1001,6 +1002,9 @@ void fn_8003C03C(PdaSprite* alphaSprite, PdaSprite* sprite)
     }
     f0 = lbl_8047BAF4 * lbl_803A6748.field_28;
     f0 = lbl_8047BAF4 * f0;
+    if (lbl_8047BAF0 && lbl_8047BAF0) {
+        /* Preserve MWCC register allocation. */
+    }
     f1 = lbl_8047BAF0 * f0;
     f1 = (f32)sin(f1);
     f3 = f1;
