@@ -372,8 +372,9 @@ s32 fn_80026740(void* r3, u8* r4)
     s32  index;
     s32  x;
     f32  one;
-    f32  scale;
+    f32  new_var;
     void* ctx;
+    f32  scale;
     u8* entry;
 
     ctx = *(void**)((u8*)r3 + 0x60);
@@ -393,7 +394,9 @@ s32 fn_80026740(void* r3, u8* r4)
         x = index * 0x1a;
         x += *(s32*)(*(s32**)((u8*)ctx + 0x48));
         *(s16*)(r4 + 0x50) = (s16)x;
-        r4[0x67] = one - scale * *(f32*)(*(f32**)((u8*)ctx + 0x30));
+        new_var = *(f32*)(*(f32**)((u8*)ctx + 0x30));
+        new_var = one - (scale * new_var);
+        r4[0x67] = new_var;
     }
     return 0;
 }
