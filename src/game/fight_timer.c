@@ -351,15 +351,13 @@ void fightTimerThreadFunc(ColosseumBattleTimerState *r3)
     extern f32 lbl_8047E6DC;
     extern u32 fn_800D3088(void);
     extern void _threadSwitch(void);
-  u32 ticks;
   f32 scale;
 
   r3->elapsed = lbl_8047E6D8;
   scale = lbl_8047E6DC;
   while (r3->elapsed < scale * r3->limit) {
     _threadSwitch();
-    ticks = fn_800D3088();
-    r3->elapsed = (f32)ticks + r3->elapsed;
+    r3->elapsed = (f32)fn_800D3088() + r3->elapsed;
   }
   r3->done = 1;
   do {
