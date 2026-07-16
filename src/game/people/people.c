@@ -400,6 +400,7 @@ void* peopleGetTransform(PeopleEntry* entry)
 void fn_80181224(void)
 {
     void* field;
+    PeopleOpenWork** openWorkSlot;
     s32 i;
     void* fieldData;
     void* floorObj;
@@ -416,11 +417,11 @@ void fn_80181224(void)
     fn_80167E64(field);
 
     /* Reset open work state */
-    work = gPeopleOpenWork;
+    work = *(openWorkSlot = &gPeopleOpenWork);
     work->subState = 0;
 
     /* Clean up the thread/task */
-    GSgappTerminate(gPeopleOpenWork->threadObj);
+    GSgappTerminate((*openWorkSlot)->threadObj);
 }
 #pragma optimization_level reset
 
