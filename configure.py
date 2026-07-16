@@ -253,7 +253,7 @@ config.libs = [
             Object(Matching, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
             Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
@@ -1136,7 +1136,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800A2B9C.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -1178,7 +1178,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800B71FC.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -1232,13 +1232,13 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/trk_range_800C4470.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_range_800C45A0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1352,7 +1352,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_range_80101910.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1373,7 +1373,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/field_range_801140DC.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1387,7 +1387,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/musyx_range_801652DC.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
@@ -1434,7 +1434,7 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_range_801B0158.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
@@ -1509,7 +1509,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/menu/menu_bios_range_8005D7F8.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1551,7 +1551,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/menu/menu_poke_coupon.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
