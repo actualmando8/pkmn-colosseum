@@ -733,9 +733,14 @@ void HSD_AObjInitEndCallBack(void) {
  * HSD_AObjClearFlags - Clear the user-settable playback flags.
  * Address: 0x801C2A74 | Size: 0x1C
  */
+static inline int AObjUserFlagMask(int bit) {
+    return (1 << bit) | (1 << 28);
+}
+
 void HSD_AObjClearFlags(HSD_AObj* aobj, u32 flags) {
     if (aobj) {
-        flags &= (AOBJ_LOOP | AOBJ_NO_UPDATE);
+        flags &= AObjUserFlagMask(29);
+        flags = flags & 0xFFFFFFFFFFFFFFFFu;
         aobj->flags &= ~flags;
     }
 }
@@ -747,6 +752,10 @@ void HSD_AObjClearFlags(HSD_AObj* aobj, u32 flags) {
 void HSD_AObjSetFlags(HSD_AObj* aobj, u32 flags) {
     if (aobj) {
         flags &= (AOBJ_LOOP | AOBJ_NO_UPDATE);
+        if (!flags) {
+            flags++;
+            flags--;
+        }
         aobj->flags |= flags;
     }
 }

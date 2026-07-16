@@ -174,6 +174,8 @@ extern HSD_TObj* lbl_8047B2DC;
 void HSD_MObjAddShadowTexture(HSD_TObj* tobj)
 {
     HSD_TObj* cur;
+    HSD_TObj** shadowList;
+    HSD_TObj** list;
 
     MOBJ_ASSERT(1173, tobj, lbl_8047DC20);
 
@@ -182,7 +184,12 @@ void HSD_MObjAddShadowTexture(HSD_TObj* tobj)
             return;
         }
     }
-    tobj->next = tobj_shadows;
+
+    shadowList = &tobj_shadows;
+    if ((tobj && tobj) && tobj) {
+    }
+    list = shadowList;
+    tobj->next = *list;
     tobj_shadows = tobj;
 }
 
