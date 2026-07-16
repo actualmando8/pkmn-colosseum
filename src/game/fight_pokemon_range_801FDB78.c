@@ -823,6 +823,37 @@ void fightOutPokemonSetHensinFightPokemonStatusId(void* trainer, u16 eventId, u3
     pokemonSetStatus(dst, 0, eventId, 0, val);
 }
 
+/* 0x801FE7EC | size: 0x130 */
+void fightOutPokemonSetHensinPokemonStatusId(void* trainer, u16 eventId, u32 param1, u32 param2) {
+    void* srcSlot;
+    void* srcPokemon;
+    void* dst;
+    u32 value;
+
+    if ((u8)param2 == 1) {
+        srcSlot = pokemonGetStatus(trainer, 0, 0xD5, 0);
+        dst = pokemonGetStatus(trainer, 0, 0xD7, 0);
+    } else {
+        srcSlot = pokemonGetStatus(trainer, 0, 0xD7, 0);
+        dst = pokemonGetStatus(trainer, 0, 0xD5, 0);
+    }
+    if (srcSlot != NULL && dst != NULL) {
+        if (srcSlot == NULL) {
+            srcPokemon = NULL;
+        } else {
+            void* temp = pokemonGetStatus(srcSlot, 0, 0xCC, 0);
+            srcPokemon = temp;
+        }
+        if (dst == NULL) {
+            dst = NULL;
+        } else {
+            dst = pokemonGetStatus(dst, 0, 0xCC, 0);
+        }
+        value = (u32)pokemonGetStatus(srcPokemon, 0, eventId, param1);
+        pokemonSetStatus(dst, 0, eventId, param1, value);
+    }
+}
+
 /* 0x801FE91C | size: 0x2F4 | large */
 void fightOutPokemonCopyHensinStatus(void) {
     extern u8 lbl_80279CB8[];

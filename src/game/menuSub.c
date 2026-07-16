@@ -622,36 +622,48 @@ s32 menuSubGetPokemonSexForDisp(void* a) {
 #pragma peephole reset
 #endif
 
-/* fn_8001E074 - 0x8001E074 | size: 0x110 */
+/* menuSubOpenYesNo - 0x8001E074 | size: 0x110 */
 #if 0
 asm void fn_8001E074(void) {
 #include "src/game/gs_pcbox_fn_8001E074.inc"
 }
 #else
 #pragma optimization_level 4
-s8 fn_8001E074(u8 arg1, s16 arg2, s16 arg3, u32 arg4) {
+#pragma push
+#pragma peephole off
+s8 menuSubOpenYesNo(u8 menuType, s16 x, s16 y, s32 initialValue) {
     extern void* windowGetActiveID();
     extern s32 menuOpenCustom(s32, ...);
     extern void menuSetPosition(s32, s16, s16);
     extern void windowCheckCursor(s32, s32);
     extern u32 windowGetValue(s32);
     extern void menuCloseCustom(s32, s32, s32);
-    u32 sp8;
-    s16 r30;
-    s16 r31;
-    sp8 = arg4;
-    if (arg4 != 0) sp8 = 1;
-    if ((u8)arg1 == 0x0) r30 = 0x11;
-    else if ((u8)arg1 == 0x1) r30 = 0x12;
-    else r30 = 0x44;
-    r31 = r30;
-    menuOpenCustom((s32)r31, windowGetActiveID(), &sp8, 0, 0, 0);
-    if (arg2 >= 0 && arg3 >= 0) menuSetPosition((s32)r31, arg2, arg3);
-    windowCheckCursor((s32)r31, 0x1);
-    r30 = (s8)windowGetValue((s32)r31);
-    menuCloseCustom((s32)r31, 0x0, 0x1);
-    return (s8)r30;
+    s32 value = initialValue;
+    s16 activeWindowId;
+    s16 windowId;
+
+    if (value != 0) value = 1;
+    switch (menuType) {
+    case 0:
+        windowId = 0x11;
+        break;
+    case 1:
+        windowId = 0x12;
+        break;
+    case 0x7f:
+    default:
+        windowId = 0x44;
+        break;
+    }
+    activeWindowId = windowId;
+    menuOpenCustom((s32)activeWindowId, windowGetActiveID(), &value, 0, 0, 0);
+    if (x >= 0 && y >= 0) menuSetPosition((s32)activeWindowId, x, y);
+    windowCheckCursor((s32)activeWindowId, 1);
+    windowId = (s8)windowGetValue((s32)activeWindowId);
+    menuCloseCustom((s32)activeWindowId, 0, 1);
+    return (s8)windowId;
 }
+#pragma pop
 #endif
 
 /* fn_8001E184 - 0x8001E184 | size: 0x7c */

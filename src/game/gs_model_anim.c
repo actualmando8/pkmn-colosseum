@@ -24,6 +24,8 @@
 #define MODEL_FLAG_TEX_ANIM_ENDED      0x00008000
 #define MODEL_FLAG_FORCE_UPDATE        0x00010000
 #define MODEL_FLAG_USE_JOBJ_CHILD      0x00020000
+#define MODEL_FLAG_ATTACHMENT_ONCE     0x00040000
+#define MODEL_FLAG_UPDATE_ATTACHMENT   0x00080000
 
 typedef struct GSmodel GSmodel;
 typedef struct GSpart GSpart;
@@ -41,6 +43,19 @@ typedef struct GSmodelPartAnimMix {
     s32 part_index;
     f32* value;
 } GSmodelPartAnimMix;
+
+typedef struct GSvec {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSvec;
+
+typedef struct GSquat {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+} GSquat;
 
 struct GSmodel {
     u32 flags;
@@ -75,10 +90,31 @@ struct GSmodel {
     GSmodelAnimEndedCallback anim_ended_callback;
     void* anim_ended_callback_arg;
     GSmodelPartAnimMix part_anim_mixes[4];
-    s32 force_fractional_frames;
-    void* fractional_frame_data;
-    u8 pad11C[0x170 - 0x11C];
+    union {
+        struct {
+            s32 force_fractional_frames;
+            void* fractional_frame_data;
+        } animation;
+        struct {
+            s32 attachment_type;
+            GSmodel* attachment_model;
+            s32 attachment_part_index;
+            GSvec attachment_position;
+            GSvec attachment_rotation;
+            GSvec attachment_scale;
+        } attachment;
+    } tail;
+    u8 pad144[0x170 - 0x144];
 };
+
+#define force_fractional_frames tail.animation.force_fractional_frames
+#define fractional_frame_data tail.animation.fractional_frame_data
+#define attachment_type tail.attachment.attachment_type
+#define attachment_model tail.attachment.attachment_model
+#define attachment_part_index tail.attachment.attachment_part_index
+#define attachment_position tail.attachment.attachment_position
+#define attachment_rotation tail.attachment.attachment_rotation
+#define attachment_scale tail.attachment.attachment_scale
 
 struct GSpart {
     u8 pad00[8];
@@ -116,7 +152,16 @@ void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame);
 void fn_800ED6E4(GSmodel* model, u8 tex_anim);
 void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta);
 GSpart* GSmodelGetPart(GSmodel* model, s32 index);
+void GSpartGetTransform(GSpart* part, GSvec* position, GSvec* rotation,
+                        GSvec* scale);
 void GSpartFree(GSpart* part);
+void fn_800E06EC(GSquat* quaternion, GSvec* rotation);
+void GSvecTransformQuat(GSvec* dst, GSquat* quaternion, GSvec* src);
+void GSvecAdd(GSvec* dst, GSvec* lhs, GSvec* rhs);
+void fn_800E0108(GSvec* dst, GSvec* lhs, GSvec* rhs);
+void modelSetPos(GSmodel* model, GSvec* position);
+void modelSetRot(GSmodel* model, GSvec* rotation);
+void modelSetScl(GSmodel* model, GSvec* scale);
 void fn_8019D620(HSD_JObj* jobj);
 void fn_8019D9DC(HSD_JObj* jobj);
 
@@ -1073,15 +1118,83 @@ done:
     model->flags |= MODEL_FLAG_SKIP_APPLY;
 }
 
+void modelUpdateAttachments__FP8_GSmodel(GSmodel* model)
+{
+    GSvec position;
+    GSvec rotation;
+    GSvec scale;
+    GSquat quaternion;
+    GSvec transformed_position;
+    GSpart* part;
+    u32 flags;
+
+    if (model->attachment_type != 0 &&
+        (model->flags & MODEL_FLAG_UPDATE_ATTACHMENT)) {
+        part = GSmodelGetPart(model->attachment_model,
+                              model->attachment_part_index);
+        GSpartGetTransform(part, &position, &rotation, &scale);
+        GSpartFree(part);
+
+        fn_800E06EC(&quaternion, &rotation);
+        GSvecTransformQuat(&transformed_position, &quaternion,
+                           &model->attachment_position);
+        GSvecAdd(&position, &position, &transformed_position);
+        GSvecAdd(&rotation, &rotation, &model->attachment_rotation);
+        fn_800E0108(&scale, &scale, &model->attachment_scale);
+
+        modelSetPos(model, &model->attachment_position);
+        modelSetRot(model, &model->attachment_rotation);
+        modelSetScl(model, &model->attachment_scale);
+
+        switch (model->attachment_type) {
+        case 1:
+            modelSetPos(model, &position);
+            break;
+        case 2:
+            modelSetRot(model, &rotation);
+            break;
+        case 3:
+            modelSetScl(model, &scale);
+            break;
+        case 4:
+            modelSetPos(model, &position);
+            modelSetRot(model, &rotation);
+            break;
+        case 5:
+            modelSetRot(model, &rotation);
+            modelSetScl(model, &scale);
+            break;
+        case 6:
+            modelSetPos(model, &position);
+            modelSetScl(model, &scale);
+            break;
+        case 7:
+            modelSetPos(model, &position);
+            modelSetRot(model, &rotation);
+            modelSetScl(model, &scale);
+            break;
+        }
+
+        flags = model->flags;
+        if (flags & MODEL_FLAG_ATTACHMENT_ONCE) {
+            model->flags = flags & ~MODEL_FLAG_UPDATE_ATTACHMENT;
+        } else {
+            model->flags = flags | MODEL_FLAG_UPDATE_ATTACHMENT;
+        }
+    }
+
+    model->flags = model->flags | MODEL_FLAG_FORCE_UPDATE;
+}
+
 u32 modelProcessAt60fps__FP8_GSmodel(GSmodel* model)
 {
     if ((model->flags & MODEL_FLAG_60FPS_ANIM) == MODEL_FLAG_60FPS_ANIM) {
         goto yes;
     }
-    if (model->force_fractional_frames == 0) {
+    if (model->attachment_type == 0) {
         goto no;
     }
-    if (model->fractional_frame_data == NULL) {
+    if (model->attachment_model == NULL) {
         goto no;
     }
 yes:

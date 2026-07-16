@@ -1776,6 +1776,43 @@ u8 menuCBRule_CheckValidItem(u16 item) {
 extern u32 lbl_80478928;
 extern u16 lbl_802EE458[];
 
+typedef struct MenuRuleItemRestrictions {
+    u8 pad_00[8];
+    s32 mode;
+    u8 pad_0C[0xC];
+    u8 item_disabled[0x3C];
+} MenuRuleItemRestrictions;
+
+/* fn_80077C68 (0x80077C68): apply the current rule's item restriction. */
+#pragma push
+#pragma peephole off
+u8 fn_80077C68(u16 item) {
+    MenuRuleItemRestrictions* rule;
+    u32 i;
+
+    rule = (MenuRuleItemRestrictions*)fn_8006B420();
+    if (menuCBRule_CheckValidItem(item) == 0) {
+        return 0;
+    }
+
+    switch (rule->mode) {
+    case 0:
+        return 1;
+    case 1:
+        return item == 0;
+    case 2:
+        for (i = 0; i < lbl_80478928; i++) {
+            if (item == lbl_802EE458[i]) {
+                return rule->item_disabled[i] == 0;
+            }
+        }
+        return 1;
+    default:
+        return 0;
+    }
+}
+#pragma pop
+
 /* fn_80077D88 (0x80077D88): bounds-checked table lookup. */
 u16 fn_80077D88(s32 index) {
     if (index < 0 || lbl_80478928 <= (u32)index) {

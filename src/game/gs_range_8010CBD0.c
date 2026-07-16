@@ -57,6 +57,32 @@ s32 GScolsys2UnloadCCD(void) {
     return 1;
 }
 
+typedef struct ColLayerFlagEntry {
+    u8 pad_00[0x10];
+    u16 flags;
+    u8 pad_12[2];
+} ColLayerFlagEntry;
+
+typedef struct ColLayer {
+    u8 pad_000[0xA00];
+    ColLayerFlagEntry flagEntries[48];
+} ColLayer;
+
+/* 0x8010CC54 | 0x118 */
+void fn_8010CC54(void)
+{
+    ColLayer* layer;
+    u32 i;
+
+    layer = GScolsys2GetCurFloor();
+    if (layer != NULL) {
+        for (i = 0; i < 48; i++) {
+            layer->flagEntries[i].flags &= 0xFFFE;
+        }
+    }
+    COL_STATE->wzxDataPtr = NULL;
+}
+
 typedef struct ColRecordVector {
     u32 x;
     u32 y;
@@ -131,33 +157,49 @@ s32 fn_8010D038(void) {
     return 1;
 }
 
+typedef union ColStateAccess {
+    GSColSysState state;
+    u8 bytes[sizeof(GSColSysState)];
+} ColStateAccess;
+
+typedef struct ColResetFlagEntry {
+    u8 pad_00[0x12];
+    u16 flags;
+} ColResetFlagEntry;
+
+typedef struct ColResetLayerView {
+    u8 pad_000[0xA02];
+    ColResetFlagEntry flagEntries[48];
+} ColResetLayerView;
+
+static inline void ColResetLayer(GSColSysState* state, s32 layer)
+{
+    ColStateAccess* access;
+    ColResetLayerView* layerView;
+    u32 i;
+
+    state->wzxDataPtr = NULL;
+    access = (ColStateAccess*)state;
+    layerView = (ColResetLayerView*)&access->bytes[layer * GSCOLSYS_LAYER_SIZE];
+    for (i = 0; i < 48; i++) {
+        layerView->flagEntries[i].flags &= 0xFFFE;
+    }
+}
+
 /* 0x8010D064 | 0x10C */
 s32 fn_8010D064(void)
 {
+    GSColSysState* state;
     s32 newLayer;
-    u8* layerBase;
-    s32 block;
 
-    newLayer = COL_LAYER_IDX + 1;
+    state = COL_STATE;
+    newLayer = state->activeLayer + 1;
     if (newLayer >= GSCOLSYS_MAX_LAYERS) {
         return 0;
     }
 
-    layerBase = (u8*)COL_STATE + newLayer * GSCOLSYS_LAYER_SIZE;
-    COL_STATE->wzxDataPtr = NULL;
-
-    for (block = 0; block < 3; block++) {
-        u16* flag;
-        u32 i;
-
-        for (i = 0; i < 16; i++) {
-            flag = (u16*)(layerBase + 0xA14 + i * 0x14);
-            *flag &= (u16)~1;
-        }
-        layerBase += 0x140;
-    }
-
-    COL_LAYER_IDX = newLayer;
+    ColResetLayer(state, newLayer);
+    state->activeLayer = newLayer;
     return 1;
 }
 
