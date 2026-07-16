@@ -665,12 +665,15 @@ void _fightTrainerAiWazaDamage190SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
 /* Address: 0x80251070 | Size: 0x5C | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage189(void* ctx, u32 slot, u32 param, u32 arg3) {
     extern u32 fn_802376EC(void*, u32);
-    u16 first;
-    u16 second;
+    s32 first;
+    s32 second;
 
     first = fn_802376EC(ctx, slot) & 0xffff;
     second = fn_802376EC(ctx, arg3) & 0xffff;
-    return (second - first) & ~((s32)(first - second + (second ^ 0x80000000)) >> 31);
+    if (first >= second) {
+        return 0;
+    }
+    return second - first;
 }
 
 static inline u32 fightTrainerAiWazaDamage188_helper1(u32 arg0, int arg1) {
