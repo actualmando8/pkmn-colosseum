@@ -49,23 +49,21 @@ s32 ddh_cc_pre_continue(void) {
 
 /* ddh_cc_write - Write data to the AMC debug port. */
 s32 ddh_cc_write(void* data, s32 size) {
-    extern char lbl_8026FC98[];
     extern s32 lbl_8047A9E0;
     extern void MWTRACE(s32 level, const char* format, ...);
     extern s32 fn_800CE7B4(u8* buffer, s32 size);
-    char* strings = lbl_8026FC98;
     s32 remaining = size;
     u8* buffer = data;
     s32 written;
 
     if (lbl_8047A9E0 == 0) {
-        MWTRACE(8, strings + 0);
+        MWTRACE(8, "cc not initialized\n");
         return -0x2711;
     }
 
-    MWTRACE(8, strings + 0x14, data, size);
+    MWTRACE(8, "cc_write : Output data 0x%08x %ld bytes\n", data, size);
     while (remaining > 0) {
-        MWTRACE(1, strings + 0x40, remaining);
+        MWTRACE(1, "cc_write sending %ld bytes\n", remaining);
         written = fn_800CE7B4(buffer, remaining);
         if (written == 0) {
             break;
@@ -80,8 +78,6 @@ s32 ddh_cc_write(void* data, s32 size) {
 #pragma use_lmw_stmw on
 s32 ddh_cc_read(u8* buffer, s32 size) {
     typedef struct CircleBuffer CircleBuffer;
-    extern const char lbl_8026FCF4[];
-    extern const char lbl_8026FD1C[];
     extern s32 lbl_8047A9E0;
     extern CircleBuffer lbl_803FF578;
     extern void MWTRACE(s32 level, const char* format, ...);
@@ -97,7 +93,7 @@ s32 ddh_cc_read(u8* buffer, s32 size) {
         return -0x2711;
     }
 
-    MWTRACE(1, lbl_8026FCF4, size, size);
+    MWTRACE(1, "Expected packet size : 0x%08x (%ld)\n", size, size);
     while (fn_800C41A4(&lbl_803FF578) < (u32)size) {
         s32 readSize;
 
@@ -116,7 +112,7 @@ s32 ddh_cc_read(u8* buffer, s32 size) {
     if (error == 0) {
         CircleBufferReadBytes(&lbl_803FF578, buffer, size);
     } else {
-        MWTRACE(8, lbl_8026FD1C, error);
+        MWTRACE(8, "cc_read : error reading bytes from EXI2 %ld\n", error);
     }
     return error;
 }
