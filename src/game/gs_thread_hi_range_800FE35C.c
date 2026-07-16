@@ -58,7 +58,7 @@ extern void fn_800D67BC(s32 a);
 extern void fn_800D6A00(s32 a);
 extern void fn_800D7820(void* ptr);
 extern void fn_800D85D4(void);
-extern void fn_800D888C(u32 mask, ...);
+extern void fn_800D888C(u32 mask);
 extern void fn_800D88DC(u32 mask);
 extern void fn_800D9ED8(void);
 extern void fn_800DC1D4(s32 a);
@@ -80,7 +80,7 @@ extern void fn_80166A28(void);
 extern void fn_800D59B8(void);
 extern void fn_800D5BA0(void);
 extern void fn_800D9D68(u16 a, u16 b, u16 c, u16 d);
-extern f64 tan(void);
+extern f64 tan(f64 angle);
 extern void fn_800D7FE4(void* mtx);
 extern void fn_800D834C(void);
 extern void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d);
@@ -321,18 +321,28 @@ void spriteSetEnv(void) {
     f32 v1[3];
     f32 v2[3];
     f32 mtx[12];
-    f32 sx;
-    f32 sy;
     f32 x;
     f32 y;
+    f32 sx;
+    f32 sy;
     f32 z;
     f32 t;
+    f32 width;
+    f32 x_scale;
+    f32 height;
+    f32 y_scale;
+    f32 half;
 
-    sx = lbl_8047CD58 / *(f32*)&lbl_80478B10;
-    sy = lbl_8047CD5C / *(f32*)&lbl_80478B14;
-    x = sx * lbl_8047CD60;
-    y = sy * lbl_8047CD60;
-    t = (f32)tan();
+    width = lbl_8047CD58;
+    x_scale = *(f32*)&lbl_80478B10;
+    height = lbl_8047CD5C;
+    y_scale = *(f32*)&lbl_80478B14;
+    sx = width / x_scale;
+    sy = height / y_scale;
+    half = lbl_8047CD60;
+    x = sx * half;
+    y = sy * half;
+    t = (f32)tan(lbl_8047CD64);
     z = y / t;
 
     set__5GSvecFfff(v0,
@@ -413,4 +423,3 @@ void fn_800FE6D0(s32 a, s32 b) {
 }
 #endif
 #pragma pop
-
