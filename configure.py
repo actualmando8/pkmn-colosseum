@@ -285,6 +285,13 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "crt/wchar_range_800C7FB8.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="runtime",
+            ),
+            Object(
+                Matching,
                 "crt/mwtrace_helpers.c",
                 progress_category="runtime",
             ),
