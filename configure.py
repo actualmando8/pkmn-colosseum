@@ -2691,17 +2691,17 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/rodata_80267060.c",
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/rodata_802663A0.c",
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/rodata_80266BD8.c",
                 progress_category="game",
             ),
@@ -2716,12 +2716,12 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/rodata_80267250.c",
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/rodata_80267350.c",
                 progress_category="game",
             ),
@@ -2877,7 +2877,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/data_8027A500.c",
                 progress_category="game",
             ),
@@ -2922,7 +2922,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/data_802EF0A8.c",
                 progress_category="game",
             ),
