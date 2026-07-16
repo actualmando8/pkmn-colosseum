@@ -9,8 +9,8 @@
  * Matches: 0x8009AFB0 - 0x8009AFD0
  */
 
-static void* __OSArenaHi;
-static void* __OSArenaLo;
+extern void* __OSArenaHi;
+extern void* __OSArenaLo;
 
 void* OSGetArenaHi(void) {
     return __OSArenaHi;

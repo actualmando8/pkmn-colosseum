@@ -9,6 +9,13 @@
  */
 #include "dolphin/types.h"
 
+/* The original VI translation unit owns these timing tables, strings, and
+ * the switch table emitted by VIGetTvFormat. */
+#pragma push
+#pragma force_active on
+#include "src/game/data/data_803120E8.c"
+#pragma pop
+
 u32 getCurrentFieldEvenOdd(void) {
     typedef struct VITiming {
         u8 _00[0x18];
