@@ -179,7 +179,7 @@ u32 fn_80166084(u32 id);
 u32 fn_80166098(u32 id);
 void* fn_8016604C(u32 size);
 u32 fn_80166168(u32 id, u32 volume);
-u32 fn_80166268();
+u32 fn_80166268(u32 id, u32 volume, u32 limit);
 u32 fn_801662E8(u32 arg0, u32 arg1);
 u32 fn_80166308(u32 id, const GSvec* position);
 u32 fn_80166370(u32 id, const GSvec* position, const GSvec* velocity, f32 minDistance, f32 maxDistance, u32 arg5,
@@ -587,7 +587,7 @@ u32 fn_80166168(u32 id, u32 volume)
 void fn_801661D0(u32 limit, u32 volume, u32 includeBgm, u32 includeSe)
 {
     u32 offset;
-    u32 i;
+    s32 i;
 
     for (i = 0, offset = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
         u32 flags = *(u8*)((u8*)lbl_80478FAC + offset);

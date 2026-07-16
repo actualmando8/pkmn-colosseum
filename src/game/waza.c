@@ -1732,35 +1732,47 @@ asm void fn_8011BA0C(void) {
 #include "src/game/gs_field_world_fn_8011BA0C.inc"
 }
 #else
-u32 fn_8011BA0C(u8 type) {
+u32 wazaGetWazaTypeIdName(u8 type) {
+    u32 result = 0;
     switch (type) {
     case 0:
-        return 0;
+        result = 0;
+        break;
     case 1:
-        return 0xEC50;
+        result = 0xEC50;
+        break;
     case 2:
-        return 0xEC51;
+        result = 0xEC51;
+        break;
     case 3:
-        return 0xEC52;
+        result = 0xEC52;
+        break;
     case 4:
-        return 0xED09;
+        result = 0xED09;
+        break;
     case 5:
-        return 0xEC53;
+        result = 0xEC53;
+        break;
     case 6:
-        return 0xEC54;
+        result = 0xEC54;
+        break;
     case 7:
-        return 0xEC55;
+        result = 0xEC55;
+        break;
     case 8:
-        return 0xEC56;
+        result = 0xEC56;
+        break;
     case 9:
-        return 0xEC57;
+        result = 0xEC57;
+        break;
     case 10:
-        return 0xEC58;
+        result = 0xEC58;
+        break;
     case 11:
-        return 0xEC59;
-    default:
-        return 0;
+        result = 0xEC59;
+        break;
     }
+    return result;
 }
 #endif
 /* 0x8011BAC0 | 0xAC */

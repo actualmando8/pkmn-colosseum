@@ -147,10 +147,11 @@ void fn_8009F890(OSMutex* mutex) {
 void __OSUnlockAllMutex(OSCurThread* thread) {
     OSMutex* mutex;
 
-    while ((mutex = thread->queueMutexHead) != NULL) {
-        OSMutex* next = mutex->next;
-        OSThreadQueue* wakeQueue = &mutex->queue;
+    while (thread->queueMutexHead) {
+        OSMutex* next;
 
+        mutex = thread->queueMutexHead;
+        next = mutex->next;
         if (next == NULL) {
             thread->queueMutexTail = NULL;
         } else {
@@ -159,7 +160,7 @@ void __OSUnlockAllMutex(OSCurThread* thread) {
         thread->queueMutexHead = next;
         mutex->count = 0;
         mutex->thread = NULL;
-        OSWakeupThread(wakeQueue);
+        OSWakeupThread(&mutex->queue);
     }
 }
 

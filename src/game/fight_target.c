@@ -45,17 +45,17 @@ u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(u32 param1, u32 param
     extern u32 lbl_80478D40;
     extern u32 fightTargetGetPtr();
     u32 i;
+    register u32 index;
     u32 slotBase;
     u8* entry;
     u32 byte;
     slotBase = fightTargetGetPtr(4, 0, param2);
     if (slotBase == 0)
         return 0;
-    i = 0;
-    while ((u16)i < lbl_80478D40) {
+    for (i = 0; (index = (i & 0xFFFF)) < lbl_80478D40; i++) {
         if ((u16)i != 0) {
             entry = &lbl_80375AC8[((u32)(u16)i) * 8];
-            if ((u16)i >= lbl_80478D40)
+            if (index >= lbl_80478D40)
                 entry = NULL;
             if (entry != NULL) {
                 if (entry == NULL)
@@ -63,13 +63,12 @@ u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(u32 param1, u32 param
                 else
                     byte = entry[1];
                 if ((u8)byte != 0) {
-                    if (param1 == fightTargetGetPtr(i, slotBase, param2)) {
+                    if ((void*)fightTargetGetPtr(i, slotBase, param2) ==
+                        (void*)param1)
                         goto done;
-                    }
                 }
             }
         }
-        i++;
     }
     i = 0;
 done:
@@ -169,7 +168,7 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
     m = 0;
     count = fightTypeDataBiosGetTrainerNum(ctxObj);
     ctxObj = (u8)fightTypeDataBiosGetFightoutPokemonNum(ctxObj);
-    numSides = (u8)count;
+    numSides = (u8)(u64)count;
     i = 0;
     while ((u16)i < 2) {
         slots[(u16)i] = fightFloorGetStatus(ctx, 0, 0x35, i);
@@ -179,7 +178,7 @@ u32 fightTargetGetPtr(u32 slotType, u32 ptr, u32 count) {
         if ((u16)slotType == 5 && (u16)i == 1) {
             return slots[(u16)i];
         }
-        if (slots[(u16)i] == ptr) {
+        if ((void*)slots[(u16)i] == (void*)ptr) {
             flag = 1;
             if ((u16)slotType == 2) return slots[(u16)i];
         } else {
@@ -247,37 +246,35 @@ u32 _fightTargetGetTargetPtrToFightSidePtr__FPvUs(u32 target, u32 param2) {
     u32 slot;
     u32 side;
     u32 j;
-    u32 tmp;
     base = fightFloorGetStatus(0, 0, 0, 0);
     group = fightTypeDataBiosGetPtr(param2);
     if (group == 0)
         return 0;
-    tmp = fightTypeDataBiosGetTrainerNum();
+    numSlotsr = fightTypeDataBiosGetTrainerNum();
     numSub1r = fightTypeDataBiosGetFightoutPokemonNum(group);
     numSub2r = fightTypeDataBiosGetEntryPokemonNum(group);
-    numSlotsr = tmp;
-    numSub2r = (u8)numSub2r;
-    numSub1r = (u8)numSub1r;
-    numSlotsr = (u8)numSlotsr;
+    numSub2r = (u8)(u64)numSub2r;
+    numSub1r = (u8)(u64)numSub1r;
+    numSlotsr = (u8)(u64)numSlotsr;
     k = 0;
     while ((u16)k < 2) {
         slot = fightFloorGetStatus(base, 0, 0x35, k);
         if (slot == target)
             return slot;
         sub = 0;
-        while ((s16)sub < (s16)numSlotsr) {
+        while ((s32)(u16)sub < (s32)numSlotsr) {
             side = fightSideGetStatus(slot, 0, 7, sub);
             if (side == target)
                 return slot;
             j = 0;
-            while ((u16)j < (u16)numSub2r) {
-                if (fightTrainerGetStatus(side, 0, 0x45, j) == target)
+            while ((s32)(u16)j < (s32)numSub2r) {
+                if ((void*)fightTrainerGetStatus(side, 0, 0x45, j) == (void*)target)
                     return slot;
                 j++;
             }
             j = 0;
-            while ((u16)j < (u16)numSub1r) {
-                if (fightTrainerGetStatus(side, 0, 0x46, j) == target)
+            while ((s32)(u16)j < (s32)numSub1r) {
+                if ((void*)fightTrainerGetStatus(side, 0, 0x46, j) == (void*)target)
                     return slot;
                 j++;
             }

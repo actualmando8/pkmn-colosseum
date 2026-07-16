@@ -193,16 +193,16 @@ typedef struct BattleReplaySecondEntry {
 void fightGSfloorPopData(BattleReplayHeader *header)
 {
     extern u32 GSmodelGetVisibility();
-    extern int fn_800E9B2C();
+    extern void GSmodelPopState();
     extern int battleGridUpdate();
+    BattleReplaySecondEntry *secondEntry;
     extern int fn_801DAEF8(int);
     extern u32 fn_801DE418(u16);
+    u16 secondCount;
     extern int fightFloorSetShadow();
     u8 *entries;
     u16 firstCount;
     BattleReplayFirstEntry *firstEntry;
-    u16 secondCount;
-    BattleReplaySecondEntry *secondEntry;
     u32 model;
     u32 state;
 
@@ -215,8 +215,8 @@ void fightGSfloorPopData(BattleReplayHeader *header)
         model = fn_801DE418(firstEntry->modelId);
         *(u32 *)(firstEntry->target + 0x27C0) = model;
         *firstEntry->modelOut = model;
-        state = fn_801DAC3C();
-        fn_800E9B2C(state, firstEntry->state);
+        state = fn_801DAC3C(model);
+        GSmodelPopState(state, firstEntry->state);
         fn_801DA224(model, firstEntry->attr);
         firstEntry++;
     }
@@ -225,8 +225,8 @@ void fightGSfloorPopData(BattleReplayHeader *header)
         model = fn_801DE190(secondEntry->modelId, secondEntry->arg, secondEntry->variant);
         *(u32 *)(secondEntry->target + 0x600) = model;
         *secondEntry->modelOut = model;
-        state = fn_801DAC3C();
-        fn_800E9B2C(state, secondEntry->state);
+        state = fn_801DAC3C(model);
+        GSmodelPopState(state, secondEntry->state);
         fn_801DA224(model, secondEntry->attr);
         state = GSmodelGetVisibility(state);
         fn_801DA4E8(model, state);

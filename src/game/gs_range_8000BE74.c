@@ -86,6 +86,8 @@ extern void fn_80166B18(u16 entry);
 extern void fn_801659FC(u16 entry, u32 a, u32 b);
 extern void fn_80165A20(u16 entry, u32 a, u32 b);
 
+/* Retail retains this otherwise-unreferenced debug-menu entry-point group. */
+#pragma force_active on
 #pragma peephole off
 
 s32 fn_8000BE74(s32 arg) {
@@ -131,20 +133,15 @@ s32 fn_8000BE74(s32 arg) {
     return 0;
 }
 
-#pragma push
-#pragma scheduling off
 s32 fn_8000BFA0(void) {
     u32 floorId;
-    u32* text;
     s32 i;
 
     if (fn_800FF52C() != 0) {
         fn_80166A28(0x26);
         i = 0;
-        text = lbl_802666B0;
-
         do {
-            fn_800FAEF8(0xC8, 0xF0, -1, text);
+            fn_800FAEF8(0xC8, 0xF0, -1, lbl_802666B0);
             _threadSwitch();
             i++;
         } while (i < 0xF);
@@ -163,7 +160,6 @@ s32 fn_8000BFA0(void) {
 
     return 1;
 }
-#pragma pop
 
 s32 fn_8000C06C(void) {
     if (menuIsCheck(8) != 0) {
@@ -461,7 +457,9 @@ loop_check:
 
 s32 fn_8000C824(void) {
     s32 selected;
+    u16 entry;
     s32 status;
+    u32 offset;
     u32 i;
 
     goto loop_check;
@@ -471,30 +469,33 @@ loop_body:
     }
 
     i = 0;
+    offset = 0;
     goto inner_check;
 inner_body:
     if (selected == (s32)i) {
         goto inner_next;
     }
-    status = fn_801666BC(lbl_80478E24[i]);
-    if (status >= 4) {
+    status = fn_801666BC(*(u16*)((u8*)lbl_80478E24 + offset));
+    switch (status) {
+    case 1:
+    case 2:
+    case 3:
+        goto call_inner;
+    default:
         goto inner_next;
     }
-    if (status >= 1) {
-        goto call_inner;
-    }
-    goto inner_next;
 call_inner:
-    fn_80166B18(lbl_80478E24[i]);
+    fn_80166B18(*(u16*)((u8*)lbl_80478E24 + offset));
 inner_next:
+    offset += sizeof(u16);
     i++;
 inner_check:
     if (i < *lbl_80478E20) {
         goto inner_body;
     }
 
-    selected = lbl_80478E24[selected];
-    status = fn_801666BC((u16)selected);
+    entry = lbl_80478E24[selected];
+    status = fn_801666BC(entry);
     if (status == 0) {
         goto use_default;
     }
@@ -505,10 +506,10 @@ inner_check:
         goto use_default;
     }
 
-    fn_80166B18((u16)selected);
+    fn_80166B18(entry);
     goto loop_check;
 use_default:
-    fn_801659FC((u16)selected, 0, 0x7F);
+    fn_801659FC(entry, 0, 0x7F);
 loop_check:
     selected = menuOpen(2, 1);
     if (selected != -1) {
@@ -521,7 +522,9 @@ loop_check:
 
 s32 fn_8000C92C(void) {
     s32 selected;
+    u16 entry;
     s32 status;
+    u32 offset;
     u32 i;
 
     goto loop_check;
@@ -531,30 +534,33 @@ loop_body:
     }
 
     i = 0;
+    offset = 0;
     goto inner_check;
 inner_body:
     if (selected == (s32)i) {
         goto inner_next;
     }
-    status = fn_801666BC(lbl_80478E2C[i]);
-    if (status >= 4) {
+    status = fn_801666BC(*(u16*)((u8*)lbl_80478E2C + offset));
+    switch (status) {
+    case 1:
+    case 2:
+    case 3:
+        goto call_inner;
+    default:
         goto inner_next;
     }
-    if (status >= 1) {
-        goto call_inner;
-    }
-    goto inner_next;
 call_inner:
-    fn_80166B18(lbl_80478E2C[i]);
+    fn_80166B18(*(u16*)((u8*)lbl_80478E2C + offset));
 inner_next:
+    offset += sizeof(u16);
     i++;
 inner_check:
     if (i < *lbl_80478E28) {
         goto inner_body;
     }
 
-    selected = lbl_80478E2C[selected];
-    status = fn_801666BC((u16)selected);
+    entry = lbl_80478E2C[selected];
+    status = fn_801666BC(entry);
     if (status == 0) {
         goto use_default;
     }
@@ -565,10 +571,10 @@ inner_check:
         goto use_default;
     }
 
-    fn_80166B18((u16)selected);
+    fn_80166B18(entry);
     goto loop_check;
 use_default:
-    fn_80165A20((u16)selected, 0, 0x7F);
+    fn_80165A20(entry, 0, 0x7F);
 loop_check:
     selected = menuOpen(2, 1);
     if (selected != -1) {

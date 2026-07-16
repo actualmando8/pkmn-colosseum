@@ -245,13 +245,25 @@ config.libs = [
             Object(Matching, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_VECINIT
             Object(Matching, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD2
             Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_CRT
-            Object(CodeCandidate, "trk/ddh_cc_range_800C3C00.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(
+                Matching,
+                "trk/ddh_cc_range_800C3C00.c",
+                mw_version="GC/2.6",
+                progress_category="runtime",
+                extra_cflags=["-rostr"],
+            ),  # BANK_TRK
             Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
             Object(Matching, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD
             Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
             Object(Matching, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
-            Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(
+                Matching,
+                "trk/TRKComm_range_800C3678.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-sdata 0"],
+                progress_category="runtime",
+            ),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(Matching, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(
@@ -809,7 +821,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/fight_trainer_range_801F7954.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -914,7 +926,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/kaisuu.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -935,7 +947,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/cursor_bios.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -984,7 +996,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/floor_data.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1516,7 +1528,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_range_8000BE74.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1784,17 +1796,17 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gba/GBARead.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                mw_version="GC/1.2.5n",
+                extra_cflags=["-O4,p", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gba/GBAWrite.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                mw_version="GC/1.2.5n",
+                extra_cflags=["-O4,p", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
@@ -2223,7 +2235,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_math_vec.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -2627,8 +2639,9 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKBoard.c",
+                mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(
@@ -2737,6 +2750,12 @@ config.libs = [
             Object(
                 DataCandidate,
                 "game/data/rodata_8026FB94.c",
+                progress_category="game",
+                extra_cflags=["-sdata2 0"],
+            ),
+            Object(
+                DataCandidate,
+                "game/data/rodata_8026FD4C.c",
                 progress_category="game",
                 extra_cflags=["-sdata2 0"],
             ),

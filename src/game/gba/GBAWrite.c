@@ -106,31 +106,33 @@ asm void fn_8025F648(void) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimize_for_size off
-u32 GBAWrite(int r3, u32 r4, u32 r5) {
-  int idx;
-  u32 r29;
-  u32 r30;
-  u8 *entry;
-  s32 result;
-  idx = r3;
-  r29 = r4;
-  r30 = r5;
-  entry = lbl_804783E0 + idx * 0x100;
-  if (*(u32 *)(entry + 0x1C) != 0) {
-    result = 2;
-  } else {
-    *(u8 *)(entry + 0x0) = 0x15;
-    memcpy(entry + 1, (void *)r29, 4);
-    *(u32 *)(entry + 0x18) = r29;
-    *(u32 *)(entry + 0x14) = r30;
-    *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
-    result = __GBATransfer(idx, 5, 1, (u32)WriteProc);
+typedef struct GBAWriteControl {
+  u8 output[5];
+  u8 input[5];
+  s32 outputBytes;
+  s32 inputBytes;
+  u8 *status;
+  u8 *ptr;
+  void (*callback)(s32, s32);
+  s32 ret;
+  u8 _padding[0xDC];
+} GBAWriteControl;
+
+static inline int GBWriteAsync(s32 chan, u8 *ptr, u8 *statusPtr) {
+  GBAWriteControl *gba = &((GBAWriteControl *)lbl_804783E0)[chan];
+  if (gba->callback) {
+    return 2;
   }
-  if (result != 0) {
-    return result;
-  }
-  return __GBASync(idx);
+  gba->output[0] = 0x15;
+  memcpy(&gba->output[1], ptr, 4);
+  gba->ptr = ptr;
+  gba->status = statusPtr;
+  gba->callback = (void (*)(s32, s32))__GBASyncCallback;
+  return __GBATransfer(chan, 5, 1, (u32)WriteProc);
 }
-#pragma pop
+
+u32 GBAWrite(s32 chan, u8 *ptr, u8 *statusPtr) {
+  int _unused;
+  int status = GBWriteAsync(chan, ptr, statusPtr);
+  return (status != 0) ? status : __GBASync(chan);
+}

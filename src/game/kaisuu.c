@@ -158,9 +158,9 @@ extern u8    lbl_8047AD10;     /* resource request gate byte (sda21) - authorita
 /* Cross-segment prototypes for menu/window-engine functions defined in
  * sibling segment files split from the gs_model.c splitter bucket. */
 extern void fn_801019F8(void);
-extern void* kaisuuBiosGetMax(u32 index);
-extern void* kaisuuBiosGetMin(u32 index);
-extern u32 kaisuuGetKaisuu(u32 param);
+extern s32 kaisuuBiosGetMax(u32 index);
+extern s32 kaisuuBiosGetMin(u32 index);
+extern s32 kaisuuGetKaisuu(u32 param);
 extern void fn_80101B34(u32 param);
 extern void fn_80101B88(u32 val);
 extern void fn_80101B90(void);
@@ -277,36 +277,44 @@ extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
 /* 0x80101A70 | 0x2C */
-void* kaisuuBiosGetMax(u32 index) {
+#pragma dont_inline on
+s32 kaisuuBiosGetMax(u32 index) {
     struct Entry {
-        void* start;
-        void* end;
+        s32 start;
+        s32 end;
     };
     struct Entry* table;
-    if (index >= lbl_80478B20) { return (void*)0; }
+    if (index >= lbl_80478B20) { return 0; }
     table = (struct Entry*)lbl_80315690;
     return table[index].end;
 }
 
 /* 0x80101A9C | 0x28 */
 /* Returns value at entry[index].field0 (lwzx from offset 0) in the 8-byte table */
-void* kaisuuBiosGetMin(u32 index) {
-    if (index >= lbl_80478B20) { return (void*)0; }
-    return *(void**)(lbl_80315690 + index * 8);
+s32 kaisuuBiosGetMin(u32 index) {
+    if (index >= lbl_80478B20) { return 0; }
+    return *(s32*)(lbl_80315690 + index * 8);
 }
+#pragma dont_inline reset
 
 /* 0x80101AC4 | 0x70 */
 extern u32 fn_800E0C54(void);  /* random or tick */
-u32 kaisuuGetKaisuu(u32 param) {
-    u32 r30 = param;
-    u32 r31 = (u32)kaisuuBiosGetMax(r30);
-    r30 = (u32)kaisuuBiosGetMin(r30);
-    if (r31 != r30) {
-        u32 tick = fn_800E0C54();
-        u32 range = r31 - r30;
-        s32 mod = (s32)(u16)tick % (s32)(range + 1);
-        return r30 + (u32)mod;
+s32 kaisuuGetKaisuu(register u32 param) {
+    s32 max;
+    int base;
+    max = kaisuuBiosGetMax(param);
+    base = kaisuuBiosGetMin(param);
+    {
+        s32 min;
+        u32 tick;
+        s32 range;
+        s32 mod;
+        min = base;
+        if (max == min)
+            return min;
+        tick = fn_800E0C54();
+        range = max - min;
+        mod = (s32)(u16)tick % (s32)(range + 1);
+        return base + mod;
     }
-    return r31;
 }
-

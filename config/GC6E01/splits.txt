@@ -261,13 +261,7 @@ game/data/rodata_8026F640.c:
 	.rodata     start:0x8026F640 end:0x8026FB80
 
 game/data/rodata_8026FB94.c:
-	.rodata     start:0x8026FB94 end:0x8026FE58
-
-game/data/rodata_8026FE58.c:
-	.rodata     start:0x8026FE58 end:0x8026FFE0
-
-game/data/rodata_80270008.c:
-	.rodata     start:0x80270008 end:0x8027A4F0
+	.rodata     start:0x8026FB94 end:0x8026FC98
 
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
@@ -977,6 +971,16 @@ trk/udp_cc.c:
 
 trk/ddh_cc_range_800C3C00.c:
 	.text       start:0x800C3C00 end:0x800C3E88
+	.rodata     start:0x8026FC98 end:0x8026FD49
+
+game/data/rodata_8026FD4C.c:
+	.rodata     start:0x8026FD4C end:0x8026FE58
+
+game/data/rodata_8026FE58.c:
+	.rodata     start:0x8026FE58 end:0x8026FFE0
+
+game/data/rodata_80270008.c:
+	.rodata     start:0x80270008 end:0x8027A4F0
 
 trk/ddh_cc_close.c:
 	.text       start:0x800C3E88 end:0x800C3E90

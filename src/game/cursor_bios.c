@@ -106,7 +106,11 @@ extern f32 lbl_8047CE3C;  /* sdata2: float constant */
 extern f32 lbl_8047CE50;  /* sdata2: float constant */
 extern f32 lbl_8047CE5C;  /* sdata2: float constant */
 extern f32 lbl_8047CE70;  /* sdata2: float constant */
-extern u8  lbl_80404A98[];  /* table for display */
+typedef struct CursorBiosEntry {
+    u8 bytes[2];
+} CursorBiosEntry;
+
+extern u8 lbl_80404A98[];  /* table for display */
 extern u8  lbl_80271E10[];  /* format string */
 extern u8  lbl_80271E4C[];  /* format string */
 extern u8  lbl_80271EE8[];  /* format string */
@@ -314,19 +318,17 @@ u32 cursorBiosSetPos(u16 idx, u16* out) {
 #pragma pop
 
 /* 0x80103EF4 | 0x80 */
+#pragma push
+#pragma peephole off
 void cursorBiosInit(void) {
-    if (0 >= 0xc) { return; }
-    {
-        u8* p = lbl_80404A98;
-        u8* q = p + 0xc;
-        p[0] = 0; p[1] = 0; p[2] = 0; p[3] = 0;
-        p[4] = 0; p[5] = 0; p[6] = 0; p[7] = 0;
-        p[8] = 0; p[9] = 0; p[10] = 0; p[11] = 0;
-        q[0] = 0; q[1] = 0; q[2] = 0; q[3] = 0;
-        q[4] = 0; q[5] = 0; q[6] = 0; q[7] = 0;
-        q[8] = 0; q[9] = 0; q[10] = 0; q[11] = 0;
+    s32 i;
+
+    for (i = 0; i < 12; i++) {
+        ((CursorBiosEntry*)lbl_80404A98)[i].bytes[0] = 0;
+        ((CursorBiosEntry*)lbl_80404A98)[i].bytes[1] = 0;
     }
 }
+#pragma pop
 
 /* 0x80103F74 | 0x70 */
 #pragma push
@@ -347,4 +349,3 @@ void fn_80103F74(void* head, u16 key, u32 data) {
     }
 }
 #pragma pop
-

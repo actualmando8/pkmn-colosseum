@@ -486,49 +486,50 @@ asm void GSvecTransformQuat(void) {
 #pragma push
 #pragma fp_contract on
 void GSvecTransformQuat(f32* r3, f32* r4, f32* r5) {
-    f32 f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12;
-    f6 = r5[1];
+    f32 f0;
+    f32 nextX;
+    f32 nextY;
+    f32 f1;
+    f32 f2;
+    f32 f3;
+    f32 f4;
+    f32 f5;
+    f32 f6;
+    f32 f7;
+    f32 inputY;
+    f32 f8;
+    f32 f9;
+    f32 f10;
+    f32 f11;
+    f32 f12;
+    inputY = r5[1];
+    f6 = inputY;
     f12 = r4[1];
     f10 = r5[2];
     f11 = r4[0];
     f0 = f6 * f12;
     f5 = r5[0];
+    f1 = f6 * f11;
     f2 = f10 * f12;
     f8 = r4[2];
-    f1 = f6 * f11;
     f9 = r4[3];
     f0 = f5 * f11 + f0;
     f3 = f5 * f9 + f2;
     f2 = f5 * f8;
     f7 = f10 * f8 + f0;
-    f1 = f10 * f9 + f1;
-    f4 = -(f6 * f8 - f3);
     f0 = f11 * f7;
+    f1 = f10 * f9 + (f32)f1;
+    nextX = -(f6 * f8 - f3);
+    f4 = nextX;
     f2 = f6 * f9 + f2;
     f6 = -(f5 * f12 - f1);
     f0 = f9 * f4 + f0;
-    f5 = -(f10 * f11 - f2);
+    nextY = -(f10 * f11 - f2);
+    f5 = nextY;
     f0 = f12 * f6 + f0;
-    f0 = -(f8 * f5 - f0);
-    r3[0] = f0;
-    f0 = r4[1];
-    f1 = r4[3];
-    f0 = f0 * f7;
-    f2 = r4[2];
-    f3 = r4[0];
-    f0 = f1 * f5 + f0;
-    f0 = f2 * f4 + f0;
-    f0 = -(f3 * f6 - f0);
-    r3[1] = f0;
-    f0 = r4[2];
-    f1 = r4[3];
-    f0 = f0 * f7;
-    f2 = r4[0];
-    f3 = r4[1];
-    f0 = f1 * f6 + f0;
-    f0 = f2 * f5 + f0;
-    f0 = -(f3 * f4 - f0);
-    r3[2] = f0;
+    r3[0] = -(f8 * f5 - f0);
+    r3[1] = r4[3] * f5 + r4[1] * f7 + r4[2] * f4 - r4[0] * f6;
+    r3[2] = r4[3] * f6 + r4[2] * f7 + r4[0] * f5 - r4[1] * f4;
 }
 #pragma pop
 #endif

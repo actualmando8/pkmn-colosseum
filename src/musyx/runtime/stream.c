@@ -25,6 +25,9 @@
  */
 #include "dolphin/types.h"
 
+typedef u32 SND_STREAMID;
+typedef u32 MusyBool;
+
 /* ===== Cross-TU MusyX helpers (already ported in sibling runtime files) ===== */
 extern void hwSetVolume(u32 v, u8 table, f32 vol, u32 pan, u32 span, f32 auxa, f32 auxb);
 extern void hwSetPitch(u32 index, u16 value);
@@ -68,11 +71,11 @@ typedef struct SynthInfo {
   u8 studioNum;    // 0x213
 } SynthInfo; // size 0x214
 
-extern u8 lbl_80434C50[]; /* synthInfo */
+extern SynthInfo lbl_80434C50; /* synthInfo */
 extern u32 lbl_8047AF44;  /* synthFlags */
 extern u8* lbl_8047AF48;  /* synthVoice (base ptr; stride 0x404, id field @0xf4) */
 
-#define synthInfo ((SynthInfo*)lbl_80434C50)
+#define synthInfo lbl_80434C50
 #define synthFlags lbl_8047AF44
 
 /* ===== Stream subsystem state (owned by this TU) ===== */
@@ -131,11 +134,11 @@ typedef struct STREAM_INFO {
   u8 studio;            // 0x60
 } STREAM_INFO; // size 0x64 (rounded up from 0x61)
 
-STREAM_INFO lbl_80435FF8[64]; /* streamInfo */
-u32 lbl_8047AF60;             /* nextPublicID */
-u8 lbl_8047AF64;              /* streamCallDelay (declared before streamCallCnt in the
+static STREAM_INFO lbl_80435FF8[64]; /* streamInfo */
+static u32 lbl_8047AF60;             /* nextPublicID */
+static u8 lbl_8047AF64;              /* streamCallDelay (declared before streamCallCnt in the
                                 * <=2.0.2 branch of reference stream.c, hence lower address) */
-u8 lbl_8047AF65;              /* streamCallCnt */
+static u8 lbl_8047AF65;              /* streamCallCnt */
 
 #define streamInfo lbl_80435FF8
 #define nextPublicID lbl_8047AF60
@@ -147,30 +150,16 @@ u8 lbl_8047AF65;              /* streamCallCnt */
  * same-TU callees; declarations just satisfy the C89 need-before-use
  * rule without affecting codegen order). */
 u32 sndStreamAllocLength(u32 num, u32 flags);
-u32 sndStreamActivate(u32 stid);
+MusyBool sndStreamActivate(SND_STREAMID stid);
 void sndStreamDeactivate(u32 stid);
 
-/* Improved 2026-07-14 from ~59% to 91.17%: caching `synthInfo->voiceNum`
- * into a local `s32 n` (declared before the loop var `i`, also s32) up
- * front makes MWCC's unroller pick the SAME by-8 group-count preamble as
- * the target (cmpwi/subi/addi/srwi/mtctr chain matches exactly, and the
- * post-loop `subf`/`cmpw` remainder-tracking sequence now matches too).
- * Remaining gap is register-allocation only: target reloads
- * `synthInfo->voiceNum` a second time (fresh `lbz`) after the unrolled
- * block for the remainder-loop bound instead of reusing the cached
- * value, plus a handful of r3/r4/r5/r6/r7 swaps in the zero-store
- * unrolled body. Tried and reverted: u8 loop var (26.91%), scoped
- * `#pragma peephole off` (36.62%), pointer-bump body via STREAM_INFO*
- * si (58.3%), i++ vs ++i (no change). Don't re-grind past 91.17% without
- * a new lever for the compiler-forced double-load of a memory-resident
- * loop bound. */
+/* The typed object declaration is significant here: it gives MWCC the same
+ * alias information as the MusyX source and preserves its by-eight unroll. */
 void fn_8014DDD8(void) {
-  s32 n;
   s32 i;
   streamCallCnt = 0;
   streamCallDelay = 3;
-  n = synthInfo->voiceNum;
-  for (i = 0; i < n; ++i) {
+  for (i = 0; i < synthInfo.voiceNum; ++i) {
     streamInfo[i].state = 0;
   }
   nextPublicID = 0;
@@ -196,7 +185,7 @@ void fn_8014DF20(void) {
   }
   streamCallCnt = streamCallDelay;
   si = &streamInfo[0];
-  for (i = 0; i < synthInfo->voiceNum; ++i, ++si) {
+  for (i = 0; i < synthInfo.voiceNum; ++i, ++si) {
     switch (si->state) {
     case 1:
       newsmp.info = si->frq | 0x40000000;
@@ -222,7 +211,7 @@ void fn_8014DF20(void) {
       v = si->voice;
       hwInitSamplePlayback(v, -1, &newsmp, 1, -1, *(u32*)(lbl_8047AF48 + v * 0x404 + 0xF4), 1, 1);
 
-      f = (si->frq / (f32)synthInfo->mixFrq);
+      f = (si->frq / (f32)synthInfo.mixFrq);
       hwSetPitch(si->voice, (u16)(f * 4096.f));
       SetHWMix(si);
 
@@ -395,7 +384,7 @@ void fn_8014E7D0(u32 voice) {
   }
 }
 
-u32 GetPrivateIndex(u32 publicID) {
+static u32 GetPrivateIndex(u32 publicID) {
   u32 i;
   for (i = 0; i < 64; ++i) {
     if (streamInfo[i].state != 0 && publicID == streamInfo[i].stid) {
@@ -489,7 +478,7 @@ void streamOutputModeChanged(void) {
   u32 i;
 
   hwDisableIrq();
-  for (i = 0; i < synthInfo->voiceNum; ++i) {
+  for (i = 0; i < synthInfo.voiceNum; ++i) {
     if (streamInfo[i].state != 0) {
       streamInfo[i].pan = streamInfo[i].orgPan;
       streamInfo[i].span = streamInfo[i].orgSPan;
@@ -595,24 +584,17 @@ void fn_8014F2DC(u32 stid, u8 vol, u8 pan, u8 span, u8 auxa, u8 auxb) {
   hwEnableIrq();
 }
 
-/* PARKED at 98.9% (2026-07-02): logic and control flow are exactly right
- * (MWCC's self-recursion partial-inlining depth matched via
- * `#pragma inline_depth(4)`, tried 1/2/3/5 -- 4 is the closest, giving
- * only 2 register-allocation swaps left, e.g. target picks r25 where we
- * pick r26 for one temp deep inside the 3rd unrolled recursion level.
- * No instruction/branch shape differs -- pure callee-saved-register
- * numbering preference by MWCC's allocator that source-level reordering
- * (locals, statement order) did not shift. */
+/* MusyX's recursive free path is partially inlined four levels deep. */
 #pragma push
 #pragma inline_depth(4)
-void sndStreamFree(u32 stid) {
+void sndStreamFree(SND_STREAMID stid) {
   u32 i;
   hwDisableIrq();
   i = GetPrivateIndex(stid);
-  if (i != (u32)-1) {
+  if (i != -1) {
     sndStreamDeactivate(stid);
     fn_80162F68(streamInfo[i].hwStreamHandle);
-    if (streamInfo[i].nextStreamHandle != (u32)-1) {
+    if (streamInfo[i].nextStreamHandle != 0xffffffff) {
       sndStreamFree(streamInfo[i].nextStreamHandle);
     }
 
@@ -623,22 +605,15 @@ void sndStreamFree(u32 stid) {
 }
 #pragma pop
 
-/* PARKED at 99.2% (2026-07-02): same story as sndStreamFree above --
- * logic/branch shape is exact, remaining diff is a handful of
- * register-allocation swaps (r30 vs r31 for the streamInfo base pointer,
- * chosen at the very first inlined GetPrivateIndex use and cascading
- * through the rest of the function). Tried: declaration-order swap of
- * i/ret, #pragma inline_depth(1..5) (no change vs default -inline auto).
- * No behavioral difference from target. */
-u32 sndStreamActivate(u32 stid) {
+MusyBool sndStreamActivate(SND_STREAMID stid) {
   u32 i;
   u32 ret = 0;
 
   hwDisableIrq();
   i = GetPrivateIndex(stid);
-  if (i != (u32)-1) {
+  if (i != -1) {
     if (streamInfo[i].state == 3) {
-      if ((streamInfo[i].voice = fn_80158328(streamInfo[i].prio)) == (u32)-1) {
+      if ((streamInfo[i].voice = fn_80158328(streamInfo[i].prio)) == -1) {
         hwEnableIrq();
         return 0;
       }
@@ -647,7 +622,7 @@ u32 sndStreamActivate(u32 stid) {
       streamInfo[i].state = 1;
     }
 
-    if (streamInfo[i].nextStreamHandle != (u32)-1) {
+    if (streamInfo[i].nextStreamHandle != 0xffffffff) {
       ret = sndStreamActivate(streamInfo[i].nextStreamHandle);
     } else {
       ret = 1;

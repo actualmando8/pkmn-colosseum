@@ -1560,19 +1560,6 @@ void floorDataBiosSetMapResID(void* obj, u32 val) {
     *(u32*)((u8*)obj + 0x8) = val;
 }
 #pragma pop
-/* 0xfn_80115A38 | global_cond_call */
-#pragma push
-#pragma scheduling on
-#pragma peephole off
-u32 floorDataBiosGetFileGroupID(u8* entry) {
-    extern u8 lbl_8035B91C[];
-    if (entry == 0) {
-        GSlogWrite(lbl_80272608, (const char*)lbl_8035B91C);
-        return 0;
-    }
-    return *(u32*)(entry + 0x4);
-}
-#pragma pop
 /* 0x70 | floorDataBiosGetCurrentPtr | generic */
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
@@ -1657,25 +1644,6 @@ extern u32 heroBiosGetNamePtr(void* ptr);
 #if 0
 asm void floorDataBiosGetCurrentPtr(void) {
 #include "src/game/gs_field_world_fn_80115BD8.inc"
-}
-#else
-void* floorDataBiosGetCurrentPtr(void) {
-    /* refs: lbl_802726D4, lbl_8035B8A0, lbl_80478FB8, lbl_80478FBC */
-    void* floorId;
-    u8* entry;
-    u32 count;
-
-    floorId = fn_800FF56C();
-    entry = (u8*)lbl_80478FBC;
-    for (count = *(u32*)lbl_80478FB8; count != 0; count--) {
-        if (*(u32*)(entry + 0xC) == (u32)floorId) {
-            return entry;
-        }
-        entry += 0x4C;
-    }
-    GSlogWrite((const char*)lbl_802726D4, (const char*)lbl_8035B8A0);
-    entry = (u8*)0;
-    return (void*)entry;
 }
 #endif
 extern u8 lbl_8035BA98[];
@@ -1964,6 +1932,19 @@ u32 floorDataBiosGetFloorID(u8* ptr) {
 }
 #pragma pop
 #endif
+/* 0xfn_80115A38 | global_cond_call */
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+u32 floorDataBiosGetFileGroupID(u8* entry) {
+    extern u8 lbl_8035B91C[];
+    if (entry == 0) {
+        GSlogWrite(lbl_80272608, (const char*)lbl_8035B91C);
+        return 0;
+    }
+    return *(u32*)(entry + 0x4);
+}
+#pragma pop
 extern u8 lbl_8035B904[];
 #if 0
 asm void floorDataBiosGetGroupID(void) {
@@ -2049,6 +2030,28 @@ u8 floorDataBiosGetArea(u8* ptr) {
 #endif
 extern u32 lbl_80478FB8;
 extern u32 lbl_80478FBC;
+#pragma push
+#pragma peephole off
+#pragma scheduling on
+#pragma optimization_level 4
+static inline void* floorDataBiosFindCurrent(u32 key) {
+    u8* entry = (u8*)lbl_80478FBC;
+    u32 count;
+
+    for (count = *(u32*)lbl_80478FB8; count != 0; count--) {
+        if (*(u32*)(entry + 0xC) == key) {
+            return entry;
+        }
+        entry += 0x4C;
+    }
+    GSlogWrite((const char*)lbl_802726D4, (const char*)lbl_8035B8A0);
+    return 0;
+}
+
+void* floorDataBiosGetCurrentPtr(void) {
+    return floorDataBiosFindCurrent((u32)fn_800FF56C());
+}
+#pragma pop
 #if 0
 asm void floorDataBiosGetPtr(void) {
 #include "src/game/gs_field_world_fn_80115C48.inc"
