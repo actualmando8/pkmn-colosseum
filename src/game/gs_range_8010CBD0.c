@@ -489,6 +489,11 @@ typedef struct ColWalkHit {
 
 extern s32 fn_8010E138(void* origin, void* results);
 
+static inline f32 GScolsys2WalkHeightDelta(Vec3f* position, ColWalkHit* hit)
+{
+    return position->y - hit[0].height;
+}
+
 /* 0x8010DE00 | 0xF0 */
 s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* subLayer)
 {
@@ -504,7 +509,7 @@ s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* subLayer)
         return 0;
     }
 
-    distance = position->y - hits[0].height;
+    distance = GScolsys2WalkHeightDelta(position, hits);
     distance = distance > 0.0f ? distance : -distance;
     closest = 0;
     closestDistance = distance;

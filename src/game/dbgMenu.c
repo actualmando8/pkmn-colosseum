@@ -444,6 +444,7 @@ typedef struct DbgMenuWindow {
 #pragma scheduling on
 void dbgMenuCursor(DbgMenuWindow* obj) {
     s8 pair[2];
+    u16 inputFlags;
     s8 entryCount;
     s8 maxCount;
     u32 flags;
@@ -451,14 +452,15 @@ void dbgMenuCursor(DbgMenuWindow* obj) {
     flags = ((DbgMenuKeyInfo*)windowGetKeyInfo())->flags;
     entryCount = _dbgMenuGetMenuNum__FP14tagWINDOW_WORKPl((u32)obj, NULL);
     maxCount = menuDataBiosGetType(obj->key);
+    inputFlags = flags;
     if (entryCount < maxCount) {
         maxCount = entryCount;
     }
 
     *(u16*)pair = obj->cursorPosition;
-    if (flags & 1) {
+    if (inputFlags & 1) {
         pair[1]--;
-    } else if (flags & 2) {
+    } else if (inputFlags & 2) {
         pair[1]++;
     }
 

@@ -665,7 +665,7 @@ s32 fn_80054914(MenuCBPane* pane, MenuCBPane* sprite) {
         column = 0;
         id = *(s16*)((u8*)sprite + 6);
         for (; column < 3; column++) {
-            if (id == table.ids[row][column]) {
+            if (*(s16*)((u8*)sprite + 6) == table.ids[row][column]) {
                 break;
             }
         }

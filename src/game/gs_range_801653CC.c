@@ -546,7 +546,7 @@ u32 fn_80166098(u32 id)
 void fn_801660D8(u32 volume, u32 includeBgm, u32 includeSe)
 {
     u32 offset;
-    u32 i;
+    int i;
 
     for (i = 0, offset = 0; i < lbl_8047B0E8; offset += sizeof(GSsndEntry), i++) {
         u32 flags = *(u8*)((u8*)lbl_80478FAC + offset);
