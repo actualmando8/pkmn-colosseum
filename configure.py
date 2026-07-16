@@ -322,6 +322,12 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "dolphin/dvd/DVDError_ErrorCode2Num.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
                 "dolphin/dvd/DVDError.c",
                 progress_category="sdk",
             ),
@@ -1131,7 +1137,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800A03B4.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
