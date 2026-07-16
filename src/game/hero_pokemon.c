@@ -1373,7 +1373,7 @@ extern u32 heroMoveSetNeckMode(s32 idx, s32 state);
 extern u32 heroMoveIsMember(s32 idx);
 extern s32 heroMoveDismissMember(s32 idx);
 extern void heroPokemonGetCelebi(u8* arg1);
-extern void fn_80130770(u8* arg1);
+extern void heroPokemonGetPikachu(u8* arg1);
 extern void heroPokemonGetHouou(u8* arg1);
 extern void fn_801309A0(u32 arg1);
 extern void* floorReadScriptPostFunc(u32 a, u32 b);
@@ -1430,10 +1430,6 @@ extern void heroMoveGetHeroRot(u32 param);
 extern void heroMoveGetHeroPos(u32 param);
 extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
-/* Address: 0x80130CD8 | Size: 0x8 | Pattern: sda_getter */
-u32 fn_80130CD8(void) {
-    return lbl_8047ADC0;
-}
 /* 0x8012F1FC | 0x210 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -1535,7 +1531,7 @@ asm void fn_80130770(void) {
 #include "src/game/gs_field_world_fn_80130770.inc"
 }
 #else
-void fn_80130770(u8* arg1) {
+void heroPokemonGetPikachu(u8* arg1) {
     extern u32 gamedataGetStatus(u32 a, u32 b);
     extern void gamedataAttestCreate(u32* a, u32 b, u32 c, u8 d, u8 e);
     extern void pokemonCreate(u8* a, u32 b, u32 c, u32* d);
@@ -1692,3 +1688,8 @@ void heroPokemonGetBlacky(u32 arg1) {
     heroCatchPokemon(arg1, buf, 0xfe, 4, 0);
 }
 #endif
+
+/* Address: 0x80130CD8 | Size: 0x8 | Pattern: sda_getter */
+u32 fn_80130CD8(void) {
+    return lbl_8047ADC0;
+}
