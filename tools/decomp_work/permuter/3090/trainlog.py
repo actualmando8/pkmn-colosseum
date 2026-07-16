@@ -80,8 +80,14 @@ class TrainLogger:
             pass  # non-main thread or unsupported: atexit still covers exits
 
     def _on_sigterm(self, signum, frame) -> None:
-        self.close()
-        sys.exit(143)
+        # Best-effort flush, then hand off to the default disposition and
+        # re-signal. Raising SystemExit cannot unwind while blocked in a hung
+        # child's Popen.wait(), which can leave a worker alive indefinitely.
+        try:
+            self.close()
+        finally:
+            signal.signal(signal.SIGTERM, signal.SIG_DFL)
+            os.kill(os.getpid(), signal.SIGTERM)
 
     # ---- diffing ------------------------------------------------------------
     def _window_diff(self, cand_lines: Sequence[str]) -> Tuple[int, str]:

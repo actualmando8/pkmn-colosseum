@@ -11,6 +11,7 @@
 #include "dolphin/os/OSContext.h"
 #include "dolphin/os/OSInterrupt.h"
 #include "dolphin/os/OSThread.h"
+#include "dolphin/os/OSTime.h"
 #include "dolphin/os/PPCArch.h"
 
 typedef void (*GXBreakPtCallback)(u16 token);
@@ -52,7 +53,7 @@ typedef struct GXData_800B857C {
 
 extern GXData_800B857C* const gx;
 extern volatile u16* __peReg;
-extern volatile u16* __memReg;
+extern void* __memReg;
 extern GXBreakPtCallback lbl_8047A9C0;
 extern GXDrawDoneCallback lbl_8047A9C4;
 extern volatile u8 lbl_8047A9C8;
@@ -67,10 +68,15 @@ extern void fn_800B7BC4(void);
 extern void fn_800B8444(void);
 extern void __GXCalculateVLim(void);
 extern u32 __cvt_fp2unsigned(f32 value);
+extern void __GetImageTileCount(s32 format, u16 width, u16 height,
+                                u32* rowTiles, u32* columnTiles, u32* planes);
 
 #define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
 #define GX_FIFO_U16 (*(volatile u16*)0xCC008000)
 #define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
+#define GX_GET_MEM_REG(offset) (*(volatile u16*)((volatile u16*)__memReg + (offset)))
+
+volatile u32 __PIRegs[12] : 0xCC003000;
 
 #define GX_BP_REG(reg)      \
     do {                    \
@@ -355,6 +361,55 @@ void GXFlush(void) {
     GX_FIFO_U32 = 0;
     GX_FIFO_U32 = 0;
     PPCSync();
+}
+
+static inline u32 __GXReadMEMCounterU32(u32 regAddrL, u32 regAddrH) {
+    u32 ctrH0;
+    u32 ctrH1;
+    u32 ctrL;
+
+    ctrH0 = GX_GET_MEM_REG(regAddrH);
+
+    do {
+        ctrH1 = ctrH0;
+        ctrL = GX_GET_MEM_REG(regAddrL);
+        ctrH0 = GX_GET_MEM_REG(regAddrH);
+    } while (ctrH0 != ctrH1);
+
+    return (ctrH0 << 16) | ctrL;
+}
+
+static void __GXAbortWait(u32 clocks) {
+    OSTime time0;
+    OSTime time1;
+
+    time0 = OSGetTime();
+    do {
+        time1 = OSGetTime();
+    } while (time1 - time0 <= (clocks / 4));
+}
+
+static void __GXAbortWaitPECopyDone(void) {
+    u32 peCnt0;
+    u32 peCnt1;
+
+    peCnt0 = __GXReadMEMCounterU32(0x28, 0x27);
+    do {
+        peCnt1 = peCnt0;
+        __GXAbortWait(32);
+        peCnt0 = __GXReadMEMCounterU32(0x28, 0x27);
+    } while (peCnt0 != peCnt1);
+}
+
+void __GXAbort(void) {
+    if (gx->field_4F2 && fn_800B7714() != 0) {
+        __GXAbortWaitPECopyDone();
+    }
+
+    __PIRegs[0x18 / 4] = 1;
+    __GXAbortWait(200);
+    __PIRegs[0x18 / 4] = 0;
+    __GXAbortWait(20);
 }
 
 void fn_800B8C58(u16 token) {
@@ -703,6 +758,48 @@ void fn_800B96BC(u32 value) {
     *regp = (*regp & 0xFFFFFFU) | 0x4D000000U;
 }
 
+void fn_800B96F8(u16 width, u16 height, s32 format, u8 mipmap) {
+    u32 rowTiles;
+    u32 columnTiles;
+    u32 planes;
+    u32 peFormat;
+    u32 peFormatHigh;
+
+    gx->field_200 = 0;
+    peFormat = format & 0xF;
+
+    if (format == 0x13) {
+        peFormat = 0xB;
+    }
+
+    switch (format) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 0x26:
+        gx->field_1FC = (gx->field_1FC & ~0x18000U) | 0x18000;
+        break;
+    default:
+        gx->field_1FC = (gx->field_1FC & ~0x18000U) | 0x10000;
+        break;
+    }
+
+    gx->field_200 = (0x10 == (format & 0x10));
+    peFormatHigh = (peFormat >> 3) & 1;
+    !peFormat;
+    gx->field_1FC = (gx->field_1FC & ~8U) | (peFormatHigh << 3);
+    peFormat &= 7;
+
+    __GetImageTileCount(format, width, height, &rowTiles, &columnTiles, &planes);
+
+    gx->field_1F8 = 0;
+    gx->field_1F8 = (gx->field_1F8 & ~0x3FFU) | (rowTiles * planes);
+    gx->field_1F8 = (gx->field_1F8 & 0xFFFFFFU) | 0x4D000000U;
+    gx->field_1FC = (gx->field_1FC & ~0x200U) | ((mipmap & 0xFF) << 9);
+    gx->field_1FC = (gx->field_1FC & ~0x70U) | (peFormat << 4);
+}
+
 void fn_800B984C(u32 value) {
     gx->field_1EC = (gx->field_1EC & ~0x3000U) | (value << 12);
     gx->field_1FC = gx->field_1FC & ~0x3000U;
@@ -723,6 +820,64 @@ void fn_800B9874(u32 value) {
     p->field_1EC = (p->field_1EC & ~2U) | (out1 << 1);
     p->field_1FC = (p->field_1FC & ~1U) | out0;
     p->field_1FC = (p->field_1FC & ~2U) | (out1 << 1);
+}
+
+static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
+    u32 count;
+    u32 realHt;
+    u32 iScaleD;
+
+    count = (efbHt - 1) * 0x100;
+    realHt = (count / iScale) + 1;
+
+    iScaleD = iScale;
+
+    if (iScaleD > 0x80 && iScaleD < 0x100) {
+        while (iScaleD % 2 == 0) {
+            iScaleD /= 2;
+        }
+
+        if (efbHt % iScaleD == 0) {
+            realHt++;
+        }
+    }
+
+    if (realHt > 0x400) {
+        realHt = 0x400;
+    }
+
+    return realHt;
+}
+
+f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
+    f32 fScale;
+    f32 yScale;
+    u32 iScale;
+    u32 tgtHt;
+    u32 realHt;
+
+    tgtHt = xfbHeight;
+    yScale = (f32)xfbHeight / (f32)efbHeight;
+    iScale = (u32)(256.0f / yScale) & 0x1FF;
+    realHt = __GXGetNumXfbLines(efbHeight, iScale);
+
+    while (realHt > xfbHeight) {
+        tgtHt--;
+        yScale = (f32)tgtHt / (f32)efbHeight;
+        iScale = (u32)(256.0f / yScale) & 0x1FF;
+        realHt = __GXGetNumXfbLines(efbHeight, iScale);
+    }
+
+    fScale = yScale;
+    while (realHt < xfbHeight) {
+        fScale = yScale;
+        tgtHt++;
+        yScale = (f32)tgtHt / (f32)efbHeight;
+        iScale = (u32)(256.0f / yScale) & 0x1FF;
+        realHt = __GXGetNumXfbLines(efbHeight, iScale);
+    }
+
+    return fScale;
 }
 
 static inline u32 gxGetNumXfbLines(u32 height, u32 scale) {
@@ -791,10 +946,222 @@ void fn_800B9BDC(GXColor_800B9BDC color, u32 clearZ) {
     p->field_002 = 0;
 }
 
+#define GX_GET_REG_FIELD(reg, size, shift) \
+    ((s32)((reg) >> (shift)) & ((1 << (size)) - 1))
+#define GX_SET_REG_FIELD(reg, size, shift, value)                                  \
+    ((reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) |                   \
+             ((u32)(value) << (shift)))
+
+void fn_800B9C44(u8 aa, const u8 samplePattern[12][2], u8 vf,
+                 const u8 vfilter[7]) {
+    u32 msLoc[4];
+    u32 coeff0;
+    u32 coeff1;
+
+    if (aa != 0) {
+        msLoc[0] = 0;
+        GX_SET_REG_FIELD(msLoc[0], 4, 0, samplePattern[0][0]);
+        GX_SET_REG_FIELD(msLoc[0], 4, 4, samplePattern[0][1]);
+        GX_SET_REG_FIELD(msLoc[0], 4, 8, samplePattern[1][0]);
+        GX_SET_REG_FIELD(msLoc[0], 4, 12, samplePattern[1][1]);
+        GX_SET_REG_FIELD(msLoc[0], 4, 16, samplePattern[2][0]);
+        GX_SET_REG_FIELD(msLoc[0], 4, 20, samplePattern[2][1]);
+        GX_SET_REG_FIELD(msLoc[0], 8, 24, 1);
+
+        msLoc[1] = 0;
+        GX_SET_REG_FIELD(msLoc[1], 4, 0, samplePattern[3][0]);
+        GX_SET_REG_FIELD(msLoc[1], 4, 4, samplePattern[3][1]);
+        GX_SET_REG_FIELD(msLoc[1], 4, 8, samplePattern[4][0]);
+        GX_SET_REG_FIELD(msLoc[1], 4, 12, samplePattern[4][1]);
+        GX_SET_REG_FIELD(msLoc[1], 4, 16, samplePattern[5][0]);
+        GX_SET_REG_FIELD(msLoc[1], 4, 20, samplePattern[5][1]);
+        GX_SET_REG_FIELD(msLoc[1], 8, 24, 2);
+
+        msLoc[2] = 0;
+        GX_SET_REG_FIELD(msLoc[2], 4, 0, samplePattern[6][0]);
+        GX_SET_REG_FIELD(msLoc[2], 4, 4, samplePattern[6][1]);
+        GX_SET_REG_FIELD(msLoc[2], 4, 8, samplePattern[7][0]);
+        GX_SET_REG_FIELD(msLoc[2], 4, 12, samplePattern[7][1]);
+        GX_SET_REG_FIELD(msLoc[2], 4, 16, samplePattern[8][0]);
+        GX_SET_REG_FIELD(msLoc[2], 4, 20, samplePattern[8][1]);
+        GX_SET_REG_FIELD(msLoc[2], 8, 24, 3);
+
+        msLoc[3] = 0;
+        GX_SET_REG_FIELD(msLoc[3], 4, 0, samplePattern[9][0]);
+        GX_SET_REG_FIELD(msLoc[3], 4, 4, samplePattern[9][1]);
+        GX_SET_REG_FIELD(msLoc[3], 4, 8, samplePattern[10][0]);
+        GX_SET_REG_FIELD(msLoc[3], 4, 12, samplePattern[10][1]);
+        GX_SET_REG_FIELD(msLoc[3], 4, 16, samplePattern[11][0]);
+        GX_SET_REG_FIELD(msLoc[3], 4, 20, samplePattern[11][1]);
+        GX_SET_REG_FIELD(msLoc[3], 8, 24, 4);
+    } else {
+        msLoc[0] = 0x01666666;
+        msLoc[1] = 0x02666666;
+        msLoc[2] = 0x03666666;
+        msLoc[3] = 0x04666666;
+    }
+
+    GX_BP_REG(msLoc[0]);
+    GX_BP_REG(msLoc[1]);
+    GX_BP_REG(msLoc[2]);
+    GX_BP_REG(msLoc[3]);
+
+    coeff0 = 0;
+    GX_SET_REG_FIELD(coeff0, 8, 24, 0x53);
+    coeff1 = 0;
+    GX_SET_REG_FIELD(coeff1, 8, 24, 0x54);
+
+    if (vf != 0) {
+        GX_SET_REG_FIELD(coeff0, 6, 0, vfilter[0]);
+        GX_SET_REG_FIELD(coeff0, 6, 6, vfilter[1]);
+        GX_SET_REG_FIELD(coeff0, 6, 12, vfilter[2]);
+        GX_SET_REG_FIELD(coeff0, 6, 18, vfilter[3]);
+        GX_SET_REG_FIELD(coeff1, 6, 0, vfilter[4]);
+        GX_SET_REG_FIELD(coeff1, 6, 6, vfilter[5]);
+        GX_SET_REG_FIELD(coeff1, 6, 12, vfilter[6]);
+    } else {
+        GX_SET_REG_FIELD(coeff0, 6, 0, 0);
+        GX_SET_REG_FIELD(coeff0, 6, 6, 0);
+        GX_SET_REG_FIELD(coeff0, 6, 12, 21);
+        GX_SET_REG_FIELD(coeff0, 6, 18, 22);
+        GX_SET_REG_FIELD(coeff1, 6, 0, 21);
+        GX_SET_REG_FIELD(coeff1, 6, 6, 0);
+        GX_SET_REG_FIELD(coeff1, 6, 12, 0);
+    }
+
+    {
+        GXData_800B857C* p = gx;
+
+        GX_BP_REG(coeff0);
+        GX_BP_REG(coeff1);
+        p->field_002 = 0;
+    }
+}
+
 void fn_800B9E6C(u32 value) {
     GXData_800B857C* p = gx;
 
     p->field_1EC = (p->field_1EC & ~0x180U) | (value << 7);
+}
+
+void fn_800B9E88(void* dest, u8 clear) {
+    u32 reg;
+    u32 tempPeCtrl;
+    u32 phyAddr;
+    u8 changePeCtrl;
+
+    if (clear) {
+        reg = gx->field_1D8;
+        GX_SET_REG_FIELD(reg, 1, 0, 1);
+        GX_SET_REG_FIELD(reg, 3, 1, 7);
+        GX_BP_REG(reg);
+
+        reg = gx->field_1D0;
+        GX_SET_REG_FIELD(reg, 1, 0, 0);
+        GX_SET_REG_FIELD(reg, 1, 1, 0);
+        GX_BP_REG(reg);
+    }
+
+    changePeCtrl = 0;
+
+    if ((clear || (u32)GX_GET_REG_FIELD(gx->field_1DC, 3, 0) == 3) &&
+        (u32)GX_GET_REG_FIELD(gx->field_1DC, 1, 6) == 1) {
+        changePeCtrl = 1;
+        tempPeCtrl = gx->field_1DC;
+        GX_SET_REG_FIELD(tempPeCtrl, 1, 6, 0);
+        GX_BP_REG(tempPeCtrl);
+    }
+
+    GX_BP_REG(gx->field_1E0);
+    GX_BP_REG(gx->field_1E4);
+    GX_BP_REG(gx->field_1E8);
+
+    phyAddr = (u32)dest & 0x3FFFFFFF;
+    reg = 0;
+    GX_SET_REG_FIELD(reg, 21, 0, phyAddr >> 5);
+    GX_SET_REG_FIELD(reg, 8, 24, 0x4B);
+    GX_BP_REG(reg);
+
+    GX_SET_REG_FIELD(gx->field_1EC, 1, 11, clear);
+    GX_SET_REG_FIELD(gx->field_1EC, 1, 14, 1);
+    GX_SET_REG_FIELD(gx->field_1EC, 8, 24, 0x52);
+    GX_BP_REG(gx->field_1EC);
+
+    if (clear) {
+        GX_BP_REG(gx->field_1D8);
+        GX_BP_REG(gx->field_1D0);
+    }
+
+    if (changePeCtrl) {
+        GXData_800B857C* p = gx;
+        GX_BP_REG(p->field_1DC);
+    }
+
+    gx->field_002 = 0;
+}
+
+void fn_800B9FE4(void* dest, u8 clear) {
+    u32 reg;
+    u32 tempPeCtrl;
+    u32 physicalAddress;
+    u8 changePeCtrl;
+
+    if (clear) {
+        reg = gx->field_1D8;
+        GX_SET_REG_FIELD(reg, 1, 0, 1);
+        GX_SET_REG_FIELD(reg, 3, 1, 7);
+        GX_BP_REG(reg);
+
+        reg = gx->field_1D0;
+        GX_SET_REG_FIELD(reg, 1, 0, 0);
+        GX_SET_REG_FIELD(reg, 1, 1, 0);
+        GX_BP_REG(reg);
+    }
+
+    changePeCtrl = 0;
+    tempPeCtrl = gx->field_1DC;
+
+    if (gx->field_200 && ((tempPeCtrl & 7) != 3)) {
+        changePeCtrl = 1;
+        GX_SET_REG_FIELD(tempPeCtrl, 3, 0, 3);
+    }
+
+    if ((clear || ((tempPeCtrl & 7) == 3)) &&
+        (((tempPeCtrl >> 6) & 1) == 1)) {
+        changePeCtrl = 1;
+        GX_SET_REG_FIELD(tempPeCtrl, 1, 6, 0);
+    }
+
+    if (changePeCtrl) {
+        GX_BP_REG(tempPeCtrl);
+    }
+
+    GX_BP_REG(gx->field_1F0);
+    GX_BP_REG(gx->field_1F4);
+    GX_BP_REG(gx->field_1F8);
+
+    physicalAddress = (u32)dest & 0x3FFFFFFF;
+    reg = 0;
+    GX_SET_REG_FIELD(reg, 21, 0, physicalAddress >> 5);
+    GX_SET_REG_FIELD(reg, 8, 24, 0x4B);
+    GX_BP_REG(reg);
+
+    GX_SET_REG_FIELD(gx->field_1FC, 1, 11, clear);
+    GX_SET_REG_FIELD(gx->field_1FC, 1, 14, 0);
+    GX_SET_REG_FIELD(gx->field_1FC, 8, 24, 0x52);
+    GX_BP_REG(gx->field_1FC);
+
+    if (clear) {
+        GX_BP_REG(gx->field_1D8);
+        GX_BP_REG(gx->field_1D0);
+    }
+
+    if (changePeCtrl) {
+        GXData_800B857C* p = gx;
+        GX_BP_REG(p->field_1DC);
+    }
+
+    gx->field_002 = 0;
 }
 
 void GXClearBoundingBox(void) {

@@ -564,13 +564,13 @@ def main():
             "[weight_overrides]\n"
             "perm_reorder_decls = 40\n"
             "perm_reorder_stmts = 40\n"
-            "perm_dummy_comma_expr = 30\n"
+            "perm_dummy_comma_expr = 0\n"
             "perm_commutative = 20\n"
-            "perm_pad_var_decl = 10\n"
+            "perm_pad_var_decl = 0\n"
             "perm_split_assignment = 20\n"
-            "perm_duplicate_assignment = 15\n"
-            "perm_add_self_assignment = 15\n"
-            "perm_refer_to_var = 15\n"
+            "perm_duplicate_assignment = 0\n"
+            "perm_add_self_assignment = 0\n"
+            "perm_refer_to_var = 0\n"
         )
         (udir / "settings.toml").write_text(settings)
 

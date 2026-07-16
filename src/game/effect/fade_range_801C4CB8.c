@@ -587,6 +587,46 @@ void _fadeFluidSetShockSub__FUlUlf(u32 x, u32 y, f32 strength) {
         [3 * (x + (y * (columns + 1))) + 2] -= strength;
 }
 
+#pragma peephole off
+void fadeFluidEvaluate(void) {
+    FadeFluidWork* fluid = (FadeFluidWork*)lbl_80467050;
+    u32 rowStride = fluid->columns + 1;
+    u32 x;
+    u32 y;
+    f32 accel = fluid->accel;
+    f32 damping = fluid->damping;
+    f32 neighbor = fluid->neighbor;
+
+    for (y = 1; y < fluid->rows; y++) {
+        u32 row = y * rowStride;
+        GSvec* source = fluid->heightPage[lbl_8047B3B8] + row;
+        GSvec* destination = fluid->heightPage[1 - lbl_8047B3B8] + row;
+
+        for (x = 1; x < fluid->columns; x++) {
+            destination[x].z =
+                accel * source[x].z + damping * destination[x].z + neighbor *
+                    (source[x + 1].z + source[x - 1].z +
+                     source[x + rowStride].z + source[x - rowStride].z);
+        }
+    }
+
+    lbl_8047B3B8 = 1 - lbl_8047B3B8;
+    for (y = 1; y < fluid->rows; y++) {
+        u32 row = y * rowStride;
+        GSvec* source = fluid->heightPage[lbl_8047B3B8] + row;
+        GSvec* velocityX = fluid->velocityX + row;
+        GSvec* velocityY = fluid->velocityY + row;
+
+        for (x = 1; x < fluid->columns; x++) {
+            velocityX[x].x = source[x - 1].z - source[x + 1].z;
+            velocityX[x].y =
+                source[x - rowStride].z - source[x + rowStride].z;
+            velocityY[x].z = source[x + 1].z - source[x - 1].z;
+        }
+    }
+}
+#pragma peephole on
+
 void fadeFluidCalcParms(f32 dt) {
     FadeFluidWork* fluid = (FadeFluidWork*)lbl_80467050;
     f32 c = fluid->limit;

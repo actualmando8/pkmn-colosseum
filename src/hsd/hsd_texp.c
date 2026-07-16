@@ -591,6 +591,7 @@ typedef struct HSD_ChannelModeState {
 
 extern HSD_ChannelModeState lbl_8036CE88;
 extern HSD_Chan lbl_8036D018[4];
+extern HSD_Chan lbl_8036D0D8[4];
 extern HSD_MaterialState lbl_80465710;
 extern HsdChanColor lbl_80478C98;
 extern s32 lbl_8047B360[2];
@@ -2783,6 +2784,20 @@ void fn_801B31A4(void) {
     }
     fn_800BBC0C(0);
     lbl_8047B370 = 0;
+}
+#pragma pop
+
+/* 0x801B31F4 | 0x64 */
+#pragma push
+#pragma optimization_level 1
+void fn_801B31F4(void)
+{
+    memcpy(&lbl_8036D018, &lbl_8036D0D8, sizeof(lbl_8036D018));
+    lbl_8047B368[0] = 1;
+    lbl_8047B368[1] = 1;
+    lbl_8047B360[0] = 1;
+    lbl_8047B360[1] = 1;
+    lbl_8047B35C = -1;
 }
 #pragma pop
 

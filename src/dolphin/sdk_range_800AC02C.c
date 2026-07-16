@@ -13,6 +13,7 @@
 #include "dolphin/exi/EXI.h"
 #include "dolphin/os/OSAlarm.h"
 #include "dolphin/os/OSInterrupt.h"
+#include "dolphin/os/OSThread.h"
 #include "dolphin/os/PPCArch.h"
 
 typedef void (*CARDCallback)(s32 chan, s32 result);
@@ -64,6 +65,8 @@ typedef struct DSPRegisters {
     /* 0x36 */ u16 aiDmaControl;
 } DSPRegisters;
 
+struct CARDFileInfo;
+
 typedef struct CARDControl {
     /* 0x000 */ s32 attached;
     /* 0x004 */ s32 result;
@@ -87,9 +90,11 @@ typedef struct CARDControl {
     /* 0x0A8 */ s32 field_A8;
     /* 0x0AC */ s32 repeat;
     /* 0x0B0 */ u32 addr;
-    /* 0x0B4 */ u32 length;
-    /* 0x0B8 */ u8* buffer;
-    /* 0x0BC */ u8 _0BC[0x08];
+    /* 0x0B4 */ u8* buffer;
+    /* 0x0B8 */ u32 xferred;
+    /* 0x0BC */ u16 freeNo;
+    /* 0x0BE */ u16 startBlock;
+    /* 0x0C0 */ struct CARDFileInfo* fileInfo;
     /* 0x0C4 */ CARDCallback extCallback;
     /* 0x0C8 */ CARDCallback txCallback;
     /* 0x0CC */ CARDCallback callback_CC;
@@ -215,7 +220,10 @@ typedef struct GXFifoObj {
 } GXFifoObj;
 
 typedef struct GXData {
-    /* 0x000 */ u8 _000[0x2C8];
+    /* 0x000 */ u8 _000[0x08];
+    /* 0x008 */ u32 cpEnable;
+    /* 0x00C */ u32 cpStatus;
+    /* 0x010 */ u8 _010[0x2B8];
     /* 0x2C8 */ u32 nextTexRgn;
     /* 0x2CC */ u32 nextTexRgnCI;
     /* 0x2D0 */ GXTlutRegion defaultTlutRegions[20];
@@ -223,6 +231,8 @@ typedef struct GXData {
 
 #define DSP_REGS    ((volatile DSPRegisters*)0xCC005000)
 #define AI_REGS     ((volatile AIRegisters*)0xCC006C00)
+#define GET_REG_FIELD(reg, size, shift) \
+    ((int)((reg) >> (shift)) & ((1 << (size)) - 1))
 
 #define AT_ADDRESS(addr) : addr
 
@@ -260,7 +270,9 @@ struct ARQRequest {
     /* 0x1C */ ARQCallback callback;
 };
 extern ARQRequest* lbl_8047A928;
+extern ARQRequest* lbl_8047A92C;
 extern ARQRequest* lbl_8047A930;
+extern ARQRequest* lbl_8047A934;
 extern ARQRequest* lbl_8047A938;
 extern ARQRequest* lbl_8047A93C;
 extern ARQCallback lbl_8047A940;
@@ -307,7 +319,11 @@ extern DSPTaskInfo* lbl_8047A95C; /* __DSP_rude_task */
 extern CARDControl lbl_803FC620[2];
 extern u8 lbl_803FC840[];
 extern u8 lbl_80312800[];
-extern GXData* gx;
+extern u16* __cpReg;
+extern OSThread* lbl_8047A9A8;
+extern BOOL lbl_8047A9B0;
+extern void (*lbl_8047A9B4)(void);
+extern u32 lbl_8047A9B8;
 extern u8 lbl_803125E8[];
 extern u8 lbl_803127F0[];
 extern u16 lbl_80478A58;
@@ -353,7 +369,30 @@ extern s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
 extern u32 DummyLen(void);
 extern s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen,
                            s32 mode);
-extern u32 bitrev(u32 data);
+static u32 bitrev(u32 data)
+{
+    u32 work;
+    u32 i;
+    u32 k = 0;
+    u32 j = 1;
+
+    work = 0;
+    for (i = 0; i < 32; i++) {
+        if (i > 15) {
+            if (i == 31) {
+                work |= (((data & (1 << 31)) >> 31) & 1);
+            } else {
+                work |= ((data & (1 << i)) >> j);
+                j += 2;
+            }
+        } else {
+            work |= ((data & (1 << i)) << (31 - i - k));
+            k++;
+        }
+    }
+
+    return work;
+}
 extern void DCFlushRange(void* addr, u32 length);
 extern void DCInvalidateRange(void* addr, u32 length);
 extern DSPTaskInfo* DSPAddTask(DSPTaskInfo* task);
@@ -1026,7 +1065,7 @@ void __ARQServiceQueueLo(void) {
     }
 }
 
-void __ARQCallbackHack(void) {
+void __ARQCallbackHack(ARQRequest* request) {
 }
 
 void __ARQInterruptServiceRoutine(void) {
@@ -1074,6 +1113,63 @@ void ARQInit(void) {
     }
 }
 #pragma dont_inline off
+
+void ARQPostRequest(ARQRequest* request, u32 owner, u32 type, u32 priority,
+                    u32 source, u32 dest, u32 length, ARQCallback callback) {
+    BOOL enabled;
+
+    request->next = NULL;
+    request->owner = owner;
+    request->type = type;
+    request->source = source;
+    request->dest = dest;
+    request->length = length;
+    if (callback != NULL) {
+        request->callback = callback;
+    } else {
+        request->callback = __ARQCallbackHack;
+    }
+
+    enabled = OSDisableInterrupts();
+    switch (priority) {
+    case 0:
+        if (lbl_8047A930 != NULL) {
+            lbl_8047A934->next = request;
+        } else {
+            lbl_8047A930 = request;
+        }
+        lbl_8047A934 = request;
+        break;
+    case 1:
+        if (lbl_8047A928 != NULL) {
+            lbl_8047A92C->next = request;
+        } else {
+            lbl_8047A928 = request;
+        }
+        lbl_8047A92C = request;
+        break;
+    }
+
+    if (lbl_8047A938 == NULL && lbl_8047A93C == NULL) {
+        if (lbl_8047A928 != NULL) {
+            if (lbl_8047A928->type == 0) {
+                ARStartDMA(lbl_8047A928->type, lbl_8047A928->source,
+                           lbl_8047A928->dest, lbl_8047A928->length);
+            } else {
+                ARStartDMA(lbl_8047A928->type, lbl_8047A928->dest,
+                           lbl_8047A928->source, lbl_8047A928->length);
+            }
+            lbl_8047A940 = lbl_8047A928->callback;
+            lbl_8047A938 = lbl_8047A928;
+            lbl_8047A928 = lbl_8047A928->next;
+        }
+        if (lbl_8047A938 == NULL) {
+            __ARQServiceQueueLo();
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+}
 
 u32 ARQGetChunkSize(void) {
     return lbl_8047A948;
@@ -1926,9 +2022,9 @@ void BlockReadCallback(s32 chan, s32 result) {
     extern s32 __CARDReadSegment(s32 chan, CARDCallback callback);
 
     if (result >= 0) {
-        card->buffer += 0x200;
+        card->xferred += 0x200;
         card->addr += 0x200;
-        card->length += 0x200;
+        card->buffer += 0x200;
         if (--card->repeat > 0) {
             result = __CARDReadSegment(chan, BlockReadCallback);
             if (result >= 0) {
@@ -1956,7 +2052,7 @@ s32 __CARDRead(s32 chan, u32 addr, u32 length, void* buffer, CARDCallback callba
     card->xferCallback = callback;
     card->repeat = length >> 9;
     card->addr = addr;
-    card->length = (u32)buffer;
+    card->buffer = buffer;
     return __CARDReadSegment(chan, BlockReadCallback);
 }
 
@@ -1966,9 +2062,9 @@ void fn_800B18C8(s32 chan, s32 result) {
     extern s32 fn_800AFEC4(s32 chan, CARDCallback callback);
 
     if (result >= 0) {
-        card->buffer += 0x80;
+        card->xferred += 0x80;
         card->addr += 0x80;
-        card->length += 0x80;
+        card->buffer += 0x80;
         if (--card->repeat > 0) {
             result = fn_800AFEC4(chan, fn_800B18C8);
             if (result >= 0) {
@@ -1997,7 +2093,7 @@ s32 fn_800B19A4(s32 chan, u32 addr, u32 length, void* buffer, CARDCallback callb
     card->xferCallback = callback;
     card->repeat = length >> 7;
     card->addr = addr;
-    card->length = (u32)buffer;
+    card->buffer = buffer;
     return fn_800AFEC4(chan, fn_800B18C8);
 }
 #pragma dont_inline off
@@ -2057,6 +2153,59 @@ void EraseCallback_800C1D6C(s32 chan, s32 result) {
         card->updateCallback = NULL;
         callback(chan, result);
     }
+}
+
+static inline u16* cardGetFatBlockInline(CARDControl* card) {
+    return card->fatBlock;
+}
+
+s32 __CARDAllocBlock(s32 chan, u32 cBlock, CARDCallback callback) {
+    CARDControl* card;
+    u16* fat;
+    u16 iBlock;
+    u16 startBlock;
+    u16 prevBlock;
+    u16 count;
+
+    card = &lbl_803FC620[chan];
+    if (!card->attached) {
+        return -3;
+    }
+
+    fat = cardGetFatBlockInline(card);
+    if (fat[3] < cBlock) {
+        return -9;
+    }
+
+    fat[3] -= cBlock;
+    startBlock = 0xFFFF;
+    iBlock = fat[4];
+    count = 0;
+    while (0 < cBlock) {
+        if (card->cBlock - 5 < ++count) {
+            return -6;
+        }
+
+        iBlock++;
+        if (iBlock < 5 || iBlock >= card->cBlock) {
+            iBlock = 5;
+        }
+
+        if (fat[iBlock] == 0) {
+            if (startBlock == 0xFFFF) {
+                startBlock = iBlock;
+            } else {
+                fat[prevBlock] = iBlock;
+            }
+            prevBlock = iBlock;
+            fat[iBlock] = 0xFFFF;
+            --cBlock;
+        }
+    }
+
+    fat[4] = iBlock;
+    card->startBlock = startBlock;
+    return __CARDUpdateFatBlock(chan, fat, callback);
 }
 
 s32 __CARDFreeBlock(s32 chan, u16 block, CARDCallback callback) {
@@ -2304,7 +2453,7 @@ s32 CARDCancel(CARDFileInfo* fileInfo) {
     result = 0;
     if (card->attached == 0) {
         result = -3;
-    } else if (card->result == -1 && *(CARDFileInfo**)&card->_0BC[4] == file) {
+    } else if (card->result == -1 && card->fileInfo == file) {
         file->length = -1;
         result = -14;
     }
@@ -2321,9 +2470,9 @@ void EraseCallback(s32 chan, s32 result) {
     extern void WriteCallback(s32 chan, s32 result);
 
     if (result >= 0) {
-        fileInfo = *(CARDFileInfo**)&card->_0BC[4];
+        fileInfo = card->fileInfo;
         result = fn_800B19A4(chan, card->sectorSize * fileInfo->startBlock,
-                            card->sectorSize, (void*)card->length, WriteCallback);
+                            card->sectorSize, card->buffer, WriteCallback);
         if (result >= 0) {
             return;
         }
@@ -2341,7 +2490,7 @@ void DeleteCallback(s32 chan, s32 result) {
 
     card->apiCallback = NULL;
     if (result >= 0) {
-        result = __CARDFreeBlock(chan, *(u16*)&card->_0BC[2], callback);
+        result = __CARDFreeBlock(chan, card->startBlock, callback);
         if (result >= 0) {
             return;
         }
@@ -2379,7 +2528,7 @@ s32 CARDDeleteAsync(s32 chan, const char* fileName, CARDCallback callback) {
 
     dir = __CARDGetDirBlock(card);
     entry = &dir[fileNo];
-    *(u16*)&card->_0BC[2] = entry->startBlock;
+    card->startBlock = entry->startBlock;
     memset(entry, 0xff, sizeof(CARDDirEntry));
 
     card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
@@ -2603,6 +2752,7 @@ s32 fn_800B5BE4(s32 chan, s32 fileNo, u8 attr, void* callback) {
 
 #pragma peephole off
 void* fn_800B5C5C(void* object) {
+    extern GXData* gx;
     s32 format;
     u32 count;
     extern u32 fn_800BAE5C(void* object);
@@ -2621,6 +2771,38 @@ void* fn_800B5C5C(void* object) {
     }
 }
 #pragma peephole reset
+
+s32 fn_800AFEC4(s32 chan, CARDCallback callback) {
+    CARDControl* card;
+    s32 result;
+
+    card = &lbl_803FC620[chan];
+    card->cmd[0] = 0xF2;
+    card->cmd[1] = (card->addr >> 17) & 0x7F;
+    card->cmd[2] = (card->addr >> 9) & 0xFF;
+    card->cmd[3] = (card->addr >> 7) & 3;
+    card->cmd[4] = card->addr & 0x7F;
+    card->cmdLen = 5;
+    card->field_A4 = 1;
+    card->field_A8 = 3;
+
+    result = fn_800AFBDC(chan, NULL, callback);
+    if (result == -1) {
+        result = 0;
+    } else if (result >= 0) {
+        if (!fn_80098368(chan, card->cmd, card->cmdLen, 1) ||
+            !EXIDma(chan, card->buffer, 0x80, card->field_A4,
+                    (EXICallback)__CARDTxHandler)) {
+            card->callback_CC = NULL;
+            EXIDeselect(chan);
+            EXIUnlock(chan);
+            result = -3;
+        } else {
+            result = 0;
+        }
+    }
+    return result;
+}
 
 s32 fn_800AFFE0(s32 chan, u32 addr, void* callback) {
     CARDControl* card = &lbl_803FC620[chan];
@@ -2650,6 +2832,7 @@ s32 fn_800AFFE0(s32 chan, u32 addr, void* callback) {
 
 #pragma peephole off
 GXTlutRegion* __GXDefaultTlutRegionCallback(u32 index) {
+    extern GXData* gx;
     GXTlutRegion* region;
 
     if (index >= 20) {
@@ -2662,6 +2845,7 @@ GXTlutRegion* __GXDefaultTlutRegionCallback(u32 index) {
 
 
 void __GXInitGX(void) {
+    extern GXData* gx;
     extern GXRenderModeObj lbl_80312D30;
     extern GXRenderModeObj lbl_80312F4C;
     extern GXRenderModeObj lbl_803130F0;
@@ -2901,15 +3085,14 @@ void __GXInitGX(void) {
     fn_800BE30C();
 }
 
-
 void* GXInit(void* base, u32 size) {
+    extern GXData* gx;
     extern const char* __GXVersion;
     extern u8 gxData_803FC860[];
     extern u8 GXResetFuncInfo_80312AD0[];
     extern u32 __OSBusClock;
     extern u16* __memReg;
     extern u16* __peReg;
-    extern u16* __cpReg;
     extern u32* __piReg;
     extern void OSRegisterVersion();
     extern void OSRegisterResetFunction();
@@ -3062,6 +3245,56 @@ void* GXInit(void* base, u32 size) {
     return gxData_803FC860 + 0x4F8;
 }
 #pragma peephole reset
+
+extern GXData* const gx;
+
+void fn_800B7594(u8 overflow, u8 underflow);
+void fn_800B75D0(u8 clearOverflow, u8 clearUnderflow);
+
+static void GXOverflowHandler(s16 interrupt, OSContext* context) {
+    lbl_8047A9B8++;
+    fn_800B7594(0, 1);
+    fn_800B75D0(1, 0);
+    lbl_8047A9B0 = TRUE;
+    OSSuspendThread(lbl_8047A9A8);
+}
+
+static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
+    OSResumeThread(lbl_8047A9A8);
+    lbl_8047A9B0 = FALSE;
+    fn_800B75D0(1, 1);
+    fn_800B7594(1, 0);
+}
+
+static void GXBreakPointHandler(s16 interrupt, OSContext* context) {
+    OSContext exceptionContext;
+
+    gx->cpEnable = gx->cpEnable & 0xFFFFFFDF;
+    __cpReg[1] = gx->cpEnable;
+    if (lbl_8047A9B4 != NULL) {
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(&exceptionContext);
+        lbl_8047A9B4();
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(context);
+    }
+}
+
+void GXCPInterruptHandler(s16 interrupt, OSContext* context) {
+    gx->cpStatus = __cpReg[0];
+    if (GET_REG_FIELD(gx->cpEnable, 1, 3) &&
+        GET_REG_FIELD(gx->cpStatus, 1, 1)) {
+        GXUnderflowHandler(interrupt, context);
+    }
+    if (GET_REG_FIELD(gx->cpEnable, 1, 2) &&
+        GET_REG_FIELD(gx->cpStatus, 1, 0)) {
+        GXOverflowHandler(interrupt, context);
+    }
+    if (GET_REG_FIELD(gx->cpEnable, 1, 5) &&
+        GET_REG_FIELD(gx->cpStatus, 1, 4)) {
+        GXBreakPointHandler(interrupt, context);
+    }
+}
 
 void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr);
 

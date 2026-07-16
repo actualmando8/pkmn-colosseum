@@ -15,6 +15,9 @@ extern void fn_800FF58C(u32 id);
 extern const char lbl_80268B38[];
 extern const char lbl_80268B4C[];
 
+/* Retail retains this otherwise-unreferenced menu entry-point group. */
+#pragma force_active on
+
 void fn_8007C260(void) {
     lbl_80478940 = -1;
 }

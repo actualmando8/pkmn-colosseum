@@ -2627,6 +2627,31 @@ typedef struct JObjAnimClassInfo {
 } JObjAnimClassInfo;
 
 void fn_801B0040(HSD_RObj* robj);
+
+#pragma push
+#pragma optimization_level 1
+#pragma optimizewithasm off
+#pragma dont_inline on
+BOOL fn_8019D980(HSD_JObj* jobj)
+{
+    BOOL dirty;
+
+    if (jobj == NULL) {
+        extern char lbl_8047DB34;
+        extern char lbl_8047DB3C;
+        __assert(&lbl_8047DB34, 0x25d, &lbl_8047DB3C);
+    }
+
+    dirty = FALSE;
+    if (!(jobj->flags & JOBJ_USER_DEF_MTX) && (jobj->flags & JOBJ_MTX_DIRTY)) {
+        dirty = TRUE;
+    }
+
+    return dirty;
+}
+#pragma dont_inline reset
+#pragma pop
+
 void fn_801A3D04(HSD_JObj* jobj);
 void fn_801A1F2C(HSD_JObj* jobj);
 
