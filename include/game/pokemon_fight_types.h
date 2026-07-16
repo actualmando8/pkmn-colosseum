@@ -156,6 +156,6 @@ s32 fightSideGetFightPokemonMaxHp(u32, u32, u32);
 s32 fightSideGetFightPokemonNokoriHp(u32, u32, u32);
 void fightSideInitAry(u32, u16);
 void fightTrainerToMenuBallStatus(u8* ptr, u8* arr);
-void fightTrainerGetTemotiNormalItemDataIdAry(u8* ptr, u16* out, u16 count, u8 mode);
+u32 fightTrainerGetTemotiNormalItemDataIdAry(u8* ptr, u16* out, u16 count, u8 mode);
 
 #endif /* GAME_POKEMON_FIGHT_TYPES_H */
