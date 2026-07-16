@@ -360,7 +360,7 @@ u32 fightEncountGetBgmSndDataId(u16 encountDataIndex) {
     extern u32 fightFloorGetStatus(u32, u16, u32, u16);
     extern u32 fightTrainerGetStatus(u32, u16, u32, u16);
     extern u32 fightTrainerKindDataBiosGetBgmSndId(void);
-    extern void fightTrainerKindDataBiosGetPtr(void);
+    extern u8* fightTrainerKindDataBiosGetPtr(u16);
     extern u32 fightEncountDataBiosGetBgmSndId(FightEncountData* ptr);
     extern u16 fightEncountDataBiosGetFightTrainerDataId(FightEncountData* base, u8 slot);
     extern u16 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr);
@@ -388,7 +388,7 @@ u32 fightEncountGetBgmSndDataId(u16 encountDataIndex) {
         if (fightTrainerDataId != 0) {
             trainerStatus = fightTrainerGetStatus(0, fightTrainerDataId, 4, 0);
             if (trainerStatus != 0) {
-                fightTrainerKindDataBiosGetPtr();
+                fightTrainerKindDataBiosGetPtr(trainerStatus);
                 bgmSndId = fightTrainerKindDataBiosGetBgmSndId();
                 if (bgmSndId != 0) {
                     return bgmSndId;
