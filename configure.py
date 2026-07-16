@@ -2627,8 +2627,9 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "trk/TRKBoard.c",
+                mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(
