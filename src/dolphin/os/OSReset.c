@@ -234,11 +234,12 @@ void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu) {
 #pragma peephole off
 u32 OSGetResetCode(void) {
     u32 resetCode;
+    volatile u32* pi;
 
     if (*(volatile u8*)0x800030E2 != 0) {
         resetCode = 0x80000000;
     } else {
-        resetCode = (__PIRegs[9] & 0xFFFFFFF8) / 8;
+        resetCode = ((pi = (volatile u32*)0xCC003000)[9] & 0xFFFFFFF8) / 8;
     }
     return resetCode;
 }

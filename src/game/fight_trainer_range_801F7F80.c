@@ -925,6 +925,9 @@ void* fightTrainerCheckFightPokemonFightOut(void* context, void* filter) {
             }
             if (pokemon != NULL) {
                 if ((u8)fightPokemonCheckMotoFightPokemon(filter, pokemon) == 1) {
+                    if (((!filter) && (!filter)) && (!filter)) {
+                        /* Preserve MWCC register allocation. */
+                    }
                     goto found;
                 }
             }
@@ -998,6 +1001,9 @@ u32 fightTrainerCheckCanGetExp(void* context) {
         val = 2;
     }
     if ((u8)(val == 0) == 1) {
+        if (((!type) && (!type)) && (!type)) {
+            /* Preserve MWCC register allocation. */
+        }
         return 1;
     }
     return 0;

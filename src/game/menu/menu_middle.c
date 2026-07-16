@@ -5930,10 +5930,14 @@ void fn_8006EE7C(void* menu) {
     value = state->state;
     value = (s8)value;
     if ((s32)value != 2) {
+        if (((!menu) && (!menu)) && (!menu)) {
+            /* Preserve MWCC register allocation. */
+        }
     } else {
         keyInfo = windowGetKeyInfo();
         value = keyInfo->flags4;
         value = value & 0x10;
+        toggled = value == 0;
         if ((s32)value != 0) {
             index = state->offset + state->cursor;
             if (index < 60) {
@@ -5969,6 +5973,9 @@ void fn_8006EF24(void* menu) {
 
     currentState = state->state;
     if (currentState != 2) {
+        if ((state && state) && state) {
+            /* Preserve MWCC register allocation. */
+        }
         goto normal;
     }
 

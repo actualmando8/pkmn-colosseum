@@ -625,6 +625,11 @@ static inline IDEntry* IDEntryAlloc(void)
 
     return entry;
 }
+
+static inline IDEntry* IDEntryAllocForInsert(void)
+{
+    return IDEntryAlloc();
+}
 #if 0
 asm void HSD_IDInsertToTable(void) {
 #include "src/hsd/hsd_fog_HSD_IDInsertToTable.inc"
@@ -654,7 +659,7 @@ void HSD_IDInsertToTable(HSD_IDTable* table, u32 id, void* data)
         entry->id = id;
         entry->data = data;
     } else {
-        entry = IDEntryAlloc();
+        entry = IDEntryAllocForInsert();
         entry->id = id;
         entry->data = data;
         entry->next = table->table[idx];

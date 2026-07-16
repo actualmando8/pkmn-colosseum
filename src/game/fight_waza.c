@@ -95,21 +95,20 @@ void fightWazaWzxTypeFuncHuuin(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
     extern void fightOutPokemonWazaEffect();
     extern void fightOutPokemonLoadWazaEffect();
     u16 limit;
-    void* uVar1;
     void* uVar2;
     u8 cVar5;
 
-    uVar1 = (void*)fightTargetGetPtr(0xf, ctx2, limit = fightFloorGetStatus(0, 0, 0x14, 0));
+    p5 = fightTargetGetPtr(0xf, ctx2, limit = fightFloorGetStatus(0, 0, 0x14, 0));
     uVar2 = (void*)fightTargetGetPtr(0x10, ctx2, limit);
     fightOutPokemonLoadWazaEffect(ctx2, ctx1, 1, p7);
-    fightOutPokemonLoadWazaEffect(uVar1, ctx1, 2, p7);
+    fightOutPokemonLoadWazaEffect(p5, ctx1, 2, p7);
     fightOutPokemonLoadWazaEffect(uVar2, ctx1, 2, p7);
-    cVar5 = fightOutPokemonCheckFightOut(uVar1);
+    cVar5 = fightOutPokemonCheckFightOut(p5);
     if ((cVar5 == 1) && (cVar5 = fightOutPokemonCheckFightOut(uVar2), cVar5 == 1)) {
         fightTargetDataBiosGetPtr(0x11);
         fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());
         fightTargetDataBiosGetPtr(0x12);
-        fightOutPokemonWazaEffect(uVar1, ctx1, 2, 1, fightTargetDataBiosGetBuff());
+        fightOutPokemonWazaEffect(p5, ctx1, 2, 1, fightTargetDataBiosGetBuff());
         fightTargetDataBiosGetPtr(0x12);
         fightOutPokemonWazaEffect(uVar2, ctx1, 2, 0, fightTargetDataBiosGetBuff());
     } else {
@@ -120,12 +119,12 @@ void fightWazaWzxTypeFuncHuuin(void* ctx1, void* ctx2, u32 p5, u32 p6, void* p7)
             fightTargetDataBiosGetPtr(0x12);
             fightOutPokemonWazaEffect(uVar2, ctx1, 2, 0, fightTargetDataBiosGetBuff());
         } else {
-            cVar5 = fightOutPokemonCheckFightOut(uVar1);
+            cVar5 = fightOutPokemonCheckFightOut(p5);
             if (cVar5 == 1) {
                 fightTargetDataBiosGetPtr(0x11);
                 fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());
                 fightTargetDataBiosGetPtr(0x12);
-                fightOutPokemonWazaEffect(uVar1, ctx1, 2, 0, fightTargetDataBiosGetBuff());
+                fightOutPokemonWazaEffect(p5, ctx1, 2, 0, fightTargetDataBiosGetBuff());
             } else {
                 fightTargetDataBiosGetPtr(0x11);
                 fightOutPokemonWazaEffect(ctx2, ctx1, 1, 1, fightTargetDataBiosGetBuff());

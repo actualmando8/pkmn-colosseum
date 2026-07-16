@@ -377,7 +377,7 @@ u8 fightSideGetDoFightTrainerCount(u32 param_1) {
         if (param_1 == 0) {
             uVar2 = 0;
         } else {
-            uVar2 = fightSideBiosGetFightTrainerPtr(param_1, (u8)bVar4);
+            uVar2 = fightSideBiosGetFightTrainerPtr(param_1, (u8)(bVar4 & 0xFFFFFFFFFFFFFFFFu));
         }
         cVar3 = fightTrainerCheckDoFight(uVar2);
         if ((u8)cVar3 != 0) {
