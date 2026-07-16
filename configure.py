@@ -285,6 +285,13 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "crt/wchar_range_800C7FB8.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="runtime",
+            ),
+            Object(
+                Matching,
                 "crt/mwtrace_helpers.c",
                 progress_category="runtime",
             ),
@@ -1263,7 +1270,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800CE7DC.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2286,7 +2293,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_xfb_capture.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
