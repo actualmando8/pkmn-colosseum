@@ -96,35 +96,32 @@ void ReadProc(int r3)
 	  }
 	}
 
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void GBARead(void) {
-#include "src/game/colosseum_battle_fn_8025F584.inc"
-}
-#endif
-#pragma pop
-#pragma push
-#pragma peephole off
-u32 GBARead(int r3, u32 r4, u32 r5) {
-  int idx;
-  u8 *entry;
-  s32 result;
-  idx = r3;
-  entry = lbl_804783E0 + idx * 0x100;
-  if (*(u32 *)(entry + 0x1C) != 0) {
-    result = 2;
-  } else {
-    *(u8 *)(entry + 0x0) = 0x14;
-    *(u32 *)(entry + 0x18) = r4;
-    *(u32 *)(entry + 0x14) = r5;
-    *(u32 *)(entry + 0x1C) = (u32)__GBASyncCallback;
-    result = __GBATransfer(idx, 1, 5, (u32)ReadProc);
+typedef struct GBAReadControl {
+  u8 output[5];
+  u8 input[5];
+  s32 outputBytes;
+  s32 inputBytes;
+  u8 *status;
+  u8 *ptr;
+  void (*callback)(s32, s32);
+  s32 ret;
+  u8 _padding[0xDC];
+} GBAReadControl;
+
+static inline int GBAReadAsync(s32 chan, u8 *ptr, u8 *statusPtr) {
+  GBAReadControl *gba = &((GBAReadControl *)lbl_804783E0)[chan];
+  if (gba->callback) {
+    return 2;
   }
-  if (result == 0) {
-    result = __GBASync(idx);
-  }
-  return result;
+  gba->output[0] = 0x14;
+  gba->ptr = ptr;
+  gba->status = statusPtr;
+  gba->callback = (void (*)(s32, s32))__GBASyncCallback;
+  return __GBATransfer(chan, 1, 5, (u32)ReadProc);
 }
-#pragma pop
+
+u32 GBARead(s32 chan, u8 *ptr, u8 *statusPtr) {
+  int _unused;
+  int status = GBAReadAsync(chan, ptr, statusPtr);
+  return (status != 0) ? status : __GBASync(chan);
+}
