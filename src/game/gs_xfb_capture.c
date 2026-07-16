@@ -42,8 +42,9 @@ void GSgfxCaptureUpdate(void) {
     extern int sprintf(char* dst, const char* format, ...);
 
     if (lbl_8047B1A0 == 1) {
-        u32 offset = fn_801BF574() * sizeof(CaptureEntry);
-        CaptureEntry* entry = (CaptureEntry*)((u8*)lbl_80466BC0 + offset);
+        u32 index = fn_801BF574();
+        CaptureEntry* entry = lbl_80466BC0;
+        entry += index;
         if (entry->xfb != 0) {
             sprintf(filename, lbl_80273A00, lbl_8047B1A4++);
             if (lbl_8047B1A4 >= 0x4650) {
