@@ -210,11 +210,11 @@ void* floorReadParticlePostFunc(u32 resId, u32 param) {
     extern u32 fn_80113F48(void);
     extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* symbol);
     extern void GSmodelLinkToGSparticleBank(void* model, void* bank);
-    void* particleBank;
     void* result;
     FloorData* floorData;
     SceneData* sceneData;
     u32 resourceFlags;
+    void* particleBank;
     u32 i = 0;
 
     result = GSresGetResource(resId, (param & 0x7FFF0000) | 0x400);

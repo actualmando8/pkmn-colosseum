@@ -460,7 +460,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSArena.c",
                 progress_category="sdk",
             ),
@@ -510,8 +510,9 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/os/OSTime.c",
+                source="dolphin/os/calendar/OSTime.c",
                 progress_category="sdk",
             ),
             Object(
@@ -1025,7 +1026,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/pokemon_data.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1207,7 +1208,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800AA288.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2111,7 +2112,7 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_wobj.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
@@ -2506,7 +2507,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "hsd/hsd_pobj.c",
                 progress_category="hsd",
             ),
@@ -2944,11 +2945,6 @@ config.libs = [
             Object(
                 DataCandidate,
                 "game/data/data_80311E54.c",
-                progress_category="game",
-            ),
-            Object(
-                DataCandidate,
-                "game/data/data_803120E8.c",
                 progress_category="game",
             ),
             Object(
