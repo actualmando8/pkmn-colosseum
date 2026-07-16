@@ -592,11 +592,11 @@ s32 GScolsys2UtilGetCpPlaneLine(Vec3f* out, f32* tOut, Vec3f* normal,
     extern void PSVECSubtract(void*, void*, void*);
     extern void PSVECScale(void*, void*, f32);
     extern void PSVECAdd(void*, void*, void*);
+    extern const f32 lbl_8047CF10;
 
     PSVECSubtract(lineEnd, lineStart, &direction);
-    denominator = normal->x * direction.x + normal->y * direction.y
-                + normal->z * direction.z;
-    if (denominator == 0.0f) {
+    if ((denominator = normal->x * direction.x + normal->y * direction.y
+                     + normal->z * direction.z) == lbl_8047CF10) {
         return 0;
     }
 
