@@ -174,13 +174,13 @@ objdump_command = "{OBJDUMP} -dr -EB -mpowerpc -M broadway --disassemble={fn}"
 [weight_overrides]
 perm_reorder_decls = 40
 perm_reorder_stmts = 40
-perm_dummy_comma_expr = 30
+perm_dummy_comma_expr = 0
 perm_commutative = 20
-perm_pad_var_decl = 10
+perm_pad_var_decl = 0
 perm_split_assignment = 20
-perm_duplicate_assignment = 15
-perm_add_self_assignment = 15
-perm_refer_to_var = 15
+perm_duplicate_assignment = 0
+perm_add_self_assignment = 0
+perm_refer_to_var = 0
 ''')
 
     # 8. smoke + fidelity gate, with fallback: stripped TU -> whole TU

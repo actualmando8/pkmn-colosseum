@@ -4,13 +4,17 @@
 usage: harvest.py <fn> <unit> [worker]
 
 Reads $FARM/dirs/<fn>/ (permuter output-<score>-* dirs + logs/run_<fn>.log).
-On a score-0 candidate:
+On a score-0 isolated candidate:
   - recompiles it with the unit's exact compile.sh
   - re-scores with objdiff-cli (independent scorer; must report 100% match)
-  - writes $FARM/results/<fn>/{source.c, diff.txt, summary.json}
+  - writes the full source/diff plus focused function.c/function.diff and a
+    summary explicitly marked live_tree_validated=false
+  - records WIN_UNCONFIRMED until a current-master full-TU replay verifies
+    relocation identity, sibling fidelity, and a real report improvement
 Non-zero best candidates are stashed under results/_partials/<fn>/ so partial
 progress is preserved. Terminal state written to $FARM/state/<fn>.status.
 """
+import difflib
 import glob
 import json
 import os
@@ -22,6 +26,90 @@ import time
 BASE = os.environ.get("FARM_BASE", "/storage/finetune/pkmn-colosseum-2026")
 FARM = os.path.join(BASE, "farm")
 OBJDIFF = os.path.join(BASE, "tools", "objdiff-cli")
+
+
+def extract_function(text, fn):
+    """Return one complete function definition from preprocessed C.
+
+    Permuter output contains a large normalized translation unit. Saving only
+    that file makes a win easy to misapply: a small but essential second edit
+    can be buried thousands of lines away in the target body. This scanner
+    emits the complete body while ignoring braces in comments and strings.
+    """
+    for match in re.finditer(r"\b" + re.escape(fn) + r"\s*\(", text):
+        i = match.end() - 1
+        depth = 0
+        quote = None
+        escaped = False
+        while i < len(text):
+            ch = text[i]
+            if quote:
+                if escaped:
+                    escaped = False
+                elif ch == "\\":
+                    escaped = True
+                elif ch == quote:
+                    quote = None
+            elif ch in ('"', "'"):
+                quote = ch
+            elif ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        if depth != 0:
+            continue
+        i += 1
+        while i < len(text) and text[i].isspace():
+            i += 1
+        if i >= len(text) or text[i] != "{":
+            continue
+
+        start = text.rfind("\n", 0, match.start()) + 1
+        brace_depth = 0
+        quote = None
+        escaped = False
+        line_comment = False
+        block_comment = False
+        j = i
+        while j < len(text):
+            ch = text[j]
+            nxt = text[j + 1] if j + 1 < len(text) else ""
+            if line_comment:
+                if ch == "\n":
+                    line_comment = False
+            elif block_comment:
+                if ch == "*" and nxt == "/":
+                    block_comment = False
+                    j += 1
+            elif quote:
+                if escaped:
+                    escaped = False
+                elif ch == "\\":
+                    escaped = True
+                elif ch == quote:
+                    quote = None
+            elif ch == "/" and nxt == "/":
+                line_comment = True
+                j += 1
+            elif ch == "/" and nxt == "*":
+                block_comment = True
+                j += 1
+            elif ch in ('"', "'"):
+                quote = ch
+            elif ch == "{":
+                brace_depth += 1
+            elif ch == "}":
+                brace_depth -= 1
+                if brace_depth == 0:
+                    end = j + 1
+                    if end < len(text) and text[end] == "\n":
+                        end += 1
+                    return text[start:end]
+            j += 1
+    return None
 
 
 def objdiff_pct(target_o, cand_o, fn):
@@ -92,21 +180,42 @@ def main():
         rd = os.path.join(FARM, "results", fn)
         os.makedirs(rd, exist_ok=True)
         subprocess.run(["cp", "-f", best_src, os.path.join(rd, "source.c")])
-        diff = subprocess.run(["diff", "-u", os.path.join(d, "base.c"), best_src],
+        base_src = os.path.join(d, "base.c")
+        diff = subprocess.run(["diff", "-u", base_src, best_src],
                               capture_output=True, text=True).stdout
         open(os.path.join(rd, "diff.txt"), "w").write(diff)
+        candidate_text = open(best_src, errors="replace").read()
+        base_text = open(base_src, errors="replace").read()
+        candidate_fn = extract_function(candidate_text, fn)
+        base_fn = extract_function(base_text, fn)
+        function_diff = ""
+        if candidate_fn:
+            open(os.path.join(rd, "function.c"), "w").write(candidate_fn)
+        if candidate_fn and base_fn:
+            function_diff = "".join(difflib.unified_diff(
+                base_fn.splitlines(keepends=True),
+                candidate_fn.splitlines(keepends=True),
+                fromfile=f"base/{fn}.c", tofile=f"candidate/{fn}.c"))
+            open(os.path.join(rd, "function.diff"), "w").write(function_diff)
         summary = {
             "fn": fn, "unit": unit, "worker": worker,
             "permuter_score": 0, "base_score": base_score,
             "achieved_pct": pct,
             "objdiff_confirmed": pct is not None and pct >= 100.0,
             "recompile_ok": r.returncode == 0,
+            "verification_scope": "isolated_preprocessed_function",
+            "live_tree_validated": False,
+            "function_extract_ok": candidate_fn is not None,
             "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "source_diff": diff[:20000],
+            "function_diff": function_diff[:20000],
         }
         with open(os.path.join(rd, "summary.json"), "w") as f:
             json.dump(summary, f, indent=1)
-        status = "WIN" if summary["objdiff_confirmed"] else "WIN_UNCONFIRMED"
+        # Isolated score-zero is only a candidate. It can hide relocation-name
+        # substitutions or stale-snapshot/no-op results, so only an external
+        # current-master full-TU replay may promote this state to WIN.
+        status = "WIN_UNCONFIRMED"
         with open(state, "w") as f:
             f.write(f"{status} {worker} {int(time.time())} pct={pct}\n")
         print(f"{status} {fn} pct={pct}")

@@ -22,3 +22,11 @@ for i in $(seq 1 "$N"); do
   sleep 2   # stagger dir-build bursts
 done
 echo "launched $N workers (pids in $FARM/farm.pids), budget=${BUDGET}s/fn"
+
+# Ensure the supervisor daemon is running (keeps workers topped up + re-admits
+# improving NOWINs). Starting it here means the installed @reboot entry for
+# launch_farm.sh also covers the supervisor across reboots. Idempotent.
+if ! ps -eo cmd | grep -q "[s]upervisor_daemon.sh"; then
+  setsid nohup nice -n 5 bash "$FARM/supervisor_daemon.sh" </dev/null >/dev/null 2>&1 &
+  echo "started supervisor daemon"
+fi

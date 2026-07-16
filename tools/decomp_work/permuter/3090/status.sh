@@ -9,9 +9,14 @@ win=$(grep -l '^WIN ' "$S"/*.status 2>/dev/null | wc -l)
 winu=$(grep -l '^WIN_UNCONFIRMED' "$S"/*.status 2>/dev/null | wc -l)
 nowin=$(grep -l '^NOWIN' "$S"/*.status 2>/dev/null | wc -l)
 fail=$(grep -l '^FAIL' "$S"/*.status 2>/dev/null | wc -l)
-workers=$(pgrep -fc "$FARM/worker.sh" 2>/dev/null || echo 0)
-perms=$(pgrep -fc "$BASE/decomp-permuter/permuter.py" 2>/dev/null || echo 0)
-echo "workers=$workers permuters=$perms | queue=$total active=$claimed WIN=$win WIN?=$winu NOWIN=$nowin FAIL=$fail"
+workers=$(ps -eo args= | awk -v script="$FARM/worker.sh" \
+  '$1 == "bash" && $2 == script && $3 ~ /^[0-9]+$/ { n++ } END { print n + 0 }')
+perms=$(ps -eo args= | awk -v script="$BASE/decomp-permuter/permuter.py" \
+  '$1 == "python3" && $2 == script { n++ } END { print n + 0 }')
+timeouts=$(ps -eo args= | awk -v script="$BASE/decomp-permuter/permuter.py" \
+  '$1 == "timeout" { for (i = 2; i <= NF; i++) if ($i == script) { n++; break } }
+   END { print n + 0 }')
+echo "workers=$workers permuters=$perms timeouts=$timeouts | queue=$total active=$claimed WIN=$win WIN?=$winu NOWIN=$nowin FAIL=$fail"
 echo "--- active ---"
 grep -H '^CLAIMED' "$S"/*.status 2>/dev/null | sed "s#$S/##;s#\.status:# #" | head -25
 echo "--- recent terminal ---"
