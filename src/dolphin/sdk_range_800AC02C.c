@@ -2208,18 +2208,20 @@ s32 __CARDAllocBlock(s32 chan, u32 cBlock, CARDCallback callback) {
     return __CARDUpdateFatBlock(chan, fat, callback);
 }
 
+inline void* inline_fn(void* arg0) {
+    return arg0;
+}
+
 s32 __CARDFreeBlock(s32 chan, u16 block, CARDCallback callback) {
     u16* fat;
     CARDControl* card = &lbl_803FC620[chan];
+    extern s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
     u16 next;
-extern s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback);
-
-
 
     if (card->attached == 0) {
         return -3;
     }
-    fat = card->fatBlock;
+    fat = inline_fn(card->fatBlock);
     while (block != 0xffff) {
         if (block < 5 || block >= card->cBlock) {
             return -6;

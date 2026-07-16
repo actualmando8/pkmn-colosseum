@@ -783,7 +783,6 @@ u32 _fightActionFlowFightTrainerSelectFightAction__FPvUsPv(void* ctx, u32 param)
 /* 0x8020BFA0 | size: 0x120 */
 #pragma push
 #pragma peephole on
-#pragma optimization_level 1
 u32 fightActionFlowKaisiPost(void* ctx) {
     extern u8 lbl_80375CC8[];
     extern u8 lbl_80378AA0[];
@@ -817,7 +816,7 @@ u32 fightActionFlowKaisiPost(void* ctx) {
     fn_8022E1C4();
     fightFloorLoopValidFightOutPokemon(0, (u32)_fightActionFlowKaisiPostSubFightOutPokemonSoubiItemCheckAppear__FPvUsPv, 0, 1);
     localBuf[0] = 1;
-    fightFloorLoopValidFightOutPokemon(0, (u32)_fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv, &localBuf[0], 0);
+    fightFloorLoopValidFightOutPokemon(0, _fightActionFlowKaisiPostSubFightOutPokemonDarkCheckAppear__FPvUsPv, &localBuf[0], 0);
     fightFloorSetMeetEnemyFightPokemonEnemySideAll(0);
     fightFloorRegistFightTrainerEnemyPokemonFightSideAll(0);
     fightFloorCreateFightPokemonEnemyAryEnemySideAll(0);
