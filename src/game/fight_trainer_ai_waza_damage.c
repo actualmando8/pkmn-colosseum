@@ -93,309 +93,6 @@ u32 fightTrainerAiWazaDamage211(void) { return 0; }
 /* Address: 0x80250998 | Size: 0x8 | Pattern: return_constant */
 u32 fightTrainerAiWazaDamage210(void) { return 0; }
 
-/* Address: 0x80250A24 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage208(void) { return 0; }
-
-/* Address: 0x80250AB0 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage206(void) { return 0; }
-
-/* Address: 0x80250AB8 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage205(void) { return 0; }
-
-/* Address: 0x80250CE8 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage201(void) { return 0; }
-
-/* Address: 0x80250D74 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage199(void) { return 0; }
-
-/* Address: 0x80250F54 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage195(void) { return 0; }
-
-/* Address: 0x80250F5C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage194(void) { return 0; }
-
-/* Address: 0x80250F64 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage193(void) { return 0; }
-
-/* Address: 0x80250F6C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage192(void) { return 0; }
-
-/* Address: 0x80250F74 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage191(void) { return 0; }
-
-/* Address: 0x80251150 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage187(void) { return 0; }
-
-/* Address: 0x802511D0 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage184(void) { return 0; }
-
-/* Address: 0x802511D8 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage183(void) { return 0; }
-
-/* Address: 0x80251264 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage181(void) { return 0; }
-
-/* Address: 0x8025126C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage180(void) { return 0; }
-
-/* Address: 0x80251274 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage179(void) { return 0; }
-
-/* Address: 0x8025127C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage178(void) { return 0; }
-
-/* Address: 0x80251284 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage177(void) { return 0; }
-
-/* Address: 0x8025128C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage176(void) { return 0; }
-
-/* Address: 0x80251294 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage175(void) { return 0; }
-
-/* Address: 0x8025129C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage174(void) { return 0; }
-
-/* Address: 0x80251350 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage172(void) { return 0; }
-
-/* Address: 0x802514C4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage168(void) { return 0; }
-
-/* Address: 0x802514CC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage167(void) { return 0; }
-
-/* Address: 0x802514D4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage166(void) { return 0; }
-
-/* Address: 0x802514DC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage165(void) { return 0; }
-
-/* Address: 0x802514E4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage164(void) { return 0; }
-
-/* Address: 0x8025160C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage160(void) { return 0; }
-
-/* Address: 0x80251650 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage158(void) { return 0; }
-
-/* Address: 0x80251680 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage156(void) { return 0; }
-
-/* Address: 0x80251798 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage153(void) { return 0; }
-
-/* Address: 0x80251B38 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage144(void) { return 0; }
-
-/* Address: 0x80251B40 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage143(void) { return 0; }
-
-/* Address: 0x80251B48 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage142(void) { return 0; }
-
-/* Address: 0x80251CDC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage137(void) { return 0; }
-
-/* Address: 0x80251CE4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage136(void) { return 0; }
-
-/* Address: 0x80251F64 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage130(void) { return 20; }
-
-/* Address: 0x80252030 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage127(void) { return 0; }
-
-/* Address: 0x80252140 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage124(void) { return 0; }
-
-/* Address: 0x8025234C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage120(void) { return 0; }
-
-/* Address: 0x80252390 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage118(void) { return 0; }
-
-/* Address: 0x80252468 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage116(void) { return 0; }
-
-/* Address: 0x80252470 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage115(void) { return 0; }
-
-/* Address: 0x80252478 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage114(void) { return 0; }
-
-/* Address: 0x80252480 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage113(void) { return 0; }
-
-/* Address: 0x80252488 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage112(void) { return 0; }
-
-/* Address: 0x80252490 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage111(void) { return 0; }
-
-/* Address: 0x80252498 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage109(void) { return 0; }
-
-/* Address: 0x802524A0 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage108(void) { return 0; }
-
-/* Address: 0x802524A8 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage107(void) { return 0; }
-
-/* Address: 0x802524B0 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage106(void) { return 0; }
-
-/* Address: 0x80252740 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage102(void) { return 0; }
-
-/* Address: 0x802527BC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage100(void) { return 5; }
-
-/* Address: 0x802528BC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage097(void) { return 0; }
-
-/* Address: 0x802528C4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage095(void) { return 0; }
-
-/* Address: 0x802528CC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage094(void) { return 0; }
-
-/* Address: 0x802528D4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage093(void) { return 0; }
-
-/* Address: 0x8025296C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage090(void) { return 0; }
-
-/* Address: 0x80252974 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage089(void) { return 0; }
-
-/* Address: 0x802529C4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage086(void) { return 0; }
-
-/* Address: 0x802529CC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage085(void) { return 0; }
-
-/* Address: 0x802529D4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage084(void) { return 0; }
-
-/* Address: 0x802529DC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage083(void) { return 0; }
-
-/* Address: 0x802529E4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage082(void) { return 0; }
-
-/* Address: 0x802529EC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage081(void) { return 0; }
-
-/* Address: 0x80252A78 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage079(void) { return 0; }
-
-/* Address: 0x80252F1C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage067(void) { return 0; }
-
-/* Address: 0x80252F24 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage066(void) { return 0; }
-
-/* Address: 0x80252F2C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage065(void) { return 0; }
-
-/* Address: 0x80252F34 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage062(void) { return 0; }
-
-/* Address: 0x80252F3C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage060(void) { return 0; }
-
-/* Address: 0x80252F44 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage059(void) { return 0; }
-
-/* Address: 0x80252F4C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage058(void) { return 0; }
-
-/* Address: 0x80252F54 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage057(void) { return 0; }
-
-/* Address: 0x80252F5C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage054(void) { return 0; }
-
-/* Address: 0x80252F64 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage053(void) { return 0; }
-
-/* Address: 0x80252F6C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage052(void) { return 0; }
-
-/* Address: 0x80252F74 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage051(void) { return 0; }
-
-/* Address: 0x80252F7C | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage050(void) { return 0; }
-
-/* Address: 0x80252F84 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage049(void) { return 0; }
-
-/* Address: 0x80253010 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage047(void) { return 0; }
-
-/* Address: 0x80253018 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage046(void) { return 0; }
-
-/* Address: 0x802531F0 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage041(void) { return 40; }
-
-/* Address: 0x80253344 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage035(void) { return 0; }
-
-/* Address: 0x802533D0 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage033(void) { return 0; }
-
-/* Address: 0x80253484 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage030(void) { return 0; }
-
-/* Address: 0x802534CC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage028(void) { return 0; }
-
-/* Address: 0x80253510 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage026(void) { return 0; }
-
-/* Address: 0x80253518 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage025(void) { return 0; }
-
-/* Address: 0x80253520 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage024(void) { return 0; }
-
-/* Address: 0x80253528 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage023(void) { return 0; }
-
-/* Address: 0x80253530 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage020(void) { return 0; }
-
-/* Address: 0x80253538 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage019(void) { return 0; }
-
-/* Address: 0x80253540 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage018(void) { return 0; }
-
-/* Address: 0x802535CC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage016(void) { return 0; }
-
-/* Address: 0x802535D4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage013(void) { return 0; }
-
-/* Address: 0x802535DC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage011(void) { return 0; }
-
-/* Address: 0x802535E4 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage010(void) { return 0; }
-
-/* Address: 0x802535EC | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage009(void) { return 0; }
-
-/* Address: 0x802538B8 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamage001(void) { return 0; }
-
-/* Address: 0x80253948 | Size: 0x8 | Pattern: return_constant */
-u32 fightTrainerAiWazaDamageNull(void) { return 0; }
-
 static inline u32 fightTrainerAiWazaDamage209_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
 }
@@ -420,6 +117,9 @@ u32 fightTrainerAiWazaDamage209(void* ctx, u32 param1, u32 param2, u32 param3) {
     return new_var;
 }
 
+/* Address: 0x80250A24 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage208(void) { return 0; }
+
 static inline u32 fightTrainerAiWazaDamage207_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
 }
@@ -443,6 +143,12 @@ u32 fightTrainerAiWazaDamage207(void* ctx, u32 param1, u32 param2, u32 param3) {
     new_var = v1;
     return new_var;
 }
+
+/* Address: 0x80250AB0 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage206(void) { return 0; }
+
+/* Address: 0x80250AB8 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage205(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage204_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
@@ -534,6 +240,9 @@ u32 fightTrainerAiWazaDamage202(void* ctx, u32 param1, u32 param2, u32 param3) {
     return new_var;
 }
 
+/* Address: 0x80250CE8 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage201(void) { return 0; }
+
 static inline u32 fightTrainerAiWazaDamage200_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
 }
@@ -557,6 +266,9 @@ u32 fightTrainerAiWazaDamage200(void* ctx, u32 param1, u32 param2, u32 param3) {
     new_var = v1;
     return new_var;
 }
+
+/* Address: 0x80250D74 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage199(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage198_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
@@ -630,6 +342,21 @@ void _fightTrainerAiWazaDamage196SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
     wazaSetStatus(sourceValue, 0, 0x2f, 0, scaledValue & 0xffff);
 }
 
+/* Address: 0x80250F54 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage195(void) { return 0; }
+
+/* Address: 0x80250F5C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage194(void) { return 0; }
+
+/* Address: 0x80250F64 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage193(void) { return 0; }
+
+/* Address: 0x80250F6C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage192(void) { return 0; }
+
+/* Address: 0x80250F74 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage191(void) { return 0; }
+
 /* Address: 0x80250F7C | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaDamage190(u32 r3, u32 r4, u32 r5, u32 r6)
 {
@@ -665,12 +392,15 @@ void _fightTrainerAiWazaDamage190SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
 /* Address: 0x80251070 | Size: 0x5C | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage189(void* ctx, u32 slot, u32 param, u32 arg3) {
     extern u32 fn_802376EC(void*, u32);
-    u16 first;
-    u16 second;
+    s32 first;
+    s32 second;
 
     first = fn_802376EC(ctx, slot) & 0xffff;
     second = fn_802376EC(ctx, arg3) & 0xffff;
-    return (second - first) & ~((s32)(first - second + (second ^ 0x80000000)) >> 31);
+    if (first >= second) {
+        return 0;
+    }
+    return second - first;
 }
 
 static inline u32 fightTrainerAiWazaDamage188_helper1(u32 arg0, int arg1) {
@@ -697,6 +427,9 @@ u32 fightTrainerAiWazaDamage188(void* ctx, u32 param1, u32 param2, u32 param3) {
     return new_var;
 }
 
+/* Address: 0x80251150 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage187(void) { return 0; }
+
 /* Address: 0x80251158 | Size: 0x3C | Pattern: simple_wrapper */
 extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 p1, u32 p2, u32 p3, u32 p4, u32 p5, u32 p6, u32 p7);
 u32 fightTrainerAiWazaDamage186(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -707,6 +440,12 @@ u32 fightTrainerAiWazaDamage186(void* ctx, u32 param1, u32 param2, u32 param3) {
 u32 fightTrainerAiWazaDamage185(void* ctx, u32 param1, u32 param2, u32 param3) {
     return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
 }
+
+/* Address: 0x802511D0 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage184(void) { return 0; }
+
+/* Address: 0x802511D8 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage183(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage182_helper(void* ctx, u32 arg1, u32 arg2, u32 arg3) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
@@ -729,6 +468,30 @@ u32 fightTrainerAiWazaDamage182(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x80251264 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage181(void) { return 0; }
+
+/* Address: 0x8025126C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage180(void) { return 0; }
+
+/* Address: 0x80251274 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage179(void) { return 0; }
+
+/* Address: 0x8025127C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage178(void) { return 0; }
+
+/* Address: 0x80251284 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage177(void) { return 0; }
+
+/* Address: 0x8025128C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage176(void) { return 0; }
+
+/* Address: 0x80251294 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage175(void) { return 0; }
+
+/* Address: 0x8025129C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage174(void) { return 0; }
+
 /* Address: 0x802512A4 | Size: 0xAC */
 u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u32 wazaGetStatus(u32, u32, u32, u32);
@@ -748,6 +511,9 @@ u32 fightTrainerAiWazaDamage173(void* ctx, u32 slot, u32 param, u32 extra) {
     }
     return 0;
 }
+
+/* Address: 0x80251350 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage172(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage171_helper1(u32 value) {
     return value << 1;
@@ -812,6 +578,21 @@ u32 fightTrainerAiWazaDamage169(void* ctx, u32 slot, u32 param, u32 extra) {
     return damage;
 }
 
+/* Address: 0x802514C4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage168(void) { return 0; }
+
+/* Address: 0x802514CC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage167(void) { return 0; }
+
+/* Address: 0x802514D4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage166(void) { return 0; }
+
+/* Address: 0x802514DC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage165(void) { return 0; }
+
+/* Address: 0x802514E4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage164(void) { return 0; }
+
 /* Address: 0x802514EC | Size: 0x98 */
 #pragma push
 #pragma global_optimizer off
@@ -852,8 +633,14 @@ s32 fightTrainerAiWazaDamage161(void* ctx, u32 param1, u32 param2, u32 param3) {
     return multiplier * fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0);
 }
 
+/* Address: 0x8025160C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage160(void) { return 0; }
+
 /* Address: 0x80251614 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage159(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
+
+/* Address: 0x80251650 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage158(void) { return 0; }
 
 /* Address: 0x80251658 | Size: 0x28 | Ghidra import */
 int fightTrainerAiWazaDamage157(void)
@@ -865,6 +652,9 @@ int fightTrainerAiWazaDamage157(void)
   uVar1 = fn_80237664();
   return -(uVar1 >> 1 & 0x7fff);
 }
+
+/* Address: 0x80251680 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage156(void) { return 0; }
 /* Address: 0x80251688 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage155(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
@@ -898,6 +688,9 @@ u32 fightTrainerAiWazaDamage154(void* ctx, u32 unused, u32 param2, u32 param3) {
     }
     return total;
 }
+
+/* Address: 0x80251798 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage153(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage152_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
@@ -998,6 +791,15 @@ u32 fightTrainerAiWazaDamage146(void* ctx, u32 param1, u32 param2, u32 param3) {
 /* Address: 0x80251AFC | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage145(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
+/* Address: 0x80251B38 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage144(void) { return 0; }
+
+/* Address: 0x80251B40 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage143(void) { return 0; }
+
+/* Address: 0x80251B48 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage142(void) { return 0; }
+
 static inline u32 fightTrainerAiWazaDamage140_helper1(u32 arg0, int arg1) {
     return arg0 << arg1;
 }
@@ -1049,6 +851,12 @@ u32 fightTrainerAiWazaDamage138(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x80251CDC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage137(void) { return 0; }
+
+/* Address: 0x80251CE4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage136(void) { return 0; }
 
 /* Address: 0x80251CEC | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaDamage135(u32 r3, u32 r4, u32 r5, u32 r6)
@@ -1128,6 +936,9 @@ int fightTrainerAiWazaDamage132(void* ctx, u32 param1, u32 param2) {
     return -value;
 }
 
+/* Address: 0x80251F64 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage130(void) { return 20; }
+
 /* Address: 0x80251F6C | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage129(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
@@ -1150,6 +961,9 @@ u32 fightTrainerAiWazaDamage128(u32 r3, u32 r4, u32 r5, u32 r6)
   iVar1 = fightSeqGetNromalWazaDamage(r3,r5,r4,r6,0,0,0,0);
   return iVar1 << 1;
 }
+
+/* Address: 0x80252030 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage127(void) { return 0; }
 
 
 /* Address: 0x80252038 | Size: 0x40 | Ghidra import */
@@ -1181,6 +995,9 @@ u32 fightTrainerAiWazaDamage125(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x80252140 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage124(void) { return 0; }
 
 /* Address: 0x80252148 | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaDamage123(u32 r3, u32 r4, u32 r5, u32 r6)
@@ -1248,8 +1065,14 @@ void _fightTrainerAiWazaDamage121SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
     wazaSetStatus(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
 
+/* Address: 0x8025234C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage120(void) { return 0; }
+
 /* Address: 0x80252354 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage119(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
+
+/* Address: 0x80252390 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage118(void) { return 0; }
 
 /* Address: 0x80252398 | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaDamage117(u32 r3, u32 r4, u32 r5, u32 r6)
@@ -1277,6 +1100,36 @@ void _fightTrainerAiWazaDamage117SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
     }
     wazaSetStatus(value, 0, 0x2f, 0, amount & 0xFFFF);
 }
+
+/* Address: 0x80252468 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage116(void) { return 0; }
+
+/* Address: 0x80252470 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage115(void) { return 0; }
+
+/* Address: 0x80252478 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage114(void) { return 0; }
+
+/* Address: 0x80252480 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage113(void) { return 0; }
+
+/* Address: 0x80252488 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage112(void) { return 0; }
+
+/* Address: 0x80252490 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage111(void) { return 0; }
+
+/* Address: 0x80252498 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage109(void) { return 0; }
+
+/* Address: 0x802524A0 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage108(void) { return 0; }
+
+/* Address: 0x802524A8 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage107(void) { return 0; }
+
+/* Address: 0x802524B0 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage106(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage105_helper(void* ctx, u32 arg1, u32 arg2, u32 arg3, int arg4, int arg5, int arg6) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
@@ -1354,6 +1207,9 @@ u32 fightTrainerAiWazaDamage103(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x80252740 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage102(void) { return 0; }
+
 /* Address: 0x80252748 | Size: 0x74 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage101(void* ctx, u32 slot, u32 param, u32 extra) {
     extern u32 fightSeqGetNromalWazaDamage(void*, u32, u32, u32, u32, u32, u32, u32);
@@ -1368,6 +1224,9 @@ u32 fightTrainerAiWazaDamage101(void* ctx, u32 slot, u32 param, u32 extra) {
     }
     return damage;
 }
+
+/* Address: 0x802527BC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage100(void) { return 5; }
 
 /* Address: 0x802527C4 | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaDamage099(u32 r3, u32 r4, u32 r5, u32 r6)
@@ -1399,6 +1258,18 @@ void _fightTrainerAiWazaDamage099SubPre__FP13FIGHT_TRAINERUsP15FightOutPokemonP1
 extern u32 fn_802376EC(void*, u32, u32);
 u16 fightTrainerAiWazaDamage098(void* ctx, u32 p1, u32 p2, u32 p3) { return (u16)fn_802376EC(ctx, p3, p2); }
 
+/* Address: 0x802528BC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage097(void) { return 0; }
+
+/* Address: 0x802528C4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage095(void) { return 0; }
+
+/* Address: 0x802528CC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage094(void) { return 0; }
+
+/* Address: 0x802528D4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage093(void) { return 0; }
+
 /* Address: 0x802528DC | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage092(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
@@ -1412,12 +1283,36 @@ u32 fightTrainerAiWazaDamage091(void* ctx, u32 slot, u32 arg2, u32 param) {
     return val2 - avg;
 }
 
+/* Address: 0x8025296C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage090(void) { return 0; }
+
+/* Address: 0x80252974 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage089(void) { return 0; }
+
 /* Address: 0x8025297C | Size: 0x24 | Pattern: call_return_u8 */
 extern u32 fn_80237774(void*);
 u8 fightTrainerAiWazaDamage088(void* ctx) { return (u8)fn_80237774(ctx); }
 
 /* Address: 0x802529A0 | Size: 0x24 | Pattern: call_return_u8 */
 u8 fightTrainerAiWazaDamage087(void* ctx) { return (u8)fn_80237774(ctx); }
+
+/* Address: 0x802529C4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage086(void) { return 0; }
+
+/* Address: 0x802529CC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage085(void) { return 0; }
+
+/* Address: 0x802529D4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage084(void) { return 0; }
+
+/* Address: 0x802529DC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage083(void) { return 0; }
+
+/* Address: 0x802529E4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage082(void) { return 0; }
+
+/* Address: 0x802529EC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage081(void) { return 0; }
 
 /* Address: 0x802529F4 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage080(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -1432,6 +1327,9 @@ u32 fightTrainerAiWazaDamage080(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x80252A78 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage079(void) { return 0; }
 
 /* Address: 0x80252A80 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage078(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -1567,6 +1465,48 @@ u32 fightTrainerAiWazaDamage068(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x80252F1C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage067(void) { return 0; }
+
+/* Address: 0x80252F24 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage066(void) { return 0; }
+
+/* Address: 0x80252F2C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage065(void) { return 0; }
+
+/* Address: 0x80252F34 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage062(void) { return 0; }
+
+/* Address: 0x80252F3C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage060(void) { return 0; }
+
+/* Address: 0x80252F44 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage059(void) { return 0; }
+
+/* Address: 0x80252F4C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage058(void) { return 0; }
+
+/* Address: 0x80252F54 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage057(void) { return 0; }
+
+/* Address: 0x80252F5C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage054(void) { return 0; }
+
+/* Address: 0x80252F64 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage053(void) { return 0; }
+
+/* Address: 0x80252F6C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage052(void) { return 0; }
+
+/* Address: 0x80252F74 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage051(void) { return 0; }
+
+/* Address: 0x80252F7C | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage050(void) { return 0; }
+
+/* Address: 0x80252F84 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage049(void) { return 0; }
+
 /* Address: 0x80252F8C | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage048(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
@@ -1580,6 +1520,12 @@ u32 fightTrainerAiWazaDamage048(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x80253010 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage047(void) { return 0; }
+
+/* Address: 0x80253018 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage046(void) { return 0; }
 
 static inline u32 fightTrainerAiWazaDamage045_helper1(u32 arg0) {
     return arg0 << 1;
@@ -1648,6 +1594,9 @@ u32 fightTrainerAiWazaDamage042(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x802531F0 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage041(void) { return 40; }
+
 /* Address: 0x802531F8 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage040(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
 
@@ -1685,6 +1634,9 @@ u32 fightTrainerAiWazaDamage036(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x80253344 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage035(void) { return 0; }
+
 static inline u32 fightTrainerAiWazaDamage034_helper(void* ctx, u32 arg1, u32 arg2, u32 arg3) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
     return fightSeqGetNromalWazaDamage(ctx, arg1, arg2, arg3, 0, 0, 0, 0);
@@ -1704,6 +1656,9 @@ u32 fightTrainerAiWazaDamage034(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x802533D0 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage033(void) { return 0; }
 
 /* Address: 0x802533D8 | Size: 0x28 | Ghidra import */
 int fightTrainerAiWazaDamage032(void)
@@ -1737,6 +1692,9 @@ u32 fightTrainerAiWazaDamage031(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x80253484 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage030(void) { return 0; }
+
 /* Address: 0x8025348C | Size: 0x40 | Ghidra import */
 u32 fightTrainerAiWazaDamage029(u32 r3, u32 r4, u32 r5, u32 r6)
 {
@@ -1746,9 +1704,33 @@ u32 fightTrainerAiWazaDamage029(u32 r3, u32 r4, u32 r5, u32 r6)
   return iVar1 * 3;
 }
 
+/* Address: 0x802534CC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage028(void) { return 0; }
+
 
 /* Address: 0x802534D4 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage027(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
+
+/* Address: 0x80253510 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage026(void) { return 0; }
+
+/* Address: 0x80253518 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage025(void) { return 0; }
+
+/* Address: 0x80253520 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage024(void) { return 0; }
+
+/* Address: 0x80253528 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage023(void) { return 0; }
+
+/* Address: 0x80253530 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage020(void) { return 0; }
+
+/* Address: 0x80253538 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage019(void) { return 0; }
+
+/* Address: 0x80253540 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage018(void) { return 0; }
 
 /* Address: 0x80253548 | Size: 0x84 | Pattern: field_accessor */
 u32 fightTrainerAiWazaDamage017(void* ctx, u32 param1, u32 param2, u32 param3) {
@@ -1763,6 +1745,21 @@ u32 fightTrainerAiWazaDamage017(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x802535CC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage016(void) { return 0; }
+
+/* Address: 0x802535D4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage013(void) { return 0; }
+
+/* Address: 0x802535DC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage011(void) { return 0; }
+
+/* Address: 0x802535E4 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage010(void) { return 0; }
+
+/* Address: 0x802535EC | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage009(void) { return 0; }
 
 /* Address: 0x802535F4 | Size: 0x3C | Pattern: simple_wrapper */
 u32 fightTrainerAiWazaDamage008(void* ctx, u32 param1, u32 param2, u32 param3) { return fightSeqGetNromalWazaDamage(ctx, param2, param1, param3, 0, 0, 0, 0); }
@@ -1828,6 +1825,9 @@ u32 fightTrainerAiWazaDamage002(void* ctx, u32 param1, u32 param2, u32 param3) {
     return v1;
 }
 
+/* Address: 0x802538B8 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamage001(void) { return 0; }
+
 /* Address: 0x802538C0 | Size: 0x88 */
 u32 fightTrainerAiWazaDamage000(void* ctx, u32 param1, u32 param2, u32 param3) {
     extern u32 fightSeqGetNromalWazaDamage(void* ctx, u32 param2, u32 param1, u32 param3, u32 zero1, u32 zero2, u32 zero3, u32 zero4);
@@ -1841,3 +1841,6 @@ u32 fightTrainerAiWazaDamage000(void* ctx, u32 param1, u32 param2, u32 param3) {
     }
     return v1;
 }
+
+/* Address: 0x80253948 | Size: 0x8 | Pattern: return_constant */
+u32 fightTrainerAiWazaDamageNull(void) { return 0; }

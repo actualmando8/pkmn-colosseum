@@ -254,10 +254,33 @@ config.libs = [
             Object(CodeCandidate, "trk/TRKComm_range_800C3678.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(Matching, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(
+                CodeCandidate,
+                "trk/TRKSerial_range_800BF088.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-rostr",
+                    "-common off",
+                    "-inline deferred",
+                    "-char signed",
+                    "-sdata 0",
+                    "-sdata2 0",
+                    "-sdatathreshold 0",
+                ],
+                progress_category="runtime",
+            ),
             Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKBoard_range_800C33BC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(
+                Matching,
+                "trk/TRKBoard_range_800C3630.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-sdata 0"],
+                progress_category="runtime",
+            ),
             Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_CRT_PRINTF
             Object(
                 NonMatching,
@@ -318,6 +341,12 @@ config.libs = [
             Object(
                 Matching,
                 "dolphin/dvd/DVDQueue.c",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/dvd/DVDError_ErrorCode2Num.c",
+                mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
             Object(
@@ -523,6 +552,11 @@ config.libs = [
             Object(
                 Matching,
                 "dolphin/si/SI_fn_800D0F44.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/si/SI_range_800D0F68.c",
                 progress_category="sdk",
             ),
             Object(
@@ -1131,7 +1165,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800A03B4.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -1544,7 +1578,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/menu/menuCB_Battle.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -1700,7 +1734,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/fight_trainer_ai_waza_damage.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
