@@ -21,10 +21,12 @@ void GSmodelSetTexAnimIndex(struct GSmodel* model, u32 index);
 void GSmodelSetTexAnimRate(struct GSmodel* model, f32 rate);
 void GSmodelSetTexAnimType(struct GSmodel* model, u32 type);
 void GSmodelRecalculateBound(struct GSmodel* model);
+void fn_800E3928(void* unused);
 
 /* HSD services used while constructing a GS model. */
 struct HSDJObj* HSD_JObjLoadJoint(struct GSjobjDesc* joint);
 void HSD_JObjAddNext(struct HSDJObj* jobj, struct HSDJObj* next);
+void fn_80190E60(struct GSbound* bound);
 void fn_8019146C(struct GSbound* bound, const struct GSvec* scale);
 void fn_80191474(struct GSbound* bound, const struct GSvec* rotation);
 void fn_8019147C(struct GSbound* bound, const struct GSvec* position);

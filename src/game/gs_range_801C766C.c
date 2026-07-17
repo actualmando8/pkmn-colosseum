@@ -7,6 +7,8 @@
  * All functions asm-only until matched.
  */
 #include "dolphin/types.h"
+#include "game/gs_flag.h"
+#include "game/world/gs_field.h"
 #pragma peephole off
 
 typedef struct Vec3 {
@@ -278,6 +280,55 @@ void fn_801C9F00(s32 active)
         heroSetStatus(0, 0x18, 0);
         heroMoveDismissMember(1);
     }
+}
+
+u8 fn_801CA358(void)
+{
+    u32 cameraMode;
+
+    if (fn_801902E0(0xADA) != 0) {
+        if (fn_801902E0(0xA0F) == 0) {
+            cameraMode = 11;
+        } else {
+            cameraMode = 12;
+        }
+    } else if (fn_801902E0(0xADB) != 0) {
+        if (fn_801902E0(0x483) == 0) {
+            cameraMode = 11;
+        } else {
+            cameraMode = 12;
+        }
+    } else if (fn_801902E0(0x42C) != 0) {
+        if (fn_801902E0(0x42D) == 0) {
+            cameraMode = 3;
+        } else {
+            cameraMode = 4;
+        }
+    } else if (fn_801902E0(0xAD3) != 0) {
+        if (fn_801902E0(0xA08) == 0) {
+            cameraMode = 3;
+        } else {
+            cameraMode = 4;
+        }
+    } else if (fn_801902E0(0xAD0) != 0) {
+        if (fn_801902E0(0xA07) == 0) {
+            cameraMode = 3;
+        } else {
+            cameraMode = 4;
+        }
+    } else if (fn_801902E0(0xACF) != 0) {
+        if (fn_801902E0(0xA06) == 0) {
+            cameraMode = 1;
+        } else {
+            cameraMode = 2;
+        }
+    } else {
+        fn_80190528(0xA05);
+        cameraMode = 0;
+    }
+
+    fn_80117AE4(cameraMode);
+    return 1;
 }
 
 u32 fadeEffectGetRandom(u32 limit)

@@ -8,6 +8,7 @@
 #include "dolphin/types.h"
 #include "game/data/sdata2_8047CAA0.h"
 #include "game/gs_model.h"
+#include "game/gs_model_anim.h"
 #include "game/gs_render.h"
 
 #define GSMODEL_FLAG_ACTIVE 0x00000001U
@@ -20,6 +21,8 @@
 #define GSMODEL_FLAG_PARTICLE_TEXSTAGE 0x00000200U
 #define GSMODEL_FLAG_PARTICLE_LINKED 0x00000400U
 #define GSMODEL_FLAG_BOUND_CHECK 0x00100000U
+#define GSMODEL_FLAG_UPDATE_BOUND 0x00200000U
+#define GSMODEL_FLAG_BOUND_VISIBLE 0x00400000U
 #define GSMODEL_FLAG_ROOT_NULL_ADDED 0x00020000U
 #define GSJOBJ_DESC_FLAG_INSTANCE 0x00001000U
 #define JOBJ_MTX_DIRTY 0x00000040U
@@ -280,6 +283,89 @@ void fn_800E3884(u32 frames, u8 phase)
             }
         }
 
+        i++;
+    }
+}
+
+static inline void modelUpdateBoundCenter(GSmodel* model)
+{
+    if (model->flags.raw & GSMODEL_FLAG_RENDER_ALT_JOBJ) {
+        memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+    } else {
+        GSpart* part;
+
+        part = GSmodelGetPart(model, 1);
+        if (part == NULL) {
+            memcpy(&model->boundCenter, &model->position, sizeof(GSvec));
+        } else {
+            GSpartGetTransform(part, &model->boundCenter, NULL, NULL);
+            GSpartFree(part);
+            model->boundCenter.y -= model->boundYOffset;
+        }
+    }
+}
+
+void fn_800E3928(void* unused)
+{
+    u32 i;
+    GSmodel* model;
+
+    i = 0;
+    while (i < lbl_8047AB78) {
+        u32 flags;
+
+        model = &lbl_8047AB74[i];
+        flags = model->flags.raw;
+        if (flags & GSMODEL_FLAG_ACTIVE) {
+            if (flags & GSMODEL_FLAG_VISIBLE) {
+                if (flags & GSMODEL_FLAG_BOUND_CHECK) {
+                    u8 boundVisible;
+
+                    boundVisible = fn_80191118(&model->bound) != 0;
+                    if (boundVisible == 1) {
+                        model->flags.raw |= GSMODEL_FLAG_BOUND_VISIBLE;
+                    } else {
+                        model->flags.raw &= ~GSMODEL_FLAG_BOUND_VISIBLE;
+                    }
+                } else {
+                    model->flags.raw |= GSMODEL_FLAG_BOUND_VISIBLE;
+                }
+            } else {
+                model->flags.raw &= ~GSMODEL_FLAG_BOUND_VISIBLE;
+            }
+        }
+        i++;
+    }
+
+    i = 0;
+    while (i < lbl_8047AB78) {
+        u32 flags;
+
+        model = &lbl_8047AB74[i];
+        flags = model->flags.raw;
+        if ((flags & GSMODEL_FLAG_ACTIVE) &&
+            (flags & (GSMODEL_FLAG_BOUND_VISIBLE |
+                      GSMODEL_FLAG_PARTICLE_LINKED))) {
+            modelApplyAnimation__FP8_GSmodel(model);
+        }
+        i++;
+    }
+
+    i = 0;
+    while (i < lbl_8047AB78) {
+        model = &lbl_8047AB74[i];
+        if (model->flags.raw & GSMODEL_FLAG_ACTIVE) {
+            u32 flags;
+
+            modelUpdateAttachments__FP8_GSmodel(model);
+            modelUpdateBoundCenter(model);
+
+            flags = model->flags.raw;
+            if ((flags & GSMODEL_FLAG_BOUND_VISIBLE) &&
+                (flags & GSMODEL_FLAG_UPDATE_BOUND)) {
+                fn_80190E60(&model->bound);
+            }
+        }
         i++;
     }
 }

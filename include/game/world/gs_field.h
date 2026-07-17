@@ -159,6 +159,8 @@ void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size);
  * Public API -- Field Camera (gs_field_world.c)
  * =================================================================== */
 
+u8 fn_80117AE4(u32 mode);
+
 /**
  * floorUpdateFieldCamera -- Update the field camera each frame.
  *
