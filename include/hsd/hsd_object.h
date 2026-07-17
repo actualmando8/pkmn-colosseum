@@ -93,13 +93,8 @@ typedef struct _HSD_ObjInfo {
     HSD_ClassInfo parent;
 } HSD_ObjInfo;
 
-/* ========================================================================= */
-/*  Global class info                                                        */
-/* ========================================================================= */
-
+/* Canonical class-info storage at lbl_8036CC00. */
 extern HSD_ClassInfo hsdObj;
-
-void ObjInfoInit(void);
 
 /* ========================================================================= */
 /*  Reference counting inlines                                               */

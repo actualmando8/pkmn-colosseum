@@ -4,7 +4,7 @@
 
 extern u8 lbl_8036CBC0[];
 extern u8 lbl_8036CBF0[];
-extern void* lbl_8036CC00[];
+extern void* hsdObj[];
 extern u8 lbl_8036CC40[];
 extern void* lbl_8036CCD0[];
 extern void* jumptable_8036CD1C[];
@@ -27,7 +27,7 @@ u8 lbl_8036CBF0[16] = {
     0xFF, 0xFF, 0xFF, 0xFF,
 };
 
-void* lbl_8036CC00[16] = {
+void* hsdObj[16] = {
     (void*)((u8*)ObjInfoInit_801AA568),
     (void*)0x00000000,
     (void*)0x00000000,
@@ -111,4 +111,3 @@ void* jumptable_8036CD1C[26] = {
     (void*)((u8*)fn_801ABDD4 + 0x3C4),
     (void*)((u8*)fn_801ABDD4 + 0x194),
 };
-

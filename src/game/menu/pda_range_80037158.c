@@ -307,10 +307,14 @@ void fn_80038124(void* window, PdaSprite* sprite)
 }
 
 #pragma scheduling off
+#pragma opt_propagation off
 void fn_800376C8(void)
 {
-    fn_800FB680(0, 0, -1, lbl_8047A480);
+    void* data = lbl_8047A480;
+
+    fn_800FB680(0, 0, -1, data);
 }
+#pragma opt_propagation reset
 #pragma scheduling reset
 
 #pragma peephole off
@@ -551,37 +555,28 @@ s32 fn_800382E8(PdaMenuState* state)
 #pragma peephole reset
 
 #pragma peephole off
-#pragma scheduling off
 s32 fn_80038380(PdaSelectionWork* work)
 {
     extern PdaKeyInfo* windowGetKeyInfo(void);
     extern s32 menuGetSelectItemNum();
     PdaKeyInfo* keyInfo;
-    u32 selectedIndex;
     s32 itemCount;
 
     keyInfo = windowGetKeyInfo();
     if (keyInfo->buttons & 2) {
         itemCount = menuGetSelectItemNum(work->menu);
-        selectedIndex = (u8)work->selectedIndex;
         itemCount = (s8)itemCount;
-        selectedIndex++;
-        work->selectedIndex = selectedIndex;
-        if ((s8)selectedIndex >= itemCount) {
+        if ((s8)++work->selectedIndex >= itemCount) {
             work->selectedIndex = itemCount - 1;
         }
     }
     if (keyInfo->buttons & 1) {
-        selectedIndex = (u8)work->selectedIndex;
-        selectedIndex--;
-        work->selectedIndex = selectedIndex;
-        if ((s8)selectedIndex < 0) {
+        if ((s8)--work->selectedIndex < 0) {
             work->selectedIndex = 0;
         }
     }
     return 0;
 }
-#pragma scheduling reset
 #pragma peephole reset
 
 #pragma peephole off
@@ -605,17 +600,22 @@ s32 fn_80039498(s32 value)
 }
 #pragma peephole reset
 
+#pragma peephole off
 s32 fn_80039548(void* window, PdaSprite* sprite)
 {
+    s32 messageId;
+
     (void)window;
 
     if (lbl_8047A4B0 == 0) {
-        sprite->messageId = 0x1b6d;
+        messageId = 0x1b6d;
     } else {
-        sprite->messageId = 0x1b6e;
+        messageId = 0x1b6e;
     }
+    sprite->messageId = messageId;
     return 0;
 }
+#pragma peephole reset
 
 #pragma peephole off
 s32 fn_8003956C(void* window, void* sprite)
@@ -704,37 +704,28 @@ s32 fn_80039004(PdaSprite* context, PdaSprite* sprite)
 #pragma peephole reset
 
 #pragma peephole off
-#pragma scheduling off
 s32 fn_8003907C(PdaSelectionWork* work)
 {
     extern PdaKeyInfo* windowGetKeyInfo(void);
     extern s32 menuGetSelectItemNum();
     PdaKeyInfo* keyInfo;
-    u32 selectedIndex;
     s32 itemCount;
 
     keyInfo = windowGetKeyInfo();
     if (keyInfo->buttons & 2) {
         itemCount = menuGetSelectItemNum(work->menu);
-        selectedIndex = (u8)work->selectedIndex;
         itemCount = (s8)itemCount;
-        selectedIndex++;
-        work->selectedIndex = selectedIndex;
-        if ((s8)selectedIndex >= itemCount) {
+        if ((s8)++work->selectedIndex >= itemCount) {
             work->selectedIndex = itemCount - 1;
         }
     }
     if (keyInfo->buttons & 1) {
-        selectedIndex = (u8)work->selectedIndex;
-        selectedIndex--;
-        work->selectedIndex = selectedIndex;
-        if ((s8)selectedIndex < 0) {
+        if ((s8)--work->selectedIndex < 0) {
             work->selectedIndex = 0;
         }
     }
     return 0;
 }
-#pragma scheduling reset
 #pragma peephole reset
 
 #pragma peephole off

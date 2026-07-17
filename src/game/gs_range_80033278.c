@@ -116,7 +116,8 @@ void fn_80034E38(u8* arg0, u8* arg1) {
         value = arg0[0x8B] | 0xFFA08000;
     } else {
         mask = -0x100;
-        value = arg0[0x8B] | mask;
+        value = arg0[0x8B];
+        value = value | (mask & 0xFFFFFFFFFFFFFFFFu);
     }
     fn_800FB680(0, 0, value, 0x3CC7);
     if (lbl_8047A450 <= 0x98967F) {

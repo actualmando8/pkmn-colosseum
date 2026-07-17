@@ -106,6 +106,7 @@ extern void fn_800D67BC(u32 arg0);
 extern void fn_800D6680(f32 x, f32 y, f32 z);
 extern void fn_800D5CB8(u32 arg0, u8 r, u8 g, u8 b, u8 a);
 extern void fn_800D59B8(u32 arg0, f32 s, f32 t);
+extern void fn_800D5F34(f32 x, f32 y, f32 z);
 extern void fn_800D6728(void);
 extern void GSgfxEndBackFBCapture(void* texture);
 extern u32 _fadeEffectGetRandom__FUl(u32 range);
@@ -134,12 +135,14 @@ extern const f32 lbl_8047E00C;
 extern const f32 lbl_8047E010;
 extern const f32 lbl_8047E014;
 extern const f32 lbl_8047E018;
+extern const f32 lbl_8047E068;
 extern const f32 lbl_8047E04C;
 extern const f32 lbl_8047E050;
 extern const f32 lbl_8047E054;
 extern const f32 lbl_8047E058;
 extern const f32 lbl_8047E0A4;
 extern const f32 lbl_8047E0A8;
+extern const f32 lbl_8047E0C0;
 extern const f32 lbl_8047E0C4;
 extern const f32 lbl_8047E0C8;
 extern const f32 lbl_8047E0CC;
@@ -341,6 +344,56 @@ u32 fn_801C5530(u32 arg0, void* texture, f32 frame, f32 duration, f32 angle, f32
         fn_801C63C0(tex, &pos, lbl_8047DFE4, lbl_8047DFE0, t, rot);
     }
     return result;
+}
+#pragma peephole on
+
+#pragma peephole off
+void fn_801C5B60(FadeTrailPoint* position, s32 alpha, f32 scale, f32 angle)
+{
+    f32 matrix[3][4];
+    GSvec point;
+    GSvec transformed;
+
+    point.x = scale;
+    point.y = scale;
+    point.z = scale;
+    fn_800E042C(matrix, &point);
+    fn_800E02E8(matrix, lbl_8047E068 * angle);
+    fn_800E03B4(matrix, (GSvec*)position);
+    fn_800D67BC(4);
+
+    point.x = lbl_8047E018;
+    point.y = lbl_8047E018;
+    point.z = lbl_8047DFE0;
+    GSvecTransform(&transformed, matrix, &point);
+    fn_800D6680(transformed.x, transformed.y, transformed.z);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+    fn_800D59B8(0, lbl_8047DFE0, lbl_8047DFE0);
+
+    point.x = lbl_8047E014;
+    point.y = lbl_8047E018;
+    point.z = lbl_8047DFE0;
+    GSvecTransform(&transformed, matrix, &point);
+    fn_800D6680(transformed.x, transformed.y, transformed.z);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+    fn_800D59B8(0, lbl_8047DFE4, lbl_8047DFE0);
+
+    point.x = lbl_8047E018;
+    point.y = lbl_8047E014;
+    point.z = lbl_8047DFE0;
+    GSvecTransform(&transformed, matrix, &point);
+    fn_800D6680(transformed.x, transformed.y, transformed.z);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+    fn_800D59B8(0, lbl_8047DFE0, lbl_8047DFE4);
+
+    point.x = lbl_8047E014;
+    point.y = lbl_8047E014;
+    point.z = lbl_8047DFE0;
+    GSvecTransform(&transformed, matrix, &point);
+    fn_800D6680(transformed.x, transformed.y, transformed.z);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+    fn_800D59B8(0, lbl_8047DFE4, lbl_8047DFE4);
+    fn_800D6728();
 }
 #pragma peephole on
 
@@ -571,6 +624,104 @@ u32 fn_801C6908(u32 range) {
 void fn_801C6928(void) {
     lbl_8047B3B0 = 1;
 }
+
+void _fadeFluidSetShockSub__FUlUlf(u32 x, u32 y, f32 strength);
+
+#pragma peephole off
+void fadeFluidSetShock(GSvec* position, f32 strength) {
+    FadeFluidWork* fluid = (FadeFluidWork*)lbl_80467050;
+    f32 cellSize = fluid->cellSize;
+    u32 x = position->x / cellSize;
+    u32 y = position->y / cellSize;
+
+    _fadeFluidSetShockSub__FUlUlf(x, y, strength);
+    strength *= lbl_8047E0C0;
+    _fadeFluidSetShockSub__FUlUlf(x - 1, y - 1, strength);
+    _fadeFluidSetShockSub__FUlUlf(x, y - 1, strength);
+    _fadeFluidSetShockSub__FUlUlf(x + 1, y - 1, strength);
+    _fadeFluidSetShockSub__FUlUlf(x - 1, y, strength);
+    _fadeFluidSetShockSub__FUlUlf(x + 1, y, strength);
+    _fadeFluidSetShockSub__FUlUlf(x - 1, y + 1, strength);
+    _fadeFluidSetShockSub__FUlUlf(x, y + 1, strength);
+    _fadeFluidSetShockSub__FUlUlf(x + 1, y + 1, strength);
+}
+#pragma peephole on
+
+#pragma peephole off
+void fn_801C6AE8(u32 x, u32 y, u8 alpha) {
+    FadeFluidWork* dimensions;
+    FadeFluidWork* fluid;
+    GSvec** heightPage;
+    GSvec* position;
+    GSvec* velocity;
+    GSvec2* texCoord;
+    u32 nextX;
+    u32 stride;
+    u32 index;
+    f32 xScale;
+    f32 yScale;
+
+    dimensions = (FadeFluidWork*)&lbl_80467050;
+    stride = dimensions->columns + 1;
+    fn_800D67BC(4);
+
+    fluid = (FadeFluidWork*)&lbl_80467050;
+    xScale = fluid->xScale;
+    yScale = fluid->yScale;
+    heightPage = fluid->heightPage;
+    index = x + y * stride;
+    position = &heightPage[lbl_8047B3B8][index];
+    velocity = &fluid->velocityX[index];
+    texCoord = &fluid->texCoord[index];
+    fn_800D6680(position->x * xScale,
+                position->y * yScale,
+                position->z * xScale);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+    fn_800D59B8(0, texCoord->x, texCoord->y);
+    fn_800D5F34(velocity->x, velocity->y, velocity->z);
+
+    nextX = x + 1;
+    index = nextX + y * stride;
+    position = &heightPage[lbl_8047B3B8][index];
+    velocity = &fluid->velocityX[index];
+    texCoord = &fluid->texCoord[index];
+    fn_800D6680(position->x * xScale,
+                position->y * yScale,
+                position->z * xScale);
+    fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+    fn_800D59B8(0, texCoord->x, texCoord->y);
+    fn_800D5F34(velocity->x, velocity->y, velocity->z);
+
+    {
+        GSvec* cornerPosition;
+        u32 nextY = y + 1;
+
+        cornerPosition = &heightPage[lbl_8047B3B8][x + nextY * stride];
+        velocity = &fluid->velocityX[x + nextY * stride];
+        index = x + nextY * stride;
+        texCoord = &fluid->texCoord[index];
+        fn_800D6680(cornerPosition->x * xScale,
+                    cornerPosition->y * yScale,
+                    cornerPosition->z * xScale);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+        fn_800D59B8(0, texCoord->x, texCoord->y);
+        fn_800D5F34(velocity->x, velocity->y, velocity->z);
+
+        index = nextX + nextY * stride;
+        position = &heightPage[lbl_8047B3B8][index];
+        velocity = &fluid->velocityX[index];
+        texCoord = &fluid->texCoord[index];
+        fn_800D6680(position->x * xScale,
+                    position->y * yScale,
+                    position->z * xScale);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+        fn_800D59B8(0, texCoord->x, texCoord->y);
+        fn_800D5F34(velocity->x, velocity->y, velocity->z);
+    }
+
+    fn_800D6728();
+}
+#pragma peephole on
 
 void _fadeFluidSetShockSub__FUlUlf(u32 x, u32 y, f32 strength) {
     FadeFluidWork* fluid = (FadeFluidWork*)lbl_80467050;

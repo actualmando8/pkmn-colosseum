@@ -635,3 +635,79 @@ L_80012758:
     return;
 }
 #endif
+
+typedef struct WindowSprite {
+    u8 pad_00[6];
+    s16 kind;
+} WindowSprite;
+
+typedef struct WindowDisplayWork {
+    u8 pad_00[0x16];
+    u8 mode;
+    u8 pad_17[0x12];
+    u8 flag;
+} WindowDisplayWork;
+
+#pragma push
+#pragma peephole off
+void fn_80012858(void* window, WindowSprite* sprite)
+{
+    void* windowGetAllocPtr(void* window);
+    WindowDisplayWork* work = windowGetAllocPtr(window);
+    s32 kind = sprite->kind;
+    s32 display = 1;
+    u8 mode = work->mode;
+
+    switch (kind) {
+    case 0x9B:
+    case 0x9C:
+    case 0xA6:
+    case 0xA7:
+    case 0x534:
+    case 0x535:
+    case 0x53C:
+    case 0x53D:
+        if (work->flag != 0) {
+            display = 0;
+        } else {
+            display = 1;
+        }
+        break;
+    case 0x99:
+    case 0x9D:
+    case 0x9E:
+    case 0xA4:
+    case 0xA8:
+    case 0xA9:
+    case 0x536:
+    case 0x537:
+    case 0x53E:
+    case 0x53F:
+        if (work->flag != 0) {
+            display = 1;
+        } else {
+            display = 0;
+        }
+        break;
+    }
+
+    switch (kind) {
+    case 0x99:
+    case 0xA4:
+    case 0x534:
+    case 0x535:
+    case 0x536:
+    case 0x537:
+    case 0x53C:
+    case 0x53D:
+    case 0x53E:
+    case 0x53F:
+        if (mode == 1) {
+            display = 0;
+        }
+        break;
+    }
+
+    winSpriteSetDisp(sprite, display);
+}
+#pragma pop

@@ -24,10 +24,8 @@ extern void* memset(void* dst, int val, u32 n);
  *   lbl_8036CC00 == hsdObj     (HSD_ObjInfo,    0x3C bytes)  [shared] */
 extern HSD_FogInfo lbl_8036C7E8;
 extern HSD_FogAdjInfo lbl_8036C828;
-extern HSD_ObjInfo lbl_8036CC00;
 #define hsdFog lbl_8036C7E8
 #define hsdFogAdj lbl_8036C828
-#define hsdObjInfo lbl_8036CC00
 
 /* String literals, held in the shared rodata/sdata2 TUs. */
 extern const char lbl_802747B8[];   /* "sysdolphin_base_library" */
@@ -47,7 +45,7 @@ void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value);
 #pragma optimizewithasm off
 static void FogAdjInfoInit(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFogAdj), HSD_CLASS_INFO(&hsdObjInfo),
+    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFogAdj), HSD_CLASS_INFO(&hsdObj),
                      (char*) lbl_802747B8, (char*) lbl_802747D0,
                      sizeof(HSD_FogAdjInfo), sizeof(HSD_FogAdj));
 }
@@ -59,7 +57,7 @@ static void FogAdjInfoInit(void)
 #pragma optimizewithasm off
 static void FogInfoInit(void)
 {
-    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFog), HSD_CLASS_INFO(&hsdObjInfo),
+    hsdInitClassInfo(HSD_CLASS_INFO(&hsdFog), HSD_CLASS_INFO(&hsdObj),
                      (char*) lbl_802747B8, (char*) &lbl_8047DA60,
                      sizeof(HSD_FogInfo), sizeof(HSD_Fog));
     HSD_CLASS_INFO(&hsdFog)->release = (void (*)(HSD_Class*)) FogRelease;

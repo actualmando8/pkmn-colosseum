@@ -31,7 +31,6 @@ extern HSD_ClassInfo* lbl_8047B218;
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern u8 lbl_8036CC00[];   /* hsdObj  class info */
 extern char lbl_80274468[]; /* "sysdolphin_base_library" */
 extern char lbl_80274480[]; /* "had_wobj" */
 void WObjInfoInit(void)
@@ -39,7 +38,7 @@ void WObjInfoInit(void)
     extern u8 lbl_8036C5F0[]; /* hsdWObj class info */
 
     hsdInitClassInfo(HSD_CLASS_INFO(lbl_8036C5F0),
-                     HSD_CLASS_INFO(lbl_8036CC00), lbl_80274468, lbl_80274480,
+                     HSD_CLASS_INFO(&hsdObj), lbl_80274468, lbl_80274480,
                      sizeof(HSD_WObjInfo), sizeof(HSD_WObj));
     HSD_CLASS_INFO(lbl_8036C5F0)->release = (void (*)(HSD_Class*)) WObjRelease;
     HSD_CLASS_INFO(lbl_8036C5F0)->amnesia = WObjAmnesia;

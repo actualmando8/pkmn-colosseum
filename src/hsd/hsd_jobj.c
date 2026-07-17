@@ -39,7 +39,6 @@ void fn_801A20C8(void* obj, u32 type, HSD_ObjData* val);
 void fn_801A3600(HSD_JObj* jobj);
 void fn_801A1B7C(HSD_JObj* jobj);
 extern u8 lbl_8036C8E0[];
-extern u8 lbl_8036CC00[];
 extern char lbl_80274AD0[];
 extern char lbl_80274AE8[];
 
@@ -379,7 +378,7 @@ void HSD_JObjSetDefaultClass(HSD_ClassInfo* info)
 void fn_8019CE50(void)
 {
     hsdInitClassInfo(HSD_CLASS_INFO(lbl_8036C8E0),
-                     HSD_CLASS_INFO(lbl_8036CC00), lbl_80274AD0, lbl_80274AE8,
+                     HSD_CLASS_INFO(&hsdObj), lbl_80274AD0, lbl_80274AE8,
                      sizeof(HSD_JObjInfoColosseum), sizeof(HSD_JObj));
     HSD_CLASS_INFO(lbl_8036C8E0)->init = (int (*)(HSD_Class*)) JObjInit;
     HSD_CLASS_INFO(lbl_8036C8E0)->release =
