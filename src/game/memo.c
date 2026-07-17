@@ -265,8 +265,8 @@ u32 memoDataGetPokemonTrainerRndFromID(u16 *r3, u16 r4) {
     r0 = r5 + 4;
     r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
 			    if (r0 == (u16)r4) {
-		      r0 = r5 + 8;
-		      return *(u32 *)((u8 *)queue + r0);
+		      queue = (u16 *)((u8 *)queue + r5);
+		      return *(u32 *)((u8 *)queue + 8);
 		    }
   }
   return 0;
@@ -302,8 +302,8 @@ u32 memoDataGetPokemonRndFromID(u16 *r3, u16 r4) {
 	    r0 = r5 + 4;
 	    r0 = (u32)*(u16 *)((u8 *)queue + r0) & 0x3FFF;
 		    if (r0 == (u16)r4) {
-		      r0 = r5 + 0xC;
-		      return *(u32 *)((u8 *)queue + r0);
+		      queue = (u16 *)((u8 *)queue + r5);
+		      return *(u32 *)((u8 *)queue + 0xC);
 		    }
   }
   return 0;

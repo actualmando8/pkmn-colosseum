@@ -271,12 +271,15 @@ void GStextureFree(GStextureHandle* tex) {
  *  `GXDrawDone(GStextureUnlockImage(image))`, so the return value is
  *  used by the caller: returns the texture's refCount before decrement.
  * ======================================================================= */
+#pragma push
+#pragma scheduling off
 u32 GStextureUnlockImage(GStextureHandle* tex) {
     DCFlushRange(tex->mipData[0], tex->totalSize);
     GXInvalidateTexAll();
 
     return tex->refCount--;
 }
+#pragma pop
 
 /* =======================================================================
  *  GStextureLockImage
