@@ -113,6 +113,8 @@ void gamedatasaveSetStatus(void* ptr, u16 kind, u32 value) {
     case 9:
         gamedatasaveBiosSetOptionAudio(sub, (u8)value);
         break;
+    case 10:
+        break;
     default:
         break;
     }
@@ -166,9 +168,13 @@ u32 gamedatasaveGetStatus(void* ptr, u16 kind) {
         return gamedatasaveBiosGetOptionNoVibration(sub);
     case 8:
         return gamedatasaveBiosGetOptionAudio(sub);
+    case 9:
+    case 10:
+        break;
     default:
-        return 0;
+        break;
     }
+    return 0;
 }
 #endif
 
