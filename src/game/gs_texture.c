@@ -45,9 +45,10 @@
 #include "game/gs_scene_types.h"  /* memcpy, GSmem externs, GSlogWrite */
 
 /* ===== External SDK / engine functions ===== */
-u16   fn_800E2C04(u32 alignment, u32 size);     /* GSmemAlloc */
+u16   fn_800E2C04(u32 size, u32 alignment);     /* GSmemAlloc */
 void  GXInvalidateTexAll(void);
-extern void  fn_800BB050(void* gxTlutObj, void* data, u32 format); /* GXInitTlutObj */
+extern void  fn_800BB050(void* gxTlutObj, void* data, u32 format,
+                         u32 entries); /* GXInitTlutObj */
 extern void  fn_800BA9E4(void* gxTexObj, void* data,
                           u16 width, u16 height, u32 gxFmt,
                           u32 wrapS, u32 wrapT, u32 hasMips); /* GXInitTexObj */
@@ -321,20 +322,19 @@ void fn_800EFD14(void) {
  *  r3 = width, r4 = height, r5 = format, r6 = tlutFormat,
  *  r7 = mipLevels
  * ======================================================================= */
-GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
-                                  u32 tlutFormat, u8 mipLevels) {
+GStextureHandle* GStextureCreate(s32 width, s32 height, s32 format,
+                                  s32 tlutFormat, u8 mipLevels) {
     u16 adjWidth, adjHeight;
-    u8 bpp;
+    u8 dimensionAlign;
     u32 pixelCount;
     u32 totalSize;
-    u8 mipCount;
     u32 i;
     GStextureHandle* tex;
-    u16 handle;
     u32 gxFmt;
-    u32 tlutPalSize;
+    s32 tlutEntries;
     s32 gxTexFmt;
     u32 hasMips;
+    u32 mipSize;
 
     /* Step 1: Default to display dimensions if both are 0 */
     if ((width & 0xFFFF) == 0 && (height & 0xFFFF) == 0) {
@@ -352,31 +352,25 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
         return NULL;
     }
 
-    /* Step 3: Determine bits per pixel from format */
+    /* Step 3: Determine the dimension-alignment granularity. */
     switch (format) {
-        case 0x00:  /* I4: 4bpp */
-        case 0x40:  /* IA4: 4bpp */
-        case 0xB0:  /* CMPR: 4bpp */
-            bpp = 8;
+        case 0x00:
+        case 0x40:
+        case 0x41:
+        case 0xB0:
+            dimensionAlign = 8;
             break;
-        case 0x01:  /* I8: 8bpp */
-        case 0x41:  /* RGB565 */
-        case 0x42:  /* RGB5A3 */
-        case 0xA0:  /* A8 */
-            bpp = 4;
+        case 0x01:
+        case 0x42:
+        case 0x43:
+        case 0xA0:
+            dimensionAlign = 4;
             break;
-        case 0x30:  /* IA8: 16bpp */
-        case 0x90:  /* CI8: palette */
-            bpp = 4;
-            break;
-        case 0x43:  /* RGBA8: 32bpp */
-            bpp = 16;
-            break;
-        case 0x44:  /* CI4 */
-            bpp = 8;
-            break;
-        case 0x45:  /* CI14x2 */
-            bpp = 32;
+        case 0x30:
+        case 0x44:
+        case 0x45:
+        case 0x90:
+            dimensionAlign = 4;
             break;
         default:
             /* Unknown format */
@@ -388,8 +382,16 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
     {
         u32 origW = width & 0xFFFF;
         u32 origH = height & 0xFFFF;
-        u32 pw = adjWidth, ph = adjHeight;
+        u16 pw, ph;
         u8 shift = 0;
+
+        adjWidth = (u16)((adjWidth + (dimensionAlign - 1)) & ~(dimensionAlign - 1));
+        adjHeight = (u16)((adjHeight + (dimensionAlign - 1)) & ~(dimensionAlign - 1));
+
+        /* Warn if dimensions were adjusted */
+        if (adjWidth != origW || adjHeight != origH) {
+            GSlogWrite(lbl_80270FBC, origW, origH, adjWidth, adjHeight);
+        }
 
         /* Iteratively halve until both are <= 4, counting shifts */
         pw = adjWidth;
@@ -404,73 +406,89 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
         if ((mipLevels & 0xFF) > shift) {
             mipLevels = shift;
         }
-
-        adjWidth = (u16)((adjWidth + (bpp - 1)) & ~(bpp - 1));
-        adjHeight = (u16)((adjHeight + (bpp - 1)) & ~(bpp - 1));
-
-        /* Warn if dimensions were adjusted */
-        if (adjWidth != origW || adjHeight != origH) {
-            GSlogWrite(lbl_80270FBC, origW, origH, adjWidth, adjHeight);
-        }
     }
 
     /* Step 5: Find a free slot in the texture pool */
     tex = gsTexPool;
-    {
-        u32 count = gsTexMaxCount;
-        u32 idx;
-        GStextureHandle* slot = gsTexPool;
-        for (idx = 0; idx < count; idx++) {
-            if (slot->inUse == 0) {
-                tex = slot;
-                break;
-            }
-            slot = (GStextureHandle*)((u8*)slot + 0x80);
+    for (i = gsTexMaxCount; i != 0; i--) {
+        if (tex->inUse == 0) {
+            goto texture_slot_found;
         }
-        if (idx >= count) {
-            tex = NULL;
-        }
+        tex++;
     }
+    tex = NULL;
+
+texture_slot_found:
 
     if (tex == NULL) {
         return NULL;
     }
 
+    tlutEntries = 0;
+    switch (format) {
+        case 0x00:
+            tlutEntries = 0x10;
+            /* fall through */
+        case 0x40:
+        case 0xB0:
+            tex->bitsPerPixel = 4;
+            break;
+        case 0x01:
+            tlutEntries = 0x100;
+            /* fall through */
+        case 0x41:
+        case 0x42:
+        case 0xA0:
+            tex->bitsPerPixel = 8;
+            break;
+        case 0x30:
+            tlutEntries = 0x400;
+            /* fall through */
+        case 0x43:
+        case 0x44:
+        case 0x90:
+            tex->bitsPerPixel = 16;
+            break;
+        case 0x45:
+            tex->bitsPerPixel = 32;
+            break;
+        default:
+            return NULL;
+    }
+
     /* Step 6: Compute total data size */
     pixelCount = (u32)adjWidth * (u32)adjHeight;
-    mipCount = (mipLevels & 0xFF) + 1;
+    mipLevels = (mipLevels & 0xFF) + 1;
     tex->totalSize = 0;
 
     {
-        u32 mipSize = (u32)bpp * pixelCount / 8;
-        u32 level;
+        u32 mipSize = (u32)tex->bitsPerPixel * pixelCount / 8;
+        s32 level;
 
-        for (level = 0; level < mipCount; level++) {
+        for (level = 0; level < mipLevels; level++) {
             u32 roundedSize = (mipSize + 0x1F) & ~0x1F;
             tex->totalSize += roundedSize;
-            mipSize >>= 2;  /* each mip is 1/4 the size */
+            mipSize >>= 1;
         }
     }
 
     /* Handle TLUT (palette) data size */
-    tlutPalSize = 0;
-    if (pixelCount != 0 && tlutFormat > 0 && tlutFormat < 4) {
+    if (tlutEntries != 0) {
+        if (tlutFormat == 0 || tlutFormat < 0 || tlutFormat >= 4) {
+            return NULL;
+        }
         /* TLUT occupies additional space (palette entries * 2 bytes) */
-        tlutPalSize = pixelCount * 16 / 8;  /* from assembly: slwi r0, r0, 4; srawi r0, r0, 3 */
-        tex->totalSize += tlutPalSize;
-    } else if (tlutFormat == 0 || tlutFormat >= 4) {
-        return NULL;
+        tex->totalSize += (tlutEntries << 4) >> 3;
     }
 
     /* Step 7: Allocate pixel data from GSmem */
-    handle = fn_800E2C04(0x20, tex->totalSize);
-    tex->memHandle = handle;
+    tex->memHandle = fn_800E2C04(tex->totalSize, 0x20);
 
-    if ((handle & 0xFFFF) == 0) {
+    if (tex->memHandle == 0) {
         return NULL;
     }
 
-    tex->mipData[0] = fn_800E27B0(handle);
+    tex->mipData[0] = fn_800E27B0(tex->memHandle);
     if (tex->mipData[0] == NULL) {
         fn_800E209C(tex->memHandle);
         return NULL;
@@ -483,12 +501,12 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
     tex->mipLevels = mipLevels;
     tex->format = format;
     tex->tlutFormat = tlutFormat;
-    tex->minFilter = 0;
-    tex->magFilter = 0;
-    tex->wrapS = 2;  /* GX_CLAMP */
-    tex->wrapT = 2;  /* GX_CLAMP */
+    tex->wrapS = 0;
+    tex->wrapT = 0;
+    tex->minFilter = 2;
+    tex->magFilter = 2;
 
-    if (mipCount > 1) {
+    if (mipLevels > 1) {
         tex->lodClamp = 2;
     } else {
         tex->lodClamp = 0;
@@ -499,16 +517,15 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
 
     /* Compute per-mip data pointers */
     {
-        u32 mipSize = (u32)bpp * pixelCount / 8;
-        u32 cumOffset = 0;
-        u32 level;
+        s32 level;
 
-        for (level = 0; level < 7; level++) {
-            if ((u32)(level + 1) < (u32)tex->mipLevels) {
-                tex->mipData[level + 1] = (u8*)tex->mipData[level] + mipSize;
-                mipSize >>= 2;
+        mipSize = (u32)tex->bitsPerPixel * pixelCount / 8;
+        for (level = 1; level < 8; level++) {
+            if (level < tex->mipLevels) {
+                tex->mipData[level] = (u8*)tex->mipData[level - 1] + mipSize;
+                mipSize >>= 1;
             } else {
-                tex->mipData[level + 1] = NULL;
+                tex->mipData[level] = NULL;
             }
         }
     }
@@ -516,8 +533,8 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
     /* Compute TLUT pointer (for CI formats) */
     if (tlutFormat >= 1 && tlutFormat < 4) {
         u8* lastMipEnd;
-        u32 mipIdx = tex->mipLevels;
-        lastMipEnd = (u8*)tex->mipData[mipIdx] + (u32)bpp * pixelCount / 8;
+        u32 mipIdx = tex->mipLevels - 1;
+        lastMipEnd = (u8*)tex->mipData[mipIdx] + mipSize;
         /* Actually from the assembly: calculated from last mip's end pointer */
         tex->tlutData = lastMipEnd;
     } else {
@@ -544,30 +561,30 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
 
     /* Set up GXTlutObj if texture has a TLUT */
     if (tex->tlutData != NULL) {
-        u32 palFmt;
-        u32 tlutWrap;
+        u32 tlutEntries;
+        u32 gxTlutFmt;
 
-        palFmt = 0;
+        tlutEntries = 0;
         switch (tex->format) {
-            case 0x00: palFmt = 0x10;  break;
-            case 0x01: palFmt = 0x100; break;
-            case 0x30: palFmt = 0x400; break;
+            case 0x00: tlutEntries = 0x10;  break;
+            case 0x01: tlutEntries = 0x100; break;
+            case 0x30: tlutEntries = 0x400; break;
             default:   break;
         }
 
-        tlutWrap = 0;
+        gxTlutFmt = 0;
         switch (tex->tlutFormat) {
-            case 1: tlutWrap = 0; break;
-            case 2: tlutWrap = 1; break;
-            case 3: tlutWrap = 2; break;
+            case 1: gxTlutFmt = 0; break;
+            case 2: gxTlutFmt = 1; break;
+            case 3: gxTlutFmt = 2; break;
             default: break;
         }
 
-        fn_800BB050(tex->gxTlutObj, tex->tlutData, tlutWrap);
+        fn_800BB050(tex->gxTlutObj, tex->tlutData, gxTlutFmt, tlutEntries);
     }
 
     /* Set up GXTexObj */
-    hasMips = (tex->mipLevels == 1) ? 0 : 1;
+    hasMips = tex->mipLevels > 1;
     fn_800BA9E4(tex->gxTexObj, tex->mipData[0], tex->width, tex->height,
                 gxTexFmt, 0, 0, hasMips);
 

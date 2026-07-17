@@ -121,8 +121,8 @@ typedef struct GStextureHandle {
  *
  * Corresponds to GStextureCreate.
  */
-GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
-                                  u32 tlutFormat, u8 mipLevels);
+GStextureHandle* GStextureCreate(s32 width, s32 height, s32 format,
+                                  s32 tlutFormat, u8 mipLevels);
 
 /**
  * GStextureUnlockImage -- Flush the texture's pixel data from the data
