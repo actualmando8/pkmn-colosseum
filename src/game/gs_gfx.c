@@ -24,6 +24,7 @@
 
 #include "dolphin/types.h"
 #include "game/gs_gfx.h"
+#include "game/gs_model.h"
 
 /* ===== Data referenced by the real fn_ functions below ===== */
 extern u8 lbl_804001F0[];  /* GX state / FIFO state block */
@@ -229,7 +230,6 @@ void fn_800D3190(void) {
 #endif
 extern void fn_800D13C4(void* a);
 extern void fn_800DC874(void* a);
-extern void fn_800E3928(void* a);
 extern void fn_801183EC(void* a);
 extern void modelShadowRender__FP10GSgfxLayer(void);
 extern void fn_8019C708(s32 a);

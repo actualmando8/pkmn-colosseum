@@ -283,14 +283,11 @@ typedef struct GSmaterialEntry {
  */
 
 /**
- * GSmaterialUpdateColors -- Comprehensive color update for a material.
+ * GSmodelUpdateAll -- Refresh active model state in three passes.
  *
- * Reads the HSD MObj and applies the current diffuse, ambient, specular,
- * and alpha values. Handles the alpha-blended / transparent pipeline
- * path and invokes the GX color/alpha update functions.
- *
- * @param entry   Pointer to a GSmaterialEntry.
- * @param flags   Control flags.
+ * Updates bound visibility, applies animation to visible or
+ * particle-linked models, then refreshes attachments and bound centers.
+ * The caller-supplied argument is unused.
  *
  * Corresponds to fn_800E3928. Size: 0x1E0.
  */

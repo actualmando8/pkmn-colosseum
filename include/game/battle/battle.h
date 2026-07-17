@@ -432,7 +432,7 @@ typedef struct TypeMatchup {
 /* fn_801C9B6C */ void fn_801C9B6C(s32 transitionType);
 /* fn_801C9C9C */ s32  fn_801C9C9C(void);
 /* fn_801C9F5C */ void fn_801C9F5C(void);
-/* fn_801CA358 */ void fn_801CA358(s32 effectType, s32 slot);
+/* fn_801CA358 */ u8   fn_801CA358(void);
 /* fn_801CA5C4 */ void fn_801CA5C4(s32 effectID, f32 x, f32 y, f32 z);
 
 /* Scene transitions & mega-functions */

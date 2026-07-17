@@ -6,6 +6,7 @@
  * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
  */
 #include "dolphin/types.h"
+#include "game/gs_model_anim.h"
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_jobj.h"
 
@@ -143,8 +144,6 @@ void modelCalculateBlendModel__FP8_GSmodelf(GSmodel* model);
 f32 fn_800ED8C4(u32 type, u32 fractional_frames, f32 frame,
                 f32 requested_frame, f32 end_frame, f32 rate);
 s32 fn_800D37CC(void);
-void modelApplyAnimation__FP8_GSmodel(GSmodel* model);
-void modelUpdateAttachments__FP8_GSmodel(GSmodel* model);
 void _modelGetAObjFunc__FP9_HSD_AObjPv(HSD_AObj* aobj, HSD_AObj** out);
 void _modelResetPartAnimMixes__FP8_GSmodel(GSmodel* model);
 void _modelSetLoopFlag__FP9_HSD_AObjUl(HSD_AObj* aobj, u32 enable);
