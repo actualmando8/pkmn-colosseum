@@ -2699,6 +2699,44 @@ s32 CARDGetResultCode(s32 chan) {
     return card->result;
 }
 
+s32 CARDFreeBlocks(s32 chan, s32* byteNotUsed, s32* filesNotUsed) {
+    CARDControl* card;
+    s32 result;
+    u16* fat;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    u16 fileNo;
+    void* __CARDGetFatBlock(CARDControl* card);
+    void* __CARDGetDirBlock(CARDControl* card);
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    fat = __CARDGetFatBlock(card);
+    dir = __CARDGetDirBlock(card);
+    if (fat == NULL || dir == NULL) {
+        return __CARDPutControlBlock(card, -6);
+    }
+
+    if (byteNotUsed != NULL) {
+        *byteNotUsed = (s32)(card->sectorSize * fat[3]);
+    }
+
+    if (filesNotUsed != NULL) {
+        *filesNotUsed = 0;
+        for (fileNo = 0; fileNo < 127; fileNo++) {
+            entry = &dir[fileNo];
+            if ((u8)entry->fileName[0] == 0xFF) {
+                ++*filesNotUsed;
+            }
+        }
+    }
+
+    return __CARDPutControlBlock(card, 0);
+}
+
 BOOL __CARDCompareFileName(CARDDirEntry* entry, char* fileName) {
     char* entryName = entry->fileName;
     char entryChar;
