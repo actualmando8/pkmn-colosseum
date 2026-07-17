@@ -11,6 +11,7 @@
  * evidence (anchor-name monotonicity checks) used to place this boundary.
  */
 #include "dolphin/types.h"
+#include "game/hero.h"
 #include "game/world/gs_field.h"
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
@@ -137,7 +138,6 @@ extern void pokemonBiosGetPokemonWazaPtr(void);
 extern void pokemonResetBasisStatus(void* ptr);
 void pokemonSetLevelBasisStatus(void);
 extern void heroSetStatus();
-extern u32 heroGetStatus();
 extern void* GSresAllocResourceAlign(); /* K&R: called with 5 args, returns void* */
 extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl(); /* K&R: asm void wrapper, used as function pointer */

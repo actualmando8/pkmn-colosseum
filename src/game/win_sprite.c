@@ -10,6 +10,7 @@
  *        Release/Add strictly monotonic with exact size matches.
  */
 #include "dolphin/types.h"
+#include "game/win_sprite.h"
 
 /* ===== External SDK / engine functions ===== */
 extern void* memset(void* dst, int val, u32 size);
@@ -148,7 +149,6 @@ extern u8    menuOffScreenCheckEnable(u8 param);
 extern void  windowClose(void* ptr, u32 flags);
 extern void* windowSearchID(s32 param);
 extern s32   _menuCBOffScreen__FP9GStextureUlPv(void);
-extern void  winSpriteSetDisp(void* node, u32 enable);
 extern void  windowGetValue(s32 param);
 extern void  windowCheckCursor(void* p, u8 flags);
 extern void  windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
@@ -268,7 +268,6 @@ extern void winSeqSetMenu(s32 param, u32 key);
 extern void fn_801081F8(void* r3_arg, u16 r4, u16 r5);
 extern void winSetSequence(void* out, u32 idx);
 extern s32 winSpriteGetDisp(void* ptr);
-extern void winSpriteSetDisp(void* node, u32 enable);
 extern void winSpriteRelease(void* head);
 extern void winSpriteInit(void);
 extern void fn_801093C8(void);
