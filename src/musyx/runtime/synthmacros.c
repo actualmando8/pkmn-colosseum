@@ -300,10 +300,14 @@ extern void fn_80160ED4(u8 voice, u32 val); /* inpResetChannelDefaults */
 extern u32 fn_801576C4(SYNTH_VOICE* svoice, u8 new_vid); /* vidMakeNew */
 extern void hwBreak(u32 voice); /* src/musyx/musyx_range_80157280.c, real symbol */
 
-extern void inpAddCtrl(void* dst, u32 lowByte, s32 value, u32 repeat, u32 hasUpperByte);
+extern void inpAddCtrl(CTRL_DEST* dst, u8 lowByte, s32 value, u8 repeat, u32 hasUpperByte);
 extern void fn_8016039C(u8 midi, u8 midiSet, u32 dirtyFlag); /* inpSetGlobalMIDIDirtyFlag */
-extern CTRL_DEST inpAuxA[8][4]; /* lbl_80435B74, per-studio stride 0x90 (4 * sizeof(CTRL_DEST)) */
-extern CTRL_DEST inpAuxB[8][4]; /* lbl_804356F4, per-studio stride 0x90 */
+extern CTRL_DEST lbl_80435B74[8][4]; /* inpAuxA, per-studio stride 0x90 */
+extern CTRL_DEST lbl_804356F4[8][4]; /* inpAuxB, per-studio stride 0x90 */
+extern u64 lbl_80368CA0[4];
+extern u32 lbl_80368CC0[4];
+extern u64 lbl_80368CD0[4];
+extern u32 lbl_80368CF0[4];
 
 /* SAMPLE_INFO: byte-exact-proven layout, copied from src/musyx/runtime/stream.c
  * (do not re-derive). */
@@ -328,27 +332,35 @@ extern u32 adsrSetup(ADSR_VARS* adsr);
 extern f32 dspDLSVolTab[129]; /* lbl_8036984C, .data 0x204 */
 extern u8 dspScale2IndexTab[1024]; /* lbl_8036944C, .data 0x400 */
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
-static void SelectSourceCommon(u8* svoice, u8* dest, u32* cstep, u64 tstflag, u32 dirtyFlag) {
-    u32 comb;
+static void SelectSourceCommon(SYNTH_VOICE* svoice, CTRL_DEST* dest, MSTEP* cstep, u64 tstflag,
+                               u32 dirtyFlag) {
+    u8 comb;
     s32 scale;
 
-    if (!(*(u64*)(svoice + 0x114) & tstflag)) {
+    if (!(svoice->cFlags & tstflag)) {
         comb = 0;
-        *(u64*)(svoice + 0x114) |= tstflag;
+        svoice->cFlags |= tstflag;
     } else {
-        comb = cstep[1] & 0xFF;
+        comb = cstep->para[1] & 0xFF;
     }
-    scale = ((s16)(cstep[0] >> 16) << 16) / 100;
+    scale = ((s16)(cstep->para[0] >> 16) << 16) / 100;
     if (scale < 0) {
-        scale -= ((s8)(cstep[1] >> 0x10) << 8) / 100;
+        scale -= ((s8)(cstep->para[1] >> 0x10) << 8) / 100;
     } else {
-        scale += ((s8)(cstep[1] >> 0x10) << 8) / 100;
+        scale += ((s8)(cstep->para[1] >> 0x10) << 8) / 100;
     }
-    inpAddCtrl(dest, (cstep[0] >> 8) & 0xFF, scale, comb, (u8)(cstep[1] >> 8) != 0);
-    *(u32*)(svoice + 0x214) |= dirtyFlag;
+    inpAddCtrl(dest, (u8)(cstep->para[0] >> 8), scale, comb,
+               (u8)(cstep->para[1] >> 8) != 0);
+    if ((dirtyFlag & 0x80000000u) != 0) {
+        fn_8016039C(svoice->midi, svoice->midiSet, dirtyFlag);
+    } else {
+        svoice->midiDirtyFlags |= dirtyFlag;
+    }
 }
 #define PF_DEFINE_MOTION_SETTER(name, initMask, dataOffset, doneMask) \
-void name(u8* ctx, u32* cmd) { SelectSourceCommon(ctx, ctx + (dataOffset), cmd, (initMask), (doneMask)); }
+void name(SYNTH_VOICE* ctx, MSTEP* cmd) { \
+    SelectSourceCommon(ctx, (CTRL_DEST*)((u8*)ctx + (dataOffset)), cmd, (initMask), (doneMask)); \
+}
 /* mcmdVolumeSelect = mcmdVolumeSelect (inpVolume@0x218, tstflag 0x80000, dirty 1);
  * identified from the SelectSource offset table below, not simindex (which
  * cannot distinguish these 260B siblings from each other). */
@@ -447,52 +459,16 @@ PF_DEFINE_MOTION_SETTER(mcmdTremoloSelect, 0x10000000ULL, 0x3C8, 0x1000u)
 #endif
 #undef PF_DEFINE_MOTION_SETTER
 
-/* ===================================================================
- * mcmdAuxAFXSelect / mcmdAuxBFXSelect: unlike the 13-member SelectSource
- * family above (whose dirtyFlag argument is always a compile-time literal
- * with bit 0x80000000 clear, letting the optimizer fold away the
- * inpSetGlobalMIDIDirtyFlag branch -- see SelectSourceCommon), these two
- * pass a *runtime* dirty[i] value that does have that bit set for some i,
- * so the branch is live in the target binary. A separate helper avoids
- * touching SelectSourceCommon (13-member family is a proven-unfixable
- * closed wall).
- * =================================================================== */
-static void SelectSourceFull(u8* svoice, u8* dest, u32* cstep, u64 tstflag, u32 dirtyFlag) {
-    u32 comb;
-    s32 scale;
-
-    if (!(*(u64*)(svoice + 0x114) & tstflag)) {
-        comb = 0;
-        *(u64*)(svoice + 0x114) |= tstflag;
-    } else {
-        comb = cstep[1] & 0xFF;
-    }
-    scale = ((s16)(cstep[0] >> 16) << 16) / 100;
-    if (scale < 0) {
-        scale -= ((s8)(cstep[1] >> 0x10) << 8) / 100;
-    } else {
-        scale += ((s8)(cstep[1] >> 0x10) << 8) / 100;
-    }
-    inpAddCtrl(dest, (cstep[0] >> 8) & 0xFF, scale, comb, (u8)(cstep[1] >> 8) != 0);
-    if ((dirtyFlag & 0x80000000u) != 0) {
-        fn_8016039C(*(u8*)(svoice + 0x121), *(u8*)(svoice + 0x122), dirtyFlag);
-    } else {
-        *(u32*)(svoice + 0x214) |= dirtyFlag;
-    }
-}
-
 void mcmdAuxAFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
-    static u64 mask[4] = {0x100000000ULL, 0x200000000ULL, 0x400000000ULL, 0x800000000ULL};
-    static u32 dirty[4] = {0x80000001u, 0x80000002u, 0x80000004u, 0x80000008u};
     u32 i = (u8)(cstep->para[1] >> 0x18);
-    SelectSourceFull((u8*)svoice, (u8*)&inpAuxA[svoice->studio][i], cstep->para, mask[i], dirty[i]);
+    SelectSourceCommon(svoice, &lbl_80435B74[svoice->studio][i], cstep, lbl_80368CA0[i],
+                       lbl_80368CC0[i]);
 }
 
 void mcmdAuxBFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
-    static u64 mask[4] = {0x1000000000ULL, 0x2000000000ULL, 0x4000000000ULL, 0x8000000000ULL};
-    static u32 dirty[4] = {0x80000010u, 0x80000020u, 0x80000040u, 0x80000080u};
     u32 i = (u8)(cstep->para[1] >> 0x18);
-    SelectSourceFull((u8*)svoice, (u8*)&inpAuxB[svoice->studio][i], cstep->para, mask[i], dirty[i]);
+    SelectSourceCommon(svoice, &lbl_804356F4[svoice->studio][i], cstep, lbl_80368CD0[i],
+                       lbl_80368CF0[i]);
 }
 
 /* ===================================================================
@@ -1930,43 +1906,43 @@ void macHandleActive(SYNTH_VOICE* svoice) { /* macHandleActive */
             mcmdSetAgeCounterByVolume(svoice, &cstep);
             break;
         case 0x40:
-            mcmdVolumeSelect((u8*)svoice, cstep.para);
+            mcmdVolumeSelect(svoice, &cstep);
             break;
         case 0x41:
-            mcmdPanningSelect((u8*)svoice, cstep.para);
+            mcmdPanningSelect(svoice, &cstep);
             break;
         case 0x42:
-            mcmdPitchWheelSelect((u8*)svoice, cstep.para);
+            mcmdPitchWheelSelect(svoice, &cstep);
             break;
         case 0x43:
-            mcmdModWheelSelect((u8*)svoice, cstep.para);
+            mcmdModWheelSelect(svoice, &cstep);
             break;
         case 0x44:
-            mcmdPedalSelect((u8*)svoice, cstep.para);
+            mcmdPedalSelect(svoice, &cstep);
             break;
         case 0x45:
-            mcmdPortamentoSelect((u8*)svoice, cstep.para);
+            mcmdPortamentoSelect(svoice, &cstep);
             break;
         case 0x46:
-            mcmdReverbSelect((u8*)svoice, cstep.para);
+            mcmdReverbSelect(svoice, &cstep);
             break;
         case 0x47:
-            mcmdSurroundPanningSelect((u8*)svoice, cstep.para);
+            mcmdSurroundPanningSelect(svoice, &cstep);
             break;
         case 0x48:
-            mcmdDopplerSelect((u8*)svoice, cstep.para);
+            mcmdDopplerSelect(svoice, &cstep);
             break;
         case 0x49:
-            mcmdTremoloSelect((u8*)svoice, cstep.para);
+            mcmdTremoloSelect(svoice, &cstep);
             break;
         case 0x4a:
-            mcmdPreAuxASelect((u8*)svoice, cstep.para);
+            mcmdPreAuxASelect(svoice, &cstep);
             break;
         case 0x4b:
-            mcmdPreAuxBSelect((u8*)svoice, cstep.para);
+            mcmdPreAuxBSelect(svoice, &cstep);
             break;
         case 0x4c:
-            mcmdPostAuxBSelect((u8*)svoice, cstep.para);
+            mcmdPostAuxBSelect(svoice, &cstep);
             break;
         case 0x4d:
             mcmdAuxAFXSelect(svoice, &cstep);

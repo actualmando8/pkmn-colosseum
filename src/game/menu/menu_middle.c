@@ -4452,7 +4452,7 @@ void fn_8006D550(void) {
 
 /* 0x8006D940 | size: 0x4C */
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 void fn_8006D940(void* menu) {
     extern void* windowSearchItemID(void* menu, s32 itemId);
     void* value;

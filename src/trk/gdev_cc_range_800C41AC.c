@@ -5,7 +5,7 @@ typedef struct CircleBuffer CircleBuffer;
 /* Low-level GDEV hardware interface functions */
 extern void DBInitInterrupts(void); /* GDEV_InitInterrupts */
 extern u32 DBQueryData(void);
-extern s32 DBRead(void* buffer, s32 size);
+extern s32 DBRead(void* buffer, u32 size);
 extern s32 DBWrite(const void* buffer, s32 size);
 extern void fn_800CE7D8(void); /* GDEV_PostStop */
 extern void fn_800CE7D4(void); /* GDEV_PreContinue */
@@ -93,8 +93,9 @@ s32 gdev_cc_write(u8* buffer, s32 size) {
 #pragma use_lmw_stmw on
 s32 gdev_cc_read(u8* buffer, s32 size) {
     u8 readBuffer[0x500];
+    u32 readSize;
+    u32 requestedSize;
     u32 error;
-    s32 pendingSize;
 
     error = 0;
 
@@ -103,17 +104,16 @@ s32 gdev_cc_read(u8* buffer, s32 size) {
     }
 
     MWTRACE(1, lbl_8026FDD4, size, size);
+    requestedSize = size;
+    readSize = size;
     {
-        const u32 requestedSize = size;
-        const s32 readSize = size;
-
         while (fn_800C41A4(&lbl_803FFA98) < readSize) {
             error = 0;
-            pendingSize = DBQueryData();
-            if (pendingSize != 0) {
+            size = DBQueryData();
+            if (size != 0) {
                 error = DBRead(readBuffer, readSize);
                 if (error == 0) {
-                    CircleBufferWriteBytes(&lbl_803FFA98, readBuffer, pendingSize);
+                    CircleBufferWriteBytes(&lbl_803FFA98, readBuffer, size);
                 }
             }
         }

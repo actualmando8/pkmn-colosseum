@@ -42,13 +42,14 @@ typedef struct MailPartyScratchExt {
  * Address: 0x801D1364 | Size: 0x38
  * Stores handle as u16 at party+0x444 via savedataGetStatus(0, 0xA).
  */
-#pragma scheduling off
-void* fn_801D1364(void* handle, s32 idx) {
+#pragma push
+#pragma peephole off
+void* fn_801D1364(u16 handle, s32 idx) {
     MailPartyScratchExt* party = (MailPartyScratchExt*)savedataGetStatus(0, 0x0A);
-    party->sortMode = (u32)handle;
+    party->sortMode = handle;
     return party;
 }
-#pragma scheduling on
+#pragma pop
 
 /**
  * fn_801D139C - Waza get entry type.
