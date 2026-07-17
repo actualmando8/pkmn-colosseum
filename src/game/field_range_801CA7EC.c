@@ -394,7 +394,7 @@ u32 floorCharacterSetPos(u32 id, f32 x, f32 y, f32 z)
 #pragma pop
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 s32 scriptFloorCharSetDisp(u32 a0, u32 a1) {
     extern u8* fn_8011711C();
     extern void floorCharacterBiosSetVisibility();
