@@ -110,7 +110,8 @@ typedef struct CARDControl {
 typedef struct CARDDirEntry {
     /* 0x00 */ u8 gameName[4];
     /* 0x04 */ u8 company[2];
-    /* 0x06 */ u8 _06[2];
+    /* 0x06 */ u8 _06;
+    /* 0x07 */ u8 bannerFormat;
     /* 0x08 */ char fileName[32];
     /* 0x28 */ u32 time;
     /* 0x2C */ u32 iconAddr;
@@ -120,8 +121,28 @@ typedef struct CARDDirEntry {
     /* 0x35 */ u8 copyTimes;
     /* 0x36 */ u16 startBlock;
     /* 0x38 */ u16 length;
-    /* 0x3A */ u8 _3A[6];
+    /* 0x3A */ u8 _3A[2];
+    /* 0x3C */ u32 commentAddr;
 } CARDDirEntry;
+
+typedef struct CARDStat {
+    /* 0x00 */ char fileName[32];
+    /* 0x20 */ u32 length;
+    /* 0x24 */ u32 time;
+    /* 0x28 */ u8 gameName[4];
+    /* 0x2C */ u8 company[2];
+    /* 0x2E */ u8 bannerFormat;
+    /* 0x2F */ u8 _2F;
+    /* 0x30 */ u32 iconAddr;
+    /* 0x34 */ u16 iconFormat;
+    /* 0x36 */ u16 iconSpeed;
+    /* 0x38 */ u32 commentAddr;
+    /* 0x3C */ u32 offsetBanner;
+    /* 0x40 */ u32 offsetBannerTlut;
+    /* 0x44 */ u32 offsetIcon[8];
+    /* 0x64 */ u32 offsetIconTlut;
+    /* 0x68 */ u32 offsetData;
+} CARDStat;
 
 typedef struct CARDMountControl {
     u8 _00[8];
@@ -346,6 +367,8 @@ extern void __DSP_remove_task(DSPTaskInfo* task);
 extern void fn_8009870C();
 extern BOOL fn_80098944(s32 chan);
 extern void fn_80098AE8(s32 chan);
+s32 fn_800AF8A0(s32 chan);
+void __CARDUnlockedHandler(s32 chan, OSContext* context);
 extern void OSRegisterVersion(const char* version);
 u16 __CARDGetFontEncode(void);
 s32 __CARDPutControlBlock(CARDControl* card, s32 result);
@@ -1852,7 +1875,44 @@ void __CARDTxHandler(s32 chan) {
 }
 #pragma optimize_for_size reset
 
-void __CARDUnlockedHandler(s32 chan) {
+void UnlockedCallback(s32 chan, s32 result) {
+    CARDCallback callback;
+    CARDControl* card;
+
+    card = &lbl_803FC620[chan];
+    if (result >= 0) {
+        card->unlockCallback = UnlockedCallback;
+        if (!EXILock(chan, 0, __CARDUnlockedHandler)) {
+            result = 0;
+        } else {
+            card->unlockCallback = NULL;
+            result = fn_800AF8A0(chan);
+        }
+    }
+
+    if (result < 0) {
+        switch (card->cmd[0]) {
+        case 0x52:
+            callback = card->txCallback;
+            if (callback != NULL) {
+                card->txCallback = NULL;
+                callback(chan, result);
+            }
+            break;
+        case 0xF2:
+        case 0xF4:
+        case 0xF1:
+            callback = card->callback_CC;
+            if (callback != NULL) {
+                card->callback_CC = NULL;
+                callback(chan, result);
+            }
+            break;
+        }
+    }
+}
+
+void __CARDUnlockedHandler(s32 chan, OSContext* context) {
     CARDControl* card = &lbl_803FC620[chan];
     CARDCallback callback = card->unlockCallback;
 
@@ -2687,6 +2747,55 @@ s32 CARDGetAttributes(s32 chan, s32 fileNo, u8* attr) {
 }
 
 #pragma dont_inline on
+void UpdateIconOffsets(CARDDirEntry* entry, CARDStat* stat);
+
+s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat,
+                       CARDCallback callback)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    s32 result;
+
+    if (fileNo < 0 || fileNo >= 127 ||
+        (stat->iconAddr != 0xFFFFFFFF && stat->iconAddr >= 0x200) ||
+        (stat->commentAddr != 0xFFFFFFFF &&
+         stat->commentAddr % 0x2000 > 0x1FC0)) {
+        return -128;
+    }
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileNo];
+    result = fn_800B4270(card, entry);
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+
+    entry->bannerFormat = stat->bannerFormat;
+    entry->iconAddr = stat->iconAddr;
+    entry->iconFormat = stat->iconFormat;
+    entry->animationSpeed = stat->iconSpeed;
+    entry->commentAddr = stat->commentAddr;
+    UpdateIconOffsets(entry, stat);
+
+    if (entry->iconAddr == 0xFFFFFFFF) {
+        entry->animationSpeed =
+            (entry->animationSpeed & ~3) | 1;
+    }
+
+    entry->time = (u32)(OSGetTime() / (*(u32*)0x800000F8 / 4));
+    result = __CARDUpdateDir(chan, callback);
+    if (result < 0) {
+        __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+
 s32 fn_800B57D0(s32 chan, s32 fileNo, CARDDirEntry* entry) {
     CARDControl* card;
     s32 result;
