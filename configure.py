@@ -2652,6 +2652,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "trk/TRKComm.c",
+                mw_version="GC/1.3.2",
                 progress_category="runtime",
             ),
             Object(
