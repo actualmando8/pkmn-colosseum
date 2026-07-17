@@ -76,11 +76,12 @@ but excludes it from primary scores, incumbents, feedback, and termination.
 ## Behavioral-feedback condition
 
 The semantic pilot runs exact-MWCC candidate PPC in the pinned external
-Dolphin-interpreter sidecar documented in
+Dolphin-interpreter sidecar and first qualifies the original against a separate
+DolRecomp-native sidecar, as documented in
 [`../semantic_oracle/README.md`](../semantic_oracle/README.md). Generate its
-ignored work unit, then provide the clean external checkout and built sidecar
-at runtime. Build the sidecar's `moderngekko-dolphin-oracle-attested` target
-first; the runner requires its adjacent `.attestation.json`:
+ignored work unit, then provide the clean external checkout and both built
+sidecars at runtime. Build `moderngekko-semantic-oracles-attested` first; the
+runner requires both attestations and the native generated-source manifest:
 
 ```sh
 python3 tools/decomp_work/permuter/gen_workunits.py \
@@ -93,7 +94,9 @@ python3 tools/decomp_work/benchmark/compile_loop.py run \
   --suite tools/decomp_work/benchmark/suite_semantic_pilot.json \
   --semantic-checkout /absolute/path/to/ModernGekko \
   --semantic-sidecar \
-    build/semantic_oracle/gpl-sidecar/moderngekko-dolphin-oracle
+    build/semantic_oracle/gpl-sidecar/moderngekko-dolphin-oracle \
+  --semantic-native-sidecar \
+    build/semantic_oracle/gpl-sidecar/moderngekko-native-oracle
 ```
 
 The benchmark condition uses 64 balanced deterministic fixtures per round for
@@ -104,12 +107,13 @@ ranking, exact flag, or normal termination; an objdiff-exact/semantic-fail
 combination is treated as a harness invariant failure. Any exact isolated lead
 still requires the normal full-DOL validation below.
 
-The run configuration fingerprints the sidecar binary and build attestation
-once before model work starts. Those exact hashes are passed into every oracle
-invocation and must be repeated in each report, along with the expected engine,
-pinned provenance, clean-checkout report, and authoritative DOL slice. The
-driver itself snapshots the binary once per comparison so reference and
-candidate cannot execute different rebuilt pathnames.
+The run configuration fingerprints both binaries, both build attestations, and
+the native generated-source manifest before model work starts. Those exact
+hashes are passed into every oracle invocation and must be repeated in each
+report, along with both engine identities, pinned provenance, clean-checkout
+report, and authoritative DOL slice. The driver snapshots both binaries per
+comparison and refuses candidate feedback unless native-original equals the
+Dolphin original.
 
 The current summary retains exact matches, compile-at-1, best match lift,
 tokens, API latency, rounds, served model ID, and failure status. Full link,

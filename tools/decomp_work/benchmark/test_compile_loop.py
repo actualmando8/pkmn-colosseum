@@ -64,14 +64,26 @@ class CompileLoopTests(unittest.TestCase):
         checkout.mkdir(exist_ok=True)
         paths = {
             name: root / name
-            for name in ("sidecar", "driver.py", "pins.json", "main.dol", "objcopy", "readelf")
+            for name in (
+                "sidecar",
+                "native-sidecar",
+                "driver.py",
+                "pins.json",
+                "main.dol",
+                "objcopy",
+                "readelf",
+            )
         }
         for name, path in paths.items():
             path.write_bytes(name.encode("ascii"))
-        for name in ("sidecar", "objcopy", "readelf"):
+        for name in ("sidecar", "native-sidecar", "objcopy", "readelf"):
             paths[name].chmod(0o700)
         attestation = root / "sidecar.attestation.json"
         attestation.write_text("{}\n", encoding="utf-8")
+        native_attestation = root / "native-sidecar.attestation.json"
+        native_attestation.write_text("{}\n", encoding="utf-8")
+        native_manifest = root / "native-sidecar.generated-manifest.json"
+        native_manifest.write_text("{}\n", encoding="utf-8")
         provenance = (
             ("DolRecomp", "3" * 40),
             ("ModernGekko", "1" * 40),
@@ -91,6 +103,9 @@ class CompileLoopTests(unittest.TestCase):
             checkout=checkout,
             sidecar=paths["sidecar"],
             attestation=attestation,
+            native_sidecar=paths["native-sidecar"],
+            native_attestation=native_attestation,
+            native_manifest=native_manifest,
             driver=paths["driver.py"],
             pins=paths["pins.json"],
             dol=paths["main.dol"],
@@ -102,6 +117,13 @@ class CompileLoopTests(unittest.TestCase):
             mismatch_limit=2,
             expected_sidecar_sha256=compile_loop.file_sha256(paths["sidecar"]),
             expected_attestation_sha256=compile_loop.file_sha256(attestation),
+            expected_native_sidecar_sha256=compile_loop.file_sha256(
+                paths["native-sidecar"]
+            ),
+            expected_native_attestation_sha256=compile_loop.file_sha256(
+                native_attestation
+            ),
+            expected_native_manifest_sha256=compile_loop.file_sha256(native_manifest),
             expected_driver_sha256=compile_loop.file_sha256(paths["driver.py"]),
             expected_pins_sha256=compile_loop.file_sha256(paths["pins.json"]),
             expected_dol_sha256=compile_loop.file_sha256(paths["main.dol"]),
@@ -141,6 +163,17 @@ class CompileLoopTests(unittest.TestCase):
             "build_attestation_sha256": config.expected_attestation_sha256,
             "build_attestation_state_sha256": "f" * 64,
             "engine": compile_loop.SEMANTIC_ENGINE,
+            "native_qualification": {
+                "engine": compile_loop.SEMANTIC_NATIVE_ENGINE,
+                "equal": True,
+                "mismatch_count": 0,
+                "sidecar_sha256": config.expected_native_sidecar_sha256,
+                "build_attestation_sha256": (
+                    config.expected_native_attestation_sha256
+                ),
+                "build_attestation_state_sha256": "d" * 64,
+                "generated_manifest_sha256": config.expected_native_manifest_sha256,
+            },
             "provenance": dict(config.expected_provenance),
             "pins": self.semantic_pin_report(config),
             "reference_authority": {
@@ -318,6 +351,30 @@ class CompileLoopTests(unittest.TestCase):
                 self.assertEqual(
                     argv[argv.index("--expected-attestation-sha256") + 1],
                     config.expected_attestation_sha256,
+                )
+                self.assertEqual(
+                    argv[argv.index("--native-sidecar") + 1],
+                    str(config.native_sidecar),
+                )
+                self.assertEqual(
+                    argv[argv.index("--native-attestation") + 1],
+                    str(config.native_attestation),
+                )
+                self.assertEqual(
+                    argv[argv.index("--native-manifest") + 1],
+                    str(config.native_manifest),
+                )
+                self.assertEqual(
+                    argv[argv.index("--expected-native-sidecar-sha256") + 1],
+                    config.expected_native_sidecar_sha256,
+                )
+                self.assertEqual(
+                    argv[argv.index("--expected-native-attestation-sha256") + 1],
+                    config.expected_native_attestation_sha256,
+                )
+                self.assertEqual(
+                    argv[argv.index("--expected-native-manifest-sha256") + 1],
+                    config.expected_native_manifest_sha256,
                 )
                 output = Path(argv[argv.index("--report-file") + 1])
                 payload = self.semantic_report_payload(
@@ -498,6 +555,34 @@ class CompileLoopTests(unittest.TestCase):
             payload = self.semantic_report_payload(
                 config, equal=True, mismatch_count=0, mismatches=[]
             )
+            payload["native_qualification"]["equal"] = False
+            payload["native_qualification"]["mismatch_count"] = 1
+            report.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(
+                compile_loop.SemanticError, "native-original qualification"
+            ):
+                compile_loop._semantic_report(report, config=config, returncode=0)
+            payload = self.semantic_report_payload(
+                config, equal=True, mismatch_count=0, mismatches=[]
+            )
+            payload["native_qualification"]["generated_manifest_sha256"] = "0" * 64
+            report.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(
+                compile_loop.SemanticError, "native generated manifest fingerprint"
+            ):
+                compile_loop._semantic_report(report, config=config, returncode=0)
+            payload = self.semantic_report_payload(
+                config, equal=True, mismatch_count=0, mismatches=[]
+            )
+            payload["native_qualification"]["build_attestation_state_sha256"] = "bad"
+            report.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(
+                compile_loop.SemanticError, "native attested build state"
+            ):
+                compile_loop._semantic_report(report, config=config, returncode=0)
+            payload = self.semantic_report_payload(
+                config, equal=True, mismatch_count=0, mismatches=[]
+            )
             payload["engine"] = "untrusted-engine"
             report.write_text(json.dumps(payload), encoding="utf-8")
             with self.assertRaisesRegex(compile_loop.SemanticError, "engine identity"):
@@ -552,6 +637,7 @@ class CompileLoopTests(unittest.TestCase):
             args = mock.Mock(
                 semantic_checkout=str(config_files.checkout),
                 semantic_sidecar=str(config_files.sidecar),
+                semantic_native_sidecar=str(config_files.native_sidecar),
             )
             with (
                 mock.patch.object(compile_loop, "SEMANTIC_DRIVER", config_files.driver),
@@ -575,6 +661,18 @@ class CompileLoopTests(unittest.TestCase):
             self.assertEqual(
                 hashes["semantic-sidecar-attestation"],
                 compile_loop.file_sha256(config.attestation),
+            )
+            self.assertEqual(
+                hashes["semantic-native-sidecar"],
+                compile_loop.file_sha256(config.native_sidecar),
+            )
+            self.assertEqual(
+                hashes["semantic-native-sidecar-attestation"],
+                compile_loop.file_sha256(config.native_attestation),
+            )
+            self.assertEqual(
+                hashes["semantic-native-manifest"],
+                compile_loop.file_sha256(config.native_manifest),
             )
             self.assertEqual(
                 hashes["semantic-original-dol"], compile_loop.file_sha256(config.dol)
@@ -612,15 +710,31 @@ class CompileLoopTests(unittest.TestCase):
                 bound.expected_attestation_sha256,
                 hashes["semantic-sidecar-attestation"],
             )
+            self.assertEqual(
+                bound.expected_native_sidecar_sha256,
+                hashes["semantic-native-sidecar"],
+            )
+            self.assertEqual(
+                bound.expected_native_attestation_sha256,
+                hashes["semantic-native-sidecar-attestation"],
+            )
+            self.assertEqual(
+                bound.expected_native_manifest_sha256,
+                hashes["semantic-native-manifest"],
+            )
             record = compile_loop.semantic_config_record(bound, verified)
             self.assertRegex(record["pin_report_sha256"], r"^[0-9a-f]{64}$")
+            self.assertEqual(
+                record["expected_native_manifest_sha256"],
+                hashes["semantic-native-manifest"],
+            )
 
             wrong_target = dict(target)
             wrong_target["function"] = "differentFunction"
             with self.assertRaisesRegex(compile_loop.BenchError, "is for"):
                 compile_loop.resolve_semantic_config(wrong_target, args)
 
-    def test_semantic_pass_does_not_replace_objdiff_ranking_or_termination(self) -> None:
+    def test_semantic_feedback_does_not_replace_objdiff_ranking_or_termination(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_value:
             root = Path(temporary_value)
             unit = self.make_workunit(root / "source")
@@ -641,15 +755,31 @@ class CompileLoopTests(unittest.TestCase):
                     True, 90.0, 4, "baseline", semantic=self.semantic_score()
                 ),
                 compile_loop.CompileScore(
-                    True, 95.0, 4, "candidate", semantic=self.semantic_score()
+                    True,
+                    95.0,
+                    4,
+                    "candidate",
+                    semantic=self.semantic_score(equal=False),
                 ),
                 compile_loop.CompileScore(
                     True, 95.0, 4, "candidate", semantic=self.semantic_score()
                 ),
             ]
+            outbound_messages: list[list[dict[str, object]]] = []
+
+            def record_api_call(**kwargs: object) -> compile_loop.ApiReply:
+                outbound_messages.append(
+                    json.loads(json.dumps(kwargs["messages"]))
+                )
+                return reply
+
             with (
                 mock.patch.object(compile_loop, "target_assembly", return_value="blr"),
-                mock.patch.object(compile_loop, "call_openai_compatible", return_value=reply),
+                mock.patch.object(
+                    compile_loop,
+                    "call_openai_compatible",
+                    side_effect=record_api_call,
+                ),
                 mock.patch.object(compile_loop, "compile_and_score", side_effect=scores),
             ):
                 result = compile_loop.run_target(
@@ -673,7 +803,12 @@ class CompileLoopTests(unittest.TestCase):
             self.assertEqual(result["rounds_completed"], 2)
             self.assertEqual(result["best_match_percent"], 95.0)
             self.assertFalse(result["exact"])
-            self.assertTrue(result["rounds"][0]["semantic_equal"])
+            self.assertFalse(result["rounds"][0]["semantic_equal"])
+            self.assertEqual(len(outbound_messages), 2)
+            self.assertIn(
+                "FAIL: r3 differed.",
+                outbound_messages[1][-1]["content"],
+            )
             initial = (destination / "initial_messages.json").read_text(encoding="utf-8")
             self.assertIn("Dolphin-interpreter behavioral feedback", initial)
             prompt = compile_loop.feedback_prompt(

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Pinned, deterministic semantic-oracle driver for integer leaf profiles.
 
-The GPL runtime remains an external executable. This driver verifies its source
-checkout, extracts relocation-free PowerPC .text from two disposable ELF
-objects, runs identical fixtures through the external sidecar, and compares
-only explicit ABI observables.
+The GPL runtimes remain external executables. This driver verifies their source
+checkout and attestations, qualifies pinned DolRecomp-native original chunks
+against Dolphin, then compares relocation-free candidate PPC under Dolphin
+using only explicit ABI observables.
 """
 
 from __future__ import annotations
@@ -32,16 +32,44 @@ DEFAULT_READELF = Path(os.environ.get("PPC_READELF", DEFAULT_BINUTILS / "powerpc
 TRANSIENT_ROOT = REPO / "build" / "semantic_oracle"
 DEFAULT_DOL = REPO / "orig" / "GC6E01" / "sys" / "main.dol"
 SIDECAR_SOURCE_DIR = Path(__file__).with_name("gpl_sidecar")
-SIDECAR_BUILD_INPUTS = ("CMakeLists.txt", "dolphin_oracle.cpp")
+SIDECAR_BUILD_INPUTS = (
+    "CMakeLists.txt",
+    "dolphin_oracle.cpp",
+    "generate_native.py",
+    "native_oracle.cpp",
+)
 SIDECAR_ATTESTATION_SUFFIX = ".attestation.json"
+NATIVE_MANIFEST_SUFFIX = ".generated-manifest.json"
 
 SCHEMA_VERSION = 1
 BUILD_ATTESTATION_KIND = "moderngekko-dolphin-oracle-build"
 EXPECTED_ENGINE = "dolphin-interpreter-from-moderngekko-tree"
+NATIVE_BUILD_ATTESTATION_KIND = "moderngekko-dolrecomp-native-oracle-build"
+NATIVE_EXPECTED_ENGINE = "moderngekko-dolrecomp-native-original"
 FUNCTION_NAME = "msgctrlWait"
 ENTRY_PC = 0x80132454
 TARGET_TEXT_SIZE = 0x78
 ORIGINAL_DOL_SHA1 = "870e8b9693ca780782d80f22a6a4572d8ba9458f"
+ORIGINAL_DOL_SHA256 = "7e6c00a3bd632126d5466cbab856c63ac3c52a5da20b60dba7e756538152c9f4"
+NATIVE_GENERATED_TREE_SHA256 = (
+    "438b92e6109ac5263860dcbcee24152148c139a34c60bf17933b4253b7309048"
+)
+NATIVE_GENERATED_FILE_COUNT = 157
+NATIVE_GENERATED_SHA256_RECIPE = (
+    "sha256(concat(u64be(relative_path_utf8_length),relative_path_utf8,"
+    "sha256(file_bytes))) for files sorted by relative POSIX path"
+)
+NATIVE_SELECTED_GENERATED_SHA256 = {
+    "chunks/chunk_0059_text1_800ED5E0.c": (
+        "8ece25c2b66ea205047e465d3b1f24b7694930677deecf92842f30305faf48d9"
+    ),
+    "chunks/chunk_0076_text1_801315E0.c": (
+        "2755b985feecd5645aebc69b9708796459a365bc95c6986ef49af5dfaa32c794"
+    ),
+    "generated.h": "4a7a53d36da85ee05c7e2a6db98efebb90662e26c53580103b17cc4daa8de71e",
+}
+NATIVE_SELECTED_GENERATED_FILES = set(NATIVE_SELECTED_GENERATED_SHA256)
+MAX_NATIVE_GENERATED_FILE_SIZE = 8 * 1024 * 1024
 MAX_INSTRUCTIONS = 64
 DEFAULT_PROFILE = "msgctrlWait-v1"
 TEXTURE_PROFILE = "GStextureLockImage-v2"
@@ -685,12 +713,176 @@ def sidecar_attestation_path(sidecar: Path) -> Path:
     return sidecar.with_name(sidecar.name + SIDECAR_ATTESTATION_SUFFIX)
 
 
-def verify_sidecar_attestation(
+def native_manifest_path(sidecar: Path) -> Path:
+    sidecar = sidecar.expanduser().resolve()
+    return sidecar.with_name(sidecar.name + NATIVE_MANIFEST_SUFFIX)
+
+
+def hash_native_generated_tree(generated_root: Path) -> dict[str, Any]:
+    """Recompute the exact, canonical-LF DolRecomp source-tree identity."""
+
+    raw_root = generated_root.expanduser()
+    if raw_root.is_symlink():
+        raise OracleError(f"native generated root must not be a symlink: {raw_root}")
+    try:
+        root = raw_root.resolve(strict=True)
+    except OSError as exc:
+        raise OracleError(f"native generated root not found: {raw_root}") from exc
+    if not root.is_dir():
+        raise OracleError(f"native generated root is not a directory: {root}")
+
+    files: list[tuple[str, Path]] = []
+    for candidate in root.rglob("*"):
+        if candidate.is_symlink():
+            raise OracleError(f"symlink in native generated source tree: {candidate}")
+        if candidate.is_dir():
+            continue
+        try:
+            mode = candidate.stat().st_mode
+        except OSError as exc:
+            raise OracleError(f"cannot inspect native generated source: {candidate}") from exc
+        if not stat.S_ISREG(mode):
+            raise OracleError(f"non-regular native generated source: {candidate}")
+        files.append((candidate.relative_to(root).as_posix(), candidate))
+    files.sort(key=lambda item: item[0])
+
+    combined = hashlib.sha256()
+    file_hashes: dict[str, str] = {}
+    for relative_path, path in files:
+        payload = read_regular_bytes(
+            path,
+            label=f"native generated source {relative_path}",
+            max_size=MAX_NATIVE_GENERATED_FILE_SIZE,
+        )
+        if b"\r" in payload:
+            raise OracleError(
+                f"native generated source is not canonical LF text: {relative_path}"
+            )
+        digest = hashlib.sha256(payload).hexdigest()
+        encoded_path = relative_path.encode("utf-8")
+        combined.update(len(encoded_path).to_bytes(8, byteorder="big"))
+        combined.update(encoded_path)
+        combined.update(bytes.fromhex(digest))
+        file_hashes[relative_path] = digest
+
+    try:
+        selected_hashes = {
+            relative_path: file_hashes[relative_path]
+            for relative_path in NATIVE_SELECTED_GENERATED_FILES
+        }
+    except KeyError as exc:
+        raise OracleError(f"required native generated source is missing: {exc.args[0]}") from exc
+    return {
+        "relative_file_count": len(files),
+        "combined_sha256": combined.hexdigest(),
+        "selected_file_sha256": selected_hashes,
+    }
+
+
+def verify_native_generation_manifest(
+    payload: bytes,
+    pin_report: dict[str, Any],
+    *,
+    generated_root: Path | None = None,
+) -> dict[str, Any]:
+    try:
+        manifest = json.loads(payload.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise OracleError("invalid native generated manifest") from exc
+    expected_commits = {
+        component["name"]: component["commit"] for component in pin_report["components"]
+    }
+    if (
+        not isinstance(manifest, dict)
+        or manifest.get("schema_version") != SCHEMA_VERSION
+        or manifest.get("commits") != expected_commits
+    ):
+        raise OracleError("native generated manifest has the wrong pins or schema")
+    dol = manifest.get("dol")
+    if (
+        not isinstance(dol, dict)
+        or dol.get("game_id") != "GC6E01"
+        or dol.get("sha1") != ORIGINAL_DOL_SHA1
+        or dol.get("sha256") != ORIGINAL_DOL_SHA256
+    ):
+        raise OracleError("native generated manifest has the wrong original DOL")
+    dolrecomp = manifest.get("dolrecomp")
+    if (
+        not isinstance(dolrecomp, dict)
+        or not re.fullmatch(r"[0-9a-f]{64}", str(dolrecomp.get("sha256") or ""))
+    ):
+        raise OracleError("native generated manifest has an invalid DolRecomp binary hash")
+    generated = manifest.get("generated")
+    if not isinstance(generated, dict):
+        raise OracleError("native generated manifest omitted generated-source identity")
+    selected = generated.get("selected_file_sha256")
+    file_count = generated.get("relative_file_count")
+    if (
+        generated.get("cpu") != "gekko"
+        or generated.get("platform") != "gamecube"
+        or generated.get("root") != "generated"
+        or generated.get("combined_sha256") != NATIVE_GENERATED_TREE_SHA256
+        or generated.get("combined_sha256_recipe")
+        != NATIVE_GENERATED_SHA256_RECIPE
+        or generated.get("text_newlines") != "lf"
+        or isinstance(file_count, bool)
+        or file_count != NATIVE_GENERATED_FILE_COUNT
+        or selected != NATIVE_SELECTED_GENERATED_SHA256
+    ):
+        raise OracleError("native generated manifest has untrusted generated-source identity")
+    if generated_root is not None:
+        actual = hash_native_generated_tree(generated_root)
+        expected = {
+            "relative_file_count": file_count,
+            "combined_sha256": generated.get("combined_sha256"),
+            "selected_file_sha256": selected,
+        }
+        if actual != expected:
+            raise OracleError(
+                "native generated source tree does not match its generation manifest"
+            )
+    return manifest
+
+
+def expected_native_binary_identity(pin_report: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "engine": NATIVE_EXPECTED_ENGINE,
+        "generated_tree_sha256": NATIVE_GENERATED_TREE_SHA256,
+        "provenance": {
+            component["name"]: component["commit"]
+            for component in pin_report["components"]
+        },
+    }
+
+
+def verify_native_binary_identity(
+    binary: Path, pin_report: dict[str, Any]
+) -> dict[str, Any]:
+    result = run_command(
+        [str(binary), "--identity"], cwd=REPO, timeout=10, max_output=64 * 1024
+    )
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout).strip()
+        raise OracleError(f"native sidecar identity probe failed: {detail[-800:]}")
+    try:
+        identity = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise OracleError("native sidecar identity probe returned invalid JSON") from exc
+    if identity != expected_native_binary_identity(pin_report):
+        raise OracleError("native sidecar embedded identity does not match its build inputs")
+    return identity
+
+
+def verify_build_attestation(
     attestation_path: Path,
     *,
     sidecar_sha256: str,
     pin_report: dict[str, Any],
+    expected_kind: str,
+    expected_binary_name: str,
     expected_attestation_sha256: str | None = None,
+    generated_manifest_sha256: str | None = None,
 ) -> tuple[dict[str, Any], str]:
     payload = read_regular_bytes(
         attestation_path,
@@ -712,7 +904,7 @@ def verify_sidecar_attestation(
     if (
         not isinstance(attestation, dict)
         or attestation.get("schema_version") != SCHEMA_VERSION
-        or attestation.get("kind") != BUILD_ATTESTATION_KIND
+        or attestation.get("kind") != expected_kind
     ):
         raise OracleError("unsupported sidecar build attestation")
     build_state = attestation.get("build_state")
@@ -728,11 +920,60 @@ def verify_sidecar_attestation(
     binary = attestation.get("binary")
     if (
         not isinstance(binary, dict)
-        or binary.get("name") != "moderngekko-dolphin-oracle"
+        or binary.get("name") != expected_binary_name
         or binary.get("sha256") != sidecar_sha256
     ):
         raise OracleError("sidecar binary does not match its build attestation")
+    manifest = attestation.get("generated_manifest")
+    binary_identity = attestation.get("binary_identity")
+    if generated_manifest_sha256 is None:
+        if manifest is not None or binary_identity is not None:
+            raise OracleError("unexpected generated manifest in sidecar build attestation")
+    elif (
+        not isinstance(manifest, dict)
+        or manifest.get("sha256") != generated_manifest_sha256
+        or binary_identity != expected_native_binary_identity(pin_report)
+    ):
+        raise OracleError(
+            "native generated manifest or binary identity does not match its build attestation"
+        )
     return attestation, attestation_sha256
+
+
+def verify_sidecar_attestation(
+    attestation_path: Path,
+    *,
+    sidecar_sha256: str,
+    pin_report: dict[str, Any],
+    expected_attestation_sha256: str | None = None,
+) -> tuple[dict[str, Any], str]:
+    return verify_build_attestation(
+        attestation_path,
+        sidecar_sha256=sidecar_sha256,
+        pin_report=pin_report,
+        expected_kind=BUILD_ATTESTATION_KIND,
+        expected_binary_name="moderngekko-dolphin-oracle",
+        expected_attestation_sha256=expected_attestation_sha256,
+    )
+
+
+def verify_native_attestation(
+    attestation_path: Path,
+    *,
+    sidecar_sha256: str,
+    generated_manifest_sha256: str,
+    pin_report: dict[str, Any],
+    expected_attestation_sha256: str | None = None,
+) -> tuple[dict[str, Any], str]:
+    return verify_build_attestation(
+        attestation_path,
+        sidecar_sha256=sidecar_sha256,
+        pin_report=pin_report,
+        expected_kind=NATIVE_BUILD_ATTESTATION_KIND,
+        expected_binary_name="moderngekko-native-oracle",
+        expected_attestation_sha256=expected_attestation_sha256,
+        generated_manifest_sha256=generated_manifest_sha256,
+    )
 
 
 def command_attest_pre(args: argparse.Namespace) -> int:
@@ -752,19 +993,70 @@ def command_attest_finalize(args: argparse.Namespace) -> int:
     if pre_state != post_state:
         raise OracleError("sidecar build inputs or pinned checkout changed during the build")
     binary = require_executable(Path(args.binary), label="semantic sidecar")
-    state_sha256 = canonical_sha256(post_state)
-    attestation = {
-        "schema_version": SCHEMA_VERSION,
-        "kind": BUILD_ATTESTATION_KIND,
-        "binary": {
-            "name": "moderngekko-dolphin-oracle",
-            "sha256": sha256_file(binary),
-        },
-        "build_state": post_state,
-        "pre_state_sha256": state_sha256,
-        "post_state_sha256": state_sha256,
-    }
-    write_private_json(Path(args.output).expanduser().resolve(), attestation)
+    output_path = Path(args.output).expanduser().resolve()
+    ensure_transient_path(output_path)
+    output_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    native = args.kind == "native"
+    if (
+        native != bool(args.generated_manifest)
+        or native != bool(args.generated_root)
+        or native != bool(args.dolrecomp)
+    ):
+        raise OracleError(
+            "native attestation requires exactly one generated manifest, source root, "
+            "and DolRecomp executable"
+        )
+    with tempfile.TemporaryDirectory(
+        prefix="attest-", dir=output_path.parent
+    ) as temporary_value:
+        temporary = Path(temporary_value)
+        binary_snapshot, binary_sha256 = snapshot_executable(
+            binary, temporary / binary.name
+        )
+        state_sha256 = canonical_sha256(post_state)
+        attestation = {
+            "schema_version": SCHEMA_VERSION,
+            "kind": NATIVE_BUILD_ATTESTATION_KIND if native else BUILD_ATTESTATION_KIND,
+            "binary": {
+                "name": (
+                    "moderngekko-native-oracle"
+                    if native
+                    else "moderngekko-dolphin-oracle"
+                ),
+                "sha256": binary_sha256,
+            },
+            "build_state": post_state,
+            "pre_state_sha256": state_sha256,
+            "post_state_sha256": state_sha256,
+        }
+        if native:
+            manifest_path = Path(args.generated_manifest).expanduser().resolve()
+            manifest_payload = read_regular_bytes(
+                manifest_path,
+                label="native generated manifest",
+                max_size=4 * 1024 * 1024,
+            )
+            manifest = verify_native_generation_manifest(
+                manifest_payload,
+                pin_report,
+                generated_root=Path(args.generated_root),
+            )
+            dolrecomp = require_executable(Path(args.dolrecomp), label="DolRecomp")
+            _, dolrecomp_sha256 = snapshot_executable(
+                dolrecomp, temporary / dolrecomp.name
+            )
+            if manifest["dolrecomp"]["sha256"] != dolrecomp_sha256:
+                raise OracleError(
+                    "native generated manifest does not match the DolRecomp executable"
+                )
+            attestation["binary_identity"] = verify_native_binary_identity(
+                binary_snapshot, pin_report
+            )
+            attestation["generated_manifest"] = {
+                "name": manifest_path.name,
+                "sha256": hashlib.sha256(manifest_payload).hexdigest(),
+            }
+    write_private_json(output_path, attestation)
     print(json.dumps(attestation, indent=2, sort_keys=True))
     return 0
 
@@ -1054,16 +1346,22 @@ def result_index(
     label: str,
     expected_provenance: dict[str, str],
     expected_function: str,
+    expected_engine: str = EXPECTED_ENGINE,
 ) -> dict[str, dict[str, Any]]:
     if result.get("schema_version") != SCHEMA_VERSION:
         raise OracleError(f"{label} result has an unsupported schema")
-    if result.get("engine") != EXPECTED_ENGINE:
+    if result.get("engine") != expected_engine:
         raise OracleError(f"{label} result has an untrusted engine identity")
     if result.get("code_sandbox_bytes") != MAX_TEXT_SIZE:
         raise OracleError(f"{label} result has the wrong code-sandbox size")
     provenance = result.get("provenance")
     if provenance != expected_provenance:
         raise OracleError(f"{label} result provenance does not match the pin manifest")
+    if expected_engine == NATIVE_EXPECTED_ENGINE:
+        if result.get("generated_tree_sha256") != NATIVE_GENERATED_TREE_SHA256:
+            raise OracleError(
+                f"{label} result has the wrong embedded generated-tree identity"
+            )
     if result.get("function") != expected_function:
         raise OracleError(f"{label} result names the wrong function")
     rows = result.get("results")
@@ -1211,6 +1509,8 @@ def compare_results(
     mismatch_limit: int = 64,
     expected_provenance: dict[str, str] | None = None,
     profile: OracleProfile = MSGCTRL_PROFILE,
+    reference_engine: str = EXPECTED_ENGINE,
+    candidate_engine: str = EXPECTED_ENGINE,
 ) -> Comparison:
     if mismatch_limit < 1:
         raise OracleError("mismatch limit must be positive")
@@ -1222,6 +1522,7 @@ def compare_results(
         label="reference",
         expected_provenance=expected_provenance,
         expected_function=profile.spec.name,
+        expected_engine=reference_engine,
     )
     candidate_rows = result_index(
         candidate,
@@ -1229,6 +1530,7 @@ def compare_results(
         label="candidate",
         expected_provenance=expected_provenance,
         expected_function=profile.spec.name,
+        expected_engine=candidate_engine,
     )
     mismatches: list[str] = []
     mismatch_count = 0
@@ -1431,9 +1733,15 @@ def command_run(args: argparse.Namespace) -> int:
         component["name"]: component["commit"] for component in pin_report["components"]
     }
     sidecar = require_executable(Path(args.sidecar), label="semantic sidecar")
+    native_sidecar = require_executable(
+        Path(args.native_sidecar), label="native semantic sidecar"
+    )
     for label, value in (
         ("sidecar", args.expected_sidecar_sha256),
         ("sidecar attestation", args.expected_attestation_sha256),
+        ("native sidecar", args.expected_native_sidecar_sha256),
+        ("native sidecar attestation", args.expected_native_attestation_sha256),
+        ("native generated manifest", args.expected_native_manifest_sha256),
     ):
         if value is not None and not re.fullmatch(r"[0-9a-f]{64}", value):
             raise OracleError(f"invalid expected {label} SHA-256")
@@ -1457,6 +1765,42 @@ def command_run(args: argparse.Namespace) -> int:
             sidecar_sha256=sidecar_sha256,
             pin_report=pin_report,
             expected_attestation_sha256=args.expected_attestation_sha256,
+        )
+        native_snapshot, native_sidecar_sha256 = snapshot_executable(
+            native_sidecar,
+            temporary / "moderngekko-native-oracle.snapshot",
+            expected_sha256=args.expected_native_sidecar_sha256,
+        )
+        native_attestation_path = (
+            Path(args.native_attestation).expanduser().resolve()
+            if args.native_attestation
+            else sidecar_attestation_path(native_sidecar)
+        )
+        native_generated_manifest_path = (
+            Path(args.native_manifest).expanduser().resolve()
+            if args.native_manifest
+            else native_manifest_path(native_sidecar)
+        )
+        native_manifest_payload = read_regular_bytes(
+            native_generated_manifest_path,
+            label="native generated manifest",
+            max_size=4 * 1024 * 1024,
+        )
+        verify_native_generation_manifest(native_manifest_payload, pin_report)
+        native_manifest_sha256 = hashlib.sha256(native_manifest_payload).hexdigest()
+        if (
+            args.expected_native_manifest_sha256 is not None
+            and native_manifest_sha256 != args.expected_native_manifest_sha256
+        ):
+            raise OracleError(
+                "native generated manifest does not match the expected run-start fingerprint"
+            )
+        native_attestation, native_attestation_sha256 = verify_native_attestation(
+            native_attestation_path,
+            sidecar_sha256=native_sidecar_sha256,
+            generated_manifest_sha256=native_manifest_sha256,
+            pin_report=pin_report,
+            expected_attestation_sha256=args.expected_native_attestation_sha256,
         )
         reference_code = extract_text(
             Path(args.reference_elf),
@@ -1487,6 +1831,31 @@ def command_run(args: argparse.Namespace) -> int:
         )
         if sha256_file(sidecar_snapshot) != sidecar_sha256:
             raise OracleError("semantic sidecar snapshot changed after the reference run")
+        native_result = invoke_sidecar(
+            native_snapshot,
+            request=reference_request,
+            request_file=temporary / "native-reference.request.json",
+            result_file=temporary / "native-reference.result.json",
+            timeout=args.timeout,
+        )
+        if sha256_file(native_snapshot) != native_sidecar_sha256:
+            raise OracleError("native semantic sidecar snapshot changed after execution")
+        native_qualification = compare_results(
+            reference_result,
+            native_result,
+            fixtures,
+            mismatch_limit=args.mismatch_limit,
+            expected_provenance=expected_provenance,
+            profile=profile,
+            reference_engine=EXPECTED_ENGINE,
+            candidate_engine=NATIVE_EXPECTED_ENGINE,
+        )
+        if not native_qualification.equal:
+            details = "; ".join(native_qualification.mismatches[:3]) or "unknown mismatch"
+            raise OracleError(
+                "native ModernGekko qualification disagreed with Dolphin; "
+                f"semantic feedback refused ({details})"
+            )
         candidate_result = invoke_sidecar(
             sidecar_snapshot,
             request=candidate_request,
@@ -1528,6 +1897,19 @@ def command_run(args: argparse.Namespace) -> int:
             "sidecar_sha256": sidecar_sha256,
             "build_attestation_sha256": attestation_sha256,
             "build_attestation_state_sha256": attestation["post_state_sha256"],
+            "native_qualification": {
+                "engine": NATIVE_EXPECTED_ENGINE,
+                "equal": native_qualification.equal,
+                "mismatch_count": native_qualification.mismatch_count,
+                "mismatches": native_qualification.mismatches,
+                "omitted_mismatches": native_qualification.omitted_mismatches,
+                "sidecar_sha256": native_sidecar_sha256,
+                "build_attestation_sha256": native_attestation_sha256,
+                "build_attestation_state_sha256": native_attestation[
+                    "post_state_sha256"
+                ],
+                "generated_manifest_sha256": native_manifest_sha256,
+            },
             "reference": {
                 "elf": display_path(Path(args.reference_elf)),
                 "text_size": len(reference_code),
@@ -1580,6 +1962,10 @@ def build_parser() -> argparse.ArgumentParser:
     attest_finalize.add_argument("--pins", default=str(DEFAULT_PINS))
     attest_finalize.add_argument("--pre-state", required=True)
     attest_finalize.add_argument("--binary", required=True)
+    attest_finalize.add_argument("--kind", choices=("dolphin", "native"), default="dolphin")
+    attest_finalize.add_argument("--generated-manifest")
+    attest_finalize.add_argument("--generated-root")
+    attest_finalize.add_argument("--dolrecomp")
     attest_finalize.add_argument("--output", required=True)
     attest_finalize.set_defaults(handler=command_attest_finalize)
 
@@ -1598,6 +1984,12 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--attestation")
     run.add_argument("--expected-sidecar-sha256")
     run.add_argument("--expected-attestation-sha256")
+    run.add_argument("--native-sidecar", required=True)
+    run.add_argument("--native-attestation")
+    run.add_argument("--native-manifest")
+    run.add_argument("--expected-native-sidecar-sha256")
+    run.add_argument("--expected-native-attestation-sha256")
+    run.add_argument("--expected-native-manifest-sha256")
     run.add_argument("--reference-elf", required=True)
     run.add_argument("--candidate-elf", required=True)
     run.add_argument("--dol", default=str(DEFAULT_DOL), help="original GC6E01 main.dol")

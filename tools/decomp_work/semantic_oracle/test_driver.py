@@ -489,6 +489,10 @@ class SidecarTests(unittest.TestCase):
                 pins=str(temporary / "pins.json"),
                 pre_state=str(pre_state),
                 binary=str(binary),
+                kind="dolphin",
+                generated_manifest=None,
+                generated_root=None,
+                dolrecomp=None,
                 output=str(output),
             )
             with (
@@ -519,6 +523,142 @@ class SidecarTests(unittest.TestCase):
                     output,
                     sidecar_sha256=driver.sha256_file(binary),
                     pin_report=drifted,
+                )
+
+    def test_native_build_attestation_binds_generated_manifest(self) -> None:
+        pin_report = {
+            "manifest_sha256": "a" * 64,
+            "checkout": "/external/ModernGekko",
+            "recursive_submodules": 39,
+            "components": [
+                {"name": "ModernGekko", "commit": "1" * 40},
+                {"name": "RecompCore", "commit": "2" * 40},
+                {"name": "DolRecomp", "commit": "3" * 40},
+            ],
+        }
+        with tempfile.TemporaryDirectory() as temporary_value:
+            temporary = Path(temporary_value)
+            binary = write_executable(temporary / "moderngekko-native-oracle", "#!/bin/sh\n")
+            dolrecomp = write_executable(temporary / "dolrecomp", "#!/bin/sh\n")
+            manifest = binary.with_name(binary.name + driver.NATIVE_MANIFEST_SUFFIX)
+            manifest_document = {
+                "schema_version": 1,
+                "commits": {
+                    "ModernGekko": "1" * 40,
+                    "RecompCore": "2" * 40,
+                    "DolRecomp": "3" * 40,
+                },
+                "dol": {
+                    "game_id": "GC6E01",
+                    "sha1": driver.ORIGINAL_DOL_SHA1,
+                    "sha256": driver.ORIGINAL_DOL_SHA256,
+                },
+                "dolrecomp": {"sha256": driver.sha256_file(dolrecomp)},
+                "generated": {
+                    "combined_sha256": driver.NATIVE_GENERATED_TREE_SHA256,
+                    "combined_sha256_recipe": driver.NATIVE_GENERATED_SHA256_RECIPE,
+                    "cpu": "gekko",
+                    "platform": "gamecube",
+                    "relative_file_count": driver.NATIVE_GENERATED_FILE_COUNT,
+                    "root": "generated",
+                    "selected_file_sha256": driver.NATIVE_SELECTED_GENERATED_SHA256,
+                    "text_newlines": "lf",
+                },
+            }
+            manifest.write_text(json.dumps(manifest_document) + "\n", encoding="utf-8")
+            generated_root = temporary / "generated"
+            generated_root.mkdir()
+            pre_state = temporary / "pre.json"
+            pre_state.write_text(
+                json.dumps(driver.sidecar_build_state(pin_report)), encoding="utf-8"
+            )
+            output = binary.with_name(binary.name + driver.SIDECAR_ATTESTATION_SUFFIX)
+            args = mock.Mock(
+                checkout=str(temporary / "checkout"),
+                pins=str(temporary / "pins.json"),
+                pre_state=str(pre_state),
+                binary=str(binary),
+                kind="native",
+                generated_manifest=str(manifest),
+                generated_root=str(generated_root),
+                dolrecomp=str(dolrecomp),
+                output=str(output),
+            )
+            expected_tree = {
+                "relative_file_count": driver.NATIVE_GENERATED_FILE_COUNT,
+                "combined_sha256": driver.NATIVE_GENERATED_TREE_SHA256,
+                "selected_file_sha256": driver.NATIVE_SELECTED_GENERATED_SHA256,
+            }
+            with (
+                mock.patch.object(driver, "verify_checkout_pins", return_value=pin_report),
+                mock.patch.object(
+                    driver, "hash_native_generated_tree", return_value=expected_tree
+                ) as tree_hash,
+                mock.patch.object(
+                    driver,
+                    "verify_native_binary_identity",
+                    return_value=driver.expected_native_binary_identity(pin_report),
+                ),
+                mock.patch("builtins.print"),
+            ):
+                self.assertEqual(driver.command_attest_finalize(args), 0)
+            tree_hash.assert_called_once_with(generated_root)
+            attestation, _ = driver.verify_native_attestation(
+                output,
+                sidecar_sha256=driver.sha256_file(binary),
+                generated_manifest_sha256=driver.sha256_file(manifest),
+                pin_report=pin_report,
+            )
+            self.assertEqual(
+                attestation["generated_manifest"]["sha256"], driver.sha256_file(manifest)
+            )
+
+            drifted_tree = copy.deepcopy(expected_tree)
+            drifted_tree["combined_sha256"] = "0" * 64
+            with (
+                mock.patch.object(driver, "verify_checkout_pins", return_value=pin_report),
+                mock.patch.object(
+                    driver, "hash_native_generated_tree", return_value=drifted_tree
+                ),
+                mock.patch.object(
+                    driver,
+                    "verify_native_binary_identity",
+                    return_value=driver.expected_native_binary_identity(pin_report),
+                ),
+                self.assertRaisesRegex(driver.OracleError, "source tree does not match"),
+            ):
+                driver.command_attest_finalize(args)
+
+            forged_manifest = copy.deepcopy(manifest_document)
+            forged_manifest["generated"]["selected_file_sha256"] = {
+                name: "f" * 64 for name in driver.NATIVE_SELECTED_GENERATED_FILES
+            }
+            with self.assertRaisesRegex(driver.OracleError, "untrusted generated-source"):
+                driver.verify_native_generation_manifest(
+                    json.dumps(forged_manifest).encode("utf-8"), pin_report
+                )
+
+            wrong_dolrecomp = write_executable(
+                temporary / "wrong-dolrecomp", "#!/bin/sh\nexit 1\n"
+            )
+            args.dolrecomp = str(wrong_dolrecomp)
+            with (
+                mock.patch.object(driver, "verify_checkout_pins", return_value=pin_report),
+                mock.patch.object(
+                    driver, "hash_native_generated_tree", return_value=expected_tree
+                ),
+                self.assertRaisesRegex(driver.OracleError, "DolRecomp executable"),
+            ):
+                driver.command_attest_finalize(args)
+            args.dolrecomp = str(dolrecomp)
+
+            manifest.write_text('{"schema_version":2}\n', encoding="utf-8")
+            with self.assertRaisesRegex(driver.OracleError, "generated manifest"):
+                driver.verify_native_attestation(
+                    output,
+                    sidecar_sha256=driver.sha256_file(binary),
+                    generated_manifest_sha256=driver.sha256_file(manifest),
+                    pin_report=pin_report,
                 )
 
     def test_fake_sidecar_round_trip_and_register_mismatch(self) -> None:
@@ -631,6 +771,26 @@ class SidecarTests(unittest.TestCase):
         wrong_sandbox["code_sandbox_bytes"] = 8192
         with self.assertRaisesRegex(driver.OracleError, "wrong code-sandbox size"):
             driver.compare_results(trusted, wrong_sandbox, fixtures)
+
+        native = copy.deepcopy(trusted)
+        native["engine"] = driver.NATIVE_EXPECTED_ENGINE
+        native["generated_tree_sha256"] = driver.NATIVE_GENERATED_TREE_SHA256
+        self.assertTrue(
+            driver.compare_results(
+                trusted,
+                native,
+                fixtures,
+                candidate_engine=driver.NATIVE_EXPECTED_ENGINE,
+            ).equal
+        )
+        native["generated_tree_sha256"] = "0" * 64
+        with self.assertRaisesRegex(driver.OracleError, "generated-tree identity"):
+            driver.compare_results(
+                trusted,
+                native,
+                fixtures,
+                candidate_engine=driver.NATIVE_EXPECTED_ENGINE,
+            )
 
     def test_returned_status_must_end_at_fixture_lr(self) -> None:
         fixtures = driver.generate_fixtures(1, 0x1234)

@@ -2,12 +2,13 @@
 
 ## Decision
 
-Use ModernGekko's pinned dependency tree only through a separately licensed,
-external semantic-testing sidecar. The implemented first lane executes exact
-original and candidate PPC with Dolphin's interpreter and observes GameCube
-state transitions, which helps reject behaviorally wrong decompilation
-candidates. It does not recover matching C and cannot replace MWCC, dtk,
-objdiff, or the full-DOL SHA check.
+Use ModernGekko's pinned dependency tree only through separately licensed,
+external semantic-testing sidecars. The completed pilot executes original and
+candidate PPC with Dolphin's interpreter, plus the original through exact
+DolRecomp-generated native chunks. Native-original must agree with Dolphin
+fixture-for-fixture before candidate feedback is admitted. This helps reject
+behaviorally wrong decompilation candidates, but cannot recover matching C or
+replace MWCC, dtk, objdiff, or the full-DOL SHA check.
 
 Do not vendor the upstream trees or link their GPL code into the game build or
 MIT Python tooling. The small sidecar source/build definition is isolated under
@@ -59,16 +60,24 @@ The original and reconstructed DOL SHA-1 both equaled
 `870e8b9693ca780782d80f22a6a4572d8ba9458f`. Zero unknown opcodes establishes
 decoder coverage, not semantic correctness.
 
-The pinned sidecar additionally ran four deterministic `msgctrlWait` fixtures
-against the exact retail function slice in 8, 22, 20, and 17 interpreter
-instructions. It reported bounded register/memory observations and normalized
-whole-MEM1 effects. A deliberately changed return instruction is rejected.
+The native build canonicalized DolRecomp text output to LF and reproducibly
+generated 157 files with combined SHA-256
+`438b92e6109ac5263860dcbcee24152148c139a34c60bf17933b4253b7309048`,
+then rehashed the complete generated tree at final attestation and compiled only
+the two reviewed full-DOL chunks. Native-original and Dolphin-original agreed on
+all 1,000 `GStextureLockImage-v2` fixtures and all ten named `msgctrlWait-v1`
+boundary fixtures. A known wrong texture candidate still produced 132
+candidate-vs-reference mismatches over 64 fixtures while native qualification
+remained at zero.
 
 ## Semantic-feedback model probe
 
 A separate Kimi K3 probe connected the sidecar to the exact-MWCC/objdiff model
 loop for the integer/pointer leaf `GStextureLockImage`. The run is retained at
 `build/model_benchmark/20260717T012212.377061Z_moonshot_kimi-k3`.
+It predates the final native-original qualification requirement, so it is
+evidence for the behavioral-feedback path rather than a current-protocol model
+benchmark.
 
 | Stage | Objdiff match | Dolphin-interpreter observations |
 |---|---:|---:|
@@ -82,10 +91,9 @@ remained. After receiving the bounded behavioral differences, round two
 compiled to the exact 48-byte retail text. The candidate and retail `.text`
 SHA-256 values are both
 `c16b4571e5b98b5da3dd3f66e8e36f653820a5c4e6dee8b4dde8e67739d60a91`.
-A separate balanced `GStextureLockImage-v2` replay over 1,000 deterministic
-fixtures also returned equal with zero mismatches after the attestation and
-single-snapshot hardening; its report is
-`build/semantic_oracle/kimi_k3_GStextureLockImage_attested_1000.report.json`.
+A current-protocol balanced replay over 1,000 deterministic fixtures returned
+zero native-vs-Dolphin and zero exact-candidate mismatches; its report is
+`build/semantic_oracle/native-integrated-GStextureLockImage-1000.report.json`.
 
 The API rounds took 99.746 and 101.054 seconds and consumed 14,946 total tokens
 (9,670 prompt, including 3,072 cached, and 5,276 completion). At Moonshot's
@@ -121,26 +129,33 @@ tests and documents remaining expected failures. ModernGekko does not yet pin
 all later native-execution fixes.
 
 Start with integer/bit/control-flow leaf functions. The current implementation
-uses Dolphin's interpreter as the candidate gate. Native ModernGekko generated
-chunks should be added only as a third lane after original-native results agree
-with the interpreter; the audited generated chunks do not consistently charge
-`downcount`, so absence of a built-in lockstep failure is not proof of parity.
+uses Dolphin's interpreter as the candidate gate and exact DolRecomp chunks as
+a native-original qualification lane. The pinned full RecompCore module path is
+not used: its emitted include/runtime CPU layouts diverge, its recorded
+RecompCore identity is stale, and generated chunks do not consistently charge
+`downcount`. The selected standalone DolRecomp CPU ABI is internally
+consistent, but every enrolled function still has to prove parity with Dolphin;
+absence of a built-in lockstep failure is not evidence.
 
 The first two profiles are also deliberately no-stack leaves. Whole-RAM
 comparison will reject an otherwise equivalent candidate that writes a legal
 stack spill slot, even if it restores `r1`; stack-using profiles need an
 explicit scratch-window contract before admission.
 
-## Recommended sidecar pilot
+## Implemented sidecar protocol
 
 The useful comparison has two independent execution paths:
 
 ```text
-original PPC + deterministic CPU/RAM fixtures -> Dolphin interpreter ----+
-                                                                         | compare
-candidate C -> exact MWCC -> relocation-free PPC -> Dolphin interpreter --+
-                                                    |
-                                                    +-> objdiff remains match authority
+original DOL -> Dolphin interpreter --------+
+                                             | native qualification (must equal)
+original DOL -> DolRecomp native chunk ------+
+
+original DOL -> Dolphin interpreter --------+
+                                             | candidate diagnostics
+candidate C -> exact MWCC -> Dolphin --------+
+                    |
+                    +-> objdiff + full DOL remain matching authorities
 ```
 
 Time-box the pilot to five to ten small integer leaves:
@@ -152,8 +167,8 @@ Time-box the pilot to five to ten small integer leaves:
    least 1,000 fixtures per function.
 5. Feed only compact state mismatches, target assembly, compiler diagnostics,
    and objdiff feedback into the model loop.
-6. Retain the sidecar only if it agrees with Dolphin and materially improves
-   convergence on held-out functions.
+6. Retain each native profile only while it agrees with Dolphin; measure model
+   convergence separately on held-out functions.
 
 Candidate C is compiled by the exact project MWCC into relocation-free PPC and
 placed in a bounded synthetic MEM1 code sandbox. Executing candidate host C

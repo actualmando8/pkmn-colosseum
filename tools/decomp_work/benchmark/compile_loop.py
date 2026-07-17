@@ -47,6 +47,7 @@ SEMANTIC_PROFILE_FUNCTIONS = {
     "GStextureLockImage-v2": "GStextureLockImage",
 }
 SEMANTIC_ENGINE = "dolphin-interpreter-from-moderngekko-tree"
+SEMANTIC_NATIVE_ENGINE = "moderngekko-dolrecomp-native-original"
 SEMANTIC_PROFILE_AUTHORITIES = {
     "GStextureLockImage-v2": {
         "virtual_address": "0x800ef548",
@@ -112,6 +113,9 @@ class SemanticOracleConfig:
     checkout: Path
     sidecar: Path
     attestation: Path
+    native_sidecar: Path
+    native_attestation: Path
+    native_manifest: Path
     driver: Path
     pins: Path
     dol: Path
@@ -123,6 +127,9 @@ class SemanticOracleConfig:
     mismatch_limit: int
     expected_sidecar_sha256: str | None = None
     expected_attestation_sha256: str | None = None
+    expected_native_sidecar_sha256: str | None = None
+    expected_native_attestation_sha256: str | None = None
+    expected_native_manifest_sha256: str | None = None
     expected_driver_sha256: str | None = None
     expected_pins_sha256: str | None = None
     expected_dol_sha256: str | None = None
@@ -489,6 +496,9 @@ def _semantic_report(
         "driver": config.expected_driver_sha256,
         "sidecar": config.expected_sidecar_sha256,
         "build attestation": config.expected_attestation_sha256,
+        "native sidecar": config.expected_native_sidecar_sha256,
+        "native build attestation": config.expected_native_attestation_sha256,
+        "native generated manifest": config.expected_native_manifest_sha256,
         "pin manifest": config.expected_pins_sha256,
         "original DOL": config.expected_dol_sha256,
         "pin report": config.expected_pin_report_sha256,
@@ -510,6 +520,50 @@ def _semantic_report(
         raise SemanticError("semantic driver report has an invalid attested build state")
     if report.get("engine") != SEMANTIC_ENGINE:
         raise SemanticError("semantic driver report has an untrusted engine identity")
+    native = report.get("native_qualification")
+    if not isinstance(native, dict):
+        raise SemanticError("semantic driver report omitted native-original qualification")
+    if native.get("engine") != SEMANTIC_NATIVE_ENGINE:
+        raise SemanticError(
+            "semantic driver report has an untrusted native-original engine identity"
+        )
+    if native.get("sidecar_sha256") != config.expected_native_sidecar_sha256:
+        raise SemanticError(
+            "semantic driver report has the wrong native sidecar fingerprint"
+        )
+    if (
+        native.get("build_attestation_sha256")
+        != config.expected_native_attestation_sha256
+    ):
+        raise SemanticError(
+            "semantic driver report has the wrong native build attestation fingerprint"
+        )
+    if (
+        native.get("generated_manifest_sha256")
+        != config.expected_native_manifest_sha256
+    ):
+        raise SemanticError(
+            "semantic driver report has the wrong native generated manifest fingerprint"
+        )
+    if not re.fullmatch(
+        r"[0-9a-f]{64}",
+        str(native.get("build_attestation_state_sha256") or ""),
+    ):
+        raise SemanticError(
+            "semantic driver report has an invalid native attested build state"
+        )
+    native_equal = native.get("equal")
+    native_mismatch_count = native.get("mismatch_count")
+    if native_equal is not True:
+        raise SemanticError("native-original qualification did not match Dolphin")
+    if (
+        isinstance(native_mismatch_count, bool)
+        or not isinstance(native_mismatch_count, int)
+        or native_mismatch_count != 0
+    ):
+        raise SemanticError(
+            "native-original qualification has a nonzero or invalid mismatch count"
+        )
     expected_provenance = dict(config.expected_provenance)
     if report.get("provenance") != expected_provenance:
         raise SemanticError("semantic driver report has the wrong pinned provenance")
@@ -611,6 +665,13 @@ def run_semantic_oracle(
             "candidate_elf_sha256": candidate_sha256,
             "sidecar_sha256": config.expected_sidecar_sha256,
             "build_attestation_sha256": config.expected_attestation_sha256,
+            "native_sidecar_sha256": config.expected_native_sidecar_sha256,
+            "native_build_attestation_sha256": (
+                config.expected_native_attestation_sha256
+            ),
+            "native_generated_manifest_sha256": (
+                config.expected_native_manifest_sha256
+            ),
         }
         write_json(report_file, report)
         return SemanticScore(
@@ -627,6 +688,9 @@ def run_semantic_oracle(
     if (
         config.expected_sidecar_sha256 is None
         or config.expected_attestation_sha256 is None
+        or config.expected_native_sidecar_sha256 is None
+        or config.expected_native_attestation_sha256 is None
+        or config.expected_native_manifest_sha256 is None
     ):
         raise SemanticError("semantic runtime fingerprints were not bound at run start")
     result = run_command(
@@ -648,6 +712,18 @@ def run_semantic_oracle(
             config.expected_sidecar_sha256,
             "--expected-attestation-sha256",
             config.expected_attestation_sha256,
+            "--native-sidecar",
+            str(config.native_sidecar),
+            "--native-attestation",
+            str(config.native_attestation),
+            "--native-manifest",
+            str(config.native_manifest),
+            "--expected-native-sidecar-sha256",
+            config.expected_native_sidecar_sha256,
+            "--expected-native-attestation-sha256",
+            config.expected_native_attestation_sha256,
+            "--expected-native-manifest-sha256",
+            config.expected_native_manifest_sha256,
             "--reference-elf",
             str(reference_elf),
             "--candidate-elf",
@@ -670,7 +746,7 @@ def run_semantic_oracle(
             str(report_file),
         ],
         cwd=REPO,
-        timeout=config.timeout * 2 + 150,
+        timeout=config.timeout * 3 + 150,
         max_output=8000,
     )
     if result.returncode not in (0, 1):
@@ -1206,6 +1282,9 @@ def execution_tool_fingerprints(
                 "semantic-pin-manifest": config.pins,
                 "semantic-sidecar": config.sidecar,
                 "semantic-sidecar-attestation": config.attestation,
+                "semantic-native-sidecar": config.native_sidecar,
+                "semantic-native-sidecar-attestation": config.native_attestation,
+                "semantic-native-manifest": config.native_manifest,
                 "semantic-original-dol": config.dol,
                 "semantic-powerpc-eabi-objcopy": config.objcopy,
                 "semantic-powerpc-eabi-readelf": config.readelf,
@@ -1268,25 +1347,48 @@ def resolve_semantic_config(
         )
     checkout_value = getattr(args, "semantic_checkout", None)
     sidecar_value = getattr(args, "semantic_sidecar", None)
-    if not checkout_value or not sidecar_value:
+    native_sidecar_value = getattr(args, "semantic_native_sidecar", None)
+    if not checkout_value or not sidecar_value or not native_sidecar_value:
         raise BenchError(
-            "selected target requires --semantic-checkout and --semantic-sidecar"
+            "selected target requires --semantic-checkout, --semantic-sidecar, "
+            "and --semantic-native-sidecar"
         )
     checkout = Path(checkout_value).expanduser().resolve()
     sidecar = Path(sidecar_value).expanduser().resolve()
     attestation = sidecar.with_name(sidecar.name + ".attestation.json")
+    native_sidecar = Path(native_sidecar_value).expanduser().resolve()
+    native_attestation = native_sidecar.with_name(
+        native_sidecar.name + ".attestation.json"
+    )
+    native_manifest = native_sidecar.with_name(
+        native_sidecar.name + ".generated-manifest.json"
+    )
     if not checkout.is_dir():
         raise BenchError(f"semantic checkout is not a directory: {checkout}")
     if not sidecar.is_file() or not os.access(sidecar, os.X_OK):
         raise BenchError(f"semantic sidecar is not executable: {sidecar}")
     if not attestation.is_file() or attestation.is_symlink():
         raise BenchError(f"semantic sidecar build attestation is missing: {attestation}")
+    if not native_sidecar.is_file() or not os.access(native_sidecar, os.X_OK):
+        raise BenchError(f"semantic native sidecar is not executable: {native_sidecar}")
+    if not native_attestation.is_file() or native_attestation.is_symlink():
+        raise BenchError(
+            "semantic native sidecar build attestation is missing: "
+            f"{native_attestation}"
+        )
+    if not native_manifest.is_file() or native_manifest.is_symlink():
+        raise BenchError(
+            f"semantic native sidecar generated manifest is missing: {native_manifest}"
+        )
     return SemanticOracleConfig(
         profile=profile,
         function=function,
         checkout=checkout,
         sidecar=sidecar,
         attestation=attestation,
+        native_sidecar=native_sidecar,
+        native_attestation=native_attestation,
+        native_manifest=native_manifest,
         driver=SEMANTIC_DRIVER,
         pins=SEMANTIC_PINS,
         dol=SEMANTIC_DOL,
@@ -1358,6 +1460,9 @@ def bind_semantic_runtime(
     required = {
         "expected_sidecar_sha256": "semantic-sidecar",
         "expected_attestation_sha256": "semantic-sidecar-attestation",
+        "expected_native_sidecar_sha256": "semantic-native-sidecar",
+        "expected_native_attestation_sha256": "semantic-native-sidecar-attestation",
+        "expected_native_manifest_sha256": "semantic-native-manifest",
         "expected_driver_sha256": "semantic-driver",
         "expected_pins_sha256": "semantic-pin-manifest",
         "expected_dol_sha256": "semantic-original-dol",
@@ -1417,6 +1522,9 @@ def semantic_config_record(
         "checkout": display_path(config.checkout),
         "sidecar": display_path(config.sidecar),
         "attestation": display_path(config.attestation),
+        "native_sidecar": display_path(config.native_sidecar),
+        "native_attestation": display_path(config.native_attestation),
+        "native_manifest": display_path(config.native_manifest),
         "driver": display_path(config.driver),
         "pins": display_path(config.pins),
         "dol": display_path(config.dol),
@@ -1426,6 +1534,11 @@ def semantic_config_record(
         "pin_report_sha256": hashlib.sha256(canonical_pin_report).hexdigest(),
         "expected_sidecar_sha256": config.expected_sidecar_sha256,
         "expected_attestation_sha256": config.expected_attestation_sha256,
+        "expected_native_sidecar_sha256": config.expected_native_sidecar_sha256,
+        "expected_native_attestation_sha256": (
+            config.expected_native_attestation_sha256
+        ),
+        "expected_native_manifest_sha256": config.expected_native_manifest_sha256,
         "expected_driver_sha256": config.expected_driver_sha256,
         "expected_pins_sha256": config.expected_pins_sha256,
         "expected_dol_sha256": config.expected_dol_sha256,
@@ -1881,6 +1994,9 @@ def command_run(args: argparse.Namespace) -> int:
                 config.pins,
                 config.sidecar,
                 config.attestation,
+                config.native_sidecar,
+                config.native_attestation,
+                config.native_manifest,
             )
         )
         pin_report = semantic_runtime_reports.get(runtime_key)
@@ -2076,6 +2192,13 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument(
         "--semantic-sidecar",
         help="external GPL semantic-sidecar executable; required by semantic targets",
+    )
+    run.add_argument(
+        "--semantic-native-sidecar",
+        help=(
+            "external pinned ModernGekko/DolRecomp native-original sidecar; "
+            "required by semantic targets"
+        ),
     )
     run.add_argument(
         "--allow-reasoning-salvage",
