@@ -217,7 +217,8 @@ s32 fn_80062284(s32 trainer) {
     u16 count;
     s32 i;
 
-    count = toolentryTaisenGetEntryPokemonNum(trainer);
+    i = toolentryTaisenGetEntryPokemonNum(trainer);
+    count = i;
     for (i = 0; i < count; i++) {
         pokemon = toolentryTaisenGetEntryPokemonPtr(trainer, i);
         if (pokemon != 0 && pokemonCheckValid(pokemon) &&

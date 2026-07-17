@@ -832,7 +832,8 @@ void fightOutPokemonSetHensinPokemonStatusId(void* trainer, u16 eventId, u32 par
 
     if ((u8)param2 == 1) {
         srcSlot = pokemonGetStatus(trainer, 0, 0xD5, 0);
-        dst = pokemonGetStatus(trainer, 0, 0xD7, 0);
+        srcPokemon = pokemonGetStatus(trainer, 0, 0xD7, 0);
+        dst = srcPokemon;
     } else {
         srcSlot = pokemonGetStatus(trainer, 0, 0xD7, 0);
         dst = pokemonGetStatus(trainer, 0, 0xD5, 0);
@@ -847,7 +848,7 @@ void fightOutPokemonSetHensinPokemonStatusId(void* trainer, u16 eventId, u32 par
         if (dst == NULL) {
             dst = NULL;
         } else {
-            dst = pokemonGetStatus(dst, 0, 0xCC, 0);
+            dst = fn_801FE5D4_getPokemon(dst);
         }
         value = (u32)pokemonGetStatus(srcPokemon, 0, eventId, param1);
         pokemonSetStatus(dst, 0, eventId, param1, value);
