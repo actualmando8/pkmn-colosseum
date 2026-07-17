@@ -7325,7 +7325,8 @@ u8 inpGetMidiLastNote(u8 midi, u8 midiSet) {
  * numSource@0x22 -- confirmed again here via the `addi r31,r31,8` pointer
  * walk and `lbz r0,0x22(r25)` loop bound. */
 extern s16 varGet(u8* svoice, u32 ctrl, u8 index);
-extern u64 lbl_8047AF58; /* synthRealTime */
+extern u32 lbl_8047AF58; /* synthRealTime, high word */
+extern u32 lbl_8047AF5C; /* synthRealTime, low word */
 
 #define GIV_CLAMP(value, min, max) ((value) > (max) ? (max) : (value) < (min) ? (min) : (value))
 #define GIV_CLAMP_INV(value, min, max) ((value) < (min) ? (min) : (value) > (max) ? (max) : (value))
@@ -7343,7 +7344,7 @@ u32 _GetInputValue(u8* svoice, u8* motionBase, u8 midi, u8 midiSet) {
     s32 vtmp;
     u32 sign;
 
-    for (value = 0, i = 0; i < inp->numSource; i++) {
+    for (value = 0, i = 0; i < ((CtrlDest*)motionBase)->numSource; i++) {
         if (inp->source[i].combine & 0x10) {
             tmp = svoice != NULL ? varGet(svoice, 0, inp->source[i].midiCtrl) : 0;
             goto block_18;
@@ -7411,7 +7412,8 @@ u32 _GetInputValue(u8* svoice, u8* motionBase, u8 midi, u8 midiSet) {
                 break;
             case 164:
                 if (svoice != NULL) {
-                    tmp = (s32)((lbl_8047AF58 - *(u64*)(svoice + 0x90)) >> 8);
+                    tmp = (s32)((((((u64)lbl_8047AF58) << 32) | (u64)lbl_8047AF5C) -
+                                *(u64*)(svoice + 0x90)) >> 8);
                     if (tmp > 0x3fff) {
                         tmp = 0x3fff;
                     }
@@ -7464,7 +7466,7 @@ u32 _GetInputValue(u8* svoice, u8* motionBase, u8 midi, u8 midiSet) {
             }
         }
     }
-    inp->oldValue = value;
+    ((CtrlDest*)motionBase)->oldValue = value;
     return (u16)value;
 }
 #pragma pop

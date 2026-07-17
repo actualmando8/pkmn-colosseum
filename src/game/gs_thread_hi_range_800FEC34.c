@@ -28,12 +28,17 @@ void fn_800FEC34(u32 callback) {
     extern u32 lbl_8047ACC0;
     extern void GSthreadUnblock(void* thread);
     GSFloorResource* resource;
+    u32 resourceCallback;
     u32 i;
 
     resource = lbl_8047ACB0;
     for (i = lbl_8047ACC0; i > 0; i--) {
         if ((s32)resource->active == 3) {
-            if ((u32)resource->callback == callback) {
+            resourceCallback = (u32)resource->callback;
+            if (resourceCallback == callback) {
+                if (resource->active) {
+                    goto found;
+                }
                 goto found;
             }
         }
