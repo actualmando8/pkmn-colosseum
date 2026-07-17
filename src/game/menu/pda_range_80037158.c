@@ -674,11 +674,9 @@ void fn_80038990(void)
     extern s32 fn_800D37CC(void);
     extern u32 fn_800D3088(void);
     extern void _threadSwitch(void);
-    f32 divisor;
 
     while (1) {
-        divisor = (f32)fn_800D37CC();
-        lbl_8047A494 = (f32)fn_800D3088() / divisor;
+        lbl_8047A494 = (f32)fn_800D3088() / (f32)fn_800D37CC();
         _threadSwitch();
     }
 }
