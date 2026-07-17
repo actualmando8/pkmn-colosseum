@@ -41,5 +41,18 @@ int target(int x) { return x + 1; }
                          "int target(int x) { return x + 1; }\n")
 
 
+class PartialScoreTest(unittest.TestCase):
+    def test_replaces_missing_partial(self):
+        self.assertEqual(HARVEST.select_partial_score(None, 30), (30, True))
+
+    def test_replaces_only_with_strict_improvement(self):
+        self.assertEqual(HARVEST.select_partial_score(30, 20), (20, True))
+        self.assertEqual(HARVEST.select_partial_score(30, 30), (30, False))
+        self.assertEqual(HARVEST.select_partial_score(30, 40), (30, False))
+
+    def test_preserves_partial_when_run_has_no_candidate(self):
+        self.assertEqual(HARVEST.select_partial_score(30, None), (30, False))
+
+
 if __name__ == "__main__":
     unittest.main()
