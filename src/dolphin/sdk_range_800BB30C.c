@@ -454,11 +454,12 @@ void fn_800BC580(u32 table, u32 red, u32 green, u32 blue, u32 alpha) {
     u32 index = table * 2;
     GXData_800BB30C* p = gx;
     u32* reg0 = &p->field_1B0[index];
-    u32* reg1 = &p->field_1B0[index + 1];
+    u32* reg1;
 
     *reg0 = (*reg0 & ~3U) | red;
     *reg0 = (*reg0 & ~0xCU) | (green << 2);
     GX_BP_REG(*reg0);
+    reg1 = &p->field_1B0[index + 1];
 
     *reg1 = (*reg1 & ~3U) | blue;
     *reg1 = (*reg1 & ~0xCU) | (alpha << 2);
