@@ -960,6 +960,8 @@ void fn_8003BF54(PdaSprite* alphaSprite, PdaSprite* sprite)
 {
     extern u8 lbl_802EF0A8[];
     extern f32 lbl_8047BAD8;
+    u8* layoutData;
+    s16* baseY;
     f32 offset;
 
     alphaSprite->alphaByte = lbl_8047BAC0 * lbl_803A6748.alphaScale;
@@ -969,10 +971,11 @@ void fn_8003BF54(PdaSprite* alphaSprite, PdaSprite* sprite)
         sprite->flags = sprite->flags & ~2;
         return;
     }
+    baseY = (s16*)((layoutData = lbl_802EF0A8) + 0x5084);
     offset = lbl_803A6748.field_18 /
              -(lbl_8047BAD8 * (f32)(lbl_803A6748.field_10 - 10));
-    sprite->field_52 = (s16)(*(s16*)(lbl_802EF0A8 + 0x5084) +
-                              offset * *(s16*)(lbl_802EF0A8 + 0x5088));
+    sprite->field_52 =
+        (s16)(*baseY + offset * *(s16*)(layoutData + 0x5088));
 }
 #pragma peephole reset
 
