@@ -318,6 +318,8 @@ s32 dataInsertSDir(SdirDataT* sdir, void* smp_data) {
     u16 n;
     u16 j;
     u16 k;
+    u16 count;
+    u32 offset;
 
     for (i = 0; i < lbl_8047AFAA && tab[i].data != sdir; ++i) {}
 
@@ -343,10 +345,12 @@ s32 dataInsertSDir(SdirDataT* sdir, void* smp_data) {
                 }
             }
 
-            tab[lbl_8047AFAA].data = sdir;
-            tab[lbl_8047AFAA].numSmp = n;
-            tab[lbl_8047AFAA].base = smp_data;
-            ++lbl_8047AFAA;
+            count = lbl_8047AFAA;
+            offset = count * sizeof(SdirTabT);
+            lbl_8047AFAA = count + 1;
+            tab[count].data = sdir;
+            ((SdirTabT*)((u8*)tab + offset))->numSmp = n;
+            ((SdirTabT*)((u8*)tab + offset))->base = smp_data;
             hwEnableIrq();
             return 1;
         } else {

@@ -934,7 +934,6 @@ asm void fn_80024CDC(void) {
 #pragma scheduling on
 #pragma fp_contract on
 void fn_80024CDC(s32 arg0, u8* arg1) {
-    u8 bVar1;
     f32 fVar2;
     s32 iVar4;
     u32 uVar3;
@@ -944,12 +943,12 @@ void fn_80024CDC(s32 arg0, u8* arg1) {
         *(s16*)(arg1 + 0x52) = *(s16*)((u8*)lbl_8047A390 + 4) + 8;
     }
 
-    bVar1 = *(u8*)(arg1 + 0x67);          /* current alpha (0..255)    */
+    iVar4 = *(u8*)(arg1 + 0x67);          /* current alpha (0..255)    */
     uVar3 = fn_800D3088();                /* u32 tick counter          */
     fVar2 = lbl_8047A37C;                 /* f32 pulse speed           */
     /* (f32)(u32)uVar3 -> unsigned int-to-float magic (no xor).  */
-    /* (f32)(s32)bVar1 -> signed int-to-float (xoris + stw).     */
-    iVar4 = (s32)(fVar2 * (f32)(u32)uVar3 + (f32)(s32)bVar1);
+    /* (f32)(s32)iVar4 -> signed int-to-float (xoris + stw).     */
+    iVar4 += fVar2 * (f32)(u32)uVar3;
 
     /* Clamp alpha to [0x40, 0xFF] and flip direction on rail.   */
     /* This produces the classic ping-pong / throb animation.   */
