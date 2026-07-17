@@ -78,7 +78,8 @@ extern u8* lbl_8047AF48;  /* synthVoice (base ptr; stride 0x404, id field @0xf4)
 #define synthInfo lbl_80434C50
 #define synthFlags lbl_8047AF44
 
-/* ===== Stream subsystem state (owned by this TU) ===== */
+/* ===== Stream subsystem state (owned by the original TU, emitted by the
+ * dedicated data splits in this repository) ===== */
 typedef struct SNDADPCMinfo {
   u16 numCoef;       // 0x0
   u8 initialPS;      // 0x2
@@ -134,11 +135,14 @@ typedef struct STREAM_INFO {
   u8 studio;            // 0x60
 } STREAM_INFO; // size 0x64 (rounded up from 0x61)
 
-static STREAM_INFO lbl_80435FF8[64]; /* streamInfo */
-static u32 lbl_8047AF60;             /* nextPublicID */
-static u8 lbl_8047AF64;              /* streamCallDelay (declared before streamCallCnt in the
+extern STREAM_INFO lbl_80435FF8[64]; /* streamInfo */
+extern u32 lbl_8047AF60;             /* nextPublicID */
+extern u8 lbl_8047AF64;              /* streamCallDelay (declared before streamCallCnt in the
                                 * <=2.0.2 branch of reference stream.c, hence lower address) */
-static u8 lbl_8047AF65;              /* streamCallCnt */
+extern u8 lbl_8047AF65;              /* streamCallCnt */
+extern const f32 lbl_8047D3B0;
+extern const f64 lbl_8047D3B8;
+extern const f32 lbl_8047D3C0[2];
 
 #define streamInfo lbl_80435FF8
 #define nextPublicID lbl_8047AF60
@@ -165,9 +169,9 @@ void fn_8014DDD8(void) {
   nextPublicID = 0;
 }
 
-static void SetHWMix(const STREAM_INFO* si) {
-  hwSetVolume(si->voice, 0, si->vol * (1 / 127.f), (si->pan << 16), (si->span << 16),
-              si->auxa * (1 / 127.f), si->auxb * (1 / 127.f));
+void SetHWMix(const STREAM_INFO* si) {
+  hwSetVolume(si->voice, 0, lbl_8047D3B0 * si->vol, (si->pan << 16), (si->span << 16),
+              lbl_8047D3B0 * si->auxa, lbl_8047D3B0 * si->auxb);
 }
 
 void fn_8014DF20(void) {
@@ -212,7 +216,7 @@ void fn_8014DF20(void) {
       hwInitSamplePlayback(v, -1, &newsmp, 1, -1, *(u32*)(lbl_8047AF48 + v * 0x404 + 0xF4), 1, 1);
 
       f = (si->frq / (f32)synthInfo.mixFrq);
-      hwSetPitch(si->voice, (u16)(f * 4096.f));
+      hwSetPitch(si->voice, (u16)(lbl_8047D3C0[0] * f));
       SetHWMix(si);
 
       hwStart(si->voice, si->studio);
@@ -384,7 +388,7 @@ void fn_8014E7D0(u32 voice) {
   }
 }
 
-static u32 GetPrivateIndex(u32 publicID) {
+u32 GetPrivateIndex(u32 publicID) {
   u32 i;
   for (i = 0; i < 64; ++i) {
     if (streamInfo[i].state != 0 && publicID == streamInfo[i].stid) {
@@ -395,7 +399,7 @@ static u32 GetPrivateIndex(u32 publicID) {
   return -1;
 }
 
-static u32 GeneratePublicID(void) {
+static inline u32 GeneratePublicID(void) {
   u32 id;
   u32 i;
 
