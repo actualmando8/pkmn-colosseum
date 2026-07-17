@@ -145,6 +145,25 @@ def objdiff_pct(target_o, cand_o, fn):
     return walk(data)
 
 
+def existing_partial_score(partial_dir):
+    try:
+        with open(os.path.join(partial_dir, "info.json")) as f:
+            data = json.load(f)
+        score = data.get("best_score")
+        return int(score) if score is not None else None
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return None
+
+
+def select_partial_score(existing_score, candidate_score):
+    """Return (record_score, replace) without regressing a banked partial."""
+    if candidate_score is None:
+        return existing_score, False
+    if existing_score is None or candidate_score < existing_score:
+        return candidate_score, True
+    return existing_score, False
+
+
 def main():
     fn, unit = sys.argv[1], sys.argv[2]
     worker = sys.argv[3] if len(sys.argv) > 3 else "?"
@@ -220,16 +239,18 @@ def main():
             f.write(f"{status} {worker} {int(time.time())} pct={pct}\n")
         print(f"{status} {fn} pct={pct}")
     else:
-        if best_src:
-            pd = os.path.join(FARM, "results", "_partials", fn)
+        pd = os.path.join(FARM, "results", "_partials", fn)
+        recorded_score, replace_partial = select_partial_score(
+            existing_partial_score(pd), best_score)
+        if best_src and replace_partial:
             os.makedirs(pd, exist_ok=True)
             subprocess.run(["cp", "-f", best_src, os.path.join(pd, "best.c")])
             with open(os.path.join(pd, "info.json"), "w") as f:
                 json.dump({"fn": fn, "unit": unit, "best_score": best_score,
                            "base_score": base_score}, f)
         with open(state, "w") as f:
-            f.write(f"NOWIN {worker} {int(time.time())} best={best_score} base={base_score}\n")
-        print(f"NOWIN {fn} best={best_score} base={base_score}")
+            f.write(f"NOWIN {worker} {int(time.time())} best={recorded_score} base={base_score}\n")
+        print(f"NOWIN {fn} run_best={best_score} best={recorded_score} base={base_score}")
 
 
 if __name__ == "__main__":

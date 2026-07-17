@@ -96,21 +96,24 @@ void fn_800D034C(void) {
 
 BOOL SIEnablePollingInterrupt(BOOL enable) {
     BOOL enabled;
+    SIGlobalData* packet;
+    volatile u32* registerBlock;
     volatile u32* csr;
     u32 reg;
     BOOL wasEnabled;
     int i;
 
+    packet = &Packet_803FFFB0;
     enabled = OSDisableInterrupts();
-    csr = &__SIRegs[SI_COMCSR_IDX];
+    csr = (registerBlock = __SIRegs) + SI_COMCSR_IDX;
     reg = *csr;
     wasEnabled = (reg & SI_COMCSR_RDSTINTMSK_MASK) ? TRUE : FALSE;
 
     if (enable) {
-        for (i = 0; i < 4; i++) {
-            Packet_803FFFB0.inputBufferVcount[i] = 0;
-        }
         reg |= SI_COMCSR_RDSTINTMSK_MASK;
+        for (i = 0; i < 4; i++) {
+            packet->inputBufferVcount[i] = 0;
+        }
     } else {
         reg &= ~SI_COMCSR_RDSTINTMSK_MASK;
     }
