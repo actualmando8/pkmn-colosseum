@@ -20,7 +20,7 @@
  *     are referenced by name from gs_render.c's EFB-capture path
  *     (`GStextureUnlockImage(image)` feeding `GXDrawDone`, and
  *     `GStextureLockImage(image, 0)`). GStextureUnlockImage's return
- *     value is used by the caller, so it returns the texture's post-
+ *     value is used by the caller, so it returns the texture's pre-
  *     decrement refCount rather than void.
  *   - GStextureConvertFromHW, GStextureGetGXformat, GStextureGetTlutFormat,
  *     GStextureGetFormat, GStextureGetMiplevels, GStextureGetYsize,
@@ -90,7 +90,7 @@ void fn_800EF098(GStextureHandle* tex) {
 
     tex->refCount++;
 
-    src = tex->data;
+    src = tex->mipData[0];
     if (src == NULL) {
         return;
     }
@@ -120,7 +120,7 @@ void fn_800EF098(GStextureHandle* tex) {
     }
 
     memcpy(src, tempBuf, allocSize);
-    DCFlushRange(tex->data, tex->totalSize);
+    DCFlushRange(tex->mipData[0], tex->totalSize);
     GXInvalidateTexAll();
 
     tex->refCount--;
@@ -268,14 +268,13 @@ void GStextureFree(GStextureHandle* tex) {
  *
  *  Real matched name (symbols.txt) referenced from gs_render.c as
  *  `GXDrawDone(GStextureUnlockImage(image))`, so the return value is
- *  used by the caller: returns the texture's refCount after decrement.
+ *  used by the caller: returns the texture's refCount before decrement.
  * ======================================================================= */
 u32 GStextureUnlockImage(GStextureHandle* tex) {
-    DCFlushRange(tex->data, tex->totalSize);
+    DCFlushRange(tex->mipData[0], tex->totalSize);
     GXInvalidateTexAll();
 
-    tex->refCount--;
-    return tex->refCount;
+    return tex->refCount--;
 }
 
 /* =======================================================================
@@ -291,7 +290,7 @@ void* GStextureLockImage(GStextureHandle* tex, u8 level) {
     }
 
     tex->refCount++;
-    return tex->mipOffsets[level] + (u8*)tex;  /* offsetted read at 0x28 + level*4 */
+    return tex->mipData[level];
 }
 
 /* =======================================================================
@@ -471,8 +470,8 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
         return NULL;
     }
 
-    tex->data = fn_800E27B0(handle);
-    if (tex->data == NULL) {
+    tex->mipData[0] = fn_800E27B0(handle);
+    if (tex->mipData[0] == NULL) {
         fn_800E209C(tex->memHandle);
         return NULL;
     }
@@ -496,9 +495,9 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
     }
 
     tex->refCount = 0;
-    tex->pad52 = 0;
+    tex->unk52 = 0;
 
-    /* Compute per-mip data offsets */
+    /* Compute per-mip data pointers */
     {
         u32 mipSize = (u32)bpp * pixelCount / 8;
         u32 cumOffset = 0;
@@ -506,23 +505,23 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
 
         for (level = 0; level < 7; level++) {
             if ((u32)(level + 1) < (u32)tex->mipLevels) {
-                tex->mipOffsets[level + 1] = tex->mipOffsets[level] + mipSize;
+                tex->mipData[level + 1] = (u8*)tex->mipData[level] + mipSize;
                 mipSize >>= 2;
             } else {
-                tex->mipOffsets[level + 1] = 0;
+                tex->mipData[level + 1] = NULL;
             }
         }
     }
 
-    /* Compute TLUT offset (for CI formats) */
+    /* Compute TLUT pointer (for CI formats) */
     if (tlutFormat >= 1 && tlutFormat < 4) {
-        u32 lastMipEnd;
+        u8* lastMipEnd;
         u32 mipIdx = tex->mipLevels;
-        lastMipEnd = tex->mipOffsets[mipIdx] + (u32)bpp * pixelCount / 8;
-        /* Actually from the assembly: calculated from last mip's end offset */
-        tex->tlutOffset = lastMipEnd;
+        lastMipEnd = (u8*)tex->mipData[mipIdx] + (u32)bpp * pixelCount / 8;
+        /* Actually from the assembly: calculated from last mip's end pointer */
+        tex->tlutData = lastMipEnd;
     } else {
-        tex->tlutOffset = 0;
+        tex->tlutData = NULL;
     }
 
     /* Step 9: Determine GX format for GXTexObj setup */
@@ -544,7 +543,7 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
     }
 
     /* Set up GXTlutObj if texture has a TLUT */
-    if (tex->tlutOffset != 0) {
+    if (tex->tlutData != NULL) {
         u32 palFmt;
         u32 tlutWrap;
 
@@ -564,13 +563,12 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
             default: break;
         }
 
-        fn_800BB050(tex->gxTlutObj, (void*)((u32)tex->data + tex->tlutOffset),
-                     tlutWrap);
+        fn_800BB050(tex->gxTlutObj, tex->tlutData, tlutWrap);
     }
 
     /* Set up GXTexObj */
     hasMips = (tex->mipLevels == 1) ? 0 : 1;
-    fn_800BA9E4(tex->gxTexObj, tex->data, tex->width, tex->height,
+    fn_800BA9E4(tex->gxTexObj, tex->mipData[0], tex->width, tex->height,
                 gxTexFmt, 0, 0, hasMips);
 
     tex->dirty = 1;
@@ -598,4 +596,3 @@ void GStextureLoad(void) {
 void GStextureInit(void) {
     /* TODO: match -- 0x70 bytes at 0x800EFFC0 */
 }
-

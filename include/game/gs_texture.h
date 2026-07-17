@@ -9,7 +9,8 @@
  * entry, no external callers under those names, and -- for several --
  * directly contradicted signatures/semantics at their real call sites).
  *
- * The GStextureHandle layout below is inferred from GStextureCreate.
+ * The GStextureHandle layout below is recovered from GStextureCreate,
+ * GStextureLockImage, and GStextureUnlockImage.
  *
  * Debug strings:
  *   "GStexture: invalid texture format"
@@ -86,12 +87,11 @@ typedef struct GStextureHandle {
     /* 0x20 */ u32    lodClamp;       /* LOD clamp / flag */
     /* 0x24 */ u16    memHandle;      /* GSmem handle for pixel data */
     /* 0x26 */ u16    pad26;
-    /* 0x28 */ void*  data;           /* pointer to pixel data (from GSmemGetPtr) */
-    /* 0x2C-0x48 */ u32 mipOffsets[8]; /* byte offset for each mip level */
-    /* 0x48 */ u32    tlutOffset;     /* byte offset of TLUT data */
+    /* 0x28 */ void*  mipData[8];     /* runtime pointer for each mip level */
+    /* 0x48 */ void*  tlutData;       /* runtime pointer to TLUT data */
     /* 0x4C */ u32    totalSize;      /* total texture data size (all mips) */
     /* 0x50 */ u16    refCount;       /* reference count / lock count */
-    /* 0x52 */ u16    pad52;
+    /* 0x52 */ u16    unk52;
     /* 0x54 */ u8     gxTexObj[0x20]; /* GXTexObj embedded struct */
     /* 0x74 */ u8     gxTlutObj[0x0C]; /* GXTlutObj embedded struct */
 } GStextureHandle;
@@ -129,7 +129,7 @@ GStextureHandle* GStextureCreate(u16 width, u16 height, u32 format,
  * cache and invalidate the GX texture cache.
  *
  * @param tex  Texture handle.
- * @return     The texture's refCount after decrementing (used by
+ * @return     The texture's refCount before decrementing (used by
  *             gs_render.c's `GXDrawDone(GStextureUnlockImage(image))`).
  */
 u32 GStextureUnlockImage(GStextureHandle* tex);

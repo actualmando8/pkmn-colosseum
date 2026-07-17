@@ -1,0 +1,56 @@
+{
+  "name": "GC6E01 compile-loop pilot",
+  "source_commit": "d9b908ee61b8214298c9c471ca04d43de4b54a3f",
+  "workunit_root": "build/permuter_workunits/win-fifty-20260716-next",
+  "targets": [
+    {
+      "function": "OSAllocFromArenaLo",
+      "workunit_root": "build/permuter_workunits/win-ship-994212e9",
+      "workunit_sha256": "e621c5feceb0242d884600adeab2e231f947fc978b9d897b9fc66448fce76114",
+      "class": "tiny-sdk-leaf",
+      "baseline_match_percent": 99.09091
+    },
+    {
+      "function": "fn_800B7D3C",
+      "workunit_sha256": "9706245c11fa3b0c7b70d7f81c49faec31e5769aa5c7e42d59c01b6ba2eaa710",
+      "class": "tiny-sdk-control",
+      "baseline_match_percent": 95.0
+    },
+    {
+      "function": "fn_8010BCE4",
+      "workunit_sha256": "f2b61ebac10566a605b5b3f0f2eaca59f653dfb21a5f8cdbaa09877ea28f1d7a",
+      "class": "small-game-control",
+      "baseline_match_percent": 95.441
+    },
+    {
+      "function": "fightTypeGetFightSideFightOutPokemonMax",
+      "workunit_sha256": "7c686fb1e66982e61df0d9fec553d17d99cb0d26d92e1372ca46e0c869b8be2f",
+      "class": "small-control",
+      "baseline_match_percent": 98.75
+    },
+    {
+      "function": "fn_80034708",
+      "workunit_sha256": "91f4610b787340f118ade73e4a38984b0c6b814a5810525003fcd11c114e95ed",
+      "class": "switch-pointer",
+      "baseline_match_percent": 95.455
+    },
+    {
+      "function": "HSD_MObjRemove",
+      "workunit_sha256": "1a0eb1f8ecca5c0cd610cbcb91f936f47ebee73fd90d6f9db7d9b9d9e713e8d8",
+      "class": "small-library",
+      "baseline_match_percent": 95.238
+    },
+    {
+      "function": "GSmaterialCreate",
+      "workunit_sha256": "6572448501c8bcf7ba35ad919648b70013da887e9508753df078fbb7e0f92971",
+      "class": "allocation-setup",
+      "baseline_match_percent": 97.386
+    },
+    {
+      "function": "fn_80116D30",
+      "workunit_sha256": "5a1b90badb3d3f138c71cb5220bb075650c5336f176af3538dac19154df30324",
+      "class": "medium-control",
+      "baseline_match_percent": 96.076
+    }
+  ]
+}
