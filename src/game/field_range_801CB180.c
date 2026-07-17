@@ -1712,6 +1712,35 @@ s32 memcardGetTaskResult(void)
     return lbl_8047B3D4->task_result;
 }
 
+void fn_801D055C(s32 task_kind, s32 card_work_size, s32 card_channel)
+{
+    if (lbl_8047B3D4->task_kind != 0) {
+        do {
+            _threadSwitch();
+        } while (memcardGetTaskResult() == 0);
+        fn_801D039C();
+    }
+
+    if (card_work_size == 0) {
+        card_work_size = 2;
+    }
+
+    lbl_8047B3D4->task_kind = task_kind;
+    lbl_8047B3D4->card_channel = card_channel;
+    lbl_8047B3D4->card_work_size = card_work_size;
+    lbl_8047B3D4->task_result = 0;
+    lbl_8047B3D4->state = 0;
+    lbl_8047B3D4->error_code = 0;
+    lbl_8047B3D4->dialog_result = 0;
+
+    fn_800E2C04(0x1E600, 0x20);
+    lbl_8047B3D4->work_buffer = fn_800E27B0();
+    fn_800E2C04(0xA000, 0x20);
+    lbl_8047B3D4->card_work_area = fn_800E27B0();
+    lbl_8047B3D4->gapp = GSgappCreate(1, 0x17, NULL, fn_801CDB04);
+    lbl_8047B3D4->savedata_status = savedataGetStatus(0, 0);
+}
+
 static inline void memcardStartTask(s32 task_kind, s32 card_work_size,
                                     s32 card_channel)
 {

@@ -50,7 +50,6 @@ extern void HSD_AObjInterpretAnim(HSD_AObj* aobj, void* obj,
 /* ------------------------------------------------------------------ */
 
 extern u8 lbl_8036D3F0[]; /* hsdTObj class info */
-extern u8 lbl_8036CC00[]; /* hsdObj  class info */
 
 extern char lbl_80275638[]; /* "sysdolphin_base_library" */
 extern char lbl_80275650[]; /* "hsd_tobj" */
@@ -70,7 +69,6 @@ extern const char lbl_8047DF10[8]; /* "tobj" */
 
 #define hsdTObjInfo HSD_TOBJ_INFO(lbl_8036D3F0)
 #define hsdTObjClass HSD_CLASS_INFO(lbl_8036D3F0)
-#define hsdObjClass HSD_CLASS_INFO(lbl_8036CC00)
 
 /* ------------------------------------------------------------------ */
 /*  File statics.  Named for their addresses so that the relocations   */
@@ -137,7 +135,8 @@ void fn_801BE85C(void* obj, u32 type, HSD_ObjData* val);
 #pragma optimization_level 0
 static void TObjInfoInit(void)
 {
-    hsdInitClassInfo(hsdTObjClass, hsdObjClass, lbl_80275638, lbl_80275650,
+    hsdInitClassInfo(hsdTObjClass, HSD_CLASS_INFO(&hsdObj),
+                     lbl_80275638, lbl_80275650,
                      sizeof(HSD_TObjInfo), sizeof(HSD_TObj));
 
     hsdTObjClass->init = (int (*)(HSD_Class*)) fn_801BBCE0;

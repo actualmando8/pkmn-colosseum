@@ -287,11 +287,10 @@ static void CObjAmnesia_Early(HSD_ClassInfo* info)
 void fn_80193C24(void)
 {
     extern HSD_CObjInfo lbl_8036C678;
-    extern HSD_ClassInfo lbl_8036CC00;
     extern char lbl_80274628[];
     extern char lbl_80274640[];
 
-    hsdInitClassInfo(HSD_CLASS_INFO(&lbl_8036C678), &lbl_8036CC00,
+    hsdInitClassInfo(HSD_CLASS_INFO(&lbl_8036C678), &hsdObj,
                      lbl_80274628, lbl_80274640, sizeof(HSD_CObjInfo),
                      sizeof(HSD_CObj));
     HSD_CLASS_INFO(&lbl_8036C678)->init =

@@ -45,7 +45,7 @@ typedef struct GSgfxState {
     /* 0x054 */ u32  frameDelta;     /* retraces elapsed since the prior frame */
     /* 0x058 */ u32  renderEnabled;  /* 1 = rendering pipeline active */
     /* 0x05C */ u8   vsyncFlag;
-    /* 0x05D-0x47D */ u8 pad[0x422];
+    /* 0x05D-0x47D */ u8 pad[0x421];
     /* 0x47E */ u8   gammaMode;
     /* 0x47F */ u8   pad_47F;
     /* 0x480 */ u32  field_480;

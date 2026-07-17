@@ -18,7 +18,7 @@ extern void  hsdInitClassInfo(void* info, void* parent, const char* library,
 /* Data / global symbols (DTK names). */
 extern void* lbl_8047B2E0;           /* free-list pool chain head (sbss) */
 extern u8    lbl_8036CBF0[];         /* data heap descriptor             */
-extern u8    lbl_8036CC00[];         /* data class info                  */
+extern u8    hsdObj[];               /* data class info                  */
 extern u8    lbl_8036C638[];         /* data parent class info           */
 extern u32   lbl_8036CC40[];         /* performance counters             */
 extern const char lbl_80274EC8[];    /* rodata string                    */
@@ -87,7 +87,7 @@ void HSD_ObjSetHeap(void* a, void* b)
  * (from backup hsd_pobj_disp.c) */
 void ObjInfoInit_801AA568(void)
 {
-    hsdInitClassInfo((void*) lbl_8036CC00,
+    hsdInitClassInfo(hsdObj,
                      (void*) lbl_8036C638, (char*) lbl_80274EC8,
                      (char*) &lbl_8047DCA0, 0x3c, 0x8);
 }

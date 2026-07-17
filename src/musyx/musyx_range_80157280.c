@@ -95,6 +95,7 @@ extern volatile const u16 lbl_80273448[];
 extern u8 lbl_8036944C[];
 extern u8 lbl_8036BF00[];
 extern u8 lbl_80434C50[];
+extern const f32 lbl_8047D4D0[2];
 extern volatile const f32 lbl_8047D4D8;
 extern f32 lbl_8047D4DC;
 extern f32 lbl_8047D4E0;
@@ -6971,6 +6972,35 @@ void salCrossProduct(f32* dst, const f32* a, const f32* b) {
     dst[0] = a[1] * b[2] - a[2] * b[1];
     dst[1] = a[2] * b[0] - a[0] * b[2];
     dst[2] = a[0] * b[1] - a[1] * b[0];
+}
+
+typedef struct SndFMatrix {
+    f32 m[3][3];
+    f32 t[3];
+} SndFMatrix;
+
+void salInvertMatrix(SndFMatrix* out, const SndFMatrix* in) {
+    f32 a;
+    f32 b;
+    f32 c;
+    f32 f;
+
+    a = in->m[1][1] * in->m[2][2] - in->m[2][1] * in->m[1][2];
+    b = -(in->m[1][0] * in->m[2][2] - in->m[2][0] * in->m[1][2]);
+    c = in->m[1][0] * in->m[2][1] - in->m[2][0] * in->m[1][1];
+    f = lbl_8047D4D0[0] / (in->m[0][0] * a + in->m[0][1] * b + in->m[0][2] * c);
+    out->m[0][0] = f * a;
+    out->m[1][0] = f * b;
+    out->m[2][0] = f * c;
+    out->m[0][1] = -f * (in->m[0][1] * in->m[2][2] - in->m[2][1] * in->m[0][2]);
+    out->m[1][1] = f * (in->m[0][0] * in->m[2][2] - in->m[2][0] * in->m[0][2]);
+    out->m[2][1] = -f * (in->m[0][0] * in->m[2][1] - in->m[2][0] * in->m[0][1]);
+    out->m[0][2] = f * (in->m[0][1] * in->m[1][2] - in->m[1][1] * in->m[0][2]);
+    out->m[1][2] = -f * (in->m[0][0] * in->m[1][2] - in->m[1][0] * in->m[0][2]);
+    out->m[2][2] = f * (in->m[0][0] * in->m[1][1] - in->m[1][0] * in->m[0][1]);
+    out->t[0] = (-in->t[0] * out->m[0][0] - in->t[1] * out->m[0][1]) - in->t[2] * out->m[0][2];
+    out->t[1] = (-in->t[0] * out->m[1][0] - in->t[1] * out->m[1][1]) - in->t[2] * out->m[1][2];
+    out->t[2] = (-in->t[0] * out->m[2][0] - in->t[1] * out->m[2][1]) - in->t[2] * out->m[2][2];
 }
 #pragma fp_contract reset
 

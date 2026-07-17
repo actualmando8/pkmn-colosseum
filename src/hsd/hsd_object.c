@@ -1,16 +1,11 @@
 /**
  * @file hsd_object.c
- * @brief HSD base object class initialization.
+ * @brief Model-bound transformation and visibility helpers.
  *
- * Colosseum address: part of HSD library section (0x80190E34+)
- * Adapted from doldecomp/melee src/sysdolphin/baselib/object.c
+ * Colosseum address: 0x80190E34 - 0x801914F4.
  */
 
-#include "hsd/hsd_object.h"
-#include "hsd/hsd_class.h"
-
-HSD_ClassInfo hsdObj = { ObjInfoInit };
-extern HSD_ClassInfo hsdClass;
+#include "dolphin/types.h"
 
 /* Internal bounding box structure used by fn_80191358 and fn_80191460-8019147C */
 typedef struct {
@@ -34,10 +29,13 @@ typedef struct {
     f32 corner1[3];   /* 0x1C */
 } HSD_ObjectTransformData;
 
-void ObjInfoInit(void)
-{
-    hsdInitClassInfo(&hsdObj, &hsdClass, "sysdolphin_base_library", "hsd_obj",
-                     sizeof(HSD_ObjInfo), sizeof(HSD_Obj));
+extern void GSvecCopy(void* dst, void* src);
+
+/* The inherited symbol name is incorrect: callsites pass a model bound and
+ * receive its vector at offset 0x28. The actual HSD ObjInfoInit is
+ * ObjInfoInit_801AA568, referenced by the class-info data at lbl_8036CC00. */
+void ObjInfoInit(HSD_BBox* bound, f32* out) {
+    GSvecCopy(out, bound->field28);
 }
 
 /* 0x80190E60 | 0x2B8 */
@@ -139,6 +137,7 @@ asm void fn_80191118(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma opt_common_subs off
 s32 fn_80191118(HSD_ObjectTransformData* data) {
     f32 corner0[3];
     f32 corner1[3];
@@ -149,6 +148,10 @@ s32 fn_80191118(HSD_ObjectTransformData* data) {
     f32 mtx_z[3][4];
     f32 mtx_y[3][4];
     f32 mtx[3][4];
+    f32 screen0x;
+    f32 screen0y;
+    f32 screen1x;
+    f32 screen1y;
     s32 result0;
     s32 result1;
 
@@ -173,31 +176,35 @@ s32 fn_80191118(HSD_ObjectTransformData* data) {
     if (result0 == 1 && result1 == 1) {
         return 0;
     }
-    if (screen0[0] < lbl_8047D8B8 && screen1[0] < lbl_8047D8B8) {
+    screen0x = screen0[0];
+    if (screen0x < lbl_8047D8B8 && screen1[0] < lbl_8047D8B8) {
         return 0;
     }
-    if (screen0[0] > lbl_8047D8BC && screen1[0] > lbl_8047D8BC) {
+    if (screen0x > lbl_8047D8BC && screen1[0] > lbl_8047D8BC) {
         return 0;
     }
-    if (screen0[1] < lbl_8047D8B8 && screen1[1] < lbl_8047D8B8) {
+    screen0y = screen0[1];
+    if (screen0y < lbl_8047D8B8 && screen1[1] < lbl_8047D8B8) {
         return 0;
     }
-    if (screen0[1] > lbl_8047D8C0 && screen1[1] > lbl_8047D8C0) {
+    if (screen0y > lbl_8047D8C0 && screen1[1] > lbl_8047D8C0) {
         return 0;
     }
     if (result0 == 1 || result1 == 1) {
         return 1;
     }
-    if (screen0[0] < lbl_8047D8B8 || screen1[0] < lbl_8047D8B8) {
+    if (screen0x < lbl_8047D8B8 ||
+        (screen1x = screen1[0]) < lbl_8047D8B8) {
         return 1;
     }
-    if (screen0[0] > lbl_8047D8BC || screen1[0] > lbl_8047D8BC) {
+    if (screen0x > lbl_8047D8BC || screen1x > lbl_8047D8BC) {
         return 1;
     }
-    if (screen0[1] < lbl_8047D8B8 || screen1[1] < lbl_8047D8B8) {
+    if (screen0y < lbl_8047D8B8 ||
+        (screen1y = screen1[1]) < lbl_8047D8B8) {
         return 1;
     }
-    if (screen0[1] > lbl_8047D8C0 || screen1[1] > lbl_8047D8C0) {
+    if (screen0y > lbl_8047D8C0 || screen1y > lbl_8047D8C0) {
         return 1;
     }
     return 2;

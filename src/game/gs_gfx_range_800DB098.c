@@ -519,6 +519,7 @@ void fn_800DB758(u16 vertCount)
     u32 state;
     u32 obj;
     u8* p;
+    u16* p16;
 
     state = lbl_8047AA80;
     if (*(s32*)(state + 0x488) == 7) {
@@ -564,11 +565,10 @@ void fn_800DB758(u16 vertCount)
     *p = (u8)(*p | *(u32*)(*(u32*)(obj + 0xC) + 4));
 
     state = lbl_8047AA80;
-    p = *(u8**)(state + 0x484);
-    *(u16*)p = vertCount;
-    p += 2;
+    p16 = *(u16**)(state + 0x484);
+    *p16++ = vertCount;
     state = lbl_8047AA80;
-    *(u32*)(state + 0x484) = (u32)p;
+    *(u32*)(state + 0x484) = (u32)p16;
 }
 #endif
 

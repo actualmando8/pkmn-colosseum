@@ -404,9 +404,9 @@ s32 fn_80053DD4(MenuCBPane* pane, MenuCBPane* sprite) {
     if (pokemon != NULL) {
         level = pokemonBiosGetLevel(pokemon);
         if ((s32)level < 100) {
-            textId = 2;
+            textId += 2;
         } else {
-            textId = 3;
+            textId += 3;
         }
         rect = GSmsgGetRect(0x1b82);
         fn_800FB680(sprite->width - (textId * 15) - (rect >> 16), 0, -1, 0x1b82);
@@ -729,6 +729,50 @@ s32 fn_80054AE0(MenuCBPane* pane, MenuCBPane* sprite) {
         winSpriteSetDisp(sprite, FALSE);
     }
     return 0;
+}
+#pragma pop
+
+#pragma push
+#pragma scheduling on
+#pragma peephole off
+s32 fn_80054B1C(s32 context, s32 mode) {
+    s32 result;
+    u32 args[2];
+
+    s32 windowGetActiveID(void);
+
+    args[0] = (u32)mode;
+    args[1] = (u32)context;
+    result = menuOpenCustom(0x9c, windowGetActiveID(), 0, 0, 1, 1, args);
+    menuClose(0x9c);
+    menuCloseSync(0x9c, 1);
+
+    switch (result) {
+    case 0:
+        switch (context) {
+        case 0:
+            return 0;
+        case 1:
+            return 1;
+        case 2:
+            return 2;
+        default:
+            return 0;
+        }
+    case 1:
+        return 3;
+    case 2:
+        if (mode != 0) {
+            return 5;
+        }
+        return 4;
+    case 3:
+        return 6;
+    case 4:
+        return 7;
+    default:
+        return 8;
+    }
 }
 #pragma pop
 

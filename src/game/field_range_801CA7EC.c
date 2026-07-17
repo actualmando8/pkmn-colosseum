@@ -93,10 +93,13 @@ u32 fn_801CA884(void)
 #pragma pop
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 s32 scriptAddPremium(s32 delta)
 {
-    s32 newVal = fn_801906A0(0xa9e) + delta;
+    s32 newVal;
+
+    newVal = fn_801906A0(0xa9e);
+    newVal += delta;
     _flagSet(0xa9e, newVal);
     return newVal;
 }
@@ -284,7 +287,7 @@ u32 fn_801CADA0(void)
 }
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 void* fn_801CADA8(u8 kind)
 {
     void* result = NULL;
@@ -380,7 +383,7 @@ u32 scriptGetPokemonNum(void)
 }
 
 #pragma push
-#pragma scheduling off
+#pragma peephole off
 u32 floorCharacterSetPos(u32 id, f32 x, f32 y, f32 z)
 {
     f32 pos[3];
