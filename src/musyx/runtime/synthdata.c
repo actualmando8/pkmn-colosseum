@@ -247,9 +247,9 @@ s32 dataRemoveLayer(u16 sid) {
 }
 
 s32 dataInsertCurve(u16 cid, void* curvedata) {
-    extern u8 lbl_80438CF8[];
+    extern DataTabT lbl_80438CF8[];
     extern u16 lbl_8047AFA8;
-#define tab ((DataTabT*)lbl_80438CF8)
+#define tab (lbl_80438CF8)
     s32 i, j;
 
     hwDisableIrq();

@@ -186,7 +186,7 @@ static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
     OSLoadContext(context);
 }
 
-static AlarmCallback* fn_8009A92C(AlarmCallback* head, AlarmCallback* blk) {
+static AlarmCallback* fn_8009A92C(AlarmCallback* head, AlarmCallback* blk, void* unused) {
     AlarmCallback* prev = 0;
     AlarmCallback* node = head;
 
@@ -299,7 +299,7 @@ void fn_8009AAD4(u32 idx, void* ptr) {
     }
     rec->unk8 = newHead;
 
-    rec->unk4 = (u32)fn_8009A92C((AlarmCallback*)rec->unk4, header);
+    rec->unk4 = (u32)fn_8009A92C((AlarmCallback*)rec->unk4, header, (void*)newHead);
 }
 
 u32 fn_8009AB50(u32 xfb) {
