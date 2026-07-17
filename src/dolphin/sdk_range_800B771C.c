@@ -9,7 +9,18 @@
  */
 #include "dolphin/types.h"
 
-extern u32* gx;
+typedef struct GXData_800B771C {
+    /* 0x000 */ u8 _000[0x14];
+    /* 0x014 */ u32 vcdLo;
+    /* 0x018 */ u32 vcdHi;
+    /* 0x01C */ u8 _01C[0x400];
+    /* 0x41C */ u8 hasNrms;
+    /* 0x41D */ u8 hasBiNrms;
+    /* 0x41E */ u8 _41E[0xD6];
+    /* 0x4F4 */ u32 dirtyState;
+} GXData_800B771C;
+
+extern volatile GXData_800B771C* const gx;
 extern void fn_800B771C(void);
 
 #define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
@@ -31,18 +42,15 @@ void fn_800B7BC4(void) {
 #pragma optimize_for_size on
 #pragma peephole off
 void fn_800B7D3C(void) {
-    volatile u32* gx32;
-    volatile u8* gx8;
+    u32 vcdLo;
 
-    gx32 = (u32*)gx;
-    gx8 = (u8*)gx;
-
-    gx32[0x5] = 0;
-    gx32[0x5] = (gx32[0x5] & 0xFFFFF9FF) | 0x200;
-    gx32[0x6] = 0;
-    gx8[0x41C] = 0;
-    gx8[0x41D] = 0;
-    gx32[0x4F4 >> 2] |= 8;
+    gx->vcdLo = 0;
+    vcdLo = *(volatile u32*)((u32)gx + 0x14);
+    gx->vcdLo = (vcdLo & 0xFFFFF9FF) | 0x200;
+    gx->vcdHi = 0;
+    gx->hasNrms = 0;
+    gx->hasBiNrms = 0;
+    gx->dirtyState |= 8;
 }
 #pragma peephole reset
 #pragma optimize_for_size reset
