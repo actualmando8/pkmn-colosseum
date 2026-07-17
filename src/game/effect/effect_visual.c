@@ -1568,13 +1568,14 @@ u16 filterStart(void* arg) {
     u16 i;
     u32 count;
     u8* p;
-    void* ptr = arg;
+    u8* ptr = (u8*)arg;
 
     if (ptr == NULL) {
         goto report_null;
     }
 
-    if (*(void**)((u8*)arg + 0x50) == NULL) {
+    arg = *(void**)((u8*)ptr + 0x50);
+    if (arg == NULL) {
         return 0;
     }
 
