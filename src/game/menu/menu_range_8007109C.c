@@ -7,6 +7,8 @@
  * All functions asm-only until matched.
  */
 #include "dolphin/types.h"
+#include "game/hero.h"
+#include "game/win_sprite.h"
 
 typedef struct MenuDVDFileInfo {
     u8 pad[0x34];
@@ -49,6 +51,11 @@ typedef struct ExDiscCouponResult {
     u16 itemId;
     u8 bag[0xC8];
 } ExDiscCouponResult;
+
+typedef struct MenuRankSprite {
+    u8 pad_00[6];
+    s16 id;
+} MenuRankSprite;
 
 #define GBA_BOOT_BSWAP(v)                                                    \
     ((((u32)(v) & 0xFF000000) >> 24) | (((u32)(v) & 0x00FF0000) >> 8)      \
@@ -3365,7 +3372,6 @@ void fn_80071318(u8* dst, u8* src) {
 /* fn_8007A5E8 (0x8007A5E8): draw the current coupon total. */
 void fn_8007A5E8(s32 unused, u8* window) {
     extern u32 lbl_8047A62C;
-    extern u32 heroGetStatus(void*, s32, s32);
     extern void msgctrlSetValue(s32, u32);
     extern u32 GSmsgGetRect(s32);
     extern void fn_800FB680(s32, s32, s32, s32);
@@ -3384,8 +3390,6 @@ void fn_8007A5E8(s32 unused, u8* window) {
 
 /* fn_8007A664 (0x8007A664): show the sprite selected by the current mode. */
 void fn_8007A664(s32 unused, u8* sprite) {
-    extern void winSpriteSetDisp(void* sprite, s32 visible);
-
     switch (lbl_8047A638) {
     case 4:
         if (*(s16*)(sprite + 6) == 0x10BF) {
@@ -3403,6 +3407,54 @@ void fn_8007A664(s32 unused, u8* sprite) {
         break;
     }
 }
+
+/* fn_8007A6F0 (0x8007A6F0): show the coupon-rank sprite. */
+#pragma push
+#pragma peephole off
+void fn_8007A6F0(s32 unused, MenuRankSprite* sprite) {
+    u32 value;
+    s32 rank;
+
+    if ((s32)lbl_8047A638 == 4) {
+        value = lbl_8047A628;
+    } else {
+        value = heroGetStatus(0, 0xE, 0);
+    }
+
+    for (rank = lbl_804788F0 - 1; rank >= 0; rank--) {
+        if (lbl_802E61D8[rank] <= value) {
+            break;
+        }
+    }
+    if (rank < 0) {
+        rank = 0;
+    }
+
+    winSpriteSetDisp(sprite, 0);
+    switch (rank) {
+    case 1:
+        if (sprite->id == 0x10C3) {
+            winSpriteSetDisp(sprite, 1);
+        }
+        break;
+    case 2:
+        if (sprite->id == 0x10C4) {
+            winSpriteSetDisp(sprite, 1);
+        }
+        break;
+    case 3:
+        if (sprite->id == 0x10C5) {
+            winSpriteSetDisp(sprite, 1);
+        }
+        break;
+    default:
+        if (sprite->id == 0x10C2) {
+            winSpriteSetDisp(sprite, 1);
+        }
+        break;
+    }
+}
+#pragma pop
 
 #pragma push
 #pragma scheduling off
