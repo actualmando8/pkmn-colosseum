@@ -401,6 +401,11 @@ void fn_800D377C(s32 mode) {
     }
 }
 
+extern s32 GSgfxVideoVsyncRate;
+s32 fn_800D37CC(void) {
+    return GSgfxVideoVsyncRate;
+}
+
 /* Initialise the GS graphics core and its default render state. */
 void GSgfxInit__FP15_GSgfxInitParms(u32 heapSize, u32 matrixSize,
                                     u32 projectionCount, u32 lightCount,
