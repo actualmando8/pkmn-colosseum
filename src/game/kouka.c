@@ -12,18 +12,10 @@
 #include "dolphin/types.h"
 #include "game/effect/effect_util_types.h"
 
-
 /* 0x80136078 | 0xC4 */
-#if 0
-asm void fn_80136078(void) {
-#include "src/game/effect/effect_util_fn_80136078.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-void fn_80136078(u32 index, void* arg1, void* arg2, s32* out) {
+void koukaExec(u32 index, void* arg1, void* arg2, s32* out) {
     u32 linkedIndex;
-    u32 sub;
+    u16 sub;
 
     if (out != NULL) {
         _koukaOneExec__FUlPvPvPl(index, arg1, arg2, out);
@@ -37,7 +29,7 @@ void fn_80136078(u32 index, void* arg1, void* arg2, s32* out) {
     }
 
     for (sub = 0; sub < 8; sub++) {
-        if ((koukaLinkDataBiosGetKouka(linkedIndex, sub & 0xFFFF) & 0xFFFF) != 0) {
+        if ((u16)koukaLinkDataBiosGetKouka(linkedIndex, sub) != 0) {
             if (out != NULL) {
                 _koukaOneExec__FUlPvPvPl(index, arg1, arg2, out + ((sub & 0xFFFF) + 1));
             } else {
@@ -46,8 +38,6 @@ void fn_80136078(u32 index, void* arg1, void* arg2, s32* out) {
         }
     }
 }
-#pragma pop
-#endif
 
 
 /* 0x8013613C | 0x22C */

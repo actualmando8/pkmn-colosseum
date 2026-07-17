@@ -8,8 +8,10 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+#include "crt/string.h"
 #include "dolphin/ai/AI.h"
 #include "dolphin/ar/AR.h"
+#include "dolphin/dvd/dvd.h"
 #include "dolphin/exi/EXI.h"
 #include "dolphin/os/OSAlarm.h"
 #include "dolphin/os/OSInterrupt.h"
@@ -2309,6 +2311,72 @@ s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback) {
                        EraseCallback_800C1D6C);
 }
 
+/*
+ * This range combines multiple CARD objects. Keep the file-lookup helpers
+ * before the directory accessor body so lookup retains the retail out-of-line
+ * call while later directory-update functions can inline the accessor.
+ */
+s32 fn_800B4270(CARDControl* card, CARDDirEntry* entry) {
+    if (entry->gameName[0] == 0xff) {
+        return -4;
+    }
+    if (card->diskId == lbl_803FC840 ||
+        (memcmp(entry->gameName, ((DVDDiskID*)card->diskId)->gameName, 4) == 0 &&
+         memcmp(entry->company, ((DVDDiskID*)card->diskId)->company, 2) == 0)) {
+        return 0;
+    }
+    return -10;
+}
+
+BOOL __CARDCompareFileName(CARDDirEntry* entry, const char* fileName) {
+    char* entryName = entry->fileName;
+    char entryChar;
+    char c;
+    s32 count = 32;
+
+    while (--count >= 0) {
+        entryChar = *entryName++;
+        c = *fileName++;
+        if (entryChar != c) {
+            return FALSE;
+        }
+        if (c == 0) {
+            return TRUE;
+        }
+    }
+    if (*fileName == 0) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void* __CARDGetDirBlock(CARDControl* card);
+s32 __CARDGetFileNo(CARDControl* card, const char* fileName, s32* pfileNo) {
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    s32 fileNo;
+    s32 result;
+
+    if (card->attached == 0) {
+        return -3;
+    }
+
+    dir = __CARDGetDirBlock(card);
+    for (fileNo = 0; fileNo < 127; fileNo++) {
+        entry = &dir[fileNo];
+        result = fn_800B4270(card, entry);
+        if (result < 0) {
+            continue;
+        }
+        if (__CARDCompareFileName(entry, fileName)) {
+            *pfileNo = fileNo;
+            return 0;
+        }
+    }
+
+    return -4;
+}
+
 void* __CARDGetDirBlock(CARDControl* card) {
     return card->dirBlock;
 }
@@ -2489,20 +2557,6 @@ s32 CARDUnmount(s32 chan) {
     return 0;
 }
 #pragma dont_inline off
-
-s32 fn_800B4270(CARDControl* card, CARDDirEntry* entry) {
-    extern s32 memcmp(const void* first, const void* second, u32 length);
-
-    if (entry->gameName[0] == 0xff) {
-        return -4;
-    }
-    if (card->diskId == lbl_803FC840 ||
-        (memcmp(entry->gameName, card->diskId, 4) == 0 &&
-         memcmp(entry->company, (u8*)card->diskId + 4, 2) == 0)) {
-        return 0;
-    }
-    return -10;
-}
 
 s32 CARDCancel(CARDFileInfo* fileInfo) {
     CARDFileInfo* file = fileInfo;
@@ -2735,28 +2789,6 @@ s32 CARDFreeBlocks(s32 chan, s32* byteNotUsed, s32* filesNotUsed) {
     }
 
     return __CARDPutControlBlock(card, 0);
-}
-
-BOOL __CARDCompareFileName(CARDDirEntry* entry, char* fileName) {
-    char* entryName = entry->fileName;
-    char entryChar;
-    char c;
-    s32 count = 32;
-
-    while (--count >= 0) {
-        entryChar = *entryName++;
-        c = *fileName++;
-        if (entryChar != c) {
-            return FALSE;
-        }
-        if (c == 0) {
-            return TRUE;
-        }
-    }
-    if (*fileName == 0) {
-        return TRUE;
-    }
-    return FALSE;
 }
 
 s32 fn_800B4308(CARDDirEntry* entry) {
