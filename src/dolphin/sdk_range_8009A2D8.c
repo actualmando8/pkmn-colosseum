@@ -333,10 +333,12 @@ void fn_8009AB60(AlarmCallback* arr, void* end, s32 count) {
 s32 fn_8009ABD0(u32 start, u32 end) {
     s32 i;
     AlarmCallback* arr = lbl_8047A6E8;
+    s32 count;
     u32 alignedStart = (start + 0x1F) & ~0x1F;
     u32 alignedEnd = end & ~0x1F;
 
-    for (i = 0; i < lbl_8047A6EC; arr++, i++) {
+    count = lbl_8047A6EC;
+    for (i = 0; i < count; arr++, i++) {
         if (arr->unk0 < 0) {
             AlarmCallback* blk = (AlarmCallback*)alignedStart;
 
