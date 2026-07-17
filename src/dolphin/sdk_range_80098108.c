@@ -31,6 +31,11 @@ typedef union EXIRegBlock {
     u32 words[15];
 } EXIRegBlock;
 
+typedef union OSSavedRegionAddress {
+    void* pointer;
+    u32 address;
+} OSSavedRegionAddress;
+
 typedef struct EXIQueueEntry {
     u32 device;
     void (*callback)(s32 chan, OSContext* context);
@@ -66,6 +71,8 @@ extern u32* BI2DebugFlag_8047A6A4;
 extern OSExceptionHandler* OSExceptionTable_8047A6C4;
 extern EXIControl lbl_803FB3C8[];
 extern DVDDriveInfo DriveInfo_803FB4A0;
+extern OSSavedRegionAddress __OSSavedRegionStart;
+extern OSSavedRegionAddress __OSSavedRegionEnd;
 
 #define AT_ADDRESS(addr) : addr
 #ifdef __MWERKS__
@@ -94,6 +101,7 @@ u32 fn_8009A23C(void);
 u32 OSGetConsoleType(void);
 void fn_80098110(s32 chan, EXIControl* exi);
 void* memmove(void* dst, const void* src, size_t n);
+void* memset(void* dst, int value, size_t n);
 
 #pragma push
 #pragma optimization_level 0
@@ -738,6 +746,49 @@ u32 OSGetConsoleType(void) {
     return BootInfo_8047A6A0->consoleType;
 }
 #pragma peephole reset
+
+extern u32 BOOT_REGION_START : 0x812FDFF0;
+extern u32 BOOT_REGION_END : 0x812FDFEC;
+
+#pragma push
+#pragma peephole off
+static void ClearArena(void) {
+    if (OSGetResetCode() != 0x80000000) {
+        __OSSavedRegionStart.address = 0;
+        __OSSavedRegionEnd.address = 0;
+        memset(OSGetArenaLo(), 0U, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+        return;
+    }
+
+    __OSSavedRegionStart.address = BOOT_REGION_START;
+    __OSSavedRegionEnd.address = BOOT_REGION_END;
+    if (BOOT_REGION_START == 0U) {
+        memset(OSGetArenaLo(), 0U, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+        return;
+    }
+
+    if ((u32)OSGetArenaLo() < __OSSavedRegionStart.address) {
+        if ((u32)OSGetArenaHi() <= __OSSavedRegionStart.address) {
+            memset(OSGetArenaLo(), 0U,
+                   (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+            return;
+        }
+
+        memset(OSGetArenaLo(), 0U,
+               __OSSavedRegionStart.address - (u32)OSGetArenaLo());
+
+        {
+            void* savedRegionEnd;
+
+            if ((u32)OSGetArenaHi() >
+                (u32)(savedRegionEnd = __OSSavedRegionEnd.pointer)) {
+                memset(savedRegionEnd, 0,
+                       (u32)OSGetArenaHi() - (u32)savedRegionEnd);
+            }
+        }
+    }
+}
+#pragma pop
 
 #pragma peephole off
 static void InquiryCallback(s32 result, DVDCommandBlock* block) {
