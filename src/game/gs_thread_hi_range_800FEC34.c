@@ -67,6 +67,9 @@ void fn_800FECB8(u32 callback) {
     for (i = lbl_8047ACC0; i > 0; i--) {
         if ((s32)resource->active == 3) {
             if ((u32)resource->callback == callback) {
+                if (resource->active) {
+                    goto found;
+                }
                 goto found;
             }
         }

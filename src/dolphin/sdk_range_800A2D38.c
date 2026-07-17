@@ -300,16 +300,19 @@ void C_MTXLightOrtho(Mtx m, f32 top, f32 bottom, f32 left, f32 right,
 {
     extern const f32 lbl_8047C298;
     f32 tmp;
+    f32 factor;
 
     tmp = lbl_8047C288 / (right - left);
-    m[0][0] = scaleS * (lbl_8047C298 * tmp);
+    factor = lbl_8047C298 * tmp;
+    m[0][0] = factor * scaleS;
     m[0][1] = lbl_8047C28C;
     m[0][2] = lbl_8047C28C;
     m[0][3] = -(right + left) * tmp * scaleS + transS;
 
     tmp = lbl_8047C288 / (top - bottom);
     m[1][0] = lbl_8047C28C;
-    m[1][1] = scaleT * (lbl_8047C298 * tmp);
+    factor = lbl_8047C298 * tmp;
+    m[1][1] = factor * scaleT;
     m[1][2] = lbl_8047C28C;
     m[1][3] = -(top + bottom) * tmp * scaleT + transT;
 
