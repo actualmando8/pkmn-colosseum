@@ -1190,7 +1190,7 @@ void testEvolution__Fv(void) {
     } GSpartyEvolutionArgs;
 
     u32 val1, val2;
-    GSpartyEvolutionArgs locals;
+    volatile GSpartyEvolutionArgs locals;
 
     val1 = heroGetStatus(NULL, 3, 0);
     if ((u8)pokemonCheckValid(val1) == 0) { return; }
@@ -1200,7 +1200,7 @@ void testEvolution__Fv(void) {
     fadeCheck(1);
     locals.left = 1;
     locals.right = 2;
-    evolutionOpen(val1, val2, 1, &locals.left, 2, locals.work);
+    evolutionOpen(val1, val2, 1, (u16*)&locals.left, 2, (u8*)locals.work);
     fadeSet(2, lbl_8047B6E8);
     fadeCheck(1);
 }
