@@ -245,6 +245,8 @@ extern u8 gamedataAttestBiosGetLangareaId(void* ptr);
 
 extern u32 pcboxGetStatus();
 
+extern u32 koukaLinkDataBiosGetKouka(u32 index, u32 sub);
+
 extern u32 koukaDataBiosGetLink(u32 index);
 
 extern u32 koukaDataBiosGetStatusKind(u32 index);

@@ -200,4 +200,6 @@ typedef struct GSFloorResHandler {
  * GSFloorResource / GSFloorResHandler.
  * =================================================================== */
 
+u32 fn_800FF560(void);
+
 #endif /* GS_FLOOR_H */

@@ -143,6 +143,8 @@ struct BattlePokemon;
 /* These are the 21 scene object indices cleaned up during fight end */
 #define BATTLE_SCENE_OBJ_COUNT  21
 
+extern const char lbl_80279BD8[];
+
 /* =========================================================================
  * Structures
  * ========================================================================= */

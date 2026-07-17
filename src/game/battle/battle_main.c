@@ -32,6 +32,8 @@
 #define battleCameraIsSimple battleCameraIsSimple_decl
 #include "game/battle/battle.h"
 #undef battleCameraIsSimple
+#include "game/gs_floor.h"
+#include "game/gs_thread.h"
 
 #pragma use_lmw_stmw on
 
@@ -45,12 +47,8 @@ extern void* memcpy(void* dst, const void* src, u32 size);
 
 /* OS / Engine */
 extern u8   fn_800FF548(void);                      /* check if floor is loaded */
-extern void* fn_800FF560(void);                     /* get parent thread */
 extern void fn_800FF56C(void);                      /* tick floor */
-extern void GSthreadTerminateGroup(void);                      /* stop particle system */
 extern void _threadSwitch(void);                      /* tick render */
-extern void* GSthreadCreate(s32 priority, void* parent, s32 stackSize,
-                          u8 usesFPU, void* entry, s32 arg); /* GSthread_Create */
 extern void fn_800D3088(void);                      /* GSgfx tick */
 extern void GSlogWrite(const char* fmt, ...);      /* GSlog_Print */
 
@@ -145,11 +143,10 @@ extern u32 lbl_80279B78[3]; /* function pointers for scene callbacks */
 /* =========================================================================
  * Implementation
  *
- * battle_FightStart (_fightInitialize__FUi14FloorEnterMode, 0x801EF4B0),
- * battle_FightEnd (_fightFinalize__FUi14FloorEnterMode, 0x801EF374),
- * battle_FightCleanup (fn_801EF488), battle_FightReset (fn_801EF5C0), and
- * battle_MainLoop (fn_801EFA08's outline) remain undecompiled; see the
- * file header for why the fictional bodies previously here were removed.
+ * battle_FightEnd (_fightFinalize__FUi14FloorEnterMode, 0x801EF374) is
+ * recovered below. battle_FightStart (_fightInitialize__FUi14FloorEnterMode,
+ * 0x801EF4B0) and battle_MainLoop (fn_801EFA08's outline) remain incomplete;
+ * see the file header for why the fictional bodies previously here were removed.
  * ========================================================================= */
 
 /* ===================================================================
@@ -193,7 +190,7 @@ u8 fn_801EF63C(void) {
 
 /* #######################################################################
  * COVERAGE STUBS: battle core / fight flow (0x801EF02C - 0x801F000C)
- * 20 functions remaining for full coverage of battle_main.c TU.
+ * 19 functions remaining for full coverage of battle_main.c TU.
  * ####################################################################### */
 
 
@@ -343,6 +340,41 @@ void fn_801EF2D4(void) {
             menuCloseCustom(objID, 0, 0);
         }
     }
+}
+
+/* 0x801EF374 | size: 0x114 */
+void _fightFinalize__FUi14FloorEnterMode(u32 floor, u32 enterMode) {
+    typedef struct BattleSceneIdList {
+        u32 ids[BATTLE_SCENE_OBJ_COUNT];
+    } BattleSceneIdList;
+    BattleSceneIdList ids;
+    u8 i;
+    s32 objID;
+    u32 soundID;
+
+    GSthreadTerminateGroup(fn_800FF560());
+    GSthreadTerminateGroup(fn_800FF560());
+
+    ids = *(const BattleSceneIdList*)lbl_80279B84;
+    for (i = 0; i < BATTLE_SCENE_OBJ_COUNT; i++) {
+        objID = ids.ids[i];
+        if (menuIsCheck(objID) == 1) {
+            menuCloseCustom(objID, 0, 0);
+        }
+    }
+
+    GSscene_SetMode(lbl_8047B5D4);
+    fn_801C31EC();
+    wazaSequenceSysRelease();
+
+    soundID = fightFloorGetStatus(0, 0, 0x12, 0);
+    if (soundID != 0) {
+        soundStop(soundID, 0);
+    }
+    fn_80165A20(1, 0, 0xFF);
+    dbgMenuSetEnable(lbl_8047B5D5);
+    lbl_8047B5DA = 0;
+    GSlogWrite(lbl_80279BD8);
 }
 
 /* 0x801EF488 | size: 0x28 | small */

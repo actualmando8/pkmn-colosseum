@@ -134,7 +134,7 @@ extern void  fn_801669E4(s32 handle, s32 fadeTime, s32 volume);
 extern void  heroMoveAddStepCallback(void* callback, s32 arg);
 
 /* Particle system */
-extern void* GSthreadTerminateGroup(void);                            /* stop particle system */
+extern void GSthreadTerminateGroup(u32 priority);          /* stop particle system */
 extern void* fn_80121E24(s32 effectID, f32 x, f32 y, f32 z); /* spawn particle effect */
 extern void  fn_80121F3C(void* particle);                  /* destroy particle */
 extern void  fn_80122048(void* particle, f32 x, f32 y, f32 z); /* set particle pos */
