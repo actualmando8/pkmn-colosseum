@@ -768,7 +768,8 @@ void psSetPointJObjNodup(void* renderObj, s32 index) {
     if (index != 0) {
         void* oldRenderObj;
 
-        slot = &lbl_80452DC8[index];
+        slot = lbl_80452DC8;
+        slot += index;
         oldRenderObj = *--slot;
         if (oldRenderObj != NULL) {
             fn_801A05EC(oldRenderObj);
@@ -797,7 +798,8 @@ void psSetPointJObj(s32 index, void* renderObj) {
     if (index != 0) {
         void* oldRenderObj;
 
-        slot = &lbl_80452DC8[index];
+        slot = lbl_80452DC8;
+        slot += index;
         oldRenderObj = *--slot;
         if (oldRenderObj == renderObj) {
             return;
