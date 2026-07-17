@@ -1,0 +1,20 @@
+{
+  "name": "GC6E01 semantic compile-loop pilot",
+  "source_commit": "d9b908ee61b8214298c9c471ca04d43de4b54a3f",
+  "workunit_root": "build/permuter_workunits/semantic-target-scan",
+  "targets": [
+    {
+      "function": "GStextureLockImage",
+      "workunit_sha256": "2a06c55318faf0eee489771c2611fdfda371617e1bb6705b12107f603497b179",
+      "class": "integer-pointer-leaf",
+      "baseline_match_percent": 91.0,
+      "semantic_oracle": {
+        "profile": "GStextureLockImage-v2",
+        "fixture_count": 64,
+        "seed": "0x6c6f7373",
+        "timeout": 120,
+        "mismatch_limit": 8
+      }
+    }
+  ]
+}

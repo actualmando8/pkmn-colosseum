@@ -37,3 +37,13 @@ public zeldaret/tww SDK reconstruction at this pinned snapshot:
 The relevant reference files are src/dolphin/mtx/mtx.c, mtxvec.c, vec.c, and
 quat.c. This records technical provenance for the exception; it does not widen
 the licensing statement above.
+
+Separately licensed semantic-oracle sidecar
+============================================
+
+Files under tools/decomp_work/semantic_oracle/gpl_sidecar are licensed under
+GPL-2.0-or-later as marked, rather than solely under the repository's MIT
+license. The executable built from those files links an external pinned
+ModernGekko/RecompCore dependency tree and may be subject to the aggregate
+GPLv3 terms documented by that upstream tree. It is not linked into the game
+build or the MIT Python tooling and is invoked only as a separate process.

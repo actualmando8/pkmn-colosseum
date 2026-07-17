@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "name": "ModernGekko",
+      "path": ".",
+      "repository": "https://github.com/ExpansionPak/ModernGekko.git",
+      "commit": "11237c119a5d8e907a20e9cae1c357df149aaa47"
+    },
+    {
+      "name": "RecompCore",
+      "path": "vendor/dolphin",
+      "repository": "https://github.com/ExpansionPak/RecompCore.git",
+      "commit": "1873066167f3d03b39771b547f280d2b970427b6",
+      "gitlink_parent": ".",
+      "gitlink_path": "vendor/dolphin"
+    },
+    {
+      "name": "DolRecomp",
+      "path": "vendor/dolphin/DolRecomp",
+      "repository": "https://github.com/ExpansionPak/DolRecomp.git",
+      "commit": "a2b02e5a515fc8971cc551ad51c9e26a9815daad",
+      "gitlink_parent": "vendor/dolphin",
+      "gitlink_path": "DolRecomp"
+    }
+  ]
+}
