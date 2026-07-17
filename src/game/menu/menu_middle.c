@@ -6990,15 +6990,17 @@ void fn_8006FE64(void* menu) {
     KeyInfo_8006BB34* keyInfo;
     s32 state;
     s32 flag;
+    int stateIndex;
     u32 value;
 
     state = MENU_MIDDLE_U8_0095(menu)->unk_0095;
     state = (s8)state;
     if (state < 6) {
+        stateIndex = state;
         keyInfo = windowGetKeyInfo();
         flag = keyInfo->flags4 & 0x10;
         if (flag != 0) {
-            value = fn_8006B3C8(state);
+            value = fn_8006B3C8(stateIndex);
             if ((u8)value == 0) {
                 fn_80166A28(0x26);
                 return;
