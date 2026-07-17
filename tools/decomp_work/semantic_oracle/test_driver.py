@@ -465,6 +465,124 @@ class SidecarTests(unittest.TestCase):
                     expected_sha256=original_sha256,
                 )
 
+    def test_native_qualification_mismatch_aborts_before_candidate_and_report(self) -> None:
+        fixture_count = 1
+        seed = 0x1234
+        profile = driver.resolve_profile(driver.DEFAULT_PROFILE)
+        fixtures = driver.generate_profile_fixtures(profile, fixture_count, seed)
+        provenance = driver.manifest_provenance(driver.load_pins())
+        pin_report = {
+            "components": [
+                {"name": name, "commit": commit}
+                for name, commit in provenance.items()
+            ]
+        }
+
+        with tempfile.TemporaryDirectory() as temporary_value:
+            temporary = Path(temporary_value)
+            sidecar = make_fake_sidecar(temporary / "dolphin-sidecar")
+            native_sidecar = write_executable(
+                temporary / "native-sidecar", "#!/bin/sh\nexit 0\n"
+            )
+            native_manifest = temporary / "native-manifest.json"
+            native_manifest.write_text("{}\n", encoding="utf-8")
+
+            reference_request = driver.build_request(b"\x00\x00\x00\x00", fixtures, profile)
+            reference_result = driver.invoke_sidecar(
+                sidecar,
+                request=reference_request,
+                request_file=temporary / "setup.request.json",
+                result_file=temporary / "setup.result.json",
+                timeout=10,
+            )
+            native_result = copy.deepcopy(reference_result)
+            native_result["engine"] = driver.NATIVE_EXPECTED_ENGINE
+            native_result["generated_tree_sha256"] = driver.NATIVE_GENERATED_TREE_SHA256
+            native_r3 = native_result["results"][0]["final"]["gpr"]["3"]
+            native_result["results"][0]["final"]["gpr"]["3"] = driver.hex32(
+                int(native_r3, 0) ^ 1
+            )
+
+            reference_request_file = temporary / "run" / "reference.request.json"
+            reference_result_file = temporary / "run" / "reference.result.json"
+            candidate_request_file = temporary / "run" / "candidate.request.json"
+            candidate_result_file = temporary / "run" / "candidate.result.json"
+            report_file = temporary / "semantic-report.json"
+            attestation = {"post_state_sha256": "a" * 64}
+
+            with (
+                mock.patch.object(driver, "TRANSIENT_ROOT", temporary / "transient"),
+                mock.patch.object(
+                    driver, "verify_checkout_pins", return_value=pin_report
+                ),
+                mock.patch.object(
+                    driver,
+                    "verify_sidecar_attestation",
+                    return_value=(attestation, "b" * 64),
+                ),
+                mock.patch.object(driver, "verify_native_generation_manifest"),
+                mock.patch.object(
+                    driver,
+                    "verify_native_attestation",
+                    return_value=(attestation, "c" * 64),
+                ),
+                mock.patch.object(
+                    driver,
+                    "extract_text",
+                    side_effect=[b"\x00\x00\x00\x00", b"\x01\x00\x00\x00"],
+                ),
+                mock.patch.object(
+                    driver, "verify_reference_authority", return_value={"verified": True}
+                ),
+                mock.patch.object(
+                    driver,
+                    "invoke_sidecar",
+                    side_effect=[reference_result, native_result],
+                ) as invoke_sidecar,
+                mock.patch("builtins.print") as print_output,
+            ):
+                status = driver.main(
+                    [
+                        "run",
+                        "--checkout",
+                        str(temporary / "checkout"),
+                        "--sidecar",
+                        str(sidecar),
+                        "--native-sidecar",
+                        str(native_sidecar),
+                        "--native-manifest",
+                        str(native_manifest),
+                        "--reference-elf",
+                        str(temporary / "reference.o"),
+                        "--candidate-elf",
+                        str(temporary / "candidate.o"),
+                        "--fixture-count",
+                        str(fixture_count),
+                        "--seed",
+                        hex(seed),
+                        "--reference-request-file",
+                        str(reference_request_file),
+                        "--reference-result-file",
+                        str(reference_result_file),
+                        "--candidate-request-file",
+                        str(candidate_request_file),
+                        "--candidate-result-file",
+                        str(candidate_result_file),
+                        "--report-file",
+                        str(report_file),
+                    ]
+                )
+
+            self.assertEqual(status, 2)
+            self.assertEqual(invoke_sidecar.call_count, 2)
+            self.assertIn(
+                "native ModernGekko qualification disagreed with Dolphin",
+                str(print_output.call_args),
+            )
+            self.assertFalse(candidate_request_file.exists())
+            self.assertFalse(candidate_result_file.exists())
+            self.assertFalse(report_file.exists())
+
     def test_build_attestation_binds_binary_inputs_and_clean_pins(self) -> None:
         pin_report = {
             "manifest_sha256": "a" * 64,

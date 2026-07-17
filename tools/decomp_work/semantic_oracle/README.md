@@ -98,7 +98,10 @@ register/RAM setup and watches. The comparison contract is:
 The completed native qualification replay passed all 1,000 balanced
 `GStextureLockImage-v2` fixtures with zero native-vs-Dolphin mismatches, then
 rejected the known wrong candidate with 132 observable mismatches over 64
-fixtures. `msgctrlWait-v1` also passed its ten named boundary fixtures.
+fixtures. A fresh 1,000-fixture `msgctrlWait-v1` replay also returned zero
+native-vs-Dolphin and zero authoritative-candidate mismatches. Its deterministic
+corpus SHA-256 is
+`690b1b4851d861bd4d8503d5f18e0b3bff147d4d42320722ae38933a23c09350`.
 
 Digest mismatches include the first bounded before/after RAM change from each
 run. The sidecar also limits its diagnostic change list to 32 spans and 512

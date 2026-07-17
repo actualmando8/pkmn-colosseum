@@ -65,10 +65,11 @@ generated 157 files with combined SHA-256
 `438b92e6109ac5263860dcbcee24152148c139a34c60bf17933b4253b7309048`,
 then rehashed the complete generated tree at final attestation and compiled only
 the two reviewed full-DOL chunks. Native-original and Dolphin-original agreed on
-all 1,000 `GStextureLockImage-v2` fixtures and all ten named `msgctrlWait-v1`
-boundary fixtures. A known wrong texture candidate still produced 132
+all 1,000 deterministic fixtures for both `GStextureLockImage-v2` and
+`msgctrlWait-v1`. A known wrong texture candidate still produced 132
 candidate-vs-reference mismatches over 64 fixtures while native qualification
-remained at zero.
+remained at zero. The 1,000-fixture `msgctrlWait-v1` corpus SHA-256 is
+`690b1b4851d861bd4d8503d5f18e0b3bff147d4d42320722ae38933a23c09350`.
 
 ## Semantic-feedback model probe
 

@@ -803,6 +803,21 @@ class CompileLoopTests(unittest.TestCase):
             self.assertEqual(result["rounds_completed"], 2)
             self.assertEqual(result["best_match_percent"], 95.0)
             self.assertFalse(result["exact"])
+            self.assertFalse(result["isolated_objdiff_exact"])
+            self.assertFalse(result["campaign_bankable"])
+            self.assertEqual(
+                result["campaign_acceptance_status"],
+                "not-isolated-objdiff-exact",
+            )
+            self.assertEqual(
+                result["full_dol_validation"],
+                {
+                    "performed": False,
+                    "passed": None,
+                    "artifact": "build/GC6E01/main.dol",
+                    "sha1_authority": "config/GC6E01/build.sha1",
+                },
+            )
             self.assertFalse(result["rounds"][0]["semantic_equal"])
             self.assertEqual(len(outbound_messages), 2)
             self.assertIn(
@@ -819,6 +834,67 @@ class CompileLoopTests(unittest.TestCase):
                 best_candidate="int target(int x) { return x + 1; }",
             )
             self.assertIn("diagnostic only", prompt)
+
+    def test_semantic_pass_objdiff_exact_stops_but_is_not_bankable(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_value:
+            root = Path(temporary_value)
+            unit = self.make_workunit(root / "source")
+            config = self.make_semantic_config(root / "semantic", function="target")
+            reply = compile_loop.ApiReply(
+                assistant={
+                    "role": "assistant",
+                    "content": "```c\nint target(int x) { return x + 1; }\n```",
+                },
+                served_model="test-model",
+                usage={},
+                elapsed_seconds=0.1,
+                finish_reason="stop",
+            )
+            scores = [
+                compile_loop.CompileScore(
+                    True, 90.0, 4, "baseline", semantic=self.semantic_score()
+                ),
+                compile_loop.CompileScore(
+                    True, 100.0, 4, "exact", semantic=self.semantic_score()
+                ),
+            ]
+            with (
+                mock.patch.object(compile_loop, "target_assembly", return_value="blr"),
+                mock.patch.object(
+                    compile_loop, "call_openai_compatible", return_value=reply
+                ) as api,
+                mock.patch.object(compile_loop, "compile_and_score", side_effect=scores),
+            ):
+                result = compile_loop.run_target(
+                    source_workunit=unit,
+                    run_directory=root / "run",
+                    function="target",
+                    provider="moonshot",
+                    model="kimi-k3",
+                    rounds=3,
+                    max_tokens=100,
+                    timeout=10,
+                    key_file=root / "unused-key",
+                    key_label=None,
+                    source_commit="a" * 40,
+                    runner_commit="b" * 40,
+                    expected_baseline=90.0,
+                    expected_workunit_sha256=compile_loop.workunit_sha256(unit),
+                    allow_reasoning_salvage=False,
+                    semantic_config=config,
+                )
+            self.assertEqual(result["rounds_completed"], 1)
+            self.assertEqual(result["best_match_percent"], 100.0)
+            self.assertTrue(result["isolated_objdiff_exact"])
+            self.assertTrue(result["exact"])
+            self.assertFalse(result["campaign_bankable"])
+            self.assertEqual(
+                result["campaign_acceptance_status"],
+                "requires-source-integration-and-full-dol-validation",
+            )
+            self.assertFalse(result["full_dol_validation"]["performed"])
+            self.assertIsNone(result["full_dol_validation"]["passed"])
+            api.assert_called_once()
 
     def test_semantic_infrastructure_failure_aborts_target(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_value:

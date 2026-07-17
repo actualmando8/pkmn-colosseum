@@ -58,6 +58,8 @@ SEMANTIC_PROFILE_AUTHORITIES = {
 SEMANTIC_MAX_TEXT_SIZE = 4096
 SEMANTIC_MAX_REPORT_SIZE = 8 * 1024 * 1024
 SOURCE_BASELINE_PATHS = ("src", "include", "config", "configure.py")
+FULL_DOL_ARTIFACT = "build/GC6E01/main.dol"
+FULL_DOL_SHA1_AUTHORITY = "config/GC6E01/build.sha1"
 WORKUNIT_FINGERPRINT_FILES = (
     "base.c",
     "compile.sh",
@@ -1831,6 +1833,7 @@ def run_target(
 
     if not (run_directory / "best_function.c").exists():
         write_private_text(run_directory / "best_function.c", best_candidate)
+    isolated_objdiff_exact = best_percent >= 100.0
     return {
         "function": function,
         "provider": provider,
@@ -1876,7 +1879,22 @@ def run_target(
         ),
         "best_match_percent": round(best_percent, 6),
         "improvement_points": round(best_percent - baseline.match_percent, 6),
-        "exact": best_percent >= 100.0,
+        "isolated_objdiff_exact": isolated_objdiff_exact,
+        # Compatibility alias for benchmark consumers written before campaign
+        # acceptance was made explicit. This is never a full-DOL claim.
+        "exact": isolated_objdiff_exact,
+        "campaign_bankable": False,
+        "campaign_acceptance_status": (
+            "requires-source-integration-and-full-dol-validation"
+            if isolated_objdiff_exact
+            else "not-isolated-objdiff-exact"
+        ),
+        "full_dol_validation": {
+            "performed": False,
+            "passed": None,
+            "artifact": FULL_DOL_ARTIFACT,
+            "sha1_authority": FULL_DOL_SHA1_AUTHORITY,
+        },
         "reasoning_salvage_best_match_percent": (
             round(salvage_best_percent, 6) if salvage_best_percent is not None else None
         ),
@@ -2137,7 +2155,12 @@ def command_run(args: argparse.Namespace) -> int:
             for result in results
         ),
         "reasoning_salvage_exact": sum(result["reasoning_salvage_exact"] for result in results),
-        "exact": sum(result["exact"] for result in results),
+        "isolated_objdiff_exact": sum(
+            result["isolated_objdiff_exact"] for result in results
+        ),
+        # Compatibility alias; see the per-target acceptance fields.
+        "exact": sum(result["isolated_objdiff_exact"] for result in results),
+        "campaign_bankable": sum(result["campaign_bankable"] for result in results),
         "mean_baseline_match_percent": round(
             sum(result["baseline_match_percent"] for result in results) / len(results), 6
         ),

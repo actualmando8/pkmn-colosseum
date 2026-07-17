@@ -100,12 +100,13 @@ python3 tools/decomp_work/benchmark/compile_loop.py run \
 ```
 
 The benchmark condition uses 64 balanced deterministic fixtures per round for
-latency. The standalone oracle defaults to 1,000 fixtures for the acceptance
+latency. The standalone oracle defaults to 1,000 fixtures for the behavioral
 gate. Behavioral pass/fail is persisted and included in prompts as a separate,
 bounded diagnostic channel. It never changes the objdiff percentage, incumbent
-ranking, exact flag, or normal termination; an objdiff-exact/semantic-fail
-combination is treated as a harness invariant failure. Any exact isolated lead
-still requires the normal full-DOL validation below.
+ranking, isolated-exact flag, or normal termination; an
+objdiff-exact/semantic-fail combination is treated as a harness invariant
+failure. Any exact isolated lead still requires the normal full-DOL validation
+below.
 
 The run configuration fingerprints both binaries, both build attestations, and
 the native generated-source manifest before model work starts. Those exact
@@ -115,11 +116,15 @@ report, and authoritative DOL slice. The driver snapshots both binaries per
 comparison and refuses candidate feedback unless native-original equals the
 Dolphin original.
 
-The current summary retains exact matches, compile-at-1, best match lift,
-tokens, API latency, rounds, served model ID, and failure status. Full link,
-full-build regression, and calculated cost are acceptance/future-protocol
-metrics, not claims made automatically by this runner. A failed target aborts
-the fixed-policy run without retry and is recorded atomically in
+The current result schema calls this `isolated_objdiff_exact`; `exact` remains
+only as a compatibility alias. Every model result records
+`campaign_bankable: false`, a pending/not-eligible acceptance status, and an
+unperformed full-DOL validation record pointing at
+`build/GC6E01/main.dol` and `config/GC6E01/build.sha1`. The runner never edits
+the source tree, so it cannot turn a scratch candidate into campaign progress.
+The summary retains isolated exact matches, compile-at-1, best match lift,
+tokens, API latency, rounds, served model ID, and failure status. A failed
+target aborts the fixed-policy run without retry and is recorded atomically in
 `run_status.json`.
 
 `--timeout` is a socket timeout plus an approximate wall budget checked between
