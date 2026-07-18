@@ -126,10 +126,7 @@ game/data/rodata_8026860C.c:
 	.rodata     start:0x8026860C end:0x8026F610
 
 game/data/rodata_8026F640.c:
-	.rodata     start:0x8026F640 end:0x8026FB80
-
-game/data/rodata_8026FB94.c:
-	.rodata     start:0x8026FB94 end:0x8026FC98
+	.rodata     start:0x8026F640 end:0x8026F688
 
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
@@ -384,8 +381,47 @@ game/menu/menu_middle_range_80069C0C.c:
 game/menu/menu_middle_exact_8006A65C.c:
 	.text       start:0x8006A65C end:0x8006A824
 
-game/menu/menu_middle_range_8006A824.c:
-	.text       start:0x8006A824 end:0x8007109C
+game/menu/menu_middle_exact_8006A824.c:
+	.text       start:0x8006A824 end:0x8006A990
+
+game/menu/menu_middle_range_8006A990.c:
+	.text       start:0x8006A990 end:0x8006AC28
+
+game/menu/menu_middle_exact_8006AC28.c:
+	.text       start:0x8006AC28 end:0x8006ACCC
+
+game/menu/menu_middle_range_8006ACCC.c:
+	.text       start:0x8006ACCC end:0x8006ADB4
+
+game/menu/menu_middle_exact_8006ADB4.c:
+	.text       start:0x8006ADB4 end:0x8006AE18
+
+game/menu/menu_middle_range_8006AE18.c:
+	.text       start:0x8006AE18 end:0x8006AEEC
+
+game/menu/menu_middle_exact_8006AEEC.c:
+	.text       start:0x8006AEEC end:0x8006AF44
+
+game/menu/menu_middle_range_8006AF44.c:
+	.text       start:0x8006AF44 end:0x8006AFC4
+
+game/menu/menu_middle_exact_8006AFC4.c:
+	.text       start:0x8006AFC4 end:0x8006AFE4
+
+game/menu/menu_middle_range_8006AFE4.c:
+	.text       start:0x8006AFE4 end:0x8006B09C
+
+game/menu/menu_middle_exact_8006B09C.c:
+	.text       start:0x8006B09C end:0x8006B154
+
+game/menu/menu_middle_range_8006B154.c:
+	.text       start:0x8006B154 end:0x8006B1C0
+
+game/menu/menu_middle_exact_8006B1C0.c:
+	.text       start:0x8006B1C0 end:0x8006B2A4
+
+game/menu/menu_middle_range_8006B2A4.c:
+	.text       start:0x8006B2A4 end:0x8007109C
 
 game/menu/menu_range_8007109C.c:
 	.text       start:0x8007109C end:0x8007C260
@@ -731,10 +767,14 @@ trk/TRKTerminateSerialHandler.c:
 	.text       start:0x800BF080 end:0x800BF088
 
 trk/TRKSerial_range_800BF088.c:
-	.text       start:0x800BF088 end:0x800BF14C
+	.text       start:0x800BF088 end:0x800BF338
+	.rodata     start:0x8026F688 end:0x8026F811
 
-trk/TRKSerial.c:
-	.text       start:0x800BF14C end:0x800BF338
+game/data/rodata_8026F818.c:
+	.rodata     start:0x8026F818 end:0x8026FB80
+
+game/data/rodata_8026FB94.c:
+	.rodata     start:0x8026FB94 end:0x8026FC98
 
 trk/usr_put_initialize.c:
 	.text       start:0x800BF338 end:0x800BF33C
@@ -1521,10 +1561,7 @@ game/data/data_80379BF4.c:
 	.data       start:0x80379BF4 end:0x8038FF64
 
 game/data/data_8038FFFC.c:
-	.data       start:0x8038FFFC end:0x8039A690
-
-game/data/data_8039A6A8.c:
-	.data       start:0x8039A6A8 end:0x8039A6C8
+	.data       start:0x8038FFFC end:0x8039A028
 
 game/gamedata.c:
 	.text       start:0x8013528C end:0x80135A30
@@ -2043,6 +2080,13 @@ game/fight_range_exact_80217018.c:
 
 game/fight_range_80217D34.c:
 	.text       start:0x80217D34 end:0x80217E20
+	.data       start:0x8039A028 end:0x8039A048
+
+game/data/data_8039A048.c:
+	.data       start:0x8039A048 end:0x8039A690
+
+game/data/data_8039A6A8.c:
+	.data       start:0x8039A6A8 end:0x8039A6C8
 
 game/fight_range_exact_80217E20.c:
 	.text       start:0x80217E20 end:0x80218BD4
