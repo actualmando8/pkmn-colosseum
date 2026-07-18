@@ -364,7 +364,13 @@ game/menu/menuCB_range_exact_80069048.c:
 	.text       start:0x80069048 end:0x8006905C
 
 game/menu/menuCB_range_8006905C.c:
-	.text       start:0x8006905C end:0x80069A08
+	.text       start:0x8006905C end:0x800697C4
+
+game/menu/menuCB_range_exact_800697C4.c:
+	.text       start:0x800697C4 end:0x800697F4
+
+game/menu/menuCB_range_800697F4.c:
+	.text       start:0x800697F4 end:0x80069A08
 
 game/menu/menuCB_range_exact_80069A08.c:
 	.text       start:0x80069A08 end:0x80069A60
@@ -372,8 +378,14 @@ game/menu/menuCB_range_exact_80069A08.c:
 game/menu/menuCB_Battle.c:
 	.text       start:0x80069A60 end:0x80069C0C
 
-game/menu/menu_middle.c:
-	.text       start:0x80069C0C end:0x8007109C
+game/menu/menu_middle_range_80069C0C.c:
+	.text       start:0x80069C0C end:0x8006A65C
+
+game/menu/menu_middle_exact_8006A65C.c:
+	.text       start:0x8006A65C end:0x8006A824
+
+game/menu/menu_middle_range_8006A824.c:
+	.text       start:0x8006A824 end:0x8007109C
 
 game/menu/menu_range_8007109C.c:
 	.text       start:0x8007109C end:0x8007C260
@@ -608,52 +620,7 @@ game/data/data_80313D9C.c:
 	.data       start:0x80313D9C end:0x80313F44
 
 game/data/data_80313F48.c:
-	.data       start:0x80313F48 end:0x8031434C
-
-game/data/data_80314350.c:
-	.data       start:0x80314350 end:0x803152B8
-
-game/data/data_803152B8.c:
-	.data       start:0x803152B8 end:0x80315320
-
-game/data/data_80315320.c:
-	.data       start:0x80315320 end:0x80315384
-
-game/data/data_80315388.c:
-	.data       start:0x80315388 end:0x80315678
-
-game/data/data_80315690.c:
-	.data       start:0x80315690 end:0x8035B060
-
-game/data/data_8035B088.c:
-	.data       start:0x8035B088 end:0x8035B3F0
-
-game/data/data_8035B400.c:
-	.data       start:0x8035B400 end:0x8035B448
-
-game/data/data_8035B468.c:
-	.data       start:0x8035B468 end:0x8035B4FC
-
-game/data/data_8035B500.c:
-	.data       start:0x8035B500 end:0x8035B878
-
-game/data/data_8035B8A0.c:
-	.data       start:0x8035B8A0 end:0x8035B8B4
-
-game/data/data_8035B904.c:
-	.data       start:0x8035B904 end:0x8035B950
-
-game/data/data_8035B96C.c:
-	.data       start:0x8035B96C end:0x8035B988
-
-game/data/data_8035B9F8.c:
-	.data       start:0x8035B9F8 end:0x8035BA10
-
-game/data/data_8035BA48.c:
-	.data       start:0x8035BA48 end:0x8035BA60
-
-game/data/data_8035BB50.c:
-	.data       start:0x8035BB50 end:0x8035E028
+	.data       start:0x80313F48 end:0x80314060
 
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
@@ -934,16 +901,21 @@ crt/math_ieee754_atan2.c:
 	.sdata2     start:0x8047C528 end:0x8047C580
 
 crt/sdata2_math_8047C580.c:
-	.sdata2     start:0x8047C580 end:0x8047C828
+	.sdata2     start:0x8047C580 end:0x8047C7E0
 
 crt/math_range_800CB2B4.c:
-	.text       start:0x800CB2B4 end:0x800CC754
+	.text       start:0x800CB2B4 end:0x800CC660
+
+crt/math_kernel_cos.c:
+	.text       start:0x800CC660 end:0x800CC754
+	.sdata2     start:0x8047C7E0 end:0x8047C828
 
 crt/math_kernel_rem_pio2.c:
 	.text       start:0x800CC754 end:0x800CD5A8
 	.sdata2     start:0x8047C828 end:0x8047C868
 
-crt/sdata2_math_suffix_8047C868.c:
+crt/math_kernel_sin.c:
+	.text       start:0x800CD5A8 end:0x800CD648
 	.sdata2     start:0x8047C868 end:0x8047C8A0
 
 crt/sdata2_math_8047C8A0.c:
@@ -976,8 +948,14 @@ game/data/sdata2_8047CF98.c:
 game/data/sdata2_8047D098.c:
 	.sdata2     start:0x8047D098 end:0x8047D108
 
-crt/math_range_800CD5A8.c:
-	.text       start:0x800CD5A8 end:0x800CE04C
+crt/math_range_800CD648.c:
+	.text       start:0x800CD648 end:0x800CDBB8
+
+crt/math_copysign.c:
+	.text       start:0x800CDBB8 end:0x800CDBE0
+
+crt/math_range_800CDBE0.c:
+	.text       start:0x800CDBE0 end:0x800CE04C
 
 crt/math_exact_800CE04C.c:
 	.text       start:0x800CE04C end:0x800CE378
@@ -1036,6 +1014,55 @@ dolphin/si/SI_fn_800D0F44.c:
 
 dolphin/si/SI_range_800D0F68.c:
 	.text       start:0x800D0F68 end:0x800D104C
+	.data       start:0x80314060 end:0x803140F3
+
+game/data/data_803140F8.c:
+	.data       start:0x803140F8 end:0x8031434C
+
+game/data/data_80314350.c:
+	.data       start:0x80314350 end:0x803152B8
+
+game/data/data_803152B8.c:
+	.data       start:0x803152B8 end:0x80315320
+
+game/data/data_80315320.c:
+	.data       start:0x80315320 end:0x80315384
+
+game/data/data_80315388.c:
+	.data       start:0x80315388 end:0x80315678
+
+game/data/data_80315690.c:
+	.data       start:0x80315690 end:0x8035B060
+
+game/data/data_8035B088.c:
+	.data       start:0x8035B088 end:0x8035B3F0
+
+game/data/data_8035B400.c:
+	.data       start:0x8035B400 end:0x8035B448
+
+game/data/data_8035B468.c:
+	.data       start:0x8035B468 end:0x8035B4FC
+
+game/data/data_8035B500.c:
+	.data       start:0x8035B500 end:0x8035B878
+
+game/data/data_8035B8A0.c:
+	.data       start:0x8035B8A0 end:0x8035B8B4
+
+game/data/data_8035B904.c:
+	.data       start:0x8035B904 end:0x8035B950
+
+game/data/data_8035B96C.c:
+	.data       start:0x8035B96C end:0x8035B988
+
+game/data/data_8035B9F8.c:
+	.data       start:0x8035B9F8 end:0x8035BA10
+
+game/data/data_8035BA48.c:
+	.data       start:0x8035BA48 end:0x8035BA60
+
+game/data/data_8035BB50.c:
+	.data       start:0x8035BB50 end:0x8035E028
 
 dolphin/si/SI_fn_800D104C.c:
 	.text       start:0x800D104C end:0x800D1070
@@ -1564,7 +1591,41 @@ musyx/runtime/stream.c:
 	.sdata2     start:0x8047D3B8 end:0x8047D3C0
 
 game/data/sdata2_8047D3C0.c:
-	.sdata2     start:0x8047D3C0 end:0x8047D690
+	.sdata2     start:0x8047D3C0 end:0x8047D548
+
+musyx/runtime/synthdata.c:
+	.text       start:0x80150C78 end:0x801525E4
+
+musyx/runtime/synthmacros.c:
+	.text       start:0x801525E4 end:0x80157280
+
+musyx/musyx_candidate_80157280.c:
+	.text       start:0x80157280 end:0x80162858
+
+musyx/musyx_hw_exact_80162858.c:
+	.text       start:0x80162858 end:0x80162FB0
+
+musyx/musyx_range_80157280.c:
+	.text       start:0x80162FB0 end:0x801652DC
+
+game/musyx_range_801652DC.c:
+	.text       start:0x801652DC end:0x801653BC
+
+game/sound/sound.c:
+	.text       start:0x801653BC end:0x801653CC
+
+game/gs_range_801653CC_prefix.c:
+	.text       start:0x801653CC end:0x801654E0
+
+game/gs_range_801653CC_exact_801654E0.c:
+	.text       start:0x801654E0 end:0x80165D0C
+
+game/gs_range_801653CC_candidate_80165D0C.c:
+	.text       start:0x80165D0C end:0x80165DEC
+	.sdata2     start:0x8047D548 end:0x8047D558
+
+game/data/sdata2_8047D558.c:
+	.sdata2     start:0x8047D558 end:0x8047D690
 
 game/data/sdata2_8047D690.c:
 	.sdata2     start:0x8047D690 end:0x8047D790
@@ -1612,40 +1673,7 @@ game/data/sdata2_8047E490.c:
 	.sdata2     start:0x8047E490 end:0x8047E538
 
 game/data/sdata2_8047E538.c:
-	.sdata2     start:0x8047E538 end:0x8047E658
-
-game/colosseum_battle_sdata2.c:
-	.sdata2     start:0x8047E658 end:0x8047E700
-
-musyx/runtime/synthdata.c:
-	.text       start:0x80150C78 end:0x801525E4
-
-musyx/runtime/synthmacros.c:
-	.text       start:0x801525E4 end:0x80157280
-
-musyx/musyx_candidate_80157280.c:
-	.text       start:0x80157280 end:0x80162858
-
-musyx/musyx_hw_exact_80162858.c:
-	.text       start:0x80162858 end:0x80162FB0
-
-musyx/musyx_range_80157280.c:
-	.text       start:0x80162FB0 end:0x801652DC
-
-game/musyx_range_801652DC.c:
-	.text       start:0x801652DC end:0x801653BC
-
-game/sound/sound.c:
-	.text       start:0x801653BC end:0x801653CC
-
-game/gs_range_801653CC_prefix.c:
-	.text       start:0x801653CC end:0x801654E0
-
-game/gs_range_801653CC_exact_801654E0.c:
-	.text       start:0x801654E0 end:0x80165D0C
-
-game/gs_range_801653CC_candidate_80165D0C.c:
-	.text       start:0x80165D0C end:0x80165DEC
+	.sdata2     start:0x8047E538 end:0x8047E618
 
 game/gs_range_801653CC_exact_80165DEC.c:
 	.text       start:0x80165DEC end:0x80165FDC
@@ -2069,6 +2097,13 @@ game/fight_range_8023565C_exact.c:
 
 game/fight_range_802373B0.c:
 	.text       start:0x802373B0 end:0x8023753C
+	.sdata2     start:0x8047E618 end:0x8047E628
+
+game/data/sdata2_8047E628.c:
+	.sdata2     start:0x8047E628 end:0x8047E658
+
+game/colosseum_battle_sdata2.c:
+	.sdata2     start:0x8047E658 end:0x8047E700
 
 game/fight_range_8023753C_exact.c:
 	.text       start:0x8023753C end:0x80238060

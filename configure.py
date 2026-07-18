@@ -578,7 +578,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/si/SI_range_800D0F68.c",
                 progress_category="sdk",
             ),
@@ -1541,13 +1541,37 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "crt/math_kernel_cos.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
+                Matching,
                 "crt/math_kernel_rem_pio2.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(
+                Matching,
+                "crt/math_kernel_sin.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
                 CodeCandidate,
-                "crt/math_range_800CD5A8.c",
+                "crt/math_range_800CD648.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
+                Matching,
+                "crt/math_copysign.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/math_range_800CDBE0.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
@@ -1737,7 +1761,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_range_801653CC_candidate_80165D0C.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -2176,6 +2200,30 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "game/menu/menuCB_range_exact_800697C4.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menuCB_range_800697F4.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
                 "game/menu/menuCB_range_exact_80069A08.c",
                 mw_version="GC/1.3",
                 extra_cflags=[
@@ -2525,7 +2573,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/fight_range_802373B0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -3055,9 +3103,38 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "game/menu/menu_middle.c",
+                "game/menu/menu_middle_range_80069C0C.c",
                 mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/menu/menu_middle_exact_8006A65C.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menu_middle_range_8006A824.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
                 progress_category="game",
             ),
             Object(
@@ -3806,12 +3883,6 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "crt/sdata2_math_suffix_8047C868.c",
-                source="crt_data/sdata2_math_suffix_8047C868.c",
-                progress_category="runtime",
-            ),
-            Object(
-                Matching,
                 "game/data/rodata_80267060.c",
                 progress_category="game",
             ),
@@ -4139,6 +4210,11 @@ config.libs = [
             Object(
                 DataCandidate,
                 "game/data/data_80313F48.c",
+                progress_category="game",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_803140F8.c",
                 progress_category="game",
             ),
             Object(
@@ -4595,6 +4671,11 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "game/data/sdata2_8047D558.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
                 "game/data/sdata2_8047D690.c",
                 progress_category="game",
             ),
@@ -4669,8 +4750,13 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                DataCandidate,
+                Matching,
                 "game/data/sdata2_8047E538.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/sdata2_8047E628.c",
                 progress_category="game",
             ),
             Object(
