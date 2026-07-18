@@ -54,7 +54,7 @@ game/data/sdata2_8047C3A0.c:
 	.sdata2     start:0x8047C3A0 end:0x8047C4A0
 
 crt/sdata2_math.c:
-	.sdata2     start:0x8047C4A0 end:0x8047C828
+	.sdata2     start:0x8047C4A0 end:0x8047C528
 
 game/data/bss_8039A700.c:
 	.bss        start:0x8039A700 end:0x8039E700
@@ -653,19 +653,7 @@ game/data/data_8035BA48.c:
 	.data       start:0x8035BA48 end:0x8035BA60
 
 game/data/data_8035BB50.c:
-	.data       start:0x8035BB50 end:0x803634A8
-
-game/data/data_803634A8.c:
-	.data       start:0x803634A8 end:0x803634EC
-
-game/data/data_803634EC.c:
-	.data       start:0x803634EC end:0x80363630
-
-game/data/data_80363630.c:
-	.data       start:0x80363630 end:0x80363774
-
-game/data/data_80363774.c:
-	.data       start:0x80363774 end:0x80363A70
+	.data       start:0x8035BB50 end:0x8035E028
 
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
@@ -939,7 +927,17 @@ crt/string.c:
 	.text       start:0x800CA7FC end:0x800CAA58
 
 crt/math_range_800CAA58.c:
-	.text       start:0x800CAA58 end:0x800CC754
+	.text       start:0x800CAA58 end:0x800CB024
+
+crt/math_ieee754_atan2.c:
+	.text       start:0x800CB024 end:0x800CB2B4
+	.sdata2     start:0x8047C528 end:0x8047C580
+
+crt/sdata2_math_8047C580.c:
+	.sdata2     start:0x8047C580 end:0x8047C828
+
+crt/math_range_800CB2B4.c:
+	.text       start:0x800CB2B4 end:0x800CC754
 
 crt/math_kernel_rem_pio2.c:
 	.text       start:0x800CC754 end:0x800CD5A8
@@ -1297,8 +1295,27 @@ game/pokemon_range_8011F5FC.c:
 game/pokemon_range_exact_801248C4.c:
 	.text       start:0x801248C4 end:0x801254B4
 
-game/pokemon_range_801254B4.c:
-	.text       start:0x801254B4 end:0x80128E38
+game/pokemon_set_status_exact_801254B4.c:
+	.text       start:0x801254B4 end:0x8012640C
+	.data       start:0x8035E028 end:0x8035E4B0
+
+game/data/data_8035E4B0.c:
+	.data       start:0x8035E4B0 end:0x803634A8
+
+game/data/data_803634A8.c:
+	.data       start:0x803634A8 end:0x803634EC
+
+game/data/data_803634EC.c:
+	.data       start:0x803634EC end:0x80363630
+
+game/data/data_80363630.c:
+	.data       start:0x80363630 end:0x80363774
+
+game/data/data_80363774.c:
+	.data       start:0x80363774 end:0x80363A70
+
+game/pokemon_range_8012640C.c:
+	.text       start:0x8012640C end:0x80128E38
 
 game/hero.c:
 	.text       start:0x80128E38 end:0x8012AC9C
