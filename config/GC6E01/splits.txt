@@ -297,7 +297,19 @@ game/menu/menuCB_BattleStart.c:
 	.text       start:0x8005DFC8 end:0x80062948
 
 game/menu/menuCB_range_80062948.c:
-	.text       start:0x80062948 end:0x80065A48
+	.text       start:0x80062948 end:0x80063D10
+
+game/menu/menuCB_range_exact_80063D10.c:
+	.text       start:0x80063D10 end:0x80063D14
+
+game/menu/menuCB_range_80063D14.c:
+	.text       start:0x80063D14 end:0x80064378
+
+game/menu/menuCB_range_exact_80064378.c:
+	.text       start:0x80064378 end:0x800643D4
+
+game/menu/menuCB_range_800643D4.c:
+	.text       start:0x800643D4 end:0x80065A48
 
 game/menu/menuCB_range_exact_80065A48.c:
 	.text       start:0x80065A48 end:0x800676EC
@@ -340,7 +352,22 @@ game/data/data_80311E54.c:
 	.data       start:0x80311E54 end:0x80311FEC
 
 game/menu/menuCB_range_800676EC.c:
-	.text       start:0x800676EC end:0x80069A60
+	.text       start:0x800676EC end:0x80068738
+
+game/menu/menuCB_range_exact_80068738.c:
+	.text       start:0x80068738 end:0x80068794
+
+game/menu/menuCB_range_80068794.c:
+	.text       start:0x80068794 end:0x80069048
+
+game/menu/menuCB_range_exact_80069048.c:
+	.text       start:0x80069048 end:0x8006905C
+
+game/menu/menuCB_range_8006905C.c:
+	.text       start:0x8006905C end:0x80069A08
+
+game/menu/menuCB_range_exact_80069A08.c:
+	.text       start:0x80069A08 end:0x80069A60
 
 game/menu/menuCB_Battle.c:
 	.text       start:0x80069A60 end:0x80069C0C
@@ -814,7 +841,7 @@ trk/TRKComm_range_800C3678.c:
 trk/TRKCommState.c:
 	.text       start:0x800C39A0 end:0x800C39BC
 
-trk/TRKComm.c:
+trk/TRKComm_exact_800C39BC.c:
 	.text       start:0x800C39BC end:0x800C3BB8
 
 trk/udp_cc.c:
@@ -952,7 +979,13 @@ game/data/sdata2_8047D098.c:
 	.sdata2     start:0x8047D098 end:0x8047D108
 
 crt/math_range_800CD5A8.c:
-	.text       start:0x800CD5A8 end:0x800CE79C
+	.text       start:0x800CD5A8 end:0x800CE04C
+
+crt/math_exact_800CE04C.c:
+	.text       start:0x800CE04C end:0x800CE378
+
+crt/math_range_800CE378.c:
+	.text       start:0x800CE378 end:0x800CE79C
 
 dolphin/exi/EXI2Stubs.c:
 	.text       start:0x800CE79C end:0x800CE7DC

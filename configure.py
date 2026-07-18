@@ -733,7 +733,7 @@ config.libs = [
                 progress_category="musyx",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "musyx/runtime/synth.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
@@ -1534,6 +1534,18 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "crt/math_exact_800CE04C.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/math_range_800CE378.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
+                Matching,
                 "dolphin/sdk_range_800CE7DC.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2025,6 +2037,54 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "game/menu/menuCB_range_exact_80063D10.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menuCB_range_80063D14.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/menu/menuCB_range_exact_80064378.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menuCB_range_800643D4.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
                 "game/menu/menuCB_range_exact_80065A48.c",
                 mw_version="GC/1.3",
                 extra_cflags=[
@@ -2038,6 +2098,66 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/menu/menuCB_range_800676EC.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/menu/menuCB_range_exact_80068738.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menuCB_range_80068794.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/menu/menuCB_range_exact_80069048.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/menu/menuCB_range_8006905C.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-i src/game/menu",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/menu/menuCB_range_exact_80069A08.c",
                 mw_version="GC/1.3",
                 extra_cflags=[
                     "-use_lmw_stmw on",
@@ -3618,8 +3738,8 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
-                "trk/TRKComm.c",
+                Matching,
+                "trk/TRKComm_exact_800C39BC.c",
                 mw_version="GC/1.3.2",
                 progress_category="runtime",
             ),
