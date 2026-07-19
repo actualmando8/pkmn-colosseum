@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196108,
     "total_functions": 8603,
-    "total_units": 1096
+    "total_units": 1121
   },
   "topology_status": {
     "auto_units": 66,
-    "named_units": 1030,
-    "source_backed_units": 1014,
+    "named_units": 1055,
+    "source_backed_units": 1039,
     "auto_code": 0,
     "auto_data": 57755,
     "auto_functions": 0
@@ -12034,16 +12034,333 @@
       "total_functions": 6
     },
     {
-      "name": "main/game/data/data_80375330",
+      "name": "main/game/fight_action_range_801F0898",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3188,
+          "virtual_address": 2149517464
+        }
+      ],
+      "total_code": 3188,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F150C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 124,
+          "virtual_address": 2149520652
+        }
+      ],
+      "total_code": 124,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F1588",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 376,
+          "virtual_address": 2149520776
+        }
+      ],
+      "total_code": 376,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F1700",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 656,
+          "virtual_address": 2149521152
+        }
+      ],
+      "total_code": 656,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F1990",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 220,
+          "virtual_address": 2149521808
+        }
+      ],
+      "total_code": 220,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F1A6C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 168,
+          "virtual_address": 2149522028
+        }
+      ],
+      "total_code": 168,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F1B14",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1052,
+          "virtual_address": 2149522196
+        }
+      ],
+      "total_code": 1052,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F1F30",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2149523248
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F1F7C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 164,
+          "virtual_address": 2149523324
+        }
+      ],
+      "total_code": 164,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F2020",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 816,
+          "virtual_address": 2149523488
+        }
+      ],
+      "total_code": 816,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F2350",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 772,
+          "virtual_address": 2149524304
+        }
+      ],
+      "total_code": 772,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F2654",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 84,
+          "virtual_address": 2149525076
+        }
+      ],
+      "total_code": 84,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F26A8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 300,
+          "virtual_address": 2149525160
+        }
+      ],
+      "total_code": 300,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F27D4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 904,
+          "virtual_address": 2149525460
+        }
+      ],
+      "total_code": 904,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F2B5C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1876,
+          "virtual_address": 2149526364
+        }
+      ],
+      "total_code": 1876,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F32B0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 60,
+          "virtual_address": 2149528240
+        }
+      ],
+      "total_code": 60,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F32EC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 252,
+          "virtual_address": 2149528300
+        }
+      ],
+      "total_code": 252,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F33E8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 968,
+          "virtual_address": 2149528552
+        }
+      ],
+      "total_code": 968,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F37B0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 884,
+          "virtual_address": 2149529520
+        }
+      ],
+      "total_code": 884,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F3B24",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 144,
+          "virtual_address": 2149530404
+        }
+      ],
+      "total_code": 144,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F3BB4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1644,
+          "virtual_address": 2149530548
+        }
+      ],
+      "total_code": 1644,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F4220",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 308,
+          "virtual_address": 2149532192
+        }
+      ],
+      "total_code": 308,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F4354",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 268,
+          "virtual_address": 2149532500
+        }
+      ],
+      "total_code": 268,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_exact_801F4460",
       "sections": [
         {
           "name": ".data",
-          "size": 756,
+          "size": 380,
           "virtual_address": 2151109424
+        },
+        {
+          "name": ".text",
+          "size": 4164,
+          "virtual_address": 2149532768
+        }
+      ],
+      "total_code": 4164,
+      "total_data": 380,
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/data/data_803754AC",
+      "sections": [
+        {
+          "name": ".data",
+          "size": 376,
+          "virtual_address": 2151109804
         }
       ],
       "total_code": 0,
-      "total_data": 756,
+      "total_data": 376,
       "total_functions": 0
     },
     {
@@ -12567,30 +12884,43 @@
       "total_functions": 0
     },
     {
-      "name": "main/game/fight_action_range_801F0898",
+      "name": "main/game/fight_floor_candidate_801F54A4",
       "sections": [
         {
           "name": ".text",
-          "size": 3188,
-          "virtual_address": 2149517464
+          "size": 3352,
+          "virtual_address": 2149536932
         }
       ],
-      "total_code": 3188,
+      "total_code": 3352,
       "total_data": 0,
-      "total_functions": 9
+      "total_functions": 1
     },
     {
-      "name": "main/game/fight_floor",
+      "name": "main/game/fight_floor_exact_801F61BC",
       "sections": [
         {
           "name": ".text",
-          "size": 20224,
-          "virtual_address": 2149520652
+          "size": 48,
+          "virtual_address": 2149540284
         }
       ],
-      "total_code": 20224,
+      "total_code": 48,
       "total_data": 0,
-      "total_functions": 67
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_floor_candidate_801F61EC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 544,
+          "virtual_address": 2149540332
+        }
+      ],
+      "total_code": 544,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/fight_floor_bios",
