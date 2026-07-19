@@ -872,13 +872,27 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
             ),
-            Object(
-                CodeCandidate,
-                "musyx/runtime/synthdata.c",
-                mw_version="GC/1.3.2",
-                extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
-                progress_category="musyx",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3.2",
+                    extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                    progress_category="musyx",
+                )
+                for status, path in [
+                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80150C78.c"),
+                    (Matching, "musyx/runtime/synthdata_exact_80150E68.c"),
+                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80150FE4.c"),
+                    (Matching, "musyx/runtime/synthdata_exact_8015122C.c"),
+                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80151B84.c"),
+                    (Matching, "musyx/runtime/synthdata_exact_8015210C.c"),
+                    (CodeCandidate, "musyx/runtime/synthdata_candidate_8015211C.c"),
+                    (Matching, "musyx/runtime/synthdata_exact_801521A8.c"),
+                    (CodeCandidate, "musyx/runtime/synthdata_candidate_801521B8.c"),
+                    (Matching, "musyx/runtime/synthdata_exact_801522E0.c"),
+                ]
+            ],
             *[
                 Object(
                     status,

@@ -2137,8 +2137,35 @@ musyx/runtime/stream.c:
 game/data/sdata2_8047D3C0_prefix.c:
 	.sdata2     start:0x8047D3C0 end:0x8047D3C8
 
-musyx/runtime/synthdata.c:
-	.text       start:0x80150C78 end:0x801525E4
+musyx/runtime/synthdata_candidate_80150C78.c:
+	.text       start:0x80150C78 end:0x80150E68
+
+musyx/runtime/synthdata_exact_80150E68.c:
+	.text       start:0x80150E68 end:0x80150FE4
+
+musyx/runtime/synthdata_candidate_80150FE4.c:
+	.text       start:0x80150FE4 end:0x8015122C
+
+musyx/runtime/synthdata_exact_8015122C.c:
+	.text       start:0x8015122C end:0x80151B84
+
+musyx/runtime/synthdata_candidate_80151B84.c:
+	.text       start:0x80151B84 end:0x8015210C
+
+musyx/runtime/synthdata_exact_8015210C.c:
+	.text       start:0x8015210C end:0x8015211C
+
+musyx/runtime/synthdata_candidate_8015211C.c:
+	.text       start:0x8015211C end:0x801521A8
+
+musyx/runtime/synthdata_exact_801521A8.c:
+	.text       start:0x801521A8 end:0x801521B8
+
+musyx/runtime/synthdata_candidate_801521B8.c:
+	.text       start:0x801521B8 end:0x801522E0
+
+musyx/runtime/synthdata_exact_801522E0.c:
+	.text       start:0x801522E0 end:0x801525E4
 
 musyx/runtime/synthmacros_exact_801525E4.c:
 	.text       start:0x801525E4 end:0x801528D4
