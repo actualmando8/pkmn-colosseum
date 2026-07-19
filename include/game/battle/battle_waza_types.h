@@ -347,7 +347,7 @@ extern void* fn_801DCDA8(void* obj, s32 fieldEffect);
 extern s32 fn_801DCDCC(void* obj);
 extern void fn_801DCE0C(void* obj);
 extern void fn_801DCEA8(void* obj);
-extern void fn_801DCF00(u32 color, f32 intensity);
+extern void fn_801DCF00(WazaEffect* effect);
 extern void fn_801DCF84(void* obj);
 extern void fn_801DCFD8(void* obj);
 extern void fn_801DD028(void* obj);

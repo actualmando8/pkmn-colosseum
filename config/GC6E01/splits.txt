@@ -245,7 +245,7 @@ game/gs_title_candidate_800210F0.c:
 game/gs_title_exact_800215C4.c:
 	.text       start:0x800215C4 end:0x80021624
 
-game/gs_title_candidate_80021624.c:
+game/gs_title_exact_80021624.c:
 	.text       start:0x80021624 end:0x80021644
 
 game/gs_title_exact_80021644.c:
@@ -1945,7 +1945,16 @@ game/pokemon_range_8011F77C.c:
 	.text       start:0x8011F77C end:0x8011F910
 
 game/pokemon_range_8011F910.c:
-	.text       start:0x8011F910 end:0x8011FCA4
+	.text       start:0x8011F910 end:0x8011FBCC
+
+game/pokemon_range_exact_8011FBCC.c:
+	.text       start:0x8011FBCC end:0x8011FC14
+
+game/pokemon_range_8011FC14.c:
+	.text       start:0x8011FC14 end:0x8011FC74
+
+game/pokemon_range_exact_8011FC74.c:
+	.text       start:0x8011FC74 end:0x8011FCA4
 
 game/pokemon_range_8011FCA4.c:
 	.text       start:0x8011FCA4 end:0x80120B00
@@ -2701,7 +2710,10 @@ hsd/hsd_cobj_exact_801944A4.c:
 	.text       start:0x801944A4 end:0x80194510
 
 hsd/hsd_cobj_candidate_80194510.c:
-	.text       start:0x80194510 end:0x80194788
+	.text       start:0x80194510 end:0x80194654
+
+hsd/hsd_cobj_exact_80194654.c:
+	.text       start:0x80194654 end:0x80194788
 
 hsd/hsd_cobj_exact_80194788.c:
 	.text       start:0x80194788 end:0x801947C8
@@ -2712,7 +2724,7 @@ hsd/hsd_cobj_candidate_801947C8.c:
 hsd/hsd_cobj_exact_80194CC4.c:
 	.text       start:0x80194CC4 end:0x80194D60
 
-hsd/hsd_cobj_candidate_80194D60.c:
+hsd/hsd_cobj_exact_80194D60.c:
 	.text       start:0x80194D60 end:0x80194D94
 
 hsd/hsd_cobj_exact_80194D94.c:
@@ -2991,7 +3003,7 @@ game/wazaSequence.c:
 game/sequence_exact_801DCDA8.c:
 	.text       start:0x801DCDA8 end:0x801DCF00
 
-game/sequence_candidate_801DCF00.c:
+game/sequence_exact_801DCF00.c:
 	.text       start:0x801DCF00 end:0x801DCF84
 
 game/sequence_exact_801DCF84.c:
