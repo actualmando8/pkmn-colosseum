@@ -2916,8 +2916,20 @@ hsd/hsd_aobj_range_801C01C8.c:
 game/battle/battle_camera.c:
 	.text       start:0x801C2AE8 end:0x801C3108
 
-game/battle/battle_grid.c:
-	.text       start:0x801C3108 end:0x801C4078
+game/battle/battle_grid_exact_801C3108.c:
+	.text       start:0x801C3108 end:0x801C3114
+
+game/battle/battle_grid_residual_801C3114.c:
+	.text       start:0x801C3114 end:0x801C3C98
+
+game/battle/battle_grid_exact_801C3C98.c:
+	.text       start:0x801C3C98 end:0x801C3E3C
+
+game/battle/battle_grid_residual_801C3E3C.c:
+	.text       start:0x801C3E3C end:0x801C3F10
+
+game/battle/battle_grid_exact_801C3F10.c:
+	.text       start:0x801C3F10 end:0x801C4078
 
 game/effect/fade.c:
 	.text       start:0x801C4078 end:0x801C4814
