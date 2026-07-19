@@ -245,7 +245,7 @@ game/gs_title_candidate_800210F0.c:
 game/gs_title_exact_800215C4.c:
 	.text       start:0x800215C4 end:0x80021624
 
-game/gs_title_candidate_80021624.c:
+game/gs_title_exact_80021624.c:
 	.text       start:0x80021624 end:0x80021644
 
 game/gs_title_exact_80021644.c:
@@ -2994,7 +2994,7 @@ game/wazaSequence.c:
 game/sequence_exact_801DCDA8.c:
 	.text       start:0x801DCDA8 end:0x801DCF00
 
-game/sequence_candidate_801DCF00.c:
+game/sequence_exact_801DCF00.c:
 	.text       start:0x801DCF00 end:0x801DCF84
 
 game/sequence_exact_801DCF84.c:

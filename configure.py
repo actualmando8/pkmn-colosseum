@@ -1393,7 +1393,7 @@ config.libs = [
                 )
                 for status, path in [
                     (Matching, "game/sequence_exact_801DCDA8.c"),
-                    (CodeCandidate, "game/sequence_candidate_801DCF00.c"),
+                    (Matching, "game/sequence_exact_801DCF00.c"),
                     (Matching, "game/sequence_exact_801DCF84.c"),
                     (CodeCandidate, "game/sequence_candidate_801DD158.c"),
                     (Matching, "game/sequence_exact_801DD23C.c"),
@@ -5056,7 +5056,7 @@ config.libs = [
                     (Matching, "game/gs_title_exact_80020F54.c"),
                     (CodeCandidate, "game/gs_title_candidate_800210F0.c"),
                     (Matching, "game/gs_title_exact_800215C4.c"),
-                    (CodeCandidate, "game/gs_title_candidate_80021624.c"),
+                    (Matching, "game/gs_title_exact_80021624.c"),
                     (Matching, "game/gs_title_exact_80021644.c"),
                     (Matching, "game/gs_title_exact_800216E0.c"),
                     (CodeCandidate, "game/gs_title_candidate_800216E8.c"),
