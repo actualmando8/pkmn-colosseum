@@ -722,7 +722,13 @@ dolphin/gx/GX_fn_800B856C.c:
 	.text       start:0x800B856C end:0x800B857C
 
 dolphin/sdk_range_800B857C.c:
-	.text       start:0x800B857C end:0x800B8E98
+	.text       start:0x800B857C end:0x800B884C
+
+dolphin/gx/GX_exact_800B884C.c:
+	.text       start:0x800B884C end:0x800B8AE8
+
+dolphin/sdk_range_800B8AE8.c:
+	.text       start:0x800B8AE8 end:0x800B8E98
 
 dolphin/sdk_exact_800B8E98.c:
 	.text       start:0x800B8E98 end:0x800B9578
@@ -2116,7 +2122,19 @@ game/fight_range_exact_80218D24.c:
 	.text       start:0x80218D24 end:0x80218FDC
 
 game/fight_range_80218FDC.c:
-	.text       start:0x80218FDC end:0x8021A6CC
+	.text       start:0x80218FDC end:0x80219E10
+
+game/fight_range_exact_80219E10.c:
+	.text       start:0x80219E10 end:0x80219FE4
+
+game/fight_range_80219FE4.c:
+	.text       start:0x80219FE4 end:0x8021A054
+
+game/fight_range_exact_8021A054.c:
+	.text       start:0x8021A054 end:0x8021A2C0
+
+game/fight_range_8021A2C0.c:
+	.text       start:0x8021A2C0 end:0x8021A6CC
 
 game/fight_range_exact_8021A6CC.c:
 	.text       start:0x8021A6CC end:0x8021B910

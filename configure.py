@@ -1450,6 +1450,18 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "dolphin/gx/GX_exact_800B884C.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_800B8AE8.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
                 "dolphin/sdk_exact_800B8E98.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2477,6 +2489,34 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/fight_range_80218FDC.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_range_exact_80219E10.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_range_80219FE4.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_range_exact_8021A054.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_range_8021A2C0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
