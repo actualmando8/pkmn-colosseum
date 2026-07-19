@@ -1093,9 +1093,6 @@ trk/TRKSerial_range_800BF088.c:
 game/data/rodata_8026F818.c:
 	.rodata     start:0x8026F818 end:0x8026FB80
 
-game/data/rodata_8026FB94.c:
-	.rodata     start:0x8026FB94 end:0x8026FC98
-
 trk/usr_put_initialize.c:
 	.text       start:0x800BF338 end:0x800BF33C
 
@@ -1159,8 +1156,20 @@ trk/TRKSaveState.c:
 trk/TRKInit.c:
 	.text       start:0x800C2D80 end:0x800C33BC
 
-trk/TRKBoard_range_800C33BC.c:
-	.text       start:0x800C33BC end:0x800C3588
+trk/TRKBoard_exact_800C33BC.c:
+	.text       start:0x800C33BC end:0x800C3414
+	.rodata     start:0x8026FB80 end:0x8026FB8B
+	.bss        start:0x803FED60 end:0x803FED64
+
+trk/TRKBoard_candidate_800C3414.c:
+	.text       start:0x800C3414 end:0x800C349C
+
+trk/TRKBoard_exact_800C349C.c:
+	.text       start:0x800C349C end:0x800C3588
+	.rodata     start:0x8026FB90 end:0x8026FB94
+
+game/data/rodata_8026FB94.c:
+	.rodata     start:0x8026FB94 end:0x8026FC98
 
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
@@ -1778,7 +1787,19 @@ game/gs_floor_data_exact_800FF0A0.c:
 	.text       start:0x800FF0A0 end:0x800FF178
 
 game/gs_floor_data_residual_800FF178.c:
-	.text       start:0x800FF178 end:0x800FF788
+	.text       start:0x800FF178 end:0x800FF4D4
+
+game/gs_floor_data_exact_800FF4D4.c:
+	.text       start:0x800FF4D4 end:0x800FF58C
+
+game/gs_floor_data_residual_800FF58C.c:
+	.text       start:0x800FF58C end:0x800FF660
+
+game/gs_floor_data_exact_800FF660.c:
+	.text       start:0x800FF660 end:0x800FF730
+
+game/gs_floor_data_residual_800FF730.c:
+	.text       start:0x800FF730 end:0x800FF788
 
 game/gs_floor.c:
 	.text       start:0x800FF788 end:0x80101910
@@ -2866,7 +2887,19 @@ hsd/hsd_texp_exact_801B387C.c:
 	.text       start:0x801B387C end:0x801B3D1C
 
 hsd/hsd_texp_suffix_801B3D1C.c:
-	.text       start:0x801B3D1C end:0x801BBAC8
+	.text       start:0x801B3D1C end:0x801B4240
+
+hsd/hsd_texp_exact_801B4240.c:
+	.text       start:0x801B4240 end:0x801B4264
+
+hsd/hsd_texp_candidate_801B4264.c:
+	.text       start:0x801B4264 end:0x801B42C0
+
+hsd/hsd_texp_exact_801B42C0.c:
+	.text       start:0x801B42C0 end:0x801B4300
+
+hsd/hsd_texp_candidate_801B4300.c:
+	.text       start:0x801B4300 end:0x801BBAC8
 
 hsd/hsd_tobj.c:
 	.text       start:0x801BBAC8 end:0x801BF098
@@ -2883,8 +2916,20 @@ hsd/hsd_aobj_range_801C01C8.c:
 game/battle/battle_camera.c:
 	.text       start:0x801C2AE8 end:0x801C3108
 
-game/battle/battle_grid.c:
-	.text       start:0x801C3108 end:0x801C4078
+game/battle/battle_grid_exact_801C3108.c:
+	.text       start:0x801C3108 end:0x801C3114
+
+game/battle/battle_grid_residual_801C3114.c:
+	.text       start:0x801C3114 end:0x801C3C98
+
+game/battle/battle_grid_exact_801C3C98.c:
+	.text       start:0x801C3C98 end:0x801C3E3C
+
+game/battle/battle_grid_residual_801C3E3C.c:
+	.text       start:0x801C3E3C end:0x801C3F10
+
+game/battle/battle_grid_exact_801C3F10.c:
+	.text       start:0x801C3F10 end:0x801C4078
 
 game/effect/fade.c:
 	.text       start:0x801C4078 end:0x801C4814
@@ -3342,8 +3387,26 @@ game/fight_range_80218BD4.c:
 game/fight_range_exact_80218D24.c:
 	.text       start:0x80218D24 end:0x80218FDC
 
+game/fight_range_exact_80218FDC.c:
+	.text       start:0x80218FDC end:0x8021908C
+
 game/fight_range_80218FDC.c:
-	.text       start:0x80218FDC end:0x80219E10
+	.text       start:0x8021908C end:0x80219270
+
+game/fight_range_exact_80219270.c:
+	.text       start:0x80219270 end:0x802192B4
+
+game/fight_range_candidate_802192B4.c:
+	.text       start:0x802192B4 end:0x80219804
+
+game/fight_range_exact_80219804.c:
+	.text       start:0x80219804 end:0x80219838
+
+game/fight_range_candidate_80219838.c:
+	.text       start:0x80219838 end:0x80219D98
+
+game/fight_range_exact_80219D98.c:
+	.text       start:0x80219D98 end:0x80219E10
 
 game/fight_range_exact_80219E10.c:
 	.text       start:0x80219E10 end:0x80219FE4

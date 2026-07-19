@@ -55,7 +55,9 @@ extern u32 lbl_8047ACE0;
 extern GSFloorResHandler lbl_80404918[];
 
 #if !defined(GS_FLOOR_DATA_EXACT_800FF0A0_ONLY) && \
-    !defined(GS_FLOOR_DATA_RESIDUAL_800FF178_ONLY)
+    !defined(GS_FLOOR_DATA_RESIDUAL_PREFIX_800FF178_ONLY) && \
+    !defined(GS_FLOOR_DATA_RESIDUAL_MIDDLE_800FF58C_ONLY) && \
+    !defined(GS_FLOOR_DATA_RESIDUAL_SUFFIX_800FF730_ONLY)
 #define GS_FLOOR_DATA_ALL
 #endif
 
@@ -104,7 +106,7 @@ found:
 #endif
 
 #if defined(GS_FLOOR_DATA_ALL) || \
-    defined(GS_FLOOR_DATA_RESIDUAL_800FF178_ONLY)
+    defined(GS_FLOOR_DATA_RESIDUAL_PREFIX_800FF178_ONLY)
 
 /* 0x800FF178 | 0x128 */
 #pragma push
@@ -132,6 +134,10 @@ void fn_800FF3C0(void) {
     /* TODO: match -- 276 bytes at 0x800FF3C0 */
 }
 #pragma pop
+
+#endif
+
+#if defined(GS_FLOOR_DATA_ALL)
 
 /* 0x800FF4D4 | 0x58 */
 void fn_800FF4D4(void* data, u8 typeId) {
@@ -183,6 +189,11 @@ u32 fn_800FF56C(void) {
     return 0;
 }
 
+#endif
+
+#if defined(GS_FLOOR_DATA_ALL) || \
+    defined(GS_FLOOR_DATA_RESIDUAL_MIDDLE_800FF58C_ONLY)
+
 /* 0x800FF58C | 0xD4 */
 void fn_800FF58C(u32 floorId) {
     GSFloorContext* currentFloor;
@@ -209,6 +220,10 @@ void fn_800FF58C(u32 floorId) {
     *(volatile u32*)&lbl_8047ACDC = 3;
     *(volatile u32*)&lbl_80478B18 = floorId;
 }
+
+#endif
+
+#if defined(GS_FLOOR_DATA_ALL)
 
 /* 0x800FF660 | 0xD0 */
 void fn_800FF660(void) {
@@ -237,6 +252,11 @@ void fn_800FF660(void) {
         lbl_8047ACDC = 5;
     }
 }
+
+#endif
+
+#if defined(GS_FLOOR_DATA_ALL) || \
+    defined(GS_FLOOR_DATA_RESIDUAL_SUFFIX_800FF730_ONLY)
 
 /* 0x800FF730 | 0x54 */
 void fn_800FF730(u32 floorId) {

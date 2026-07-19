@@ -335,16 +335,16 @@ typedef struct TypeMatchup {
  * [game/battle/battle_grid.c, game/effect/fade.c, game/effect/fade_effect.c]
  * ========================================================================= */
 
-/* battleGridGetPtr (was fn_801C3108) */ s32  battleGridGetPtr(void);                        /* battleGrid_GetState */
+/* battleGridGetPtr (was fn_801C3108) */ void* battleGridGetPtr(void);                       /* battleGrid_GetState */
 /* fn_801C3114 */ void fn_801C3114(void);                        /* battleGrid_Init */
 /* fn_801C31EC */ void fn_801C31EC(void);                        /* battleGrid_Setup */
 /* battleGridUpdate (was fn_801C3430) */ void battleGridUpdate(void);                        /* battleGridSetup 0x634 */
 /* battleGridGetDistance (was fn_801C3A64) */ void battleGridGetDistance(void);                        /* battleGridLoadModels 0x11C */
 /* battleGridGetNormalisedScale (was fn_801C3B80) */ void battleGridGetNormalisedScale(void);                        /* battleGridUpdatePositions */
-/* battleGridRemovePokemon (was fn_801C3C98) */ void battleGridRemovePokemon(s32 slot);
-/* fn_801C3D64 */ void fn_801C3D64(void* model);                 /* battleGridReplacePokemon */
-/* battleGridAddPokemon (was fn_801C3E3C) */ void battleGridAddPokemon(s32 slot, s32 animType);
-/* fn_801C3F10 */ void fn_801C3F10(void* model);                 /* battleGridReplaceTrainer */
+/* battleGridRemovePokemon (was fn_801C3C98) */ void battleGridRemovePokemon(u8* pokemon);
+/* battleGridReplacePokemon (was fn_801C3D64) */ void battleGridReplacePokemon(u8* pokemon, u8* replacement);
+/* battleGridAddPokemon (was fn_801C3E3C) */ void battleGridAddPokemon(u8* slot, u8* pokemon);
+/* battleGridReplaceTrainer (was fn_801C3F10) */ void battleGridReplaceTrainer(u8* trainer, u8* replacement);
 /* battleGridAddTrainer (was fn_801C3FBC) */ void battleGridAddTrainer(u8* slot, u8 arg1, u8 arg2);
 /* fadeEffectDokuStop (was fn_801C4078) */ void* fadeEffectDokuStop(s32 slot);
 /* fadeEffectDokuStart */ void fadeEffectDokuStart(void);

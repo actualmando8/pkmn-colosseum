@@ -52,15 +52,27 @@ typedef struct BattleGridGroupTable {
     u16 pokemonCount;
 } BattleGridGroupTable;
 
+#if !defined(BATTLE_GRID_RESIDUAL_PREFIX_801C3114_ONLY) && \
+    !defined(BATTLE_GRID_RESIDUAL_MIDDLE_801C3E3C_ONLY)
+#define BATTLE_GRID_ALL
+#endif
+
+#if defined(BATTLE_GRID_ALL)
+
 /**
  * battleGridGetPtr - Get current grid state (renamed from fn_801C3108;
  * confirmed name -- naming pass 2026-07-07).
  * Address: 0x801C3108 | Size: 0xC
  */
-s32 battleGridGetPtr(void) {
+void* battleGridGetPtr(void) {
     extern u8 lbl_80466DE8[];
-    return (s32)lbl_80466DE8;
+    return lbl_80466DE8;
 }
+
+#endif
+
+#if defined(BATTLE_GRID_ALL) || \
+    defined(BATTLE_GRID_RESIDUAL_PREFIX_801C3114_ONLY)
 
 /**
  * fn_801C3114 / battleGrid_Init - Initialize the battle grid.
@@ -193,6 +205,10 @@ void battleGridGetNormalisedScale(void) {
     }
 }
 
+#endif
+
+#if defined(BATTLE_GRID_ALL)
+
 /**
  * battleGridRemovePokemon - Grid slot state update helper (renamed from
  * fn_801C3C98; confirmed name -- naming pass 2026-07-07).
@@ -254,6 +270,11 @@ void battleGridReplacePokemon(u8* pokemon, u8* replacement) {
     }
 }
 
+#endif
+
+#if defined(BATTLE_GRID_ALL) || \
+    defined(BATTLE_GRID_RESIDUAL_MIDDLE_801C3E3C_ONLY)
+
 /**
  * battleGridAddPokemon - Grid slot model transition animation (renamed
  * from fn_801C3E3C; confirmed name -- naming pass 2026-07-07).
@@ -291,6 +312,10 @@ void battleGridAddPokemon(u8* slot, u8* pokemon) {
         }
     }
 }
+
+#endif
+
+#if defined(BATTLE_GRID_ALL)
 
 /**
  * battleGridReplaceTrainer / battleGridReplaceTrainer - Replace trainer model in a grid slot.
@@ -357,3 +382,5 @@ void battleGridAddTrainer(u8* slot, u8 arg1, u8 arg2) {
         lbl_80466DE8.count = lbl_80466DE8.count + 1;
     }
 }
+
+#endif
