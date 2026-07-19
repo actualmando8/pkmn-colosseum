@@ -118,6 +118,27 @@ typedef struct { u16 gid; u16 fxNum; void* fxTab; } FxGroupT;                 /*
 typedef struct { u16 num; u16 subTabIndex; } MacMainEntryT;                   /* macro main-table entry, 4 bytes */
 typedef struct { void* data; u16 id; u16 refCount; } MacSubEntryT;            /* macro sub-table entry, 8 bytes */
 
+s32 maccmp(u16* a, u16* b);
+s32 smpcmp(u16* a, u16* b);
+s32 curvecmp(u16* a, u16* b);
+s32 layercmp(u16* a, u16* b);
+s32 fxcmp(u16* a, u16* b);
+
+#if !defined(MUSYX_SYNTHDATA_CANDIDATE_80150C78_80150E68) && \
+    !defined(MUSYX_SYNTHDATA_EXACT_80150E68_80150FE4) && \
+    !defined(MUSYX_SYNTHDATA_CANDIDATE_80150FE4_8015122C) && \
+    !defined(MUSYX_SYNTHDATA_EXACT_8015122C_80151B84) && \
+    !defined(MUSYX_SYNTHDATA_CANDIDATE_80151B84_8015210C) && \
+    !defined(MUSYX_SYNTHDATA_EXACT_8015210C_8015211C) && \
+    !defined(MUSYX_SYNTHDATA_CANDIDATE_8015211C_801521A8) && \
+    !defined(MUSYX_SYNTHDATA_EXACT_801521A8_801521B8) && \
+    !defined(MUSYX_SYNTHDATA_CANDIDATE_801521B8_801522E0) && \
+    !defined(MUSYX_SYNTHDATA_EXACT_801522E0_801525E4)
+#define MUSYX_SYNTHDATA_ALL
+#endif
+
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_CANDIDATE_80150C78_80150E68)
 s32 dataInsertKeymap(u16 cid, void* keymapdata) {
     extern u8 lbl_804378F8[];
     extern u16 lbl_8047AFA6;
@@ -155,7 +176,10 @@ s32 dataInsertKeymap(u16 cid, void* keymapdata) {
     return 1;
 #undef tab
 }
+#endif
 
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_EXACT_80150E68_80150FE4)
 s32 dataRemoveKeymap(u16 sid) {
     extern u8 lbl_804378F8[];
     extern u16 lbl_8047AFA6;
@@ -181,7 +205,10 @@ s32 dataRemoveKeymap(u16 sid) {
     return 0;
 #undef tab
 }
+#endif
 
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_CANDIDATE_80150FE4_8015122C)
 s32 dataInsertLayer(u16 cid, void* layerdata, u16 size) {
     extern u8 lbl_804380F8[];
     extern u16 lbl_8047AFA4;
@@ -220,7 +247,10 @@ s32 dataInsertLayer(u16 cid, void* layerdata, u16 size) {
     return 1;
 #undef tab
 }
+#endif
 
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_EXACT_8015122C_80151B84)
 s32 dataRemoveLayer(u16 sid) {
     extern u8 lbl_804380F8[];
     extern u16 lbl_8047AFA4;
@@ -443,7 +473,10 @@ s32 dataInsertFX(u16 gid, FxEntryT* fx, u16 fxNum) {
     return 0;
 #undef tab
 }
+#endif
 
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_CANDIDATE_80151B84_8015210C)
 s32 dataInsertMacro(u16 mid, void* macroaddr) {
     extern u8 lbl_8043D6F8[];
     extern u8 lbl_8043DEF8[];
@@ -536,10 +569,14 @@ s32 dataRemoveMacro(u16 mid) {
 #undef mainTab
 #undef subTab
 }
+#endif
 
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_EXACT_8015210C_8015211C)
 s32 maccmp(u16* a, u16* b) {
     return (s32)(a[2]) - (s32)(b[2]);
 }
+#endif
 typedef s32 (*PeopleCmpFn)(u8* a, u8* b);
 extern void* sndBSearch(u8* key, u8* base, s32 count, u32 size, PeopleCmpFn cmp);
 extern u8 lbl_8043D6F8[];
@@ -550,6 +587,8 @@ extern u32 lbl_8047AF9C;
 extern u32 lbl_8047AF8C;
 /* Early asm includes predate the symbol-map rename at 0x80162118. */
 #define fn_80162118 sndBSearch
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_CANDIDATE_8015211C_801521A8)
 #if 0
 asm void dataGetMacro(void) {
 #include "src/game/people/people_field_fn_8015211C.inc"
@@ -581,6 +620,10 @@ u32 dataGetMacro(u32 key) {
 }
 #pragma peephole reset
 #endif
+#endif
+
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_EXACT_801521A8_801521B8)
 #if 0
 asm void smpcmp(void) {
 #include "src/game/people/people_field_fn_801521A8.inc"
@@ -590,6 +633,8 @@ s32 smpcmp(u16* a, u16* b) {
     return (s32)(a[0]) - (s32)(b[0]);
 }
 #endif
+#endif
+
 extern void _savegpr_20(void);
 extern void _restgpr_20(void);
 extern void _savegpr_23(void);
@@ -605,6 +650,8 @@ extern u8 lbl_8043CCF8[];
 extern u32 lbl_8047AF88;
 extern u32 lbl_8047AF84;
 extern u16 lbl_8047AFAA;
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_CANDIDATE_801521B8_801522E0)
 #if 0
 asm void dataGetSample(void) {
 #include "src/game/people/people_field_fn_801521B8.inc"
@@ -649,6 +696,10 @@ u32 dataGetSample(u16 key, u32* out) {
     return (u32)-1;
 }
 #endif
+#endif
+
+#if defined(MUSYX_SYNTHDATA_ALL) || \
+    defined(MUSYX_SYNTHDATA_EXACT_801522E0_801525E4)
 #if 0
 asm void curvecmp(void) {
 #include "src/game/people/people_field_curvecmp.inc"
@@ -792,3 +843,4 @@ void dataExit(void) {
     extern void fn_80163030(void);
     fn_80163030();
 }
+#endif

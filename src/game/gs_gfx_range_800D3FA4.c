@@ -517,6 +517,8 @@ extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D3FA4_800D45F8)
 /* ==================================================================
  * fn_800D3FA4 -- GSgfx_BeginFrame
  *
@@ -746,6 +748,7 @@ void fn_800D3FA4(u32 flags, u8 setupCamera, u8 resetQueue) {
         *(u32*)((u8*)lbl_8047AA80 + 0x494) = *(u32*)((u8*)lbl_8047AA80 + 0x490);
     }
 }
+#endif
 
 
 /* Render-command stream callees. */
@@ -839,6 +842,8 @@ extern void fn_800DC14C(u32, u32, u32, u32, u8, u32);
 extern void fn_800DC1D4(u8);
 extern void fn_800DC224(u32, u32, u32, u32, u32);
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D461C_800D55D0)
 /* ==================================================================
  * fn_800D461C -- GSlog_PrintFormatted
  *
@@ -1048,8 +1053,11 @@ u32* fn_800D461C(u32* command)
 
     return p;
 }
+#endif
 
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D461C_800D55D0)
 /* ==================================================================
  * fn_800D4F98 -- GSlog_QueueCommand
  *
@@ -1167,7 +1175,10 @@ void fn_800D4F98(u32 opcode, u32 paramCount, ...)
 #undef NEXT_WORD
 #undef PUT_WORD
 }
+#endif
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D45F8_800D461C)
 extern u32 lbl_8047AA80;
 #if 0
 asm void fn_800D45F8(void) {
@@ -1191,7 +1202,10 @@ void fn_800D4610(u8 val) {
 
     state->requestBufferFlag = val;
 }
+#endif
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D461C_800D55D0)
 void fn_800D5504(u32 size) {
     const GSgfxRequestStrings* strings =
         (const GSgfxRequestStrings*)lbl_802703C0;
@@ -1218,7 +1232,10 @@ void fn_800D5504(u32 size) {
                ((GSgfxState*)lbl_8047AA80)->requestBufferSize,
                ((GSgfxState*)lbl_8047AA80)->requestBuffer);
 }
+#endif
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D55D0_800D56C0)
 extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
 extern f32 lbl_8047CA34;
@@ -1264,7 +1281,10 @@ void fn_800D5648(f32 val) {
     }
 }
 #endif
+#endif
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D56C0_800D67BC)
 extern void fn_800D7230(void);
 #if 0
 asm void fn_800D56C0(void) {
@@ -1574,7 +1594,7 @@ asm void fn_800D5F34(void) {
 #else
 void fn_800D5F34(f32 x, f32 y, f32 z) {
     if (!*(u8*)(lbl_8047AA80 + 0x47e) && *(s32*)lbl_8047AA80 == 1) {
-        fn_800D4F98(0x11, 0xd, x);
+        fn_800D4F98(0x11, 0xd, x, y, z);
     } else {
         *(s32*)(lbl_8047AA80 + 0x4c4) = (u32)fn_800D7468;
         *(f32*)(lbl_8047AA80 + 0x4d4) = x;
@@ -1840,7 +1860,10 @@ void fn_800D6728(void) {
     }
 }
 #endif
+#endif
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D67BC_800D6A00)
 extern void fn_800B928C(u32, u32, u16);
 extern u8 lbl_80314350[];
 extern u8 lbl_804001F0[];
@@ -1901,7 +1924,10 @@ void fn_800D67BC(u16 vertCount) {
                 (u32*)(lbl_804001F0 + 0xc), (u32*)(lbl_804001F0 + 0x4));
 }
 #endif
+#endif
 
+#if !defined(GS_GFX_RANGE_SPLIT) || \
+    defined(GS_GFX_RANGE_800D6A00_800D6B00)
 #if 0
 asm void fn_800D6A00(void) {
 #include "src/game/gs_render_fn_800D6A00.inc"
@@ -1937,4 +1963,5 @@ void fn_800D6A80(u16 vertCount, s32 type, u32* totalVerts, u32* totalPrims) {
         case 7: *totalPrims += (vertCount >> 1); break;
     }
 }
+#endif
 #endif

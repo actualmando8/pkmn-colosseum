@@ -179,6 +179,10 @@
 
 #include "dolphin/types.h"
 
+#if defined(GS_TITLE_SPLIT)
+#pragma force_active on
+#endif
+
 /* =========================================================================
  * External declarations
  * ========================================================================= */
@@ -275,7 +279,12 @@ extern void* fn_800FF560(void);
 /* Forward declarations for same-TU callees used before their definitions. */
 void fn_8002058C(void);
 void fn_8002060C(void);
+void fn_800216E8(void*, s32, u8*, s16, s32);
+extern u8 pokemonIsDarkPokemon(s32);
+extern f32 pokemonGetDp(void*);
+extern u8 lbl_803A1B90[];
 
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_8002049C)
 void fn_8002049C(void) {
     void* ctx;
 
@@ -309,6 +318,7 @@ void fn_8002049C(void) {
         fn_8002060C();
     }
 }
+#endif
 
 /* =========================================================================
  * Function: GStitle_MainLoop
@@ -316,6 +326,7 @@ void fn_8002049C(void) {
  * Size:     0xE8
  * ========================================================================= */
 
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800203B4)
 void fn_800203B4(void) {
     for (;;) {
         if (lbl_8047A31C == 0x28) {
@@ -352,6 +363,7 @@ void fn_800203B4(void) {
         _threadSwitch();
     }
 }
+#endif
 
 /* =========================================================================
  * Function: GStitle_Cleanup
@@ -362,8 +374,7 @@ void fn_800203B4(void) {
  * message boxes, then waits for the title thread to complete.
  * ========================================================================= */
 
-#pragma push
-#pragma optimization_level 4
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80020328)
 void fn_80020328(void) {
     menuCloseCustom(0x13, 0, 1);
     menuCloseCustom(0x15, 0, 1);
@@ -383,7 +394,7 @@ void fn_80020328(void) {
     lbl_8047A330 = NULL;
     lbl_8047A32C = 0;
 }
-#pragma pop
+#endif
 
 /* ===================================================================
  * AUTO-GENERATED accessor functions
@@ -396,22 +407,30 @@ extern u32 lbl_8047A350;
 extern u32 lbl_8047A358;
 
 /* Address: 0x800205B8 | Size: 0x8 | Pattern: sda_setter */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800205B8)
 void fn_800205B8(u32 val) {
     lbl_8047A310 = val;
 }
+#endif
 
 /* Address: 0x800205C0 | Size: 0x8 | Pattern: sda_setter */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800205C0)
 void fn_800205C0(u32 val) {
     lbl_8047A350 = val;
 }
+#endif
 
 /* Address: 0x80020E9C | Size: 0x8 | Pattern: return_constant */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80020E9C)
 u32 fn_80020E9C(void) { return 0; }
+#endif
 
 /* Address: 0x800216E0 | Size: 0x8 | Pattern: sda_setter */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800216E0)
 void fn_800216E0(u32 val) {
     lbl_8047A358 = val;
 }
+#endif
 
 /* =========================================================================
  * Stubs for remaining GStitle functions (0x80024438-0x80025F84)
@@ -421,6 +440,7 @@ extern u32 lbl_80478DDC;
 extern u32 fn_801902E0(void*);
 
 /* 0x4C | fn_80024438 | check_then_call */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80024438)
 void fn_80024438(u32 arg1, u32 arg2) {
     void* ctx = *(void**)&lbl_80478DDC;
     u32 result = (u32)fn_801902E0(*(void**)((u8*)ctx + 0x80));
@@ -505,7 +525,6 @@ asm void fn_80024698(void) {
 #include "src/game/gs_title_fn_80024698.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_80024698(void) { }
 #endif
 
@@ -517,8 +536,6 @@ asm void fn_8002469C(void) {
 #include "src/game/gs_title_fn_8002469C.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma scheduling off
 void fn_8002469C(void) {
     msgctrlSetValue(0x37, GSmsgGetGSchar(0x3cdf));
 }
@@ -530,11 +547,10 @@ asm void fn_800246CC(void) {
 #include "src/game/gs_title_fn_800246CC.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma scheduling off
 void fn_800246CC(void) {
     msgctrlSetValue(0x37, GSmsgGetGSchar(0x3ce4));
 }
+#endif
 #endif
 
 /* 0x800246FC | 0x330
@@ -575,13 +591,12 @@ extern f32 lbl_8047B8DC;
 extern u32 lbl_8047A36C;
 extern u8 lbl_802E4F58[];
 extern u32 lbl_80478DE0;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800246FC)
 #if 0
 asm void fn_800246FC(void) {
 #include "src/game/gs_title_fn_800246FC.inc"
 }
 #else
-#pragma push
-#pragma scheduling on
 void fn_800246FC(u8* arg0, u8* arg1) {
     extern u8 lbl_802E4F58[];
     extern f32 lbl_80478898;
@@ -730,7 +745,6 @@ void fn_800246FC(u8* arg0, u8* arg1) {
 
     msgctrlSetValue(0x37, GSmsgGetGSchar(1));
 }
-#pragma pop
 #endif
 
 /* 0x80024A2C | 0x178
@@ -758,11 +772,6 @@ asm void fn_80024A2C(void) {
 #include "src/game/gs_title_fn_80024A2C.inc"
 }
 #else
-#pragma push
-#pragma optimization_level 4
-#pragma scheduling on
-#pragma peephole off
-#pragma fp_contract on
 void fn_80024A2C(u8* arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A368;
@@ -824,7 +833,6 @@ LAB_80024aec:
         *(u32*)(arg1 + 0x58) = val;
     }
 }
-#pragma pop
 #endif
 
 /* 0x80024BA4 | 0x138
@@ -848,8 +856,6 @@ asm void fn_80024BA4(void) {
 #include "src/game/gs_title_fn_80024BA4.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma scheduling on
 void fn_80024BA4(s32 arg0, u8* arg1) {
     extern u32 lbl_80478DD8;
     extern u32 lbl_8047A36C;
@@ -902,6 +908,7 @@ LAB_80024c64:
     }
 }
 #endif
+#endif
 
 /* 0x80024CDC | 0xE0
  *
@@ -925,14 +932,12 @@ extern u32 lbl_8047A390;
 extern f64 lbl_8047B8D0;
 extern f64 lbl_8047B8B8;
 extern f32 lbl_8047A37C;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80024CDC)
 #if 0
 asm void fn_80024CDC(void) {
 #include "src/game/gs_title_fn_80024CDC.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma scheduling on
-#pragma fp_contract on
 void fn_80024CDC(s32 arg0, u8* arg1) {
     f32 fVar2;
     s32 iVar4;
@@ -962,6 +967,7 @@ void fn_80024CDC(s32 arg0, u8* arg1) {
 
     *(u8*)(arg1 + 0x67) = (u8)iVar4;
 }
+#endif
 #endif
 
 /* 0x80024DBC | 0x170
@@ -993,14 +999,12 @@ extern u32 lbl_8047A368;
 extern f64 lbl_8047B8B8;
 extern f32 lbl_8047A374;
 extern f32 lbl_8047B8E0;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80024DBC)
 #if 0
 asm void fn_80024DBC(void) {
 #include "src/game/gs_title_fn_80024DBC.inc"
 }
 #else
-#pragma scheduling on
-#pragma peephole off
-#pragma optimization_level 4
 void fn_80024DBC(s32 arg0, u8* arg1) {
     extern u8 lbl_803A204C[];
     extern u8 lbl_803A2058[];
@@ -1782,6 +1786,7 @@ L_80025910:
     return;
 }
 #endif
+#endif
 
 /* 0x800259B0 | 0xCC */
 extern void fn_801CB954(void);
@@ -1801,14 +1806,12 @@ extern u32 lbl_8047A384;
 extern u32 lbl_8047A388;
 extern u32 lbl_8047A390;
 extern u32 lbl_8047A3AC;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800259B0)
 #if 0
 asm void fn_800259B0(void) {
 #include "src/game/gs_title_fn_800259B0.inc"
 }
 #else
-#pragma scheduling on
-#pragma peephole off
-#pragma optimization_level 4
 void fn_800259B0(void) {
     extern u8 lbl_803A2058[];
     extern u8 lbl_803A204C[];
@@ -1933,8 +1936,8 @@ asm void fn_80025A7C(void) {
 #include "src/game/gs_title_fn_80025A7C.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_80025A7C(void) { }
+#endif
 #endif
 
 /* 0x80025A80 | 0x19C
@@ -1978,6 +1981,7 @@ extern f32 lbl_8047A3A4;
 extern f32 lbl_8047B8E4;
 extern f32 lbl_8047B8C8;
 extern void fn_80025C1C(f32, f32, f32, s32, s32, s32, f32*);
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80025A80)
 #if 0
 asm void fn_80025A80(void) {
 #include "src/game/gs_title_fn_80025A80.inc"
@@ -2191,20 +2195,21 @@ void fn_80025C1C(f32 arg_f1, f32 arg_f2, f32 arg_f3,
     fn_800D6728();
 }
 #endif
+#endif
 
 /* 0x80025F74 | 0x10 */
 extern u8 lbl_8047A3A8;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80025F74)
 #if 0
 asm void fn_80025F74(void) {
 #include "src/game/gs_title_fn_80025F74.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 s32 fn_80025F74(void) {
     lbl_8047A3A8 = 1;
     return 0;
 }
+#endif
 #endif
 
 /* 0x80025F84 | 0x3EC
@@ -2269,6 +2274,7 @@ extern f64 lbl_8047B8B8;
 extern f32 lbl_8047B8E4;
 extern f64 lbl_8047B8D0;
 extern f32 lbl_8047B900;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80025F84)
 #if 0
 asm void fn_80025F84(void) {
 #include "src/game/gs_title_fn_80025F84.inc"
@@ -2423,18 +2429,18 @@ void fn_80025F84(void) {
     }
 }
 #endif
+#endif
 
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_8002058C - 0x8002058C | size: 0x2c */
 extern u8 lbl_8047A32C;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_8002058C)
 #if 0
 asm void fn_8002058C(void) {
 #include "src/game/gs_title_fn_8002058C.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 void fn_8002058C(void) {
     lbl_8047A32C = 0;
     fn_801EF644(-1);
@@ -2444,11 +2450,13 @@ void fn_8002058C(void) {
     }
 }
 #endif
+#endif
 
 /* fn_800205C8 - 0x800205C8 | size: 0x44 */
 extern void fn_800FB680(u32 a, u32 b, s32 c, u32 d);
 extern u32 lbl_8047A350;
 extern u32 lbl_80478880;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800205C8)
 #if 0
 asm void fn_800205C8(void) {
 #include "src/game/gs_title_fn_800205C8.inc"
@@ -2463,18 +2471,20 @@ void fn_800205C8(u8* obj) {
 }
 #pragma pop
 #endif
+#endif
 
 /* fn_8002060C - 0x8002060C | size: 0xc */
 extern u32 lbl_8047A350;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_8002060C)
 #if 0
 asm void fn_8002060C(void) {
 #include "src/game/gs_title_fn_8002060C.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_8002060C(void) {
     lbl_8047A350 = 0;
 }
+#endif
 #endif
 
 /* fn_80020618 - 0x80020618 | size: 0x304 */
@@ -2490,6 +2500,7 @@ extern u32 lbl_8047B868;
 extern u32 lbl_8047B86C;
 extern u32 lbl_8047B870;
 extern f32 lbl_8047B874;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80020618)
 #if 0
 asm void fn_80020618(void) {
 #include "src/game/gs_title_fn_80020618.inc"
@@ -2497,14 +2508,15 @@ asm void fn_80020618(void) {
 #else
 void fn_80020618(void) { /* TODO */ }
 #endif
+#endif
 
 /* fn_8002091C - 0x8002091C | size: 0x10 */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_8002091C)
 #if 0
 asm void fn_8002091C(void) {
 #include "src/game/gs_title_fn_8002091C.inc"
 }
 #else
-#pragma optimization_level 4
 s32 fn_8002091C(void) {
     return *(s32*)lbl_803A1FC8;
 }
@@ -2519,8 +2531,6 @@ asm void fn_8002092C(void) {
 #include "src/game/gs_title_fn_8002092C.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma fp_contract on
 void fn_8002092C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
@@ -2545,7 +2555,6 @@ asm void fn_800209BC(void) {
 #include "src/game/gs_title_fn_800209BC.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_800209BC(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
@@ -2570,7 +2579,6 @@ asm void fn_80020A4C(void) {
 #include "src/game/gs_title_fn_80020A4C.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_80020A4C(void* r3, u8* r4) {
     f32 f2;
     f32 f0;
@@ -2593,8 +2601,6 @@ asm void fn_80020ADC(void) {
 #include "src/game/gs_title_fn_80020ADC.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 void fn_80020ADC(void* r3, u8* r4) {
     if (GSsndGetOutputMode() != 1) {
         *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
@@ -2610,8 +2616,6 @@ asm void fn_80020B34(void) {
 #include "src/game/gs_title_fn_80020B34.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 void fn_80020B34(void* r3, u8* r4) {
     if (GSsndGetOutputMode() == 1) {
         *(s8*)(r4 + 4) = *(s8*)(r4 + 4) | 2;
@@ -2627,7 +2631,6 @@ asm void fn_80020B8C(void) {
 #include "src/game/gs_title_fn_80020B8C.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_80020B8C(void* r3, u8* r4) {
     *(f32*)(r4 + 0x70) = *(f32*)(lbl_803A1FC8 + 0x10);
 }
@@ -2642,8 +2645,6 @@ asm void fn_80020BA0(void) {
 #include "src/game/gs_title_fn_80020BA0.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 void fn_80020BA0(void* arg0, u8* arg1) {
     s16* ptr;
 
@@ -2679,9 +2680,6 @@ asm void fn_80020C9C(void) {
 #include "src/game/gs_title_fn_80020C9C.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
 void fn_80020C9C(void) {
     extern void _threadSwitch(void);
     extern u8 winSeqCheckMove(s32);
@@ -2758,20 +2756,19 @@ void fn_80020C9C(void) {
         }
     } while (active != 0);
 }
-#pragma pop
+#endif
 #endif
 
 /* fn_80020EA4 - 0x80020EA4 | size: 0xb0 */
 extern u32 lbl_8047A360;
 extern u32 lbl_802E4EF0[];
 extern u32 lbl_802E4ED8[];
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80020EA4)
 #if 0
 asm void fn_80020EA4(void) {
 #include "src/game/gs_title_fn_80020EA4.inc"
 }
 #else
-#pragma push
-#pragma optimization_level 2
 void fn_80020EA4(u8* r3, u8* r4) {
     u8* r31;
     u8 byte;
@@ -2788,7 +2785,7 @@ void fn_80020EA4(u8* r3, u8* r4) {
         }
     }
 }
-#pragma pop
+#endif
 #endif
 
 /* fn_80020F54 - 0x80020F54 | size: 0x19c */
@@ -2800,14 +2797,12 @@ extern u8 lbl_803A1FF8[];
 extern u8 lbl_80314F98[];
 extern u32 lbl_8047B898;
 extern u32 lbl_8047B89C;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80020F54)
 #if 0
 asm void fn_80020F54(void) {
 #include "src/game/gs_title_fn_80020F54.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
 void fn_80020F54(u8* arg0, u8* arg1) {
     extern void fn_800D88DC(s32);
     extern void fn_800D888C(s32);
@@ -2868,7 +2863,7 @@ void fn_80020F54(u8* arg0, u8* arg1) {
         break;
     }
 }
-#pragma pop
+#endif
 #endif
 
 /* fn_800210F0 - 0x800210F0 | size: 0x4d4 */
@@ -2896,6 +2891,7 @@ extern u32 lbl_8047B898;
 extern u32 lbl_8047A358;
 extern void menuModelSetMotion(void);
 extern u8 menuSubOpenYesNo(s32, s32, s32, s32);
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800210F0)
 #if 0
 asm void fn_800210F0(void) {
 #include "src/game/gs_title_fn_800210F0.inc"
@@ -2903,16 +2899,16 @@ asm void fn_800210F0(void) {
 #else
 void fn_800210F0(void) { /* TODO */ }
 #endif
+#endif
 
 /* fn_800215C4 - 0x800215C4 | size: 0x60 */
 extern u32 lbl_8047A35C;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800215C4)
 #if 0
 asm void fn_800215C4(void) {
 #include "src/game/gs_title_fn_800215C4.inc"
 }
 #else
-#pragma peephole off
-#pragma optimization_level 4
 void fn_800215C4(void) {
     menuCloseCustom(0xaa, 0, 1);
     menuCloseCustom(0x7a, 0, 1);
@@ -2920,35 +2916,32 @@ void fn_800215C4(void) {
     fn_801CB9D8(lbl_8047A35C);
     fn_8010A420(lbl_803A1FF8);
 }
-#pragma peephole on
+#endif
 #endif
 
 /* fn_80021624 - 0x80021624 | size: 0x20 */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80021624)
 #if 0
 asm void fn_80021624(void) {
 #include "src/game/gs_title_fn_80021624.inc"
 }
 #else
-#pragma push
-#pragma optimization_level 4
-#pragma dont_inline on
 void fn_80021624(void) {
     fn_800210F0();
 }
-#pragma pop
+#endif
 #endif
 
 /* fn_80021644 - 0x80021644 | size: 0x9c */
 extern void GSscene_SetMode(void);
 extern u32 lbl_8047A35C;
 extern u32 lbl_8047A358;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80021644)
 #if 0
 asm void fn_80021644(void) {
 #include "src/game/gs_title_fn_80021644.inc"
 }
 #else
-#pragma peephole off
-#pragma optimization_level 4
 void fn_80021644(void) {
     extern void fn_80165A20(s32, s32, s32);
     extern void* fn_80113F48(void);
@@ -2969,19 +2962,19 @@ void fn_80021644(void) {
         (&lbl_8047A360)[1] = 0;
     }
 }
-#pragma peephole on
+#endif
 #endif
 
 /* fn_800216E8 - 0x800216E8 | size: 0x1d4 */
 extern void fn_800F96E4(void*, s32, void*);
 extern void* pokemonBiosGetNicknamePtr(s32);
 extern u8 lbl_80266C7C[];
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800216E8)
 #if 0
 asm void fn_800216E8(void) {
 #include "src/game/gs_title_fn_800216E8.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
     struct TitleNameCand {
         s32 code;
@@ -3062,8 +3055,6 @@ asm void fn_800218BC(void) {
 #include "src/game/gs_title_fn_800218BC.inc"
 }
 #else
-#pragma push
-#pragma peephole off
 s32 fn_800218BC(u32 arg0, u32* arg1)
 {
     extern f32 pokemonGetDp(void*);
@@ -3135,17 +3126,16 @@ s32 fn_800218BC(u32 arg0, u32* arg1)
     }
     return 1;
 }
-#pragma pop
+#endif
 #endif
 
 /* fn_80021A9C - 0x80021A9C | size: 0x78 */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80021A9C)
 #if 0
 asm void fn_80021A9C(void) {
 #include "src/game/gs_title_fn_80021A9C.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma peephole off
 s32 fn_80021A9C(u32 r3, u32* r4) {
     u8* r5;
     s32 count;
@@ -3164,6 +3154,7 @@ s32 fn_80021A9C(u32 r3, u32* r4) {
     return 1;
 }
 #endif
+#endif
 
 /* fn_80021B14 - 0x80021B14 | size: 0x53c */
 extern void fn_80142EF8(void);
@@ -3177,12 +3168,14 @@ extern u8 lbl_80478890[8];
 extern u8 lbl_80266DB0[];
 extern u8 lbl_80266D78[];
 extern void fn_80023968(void);
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80021B14)
 #if 0
 asm void fn_80021B14(void) {
 #include "src/game/gs_title_fn_80021B14.inc"
 }
 #else
 void fn_80021B14(void) { /* TODO */ }
+#endif
 #endif
 
 /* fn_80022050 - 0x80022050 | size: 0x12c */
@@ -3191,13 +3184,12 @@ extern s32 fn_801347E8(s32, s8);
 extern void fn_800140FC(s32*, s32*);
 extern s32 fightTrainerIsSelectedItemBall(s32);
 extern void fn_80023968(void);
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80022050)
 #if 0
 asm void fn_80022050(void) {
 #include "src/game/gs_title_fn_80022050.inc"
 }
 #else
-#pragma optimization_level 4
-#pragma peephole off
 s32 fn_80022050(s32 arg0, s32* arg1) {
     s32 sp14;
     s32 sp10;
@@ -3243,8 +3235,10 @@ s32 fn_80022050(s32 arg0, s32* arg1) {
     return 0;
 }
 #endif
+#endif
 
 /* fn_8002217C - 0x8002217C | size: 0x2fc */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_8002217C)
 #if 0
 asm void fn_8002217C(void) {
 #include "src/game/gs_title_fn_8002217C.inc"
@@ -3264,8 +3258,6 @@ asm void fn_80022478(void) {
 #include "src/game/gs_title_fn_80022478.inc"
 }
 #else
-#pragma push
-#pragma peephole off
 s32 fn_80022478(u32 arg0, u32* arg1) {
     u8 state_buf[0x110];
     u8 text_buf[0x100];
@@ -3350,7 +3342,6 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
         return 1;
     }
 }
-#pragma pop
 #endif
 
 /* fn_80022720 - 0x80022720 | size: 0x114
@@ -3708,17 +3699,16 @@ s32 fn_80022B3C(s32 arg0, s32 arg1) {
     return 1;
 }
 #endif
+#endif
 
 /* fn_80022E54 - 0x80022E54 | size: 0x90 */
 extern void fn_800190D8(void*, s32);
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80022E54)
 #if 0
 asm void fn_80022E54(void) {
 #include "src/game/gs_title_fn_80022E54.inc"
 }
 #else
-#pragma push
-#pragma optimization_level 4
-#pragma scheduling on
 s32 fn_80022E54(void* r3, u32* r4) {
     void* r29;
     u32* r30;
@@ -3738,7 +3728,6 @@ s32 fn_80022E54(void* r3, u32* r4) {
     }
     return 1;
 }
-#pragma pop
 #endif
 
 /* fn_80022EE4 - 0x80022EE4 | size: 0x184 */
@@ -3751,8 +3740,6 @@ asm void fn_80022EE4(void) {
 #include "src/game/gs_title_fn_80022EE4.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 s32 fn_80022EE4(u32 arg0, u32* arg1) {
     extern s32 fn_80144574(void*, s32, s32, u16, s32);
     u8 text_buf[0x100];
@@ -3796,17 +3783,17 @@ s32 fn_80022EE4(u32 arg0, u32* arg1) {
     return 1;
 }
 #endif
+#endif
 
 /* fn_80023068 - 0x80023068 | size: 0x20c */
 extern s32 fn_80019B48(s32);
 extern void fn_80019B1C(void);
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80023068)
 #if 0
 asm void fn_80023068(void) {
 #include "src/game/gs_title_fn_80023068.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 s32 fn_80023068(u32 arg0, u32* arg1) {
     extern s32 fn_80144574(void*, s32, s32, u16, s32);
     extern void fn_800216E8(void*, s32, void*, s32, s32);
@@ -3886,17 +3873,17 @@ s32 fn_80023068(u32 arg0, u32* arg1) {
     return 1;
 }
 #endif
+#endif
 
 /* cbForgetWazaSelect__FP7PokemonUsl - 0x80023274 | size: 0x7c */
 extern s32 fn_80097B04(s32, s32);
 extern f32 lbl_8047B8A4;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80023274)
 #if 0
 asm void cbForgetWazaSelect__FP7PokemonUsl(void) {
 #include "src/game/gs_title_fn_80023274.inc"
 }
 #else
-#pragma scheduling on
-#pragma optimization_level 4
 s32 cbForgetWazaSelect__FP7PokemonUsl(s32 r3, s32 r4) {
     s32 result;
 
@@ -3910,7 +3897,7 @@ s32 cbForgetWazaSelect__FP7PokemonUsl(s32 r3, s32 r4) {
     fadeCheck(1);
     return (s8)result;
 }
-#pragma peephole on
+#endif
 #endif
 
 /* fn_800232F0 - 0x800232F0 | size: 0x470 */
@@ -3922,6 +3909,7 @@ extern void winMsgCloseLevelUpStatus(void);
 extern void pokemonSearchWazaDataId(void);
 extern void pokemonGetOboeWazaDataId(void);
 extern f32 lbl_8047B8A4;
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800232F0)
 #if 0
 asm void fn_800232F0(void) {
 #include "src/game/gs_title_fn_800232F0.inc"
@@ -3936,7 +3924,6 @@ asm void fn_80023760(void) {
 #include "src/game/gs_title_fn_80023760.inc"
 }
 #else
-#pragma optimization_level 4
 s32 fn_80023760(u32 arg0, u32* arg1) {
     u8 buf[0x80];
     u16 entries[5];
@@ -4024,10 +4011,6 @@ asm void fn_80023B9C(void) {
 #include "src/game/gs_title_fn_80023B9C.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-#pragma scheduling on
-#pragma optimization_level 4
 s32 fn_80023B9C(u32 arg0, u32* arg1) {
     extern void fn_800216E8(void*, s32, void*, s32, s32);
     u32 sc;
@@ -4099,17 +4082,16 @@ ret_zero:
 
     return 1;
 }
-#pragma pop
+#endif
 #endif
 
 /* fn_80023DA8 - 0x80023DA8 | size: 0x3c */
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80023DA8)
 #if 0
 asm void fn_80023DA8(void) {
 #include "src/game/gs_title_fn_80023DA8.inc"
 }
 #else
-#pragma scheduling off
-#pragma optimization_level 4
 s32 fn_80023DA8(void) {
     winMsgOpen(2, 0x44c6, 1, 0);
     winMsgClose(1);
@@ -4123,8 +4105,6 @@ asm void fn_80023DE4(void) {
 #include "src/game/gs_title_fn_80023DE4.inc"
 }
 #else
-#pragma scheduling off
-#pragma optimization_level 4
 s32 fn_80023DE4(void) {
     winMsgOpen(2, 0x4261, 1, 0);
     winMsgClose(1);
@@ -4138,8 +4118,6 @@ asm void fn_80023E20(void) {
 #include "src/game/gs_title_fn_80023E20.inc"
 }
 #else
-#pragma scheduling off
-#pragma optimization_level 4
 s32 fn_80023E20(void) {
     winMsgOpen(2, 0x426a, 1, 0);
     winMsgClose(1);
@@ -4153,8 +4131,8 @@ asm void fn_80023E5C(void) {
 #include "src/game/gs_title_fn_80023E5C.inc"
 }
 #else
-#pragma optimization_level 4
 void fn_80023E5C(void) { }
+#endif
 #endif
 
 /* fn_80023E60 - 0x80023E60 | size: 0x300 */
@@ -4174,15 +4152,12 @@ extern u8 lbl_8047A380;
 extern void fn_80024160(u8*, void*, u16*, u8*);
 extern u8 lbl_803A2058[];
 extern u8 lbl_803A204C[];
+#if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80023E60)
 #if 0
 asm void fn_80023E60(void) {
 #include "src/game/gs_title_fn_80023E60.inc"
 }
 #else
-#pragma push
-#pragma scheduling on
-#pragma peephole off
-#pragma optimization_level 4
 s32 fn_80023E60(u8* arg0) {
     extern s32 windowGetCursorToItem(u8*);
     extern u16* windowGetKeyInfo(void);
@@ -4295,7 +4270,6 @@ MATCH2:
 
     return 0;
 }
-#pragma pop
 #endif
 
 /* fn_80024160 - 0x80024160 | size: 0x1a8 */
@@ -4307,9 +4281,6 @@ asm void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
 #include "src/game/gs_title_fn_80024160.inc"
 }
 #else
-#pragma push
-#pragma peephole off
-#pragma optimization_level 4
 void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
     s32 chain_index;
     s32 active_index;
@@ -4383,7 +4354,6 @@ void fn_80024160(u8* arg0, void* arg1, u16* arg2, u8* arg3) {
         }
     }
 }
-#pragma pop
 #endif
 
 /* fn_80024308 - 0x80024308 | size: 0x130
@@ -4465,4 +4435,5 @@ s32 fn_80024308(u8* arg0) {
     return 0;
 }
 #pragma pop
+#endif
 #endif

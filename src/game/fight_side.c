@@ -11,6 +11,8 @@
 
 #include "game/pokemon_fight_types.h"
 
+#if defined(FIGHT_SIDE_801F6B54_801F6F38)
+
 /* 0x801F6B54 | size: 0xF8 | medium */
 void fightSideRegistFightSideEnemyPokemonFightAll(u32 param_1, u32 param_2, u32 param_3, u32 param_4, u32 param_5) {
     extern u32 fightSideBiosGetFightTrainerPtr(u32, u32);
@@ -146,6 +148,10 @@ void fightSideInitJoutaiDataId(u32 param_1, u32 param_2) {
         fn_8011B788(param_1, param_2);
     }
 }
+
+#endif
+
+#if defined(FIGHT_SIDE_801F6F38_801F7258)
 
 /* 0x801F6F38 | size: 0x9C | medium */
 s16 fightSideGetHikaeFightPokemonNum(u32 param_1, u32 param_2, u32 param_3, u32 param_4) {
@@ -310,6 +316,10 @@ s32 fightSideGetFightPokemonNokoriHp(u32 param_1, u32 param_2, u32 param_3) {
     return total;
 }
 
+#endif
+
+#if defined(FIGHT_SIDE_801F7258_801F72B0)
+
 /* 0x801F7258 | size: 0x58 | small */
 u32 fightSideGetValidFightTrainerPtr(u32 param_1) {
     extern u32 fightSideBiosGetFightTrainerPtr(u32);
@@ -328,6 +338,10 @@ u32 fightSideGetValidFightTrainerPtr(u32 param_1) {
     }
     return uVar1;
 }
+
+#endif
+
+#if defined(FIGHT_SIDE_801F72B0_801F7388)
 
 /* 0x801F72B0 | size: 0xD8 | medium */
 void fightSideGetFightTrainerGridParam(u32 param_1, u16 param_2, u16 param_3, s8* param_4, u8* param_5) {
@@ -362,6 +376,10 @@ void fightSideGetFightTrainerGridParam(u32 param_1, u16 param_2, u16 param_3, s8
         }
     }
 }
+
+#endif
+
+#if defined(FIGHT_SIDE_801F7388_801F75F8)
 
 u8 fightSideGetDoFightTrainerCount(u32 param_1) {
     extern u32 fightSideBiosGetFightTrainerPtr(u32, u32);
@@ -492,6 +510,10 @@ void fightSideInitAry(u32 param_1, u16 param_2) {
     }
 }
 
+#endif
+
+#if defined(FIGHT_SIDE_801F75F8_801F76B8)
+
 /* 0x801F75F8 | size: 0xC4 | medium */
 void fightSideSetStatus(u8* ptr1, u32 param2, u32 slotType, u32 param4, u32 param5) {
     extern u8* fightSideDataBiosGetPtr(u32);
@@ -534,6 +556,10 @@ void fightSideSetStatus(u8* ptr1, u32 param2, u32 slotType, u32 param4, u32 para
     }
 }
 
+#endif
+
+#if defined(FIGHT_SIDE_801F76B8_801F7798)
+
 /* 0x801F76B8 | size: 0xE0 | fightSideGetStatus: per-side status dispatcher */
 u32 fightSideGetStatus(u8* ptr1, u32 param2, u32 slotType, u32 param5) {
     extern u32 fightSideDataBiosGetFightoutPokemonStatusMenuDataId(u8*, u32);
@@ -573,3 +599,5 @@ u32 fightSideGetStatus(u8* ptr1, u32 param2, u32 slotType, u32 param5) {
         return 0;
     }
 }
+
+#endif

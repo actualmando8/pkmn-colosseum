@@ -429,23 +429,31 @@ extern void macHandle(u32 deltaTime);       /* macHandle */
 extern u32 synthStartSound(u16 id, u8 prio, u8 max, u8 key, u8 vol, u8 panning, u8 midi,
                           u8 midiSet, u8 section, u16 step, u16 trackid, u8 vGroup,
                           s16 prioOffset, u8 studio, u32 itd);
+#if defined(SYNTH_SUFFIX_SPLIT) && defined(SYNTH_SUFFIX_INIT)
+extern u32 synthHWMessageHandler(u32 mesg, u32 voiceID);
+#endif
 
 /*
  * These definitions remain visible in this partition because GC/1.3.2 inlines
  * them into suffix functions. static inline prevents duplicate out-of-line
  * symbols; the canonical definitions live in the preceding partitions.
  */
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_INIT)
 static inline void synthSetBpm(u32 bpm, u8 seqId, u8 secIndex) {
     if (seqId == 0xff) {
         seqId = 8;
     }
     lbl_80434A10[seqId][secIndex] = ((bpm << 3) * 1536) / 240;
 }
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT)
 static inline u32 synthGetTicksPerSecond(SYNTH_VOICE* svoice) {
     return lbl_80434A10[svoice->midiSet == 0xff ? 8 : svoice->midiSet][svoice->section];
 }
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_LOW)
 static inline void synthInitPortamento(SYNTH_VOICE* svoice) {
     if (svoice->cFlags & 0x20000) {
         return;
@@ -461,11 +469,22 @@ static inline void synthInitPortamento(SYNTH_VOICE* svoice) {
     }
     svoice->portCurPitch = svoice->lastNote << 16;
 }
+#endif
+
+#if defined(SYNTH_SUFFIX_SPLIT) && \
+    (defined(SYNTH_SUFFIX_LOW) || defined(SYNTH_SUFFIX_ZERO))
+extern void synthAddJob(SYNTH_VOICE* svoice, u32 jobType, u32 deltaTime);
+#endif
 
 /* -------------------------------------------------------------------
  * synthGetTicksPerSecond / synthSetBpm's table
  * ---------------------------------------------------------------- */
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_JOBS)
+#if defined(SYNTH_SUFFIX_SPLIT)
+void synthAddJob(SYNTH_VOICE* svoice, u32 jobType, u32 deltaTime) {
+#else
 static void synthAddJob(SYNTH_VOICE* svoice, u32 jobType, u32 deltaTime) {
+#endif
     u8 jobTabIndex;
     SYNTH_QUEUE* newJq;
     SYNTH_QUEUE** root;
@@ -541,7 +560,9 @@ void synthForceLowPrecisionUpdate(SYNTH_VOICE* svoice) {
 }
 
 void synthKeyStateUpdate(SYNTH_VOICE* svoice) { synthAddJob(svoice, 2, 0); }
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_FX)
 u8 synthFXGetMaxVoices(u16 fid) {
     FX_TAB* fx;
     if ((fx = (FX_TAB*)dataGetFX(fid)) != NULL) {
@@ -636,8 +657,10 @@ u32 synthSendKeyOff(u32 voiceid) {
     }
     return ret;
 }
+#endif
 
-static void SetupFader(SYNTHMasterFader* smf, u8 volume, u32 time, u8 seqMode, u32 seqId) {
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_VOLUME)
+static inline void SetupFader(SYNTHMasterFader* smf, u8 volume, u32 time, u8 seqMode, u32 seqId) {
     smf->seqMode = seqMode;
     smf->seqId = seqId;
     if (time != 0) {
@@ -717,7 +740,9 @@ void synthVolume(u8 volume, u16 time, u8 vGroup, u8 seqMode, u32 seqId) {
         return;
     }
 }
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_POST)
 u32 synthIsFadeOutActive(u8 vGroup) {
     if (lbl_80434E64[vGroup].type != 4 && (lbl_8047AF40 & (1 << vGroup)) != 0 &&
         lbl_80434E64[vGroup].start > lbl_80434E64[vGroup].target) {
@@ -731,16 +756,22 @@ void synthSetMusicVolumeType(u8 vGroup, u8 type) {
         lbl_80434E64[vGroup].type = type;
     }
 }
+#endif
 
-static void UpdateTimeMIDICtrl(SYNTH_VOICE* sv) {
+#if !defined(SYNTH_SUFFIX_SPLIT) || \
+    defined(SYNTH_SUFFIX_LOW) || defined(SYNTH_SUFFIX_ZERO) || \
+    defined(SYNTH_SUFFIX_HANDLE)
+static inline void UpdateTimeMIDICtrl(SYNTH_VOICE* sv) {
     if (!sv->timeUsedByInput) {
         return;
     }
     sv->timeUsedByInput = 0;
     sv->midiDirtyFlags = 0x1fff;
 }
+#endif
 
-static u32 apply_portamento(SYNTH_VOICE* svoice, u32 ccents, u32 deltaTime) {
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_LOW)
+static inline u32 apply_portamento(SYNTH_VOICE* svoice, u32 ccents, u32 deltaTime) {
     u32 old_portCurPitch;
 
     if ((svoice->cFlags & 0x400) != 0 && (s32)((svoice->portDuration - svoice->portTime) >> 8) > 0) {
@@ -759,7 +790,7 @@ static u32 apply_portamento(SYNTH_VOICE* svoice, u32 ccents, u32 deltaTime) {
     return ccents;
 }
 
-static u32 convert_cents(SYNTH_VOICE* svoice, u32 ccents) {
+static inline u32 convert_cents(SYNTH_VOICE* svoice, u32 ccents) {
     u32 curDetune;
     u32 cpitch;
 
@@ -920,7 +951,9 @@ void LowPrecisionHandler(u32 i) {
 end:
     UpdateTimeMIDICtrl(sv);
 }
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_ZERO)
 #pragma fp_contract off
 void ZeroOffsetHandler(u32 i) {
     SYNTH_VOICE* sv;
@@ -1050,8 +1083,13 @@ end:
     UpdateTimeMIDICtrl(sv);
 }
 #pragma fp_contract on
+#endif
 
-static void EventHandler(u32 i) {
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_HANDLE)
+extern void LowPrecisionHandler(u32 i);
+extern void ZeroOffsetHandler(u32 i);
+
+static inline void EventHandler(u32 i) {
     SYNTH_VOICE* sv;
 
     sv = &lbl_8047AF48[i];
@@ -1079,7 +1117,7 @@ end:
     UpdateTimeMIDICtrl(sv);
 }
 
-static void HandleJobQueue(SYNTH_QUEUE** queueRoot, void (*handler)(u32)) {
+static inline void HandleJobQueue(SYNTH_QUEUE** queueRoot, void (*handler)(u32)) {
     SYNTH_QUEUE* jq;
     SYNTH_QUEUE* nextJq;
 
@@ -1096,7 +1134,7 @@ static void HandleJobQueue(SYNTH_QUEUE** queueRoot, void (*handler)(u32)) {
     *queueRoot = NULL;
 }
 
-static void HandleVoices(SYNTH_JOBTAB* jobTables) {
+static inline void HandleVoices(SYNTH_JOBTAB* jobTables) {
     SYNTH_JOBTAB* jTab;
 
     jTab = &jobTables[lbl_8047AF19];
@@ -1106,7 +1144,7 @@ static void HandleVoices(SYNTH_JOBTAB* jobTables) {
     lbl_8047AF19 = (lbl_8047AF19 + 1) & 0x1f;
 }
 
-static void HandleFaderTermination(SYNTHMasterFader* smf) {
+static inline void HandleFaderTermination(SYNTHMasterFader* smf) {
     switch (smf->seqMode) {
     case 1: seqStop(smf->seqId); break;
     case 2: seqPause(smf->seqId); break;
@@ -1194,7 +1232,9 @@ void synthHandle(u32 deltaTime) {
     lbl_8047AF58 += deltaTime;
 }
 #pragma fp_contract on
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_POST)
 u32 synthHWMessageHandler(u32 mesg, u32 voiceID) {
     u32 ret;
     ret = 0;
@@ -1223,8 +1263,10 @@ u32 synthHWMessageHandler(u32 mesg, u32 voiceID) {
     }
     return ret;
 }
+#endif
 
-static void synthInitJobQueue(SYNTH_JOBTAB* jobTables) {
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_INIT)
+static inline void synthInitJobQueue(SYNTH_JOBTAB* jobTables) {
     u8 i;
 
     for (i = 0; i < 32; ++i) {
@@ -1328,7 +1370,10 @@ void synthInit(u32 mixFrq, u32 numVoices) {
 
     fn_8016248C((u32)synthHWMessageHandler);
 }
+#endif
 
+#if !defined(SYNTH_SUFFIX_SPLIT) || defined(SYNTH_SUFFIX_EXIT)
 void synthExit(void) {
     fn_80164400((u32)lbl_8047AF48);
 }
+#endif

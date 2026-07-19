@@ -503,12 +503,14 @@ typedef struct GSgfxStatePartial {
  *     blr
  * ================================================================== */
 
+#if defined(GS_GFX_LAYER_800D7230_800D76A8)
 void fn_800D7230(void) {
     GSgfxStatePartial* state = (GSgfxStatePartial*)lbl_8047AA80;
     u8 value = state->fifoAttrBase;
 
     *(volatile u8*)0xCC008000 = value + (value << 1);
 }
+#endif
 
 /* ==================================================================
  * fn_800D892C -- GSgfx_ConfigurePipeline
@@ -516,6 +518,7 @@ void fn_800D7230(void) {
  * Configure the full GX rendering pipeline. At 2320 bytes, this is
  * a major setup function. Called once per render mode change.
  * ================================================================== */
+#if defined(GS_GFX_LAYER_800D892C_800D9AF0)
 void fn_800D892C(u32 objArg) {
     u8* obj;
     u8* state;
@@ -724,7 +727,9 @@ void fn_800D892C(u32 objArg) {
 
     fn_800D923C();
 }
+#endif
 
+#if defined(GS_GFX_LAYER_800D6B00_800D7230)
 extern u8 lbl_804007E8[];
 #if 0
 asm void fn_800D6B00(void) {
@@ -797,7 +802,9 @@ void fn_800D6B00(void) {
     *(u8*)(state + 0x49f) = 0;
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D7230_800D76A8)
 extern u32 lbl_8047AA80;
 #if 0
 asm void fn_800D724C(void) {
@@ -1231,6 +1238,7 @@ void fn_800D7650(u8* obj) {
     obj[0x158] = 0; obj[0x174] = 0;
 }
 #endif
+#endif
 
 extern void fn_800B7D74(u32, u32, u32, u32, u8);
 extern void fn_800B7D3C(void);
@@ -1240,6 +1248,7 @@ extern u8 lbl_80314370[];
 extern u8 lbl_803143B4[];
 extern u8 lbl_803143D8[];
 extern u8 lbl_803143A8[];
+#if defined(GS_GFX_LAYER_800D76A8_800D7820)
 #if 0
 asm void fn_800D76A8(void) {
 #include "src/game/gs_render_fn_800D76A8.inc"
@@ -1268,7 +1277,9 @@ void fn_800D76A8(u32 obj, u16 vertCount) {
     fn_800D7940(obj, vertCount);
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D7820_800D7894)
 #if 0
 asm void fn_800D7820(void) {
 #include "src/game/gs_render_fn_800D7820.inc"
@@ -1296,7 +1307,9 @@ void fn_800D7868(u8* arr, u32 idx, u32 a, u32 b, u32 c, u8 d, u32 e, u8 f) {
     p[0x20] = f;
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D7894_800D7A70)
 extern u32 lbl_8047AAB0;
 extern u32 lbl_8047AAAC;
 extern u8 lbl_803144D0[];
@@ -1394,7 +1407,9 @@ void fn_800D7940(u32 obj, u16 vertCount) {
     fn_800D6728();
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D7A70_800D7D90)
 #if 0
 asm void fn_800D7A70(u32) {
 #include "src/game/gs_render_fn_800D7A70.inc"
@@ -1518,7 +1533,9 @@ void fn_800D7D10(u8 idx, void* src) {
     else { fn_800E0628(src, &lbl_80400948[idx * 0x30]); }
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D7D90_800D7E5C)
 extern u8 lbl_8047AAC8;
 #if 0
 asm void fn_800D7D90(void) {
@@ -1545,7 +1562,9 @@ void fn_800D7D90(u8 idx, void* src) {
     }
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D7E5C_800D85D4)
 extern u32 lbl_8047AAC0;
 extern u32 lbl_8047AAC4;
 extern u8 lbl_8047AAC8;
@@ -1709,21 +1728,21 @@ asm void fn_800D8284(void) {
 }
 #else
 void fn_800D8284(f32 a, f32 b, f32 c) {
-    f32 f30;
-    f32 f31;
-    u32 r31;
-    f30 = b;
-    f31 = c;
+    f32 y;
+    f32 z;
+    u32 matrixIndex;
+    y = b;
+    z = c;
     if (*(s32*)lbl_8047AA80 == 1) {
-        fn_800D4F98(0x3c, 0xd, a, f30, f31);
+        fn_800D4F98(0x3c, 0xd, a, y, z);
     } else {
         fn_800E0370((void*)lbl_8047AAC0, a);
-        fn_800E032C((void*)lbl_8047AAC0, f30);
-        fn_800E02E8((void*)lbl_8047AAC0, f31);
-        r31 = *(u32*)(lbl_80314610 + 0x24);
-        GXLoadPosMtxImm(lbl_8047AAC0, r31);
-        GXLoadNrmMtxImm(lbl_8047AAC0, r31);
-        fn_800BD554(r31);
+        fn_800E032C((void*)lbl_8047AAC0, y);
+        fn_800E02E8((void*)lbl_8047AAC0, z);
+        matrixIndex = *(u32*)(lbl_80314610 + 0x24);
+        GXLoadPosMtxImm(lbl_8047AAC0, matrixIndex);
+        GXLoadNrmMtxImm(lbl_8047AAC0, matrixIndex);
+        fn_800BD554(matrixIndex);
         fn_800E0628((void*)(lbl_80400948 + 0x1b0), (void*)lbl_8047AAC0);
         lbl_8047AAC8 = 0;
     }
@@ -1817,7 +1836,9 @@ void fn_800D848C(u32 idx, s32 mode, u32 arg, void* mtx) {
     }
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D85D4_800D87AC)
 extern void fn_800BAE34();
 extern void fn_800BACA0();
 extern void fn_800BB098();
@@ -1872,7 +1893,9 @@ void fn_800D85D4(s32 slot, void* model) {
     *(u32*)(lbl_804001F0 + 0x24) += 1;
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D87AC_800D892C)
 extern void fn_800BBC34(u32);
 extern void fn_800BBC0C(u32);
 #if 0
@@ -1926,7 +1949,9 @@ void fn_800D88DC(u32 mask) {
     else { *(s32*)(lbl_8047AA80 + 0x10) |= mask; }
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D892C_800D9AF0)
 extern void fn_800BA6B0();
 extern void fn_800BA6F4();
 extern void fn_800B884C();
@@ -2045,7 +2070,9 @@ void fn_800D923C(void) {
     *(u32*)(state + 0x414) = 0;
 }
 #endif
+#endif
 
+#if defined(GS_GFX_LAYER_800D892C_800D9AF0)
 #if 0
 asm void fn_800D963C(void) {
 #include "src/game/gs_render_fn_800D963C.inc"
@@ -2104,4 +2131,5 @@ void fn_800D963C(u32 idx, s32 mode) {
 
     *(u32*)(state + 0x414) |= 4;
 }
+#endif
 #endif
