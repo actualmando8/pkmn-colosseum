@@ -1347,13 +1347,21 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/wazaSequenceSys_tail.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/wazaSequenceSys_tail_candidate_801DAC90.c"),
+                    (Matching, "game/wazaSequenceSys_tail_exact_801DB060.c"),
+                    (CodeCandidate, "game/wazaSequenceSys_tail_candidate_801DB288.c"),
+                    (Matching, "game/wazaSequenceSys_tail_exact_801DB848.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/wazaSequence.c",

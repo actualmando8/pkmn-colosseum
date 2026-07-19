@@ -2915,8 +2915,17 @@ game/wazaSequenceEntry.c:
 game/wazaSequenceSys.c:
 	.text       start:0x801D9E1C end:0x801DAC90
 
-game/wazaSequenceSys_tail.c:
-	.text       start:0x801DAC90 end:0x801DB988
+game/wazaSequenceSys_tail_candidate_801DAC90.c:
+	.text       start:0x801DAC90 end:0x801DB060
+
+game/wazaSequenceSys_tail_exact_801DB060.c:
+	.text       start:0x801DB060 end:0x801DB288
+
+game/wazaSequenceSys_tail_candidate_801DB288.c:
+	.text       start:0x801DB288 end:0x801DB848
+
+game/wazaSequenceSys_tail_exact_801DB848.c:
+	.text       start:0x801DB848 end:0x801DB988
 
 game/wazaSequence.c:
 	.text       start:0x801DB988 end:0x801DCDA8
