@@ -1778,7 +1778,19 @@ game/gs_floor_data_exact_800FF0A0.c:
 	.text       start:0x800FF0A0 end:0x800FF178
 
 game/gs_floor_data_residual_800FF178.c:
-	.text       start:0x800FF178 end:0x800FF788
+	.text       start:0x800FF178 end:0x800FF4D4
+
+game/gs_floor_data_exact_800FF4D4.c:
+	.text       start:0x800FF4D4 end:0x800FF58C
+
+game/gs_floor_data_residual_800FF58C.c:
+	.text       start:0x800FF58C end:0x800FF660
+
+game/gs_floor_data_exact_800FF660.c:
+	.text       start:0x800FF660 end:0x800FF730
+
+game/gs_floor_data_residual_800FF730.c:
+	.text       start:0x800FF730 end:0x800FF788
 
 game/gs_floor.c:
 	.text       start:0x800FF788 end:0x80101910
