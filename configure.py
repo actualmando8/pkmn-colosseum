@@ -296,6 +296,12 @@ config.libs = [
             ),
             Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKTarget_exact_800C1548.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKTarget_residual_800C17CC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKTarget_exact_800C195C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKTarget_residual_800C1A08.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKTarget_exact_800C24BC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKTarget_residual_800C25FC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKBoard_range_800C33BC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(

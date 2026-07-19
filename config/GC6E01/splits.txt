@@ -1133,7 +1133,25 @@ trk/TRKTargetStopped.c:
 	.text       start:0x800C1328 end:0x800C1348
 
 trk/TRKTarget_range_800C1348.c:
-	.text       start:0x800C1348 end:0x800C2A10
+	.text       start:0x800C1348 end:0x800C1548
+
+trk/TRKTarget_exact_800C1548.c:
+	.text       start:0x800C1548 end:0x800C17CC
+
+trk/TRKTarget_residual_800C17CC.c:
+	.text       start:0x800C17CC end:0x800C195C
+
+trk/TRKTarget_exact_800C195C.c:
+	.text       start:0x800C195C end:0x800C1A08
+
+trk/TRKTarget_residual_800C1A08.c:
+	.text       start:0x800C1A08 end:0x800C24BC
+
+trk/TRKTarget_exact_800C24BC.c:
+	.text       start:0x800C24BC end:0x800C25FC
+
+trk/TRKTarget_residual_800C25FC.c:
+	.text       start:0x800C25FC end:0x800C2A10
 
 trk/TRKSaveState.c:
 	.text       start:0x800C2A10 end:0x800C2D80
