@@ -706,14 +706,47 @@ dolphin/pad/PAD_exact_800AB4FC.c:
 dolphin/pad/PAD_suffix_800ABD68.c:
 	.text       start:0x800ABD68 end:0x800AC02C
 
-dolphin/sdk_range_800AC02C.c:
-	.text       start:0x800AC02C end:0x800ACBFC
+dolphin/ai_exact_800AC02C.c:
+	.text       start:0x800AC02C end:0x800AC440
+
+dolphin/sdk_range_800AC440.c:
+	.text       start:0x800AC440 end:0x800AC5AC
+
+dolphin/ai_exact_800AC5AC.c:
+	.text       start:0x800AC5AC end:0x800AC6D4
+
+dolphin/sdk_range_800AC6D4.c:
+	.text       start:0x800AC6D4 end:0x800AC910
+
+dolphin/ar_exact_800AC910.c:
+	.text       start:0x800AC910 end:0x800AC954
+
+dolphin/ar_exact_800AC954.c:
+	.text       start:0x800AC954 end:0x800ACB44
+
+dolphin/ar_exact_800ACB44.c:
+	.text       start:0x800ACB44 end:0x800ACBFC
 
 dolphin/sdk_exact_800ACBFC.c:
 	.text       start:0x800ACBFC end:0x800AE3F0
 
-dolphin/sdk_range_800AE3F0.c:
-	.text       start:0x800AE3F0 end:0x800B3B68
+dolphin/ar_dsp_exact_800AE3F0.c:
+	.text       start:0x800AE3F0 end:0x800AE9FC
+
+dolphin/sdk_range_800AE9FC.c:
+	.text       start:0x800AE9FC end:0x800AF474
+
+dolphin/card_exact_800AF474.c:
+	.text       start:0x800AF474 end:0x800AF8A0
+
+dolphin/sdk_range_800AF8A0.c:
+	.text       start:0x800AF8A0 end:0x800B1788
+
+dolphin/card_exact_800B1788.c:
+	.text       start:0x800B1788 end:0x800B2070
+
+dolphin/sdk_range_800B2070.c:
+	.text       start:0x800B2070 end:0x800B3B68
 
 dolphin/card_exact_800B3B68.c:
 	.text       start:0x800B3B68 end:0x800B4488
@@ -2137,10 +2170,7 @@ game/fight_range_80217D34.c:
 	.data       start:0x8039A028 end:0x8039A048
 
 game/data/data_8039A048.c:
-	.data       start:0x8039A048 end:0x8039A690
-
-game/data/data_8039A6A8.c:
-	.data       start:0x8039A6A8 end:0x8039A6C8
+	.data       start:0x8039A048 end:0x8039A130
 
 game/fight_range_exact_80217E20.c:
 	.text       start:0x80217E20 end:0x80218BD4
@@ -2163,8 +2193,11 @@ game/fight_range_80219FE4.c:
 game/fight_range_exact_8021A054.c:
 	.text       start:0x8021A054 end:0x8021A2C0
 
-game/fight_range_8021A2C0.c:
-	.text       start:0x8021A2C0 end:0x8021A6CC
+game/fight_range_exact_8021A2C0.c:
+	.text       start:0x8021A2C0 end:0x8021A338
+
+game/fight_range_8021A338.c:
+	.text       start:0x8021A338 end:0x8021A6CC
 
 game/fight_range_exact_8021A6CC.c:
 	.text       start:0x8021A6CC end:0x8021B910
@@ -2182,7 +2215,30 @@ game/fight_range_exact_8021D9C0.c:
 	.text       start:0x8021D9C0 end:0x8021FAD4
 
 game/fight_range_8021FAD4.c:
-	.text       start:0x8021FAD4 end:0x80222110
+	.text       start:0x8021FAD4 end:0x80220778
+
+game/fight_range_exact_80220778.c:
+	.text       start:0x80220778 end:0x80220868
+
+game/fight_range_80220868.c:
+	.text       start:0x80220868 end:0x80220B8C
+
+game/fight_range_exact_80220B8C.c:
+	.text       start:0x80220B8C end:0x8022106C
+	.data       start:0x8039A130 end:0x8039A1C8
+
+game/fight_range_8022106C.c:
+	.text       start:0x8022106C end:0x80221104
+
+game/fight_range_exact_80221104.c:
+	.text       start:0x80221104 end:0x80222110
+	.data       start:0x8039A1C8 end:0x8039A200
+
+game/data/data_8039A200.c:
+	.data       start:0x8039A200 end:0x8039A690
+
+game/data/data_8039A6A8.c:
+	.data       start:0x8039A6A8 end:0x8039A6C8
 
 game/fight_range_exact_80222110.c:
 	.text       start:0x80222110 end:0x80222BD8
@@ -2206,7 +2262,19 @@ game/fight_range_8022A504.c:
 	.text       start:0x8022A504 end:0x8022B29C
 
 game/fight_range_8022B29C.c:
-	.text       start:0x8022B29C end:0x8023565C
+	.text       start:0x8022B29C end:0x8022DCB8
+
+game/fight_range_exact_8022DCB8.c:
+	.text       start:0x8022DCB8 end:0x8022F2F8
+
+game/fight_range_8022F2F8.c:
+	.text       start:0x8022F2F8 end:0x80232FE4
+
+game/fight_range_exact_80232FE4.c:
+	.text       start:0x80232FE4 end:0x802331F4
+
+game/fight_range_802331F4.c:
+	.text       start:0x802331F4 end:0x8023565C
 
 game/fight_range_8023565C_exact.c:
 	.text       start:0x8023565C end:0x802373B0
