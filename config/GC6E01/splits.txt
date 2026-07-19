@@ -1093,9 +1093,6 @@ trk/TRKSerial_range_800BF088.c:
 game/data/rodata_8026F818.c:
 	.rodata     start:0x8026F818 end:0x8026FB80
 
-game/data/rodata_8026FB94.c:
-	.rodata     start:0x8026FB94 end:0x8026FC98
-
 trk/usr_put_initialize.c:
 	.text       start:0x800BF338 end:0x800BF33C
 
@@ -1159,8 +1156,20 @@ trk/TRKSaveState.c:
 trk/TRKInit.c:
 	.text       start:0x800C2D80 end:0x800C33BC
 
-trk/TRKBoard_range_800C33BC.c:
-	.text       start:0x800C33BC end:0x800C3588
+trk/TRKBoard_exact_800C33BC.c:
+	.text       start:0x800C33BC end:0x800C3414
+	.rodata     start:0x8026FB80 end:0x8026FB8B
+	.bss        start:0x803FED60 end:0x803FED64
+
+trk/TRKBoard_candidate_800C3414.c:
+	.text       start:0x800C3414 end:0x800C349C
+
+trk/TRKBoard_exact_800C349C.c:
+	.text       start:0x800C349C end:0x800C3588
+	.rodata     start:0x8026FB90 end:0x8026FB94
+
+game/data/rodata_8026FB94.c:
+	.rodata     start:0x8026FB94 end:0x8026FC98
 
 trk/TRKBoard.c:
 	.text       start:0x800C3588 end:0x800C3630
