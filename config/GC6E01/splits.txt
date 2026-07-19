@@ -2523,8 +2523,71 @@ hsd/hsd_range_801920E4.c:
 hsd/hsd_class.c:
 	.text       start:0x801938FC end:0x80193C24
 
-hsd/hsd_cobj.c:
-	.text       start:0x80193C24 end:0x80197A64
+hsd/hsd_cobj_candidate_80193C24.c:
+	.text       start:0x80193C24 end:0x80193CD0
+
+hsd/hsd_cobj_exact_80193CD0.c:
+	.text       start:0x80193CD0 end:0x80193D30
+
+hsd/hsd_cobj_candidate_80193D30.c:
+	.text       start:0x80193D30 end:0x801942B8
+
+hsd/hsd_cobj_exact_801942B8.c:
+	.text       start:0x801942B8 end:0x80194400
+
+hsd/hsd_cobj_candidate_80194400.c:
+	.text       start:0x80194400 end:0x801944A4
+
+hsd/hsd_cobj_exact_801944A4.c:
+	.text       start:0x801944A4 end:0x80194510
+
+hsd/hsd_cobj_candidate_80194510.c:
+	.text       start:0x80194510 end:0x80194788
+
+hsd/hsd_cobj_exact_80194788.c:
+	.text       start:0x80194788 end:0x801947C8
+
+hsd/hsd_cobj_candidate_801947C8.c:
+	.text       start:0x801947C8 end:0x80194CC4
+
+hsd/hsd_cobj_exact_80194CC4.c:
+	.text       start:0x80194CC4 end:0x80194D60
+
+hsd/hsd_cobj_candidate_80194D60.c:
+	.text       start:0x80194D60 end:0x80194D94
+
+hsd/hsd_cobj_exact_80194D94.c:
+	.text       start:0x80194D94 end:0x80194DA4
+
+hsd/hsd_cobj_candidate_80194DA4.c:
+	.text       start:0x80194DA4 end:0x80195794
+
+hsd/hsd_cobj_exact_80195794.c:
+	.text       start:0x80195794 end:0x80195904
+
+hsd/hsd_cobj_exact_80195904.c:
+	.text       start:0x80195904 end:0x80195970
+
+hsd/hsd_cobj_exact_80195970.c:
+	.text       start:0x80195970 end:0x801959DC
+
+hsd/hsd_cobj_exact_801959DC.c:
+	.text       start:0x801959DC end:0x80195A6C
+
+hsd/hsd_cobj_candidate_80195A6C.c:
+	.text       start:0x80195A6C end:0x80196C3C
+
+hsd/hsd_cobj_exact_80196C3C.c:
+	.text       start:0x80196C3C end:0x80196C54
+
+hsd/hsd_cobj_candidate_80196C54.c:
+	.text       start:0x80196C54 end:0x8019733C
+
+hsd/hsd_cobj_exact_8019733C.c:
+	.text       start:0x8019733C end:0x80197344
+
+hsd/hsd_cobj_candidate_80197344.c:
+	.text       start:0x80197344 end:0x80197A64
 
 hsd/hsd_displayfunc.c:
 	.text       start:0x80197A64 end:0x80198F7C
