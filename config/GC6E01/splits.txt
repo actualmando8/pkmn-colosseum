@@ -1972,10 +1972,7 @@ game/effect/effect_visual_sdata2_8047D198.c:
 	.sdata2     start:0x8047D198 end:0x8047D298
 
 game/effect/effect_visual_sdata2_8047D298.c:
-	.sdata2     start:0x8047D298 end:0x8047D394
-
-game/data/sdata2_8047D398.c:
-	.sdata2     start:0x8047D398 end:0x8047D3B8
+	.sdata2     start:0x8047D298 end:0x8047D350
 
 game/data/data_80363AC8.c:
 	.data       start:0x80363AC8 end:0x80363CA4
@@ -2137,7 +2134,17 @@ musyx/runtime/seq_exact_80146E88.c:
 	.text       start:0x80146E88 end:0x801485FC
 
 musyx/runtime/seq_candidate_801485FC.c:
-	.text       start:0x801485FC end:0x8014A23C
+	.text       start:0x801485FC end:0x80149090
+
+musyx/runtime/seq_exact_80149090.c:
+	.text       start:0x80149090 end:0x8014A23C
+	.sdata2     start:0x8047D350 end:0x8047D370
+
+game/effect/effect_visual_sdata2_8047D370.c:
+	.sdata2     start:0x8047D370 end:0x8047D394
+
+game/data/sdata2_8047D398.c:
+	.sdata2     start:0x8047D398 end:0x8047D3B8
 
 musyx/runtime/synth.c:
 	.text       start:0x8014A23C end:0x8014A280

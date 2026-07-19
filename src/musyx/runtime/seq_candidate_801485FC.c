@@ -334,6 +334,8 @@ extern void synthVolume(u8 volume, u16 time, u8 volGroup, u8 mode, u32 pubId);
 /* This translation unit is a topology-only split of the original seq.c. */
 extern SEQ_EVENT* GenerateNextTrackEvent(u8 trackId);
 
+#if !defined(SEQ_SUFFIX_BANK_ACTIVE) || \
+    defined(SEQ_EXACT_80149090_8014A23C)
 /*
  * Compile-only copies preserve MWCC's original same-TU inlining decisions.
  * Declaring them inline prevents unused out-of-line copies from being emitted.
@@ -417,7 +419,8 @@ static void InsertGlobalEvent(SEQ_SECTION* section, SEQ_EVENT* event) {
     event->next = NULL;
 }
 
-static void InitTrackEvents(void) {
+/* Exported for the physical split; static in the original seq.c TU. */
+void InitTrackEvents(void) {
     u32 i;
     SEQ_EVENT* ev;
 
@@ -733,3 +736,4 @@ void seqInit(void) {
     ClearNotes();
     InitPublicIds();
 }
+#endif
