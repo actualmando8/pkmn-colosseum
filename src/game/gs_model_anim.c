@@ -230,6 +230,8 @@ typedef void (*GSmodelAObjApplyFunc)(HSD_AObj* aobj, void* arg);
 void fn_801A3918(HSD_JObj* jobj, GSmodelAObjApplyFunc func, u32 arg);
 void fn_800EE20C(HSD_AObj* aobj, void* arg);
 
+#if defined(GS_MODEL_ANIM_800EC0E8_800EC35C)
+
 void GSmodelForceAnimTransformUpdate(GSmodel* model)
 {
     u32 flags = model->flags;
@@ -336,6 +338,11 @@ void GSmodelSetTexAnimRate(GSmodel* model, f32 rate)
         }
     }
 }
+
+#endif
+
+#if defined(GS_MODEL_ANIM_800EC35C_800EC4D0)
+
 void GSmodelSetTexAnimIndex(GSmodel* model, u32 index)
 {
     HSD_JObj* jobj = model->jobj;
@@ -389,3 +396,5 @@ void GSmodelSetTexAnimIndex(GSmodel* model, u32 index)
         break;
     }
 }
+
+#endif

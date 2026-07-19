@@ -2363,13 +2363,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_model_anim.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_model_anim_candidate_800EBEEC.c"),
+                    (Matching, "game/gs_model_anim_exact_800EC0E8.c"),
+                    (CodeCandidate, "game/gs_model_anim_candidate_800EC35C.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gs_model_anim_exact_800EC4D0.c",
