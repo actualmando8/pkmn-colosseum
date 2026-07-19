@@ -140,8 +140,29 @@ game/main_retrace.c:
 game/main_tail.c:
 	.text       start:0x80005FA8 end:0x80006630
 
-game/gs_task.c:
-	.text       start:0x80006630 end:0x80009178
+game/gs_task_exact_80006630.c:
+	.text       start:0x80006630 end:0x80006724
+
+game/gs_task_residual_80006724.c:
+	.text       start:0x80006724 end:0x80006884
+
+game/gs_task_exact_80006884.c:
+	.text       start:0x80006884 end:0x80006908
+
+game/gs_task_residual_80006908.c:
+	.text       start:0x80006908 end:0x80006FAC
+
+game/gs_task_exact_80006FAC.c:
+	.text       start:0x80006FAC end:0x80007364
+
+game/gs_task_residual_80007364.c:
+	.text       start:0x80007364 end:0x8000765C
+
+game/gs_task_exact_8000765C.c:
+	.text       start:0x8000765C end:0x80008868
+
+game/gs_task_residual_80008868.c:
+	.text       start:0x80008868 end:0x80009178
 
 game/gs_range_80009178.c:
 	.text       start:0x80009178 end:0x800096B4

@@ -126,6 +126,14 @@ extern void* fn_800086EC(u32 id);   /* Validate NPC index (type byte) */
 extern void* _dbgMenuFightGetFightFloorDataIdSub(u32 id);   /* Validate NPC index (type u16) */
 extern void* fn_8000868C(u32 id);   /* Validate scene item index */
 extern void* fn_800085D8(s32 difficulty);   /* Validate encounter difficulty */
+extern void* _dbgMenuFightGetZokuseiDataIdSub(u32 id);
+extern void* fn_800087FC(u32 id);
+extern u8 fn_801EF63C(void);
+extern u32 lbl_8047A278;
+extern u32 lbl_80478F00;
+extern u32 lbl_80478F40;
+extern u32 lbl_80478F48;
+s32 fn_80006908(u16 id);
 
 /* =========================================================================
  * SDA global variables
@@ -148,6 +156,7 @@ extern void* gEncounterTable;   /* lbl_80478F00 : .sbss -- encounter difficulty 
 /* lbl_80266700: Scene resource ID mapping table (14 entries) */
 /* jumptable_802E28D0: Jump table for fn_80006908 scene event dispatch */
 
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_EXACT_80006630)
 /* =========================================================================
  * Function: dbgMenuCameraResetFloor (orphan fiction "GStask_InitCamera" renamed --
  *           address 0x80006630 / size 0x24 matches config/GC6E01/symbols.txt
@@ -226,6 +235,9 @@ s32 dbgMenuCameraSetType(void* unused, s32 mode) {
 }
 #pragma pop
 
+#endif /* GS_TASK_RANGE_EXACT_80006630 */
+
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_RESIDUAL_80006724)
 /* =========================================================================
  * Function: fn_80006724 (orphan fiction "GStask_LoadPDAMenu" renamed --
  *           address/size match symbols.txt exactly)
@@ -312,12 +324,15 @@ s32 fn_8000682C(void) {
 }
 #pragma pop
 
+#endif /* GS_TASK_RANGE_RESIDUAL_80006724 */
+
 typedef struct GsTaskCountTable {
     u32 count;
 } GsTaskCountTable;
 
 extern GsTaskCountTable* lbl_80478F20;
 
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_EXACT_80006884)
 #pragma push
 #pragma peephole off
 s32 fn_80006884(void) {
@@ -346,6 +361,7 @@ s32 fn_80006884(void) {
     return ret;
 }
 #pragma pop
+#endif /* GS_TASK_RANGE_EXACT_80006884 */
 
 /* =========================================================================
  * Remaining functions in this module (0x80006884 - 0x80009178) are not
@@ -411,65 +427,6 @@ extern void* fightEncountDataBiosGetFightName(void* ptr);
 /* Global state references */
 extern u32 lbl_80478B38;
 
-/* =======================================================================
- * _dbgMenuFightGetZokuseiDataIdSub -- GStask_LookupResourceById
- *
- * Looks up a resource by ID. If ID is 9, uses a fixed constant.
- * If ID >= the global count (lbl_80478B38), also uses the constant.
- * Otherwise, converts via fn_8010C4D4 and passes to GSmsgGetGSchar.
- *
- * Address: 0x8000857C  Size: 0x5C (92 bytes)
- * ======================================================================= */
-#pragma push
-#pragma peephole off
-void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
-{
-    if (id == 9) {
-        return GSmsgGetGSchar(0x0000EB63);
-    }
-    if (id >= lbl_80478B38) {
-        return GSmsgGetGSchar(0x0000EB63);
-    }
-    {
-        u32 idx;
-        idx = (u16)id;
-        return GSmsgGetGSchar((u32)fn_8010C4D4(idx));
-    }
-}
-#pragma pop
-
-/* =======================================================================
- * fn_800087FC -- GStask_LookupEventById
- *
- * Looks up an event resource by ID. Returns NULL-equivalent constant
- * on invalid input or out-of-range. Otherwise, chains through
- * fightEncountDataBiosGetPtr -> fightEncountDataBiosGetFightName -> GSmsgGetGSchar.
- *
- * Address: 0x800087FC  Size: 0x6C (108 bytes)
- * ======================================================================= */
-#pragma push
-#pragma scheduling off
-void* fn_800087FC(u32 id)
-{
-    extern void* fightEncountDataBiosGetPtr(u16 id);
-    extern u32 lbl_80478F50;
-    u32 result;
-
-    if (id == 0) {
-        result = 0x0000EB63;
-    } else if (id >= *(u32*)lbl_80478F50) {
-        result = 0x0000EB63;
-    } else {
-        result = (u32)fightEncountDataBiosGetFightName(fightEncountDataBiosGetPtr((u16)id));
-    }
-    if (result == 0) {
-        result = 0x0000EB63;
-    }
-
-    return GSmsgGetGSchar(result);
-}
-#pragma pop
-
 extern u8 lbl_8047882E;
 extern u8 lbl_8047A271;
 extern u8 lbl_8047A280;
@@ -477,50 +434,6 @@ extern u16 lbl_8047A282;
 extern u8 lbl_8047A284;
 extern u8 lbl_8047A285;
 extern u8 lbl_8047A286;
-
-/* Address: 0x800077F8 | Size: 0x8 | Pattern: return_constant */
-u32 fn_800077F8(void) { return 1; }
-
-/* Address: 0x80007840 | Size: 0x8 | Pattern: return_constant */
-u32 fn_80007840(void) { return 1; }
-
-/* Address: 0x80008144 | Size: 0x8 | Pattern: return_constant */
-u32 fn_80008144(void) { return 1; }
-
-/* Address: 0x8000814C | Size: 0x8 | Pattern: sda_getter */
-u16 fn_8000814C(void) {
-    return lbl_8047A282;
-}
-
-/* Address: 0x80008154 | Size: 0x8 | Pattern: sda_getter */
-u8 fn_80008154(void) {
-    return lbl_8047A280;
-}
-
-/* Address: 0x8000815C | Size: 0x8 | Pattern: sda_getter */
-u8 fn_8000815C(void) {
-    return lbl_8047882E;
-}
-
-/* Address: 0x80008164 | Size: 0x8 | Pattern: sda_getter */
-u8 fn_80008164(void) {
-    return lbl_8047A286;
-}
-
-/* Address: 0x8000816C | Size: 0x8 | Pattern: sda_getter */
-u8 fn_8000816C(void) {
-    return lbl_8047A285;
-}
-
-/* Address: 0x80008174 | Size: 0x8 | Pattern: sda_getter */
-u8 fn_80008174(void) {
-    return lbl_8047A284;
-}
-
-/* Address: 0x8000817C | Size: 0x8 | Pattern: sda_getter */
-u8 fn_8000817C(void) {
-    return lbl_8047A271;
-}
 
 /* 0x80008868 | 0x3D8 */
 extern u32 menuDataBiosGetType(u32);
@@ -535,279 +448,7 @@ extern u8 lbl_803A19C8[];
 extern u8 lbl_80266688[];
 extern u32 lbl_80478F9C;
 extern u8 lbl_8047B6C8[3];
-#if 1
-#if 0
-asm void fn_80008868(void) {
-#include "src/game/gs_task_fn_80008868.inc"
-}
-#endif
-#else
-void fn_80008868(void) {
-    extern u8 lbl_80266688[];
-    extern u8 lbl_803A19C8[];
-    extern u8 lbl_80478838[8];
-    extern u32 lbl_80478F98;
-    extern u32 lbl_80478F9C;
-    extern u8 lbl_8047B6C8[3];
-    extern void fn_8001E4B4();
-    extern void fn_8001EA98();
-    extern void menuDataBiosGetType();
-    extern void sprintf();
-    extern void fn_800FAEF8();
-    extern void fn_801906A0();
-    u8 sp[0x30];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r24 = 0;
-    u32 r25 = 0;
-    u32 r26 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    void (*ctr_fn)(void) = 0;
-    u32 ctr = 0;
-
-    r3 = *(u32*)((u8*)r3 + 0x4);
-    r25 = 0x28;
-    menuDataBiosGetType();
-    r4 = lbl_80478F98;
-    tmp = 0x0;
-    *(u32*)(sp + 0x8) = tmp;
-    tmp = 0x1e0;
-    r4 = *(u32*)((u8*)r4 + 0x0);
-    r24 = r3 & 0xFF;
-    *(u32*)(sp + 0x8) = tmp;
-    r26 = r4;
-    if ((s32)r4 > (s32)r24) {
-        r26 = r24;
-    }
-    r27 = r26 * 0xd;
-    r3 = 0x1e;
-    r5 = r4 + 0x19;
-    r6 = r27;
-    r4 = 0x28;
-    fn_8001EA98();
-    /* lha tmp, lbl_80478838@sda21(tmp) */;
-    if ((s32)tmp > 0) {
-        r4 = 0x21;
-        r6 = 0x21;
-        r8 = 0x17;
-        tmp = (u32)r3 >> 31;
-        tmp = tmp + r3;
-        r7 = (s32)tmp >> 1;
-        r3 = r7 + 0x14;
-        r5 = r7 + 0x28;
-        r7 = r7 + 0x1e;
-        fn_8001E4B4();
-    }
-    r3 = lbl_80478F98;
-    /* lha r4, lbl_80478838@sda21(tmp) */;
-    tmp = *(u32*)((u8*)r3 + 0x0);
-    tmp = tmp - r4;
-    if ((s32)tmp > (s32)r24) {
-        r4 = r27 + 0x2f;
-        r6 = r4;
-        r8 = r27 + 0x39;
-        tmp = (u32)r3 >> 31;
-        tmp = tmp + r3;
-        r7 = (s32)tmp >> 1;
-        r3 = r7 + 0x14;
-        r5 = r7 + 0x28;
-        r7 = r7 + 0x1e;
-        fn_8001E4B4();
-    }
-    r27 = 0x0;
-    r28 = (u32)lbl_80478838;
-    r4 = (u32)lbl_803A19C8;
-    r3 = (u32)lbl_80266688;
-    r29 = (u32)lbl_803A19C8;
-    r30 = (u32)lbl_80266688;
-    while ((s32)r27 < (s32)r26) {
-    /* L_80008968 */
-    tmp = *(s16*)((u8*)r28 + 0x2);
-    if ((s32)tmp == (s32)r27) {
-        r3 = 0xFF000000;
-        r24 = r3 + 0xff;
-    } else {
-        r24 = -0x1;
-    }
-    /* lha tmp, lbl_80478838@sda21(tmp) */;
-    r5 = r27 + tmp;
-    if ((s32)r5 < 0) {
-        tmp = 0x0;
-    } else {
-        r3 = lbl_80478F98;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r5 >= tmp) {
-            tmp = 0x0;
-        } else {
-    r7 = *(s16*)((u8*)r3 + 0x4);
-    if ((s32)r5 != 0) {
-        r3 = 0x0;
-        if ((s32)tmp > 0) {
-            if ((s32)tmp > 8) {
-                r4 = lbl_80478F9C;
-                tmp = r6 + 0x7;
-                tmp = (u32)tmp >> 3;
-                ctr_fn = (void(*)(void))tmp;
-                if ((s32)r6 > 0) {
-                    do {
-                        tmp = (s16)r7;
-                        r3 = r3 + 0x8;
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r4 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        r7 = *(s16*)(r4 + tmp);
-                    } while (--ctr != 0);
-            }
-            }
-            r6 = lbl_80478F9C;
-            tmp = r4 - r3;
-            ctr_fn = (void(*)(void))tmp;
-            if ((s32)r3 < (s32)r4) {
-                do {
-                    tmp = (s16)r7;
-                    r3 = r3 + 0x1;
-                    r4 = tmp << 3;
-                    tmp = r4 + 0x6;
-                    r7 = *(s16*)(r6 + tmp);
-                } while (--ctr != 0);
-        }
-        }
-        tmp = (s16)r7;
-        r4 = lbl_80478F9C;
-        r3 = tmp << 3;
-        tmp = r3 + 0x6;
-        r7 = *(s16*)(r4 + tmp);
-    }
-    tmp = r7 & 0xFFFF;
-        }
-    }
-    /* L_80008AA8 */
-    r3 = r29;
-    r4 = r30;
-    r6 = tmp & 0xFFFF;
-    sprintf();
-    r4 = r25;
-    r5 = r24;
-    r6 = r29;
-    r3 = 0x1e;
-    fn_800FAEF8();
-    /* lha tmp, lbl_80478838@sda21(tmp) */;
-    r4 = r27 + tmp;
-    if ((s32)r4 < 0) {
-        tmp = 0x0;
-    } else {
-        r3 = lbl_80478F98;
-        tmp = *(u32*)((u8*)r3 + 0x0);
-        if (r4 >= tmp) {
-            tmp = 0x0;
-        } else {
-    r7 = *(s16*)((u8*)r3 + 0x4);
-    if ((s32)r4 != 0) {
-        r3 = 0x0;
-        if ((s32)tmp > 0) {
-            if ((s32)tmp > 8) {
-                r5 = lbl_80478F9C;
-                tmp = r6 + 0x7;
-                tmp = (u32)tmp >> 3;
-                ctr_fn = (void(*)(void))tmp;
-                if ((s32)r6 > 0) {
-                    do {
-                        tmp = (s16)r7;
-                        r3 = r3 + 0x8;
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        tmp = *(s16*)(r5 + tmp);
-                        r6 = tmp << 3;
-                        tmp = r6 + 0x6;
-                        r7 = *(s16*)(r5 + tmp);
-                    } while (--ctr != 0);
-            }
-            }
-            r5 = lbl_80478F9C;
-            tmp = r4 - r3;
-            ctr_fn = (void(*)(void))tmp;
-            if ((s32)r3 < (s32)r4) {
-                do {
-                    tmp = (s16)r7;
-                    r3 = r3 + 0x1;
-                    r4 = tmp << 3;
-                    tmp = r4 + 0x6;
-                    r7 = *(s16*)(r5 + tmp);
-                } while (--ctr != 0);
-        }
-        }
-        tmp = (s16)r7;
-        r4 = lbl_80478F9C;
-        r3 = tmp << 3;
-        tmp = r3 + 0x6;
-        r7 = *(s16*)(r4 + tmp);
-    }
-    tmp = r7 & 0xFFFF;
-        }
-    }
-    /* L_80008BF8 */
-    r3 = tmp & 0xFFFF;
-    fn_801906A0();
-    r7 = r3;
-    r4 = r25;
-    r5 = r24;
-    r3 = r31 + 0x1e;
-    r6 = (u32)lbl_8047B6C8;
-    fn_800FAEF8();
-    r25 = r25 + 0xd;
-    r27 = r27 + 0x1;
-    } /* end while loop */
-    return;
-}
-#endif
+/* fn_80008868 remains a residual with no admitted pure-C candidate. */
 
 /* 0x80008C40 | 0x538 */
 extern u8* windowGetKeyInfo(void);
@@ -815,6 +456,7 @@ extern void fn_80190528(u32);
 extern void fn_801903B0(u32);
 extern u32 lbl_80478F98;
 extern u32 lbl_80478F9C;
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_RESIDUAL_80008868)
 static u16 GStaskGetLinkedEntryId(s32 index) {
     u8* list;
     s16 node;
@@ -899,7 +541,9 @@ void fn_80008C40(u8* window) {
     *(u32*)lbl_80478838 = ((u16)top << 16) | (u16)cursor;
     *(u32*)(window + 0x80) = GStaskGetLinkedEntryId(top + cursor);
 }
+#endif /* GS_TASK_RANGE_RESIDUAL_80008868 */
 
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_RESIDUAL_80006908)
 /* ===== Phase 2 recovery stubs ===== */
 
 /* fn_80006908 - 0x80006908 | size: 0x6a4 */
@@ -1149,15 +793,13 @@ s32 fn_80006908(u16 id)
     return 1;
 }
 #pragma pop
+#endif /* GS_TASK_RANGE_RESIDUAL_80006908 */
 
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_EXACT_80006FAC)
 /* fn_80006FAC - 0x80006FAC | size: 0xdc */
 extern u32 fn_800F7AF0(s32 port);
 extern u32 fn_800F7BC4(s32 port);
-#if 0
-asm void fn_80006FAC(void) {
-#include "src/game/gs_task_fn_80006FAC.inc"
-}
-#else
+#if 1
 #pragma peephole off
 void menuFightButtonNormal(u8* ctx) {
     u32 buttons;
@@ -1194,11 +836,7 @@ void menuFightButtonNormal(u8* ctx) {
 extern u8   fn_801EF63C(void);
 extern void fightFloorSetTimeOutAllFightResult(s32 mode);
 extern void dbgMenuClose(void);
-#if 0
-asm void dbgMenuFightStopTimeOut(void) {
-#include "src/game/gs_task_fn_80007088.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightStopTimeOut(void) {
@@ -1214,11 +852,7 @@ s32 dbgMenuFightStopTimeOut(void) {
 
 /* dbgMenuFightStopHostLose - 0x800070CC | size: 0x44 */
 extern void fn_801EF62C(s32 mode);
-#if 0
-asm void dbgMenuFightStopHostLose(void) {
-#include "src/game/gs_task_fn_800070CC.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightStopHostLose(void) {
@@ -1233,11 +867,7 @@ s32 dbgMenuFightStopHostLose(void) {
 #endif
 
 /* dbgMenuFightStopHostWin - 0x80007110 | size: 0x44 */
-#if 0
-asm void dbgMenuFightStopHostWin(void) {
-#include "src/game/gs_task_fn_80007110.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightStopHostWin(void) {
@@ -1256,11 +886,7 @@ extern s32  menuFightPokemonSelectSub(void);
 extern u32  fightTrainerGetValidFightPokemonPtr(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
 extern u32  lbl_8047A27C;
-#if 0
-asm void dbgMenuFightFightPokemonSelect5(void) {
-#include "src/game/gs_task_fn_80007154.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect5(void) {
@@ -1273,11 +899,7 @@ s32 dbgMenuFightFightPokemonSelect5(void) {
 #endif
 
 /* dbgMenuFightFightPokemonSelect4 - 0x800071AC | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
-#if 0
-asm void dbgMenuFightFightPokemonSelect4(void) {
-#include "src/game/gs_task_fn_800071AC.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect4(void) {
@@ -1290,11 +912,7 @@ s32 dbgMenuFightFightPokemonSelect4(void) {
 #endif
 
 /* dbgMenuFightFightPokemonSelect3 - 0x80007204 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
-#if 0
-asm void dbgMenuFightFightPokemonSelect3(void) {
-#include "src/game/gs_task_fn_80007204.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect3(void) {
@@ -1307,11 +925,7 @@ s32 dbgMenuFightFightPokemonSelect3(void) {
 #endif
 
 /* dbgMenuFightFightPokemonSelect2 - 0x8000725C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
-#if 0
-asm void dbgMenuFightFightPokemonSelect2(void) {
-#include "src/game/gs_task_fn_8000725C.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect2(void) {
@@ -1324,11 +938,7 @@ s32 dbgMenuFightFightPokemonSelect2(void) {
 #endif
 
 /* dbgMenuFightFightPokemonSelect1 - 0x800072B4 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
-#if 0
-asm void dbgMenuFightFightPokemonSelect1(void) {
-#include "src/game/gs_task_fn_800072B4.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect1(void) {
@@ -1341,11 +951,7 @@ s32 dbgMenuFightFightPokemonSelect1(void) {
 #endif
 
 /* dbgMenuFightFightPokemonSelect0 - 0x8000730C | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
-#if 0
-asm void dbgMenuFightFightPokemonSelect0(void) {
-#include "src/game/gs_task_fn_8000730C.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightPokemonSelect0(void) {
@@ -1356,6 +962,7 @@ s32 dbgMenuFightFightPokemonSelect0(void) {
 }
 #pragma pop
 #endif
+#endif /* GS_TASK_RANGE_EXACT_80006FAC */
 
 /* menuFightPokemonSelectSub - 0x80007364 | size: 0x2f8 */
 extern void* fightFloorGetStatus(s32 a, u16 b, s32 c, s32 d);
@@ -1386,123 +993,15 @@ extern void* pokemonGetTokuseiDataId(void* ptr);
 extern void fightOutPokemonSetTokuseiDataId(void* ptr, void* a);
 extern void fightOutPokemonSetZokuseiDataId(void* ptr, u8 a, u16 b);
 extern void fightMenuFightTrainerRenewStatusMenu(void* ptr, u16 a);
-#if 1
-#if 0
-asm s32 menuFightPokemonSelectSub(void) {
-#include "src/game/gs_task_menuFightPokemonSelectSub.inc"
-}
-#endif
-#else
-#pragma peephole off
-s32 menuFightPokemonSelectSub(u32 ctx) {
-    u32 savedId;
-    u8 prevLevel;
-    void* archive;
-    void* scene;
-    s32 result;
-    void* encounter;
-    u16 itemId;
-    u16 subItem;
-    u16 loopIdx;
-    u8 sp_b;
-    u8 sp_a;
-    u8 sp_9;
-    u8 sp_8;
-    sp_b = 0;
-    sp_a = 0;
-    sp_9 = 0;
-    sp_8 = 0;
+/* menuFightPokemonSelectSub remains a residual with no admitted pure-C candidate. */
 
-    savedId = (u16)(u32)fightFloorGetStatus(0, 0, 0x14, 0);
-    scene = fightPokemonGetPokemonPtr(ctx);
-    if (scene == 0) {
-        return -1;
-    }
-
-    archive = fightFloorGetFightPokemonPtrToFightTrainerPtr(0, ctx);
-    if (archive == 0) {
-        return -1;
-    }
-
-    prevLevel = figthPokemonGetLevel(ctx);
-
-    if (fightTrainerCheckCanIrekaeFightPokemon(archive, ctx) == 2) {
-        encounter = fightTrainerGetFightPokemonPtrToFightOutPokemonPtr(archive, ctx);
-        if (fightOutPokemonIsUseHensinBuff() == 1) {
-            return -1;
-        }
-
-        if (encounter != 0) {
-            fightOutPokemonGetTokuseiDataId(encounter);
-            for (loopIdx = 0; (u16)loopIdx < 2; loopIdx++) {
-                fightOutPokemonGetZokuseiDataId(encounter, 0);
-            }
-        }
-
-        result = fn_800096B4(scene, 1, &sp_b, &sp_a, &sp_9, &sp_8);
-        if (result == 1) {
-            itemId = pokemonGetStatus(0, (u16)(u32)scene, 0x6e, 0);
-            if (encounter != 0) {
-                subItem = pokemonGetStatus(0, (u16)(u32)encounter, 0xee, 0);
-                if (subItem != 0) {
-                    void* animPtr;
-                    fn_8010B01C(scene, 0, 0);
-                    do {
-                        fn_8010BBB8(scene);
-                    } while (fn_8010BCE4() == 0);
-                    animPtr = pokemonCreateSequence(scene);
-                    battleGridReplacePokemon((void*)(u32)subItem, animPtr);
-                    battleGridUpdate();
-                    pokemonSetStatus(encounter, 0, 0xee, 0, (s32)animPtr);
-                    fn_801DB100((void*)(u32)subItem);
-                    fn_801DA4E8(animPtr, 1);
-                    fightOutPokemonWriteJoutaiDataId(encounter, 0x14);
-                }
-                {
-                    u16 newId;
-                    newId = (u16)(u32)fightFloorGetStatus(0, 0, 0x14, 0);
-                    fightMenuFightOutPokemonRenewStatusMenu(encounter, newId, 1);
-                }
-                {
-                    u16 eeItem;
-                    eeItem = pokemonGetStatus(0, (u16)(u32)encounter, 0xee, 0);
-                    pokemonSetSequenceStatus(scene, eeItem);
-                }
-                fightOutPokemonSetTokuseiDataId(encounter, pokemonGetTokuseiDataId(scene));
-                {
-                    u16 i;
-                    for (i = 0; (u16)i < 2; i++) {
-                        u16 val;
-                        val = pokemonGetStatus(0, itemId, 0x16, i);
-                        fightOutPokemonSetZokuseiDataId(encounter, (u8)i, val);
-                    }
-                }
-            }
-        }
-    } else {
-        result = fn_800096B4(scene, 1, 0, 0, 0, 0);
-    }
-
-    if ((u8)figthPokemonGetLevel(ctx) > (u8)prevLevel) {
-        pokemonSetStatus((void*)ctx, 0, 0xd0, 0, 1);
-    }
-
-    fightMenuFightTrainerRenewStatusMenu(archive, savedId);
-    return result;
-}
-#pragma peephole on
-#endif
-
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_EXACT_8000765C)
 /* dbgMenuFightFightTrainerPokemonPartDataEdit - 0x8000765C | size: 0xac */
 extern void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id);
 extern void fn_80051710(u16 id);
 extern u16 lbl_80478830;
 extern u32 lbl_80478F08;
-#if 0
-asm void dbgMenuFightFightTrainerPokemonPartDataEdit(void) {
-#include "src/game/gs_task_fn_8000765C.inc"
-}
-#else
+#if 1
 #pragma peephole off
 s32 dbgMenuFightFightTrainerPokemonPartDataEdit(void) {
     u32 result;
@@ -1534,11 +1033,7 @@ s32 dbgMenuFightFightTrainerPokemonPartDataEdit(void) {
 
 /* dbgMenuFightFightTrainerAiDataEdit - 0x80007708 | size: 0x70 */
 extern s32  fn_80051E38(u32 slot);
-#if 0
-asm void dbgMenuFightFightTrainerAiDataEdit(void) {
-#include "src/game/gs_task_fn_80007708.inc"
-}
-#else
+#if 1
 #pragma peephole off
 s32 dbgMenuFightFightTrainerAiDataEdit(void) {
     u16 tmp;
@@ -1553,11 +1048,7 @@ s32 dbgMenuFightFightTrainerAiDataEdit(void) {
 
 /* fn_80007778 - 0x80007778 | size: 0x20 */
 extern void fn_8004EADC(void);
-#if 0
-asm void fn_80007778(void) {
-#include "src/game/gs_task_fn_80007778.inc"
-}
-#else
+#if 1
 void fn_80007778(void) {
     fn_8004EADC();
 }
@@ -1565,11 +1056,7 @@ void fn_80007778(void) {
 
 /* fn_80007798 - 0x80007798 | size: 0x20 */
 extern void fn_8004EC54(void);
-#if 0
-asm void fn_80007798(void) {
-#include "src/game/gs_task_fn_80007798.inc"
-}
-#else
+#if 1
 void fn_80007798(void) {
     fn_8004EC54();
 }
@@ -1577,11 +1064,7 @@ void fn_80007798(void) {
 
 /* fn_800077B8 - 0x800077B8 | size: 0x20 */
 extern void fn_8004EDCC(void);
-#if 0
-asm void fn_800077B8(void) {
-#include "src/game/gs_task_fn_800077B8.inc"
-}
-#else
+#if 1
 void fn_800077B8(void) {
     fn_8004EDCC();
 }
@@ -1589,23 +1072,18 @@ void fn_800077B8(void) {
 
 /* dbgMenuFightFightTrainerAiAddsubWazaDefpokemon - 0x800077D8 | size: 0x20 */
 extern void fn_8004F860(void);
-#if 0
-asm void dbgMenuFightFightTrainerAiAddsubWazaDefpokemon(void) {
-#include "src/game/gs_task_fn_800077D8.inc"
-}
-#else
+#if 1
 void dbgMenuFightFightTrainerAiAddsubWazaDefpokemon(void) {
     fn_8004F860();
 }
 #endif
 
+/* Address: 0x800077F8 | Size: 0x8 | Pattern: return_constant */
+u32 fn_800077F8(void) { return 1; }
+
 /* dbgMenuFightFightTrainerAiAddsubIrekaeDasu - 0x80007800 | size: 0x20 */
 extern void fn_8004FE3C(void);
-#if 0
-asm void dbgMenuFightFightTrainerAiAddsubIrekaeDasu(void) {
-#include "src/game/gs_task_fn_80007800.inc"
-}
-#else
+#if 1
 void dbgMenuFightFightTrainerAiAddsubIrekaeDasu(void) {
     fn_8004FE3C();
 }
@@ -1613,26 +1091,21 @@ void dbgMenuFightFightTrainerAiAddsubIrekaeDasu(void) {
 
 /* fn_80007820 - 0x80007820 | size: 0x20 */
 extern void fn_80050844(void);
-#if 0
-asm void fn_80007820(void) {
-#include "src/game/gs_task_fn_80007820.inc"
-}
-#else
+#if 1
 void fn_80007820(void) {
     fn_80050844();
 }
 #endif
+
+/* Address: 0x80007840 | Size: 0x8 | Pattern: return_constant */
+u32 fn_80007840(void) { return 1; }
 
 /* fn_80007848 - 0x80007848 | size: 0xa4 */
 extern void dbgMenuFightTrainerDataStatusInputDigit(u16 id, s32 a, s32 b, s32 c, s32 d);
 extern u16 lbl_8047A28A;
 extern u32 lbl_80478F28;
 extern void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id);
-#if 0
-asm void fn_80007848(void) {
-#include "src/game/gs_task_fn_80007848.inc"
-}
-#else
+#if 1
 #pragma peephole off
 s32 fn_80007848(void) {
     u32 result;
@@ -1661,11 +1134,7 @@ s32 fn_80007848(void) {
 /* dbgMenuFightFightTrainerSelect1 - 0x800078EC | size: 0x58 */
 extern u32  fightSideGetValidFightTrainerPtr(u32 ptr, s32 mode);
 extern u32  lbl_8047A274;
-#if 0
-asm void dbgMenuFightFightTrainerSelect1(void) {
-#include "src/game/gs_task_fn_800078EC.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightTrainerSelect1(void) {
@@ -1678,11 +1147,7 @@ s32 dbgMenuFightFightTrainerSelect1(void) {
 #endif
 
 /* dbgMenuFightFightTrainerSelect0 - 0x80007944 | size: 0x58 */
-#if 0
-asm void dbgMenuFightFightTrainerSelect0(void) {
-#include "src/game/gs_task_fn_80007944.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightTrainerSelect0(void) {
@@ -1696,11 +1161,7 @@ s32 dbgMenuFightFightTrainerSelect0(void) {
 
 /* dbgMenuFightFightSideSelectHostEnemy - 0x8000799C | size: 0x58 */
 extern u32  fightTargetGetPtrAsNowFightType(s32 a, s32 b);
-#if 0
-asm void dbgMenuFightFightSideSelectHostEnemy(void) {
-#include "src/game/gs_task_fn_8000799C.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightSideSelectHostEnemy(void) {
@@ -1713,11 +1174,7 @@ s32 dbgMenuFightFightSideSelectHostEnemy(void) {
 #endif
 
 /* dbgMenuFightFightSideSelectHost - 0x800079F4 | size: 0x58 */
-#if 0
-asm void dbgMenuFightFightSideSelectHost(void) {
-#include "src/game/gs_task_fn_800079F4.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightSideSelectHost(void) {
@@ -1730,11 +1187,7 @@ s32 dbgMenuFightFightSideSelectHost(void) {
 #endif
 
 /* dbgMenuFightFightFloorEditTenkou - 0x80007A4C | size: 0x38 */
-#if 0
-asm void dbgMenuFightFightFloorEditTenkou(void) {
-#include "src/game/gs_task_fn_80007A4C.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightFloorEditTenkou(void) {
@@ -1748,11 +1201,7 @@ s32 dbgMenuFightFightFloorEditTenkou(void) {
 extern void dbgMenuFightWazaEditSub(u16 id);
 extern u16 lbl_8047882A;
 extern void* _dbgMenuFightGetWazaDataIdSub(u32 id);
-#if 0
-asm void dbgMenuFightWazaEdit(void) {
-#include "src/game/gs_task_fn_80007A84.inc"
-}
-#else
+#if 1
 #pragma peephole off
 s32 dbgMenuFightWazaEdit(void) {
     u32 result;
@@ -1797,11 +1246,7 @@ extern u8 lbl_8047A286;
 extern u8 lbl_8047A280;
 extern u16 lbl_8047A282;
 extern u8 lbl_8047882E;
-#if 0
-asm void fn_80007B30(void) {
-#include "src/game/gs_task_fn_80007B30.inc"
-}
-#else
+#if 1
 #pragma peephole off
 s32 fn_80007B30(void) {
     u8 save_sfx;
@@ -1996,11 +1441,7 @@ s32 fn_80007B30(void) {
 #endif
 
 /* dbgMenuFightStop - 0x80007FDC | size: 0x38 */
-#if 0
-asm void dbgMenuFightStop(void) {
-#include "src/game/gs_task_fn_80007FDC.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightStop(void) {
@@ -2011,11 +1452,7 @@ s32 dbgMenuFightStop(void) {
 #endif
 
 /* dbgMenuFightFightFloorEdit - 0x80008014 | size: 0x38 */
-#if 0
-asm void dbgMenuFightFightFloorEdit(void) {
-#include "src/game/gs_task_fn_80008014.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightFightFloorEdit(void) {
@@ -2032,11 +1469,7 @@ extern void* GSthreadCreate(s32 a, void* b, s32 c, s32 d, s32 e, void* f);
 extern void GSthreadSetArgs(void* task, s32 a, ...);
 extern u16 lbl_8047882C;
 extern u32 lbl_80478F50;
-#if 0
-asm void fn_8000804C(void) {
-#include "src/game/gs_task_fn_8000804C.inc"
-}
-#else
+#if 1
 #pragma peephole off
 s32 fn_8000804C(void) {
     u32 result;
@@ -2081,14 +1514,48 @@ s32 fn_8000804C(void) {
 #pragma peephole on
 #endif
 
+/* Address: 0x80008144 | Size: 0x8 | Pattern: return_constant */
+u32 fn_80008144(void) { return 1; }
+
+/* Address: 0x8000814C | Size: 0x8 | Pattern: sda_getter */
+u16 fn_8000814C(void) {
+    return lbl_8047A282;
+}
+
+/* Address: 0x80008154 | Size: 0x8 | Pattern: sda_getter */
+u8 fn_80008154(void) {
+    return lbl_8047A280;
+}
+
+/* Address: 0x8000815C | Size: 0x8 | Pattern: sda_getter */
+u8 fn_8000815C(void) {
+    return lbl_8047882E;
+}
+
+/* Address: 0x80008164 | Size: 0x8 | Pattern: sda_getter */
+u8 fn_80008164(void) {
+    return lbl_8047A286;
+}
+
+/* Address: 0x8000816C | Size: 0x8 | Pattern: sda_getter */
+u8 fn_8000816C(void) {
+    return lbl_8047A285;
+}
+
+/* Address: 0x80008174 | Size: 0x8 | Pattern: sda_getter */
+u8 fn_80008174(void) {
+    return lbl_8047A284;
+}
+
+/* Address: 0x8000817C | Size: 0x8 | Pattern: sda_getter */
+u8 fn_8000817C(void) {
+    return lbl_8047A271;
+}
+
 /* dbgMenuFightGetMsgSpeedToFrame - 0x80008184 | size: 0xc0 */
 extern u8 winMsgCloseCheckFight(void);
 extern u8 lbl_80266678[];
-#if 0
-asm void dbgMenuFightGetMsgSpeedToFrame(void) {
-#include "src/game/gs_task_fn_80008184.inc"
-}
-#else
+#if 1
 #pragma peephole off
 u32 dbgMenuFightGetMsgSpeedToFrame(u32 value) {
     u32 buttons;
@@ -2124,11 +1591,7 @@ u32 dbgMenuFightGetMsgSpeedToFrame(u32 value) {
 /* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub - 0x80008244 | size: 0x14c */
 extern void msgctrlSetValue(s32 slot, void* ptr);
 extern u32 lbl_80478F28;
-#if 0
-asm void _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(void) {
-#include "src/game/gs_task_fn_80008244.inc"
-}
-#else
+#if 1
 #pragma peephole off
 void* _dbgMenuFightGetFightTrainerAiAddsubValueDataIdSub(u32 id) {
     void* r31;
@@ -2171,11 +1634,7 @@ void* _dbgMenuFightGetFightTrainerPokemonPartDataIdSub(u32 id) {
 
 /* _dbgMenuFightGetWazaDataIdSub - 0x800083FC | size: 0x64 */
 extern void* wazaGetStatus(s32 a, u16 b, s32 c, s32 d);
-#if 0
-asm void _dbgMenuFightGetWazaDataIdSub(void) {
-#include "src/game/gs_task_fn_800083FC.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
@@ -2188,11 +1647,7 @@ void* _dbgMenuFightGetWazaDataIdSub(u32 id) {
 
 /* dbgMenuFightGetWazaTypeId - 0x80008460 | size: 0x60 */
 extern void* _dbgMenuFightGetWazaTypeIdSub(u32 id);   /* forward decl for callback */
-#if 0
-asm void dbgMenuFightGetWazaTypeId(void) {
-#include "src/game/gs_task_fn_80008460.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightGetWazaTypeId(s32 id) {
@@ -2207,11 +1662,7 @@ s32 dbgMenuFightGetWazaTypeId(s32 id) {
 
 /* _dbgMenuFightGetWazaTypeIdSub - 0x800084C0 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl wazaGetWazaTypeIdName vs bl wazaGetWazaTypeIdName (same addr) */
 extern void* wazaGetWazaTypeIdName(u8 idx);
-#if 0
-asm void _dbgMenuFightGetWazaTypeIdSub(void) {
-#include "src/game/gs_task_fn_800084C0.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 void* _dbgMenuFightGetWazaTypeIdSub(u32 id) {
@@ -2223,11 +1674,7 @@ void* _dbgMenuFightGetWazaTypeIdSub(u32 id) {
 #endif
 
 /* dbgMenuFightGetZokuseiDataId - 0x80008518 | size: 0x64 */
-#if 0
-asm void dbgMenuFightGetZokuseiDataId(void) {
-#include "src/game/gs_task_fn_80008518.inc"
-}
-#else
+#if 1
 #pragma push
 #pragma peephole off
 s32 dbgMenuFightGetZokuseiDataId(u32 id) {
@@ -2240,12 +1687,35 @@ s32 dbgMenuFightGetZokuseiDataId(u32 id) {
 #pragma pop
 #endif
 
-/* fn_800085D8 - 0x800085D8 | size: 0xb4 */
-#if 0
-asm void fn_800085D8(void) {
-#include "src/game/gs_task_fn_800085D8.inc"
+/* =======================================================================
+ * _dbgMenuFightGetZokuseiDataIdSub -- GStask_LookupResourceById
+ *
+ * Looks up a resource by ID. If ID is 9, uses a fixed constant.
+ * If ID >= the global count (lbl_80478B38), also uses the constant.
+ * Otherwise, converts via fn_8010C4D4 and passes to GSmsgGetGSchar.
+ *
+ * Address: 0x8000857C  Size: 0x5C (92 bytes)
+ * ======================================================================= */
+#pragma push
+#pragma peephole off
+void* _dbgMenuFightGetZokuseiDataIdSub(u32 id)
+{
+    if (id == 9) {
+        return GSmsgGetGSchar(0x0000EB63);
+    }
+    if (id >= lbl_80478B38) {
+        return GSmsgGetGSchar(0x0000EB63);
+    }
+    {
+        u32 idx;
+        idx = (u16)id;
+        return GSmsgGetGSchar((u32)fn_8010C4D4(idx));
+    }
 }
-#else
+#pragma pop
+
+/* fn_800085D8 - 0x800085D8 | size: 0xb4 */
+#if 1
 #pragma push
 #pragma scheduling off
 void* fn_800085D8(s32 difficulty) {
@@ -2269,11 +1739,7 @@ void* fn_800085D8(s32 difficulty) {
 #endif
 
 /* fn_8000868C - 0x8000868C | size: 0x60 */
-#if 0
-asm void fn_8000868C(void) {
-#include "src/game/gs_task_fn_8000868C.inc"
-}
-#else
+#if 1
 void* fn_8000868C(u32 id) {
     u32 result;
     if (id >= *(u32*)lbl_80478F20) {
@@ -2289,11 +1755,7 @@ void* fn_8000868C(u32 id) {
 /* fn_800086EC - 0x800086EC | size: 0x58 */
 extern void* fightTypeDataBiosGetPtr(u16 id);
 extern void* fightTypeDataBiosGetName(void* ptr);
-#if 0
-asm void fn_800086EC(void) {
-#include "src/game/gs_task_fn_800086EC.inc"
-}
-#else
+#if 1
 void* fn_800086EC(u32 id) {
     u32 result;
     if (id >= *(u32*)lbl_80478F00) {
@@ -2309,11 +1771,7 @@ void* fn_800086EC(u32 id) {
 /* _dbgMenuFightGetFightKindDataIdSub - 0x80008744 | size: 0x58 */
 extern void* fightKindDataBiosGetPtr(u16 id);
 extern void* fightKindDataBiosGetName(void* ptr);
-#if 0
-asm void _dbgMenuFightGetFightKindDataIdSub(void) {
-#include "src/game/gs_task_fn_80008744.inc"
-}
-#else
+#if 1
 void* _dbgMenuFightGetFightKindDataIdSub(u32 id) {
     u32 result;
     if (id >= *(u32*)lbl_80478F40) {
@@ -2327,11 +1785,7 @@ void* _dbgMenuFightGetFightKindDataIdSub(u32 id) {
 #endif
 
 /* _dbgMenuFightGetFightFloorDataIdSub - 0x8000879C | size: 0x60 */
-#if 0
-asm void _dbgMenuFightGetFightFloorDataIdSub(void) {
-#include "src/game/gs_task_fn_8000879C.inc"
-}
-#else
+#if 1
 void* _dbgMenuFightGetFightFloorDataIdSub(u32 id) {
     u32 result;
     if (id >= *(u32*)lbl_80478F48) {
@@ -2343,3 +1797,36 @@ void* _dbgMenuFightGetFightFloorDataIdSub(u32 id) {
     return GSmsgGetGSchar(result);
 }
 #endif
+
+/* =======================================================================
+ * fn_800087FC -- GStask_LookupEventById
+ *
+ * Looks up an event resource by ID. Returns NULL-equivalent constant
+ * on invalid input or out-of-range. Otherwise, chains through
+ * fightEncountDataBiosGetPtr -> fightEncountDataBiosGetFightName -> GSmsgGetGSchar.
+ *
+ * Address: 0x800087FC  Size: 0x6C (108 bytes)
+ * ======================================================================= */
+#pragma push
+#pragma scheduling off
+void* fn_800087FC(u32 id)
+{
+    extern void* fightEncountDataBiosGetPtr(u16 id);
+    extern u32 lbl_80478F50;
+    u32 result;
+
+    if (id == 0) {
+        result = 0x0000EB63;
+    } else if (id >= *(u32*)lbl_80478F50) {
+        result = 0x0000EB63;
+    } else {
+        result = (u32)fightEncountDataBiosGetFightName(fightEncountDataBiosGetPtr((u16)id));
+    }
+    if (result == 0) {
+        result = 0x0000EB63;
+    }
+
+    return GSmsgGetGSchar(result);
+}
+#pragma pop
+#endif /* GS_TASK_RANGE_EXACT_8000765C */
