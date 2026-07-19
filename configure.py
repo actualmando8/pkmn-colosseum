@@ -4618,13 +4618,28 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_gfx_layer_state.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D6B00.c"),
+                    (Matching, "game/gs_gfx_layer_exact_800D7230.c"),
+                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D76A8.c"),
+                    (Matching, "game/gs_gfx_layer_exact_800D7820.c"),
+                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D7894.c"),
+                    (Matching, "game/gs_gfx_layer_exact_800D7A70.c"),
+                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D7D90.c"),
+                    (Matching, "game/gs_gfx_layer_exact_800D7E5C.c"),
+                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D85D4.c"),
+                    (Matching, "game/gs_gfx_layer_exact_800D87AC.c"),
+                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D892C.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/gs_gfx_range_800D9AF0.c",

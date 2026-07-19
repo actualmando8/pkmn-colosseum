@@ -1411,8 +1411,38 @@ game/gs_gfx_candidate_800D67BC.c:
 game/gs_gfx_exact_800D6A00.c:
 	.text       start:0x800D6A00 end:0x800D6B00
 
-game/gs_gfx_layer_state.c:
-	.text       start:0x800D6B00 end:0x800D9AF0
+game/gs_gfx_layer_candidate_800D6B00.c:
+	.text       start:0x800D6B00 end:0x800D7230
+
+game/gs_gfx_layer_exact_800D7230.c:
+	.text       start:0x800D7230 end:0x800D76A8
+
+game/gs_gfx_layer_candidate_800D76A8.c:
+	.text       start:0x800D76A8 end:0x800D7820
+
+game/gs_gfx_layer_exact_800D7820.c:
+	.text       start:0x800D7820 end:0x800D7894
+
+game/gs_gfx_layer_candidate_800D7894.c:
+	.text       start:0x800D7894 end:0x800D7A70
+
+game/gs_gfx_layer_exact_800D7A70.c:
+	.text       start:0x800D7A70 end:0x800D7D90
+
+game/gs_gfx_layer_candidate_800D7D90.c:
+	.text       start:0x800D7D90 end:0x800D7E5C
+
+game/gs_gfx_layer_exact_800D7E5C.c:
+	.text       start:0x800D7E5C end:0x800D85D4
+
+game/gs_gfx_layer_candidate_800D85D4.c:
+	.text       start:0x800D85D4 end:0x800D87AC
+
+game/gs_gfx_layer_exact_800D87AC.c:
+	.text       start:0x800D87AC end:0x800D892C
+
+game/gs_gfx_layer_candidate_800D892C.c:
+	.text       start:0x800D892C end:0x800D9AF0
 
 game/gs_gfx_range_800D9AF0.c:
 	.text       start:0x800D9AF0 end:0x800D9D68
