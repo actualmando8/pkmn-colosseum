@@ -3069,8 +3069,26 @@ game/fight_floor_candidate_801F61EC.c:
 game/fight_floor_bios.c:
 	.text       start:0x801F640C end:0x801F6B54
 
-game/fight_side.c:
-	.text       start:0x801F6B54 end:0x801F7798
+game/fight_side_exact_801F6B54.c:
+	.text       start:0x801F6B54 end:0x801F6F38
+
+game/fight_side_candidate_801F6F38.c:
+	.text       start:0x801F6F38 end:0x801F7258
+
+game/fight_side_exact_801F7258.c:
+	.text       start:0x801F7258 end:0x801F72B0
+
+game/fight_side_candidate_801F72B0.c:
+	.text       start:0x801F72B0 end:0x801F7388
+
+game/fight_side_exact_801F7388.c:
+	.text       start:0x801F7388 end:0x801F75F8
+
+game/fight_side_candidate_801F75F8.c:
+	.text       start:0x801F75F8 end:0x801F76B8
+
+game/fight_side_candidate_801F76B8.c:
+	.text       start:0x801F76B8 end:0x801F7798
 
 game/fight_side_bios.c:
 	.text       start:0x801F7798 end:0x801F7954

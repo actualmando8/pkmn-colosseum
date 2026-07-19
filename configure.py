@@ -1185,13 +1185,24 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/fight_side.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/fight_side_exact_801F6B54.c"),
+                    (CodeCandidate, "game/fight_side_candidate_801F6F38.c"),
+                    (Matching, "game/fight_side_exact_801F7258.c"),
+                    (CodeCandidate, "game/fight_side_candidate_801F72B0.c"),
+                    (Matching, "game/fight_side_exact_801F7388.c"),
+                    (CodeCandidate, "game/fight_side_candidate_801F75F8.c"),
+                    (CodeCandidate, "game/fight_side_candidate_801F76B8.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/fight_side_bios.c",
