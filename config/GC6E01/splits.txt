@@ -1390,8 +1390,26 @@ game/gs_gfx.c:
 game/gs_gfx_core.c:
 	.text       start:0x800D3E4C end:0x800D3FA4
 
-game/gs_gfx_range_800D3FA4.c:
-	.text       start:0x800D3FA4 end:0x800D6B00
+game/gs_gfx_candidate_800D3FA4.c:
+	.text       start:0x800D3FA4 end:0x800D45F8
+
+game/gs_gfx_exact_800D45F8.c:
+	.text       start:0x800D45F8 end:0x800D461C
+
+game/gs_gfx_candidate_800D461C.c:
+	.text       start:0x800D461C end:0x800D55D0
+
+game/gs_gfx_candidate_800D55D0.c:
+	.text       start:0x800D55D0 end:0x800D56C0
+
+game/gs_gfx_exact_800D56C0.c:
+	.text       start:0x800D56C0 end:0x800D67BC
+
+game/gs_gfx_candidate_800D67BC.c:
+	.text       start:0x800D67BC end:0x800D6A00
+
+game/gs_gfx_exact_800D6A00.c:
+	.text       start:0x800D6A00 end:0x800D6B00
 
 game/gs_gfx_layer_state.c:
 	.text       start:0x800D6B00 end:0x800D9AF0
