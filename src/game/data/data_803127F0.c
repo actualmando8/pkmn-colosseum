@@ -57,6 +57,7 @@ extern u8 fn_800B857C[];
 
 /* Auto-carved .data unit 0x803127F0..0x80313364 (44 objects). Non-relocated data as byte-exact u8[]; pointer/jump tables as void*[] for R_PPC_ADDR32 relocations. */
 
+#if !defined(DATA_80312C40_SUFFIX)
 void* lbl_803127F0[4] = {
     (void*)((u8*)OnReset_800C0734),
     (void*)0x0000007F,
@@ -220,41 +221,9 @@ void* jumptable_80312B8C[17] = {
     (void*)((u8*)fn_800B80CC + 0x338),
     (void*)((u8*)fn_800B80CC + 0x8C),
 };
+#endif
 
-void* jumptable_80312BD0[7] = {
-    (void*)((u8*)fn_800B857C + 0x1C4),
-    (void*)((u8*)fn_800B857C + 0x1E4),
-    (void*)((u8*)fn_800B857C + 0x204),
-    (void*)((u8*)fn_800B857C + 0x224),
-    (void*)((u8*)fn_800B857C + 0x244),
-    (void*)((u8*)fn_800B857C + 0x25C),
-    (void*)((u8*)fn_800B857C + 0x27C),
-};
-
-void* jumptable_80312BEC[21] = {
-    (void*)((u8*)fn_800B857C + 0x38),
-    (void*)((u8*)fn_800B857C + 0x44),
-    (void*)((u8*)fn_800B857C + 0x50),
-    (void*)((u8*)fn_800B857C + 0x5C),
-    (void*)((u8*)fn_800B857C + 0x78),
-    (void*)((u8*)fn_800B857C + 0x80),
-    (void*)((u8*)fn_800B857C + 0x88),
-    (void*)((u8*)fn_800B857C + 0x90),
-    (void*)((u8*)fn_800B857C + 0x98),
-    (void*)((u8*)fn_800B857C + 0xA0),
-    (void*)((u8*)fn_800B857C + 0xA8),
-    (void*)((u8*)fn_800B857C + 0xB0),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0xB4),
-    (void*)((u8*)fn_800B857C + 0x68),
-    (void*)((u8*)fn_800B857C + 0x70),
-};
-
+#if !defined(DATA_803127F0_PREFIX)
 u8 lbl_80312C40[60] = {
     0x00, 0x00, 0x00, 0x01, 0x02, 0x80, 0x00, 0xF0, 0x00, 0xF0, 0x00, 0x28,
     0x00, 0x00, 0x02, 0x80, 0x01, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -504,4 +473,4 @@ void* jumptable_80313348[7] = {
     (void*)((u8*)GXInitLightSpot + 0xF0),
     (void*)((u8*)GXInitLightSpot + 0x124),
 };
-
+#endif

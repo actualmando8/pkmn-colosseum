@@ -314,6 +314,7 @@ void fn_800B857C(GXTexCoordID_800B857C dst_coord,
 }
 #endif
 
+#if !defined(GX_EXACT_800B857C_800B884C)
 void fn_800B884C(u8 count) {
     u32 n = count;
     GXData_800B857C* p = gx;
@@ -1184,4 +1185,5 @@ void GXClearBoundingBox(void) {
     GX_FIFO_U32 = 0x560003FF;
     p->field_002 = 0;
 }
+#endif
 #endif
