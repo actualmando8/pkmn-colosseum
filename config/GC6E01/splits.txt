@@ -630,7 +630,67 @@ dolphin/dvd/dvdfs_range_800A4D28.c:
 	.text       start:0x800A4D28 end:0x800A5624
 
 dolphin/dvd/DVD.c:
-	.text       start:0x800A5624 end:0x800A7820
+	.text       start:0x800A5624 end:0x800A5784
+
+dolphin/dvd/DVD_exact_800A5784.c:
+	.text       start:0x800A5784 end:0x800A5810
+
+dolphin/dvd/DVD_range_800A5810.c:
+	.text       start:0x800A5810 end:0x800A58BC
+
+dolphin/dvd/DVD_exact_800A58BC.c:
+	.text       start:0x800A58BC end:0x800A58F0
+
+dolphin/dvd/DVD_exact_800A58F0.c:
+	.text       start:0x800A58F0 end:0x800A5918
+
+dolphin/dvd/DVD_exact_800A5918.c:
+	.text       start:0x800A5918 end:0x800A59CC
+
+dolphin/dvd/DVD_exact_800A59CC.c:
+	.text       start:0x800A59CC end:0x800A5C60
+
+dolphin/dvd/DVD_exact_800A5C60.c:
+	.text       start:0x800A5C60 end:0x800A5CC8
+
+dolphin/dvd/DVD_exact_800A5CC8.c:
+	.text       start:0x800A5CC8 end:0x800A5D60
+
+dolphin/dvd/DVD_exact_800A5D60.c:
+	.text       start:0x800A5D60 end:0x800A5D88
+
+dolphin/dvd/DVD_range_800A5D88.c:
+	.text       start:0x800A5D88 end:0x800A5EE0
+
+dolphin/dvd/DVD_exact_800A5EE0.c:
+	.text       start:0x800A5EE0 end:0x800A60D4
+
+dolphin/dvd/DVD_range_800A60D4.c:
+	.text       start:0x800A60D4 end:0x800A62CC
+
+dolphin/dvd/DVD_exact_800A62CC.c:
+	.text       start:0x800A62CC end:0x800A63C8
+
+dolphin/dvd/DVD_range_800A63C8.c:
+	.text       start:0x800A63C8 end:0x800A640C
+
+dolphin/dvd/DVD_exact_800A640C.c:
+	.text       start:0x800A640C end:0x800A6508
+
+dolphin/dvd/DVD_exact_800A6508.c:
+	.text       start:0x800A6508 end:0x800A6578
+
+dolphin/dvd/DVD_exact_800A6578.c:
+	.text       start:0x800A6578 end:0x800A6684
+
+dolphin/dvd/DVD_range_800A6684.c:
+	.text       start:0x800A6684 end:0x800A7484
+
+dolphin/dvd/DVD_exact_800A7484.c:
+	.text       start:0x800A7484 end:0x800A76E4
+
+dolphin/dvd/DVD_range_800A76E4.c:
+	.text       start:0x800A76E4 end:0x800A7820
 
 dolphin/sdk_range_800A7820.c:
 	.text       start:0x800A7820 end:0x800A7F28
@@ -1579,76 +1639,7 @@ game/data/data_803751F0.c:
 	.data       start:0x803751F0 end:0x8037522C
 
 game/data/data_80375230.c:
-	.data       start:0x80375230 end:0x8037532C
-
-game/data/data_80375330.c:
-	.data       start:0x80375330 end:0x80375624
-
-game/data/data_80375628.c:
-	.data       start:0x80375628 end:0x8037564C
-
-game/data/data_8037564C.c:
-	.data       start:0x8037564C end:0x80375670
-
-game/data/data_80375670.c:
-	.data       start:0x80375670 end:0x80375934
-
-game/data/data_80375938.c:
-	.data       start:0x80375938 end:0x80375E60
-
-game/data/data_80375F98.c:
-	.data       start:0x80375F98 end:0x80375F9C
-
-game/data/data_803760D8.c:
-	.data       start:0x803760D8 end:0x80376104
-
-game/data/data_80376FCC.c:
-	.data       start:0x80376FCC end:0x80377088
-
-game/data/data_80377B0C.c:
-	.data       start:0x80377B0C end:0x80377D90
-
-game/data/data_803784C0.c:
-	.data       start:0x803784C0 end:0x80378538
-
-game/data/data_803786D0.c:
-	.data       start:0x803786D0 end:0x80378724
-
-game/data/data_80378794.c:
-	.data       start:0x80378794 end:0x80378798
-
-game/data/data_803788C0.c:
-	.data       start:0x803788C0 end:0x80378968
-
-game/data/data_80378A7C.c:
-	.data       start:0x80378A7C end:0x80378AA0
-
-game/data/data_80378B00.c:
-	.data       start:0x80378B00 end:0x80378B44
-
-game/data/data_80378D14.c:
-	.data       start:0x80378D14 end:0x80378D7C
-
-game/data/data_80379388.c:
-	.data       start:0x80379388 end:0x8037939C
-
-game/data/data_8037943C.c:
-	.data       start:0x8037943C end:0x80379478
-
-game/data/data_803794CC.c:
-	.data       start:0x803794CC end:0x803795D8
-
-game/data/data_80379714.c:
-	.data       start:0x80379714 end:0x80379808
-
-game/data/data_80379A3C.c:
-	.data       start:0x80379A3C end:0x80379B0C
-
-game/data/data_80379BF4.c:
-	.data       start:0x80379BF4 end:0x8038FF64
-
-game/data/data_8038FFFC.c:
-	.data       start:0x8038FFFC end:0x8039A028
+	.data       start:0x80375230 end:0x803752F8
 
 game/gamedata.c:
 	.text       start:0x8013528C end:0x80135A30
@@ -2084,11 +2075,99 @@ game/battle/battle_range_exact_801EE034.c:
 game/battle/battle_range_candidate_801EE958.c:
 	.text       start:0x801EE958 end:0x801EF02C
 
-game/battle/battle_main.c:
-	.text       start:0x801EF02C end:0x801F0058
+game/battle/battle_main_exact_801EF02C.c:
+	.text       start:0x801EF02C end:0x801EF4B0
 
-game/fight_target.c:
-	.text       start:0x801F0058 end:0x801F0898
+game/battle/battle_main_candidate_801EF4B0.c:
+	.text       start:0x801EF4B0 end:0x801EF5C0
+
+game/battle/battle_main_exact_801EF5C0.c:
+	.text       start:0x801EF5C0 end:0x801EFA08
+
+game/battle/battle_main_candidate_801EFA08.c:
+	.text       start:0x801EFA08 end:0x801EFFC4
+
+game/battle/battle_main_exact_801EFFC4.c:
+	.text       start:0x801EFFC4 end:0x801F0058
+
+game/fight_target_exact_801F0058.c:
+	.text       start:0x801F0058 end:0x801F0134
+
+game/fight_target_801F0134.c:
+	.text       start:0x801F0134 end:0x801F0204
+
+game/fight_target_exact_801F0204.c:
+	.text       start:0x801F0204 end:0x801F0898
+	.data       start:0x803752F8 end:0x8037532C
+
+game/data/data_80375330.c:
+	.data       start:0x80375330 end:0x80375624
+
+game/data/data_80375628.c:
+	.data       start:0x80375628 end:0x8037564C
+
+game/data/data_8037564C.c:
+	.data       start:0x8037564C end:0x80375670
+
+game/data/data_80375670.c:
+	.data       start:0x80375670 end:0x80375934
+
+game/data/data_80375938.c:
+	.data       start:0x80375938 end:0x80375E60
+
+game/data/data_80375F98.c:
+	.data       start:0x80375F98 end:0x80375F9C
+
+game/data/data_803760D8.c:
+	.data       start:0x803760D8 end:0x80376104
+
+game/data/data_80376FCC.c:
+	.data       start:0x80376FCC end:0x80377088
+
+game/data/data_80377B0C.c:
+	.data       start:0x80377B0C end:0x80377D90
+
+game/data/data_803784C0.c:
+	.data       start:0x803784C0 end:0x80378538
+
+game/data/data_803786D0.c:
+	.data       start:0x803786D0 end:0x80378724
+
+game/data/data_80378794.c:
+	.data       start:0x80378794 end:0x80378798
+
+game/data/data_803788C0.c:
+	.data       start:0x803788C0 end:0x80378968
+
+game/data/data_80378A7C.c:
+	.data       start:0x80378A7C end:0x80378AA0
+
+game/data/data_80378B00.c:
+	.data       start:0x80378B00 end:0x80378B44
+
+game/data/data_80378D14.c:
+	.data       start:0x80378D14 end:0x80378D7C
+
+game/data/data_80379388.c:
+	.data       start:0x80379388 end:0x8037939C
+
+game/data/data_8037943C.c:
+	.data       start:0x8037943C end:0x80379478
+
+game/data/data_803794CC.c:
+	.data       start:0x803794CC end:0x803795D8
+
+game/data/data_80379714.c:
+	.data       start:0x80379714 end:0x80379808
+
+game/data/data_80379A3C.c:
+	.data       start:0x80379A3C end:0x80379B0C
+
+game/data/data_80379BF4.c:
+	.data       start:0x80379BF4 end:0x8038FF64
+
+game/data/data_8038FFFC.c:
+	.data       start:0x8038FFFC end:0x8039A028
 
 game/fight_action_range_801F0898.c:
 	.text       start:0x801F0898 end:0x801F150C
@@ -2209,7 +2288,13 @@ game/fight_range_exact_8021C0F4.c:
 	.text       start:0x8021C0F4 end:0x8021CA00
 
 game/fight_range_8021CA00.c:
-	.text       start:0x8021CA00 end:0x8021D9C0
+	.text       start:0x8021CA00 end:0x8021CB58
+
+game/fight_range_exact_8021CB58.c:
+	.text       start:0x8021CB58 end:0x8021D40C
+
+game/fight_range_8021D40C.c:
+	.text       start:0x8021D40C end:0x8021D9C0
 
 game/fight_range_exact_8021D9C0.c:
 	.text       start:0x8021D9C0 end:0x8021FAD4
@@ -2268,13 +2353,25 @@ game/fight_range_exact_8022DCB8.c:
 	.text       start:0x8022DCB8 end:0x8022F2F8
 
 game/fight_range_8022F2F8.c:
-	.text       start:0x8022F2F8 end:0x80232FE4
+	.text       start:0x8022F2F8 end:0x8022FE20
+
+game/fight_range_exact_8022FE20.c:
+	.text       start:0x8022FE20 end:0x80230568
+
+game/fight_range_80230568.c:
+	.text       start:0x80230568 end:0x80232FE4
 
 game/fight_range_exact_80232FE4.c:
 	.text       start:0x80232FE4 end:0x802331F4
 
 game/fight_range_802331F4.c:
-	.text       start:0x802331F4 end:0x8023565C
+	.text       start:0x802331F4 end:0x80233DB0
+
+game/fight_range_exact_80233DB0.c:
+	.text       start:0x80233DB0 end:0x80234A0C
+
+game/fight_range_80234A0C.c:
+	.text       start:0x80234A0C end:0x8023565C
 
 game/fight_range_8023565C_exact.c:
 	.text       start:0x8023565C end:0x802373B0
