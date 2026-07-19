@@ -1945,7 +1945,16 @@ game/pokemon_range_8011F77C.c:
 	.text       start:0x8011F77C end:0x8011F910
 
 game/pokemon_range_8011F910.c:
-	.text       start:0x8011F910 end:0x8011FCA4
+	.text       start:0x8011F910 end:0x8011FBCC
+
+game/pokemon_range_exact_8011FBCC.c:
+	.text       start:0x8011FBCC end:0x8011FC14
+
+game/pokemon_range_8011FC14.c:
+	.text       start:0x8011FC14 end:0x8011FC74
+
+game/pokemon_range_exact_8011FC74.c:
+	.text       start:0x8011FC74 end:0x8011FCA4
 
 game/pokemon_range_8011FCA4.c:
 	.text       start:0x8011FCA4 end:0x80120B00

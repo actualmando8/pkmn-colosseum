@@ -1633,6 +1633,27 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/pokemon_range_exact_8011FBCC.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/pokemon_range_8011FC14.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/pokemon_range_exact_8011FC74.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
                 "game/pokemon_range_8011FCA4.c",
                 mw_version="GC/1.3",
