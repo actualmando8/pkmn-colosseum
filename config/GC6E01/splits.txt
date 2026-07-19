@@ -1373,41 +1373,8 @@ game/data/data_803152B8.c:
 game/data/data_80315320.c:
 	.data       start:0x80315320 end:0x80315384
 
-game/data/data_80315388.c:
-	.data       start:0x80315388 end:0x80315678
-
-game/data/data_80315690.c:
-	.data       start:0x80315690 end:0x8035B060
-
-game/data/data_8035B088.c:
-	.data       start:0x8035B088 end:0x8035B3F0
-
-game/data/data_8035B400.c:
-	.data       start:0x8035B400 end:0x8035B448
-
-game/data/data_8035B468.c:
-	.data       start:0x8035B468 end:0x8035B4FC
-
-game/data/data_8035B500.c:
-	.data       start:0x8035B500 end:0x8035B878
-
-game/data/data_8035B8A0.c:
-	.data       start:0x8035B8A0 end:0x8035B8B4
-
-game/data/data_8035B904.c:
-	.data       start:0x8035B904 end:0x8035B950
-
-game/data/data_8035B96C.c:
-	.data       start:0x8035B96C end:0x8035B988
-
-game/data/data_8035B9F8.c:
-	.data       start:0x8035B9F8 end:0x8035BA10
-
-game/data/data_8035BA48.c:
-	.data       start:0x8035BA48 end:0x8035BA60
-
-game/data/data_8035BB50.c:
-	.data       start:0x8035BB50 end:0x8035BB88
+game/data/data_80315388_prefix.c:
+	.data       start:0x80315388 end:0x803155B0
 
 dolphin/si/SI_fn_800D104C.c:
 	.text       start:0x800D104C end:0x800D1070
@@ -1716,8 +1683,51 @@ game/gs_model_anim_candidate_800EC35C.c:
 game/gs_model_anim_exact_800EC4D0.c:
 	.text       start:0x800EC4D0 end:0x800ED4D4
 
-game/gs_model_anim_suffix_800ED4D4.c:
-	.text       start:0x800ED4D4 end:0x800EE150
+game/gs_model_anim_suffix_exact_800ED4D4.c:
+	.text       start:0x800ED4D4 end:0x800ED8C4
+	.data       start:0x803155B0 end:0x803155D0
+
+game/data/data_803155D0.c:
+	.data       start:0x803155D0 end:0x80315678
+
+game/data/data_80315690.c:
+	.data       start:0x80315690 end:0x8035B060
+
+game/data/data_8035B088.c:
+	.data       start:0x8035B088 end:0x8035B3F0
+
+game/data/data_8035B400.c:
+	.data       start:0x8035B400 end:0x8035B448
+
+game/data/data_8035B468.c:
+	.data       start:0x8035B468 end:0x8035B4FC
+
+game/data/data_8035B500.c:
+	.data       start:0x8035B500 end:0x8035B878
+
+game/data/data_8035B8A0.c:
+	.data       start:0x8035B8A0 end:0x8035B8B4
+
+game/data/data_8035B904.c:
+	.data       start:0x8035B904 end:0x8035B950
+
+game/data/data_8035B96C.c:
+	.data       start:0x8035B96C end:0x8035B988
+
+game/data/data_8035B9F8.c:
+	.data       start:0x8035B9F8 end:0x8035BA10
+
+game/data/data_8035BA48.c:
+	.data       start:0x8035BA48 end:0x8035BA60
+
+game/data/data_8035BB50.c:
+	.data       start:0x8035BB50 end:0x8035BB88
+
+game/gs_model_anim_suffix_candidate_800ED8C4.c:
+	.text       start:0x800ED8C4 end:0x800EE044
+
+game/gs_model_anim_suffix_exact_800EE044.c:
+	.text       start:0x800EE044 end:0x800EE150
 
 game/gs_part.c:
 	.text       start:0x800EE150 end:0x800EE928
