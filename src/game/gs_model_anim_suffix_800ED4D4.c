@@ -218,16 +218,14 @@ typedef struct GSmodelAnimEndedInfo {
     } while (0)
 
 
-/* sModelJObjCount / sModelJObjLastIndex are .sbss globals owned by the
- * gs_model_anim split (config/GC6E01/symbols.txt). fn_800EE0E8 uses them
- * as a shared counter/scratch during a JObj traversal driven by fn_800EE20C. */
-extern s32 sModelJObjCount;
-extern s32 sModelJObjLastIndex;
+extern s32 lbl_8047ABAC;
+extern s32 lbl_8047ABB0;
 typedef void (*GSmodelAObjApplyFunc)(HSD_AObj* aobj, void* arg);
 void fn_801A3918(HSD_JObj* jobj, GSmodelAObjApplyFunc func, u32 arg);
 void fn_800EE20C(HSD_AObj* aobj, void* arg);
 
-
+#if !defined(GS_MODEL_ANIM_SUFFIX_SPLIT) || \
+    defined(GS_MODEL_ANIM_SUFFIX_PREFIX)
 void modelUpdateAttachments__FP8_GSmodel(GSmodel* model)
 {
     GSvec position;
@@ -409,6 +407,10 @@ void fn_800ED7E4(GSmodel* model, u8 tex_anim, f32 delta)
         }
     }
 }
+#endif
+
+#if !defined(GS_MODEL_ANIM_SUFFIX_SPLIT) || \
+    defined(GS_MODEL_ANIM_SUFFIX_MIDDLE)
 void _modelResetPartAnimMixes__FP8_GSmodel(GSmodel* model)
 {
     GSmodelPartAnimMix* mix;
@@ -466,6 +468,10 @@ void _modelResetPartAnimMixes__FP8_GSmodel(GSmodel* model)
         GSpartFree(part);
     }
 }
+#endif
+
+#if !defined(GS_MODEL_ANIM_SUFFIX_SPLIT) || \
+    defined(GS_MODEL_ANIM_SUFFIX_SUFFIX)
 void _modelGetAObjFunc__FP9_HSD_AObjPv(HSD_AObj* aobj, HSD_AObj** out)
 {
     if (aobj != NULL) {
@@ -492,14 +498,16 @@ void _modelGetEndFrame(HSD_AObj* aobj, f32* end_frame)
 }
 s32 fn_800EE0E8(GSmodel* model)
 {
-    sModelJObjCount = 0;
-    sModelJObjLastIndex = -1;
+    lbl_8047ABB0 = 0;
+    lbl_8047ABAC = -1;
     fn_801A3918(model->jobj, fn_800EE20C, 0);
     if (model->flags & MODEL_FLAG_USE_JOBJ_CHILD) {
-        sModelJObjCount = sModelJObjCount - 1;
+        lbl_8047ABB0 = lbl_8047ABB0 - 1;
     }
-    return sModelJObjCount;
+    return lbl_8047ABB0;
 }
+#endif
+
 #undef MODEL_RESET_PART_ANIM_MIX_ADD_ROT
 #undef MODEL_RESET_PART_ANIM_MIX_SET_ROT
 #undef MODEL_RESET_PART_ANIM_MIX_DIRTY

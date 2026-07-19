@@ -1,0 +1,3 @@
+#define TRK_TARGET_RANGE_SPLIT
+#define TRK_TARGET_RANGE_800C24BC_800C25FC
+#include "src/trk/TRKTarget_range_800C1348.c"

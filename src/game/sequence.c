@@ -11,6 +11,7 @@
 
 #include "game/battle/battle_waza_types.h"
 
+#if defined(SEQUENCE_801DCDA8_801DCF00)
 
 /**
  * fn_801DCDA8 - Waza field effect get type.
@@ -89,6 +90,10 @@ void fn_801DCEA8(void* obj) {
     }
 }
 
+#endif
+
+#if defined(SEQUENCE_801DCF00_801DCF84)
+
 /**
  * fn_801DCF00 - Waza lighting override set.
  * Address: 0x801DCF00 | Size: 0x84
@@ -114,6 +119,10 @@ void fn_801DCF00(u32 color, f32 intensity) {
         fn_801DEF0C(obj, 1, 0);
     }
 }
+
+#endif
+
+#if defined(SEQUENCE_801DCF84_801DD158)
 
 /**
  * fn_801DCF84 - Waza lighting override clear.
@@ -213,6 +222,10 @@ void fn_801DD100(u8* p, u8* q) {
     }
 }
 
+#endif
+
+#if defined(SEQUENCE_801DD158_801DD23C)
+
 /**
  * fn_801DD158 - Waza color filter update.
  * Address: 0x801DD158 | Size: 0xE4
@@ -220,6 +233,10 @@ void fn_801DD100(u8* p, u8* q) {
 void fn_801DD158(void* obj) {
     /* TODO: Color filter update (0xE4 bytes) */
 }
+
+#endif
+
+#if defined(SEQUENCE_801DD23C_801DD45C)
 
 /**
  * fn_801DD23C - Waza color filter transition.
@@ -332,6 +349,10 @@ void fn_801DD3E4(void* obj) {
     }
 }
 
+#endif
+
+#if defined(SEQUENCE_801DD45C_801DE164)
+
 /**
  * sequenceLoad - Waza scene snapshot.
  * Address: 0x801DD45C | Size: 0x18C
@@ -382,6 +403,10 @@ void fn_801DDEE4(s32 slot, s32 flashType) {
     /* TODO: Hit flash effect (0x280 bytes) */
 }
 
+#endif
+
+#if defined(SEQUENCE_801DE164_801DE190)
+
 /**
  * fn_801DE164 - Waza hit flash get active.
  * Address: 0x801DE164 | Size: 0x2C
@@ -398,6 +423,10 @@ BOOL fn_801DE164(s32 slot) {
     }
     return FALSE;
 }
+
+#endif
+
+#if defined(SEQUENCE_801DE190_801DE654)
 
 /**
  * fn_801DE190 - Waza hit flash update.
@@ -423,6 +452,10 @@ void fn_801DE598(void) {
     /* TODO: HP drain update (0xBC bytes) */
 }
 
+#endif
+
+#if defined(SEQUENCE_801DE654_801DE698)
+
 /**
  * sequenceAnimEndCallback - Waza HP drain get active.
  * Address: 0x801DE654 | Size: 0x44
@@ -434,3 +467,5 @@ void sequenceAnimEndCallback(s32 arg0, s32 arg1) {
     fn_801DE698();
     _eyeTexAnimEnded(arg0, arg1);
 }
+
+#endif

@@ -5,11 +5,9 @@
  * Address range: 0x801DAC90 - 0x801DB988
  */
 
-#define fn_801DB8FC fn_801DB8FC_decl
-#define wazaSequenceSysResetAnimationExcept wazaSequenceSysResetAnimationExcept_decl
 #include "game/battle/battle_waza_types.h"
-#undef fn_801DB8FC
-#undef wazaSequenceSysResetAnimationExcept
+
+#if defined(WAZA_SEQUENCE_SYS_TAIL_801DAC90_801DB060)
 
 /* =========================================================================
  * WAZA SYSTEM LIFECYCLE (0x801DAC90 - 0x801DB100)
@@ -57,11 +55,15 @@ void fn_801DAEF8(s32 count) {
      */
 }
 
+#endif
+
+#if defined(WAZA_SEQUENCE_SYS_TAIL_801DB060_801DB288)
+
 /**
- * wazaSequenceSysGetResID - Waza system get initialized.
+ * wazaSequenceSysGetResID - Allocate the next waza resource ID.
  * Address: 0x801DB060 | Size: 0x28
  */
-BOOL wazaSequenceSysGetResID(void) {
+int wazaSequenceSysGetResID(void) {
     if ((u32)(lbl_8047B410 + 0x10000) == 0xFFFF) {
         lbl_8047B410 = 0;
     }
@@ -173,6 +175,10 @@ void wazaSequenceSysFreeSequenceResource(void* obj) {
     }
 }
 
+#endif
+
+#if defined(WAZA_SEQUENCE_SYS_TAIL_801DB288_801DB848)
+
 /**
  * wazaSequenceSysFreeWazaResource - Waza sequence data parse.
  * Address: 0x801DB288 | Size: 0x170
@@ -189,6 +195,10 @@ void wazaSequenceSysGetWazaTime(void* seqData) {
     /* TODO: Complex sequence data parse (0x450 bytes) */
 }
 
+#endif
+
+#if defined(WAZA_SEQUENCE_SYS_TAIL_801DB848_801DB988)
+
 /**
  * wazaSequenceSysGetModelShadowLight__Fv - Waza data get move count.
  * Address: 0x801DB848 | Size: 0x8
@@ -203,7 +213,7 @@ s32 wazaSequenceSysGetModelShadowLight__Fv(void) {
  * Address: 0x801DB850 | Size: 0x8
  */
 extern s32 lbl_8047B414;
-s32 wazaSequenceSysGetModelShadowCount__Fv(s32 moveID) {
+s32 wazaSequenceSysGetModelShadowCount__Fv(void) {
     return lbl_8047B414;
 }
 
@@ -212,7 +222,7 @@ s32 wazaSequenceSysGetModelShadowCount__Fv(s32 moveID) {
  * Address: 0x801DB858 | Size: 0xC
  */
 extern u8 lbl_80467C80[];
-void* wazaSequenceSysGetModelShadowList__Fv(s32 moveID) {
+void* wazaSequenceSysGetModelShadowList__Fv(void) {
     return lbl_80467C80;
 }
 
@@ -258,3 +268,5 @@ void fn_801DB8FC(void* entry, u32 drawFlags, u8 modelID) {
         node = *(u8**)(node + 0xA8);
     }
 }
+
+#endif

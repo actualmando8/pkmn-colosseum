@@ -14,10 +14,13 @@ extern u8 gTRKCPUState[];
 extern u8 lbl_80313834[];
 
 /* TRK exception status structure @ 0x80313824 */
-extern u8 gTRKExceptionStatus[];
+extern u8 gTRKExceptionStatus_80313824[];
 
 /* "TargetDoStep()\n" */
 extern u8 lbl_8026FB70[];
+
+#if !defined(TRK_TARGET_RANGE_SPLIT) || \
+    defined(TRK_TARGET_RANGE_800C1548_800C17CC)
 
 /* TRKTargetGetPC - 0x800C1548 | size 0x10 | scope none */
 s32 TRKTargetGetPC(void) {
@@ -92,13 +95,13 @@ void TRKTargetAddExceptionInfo(s32 arg) {
     u32 dataword;
 
     memset(buf, 0, 0x40);
-    dataword = *(u32*)gTRKExceptionStatus;
+    dataword = *(u32*)gTRKExceptionStatus_80313824;
     *(u32*)&buf[0x0] = 0x40;
     buf[0x4] = 0x91;
     *(u32*)&buf[0x8] = dataword;
     TRKTargetReadInstruction((u8*)&result, dataword);
     *(u32*)&buf[0xC] = result;
-    *(u32*)&buf[0x10] = *(u16*)&gTRKExceptionStatus[0x8];
+    *(u32*)&buf[0x10] = *(u16*)&gTRKExceptionStatus_80313824[0x8];
     TRKAppendBuffer_ui8(arg, buf, 0x40);
 }
 
@@ -118,6 +121,11 @@ void TRKTargetAddStopInfo(s32 arg) {
     *(u32*)&buf[0x10] = *(u32*)&gTRKCPUState[0x2F8] & 0xFFFF;
     TRKAppendBuffer_ui8(arg, buf, 0x40);
 }
+
+#endif
+
+#if !defined(TRK_TARGET_RANGE_SPLIT) || \
+    defined(TRK_TARGET_RANGE_800C195C_800C1A08)
 
 /* TRKPostInterruptEvent - 0x800C195C | size 0xAC | scope global */
 void TRKPostInterruptEvent(void) {
@@ -152,6 +160,11 @@ void TRKPostInterruptEvent(void) {
     }
 }
 
+#endif
+
+#if !defined(TRK_TARGET_RANGE_SPLIT) || \
+    defined(TRK_TARGET_RANGE_800C24BC_800C25FC)
+
 /* TRKTargetAccessDefault - 0x800C24BC | size 0xF4 | scope global */
 s32 TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister, s32 buffer,
                            u32* transferSize, s32 read) {
@@ -161,7 +174,6 @@ s32 TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister, s32 buffer,
 
     extern s32 TRKAppendBuffer_ui32(s32 buffer, u32* data, u32 count);
     extern s32 TRKReadBuffer_ui32(s32 buffer, u32* data, u32 count);
-    extern u8 gTRKExceptionStatus_80313824[];
 
     s32 result;
     u32 registerCount;
@@ -207,6 +219,10 @@ s32 TRKTargetReadInstruction(u8* buf, u32 pc) {
     return result;
 }
 
+#endif
+
+#if !defined(TRK_TARGET_RANGE_SPLIT)
+
 /* TRKAccessFile - 0x800C29F0 | size: 0x8 | scope global */
 u32 TRKAccessFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
     (void)cmd;
@@ -233,3 +249,5 @@ u32 TRKPositionFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
     (void)cmd;
     return TRKAccessFile(0xD4, dir, addrBuf, len);
 }
+
+#endif
