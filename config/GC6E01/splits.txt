@@ -203,8 +203,116 @@ game/menuSub.c:
 game/gs_pcbox_range_8001E3E0.c:
 	.text       start:0x8001E3E0 end:0x80020328
 
-game/gs_title.c:
-	.text       start:0x80020328 end:0x80026370
+game/gs_title_exact_80020328.c:
+	.text       start:0x80020328 end:0x800203B4
+
+game/gs_title_exact_800203B4.c:
+	.text       start:0x800203B4 end:0x8002049C
+
+game/gs_title_exact_8002049C.c:
+	.text       start:0x8002049C end:0x8002058C
+
+game/gs_title_exact_8002058C.c:
+	.text       start:0x8002058C end:0x800205B8
+
+game/gs_title_exact_800205B8.c:
+	.text       start:0x800205B8 end:0x800205C0
+
+game/gs_title_exact_800205C0.c:
+	.text       start:0x800205C0 end:0x800205C8
+
+game/gs_title_candidate_800205C8.c:
+	.text       start:0x800205C8 end:0x8002060C
+
+game/gs_title_exact_8002060C.c:
+	.text       start:0x8002060C end:0x80020618
+
+game/gs_title_candidate_80020618.c:
+	.text       start:0x80020618 end:0x8002091C
+
+game/gs_title_exact_8002091C.c:
+	.text       start:0x8002091C end:0x80020E9C
+
+game/gs_title_exact_80020E9C.c:
+	.text       start:0x80020E9C end:0x80020EA4
+
+game/gs_title_candidate_80020EA4.c:
+	.text       start:0x80020EA4 end:0x80020F54
+
+game/gs_title_exact_80020F54.c:
+	.text       start:0x80020F54 end:0x800210F0
+
+game/gs_title_candidate_800210F0.c:
+	.text       start:0x800210F0 end:0x800215C4
+
+game/gs_title_exact_800215C4.c:
+	.text       start:0x800215C4 end:0x80021624
+
+game/gs_title_candidate_80021624.c:
+	.text       start:0x80021624 end:0x80021644
+
+game/gs_title_exact_80021644.c:
+	.text       start:0x80021644 end:0x800216E0
+
+game/gs_title_exact_800216E0.c:
+	.text       start:0x800216E0 end:0x800216E8
+
+game/gs_title_candidate_800216E8.c:
+	.text       start:0x800216E8 end:0x80021A9C
+
+game/gs_title_exact_80021A9C.c:
+	.text       start:0x80021A9C end:0x80021B14
+
+game/gs_title_candidate_80021B14.c:
+	.text       start:0x80021B14 end:0x80022050
+
+game/gs_title_exact_80022050.c:
+	.text       start:0x80022050 end:0x8002217C
+
+game/gs_title_candidate_8002217C.c:
+	.text       start:0x8002217C end:0x80022E54
+
+game/gs_title_exact_80022E54.c:
+	.text       start:0x80022E54 end:0x80023068
+
+game/gs_title_candidate_80023068.c:
+	.text       start:0x80023068 end:0x80023274
+
+game/gs_title_exact_80023274.c:
+	.text       start:0x80023274 end:0x800232F0
+
+game/gs_title_candidate_800232F0.c:
+	.text       start:0x800232F0 end:0x80023DA8
+
+game/gs_title_exact_80023DA8.c:
+	.text       start:0x80023DA8 end:0x80023E60
+
+game/gs_title_candidate_80023E60.c:
+	.text       start:0x80023E60 end:0x80024438
+
+game/gs_title_exact_80024438.c:
+	.text       start:0x80024438 end:0x800246FC
+
+game/gs_title_candidate_800246FC.c:
+	.text       start:0x800246FC end:0x80024CDC
+
+game/gs_title_candidate_80024CDC.c:
+	.text       start:0x80024CDC end:0x80024DBC
+
+game/gs_title_candidate_80024DBC.c:
+	.text       start:0x80024DBC end:0x800259B0
+
+game/gs_title_exact_800259B0.c:
+	.text       start:0x800259B0 end:0x80025A80
+
+game/gs_title_candidate_80025A80.c:
+	.text       start:0x80025A80 end:0x80025F74
+
+game/gs_title_exact_80025F74.c:
+	.text       start:0x80025F74 end:0x80025F84
+
+game/gs_title_candidate_80025F84.c:
+	.text       start:0x80025F84 end:0x80026370
 
 game/menuNameEntry.c:
 	.text       start:0x80026370 end:0x80029850
