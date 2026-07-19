@@ -1525,6 +1525,20 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/hero_savedata_exact_80129280.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/hero_bios_exact_8012A450.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
                 "game/hero_move.c",
                 mw_version="GC/1.3",
@@ -1852,8 +1866,8 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
-                "dolphin/sdk_range_800B857C.c",
+                Matching,
+                "dolphin/gx/GX_exact_800B857C.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -4227,8 +4241,57 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/gs_task_exact_80006630.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
-                "game/gs_task.c",
+                "game/gs_task_residual_80006724.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/gs_task_exact_80006884.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_task_residual_80006908.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/gs_task_exact_80006FAC.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_task_residual_80007364.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/gs_task_exact_8000765C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_task_residual_80008868.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -5135,11 +5198,6 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                Matching,
-                "game/data/data_803634A8.c",
-                progress_category="game",
-            ),
-            Object(
                 DataCandidate,
                 "game/data/bss_8039A700.c",
                 progress_category="game",
@@ -5341,7 +5399,12 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "game/data/data_803127F0.c",
+                "game/data/data_803127F0_prefix.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/data_80312C40_suffix.c",
                 progress_category="game",
             ),
             Object(
@@ -5475,8 +5538,13 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                Matching,
+                DataCandidate,
                 "game/data/data_803634EC.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/data_803635C0.c",
                 progress_category="game",
             ),
             Object(

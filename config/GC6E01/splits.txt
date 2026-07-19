@@ -140,8 +140,29 @@ game/main_retrace.c:
 game/main_tail.c:
 	.text       start:0x80005FA8 end:0x80006630
 
-game/gs_task.c:
-	.text       start:0x80006630 end:0x80009178
+game/gs_task_exact_80006630.c:
+	.text       start:0x80006630 end:0x80006724
+
+game/gs_task_residual_80006724.c:
+	.text       start:0x80006724 end:0x80006884
+
+game/gs_task_exact_80006884.c:
+	.text       start:0x80006884 end:0x80006908
+
+game/gs_task_residual_80006908.c:
+	.text       start:0x80006908 end:0x80006FAC
+
+game/gs_task_exact_80006FAC.c:
+	.text       start:0x80006FAC end:0x80007364
+
+game/gs_task_residual_80007364.c:
+	.text       start:0x80007364 end:0x8000765C
+
+game/gs_task_exact_8000765C.c:
+	.text       start:0x8000765C end:0x80008868
+
+game/gs_task_residual_80008868.c:
+	.text       start:0x80008868 end:0x80009178
 
 game/gs_range_80009178.c:
 	.text       start:0x80009178 end:0x800096B4
@@ -748,32 +769,8 @@ game/data/data_80312558.c:
 game/data/data_803125E8.c:
 	.data       start:0x803125E8 end:0x803127A8
 
-game/data/data_803127F0.c:
-	.data       start:0x803127F0 end:0x80313364
-
-game/data/data_80313368.c:
-	.data       start:0x80313368 end:0x8031358C
-
-game/data/data_80313590.c:
-	.data       start:0x80313590 end:0x803137DC
-
-game/data/data_803137E0.c:
-	.data       start:0x803137E0 end:0x80313818
-
-game/data/data_80313824.c:
-	.data       start:0x80313824 end:0x803138B0
-
-game/data/data_803139F0.c:
-	.data       start:0x803139F0 end:0x80313B14
-
-game/data/data_80313B18.c:
-	.data       start:0x80313B18 end:0x80313D18
-
-game/data/data_80313D9C.c:
-	.data       start:0x80313D9C end:0x80313F44
-
-game/data/data_80313F48.c:
-	.data       start:0x80313F48 end:0x80314060
+game/data/data_803127F0_prefix.c:
+	.data       start:0x803127F0 end:0x80312BD0
 
 dolphin/vi/VI_fn_800AA498.c:
 	.text       start:0x800AA498 end:0x800AA4D4
@@ -853,8 +850,36 @@ dolphin/sdk_range_800B771C.c:
 dolphin/gx/GX_fn_800B856C.c:
 	.text       start:0x800B856C end:0x800B857C
 
-dolphin/sdk_range_800B857C.c:
+dolphin/gx/GX_exact_800B857C.c:
 	.text       start:0x800B857C end:0x800B884C
+	.data       start:0x80312BD0 end:0x80312C40
+
+game/data/data_80312C40_suffix.c:
+	.data       start:0x80312C40 end:0x80313364
+
+game/data/data_80313368.c:
+	.data       start:0x80313368 end:0x8031358C
+
+game/data/data_80313590.c:
+	.data       start:0x80313590 end:0x803137DC
+
+game/data/data_803137E0.c:
+	.data       start:0x803137E0 end:0x80313818
+
+game/data/data_80313824.c:
+	.data       start:0x80313824 end:0x803138B0
+
+game/data/data_803139F0.c:
+	.data       start:0x803139F0 end:0x80313B14
+
+game/data/data_80313B18.c:
+	.data       start:0x80313B18 end:0x80313D18
+
+game/data/data_80313D9C.c:
+	.data       start:0x80313D9C end:0x80313F44
+
+game/data/data_80313F48.c:
+	.data       start:0x80313F48 end:0x80314060
 
 dolphin/gx/GX_exact_800B884C.c:
 	.text       start:0x800B884C end:0x800B8AE8
@@ -1732,23 +1757,31 @@ game/pokemon_set_status_exact_801254B4.c:
 game/data/data_8035E4B0.c:
 	.data       start:0x8035E4B0 end:0x803634A8
 
-game/data/data_803634A8.c:
+game/pokemon_range_8012640C.c:
+	.text       start:0x8012640C end:0x80128E38
+
+game/hero.c:
+	.text       start:0x80128E38 end:0x80129280
+
+game/hero_savedata_exact_80129280.c:
+	.text       start:0x80129280 end:0x8012A450
 	.data       start:0x803634A8 end:0x803634EC
 
 game/data/data_803634EC.c:
-	.data       start:0x803634EC end:0x80363630
+	.data       start:0x803634EC end:0x803634F0
+
+game/hero_bios_exact_8012A450.c:
+	.text       start:0x8012A450 end:0x8012AC9C
+	.data       start:0x803634F0 end:0x803635C0
+
+game/data/data_803635C0.c:
+	.data       start:0x803635C0 end:0x80363630
 
 game/data/data_80363630.c:
 	.data       start:0x80363630 end:0x80363774
 
 game/data/data_80363774.c:
 	.data       start:0x80363774 end:0x80363A70
-
-game/pokemon_range_8012640C.c:
-	.text       start:0x8012640C end:0x80128E38
-
-game/hero.c:
-	.text       start:0x80128E38 end:0x8012AC9C
 
 game/hero_move.c:
 	.text       start:0x8012AC9C end:0x80130660
