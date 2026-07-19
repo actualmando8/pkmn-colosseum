@@ -2887,7 +2887,19 @@ hsd/hsd_texp_exact_801B387C.c:
 	.text       start:0x801B387C end:0x801B3D1C
 
 hsd/hsd_texp_suffix_801B3D1C.c:
-	.text       start:0x801B3D1C end:0x801BBAC8
+	.text       start:0x801B3D1C end:0x801B4240
+
+hsd/hsd_texp_exact_801B4240.c:
+	.text       start:0x801B4240 end:0x801B4264
+
+hsd/hsd_texp_candidate_801B4264.c:
+	.text       start:0x801B4264 end:0x801B42C0
+
+hsd/hsd_texp_exact_801B42C0.c:
+	.text       start:0x801B42C0 end:0x801B4300
+
+hsd/hsd_texp_candidate_801B4300.c:
+	.text       start:0x801B4300 end:0x801BBAC8
 
 hsd/hsd_tobj.c:
 	.text       start:0x801BBAC8 end:0x801BF098
