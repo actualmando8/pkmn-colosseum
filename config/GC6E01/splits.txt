@@ -2690,7 +2690,37 @@ hsd/hsd_jobj_exact_8019F718.c:
 	.text       start:0x8019F718 end:0x8019FF74
 
 hsd/hsd_jobj_suffix_8019FF74.c:
-	.text       start:0x8019FF74 end:0x801A301C
+	.text       start:0x8019FF74 end:0x801A053C
+
+hsd/hsd_jobj_exact_801A053C.c:
+	.text       start:0x801A053C end:0x801A05EC
+
+hsd/hsd_jobj_residual_801A05EC.c:
+	.text       start:0x801A05EC end:0x801A0B9C
+
+hsd/hsd_jobj_exact_801A0B9C.c:
+	.text       start:0x801A0B9C end:0x801A0CE8
+
+hsd/hsd_jobj_residual_801A0CE8.c:
+	.text       start:0x801A0CE8 end:0x801A0D3C
+
+hsd/hsd_jobj_exact_801A0D3C.c:
+	.text       start:0x801A0D3C end:0x801A0D94
+
+hsd/hsd_jobj_residual_801A0D94.c:
+	.text       start:0x801A0D94 end:0x801A1980
+
+hsd/hsd_jobj_exact_801A1980.c:
+	.text       start:0x801A1980 end:0x801A1A00
+
+hsd/hsd_jobj_residual_801A1A00.c:
+	.text       start:0x801A1A00 end:0x801A1B40
+
+hsd/hsd_jobj_exact_801A1B40.c:
+	.text       start:0x801A1B40 end:0x801A1B7C
+
+hsd/hsd_jobj_residual_801A1B7C.c:
+	.text       start:0x801A1B7C end:0x801A301C
 
 hsd/hsd_jobj_exact_801A301C.c:
 	.text       start:0x801A301C end:0x801A4000
