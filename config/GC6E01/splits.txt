@@ -1854,8 +1854,119 @@ game/tikeiBios.c:
 game/effect/tracefx.c:
 	.text       start:0x801364A8 end:0x801380D4
 
-game/effect/effect_visual.c:
-	.text       start:0x801380D4 end:0x80140588
+game/effect/effect_visual_exact_801380D4.c:
+	.text       start:0x801380D4 end:0x8013814C
+
+game/effect/effect_visual_candidate_8013814C.c:
+	.text       start:0x8013814C end:0x80138630
+
+game/effect/effect_visual_exact_80138630.c:
+	.text       start:0x80138630 end:0x801386DC
+
+game/effect/effect_visual_candidate_801386DC.c:
+	.text       start:0x801386DC end:0x801387C0
+
+game/effect/effect_visual_exact_801387C0.c:
+	.text       start:0x801387C0 end:0x80138838
+
+game/effect/effect_visual_candidate_80138838.c:
+	.text       start:0x80138838 end:0x80138B00
+
+game/effect/effect_visual_exact_80138B00.c:
+	.text       start:0x80138B00 end:0x80138BBC
+
+game/effect/effect_visual_candidate_80138BBC.c:
+	.text       start:0x80138BBC end:0x80139820
+
+game/effect/effect_visual_exact_80139820.c:
+	.text       start:0x80139820 end:0x80139AC4
+
+game/effect/effect_visual_candidate_80139AC4.c:
+	.text       start:0x80139AC4 end:0x8013A42C
+
+game/effect/effect_visual_exact_8013A42C.c:
+	.text       start:0x8013A42C end:0x8013A520
+
+game/effect/effect_visual_candidate_8013A520.c:
+	.text       start:0x8013A520 end:0x8013AA8C
+
+game/effect/effect_visual_exact_8013AA8C.c:
+	.text       start:0x8013AA8C end:0x8013AB60
+
+game/effect/effect_visual_candidate_8013AB60.c:
+	.text       start:0x8013AB60 end:0x8013AD68
+
+game/effect/effect_visual_exact_8013AD68.c:
+	.text       start:0x8013AD68 end:0x8013AD9C
+
+game/effect/effect_visual_candidate_8013AD9C.c:
+	.text       start:0x8013AD9C end:0x8013B034
+
+game/effect/effect_visual_exact_8013B034.c:
+	.text       start:0x8013B034 end:0x8013B268
+
+game/effect/effect_visual_candidate_8013B268.c:
+	.text       start:0x8013B268 end:0x8013B490
+
+game/effect/effect_visual_exact_8013B490.c:
+	.text       start:0x8013B490 end:0x8013B5E4
+
+game/effect/effect_visual_candidate_8013B5E4.c:
+	.text       start:0x8013B5E4 end:0x8013C5A0
+
+game/effect/effect_visual_exact_8013C5A0.c:
+	.text       start:0x8013C5A0 end:0x8013C670
+
+game/effect/effect_visual_candidate_8013C670.c:
+	.text       start:0x8013C670 end:0x8013D604
+
+game/effect/effect_visual_exact_8013D604.c:
+	.text       start:0x8013D604 end:0x8013D984
+
+game/effect/effect_visual_candidate_8013D984.c:
+	.text       start:0x8013D984 end:0x8013DB64
+
+game/effect/effect_visual_exact_8013DB64.c:
+	.text       start:0x8013DB64 end:0x8013DE6C
+
+game/effect/effect_visual_candidate_8013DE6C.c:
+	.text       start:0x8013DE6C end:0x8013E470
+
+game/effect/effect_visual_exact_8013E470.c:
+	.text       start:0x8013E470 end:0x8013E54C
+
+game/effect/effect_visual_candidate_8013E54C.c:
+	.text       start:0x8013E54C end:0x8013E5AC
+
+game/effect/effect_visual_exact_8013E5AC.c:
+	.text       start:0x8013E5AC end:0x8013E8A4
+
+game/effect/effect_visual_candidate_8013E8A4.c:
+	.text       start:0x8013E8A4 end:0x8013F000
+
+game/effect/effect_visual_exact_8013F000.c:
+	.text       start:0x8013F000 end:0x8013F344
+
+game/effect/effect_visual_candidate_8013F344.c:
+	.text       start:0x8013F344 end:0x8013F410
+
+game/effect/effect_visual_exact_8013F410.c:
+	.text       start:0x8013F410 end:0x8013F80C
+
+game/effect/effect_visual_candidate_8013F80C.c:
+	.text       start:0x8013F80C end:0x8013FBE0
+
+game/effect/effect_visual_exact_8013FBE0.c:
+	.text       start:0x8013FBE0 end:0x8013FF0C
+
+game/effect/effect_visual_candidate_8013FF0C.c:
+	.text       start:0x8013FF0C end:0x80140138
+
+game/effect/effect_visual_exact_80140138.c:
+	.text       start:0x80140138 end:0x801402AC
+
+game/effect/effect_visual_candidate_801402AC.c:
+	.text       start:0x801402AC end:0x80140588
 
 game/people/people_data.c:
 	.text       start:0x80140588 end:0x80144574
@@ -2527,8 +2638,81 @@ game/fight_target_exact_801F0204.c:
 	.text       start:0x801F0204 end:0x801F0898
 	.data       start:0x803752F8 end:0x8037532C
 
-game/data/data_80375330.c:
-	.data       start:0x80375330 end:0x80375624
+game/fight_action_range_801F0898.c:
+	.text       start:0x801F0898 end:0x801F150C
+
+game/fight_floor_exact_801F150C.c:
+	.text       start:0x801F150C end:0x801F1588
+
+game/fight_floor_candidate_801F1588.c:
+	.text       start:0x801F1588 end:0x801F1700
+
+game/fight_floor_exact_801F1700.c:
+	.text       start:0x801F1700 end:0x801F1990
+
+game/fight_floor_candidate_801F1990.c:
+	.text       start:0x801F1990 end:0x801F1A6C
+
+game/fight_floor_exact_801F1A6C.c:
+	.text       start:0x801F1A6C end:0x801F1B14
+
+game/fight_floor_candidate_801F1B14.c:
+	.text       start:0x801F1B14 end:0x801F1F30
+
+game/fight_floor_exact_801F1F30.c:
+	.text       start:0x801F1F30 end:0x801F1F7C
+
+game/fight_floor_candidate_801F1F7C.c:
+	.text       start:0x801F1F7C end:0x801F2020
+
+game/fight_floor_exact_801F2020.c:
+	.text       start:0x801F2020 end:0x801F2350
+
+game/fight_floor_candidate_801F2350.c:
+	.text       start:0x801F2350 end:0x801F2654
+
+game/fight_floor_exact_801F2654.c:
+	.text       start:0x801F2654 end:0x801F26A8
+
+game/fight_floor_candidate_801F26A8.c:
+	.text       start:0x801F26A8 end:0x801F27D4
+
+game/fight_floor_exact_801F27D4.c:
+	.text       start:0x801F27D4 end:0x801F2B5C
+
+game/fight_floor_candidate_801F2B5C.c:
+	.text       start:0x801F2B5C end:0x801F32B0
+
+game/fight_floor_exact_801F32B0.c:
+	.text       start:0x801F32B0 end:0x801F32EC
+
+game/fight_floor_candidate_801F32EC.c:
+	.text       start:0x801F32EC end:0x801F33E8
+
+game/fight_floor_exact_801F33E8.c:
+	.text       start:0x801F33E8 end:0x801F37B0
+
+game/fight_floor_candidate_801F37B0.c:
+	.text       start:0x801F37B0 end:0x801F3B24
+
+game/fight_floor_exact_801F3B24.c:
+	.text       start:0x801F3B24 end:0x801F3BB4
+
+game/fight_floor_candidate_801F3BB4.c:
+	.text       start:0x801F3BB4 end:0x801F4220
+
+game/fight_floor_exact_801F4220.c:
+	.text       start:0x801F4220 end:0x801F4354
+
+game/fight_floor_candidate_801F4354.c:
+	.text       start:0x801F4354 end:0x801F4460
+
+game/fight_floor_exact_801F4460.c:
+	.text       start:0x801F4460 end:0x801F54A4
+	.data       start:0x80375330 end:0x803754AC
+
+game/data/data_803754AC.c:
+	.data       start:0x803754AC end:0x80375624
 
 game/data/data_80375628.c:
 	.data       start:0x80375628 end:0x8037564C
@@ -2596,11 +2780,14 @@ game/data/data_80379BF4.c:
 game/data/data_8038FFFC.c:
 	.data       start:0x8038FFFC end:0x8039A028
 
-game/fight_action_range_801F0898.c:
-	.text       start:0x801F0898 end:0x801F150C
+game/fight_floor_candidate_801F54A4.c:
+	.text       start:0x801F54A4 end:0x801F61BC
 
-game/fight_floor.c:
-	.text       start:0x801F150C end:0x801F640C
+game/fight_floor_exact_801F61BC.c:
+	.text       start:0x801F61BC end:0x801F61EC
+
+game/fight_floor_candidate_801F61EC.c:
+	.text       start:0x801F61EC end:0x801F640C
 
 game/fight_floor_bios.c:
 	.text       start:0x801F640C end:0x801F6B54

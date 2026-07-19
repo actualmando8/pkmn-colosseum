@@ -11,6 +11,11 @@
 
 #include "game/pokemon_fight_types.h"
 
+u32 _fightFloorCheckFightOutPokemonPtrAryPokemonTokuseiDataIdSub__FPvUsPv(
+    void* obj, u32 slot, void* data);
+
+#if defined(FIGHT_FLOOR_801F150C_801F1588)
+
 /* 0x801F150C | size: 0x48 | small */
 void fightFloorSetTuusinErrorFightResult(void* param) {
     extern void fightFloorLoopValidFightOutPokemon(void*, void*, u32, u32);
@@ -29,6 +34,10 @@ s32 _fightFloorSetTuusinErrorFightResultSub__FPvUsPv(void* context) {
     pokemonSetStatus(context, 0, 0x112, 0, 1);
     return 1;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F1588_801F1700)
 
 /* 0x801F1588 | size: 0x178 | medium */
 void fightFloorSetTimeOutAllFightResult(void* param) {
@@ -81,6 +90,10 @@ void fightFloorSetTimeOutAllFightResult(void* param) {
         }
     }
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F1700_801F1990)
 
 /* 0x801F1700 | size: 0x58 | small */
 u32 fightFloorIsUseFightTimerCommand(void* param) {
@@ -195,6 +208,10 @@ void fightFloorSetMenuFightAction(void* obj, u32 arg2, void* dst) {
 /* 0x801F198C | size: 0x4 | trivial */
 void fightFloorSetShadow(void) {}
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F1990_801F1A6C)
+
 /* 0x801F1990 | size: 0xDC | medium */
 u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(void* arg1, void* arg2, u8 arg3, u8 arg4, void* arg5, void* arg6) {
     extern void* _fightFloorGetFightTrainerFightOutPokemonPtrArySub__FPvUsPv(void*, u16, void*);
@@ -233,6 +250,10 @@ u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(void* arg
     return 0;
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F1A6C_801F1B14)
+
 /* 0x801F1A6C | size: 0xA8 | medium */
 u16 fightFloorGetFightTrainerFightPokemonPtrAry(u32 obj, u32 slot, u32* arr, u8 r6, u8 r7_orig) {
     extern u32 fightFloorGetStatus(u32, u32, u32, u32);
@@ -258,6 +279,10 @@ u16 fightFloorGetFightTrainerFightPokemonPtrAry(u32 obj, u32 slot, u32* arr, u8 
     fightFloorLoopValidFightTrainer(obj, (void*)_fightFloorGetFightTrainerFightPokemonPtrArySub__FPvUsPv, buf, 0);
     return (u16)buf[2];
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F1B14_801F1F30)
 
 /* 0x801F1B14 | size: 0x184 | medium */
 u32 _fightFloorGetFightTrainerFightPokemonPtrArySub__FPvUsPv(void* obj, u32 slot, void* data) {
@@ -417,6 +442,10 @@ _found:
     return 0;
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F1F30_801F1F7C)
+
 /* 0x801F1F30 | size: 0x4C | small */
 u8 fightFloorCheckHuuinWazaFightOutPokemon(u32 param_1, u32 param_2, u16 param_3) {
     extern void fightFloorLoopValidFightOutPokemon(u32, void*, void*, u32);
@@ -429,6 +458,10 @@ u8 fightFloorCheckHuuinWazaFightOutPokemon(u32 param_1, u32 param_2, u16 param_3
     fightFloorLoopValidFightOutPokemon(param_1, (void*)_fightFloorCheckHuuinWazaFightOutPokemonSub__FPvUsPv, buf, 0);
     return (u8)buf[2];
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F1F7C_801F2020)
 
 /* 0x801F1F7C | size: 0x90 | medium */
 u32 _fightFloorCheckHuuinWazaFightOutPokemonSub__FPvUsPv(void* obj, u32 slot, void* data) {
@@ -453,6 +486,10 @@ u32 _fightFloorCheckHuuinWazaFightOutPokemonSub__FPvUsPv(void* obj, u32 slot, vo
 _ret1:
     return 1;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F2020_801F2350)
 
 /* 0x801F2020 | size: 0x1FC | medium */
 u32 fightFloorCheckFightActionFightOutPokemonIrekaeSelect(u32 obj, u32 r4arg, u32* out) {
@@ -572,6 +609,10 @@ void fightFloorReplaceFightOutPokemonAttackToDefense(u32 obj) {
     fightFloorSetStatus(r30, 0, 0x43, 0, r31);
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F2350_801F2654)
+
 /* 0x801F2350 | size: 0xE4 | medium */
 s32 fightFloorGetEnemyFightSideManyDamageHpRate(u32 unused, u32 r4arg) {
     extern u32 pokemonGetStatus(u32, u32, u32, u32);
@@ -688,6 +729,10 @@ u32 fightFloorGetFightOutPokemonPtrRandom(u32 param_1, u32 param_2, u32 param_3,
     return 0;
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F2654_801F26A8)
+
 /* 0x801F2654 | size: 0x54 | small -- 100% MATCH */
 u16 fightFloorGetValidFightOutPokemonCount(u32 param_1, u8 param_2, u32 param_3, u8 param_4) {
     extern u32 _fightFloorGetValidFightOutPokemonCountSub__FPvUsPv(u32, u32, u32*);
@@ -700,6 +745,10 @@ u16 fightFloorGetValidFightOutPokemonCount(u32 param_1, u8 param_2, u32 param_3,
     fightFloorLoopValidFightOutPokemon(param_1, (void*)_fightFloorGetValidFightOutPokemonCountSub__FPvUsPv, data, 0);
     return (u16)data[1];
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F26A8_801F27D4)
 
 /* 0x801F26A8 | size: 0x12C | medium */
 /* 0x801F26A8 | size: 0x12C | medium -- best: 91.60%, reg-alloc wall */
@@ -754,6 +803,10 @@ u32 _fightFloorGetValidFightOutPokemonCountSub__FPvUsPv(u32 ctx, u32 param_2, u3
     r28[1] = r28[1] + 1;
     return 1;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F27D4_801F2B5C)
 
 /* 0x801F27D4 | size: 0x30 | small */
 void fightFloorInitFightOutPokemonPtrAryFightWazaJoutai(u32 param_1) {
@@ -877,6 +930,10 @@ u32 fightFloorGetGcHeroFightTrainerPtr(u32 ctx) {
     }
     return 0;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F2B5C_801F32B0)
 
 /* 0x801F2B5C | size: 0x3E0 | large -- variant 3 */
 void fightFloorLoopValidFightTrainer(u32 param_1, void (*param_2)(u32, u32, u32), u32 param_3, u8 param_4) {
@@ -1145,6 +1202,10 @@ void fightFloorSetMeetEnemyFightPokemonEnemySideAll(void *param_1) {
     }
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F32B0_801F32EC)
+
 /* 0x801F32B0 | size: 0x3C | small */
 u8 fightFloorIsIrekaeFightOutPokemon(u32 param_1) {
     extern void fightFloorLoopValidFightTrainer(u32, void*, void*, u32);
@@ -1155,6 +1216,10 @@ u8 fightFloorIsIrekaeFightOutPokemon(u32 param_1) {
     fightFloorLoopValidFightTrainer(param_1, (void*)_fightFloorIsIrekaeFightOutPokemonSub__FPvUsPv, &local, 0);
     return local;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F32EC_801F33E8)
 
 /* 0x801F32EC | size: 0xFC | medium */
 u32 _fightFloorIsIrekaeFightOutPokemonSub__FPvUsPv(void *param_1, u32 r4_unused, u8 *out_buf) {
@@ -1197,6 +1262,10 @@ u32 _fightFloorIsIrekaeFightOutPokemonSub__FPvUsPv(void *param_1, u32 r4_unused,
     }
     return 1;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F33E8_801F37B0)
 
 /* 0x801F33E8 | size: 0x48 | small */
 u16 fightFloorCheckFightOutPokemonPtrAryJoutaiDataId(void *param_1, u16 param_2) {
@@ -1343,6 +1412,10 @@ _checkId:
     return 1;
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F37B0_801F3B24)
+
 /* 0x801F37B0 | size: 0x1D4 | medium */
 u8 fightFloorLoopValidFightOutPokemon(void *param_1, void *callback, void *buf, u8 flag) {
     extern u32 fightFloorGetStatus(void*, u32, u32, u32);
@@ -1475,6 +1548,10 @@ u8 fightFloorSetFightResultId(void *param_1, u32 param_2) {
     return 1;
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F3B24_801F3BB4)
+
 /* 0x801F3B24 | size: 0x90 | medium */
 void fightFloorSortFightOutPokemonPtrAry(void* obj, u32 param2) {
     extern u32 fightFloorGetStatus(void*, int, int, int);
@@ -1490,6 +1567,10 @@ void fightFloorSortFightOutPokemonPtrAry(void* obj, u32 param2) {
     fightFloorSortFightOutPokemonPtrArySub(obj, buf, 8, param2);
     fightFloorSetStatus(obj, 0, 0x5a, 0, buf);
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F3BB4_801F4220)
 
 /* 0x801F3BB4 | size: 0x134 | medium */
 void fightFloorSortFightOutPokemonPtrArySub(void* obj, u32* arr, u16 count, u32 flag) {
@@ -1724,6 +1805,10 @@ s32 fightFloorCmpfightOutPokemonNimbleness(void *p1, void *p2, void *p3, u8 p4) 
     }
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F4220_801F4354)
+
 /* 0x801F4220 | size: 0x134 | medium */
 void* fightFloorGetFightOutPokemonPtrToHeroPtr(void* obj, void* search_val) {
     extern u32 pokemonGetStatus(void*, int, int, int);
@@ -1774,6 +1859,10 @@ check:
     }
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F4354_801F4460)
+
 /* 0x801F4354 | size: 0x10C | medium */
 void* fightFloorGetFightOutPokemonPtrToFightTrainerPtr(void* obj, void* search_val) {
     extern u32 pokemonGetStatus(void*, int, int, int);
@@ -1811,6 +1900,10 @@ done:
         return 0;
     return (void*)side;
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F4460_801F54A4)
 
 /* 0x801F4460 | size: 0xDC | medium */
 void* fightFloorGetFightPokemonPtrToFightTrainerPtr(void* obj, void* search_val) {
@@ -2346,6 +2439,10 @@ u8 fightFloorSetStatus(u32 p1, u16 p2, u32 p3, u16 p4, u32 p5) {
     return (u8)ret;
 }
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F54A4_801F61BC)
+
 #pragma push
 #if 0
 asm void fightFloorGetStatus(void) {
@@ -2749,11 +2846,19 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
 #endif
 #pragma pop
 
+#endif
+
+#if defined(FIGHT_FLOOR_801F61BC_801F61EC)
+
 /* 0x801F61BC | size: 0x30 */
 struct Pokemon* fightFloorGetNowPtr(void) {
     extern u32 fightFloorGetStatus(void*, u32, u32, u32);
     return (struct Pokemon*)fightFloorGetStatus(0, 0, 0, 0);
 }
+
+#endif
+
+#if defined(FIGHT_FLOOR_801F61EC_801F640C)
 
 /* 0x801F61EC | size: 0x220 | large */
 u32 _fightFloorCreateFightOutPokemonPtrAry__FP11FIGHT_FLOORPP15FightOutPokemonbUcP15FightOutPokemon(u32 param_1, u32 *param_2, u32 param_3, u32 param_4, u32 param_5) {
@@ -2849,3 +2954,5 @@ u32 _fightFloorCreateFightOutPokemonPtrAry__FP11FIGHT_FLOORPP15FightOutPokemonbU
     }
     return uCount;
 }
+
+#endif
