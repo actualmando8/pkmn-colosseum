@@ -1321,7 +1321,10 @@ crt/math_exact_800CE04C.c:
 	.text       start:0x800CE04C end:0x800CE378
 
 crt/math_range_800CE378.c:
-	.text       start:0x800CE378 end:0x800CE79C
+	.text       start:0x800CE378 end:0x800CE59C
+
+crt/math_exact_800CE59C.c:
+	.text       start:0x800CE59C end:0x800CE79C
 
 dolphin/exi/EXI2Stubs.c:
 	.text       start:0x800CE79C end:0x800CE7DC

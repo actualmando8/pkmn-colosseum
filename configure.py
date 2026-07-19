@@ -2247,6 +2247,12 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "crt/math_exact_800CE59C.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
+            Object(
+                Matching,
                 "dolphin/sdk_range_800CE7DC.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
