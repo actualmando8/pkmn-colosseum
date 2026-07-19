@@ -201,6 +201,24 @@ extern void  fn_800B856C(void);
 extern void  GStextureFree(void* model);
 extern void  fn_800D9B58(f32 a, f32 b, f32 c, f32 d);
 extern void  fn_800D9ED8(u32 param);
+extern void* GSmodelGetPart(void* model, u32 mode);
+extern void  GSpartGetTransform(void* obj, void* a, void* b, void* c);
+extern void  GSpartFree(void* handle);
+extern void* GSpartGetMaterial(void* handle, u32 idx);
+extern void* GStextureCreate(u32 a, u32 b, u32 size, u32 d, u32 e);
+extern void* fn_800E3B08(u32 index);
+extern void  fn_800E24B0(u16 handle);
+extern void  fn_800E209C(u16 handle);
+extern void  fn_800F9210(u32 group, u32 resource);
+extern void  GSmodelSetVisibility(void* model, u32 visible);
+extern u8    GSmodelCanTexAnimate(void* model);
+extern void  GSmodelSetTexAnimIndex(void* model, u16 value);
+extern void  GSmodelSetTexAnimRate(void* model, f32 value);
+extern void  GSmodelSetTexAnimFrame(void* model, f32 value);
+extern void  GSmodelSetTexAnimType(void* model, u32 value);
+extern void  GSmodelStartTexAnimation(void* model);
+extern u8    lbl_80314AE8[];
+extern u8    lbl_80466BC0[];
 
 /* Camera */
 extern void* cameraGetActive(void);
@@ -422,6 +440,8 @@ extern u32 fn_8013FD68(void* ptr);
 extern u16 billboardEffectStart(void* ptr);
 extern u32 fn_8013FF0C(void* ptr);
 
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_801380D4_8013814C)
 u32 fn_801380D4(void* callbacks) {
     u32 effectId = fn_80131428(callbacks, 0x70);
     if (effectId) {
@@ -437,7 +457,9 @@ u32 fn_801380D4(void* callbacks) {
     }
     return effectId;
 }
+#endif
 
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 #if 0
 asm void _lightningRenderMain(void) {
 #include "src/game/effect/effect_visual__lightningRenderMain.inc"
@@ -494,6 +516,10 @@ u32 _lightningRenderMain(void* ptr) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_80138630_801386DC)
 #if 0
 asm void fn_80138630(void* ptr) {
 #include "src/game/effect/effect_visual_fn_80138630.inc"
@@ -536,6 +562,9 @@ u32 fn_80138680(void* ptr) {
     return ret;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern u8 lbl_80272B40[];
 #if 0
 asm u32 fn_801386DC(void* ptr) {
@@ -572,6 +601,10 @@ u32 fn_801386DC(void* ptr) {
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_801387C0_80138838)
 #if 0
 asm void fn_801387C0(void* ptr, u32 delta) {
 #include "src/game/effect/effect_visual_fn_801387C0.inc"
@@ -597,6 +630,9 @@ fail:
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void fn_800E0BE4(void);
 extern void fn_800CDBE0(void);
 extern void fn_800CE148(void);
@@ -651,6 +687,10 @@ void fn_80138838(void* ptr, u32 b) {
     }
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_80138B00_80138BBC)
 #if 0
 asm void leaffxStartEffect(void) {
 #include "src/game/effect/effect_visual_leaffxStartEffect.inc"
@@ -686,6 +726,9 @@ u32 fn_80138B74(void* ptr) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void GSmodelSetVisibility(void* a, u32 b);
 extern void GSmodelFree(void* entry);
 extern u32 fn_800EE0E8(void* entry);
@@ -928,6 +971,10 @@ void _leaffxGenerateLeafData(void* ptr, void* entry) {
     GSmodelSetVisibility(clone, 1);
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_80139820_80139AC4)
 #if 0
 asm void electronStartEffect(void) {
 #include "src/game/effect/effect_visual_electronStartEffect.inc"
@@ -1047,6 +1094,9 @@ u32 fn_80139934(void* ptr) {
 #else
 u32 fn_80139934(void* ptr) { /* TODO */ }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern u32 lbl_8047D198;
 extern u32 lbl_8047D1A0;
 #if 0
@@ -1223,6 +1273,10 @@ void fn_8013A1D4(void* arg0, void* arg1, void* arg2, u32 arg3, f32 arg4) {
     *(f32*)(entry + 0xCC) = *(f32*)(parent + 0x28);
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013A42C_8013A520)
 #if 0
 asm void fn_8013A42C(void) {
 #include "src/game/effect/effect_visual_fn_8013A42C.inc"
@@ -1266,6 +1320,9 @@ u32 fn_8013A49C(void* ptr) {
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void __cvt_fp2unsigned(void);
 extern u32 lbl_8047D1B8;
 extern u32 lbl_8047D1BC;
@@ -1309,6 +1366,10 @@ u32 fn_8013A520(void* ptr) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013AA8C_8013AB60)
 #if 0
 asm u32 fn_8013AA8C(void* ptr, u16 delta) {
 #include "src/game/effect/effect_visual_fn_8013AA8C.inc"
@@ -1367,6 +1428,9 @@ u32 fn_8013AB34(void* ptr) {
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1E0;
 #if 0
@@ -1415,6 +1479,10 @@ u32 fn_8013AB60(void* ptr, u8* src, u8* dst, u32 alpha) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013AD68_8013AD9C)
 #if 0
 asm u32 fn_8013AD68(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013AD68.inc"
@@ -1433,6 +1501,9 @@ u32 fn_8013AD68(void* ptr) {
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void fn_80168408(void);
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1F0;
@@ -1478,6 +1549,10 @@ u32 fn_8013AD9C(void* ptr, u32 delta) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013B034_8013B268)
 #if 0
 asm void fn_8013B034(void* ptr) {
 #include "src/game/effect/effect_visual_fn_8013B034.inc"
@@ -1611,6 +1686,9 @@ report_null:
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void GSmodelSetModulationColor(void* obj, void* param);
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1F8;
@@ -1643,6 +1721,10 @@ void fn_8013B268(void* ptr, u8* color) {
     }
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013B490_8013B5E4)
 #if 0
 asm void fn_8013B490(void) {
 #include "src/game/effect/effect_visual_fn_8013B490.inc"
@@ -1706,6 +1788,9 @@ u32 fn_8013B558(void* ptr) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void fn_800E2C04(void);
 extern void fn_800E0E14(void);
 extern void GSmodelSetRotation(void);
@@ -1913,6 +1998,10 @@ u32 fn_8013C074(void* ptr, void* arg) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013C5A0_8013C670)
 #if 0
 asm void fn_8013C5A0(void) {
 #include "src/game/effect/effect_visual_fn_8013C5A0.inc"
@@ -1951,6 +2040,9 @@ u32 fn_8013C614(void* ptr) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void GSmodelStopTexAnimation(void* a);
 #if 0
 asm void fn_8013C670(void) {
@@ -1993,6 +2085,9 @@ u32 fn_8013C670(void* arg) {
 }
 #pragma pop
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void GSmodelLinkTexAnimToAnim(void);
 extern u32 lbl_8047D230;
 extern u32 lbl_8047D234;
@@ -2162,6 +2257,10 @@ u32 fn_8013D0A8(void* ptr, void* arg) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013D604_8013D984)
 #if 0
 asm void fn_8013D604(void* ptr, u32 val, f32 f1, f32 f2) {
 #include "src/game/effect/effect_visual_fn_8013D604.inc"
@@ -2334,6 +2433,9 @@ log:
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern s32 fn_800E3B3C(void);
 extern void fn_800D4604(u32 mode);
 extern void fn_800D377C(u32 a);
@@ -2382,6 +2484,10 @@ u32 fn_8013D984(void* ptr, u32 delta) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013DB64_8013DE6C)
 #if 0
 asm void fn_8013DB64(void* ptr, u32 val, f32 f1, f32 f2) {
 #include "src/game/effect/effect_visual_fn_8013DB64.inc"
@@ -2525,6 +2631,9 @@ u32 blurEffectStart(void* ptr) {
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void GSmodelIsAnimating(void);
 extern void fn_800D3068(void);
 extern void GSmodelGetAnimFrame(void);
@@ -2620,6 +2729,10 @@ u32 fn_8013E258(void* model, void* unused, void* state) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013E470_8013E54C)
 #if 0
 asm void fn_8013E470(void) {
 #include "src/game/effect/effect_visual_fn_8013E470.inc"
@@ -2669,6 +2782,9 @@ u32 fn_8013E4D4(void* callbacks) {
     return effectId;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 #if 0
 asm void fn_8013E54C(void) {
 #include "src/game/effect/effect_visual_fn_8013E54C.inc"
@@ -2691,6 +2807,10 @@ u32 fn_8013E54C(void* arg) {
 }
 #pragma pop
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013E5AC_8013E8A4)
 #if 0
 asm void fn_8013E5AC(void) {
 #include "src/game/effect/effect_visual_fn_8013E5AC.inc"
@@ -2792,6 +2912,9 @@ u32 fn_8013E6C4(u8* ptr)
 #else
 void fn_8013E6C4(void) { /* TODO */ }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern void fmod(void);
 extern u32 lbl_8047D2B8;
 extern u32 lbl_8047D2A8;
@@ -2870,6 +2993,10 @@ void fn_8013EA44(void* ptr) {
     *(f32*)(p + 0x24) = *(f32*)(p + 0x28);
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013F000_8013F344)
 #if 0
 asm void fn_8013F000(void) {
 #include "src/game/effect/effect_visual_fn_8013F000.inc"
@@ -2999,6 +3126,9 @@ u32 fn_8013F114(void* ptr) {
 #else
 u32 fn_8013F114(void* ptr) { /* TODO */ }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047D300;
 extern u8 lbl_80272FE0[];
@@ -3048,6 +3178,10 @@ u16 distortionEffectStart(void* ptr) {
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013F410_8013F80C)
 extern u8 GSmodelGetVisibility(void* obj);
 extern void fn_80118104(u32 a, u32 b);
 extern void fn_800D848C(u32 a, u32 b, u32 c, void* d);
@@ -3167,6 +3301,9 @@ u32 fn_8013F410(void* ptr) {
 #else
 u32 fn_8013F410(void* ptr) { /* TODO */ }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern u32 lbl_8047AEE8;
 extern u32 lbl_8047D310;
 extern u32 lbl_8047D300;
@@ -3242,6 +3379,10 @@ void _distortionEffectUpdateMatrices(void* ptr) {
     }
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_8013FBE0_8013FF0C)
 #if 0
 asm void patchiruTextureStart(void) {
 #include "src/game/effect/effect_visual_patchiruTextureStart.inc"
@@ -3388,6 +3529,9 @@ report_null:
     return 0;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern f64 tan(f64 x);
 extern u32 fn_80118DA8(void* ptr);
 extern void fn_80118F04(void* arg1, void* arg2);
@@ -3440,6 +3584,10 @@ u32 fn_8013FF0C(void* ptr) {
     return 1;
 }
 #endif
+#endif
+
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE) || \
+    defined(EFFECT_VISUAL_EXACT_80140138_801402AC)
 #if 0
 asm void Unload__13ModelSequenceFPUc(void) {
 #include "src/game/effect/effect_visual_fn_80140138.inc"
@@ -3512,7 +3660,9 @@ u32 fn_80140190(void** out, void* model, u32 arg) {
     return ret;
 }
 #endif
+#endif
 
+#if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 void* _pachiruEffectCreateTexture__FP9GStextureP9GStextureUl(void* baseTexture,
                                                              void* spotTexture,
                                                              u32 pattern)
@@ -3802,4 +3952,5 @@ int tasteDataGetAisyou(void* obj, u32 index) {
     new_var = (s8*)obj;
     return (int)(s8)*(new_var + masked_index + 4);
 }
+#endif
 #endif
