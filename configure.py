@@ -264,7 +264,19 @@ config.libs = [
                 extra_cflags=["-sdata 0"],
                 progress_category="runtime",
             ),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKNub_range_800BE47C.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(
+                Matching,
+                "trk/TRKNub_exact_800BE47C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-rostr"],
+                progress_category="runtime",
+            ),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKNub_candidate_800BE6B4.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKNub_exact_800BE800.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(CodeCandidate, "trk/TRKNub_candidate_800BE844.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKNub_exact_800BEBB0.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKNub_exact_800BEC18.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            Object(Matching, "trk/TRKNub_exact_800BED14.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(Matching, "trk/TRKNub_range_800BEE74.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(
                 Matching,

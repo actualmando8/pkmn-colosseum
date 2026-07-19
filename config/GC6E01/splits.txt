@@ -125,9 +125,6 @@ game/data/rodata_80268424.c:
 game/data/rodata_8026860C.c:
 	.rodata     start:0x8026860C end:0x8026F610
 
-game/data/rodata_8026F640.c:
-	.rodata     start:0x8026F640 end:0x8026F688
-
 __init_cpp_exceptions.cpp:
 	.dtors      start:0x80266380 end:0x80266384
 
@@ -1049,8 +1046,30 @@ dolphin/sdk_range_800BB30C.c:
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
 
-trk/TRKNub_range_800BE47C.c:
-	.text       start:0x800BE47C end:0x800BEE44
+trk/TRKNub_exact_800BE47C.c:
+	.text       start:0x800BE47C end:0x800BE6B4
+	.rodata     start:0x8026F610 end:0x8026F62C
+
+game/data/rodata_8026F640.c:
+	.rodata     start:0x8026F640 end:0x8026F688
+
+trk/TRKNub_candidate_800BE6B4.c:
+	.text       start:0x800BE6B4 end:0x800BE800
+
+trk/TRKNub_exact_800BE800.c:
+	.text       start:0x800BE800 end:0x800BE844
+
+trk/TRKNub_candidate_800BE844.c:
+	.text       start:0x800BE844 end:0x800BEBB0
+
+trk/TRKNub_exact_800BEBB0.c:
+	.text       start:0x800BEBB0 end:0x800BEC18
+
+trk/TRKNub_exact_800BEC18.c:
+	.text       start:0x800BEC18 end:0x800BED14
+
+trk/TRKNub_exact_800BED14.c:
+	.text       start:0x800BED14 end:0x800BEE44
 
 trk/TRKBufferReset.c:
 	.text       start:0x800BEE44 end:0x800BEE74
