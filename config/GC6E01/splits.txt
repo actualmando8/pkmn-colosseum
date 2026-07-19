@@ -2878,8 +2878,32 @@ game/wazaSequenceSys_tail.c:
 game/wazaSequence.c:
 	.text       start:0x801DB988 end:0x801DCDA8
 
-game/sequence.c:
-	.text       start:0x801DCDA8 end:0x801DE698
+game/sequence_exact_801DCDA8.c:
+	.text       start:0x801DCDA8 end:0x801DCF00
+
+game/sequence_candidate_801DCF00.c:
+	.text       start:0x801DCF00 end:0x801DCF84
+
+game/sequence_exact_801DCF84.c:
+	.text       start:0x801DCF84 end:0x801DD158
+
+game/sequence_candidate_801DD158.c:
+	.text       start:0x801DD158 end:0x801DD23C
+
+game/sequence_exact_801DD23C.c:
+	.text       start:0x801DD23C end:0x801DD45C
+
+game/sequence_candidate_801DD45C.c:
+	.text       start:0x801DD45C end:0x801DE164
+
+game/sequence_exact_801DE164.c:
+	.text       start:0x801DE164 end:0x801DE190
+
+game/sequence_candidate_801DE190.c:
+	.text       start:0x801DE190 end:0x801DE654
+
+game/sequence_exact_801DE654.c:
+	.text       start:0x801DE654 end:0x801DE698
 
 game/gs_range_801DE698.c:
 	.text       start:0x801DE698 end:0x801DF790

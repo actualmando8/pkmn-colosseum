@@ -1343,13 +1343,26 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/sequence.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/sequence_exact_801DCDA8.c"),
+                    (CodeCandidate, "game/sequence_candidate_801DCF00.c"),
+                    (Matching, "game/sequence_exact_801DCF84.c"),
+                    (CodeCandidate, "game/sequence_candidate_801DD158.c"),
+                    (Matching, "game/sequence_exact_801DD23C.c"),
+                    (CodeCandidate, "game/sequence_candidate_801DD45C.c"),
+                    (Matching, "game/sequence_exact_801DE164.c"),
+                    (CodeCandidate, "game/sequence_candidate_801DE190.c"),
+                    (Matching, "game/sequence_exact_801DE654.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/kaisuu.c",
