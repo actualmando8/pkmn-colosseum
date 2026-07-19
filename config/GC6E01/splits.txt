@@ -2097,8 +2097,32 @@ musyx/runtime/synth.c:
 musyx/runtime/synth_exact_8014A280.c:
 	.text       start:0x8014A280 end:0x8014B044
 
-musyx/runtime/synth_suffix_8014B044.c:
-	.text       start:0x8014B044 end:0x8014D598
+musyx/runtime/synth_suffix_exact_8014B044.c:
+	.text       start:0x8014B044 end:0x8014B788
+
+musyx/runtime/synth_suffix_exact_8014B788.c:
+	.text       start:0x8014B788 end:0x8014BE84
+
+musyx/runtime/synth_suffix_exact_8014BE84.c:
+	.text       start:0x8014BE84 end:0x8014C0A4
+
+musyx/runtime/synth_suffix_candidate_8014C0A4.c:
+	.text       start:0x8014C0A4 end:0x8014C5B4
+
+musyx/runtime/synth_suffix_exact_8014C5B4.c:
+	.text       start:0x8014C5B4 end:0x8014C984
+
+musyx/runtime/synth_suffix_candidate_8014C984.c:
+	.text       start:0x8014C984 end:0x8014CEB4
+
+musyx/runtime/synth_suffix_exact_8014CEB4.c:
+	.text       start:0x8014CEB4 end:0x8014D000
+
+musyx/runtime/synth_suffix_candidate_8014D000.c:
+	.text       start:0x8014D000 end:0x8014D574
+
+musyx/runtime/synth_suffix_exact_8014D574.c:
+	.text       start:0x8014D574 end:0x8014D598
 
 musyx/runtime/seq_api.c:
 	.text       start:0x8014D598 end:0x8014D75C
