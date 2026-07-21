@@ -65,6 +65,7 @@ extern void  floorCharacterBiosSetVisibility();
 extern u32 exribbonSetEarthRibbon(void* mon);
 extern void etctoolSetPokemonNakigoe();
 
+#if defined(FIELD_801CA7EC_PREFIX_ACTIVE)
 u32 scriptAddPokecoupon(s32 delta)
 {
     heroGetStatus((u8*)0, 0xd, 0);
@@ -321,7 +322,9 @@ void scriptSetPokemonNakigoe(void) {
     extern void etctoolSetPokemonNakigoe(void);
     etctoolSetPokemonNakigoe();
 }
+#endif
 
+#if defined(FIELD_EXACT_801CAEA0)
 u32 scriptGetPokemonNickName(s32 slot)
 {
     void* mon;
@@ -335,7 +338,9 @@ u32 scriptGetPokemonNickName(s32 slot)
     }
     return pokemonGetStatus(mon, 0, 0x77, 0);
 }
+#endif
 
+#if defined(FIELD_801CAF0C_SUFFIX_ACTIVE)
 u32 scriptGetDarkPointZeroPokemonNum(void)
 {
     u16 count = 0;
@@ -406,3 +411,4 @@ s32 scriptFloorCharSetDisp(u32 a0, u32 a1) {
     return 1;
 }
 #pragma pop
+#endif

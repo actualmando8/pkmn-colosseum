@@ -23,12 +23,15 @@ typedef struct {
 extern void OSInitThreadQueue(OSThreadQueue* queue);
 extern void OSWakeupThread(void* queue);
 
+#if defined(SDK_8009F77C_PREFIX_ACTIVE)
 void fn_8009F77C(fn_8009F77C_Worker* arg) {
     OSInitThreadQueue(&arg->queue);
     arg->unk_08 = 0;
     arg->unk_0C = 0;
 }
+#endif
 
+#if defined(SDK_8009F9C8_SUFFIX_ACTIVE)
 void fn_8009F9C8(void* queue) {
     OSInitThreadQueue((OSThreadQueue*)queue);
 }
@@ -36,6 +39,7 @@ void fn_8009F9C8(void* queue) {
 void fn_8009FABC(void* queue) {
     OSWakeupThread(queue);
 }
+#endif
 
 /* --- OSMutex / OSCond family, 0x8009F7B4 - 0x8009FAEC --- */
 
@@ -70,6 +74,7 @@ extern s32 __OSGetEffectivePriority(OSCurThread* thread);
 extern OSCurThread* fn_800A13F8(void);
 extern void fn_800A16E8(OSCurThread* thread, s32 priority);
 
+#if defined(SDK_8009F77C_PREFIX_ACTIVE)
 void fn_8009F7B4(OSMutex* mutex) {
     BOOL enabled;
     OSCurThread* current;
@@ -143,7 +148,9 @@ void fn_8009F890(OSMutex* mutex) {
 
     OSRestoreInterrupts(enabled);
 }
+#endif
 
+#if defined(SDK_EXACT_8009F958)
 void __OSUnlockAllMutex(OSCurThread* thread) {
     OSMutex* mutex;
 
@@ -163,7 +170,9 @@ void __OSUnlockAllMutex(OSCurThread* thread) {
         OSWakeupThread(&mutex->queue);
     }
 }
+#endif
 
+#if defined(SDK_8009F9C8_SUFFIX_ACTIVE)
 void fn_8009F9E8(OSThreadQueue* queue, OSMutex* mutex) {
     BOOL enabled;
     OSCurThread* current;
@@ -210,3 +219,4 @@ void fn_8009F9E8(OSThreadQueue* queue, OSMutex* mutex) {
 
     OSRestoreInterrupts(enabled);
 }
+#endif
