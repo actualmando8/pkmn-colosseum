@@ -40,7 +40,7 @@ extern u32   fn_800F7274(u16 handle);
 extern void  floorSetFadeScript(u32 a, u32 b);
 
 /* ===== SDA/SBSS globals (floor context / resource pool state) ===== */
-extern u32 lbl_80478B18;
+extern volatile u32 lbl_80478B18;
 extern u32 lbl_8047ACA8;
 extern u32 lbl_8047ACB0;
 extern u32 lbl_8047ACB4;
@@ -49,7 +49,7 @@ extern u32 lbl_8047ACC0;
 extern u32 lbl_8047ACC4;
 extern u32 lbl_8047ACC8;
 extern GSFloorResource* lbl_8047ACCC;
-extern u32 lbl_8047ACD8;
+extern volatile u32 lbl_8047ACD8;
 extern u32 lbl_8047ACDC;
 extern u32 lbl_8047ACE0;
 extern GSFloorResHandler lbl_80404918[];
@@ -262,8 +262,8 @@ void fn_800FF660(void) {
 void fn_800FF730(u32 floorId) {
     floorSetFadeScript(0x05960009, 0x05960008);
     if (lbl_8047ACC4 < lbl_8047ACA8) {
-        *(volatile u32*)&lbl_8047ACD8 = 4;
-        *(volatile u32*)&lbl_80478B18 = floorId;
+        lbl_8047ACD8 = 4;
+        lbl_80478B18 = floorId;
     }
 }
 
