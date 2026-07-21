@@ -5133,6 +5133,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
+            Object(
+                Matching,
+                "game/gs_title_candidate_800205C8.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-opt nopeephole",
+                    "-O1",
+                ],
+                progress_category="game",
+            ),
             *[
                 Object(
                     status,
@@ -5148,7 +5161,6 @@ config.libs = [
                     (Matching, "game/gs_title_exact_8002058C.c"),
                     (Matching, "game/gs_title_exact_800205B8.c"),
                     (Matching, "game/gs_title_exact_800205C0.c"),
-                    (CodeCandidate, "game/gs_title_candidate_800205C8.c"),
                     (Matching, "game/gs_title_exact_8002060C.c"),
                     (CodeCandidate, "game/gs_title_candidate_80020618.c"),
                     (Matching, "game/gs_title_exact_8002091C.c"),
