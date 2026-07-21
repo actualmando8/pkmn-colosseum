@@ -417,30 +417,33 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current decompilation head: a5fe88ae (PR #389 merged)
-Open PRs: none after reconciliation
-Exact-source delta from goal baseline: +9 functions / +4,116 code bytes
+Current decompilation source head: ba22889b (PR #391)
+Open PRs: #391, strict 30-function linked batch
+Exact-source delta from goal baseline: +21 functions / +9,816 code bytes
 PR #388 batch: +30 linked functions / +7 linked units / +5,664 linked code bytes
 PR #389 batch: +2 exact functions / +1,080 matched code;
   +3 linked functions / +3 units / +1,176 linked code / +0 linked data
-Newly linked function delta from goal baseline: +44
-Newly linked unit/code/data delta from goal baseline: +16 units / +8,656 code / +177 data
-Head report: 6,277 / 8,603 matched functions; 890,612 matched code bytes
-Head linked: 701 / 1,301 units; 574,816 complete code bytes
-README/report/decomp.dev: synced at a5fe88ae
+PR #391 batch: +12 exact functions / +5,700 matched code;
+  +30 linked functions / +5 units / +7,616 linked code / +0 linked data
+Newly linked function delta from goal baseline: +74
+Newly linked unit/code/data delta from goal baseline: +21 units / +16,272 code / +177 data
+Head report: 6,289 / 8,603 matched functions; 896,312 matched code bytes
+Head linked: 706 / 1,301 units; 582,432 complete code bytes
+README/report: synced on PR #391; decomp.dev confirmation pending CI
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: 541-entry 80%-plus queue, 21 workers, no actionable wins; historical
-  dataInsertLayer WIN? rejected as a shaped duplicate and retired from the queue
-Windows: 77 active-valid 70%-to-80% units, 12 workers, no wins; refreshed with
-  29 newly valid functions while retaining useful prior workunits
-Active worktrees after reconciliation: clean master only
-Banked commits not merged: none
+3090: 541-entry 80%-plus queue, 21 workers; remove PR #391 functions on merge
+Windows: 77 active-valid 70%-to-80% units, 12 workers; remove PR #391 functions
+  on merge before the next refresh
+Active worktrees: PR #391 integration plus the next HSD JObj scout; audited
+  batch/reject trees await post-merge cleanup
+Banked commits not merged: none; viewport fallback 6344311f was integrated in #391
 Integrated: PR #388 (30-function linked batch) and PR #389 (MusyX table
-  insertions plus effect teardown callback)
+  insertions plus effect teardown callback); PR #391 pending
 Rejected: fight_timer (private conversion constants break canonical relocations);
   THP decoder (293 relocation mismatches, extra data, and asm outside allowlist);
-  pokemonGetDp (private conversion constant); fight residuals that require register,
-  inline, pragma, jump-table, or volatile-only shaping
-Next unit closers: strict CObjLoad and HSD JObj islands, then the remaining
-  clean low-residual SDK/game objects with full relocation/data ownership
+  CObjLoad (exact local literal cannot satisfy existing global HSD references
+  without duplicated data); pokemonGetDp (private conversion constant); fight
+  residuals that require register, inline, pragma, jump-table, or volatile-only shaping
+Next unit closers: HSD JObj suffix 8019FF74 and residual 801A0D94, then the
+  remaining clean low-residual SDK/game objects with full relocation/data ownership
 ```
