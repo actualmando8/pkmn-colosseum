@@ -441,7 +441,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/pad/PAD_suffix_800ABD68.c",
                 progress_category="sdk",
             ),
