@@ -2322,7 +2322,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/math_range_800CDBE0.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
