@@ -8,7 +8,9 @@
 set -uo pipefail
 FN="${1:?usage: verify_fn.sh <fn> [min_pct]}"; MIN="${2:-100}"
 cd "$(dirname "$0")/.."
-ninja >/dev/null 2>&1 || { echo "BUILD FAILED"; exit 1; }
+# Build the report target explicitly: the default target does NOT regenerate
+# report.json for asm-fallback units, so a bare `ninja` reads stale percentages.
+ninja build/GC6E01/report.json >/dev/null 2>&1 || { echo "BUILD FAILED"; exit 1; }
 PCT=$(python3 - "$FN" <<'PY'
 import json,sys
 fn=sys.argv[1]; r=json.load(open('build/GC6E01/report.json'))
