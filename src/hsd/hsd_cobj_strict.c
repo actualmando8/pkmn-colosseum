@@ -977,7 +977,25 @@ extern void PSMTXRotAxisRad(f32 m[3][4], Vec* axis, f32 rad);
 extern void HSD_CObjSetMtxDirty(HSD_CObj*);
 extern void HSD_CObjGetEyePosition(HSD_CObj*, Vec*);
 extern void HSD_CObjGetInterest(HSD_CObj*, Vec*);
+#if defined(HSD_COBJ_SPLIT) && defined(HSD_COBJ_CANDIDATE_80194DA4)
+/* util.h supplies this helper inline in the original HSD translation unit. */
+static inline int vec_normalize_check(Vec* src, Vec* dst)
+{
+    if (!src || !dst) {
+        return -1;
+    }
+    if (__fabs(src->x) <= lbl_80478AC8[0] &&
+        __fabs(src->y) <= lbl_80478AC8[0] &&
+        __fabs(src->z) <= lbl_80478AC8[0])
+    {
+        return -1;
+    }
+    PSVECNormalize(src, dst);
+    return 0;
+}
+#else
 extern int vec_normalize_check(Vec* src, Vec* dst);
+#endif
 extern int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll);
 extern f32 upvec2roll(HSD_CObj* cobj, Vec* up);
 extern void HSD_CObjSetUpVector(HSD_CObj* cobj, Vec* up);
@@ -1052,8 +1070,8 @@ static inline int cobj_get_eye_vector(HSD_CObj* cobj, Vec* eye)
     if (!cobj || !cobj->eyepos || !cobj->interest) {
         return 0;
     }
-    HSD_CObjGetEyePosition(cobj, &eyepos);
-    HSD_CObjGetInterest(cobj, &interest);
+    cobj_get_eye_position(cobj, &eyepos);
+    cobj_get_interest(cobj, &interest);
     PSVECSubtract(&interest, &eyepos, eye);
     return vec_normalize_check(eye, eye) == 0;
 }

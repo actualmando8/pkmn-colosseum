@@ -5249,7 +5249,6 @@ config.libs = [
                     (Matching, "hsd/hsd_cobj_exact_80194CC4.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194D60.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194D94.c"),
-                    (CodeCandidate, "hsd/hsd_cobj_candidate_80194DA4.c"),
                     (Matching, "hsd/hsd_cobj_exact_80195794.c"),
                     (Matching, "hsd/hsd_cobj_exact_80195904.c"),
                     (Matching, "hsd/hsd_cobj_exact_80195970.c"),
@@ -5261,6 +5260,13 @@ config.libs = [
                     (CodeCandidate, "hsd/hsd_cobj_candidate_80197344.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "hsd/hsd_cobj_candidate_80194DA4.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O1"],
+                progress_category="hsd",
+            ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_jobj.c",
