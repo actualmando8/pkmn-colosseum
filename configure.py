@@ -2273,8 +2273,9 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/math_range_800CAA58.c",
+                source="crt_matching/math_range_800CAA58.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
@@ -5814,12 +5815,6 @@ config.libs = [
             Object(
                 Matching,
                 "trk/gdev_cc_shutdown.c",
-                progress_category="runtime",
-            ),
-            Object(
-                Matching,
-                "crt/sdata2_math.c",
-                source="crt_data/sdata2_math.c",
                 progress_category="runtime",
             ),
             Object(

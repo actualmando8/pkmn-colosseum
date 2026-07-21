@@ -53,9 +53,6 @@ game/data/sdata2_8047C2A0.c:
 game/data/sdata2_8047C3A0.c:
 	.sdata2     start:0x8047C3A0 end:0x8047C4A0
 
-crt/sdata2_math.c:
-	.sdata2     start:0x8047C4A0 end:0x8047C528
-
 game/data/bss_8039A700.c:
 	.bss        start:0x8039A700 end:0x8039E700
 
@@ -1301,6 +1298,7 @@ crt/string.c:
 
 crt/math_range_800CAA58.c:
 	.text       start:0x800CAA58 end:0x800CB024
+	.sdata2     start:0x8047C4A0 end:0x8047C528
 
 crt/math_ieee754_atan2.c:
 	.text       start:0x800CB024 end:0x800CB2B4
