@@ -1,5 +1,10 @@
 # Claude Handoff - GC6E01 DTK Reset + Object-Map Campaign
 
+> Historical reset snapshot. For the current decompilation campaign restart,
+> worktree reconciliation, farm refresh, strict-win audit, integration, and
+> closeout procedure, use [`CAMPAIGN_OPERATIONS.md`](CAMPAIGN_OPERATIONS.md).
+> Metrics below describe the 2026-06-30 reset and are not current progress.
+
 Date: 2026-06-30  
 Repo: `/Users/douglaswhittingham/pkmn-colosseum`  
 Target: Pokemon Colosseum `GC6E01`
@@ -305,4 +310,3 @@ If switching to decompilation:
 2. Use `objdiff`/report to find a near miss.
 3. Make real C changes only.
 4. Validate with the DTK report and `ninja`.
-

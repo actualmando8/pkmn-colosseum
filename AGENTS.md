@@ -38,6 +38,13 @@ Use the smallest check that proves the change:
 
 If a command cannot run in the environment, report the exact command and why.
 
+## Campaign Operations
+
+Before resuming fleet, farm, worktree-reconciliation, or batch-integration work,
+read `docs/CAMPAIGN_OPERATIONS.md`. It is the current restart/cleanup playbook
+and contains the handoff ledger. Keep exact-source and newly linked progress
+separate.
+
 ## Naming
 
 Rename conservatively and preserve address traceability. A nontrivial rename
