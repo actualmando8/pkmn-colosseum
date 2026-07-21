@@ -48,7 +48,7 @@ game/data/sdata2_8047C1A0.c:
 	.sdata2     start:0x8047C1A0 end:0x8047C2A0
 
 game/data/sdata2_8047C2A0_prefix.c:
-	.sdata2     start:0x8047C2A0 end:0x8047C348
+	.sdata2     start:0x8047C2A0 end:0x8047C308
 
 game/data/bss_8039A700.c:
 	.bss        start:0x8039A700 end:0x8039E700
@@ -985,6 +985,10 @@ dolphin/sdk_exact_800B8E98.c:
 
 dolphin/sdk_range_800B9578.c:
 	.text       start:0x800B9578 end:0x800BA198
+	.sdata2     start:0x8047C308 end:0x8047C318
+
+game/data/sdata2_8047C318.c:
+	.sdata2     start:0x8047C318 end:0x8047C348
 
 dolphin/gx/GX_fn_800BA198.c:
 	.text       start:0x800BA198 end:0x800BA1B4
