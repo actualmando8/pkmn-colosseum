@@ -417,8 +417,8 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current decompilation source head: ba22889b (PR #391)
-Open PRs: #391, strict 30-function linked batch
+Current decompilation head: 31a8ec96 (PR #391 merged)
+Open PRs: none after reconciliation
 Exact-source delta from goal baseline: +21 functions / +9,816 code bytes
 PR #388 batch: +30 linked functions / +7 linked units / +5,664 linked code bytes
 PR #389 batch: +2 exact functions / +1,080 matched code;
@@ -429,21 +429,25 @@ Newly linked function delta from goal baseline: +74
 Newly linked unit/code/data delta from goal baseline: +21 units / +16,272 code / +177 data
 Head report: 6,289 / 8,603 matched functions; 896,312 matched code bytes
 Head linked: 706 / 1,301 units; 582,432 complete code bytes
-README/report: synced on PR #391; decomp.dev confirmation pending CI
+README/report/decomp.dev: synced at 31a8ec96
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: 541-entry 80%-plus queue, 21 workers; remove PR #391 functions on merge
-Windows: 77 active-valid 70%-to-80% units, 12 workers; remove PR #391 functions
-  on merge before the next refresh
-Active worktrees: PR #391 integration plus the next HSD JObj scout; audited
-  batch/reject trees await post-merge cleanup
-Banked commits not merged: none; viewport fallback 6344311f was integrated in #391
+3090: 535-entry 80%-plus queue across 210 units; 21 workers/permuters/
+  timeouts/claims; no new recoverable wins; terminal state retained
+Windows: 74 active-valid 70%-to-80% units, 12 workers, zero live wins/bad;
+  persisted state pruned to the new manifest
+Active worktrees: clean master plus the next CObj getter-island scout
+Banked commits not merged: none
 Integrated: PR #388 (30-function linked batch) and PR #389 (MusyX table
-  insertions plus effect teardown callback); PR #391 pending
+  insertions plus effect teardown callback), and PR #391 (30 linked functions)
 Rejected: fight_timer (private conversion constants break canonical relocations);
   THP decoder (293 relocation mismatches, extra data, and asm outside allowlist);
   CObjLoad (exact local literal cannot satisfy existing global HSD references
-  without duplicated data); pokemonGetDp (private conversion constant); fight
-  residuals that require register, inline, pragma, jump-table, or volatile-only shaping
-Next unit closers: HSD JObj suffix 8019FF74 and residual 801A0D94, then the
-  remaining clean low-residual SDK/game objects with full relocation/data ownership
+  without duplicated data); HSD JObj islands (current exacts require impossible
+  branches, volatile rereads, gotos, or local optimization pragmas);
+  HSD_MObjReqAnimByFlags (goto/dummy-label zero changes null behavior);
+  pokemonGetDp (private conversion constant); fight residuals that require register,
+  inline, pragma, jump-table, or volatile-only shaping
+Next unit closers: strict CObj getter islands 80193C24 and 80194510, then
+  80194DA4 and remaining clean low-residual SDK/game objects with full
+  relocation/data ownership
 ```
