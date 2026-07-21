@@ -4980,7 +4980,7 @@ config.libs = [
                 ]
             ],
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_gfx_range_800D9AF0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -6595,6 +6595,11 @@ config.libs = [
             Object(
                 Matching,
                 "game/data/sdata2_8047C9A0.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/sdata2_8047CA70.c",
                 progress_category="game",
             ),
             Object(

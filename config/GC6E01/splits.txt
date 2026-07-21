@@ -1331,10 +1331,7 @@ game/gs_render_util_sdata2.c:
 	.sdata2     start:0x8047C990 end:0x8047C99C
 
 game/data/sdata2_8047C9A0.c:
-	.sdata2     start:0x8047C9A0 end:0x8047CA9D
-
-game/data/sdata2_8047CAA0.c:
-	.sdata2     start:0x8047CAA0 end:0x8047CB88
+	.sdata2     start:0x8047C9A0 end:0x8047CA58
 
 crt/math_range_800CD648.c:
 	.text       start:0x800CD648 end:0x800CDBB8
@@ -1481,6 +1478,13 @@ game/gs_gfx_layer_candidate_800D892C.c:
 
 game/gs_gfx_range_800D9AF0.c:
 	.text       start:0x800D9AF0 end:0x800D9D68
+	.sdata2     start:0x8047CA58 end:0x8047CA70
+
+game/data/sdata2_8047CA70.c:
+	.sdata2     start:0x8047CA70 end:0x8047CA9D
+
+game/data/sdata2_8047CAA0.c:
+	.sdata2     start:0x8047CAA0 end:0x8047CB88
 
 game/gs_gfx_exact_800D9D68.c:
 	.text       start:0x800D9D68 end:0x800DA578

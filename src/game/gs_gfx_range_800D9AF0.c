@@ -267,10 +267,9 @@ extern void fn_800BC580();
 extern void fn_800BD2E0(void*, u32);
 extern f32 lbl_8047CA50;
 extern f32 lbl_8047CA54;
-extern void GScameraSetViewport(void*, u16, u16, u16, u16);
+extern void GScameraSetViewport(void*, u32, u32, u32, u32);
 extern u32 lbl_8047CA60;
 extern u32 lbl_8047CA68;
-extern u32 lbl_8047CA58;
 extern void fn_800BD7A0(u32, u32, u32, u32);
 extern void fn_800D2150(u32, u16, u16, u16, u16);
 extern void HSD_FogSet(u32);
@@ -521,31 +520,30 @@ void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d) {
 }
 #endif
 
-extern void GScameraSetViewport(void*, u16, u16, u16, u16);
+extern void GScameraSetViewport(void*, u32, u32, u32, u32);
 extern u32 lbl_8047CA60;
 extern u32 lbl_8047CA68;
-extern u32 lbl_8047CA58;
 #if 0
 asm void fn_800D9C24(void) {
 #include "src/game/gs_render_fn_800D9C24.inc"
 }
 #else
-void fn_800D9C24(u16 x0, u16 y0, u16 x1, u16 y1) {
-    u32 state;
+void fn_800D9C24(u32 x0, u32 y0, u32 x1, u32 y1) {
     u32 camera;
 
-    state = lbl_8047AA80;
-    if (*(s32*)state == 1) {
-        fn_800D4F98(0x38, 4, (u32)x0, (u32)y0, (u32)x1, (u32)y1);
+    if (*(s32*)lbl_8047AA80 == 1) {
+        fn_800D4F98(0x38, 4, (u16)x0, (u16)y0, (u16)x1, (u16)y1);
         return;
     }
 
-    fn_800D3EC4(0, (f32)x0, (f32)y0, (f32)(u16)(x1 - x0 + 1),
-                (f32)(u16)(y1 - y0 + 1), lbl_8047CA50, *(f32*)&lbl_8047CA58);
-    *(u16*)(state + 0x476) = x0;
-    *(u16*)(state + 0x478) = y0;
-    *(u16*)(state + 0x47a) = x1;
-    *(u16*)(state + 0x47c) = y1;
+    fn_800D3EC4(0, (f32)(u16)x0, (f32)(u16)y0,
+                (f32)((u16)x1 - (u16)x0 + 1),
+                (f32)((u16)y1 - (u16)y0 + 1), lbl_8047CA50,
+                1.0f);
+    *(u16*)(lbl_8047AA80 + 0x476) = (u16)x0;
+    *(u16*)(lbl_8047AA80 + 0x478) = (u16)y0;
+    *(u16*)(lbl_8047AA80 + 0x47a) = (u16)x1;
+    *(u16*)(lbl_8047AA80 + 0x47c) = (u16)y1;
     camera = GScameraGetActiveCamera();
     if (camera != 0) {
         GScameraSetViewport((void*)camera, x0, y0, x1, y1);
