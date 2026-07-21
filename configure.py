@@ -1908,6 +1908,18 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
+                Matching,
+                "dolphin/sdk_exact_8009ABD0.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_8009AC3C.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
                 CodeCandidate,
                 "dolphin/sdk_range_8009AFD0.c",
                 mw_version="GC/1.2.5n",
@@ -1927,7 +1939,19 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/sdk_range_8009F77C.c",
+                "dolphin/sdk_range_8009F77C_prefix.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_8009F958.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_8009F9C8.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -2173,7 +2197,19 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/sdk_range_800BB30C.c",
+                "dolphin/sdk_range_800BB30C_prefix.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/gx/GX_exact_800BC580.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_800BC618.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -3081,7 +3117,21 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "game/field_range_801CA7EC.c",
+                "game/field_range_801CA7EC_prefix.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/field_exact_801CAEA0.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/field_range_801CAF0C.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",

@@ -115,6 +115,7 @@ typedef struct TRKEvent {
         GX_FIFO_U32 = (reg); \
     } while (0)
 
+#if defined(SDK_800BB30C_PREFIX_ACTIVE)
 void fn_800BB30C(u32 texMap, u32 texCoord) {
     GXData_800BB30C* p = gx;
     u32 size = p->texMapSize[texMap];
@@ -324,6 +325,7 @@ void fn_800BC290(u32 stage, s32 op, u32 bias, u32 scale, u32 clamp,
     p->tevAlphaEnv[stage] = reg;
     p->field_002 = 0;
 }
+#endif
 
 typedef struct GXColor_800BC2F8 {
     u8 r;
@@ -343,6 +345,7 @@ typedef struct GXFogAdjTable_800BCCDC {
     u16 r[10];
 } GXFogAdjTable_800BCCDC;
 
+#if defined(SDK_800BB30C_PREFIX_ACTIVE)
 void fn_800BC2F8(u32 id, GXColor_800BC2F8 color) {
     u32 reg0;
     u32 reg1;
@@ -449,7 +452,9 @@ void fn_800BC52C(u32 stage, u32 rasSel, u32 texSel) {
     GX_BP_REG(*reg);
     p->field_002 = 0;
 }
+#endif
 
+#if defined(SDK_EXACT_800BC580)
 void fn_800BC580(u32 table, u32 red, u32 green, u32 blue, u32 alpha) {
     u32 index = table * 2;
     GXData_800BB30C* p = gx;
@@ -466,7 +471,9 @@ void fn_800BC580(u32 table, u32 red, u32 green, u32 blue, u32 alpha) {
     GX_BP_REG(*reg1);
     p->field_002 = 0;
 }
+#endif
 
+#if defined(SDK_800BC618_SUFFIX_ACTIVE)
 void fn_800BC618(u32 comp0, u8 ref0, u32 op, u32 comp1, u8 ref1) {
     u32 reg = ref0;
     GXData_800BB30C* p;
@@ -992,3 +999,4 @@ void TRKNubMainLoop(void) {
 void TRKDestructEvent(TRKEvent* event) {
     TRKReleaseBuffer(event->bufferIndex);
 }
+#endif

@@ -649,7 +649,13 @@ dolphin/sdk_exact_8009A92C.c:
 	.text       start:0x8009A92C end:0x8009A9D8
 
 dolphin/sdk_range_8009A9D8.c:
-	.text       start:0x8009A9D8 end:0x8009AFB0
+	.text       start:0x8009A9D8 end:0x8009ABD0
+
+dolphin/sdk_exact_8009ABD0.c:
+	.text       start:0x8009ABD0 end:0x8009AC3C
+
+dolphin/sdk_range_8009AC3C.c:
+	.text       start:0x8009AC3C end:0x8009AFB0
 
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
@@ -694,8 +700,14 @@ dolphin/sdk_range_8009E7B0.c:
 dolphin/os/OSMemory.c:
 	.text       start:0x8009F1B8 end:0x8009F77C
 
-dolphin/sdk_range_8009F77C.c:
-	.text       start:0x8009F77C end:0x8009FAEC
+dolphin/sdk_range_8009F77C_prefix.c:
+	.text       start:0x8009F77C end:0x8009F958
+
+dolphin/sdk_exact_8009F958.c:
+	.text       start:0x8009F958 end:0x8009F9C8
+
+dolphin/sdk_range_8009F9C8.c:
+	.text       start:0x8009F9C8 end:0x8009FAEC
 
 dolphin/os/OSState_fn_8009FAEC.c:
 	.text       start:0x8009FAEC end:0x8009FAF8
@@ -1040,8 +1052,14 @@ dolphin/gx/GX_fn_800BB2E4.c:
 dolphin/gx/GX_fn_800BB2F8.c:
 	.text       start:0x800BB2F8 end:0x800BB30C
 
-dolphin/sdk_range_800BB30C.c:
-	.text       start:0x800BB30C end:0x800BE464
+dolphin/sdk_range_800BB30C_prefix.c:
+	.text       start:0x800BB30C end:0x800BC580
+
+dolphin/gx/GX_exact_800BC580.c:
+	.text       start:0x800BC580 end:0x800BC618
+
+dolphin/sdk_range_800BC618.c:
+	.text       start:0x800BC618 end:0x800BE464
 
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
@@ -2955,8 +2973,14 @@ game/effect/fade_range_801C4CB8.c:
 game/gs_range_801C766C.c:
 	.text       start:0x801C766C end:0x801CA7EC
 
-game/field_range_801CA7EC.c:
-	.text       start:0x801CA7EC end:0x801CB180
+game/field_range_801CA7EC_prefix.c:
+	.text       start:0x801CA7EC end:0x801CAEA0
+
+game/field_exact_801CAEA0.c:
+	.text       start:0x801CAEA0 end:0x801CAF0C
+
+game/field_range_801CAF0C.c:
+	.text       start:0x801CAF0C end:0x801CB180
 
 game/field_range_801CB180.c:
 	.text       start:0x801CB180 end:0x801D0314

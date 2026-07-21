@@ -31,7 +31,8 @@ typedef struct OSAlarmQueue {
     OSAlarm* tail;
 } OSAlarmQueue;
 
-#if !defined(SDK_8009A9D8_SUFFIX_ACTIVE)
+#if !defined(SDK_8009A9D8_PREFIX_ACTIVE) && !defined(SDK_EXACT_8009ABD0) && \
+    !defined(SDK_8009AC3C_SUFFIX_ACTIVE)
 static OSAlarmQueue AlarmQueue;
 
 static void InsertAlarm(OSAlarm* alarm, s64 fire, OSAlarmHandler handler);
@@ -191,7 +192,7 @@ static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
 extern AlarmCallback* fn_8009A92C(AlarmCallback* head, AlarmCallback* blk,
                                    void* unused);
 
-#if defined(SDK_8009A9D8_SUFFIX_ACTIVE)
+#if defined(SDK_8009A9D8_PREFIX_ACTIVE)
 void* fn_8009A9D8(u32 idx, u32 size) {
     AlarmCallback* rec = &lbl_8047A6E8[idx];
     AlarmCallback* node = (AlarmCallback*)rec->unk4;
@@ -295,7 +296,9 @@ void fn_8009AB60(AlarmCallback* arr, void* end, s32 count) {
     lbl_8047A6F0 = ((u32)lbl_8047A6E8 + size + 0x1F) & ~0x1F;
 }
 #pragma optimize_for_size reset
+#endif
 
+#if defined(SDK_EXACT_8009ABD0)
 s32 fn_8009ABD0(u32 start, u32 end) {
     s32 i;
     AlarmCallback* arr = lbl_8047A6E8;
@@ -319,7 +322,9 @@ s32 fn_8009ABD0(u32 start, u32 end) {
     }
     return -1;
 }
+#endif
 
+#if defined(SDK_8009AC3C_SUFFIX_ACTIVE)
 void fn_8009AC3C(u32 xfb) {
     lbl_8047A6E8[xfb].unk0 = -1;
 }
