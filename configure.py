@@ -5249,16 +5249,25 @@ config.libs = [
                     status,
                     path,
                     mw_version="GC/1.3",
+                    extra_cflags=(
+                        ["-O1"]
+                        if path
+                        in (
+                            "hsd/hsd_cobj_candidate_80193C24.c",
+                            "hsd/hsd_cobj_candidate_80194510.c",
+                        )
+                        else []
+                    ),
                     progress_category="hsd",
                 )
                 for status, path in [
-                    (CodeCandidate, "hsd/hsd_cobj_candidate_80193C24.c"),
+                    (Matching, "hsd/hsd_cobj_candidate_80193C24.c"),
                     (Matching, "hsd/hsd_cobj_exact_80193CD0.c"),
                     (CodeCandidate, "hsd/hsd_cobj_candidate_80193D30.c"),
                     (Matching, "hsd/hsd_cobj_exact_801942B8.c"),
                     (CodeCandidate, "hsd/hsd_cobj_candidate_80194400.c"),
                     (Matching, "hsd/hsd_cobj_exact_801944A4.c"),
-                    (CodeCandidate, "hsd/hsd_cobj_candidate_80194510.c"),
+                    (Matching, "hsd/hsd_cobj_candidate_80194510.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194654.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194788.c"),
                     (CodeCandidate, "hsd/hsd_cobj_candidate_801947C8.c"),
