@@ -418,8 +418,8 @@ Next three unit closers:
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master: 4b68d012 (PR #387 merged)
-Campaign head: 94c7af3d (integration/fifteenth-refill-20260721; PR pending)
-Open PRs: none before publishing the fifteenth refill
+Campaign head: PR #388 (integration/fifteenth-refill-20260721)
+Open PRs: #388 only
 Exact-source delta from goal baseline: +7 functions / +3,036 code bytes
 Newly linked function delta: +31
 Newly linked unit/code/data delta: +8 units / +5,428 code / +177 data
