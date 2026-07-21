@@ -140,9 +140,9 @@ s32 fxcmp(u16* a, u16* b);
 #if defined(MUSYX_SYNTHDATA_ALL) || \
     defined(MUSYX_SYNTHDATA_CANDIDATE_80150C78_80150E68)
 s32 dataInsertKeymap(u16 cid, void* keymapdata) {
-    extern u8 lbl_804378F8[];
+    extern DataTabT lbl_804378F8[];
     extern u16 lbl_8047AFA6;
-#define tab ((DataTabT*)lbl_804378F8)
+#define tab (lbl_804378F8)
     s32 i, j;
 
     hwDisableIrq();
@@ -210,9 +210,9 @@ s32 dataRemoveKeymap(u16 sid) {
 #if defined(MUSYX_SYNTHDATA_ALL) || \
     defined(MUSYX_SYNTHDATA_CANDIDATE_80150FE4_8015122C)
 s32 dataInsertLayer(u16 cid, void* layerdata, u16 size) {
-    extern u8 lbl_804380F8[];
+    extern LayerTabT lbl_804380F8[];
     extern u16 lbl_8047AFA4;
-#define tab ((LayerTabT*)lbl_804380F8)
+#define tab (lbl_804380F8)
     s32 i, j;
 
     hwDisableIrq();

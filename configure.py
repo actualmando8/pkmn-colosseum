@@ -741,7 +741,16 @@ config.libs = [
                     status,
                     f"game/effect/{name}.c",
                     mw_version="GC/1.3",
-                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    extra_cflags=(
+                        [
+                            "-O1",
+                            "-use_lmw_stmw on",
+                            "-sdata 8",
+                            "-sdata2 8",
+                        ]
+                        if name == "effect_visual_candidate_8013E54C"
+                        else ["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"]
+                    ),
                     progress_category="game",
                 )
                 for status, name in [
@@ -772,7 +781,7 @@ config.libs = [
                     (Matching, "effect_visual_exact_8013DB64"),
                     (CodeCandidate, "effect_visual_candidate_8013DE6C"),
                     (Matching, "effect_visual_exact_8013E470"),
-                    (CodeCandidate, "effect_visual_candidate_8013E54C"),
+                    (Matching, "effect_visual_candidate_8013E54C"),
                     (Matching, "effect_visual_exact_8013E5AC"),
                     (CodeCandidate, "effect_visual_candidate_8013E8A4"),
                     (Matching, "effect_visual_exact_8013F000"),
@@ -927,9 +936,9 @@ config.libs = [
                     progress_category="musyx",
                 )
                 for status, path in [
-                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80150C78.c"),
+                    (Matching, "musyx/runtime/synthdata_candidate_80150C78.c"),
                     (Matching, "musyx/runtime/synthdata_exact_80150E68.c"),
-                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80150FE4.c"),
+                    (Matching, "musyx/runtime/synthdata_candidate_80150FE4.c"),
                     (Matching, "musyx/runtime/synthdata_exact_8015122C.c"),
                     (CodeCandidate, "musyx/runtime/synthdata_candidate_80151B84.c"),
                     (Matching, "musyx/runtime/synthdata_exact_8015210C.c"),

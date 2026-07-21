@@ -417,30 +417,29 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current master: 4b68d012 (PR #387 merged)
-Campaign head: PR #388 (integration/fifteenth-refill-20260721)
-Open PRs: #388 only
-Exact-source delta from goal baseline: +7 functions / +3,036 code bytes
-PR #388 delta from master: +4 exact functions / +1,796 matched code;
-  +30 linked functions / +7 units / +5,664 linked code / +0 linked data
-Newly linked function delta from goal baseline: +41
-Newly linked unit/code/data delta from goal baseline: +13 units / +7,480 code / +177 data
-Head report: 6,275 / 8,603 matched functions; 889,532 matched code bytes
-Head linked: 698 / 1,301 units; 573,640 complete code bytes
-README/report: synced on the final 30-function fifteenth-refill head
+Current master: aac025cb (PR #388 merged, 30 linked functions)
+Campaign head: PR #389 (integration/sixteenth-refill-20260721)
+Open PRs: #389 only
+Exact-source delta from goal baseline: +9 functions / +4,116 code bytes
+Sixteenth-refill delta from master: +2 exact functions / +1,080 matched code;
+  +3 linked functions / +3 units / +1,176 linked code / +0 linked data
+Newly linked function delta from goal baseline: +44
+Newly linked unit/code/data delta from goal baseline: +16 units / +8,656 code / +177 data
+Head report: 6,277 / 8,603 matched functions; 890,612 matched code bytes
+Head linked: 701 / 1,301 units; 574,816 complete code bytes
+README/report: synced on the validated sixteenth-refill head
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: pre-merge current-master queue has 543 entries and 21 workers; no pending wins;
-  refresh to the merged #388 head after integration
-Windows: pre-merge disjoint batch has 49 active-valid units and 12 workers; no
-  pending wins; refresh to the merged #388 head after integration
-Active worktrees: fifteenth integration plus validated next-batch MusyX/effect
-  scouts and clean/rejected audit trees queued for post-merge reconciliation
-Banked next batch: 8a31a866 (MusyX dataInsertKeymap/dataInsertLayer, +2 functions /
-  +1,080 linked code) and b050e547 (effect teardown callback, +1 / +96)
+3090: 543-entry queue, 21 workers; dataInsertLayer WIN? reconciled as a duplicate
+  with allocation-only temporaries; refresh after the sixteenth refill merges
+Windows: 49 active-valid units, 12 workers, no new wins; refresh after the
+  sixteenth refill merges
+Active worktrees: clean master plus the sixteenth integration tree only
+Integrated next batch: 493e729f (MusyX dataInsertKeymap/dataInsertLayer) and
+  e03624c4 (effect teardown callback)
 Rejected: fight_timer (private conversion constants break canonical relocations);
   THP decoder (293 relocation mismatches, extra data, and asm outside allowlist);
   pokemonGetDp (private conversion constant); fight residuals that require register,
   inline, pragma, jump-table, or volatile-only shaping
-Next unit closers: integrate the three banked MusyX/effect functions, then audit
-  strict CObjLoad and HSD JObj islands against full relocation/data ownership
+Next unit closers: strict CObjLoad and HSD JObj islands, then the remaining
+  clean low-residual SDK/game objects with full relocation/data ownership
 ```
