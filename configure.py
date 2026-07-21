@@ -252,7 +252,13 @@ config.libs = [
                 progress_category="runtime",
                 extra_cflags=["-rostr"],
             ),  # BANK_TRK
-            Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(
+                Matching,
+                "trk/gdev_cc_range_800C41AC.c",
+                mw_version="GC/2.6",
+                progress_category="runtime",
+                extra_cflags=["-rostr"],
+            ),  # BANK_TRK
             Object(Matching, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD
             Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
