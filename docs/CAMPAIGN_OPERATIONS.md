@@ -417,22 +417,23 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current master: 4fbfc965 (PR #386 merged)
-Campaign head: PR #387 (integration/fourteenth-refill-20260721)
-Open PRs: #387 only
-Exact-source delta from goal baseline: +3 functions / +1,240 code bytes
-Newly linked function delta: +11
-Newly linked unit/code/data delta: +6 units / +1,816 code / +177 data
-Head report: 6,271 / 8,603 matched functions; 887,736 matched code bytes
-Head linked: 691 / 1,301 units; 567,976 complete code bytes
-README/report: synced on PR #387
+Current master: 4b68d012 (PR #387 merged)
+Campaign head: 94c7af3d (integration/fifteenth-refill-20260721; PR pending)
+Open PRs: none before publishing the fifteenth refill
+Exact-source delta from goal baseline: +7 functions / +3,036 code bytes
+Newly linked function delta: +31
+Newly linked unit/code/data delta: +8 units / +5,428 code / +177 data
+Head report: 6,275 / 8,603 matched functions; 889,532 matched code bytes
+Head linked: 693 / 1,301 units; 571,588 complete code bytes
+README/report: synced on fifteenth-refill head
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: current-master 80-100% queue, 545 entries, 21 workers; no pending wins
-Windows: disjoint 70-80% batch, 49 units, 12 workers; no pending wins
-Active worktrees: PR #387 integration plus its three reconciled scout trees
-Banked commits: f530aaeb (GDEV), 7c847ee0 (fn_8022BB84), both in PR #387
-Rejected: floor_character (pragma/register blocker); fight_gsfloor (legacy shaping);
-  fn_8022B2CC (register allocation and jump-table blocker)
-Next unit closers: DVDConvertPathToEntrynum/entryToPath;
-  DVDCancelAsync/__DVDPrepareResetAsync; clean HSD CObj/JObj suffix candidates
+3090: current-master 80-100% queue, 543 entries, 21 workers; no pending wins
+Windows: disjoint 70-80% batch, 49 active-valid units, 12 workers; no pending wins
+Active worktrees: fifteenth integration plus DVDFs, DVD, PAD, and HSD scout trees
+Banked commits: efc86e7e (DVDFs), ab9565c7 (DVD prepare), e780da0a (PAD reset),
+  94c7af3d (strict HSD CObj migration), all on the fifteenth integration branch
+Rejected: OSRun LR trampoline (requires asm); DVDCancelAsync (unused-local frame
+  shaping and artificial jump-table alias); roll2upvec (FPR coloring only)
+Next unit closers: strict CObjLoad slice; strict HSD JObj suffix;
+  remaining authentic PAD reset/recalibration functions
 ```
