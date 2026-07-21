@@ -16,9 +16,6 @@ extern s32 CircleBufferReadBytes(CircleBuffer* circle, u8* buffer, u32 size);
 
 extern CircleBuffer lbl_803FFA98;
 extern s32 lbl_8047A9E8;
-extern char lbl_8026FD78[];
-extern const char lbl_8026FDD4[];
-extern const char lbl_8026FDFC[];
 extern void MWTRACE(s32 level, const char* format, ...);
 
 /*
@@ -62,28 +59,24 @@ s32 gdev_cc_pre_continue(void) {
 }
 
 /* gdev_cc_write - Write data to the GDEV debug port. */
-s32 gdev_cc_write(u8* buffer, s32 size) {
-    char* strings = lbl_8026FD78;
+s32 gdev_cc_write(void* data, s32 size) {
+    s32 remaining = size;
+    u8* buffer = data;
     s32 written;
-    s32 remaining;
-    u32 cursor;
-
-    cursor = (u32)buffer;
-    remaining = size;
 
     if (lbl_8047A9E8 == 0) {
-        MWTRACE(8, strings + 0);
+        MWTRACE(8, "cc not initialized\n");
         return -0x2711;
     }
 
-    MWTRACE(8, strings + 0x14, buffer, size);
+    MWTRACE(8, "cc_write : Output data 0x%08x %ld bytes\n", data, size);
     while (remaining > 0) {
-        MWTRACE(1, strings + 0x40, remaining);
-        written = DBWrite((const void*)cursor, remaining);
+        MWTRACE(1, "cc_write sending %ld bytes\n", remaining);
+        written = DBWrite(buffer, remaining);
         if (written == 0) {
             break;
         }
-        cursor += written;
+        buffer += written;
         remaining -= written;
     }
     return 0;
@@ -103,7 +96,7 @@ s32 gdev_cc_read(u8* buffer, s32 size) {
         return -0x2711;
     }
 
-    MWTRACE(1, lbl_8026FDD4, size, size);
+    MWTRACE(1, "Expected packet size : 0x%08x (%ld)\n", size, size);
     requestedSize = size;
     readSize = size;
     {
@@ -121,7 +114,7 @@ s32 gdev_cc_read(u8* buffer, s32 size) {
         if (error == 0) {
             CircleBufferReadBytes(&lbl_803FFA98, buffer, requestedSize);
         } else {
-            MWTRACE(8, lbl_8026FDFC, error);
+            MWTRACE(8, "cc_read : error reading bytes from EXI2 %ld\n", error);
         }
     }
     return error;

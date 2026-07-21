@@ -417,16 +417,22 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current master: 70f67c0d (PR #384 merged)
-Open PRs: none; #383 closed as optimize_for_size-owned
-Exact-source delta from goal baseline: +1 function / +368 code bytes (EXISync)
-Newly linked unit delta: 0
-Report: 6,269 / 8,603 matched functions; 886,864 matched code bytes
-Linked: 685 / 1,292 units; 566,160 complete code bytes
-README: synced to the canonical report
+Current master: 4fbfc965 (PR #386 merged)
+Campaign head: PR #387 (integration/fourteenth-refill-20260721)
+Open PRs: #387 only
+Exact-source delta from goal baseline: +3 functions / +1,240 code bytes
+Newly linked function delta: +11
+Newly linked unit/code/data delta: +6 units / +1,816 code / +177 data
+Head report: 6,271 / 8,603 matched functions; 887,736 matched code bytes
+Head linked: 691 / 1,301 units; 567,976 complete code bytes
+README/report: synced on PR #387
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: refreshed 80-100% band, 545 queued, target 21 workers
-Windows: refreshed disjoint 70-80% batch, 49 fidelity-gated units, 12 workers
-Pending audits: Windows cumulative wins; fn_8022B2CC natural-source scout
-3090 WIN? audit: no new strict survivors
+3090: current-master 80-100% queue, 545 entries, 21 workers; no pending wins
+Windows: disjoint 70-80% batch, 49 units, 12 workers; no pending wins
+Active worktrees: PR #387 integration plus its three reconciled scout trees
+Banked commits: f530aaeb (GDEV), 7c847ee0 (fn_8022BB84), both in PR #387
+Rejected: floor_character (pragma/register blocker); fight_gsfloor (legacy shaping);
+  fn_8022B2CC (register allocation and jump-table blocker)
+Next unit closers: DVDConvertPathToEntrynum/entryToPath;
+  DVDCancelAsync/__DVDPrepareResetAsync; clean HSD CObj/JObj suffix candidates
 ```

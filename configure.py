@@ -252,7 +252,13 @@ config.libs = [
                 progress_category="runtime",
                 extra_cflags=["-rostr"],
             ),  # BANK_TRK
-            Object(CodeCandidate, "trk/gdev_cc_range_800C41AC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
+            Object(
+                Matching,
+                "trk/gdev_cc_range_800C41AC.c",
+                mw_version="GC/2.6",
+                progress_category="runtime",
+                extra_cflags=["-rostr"],
+            ),  # BANK_TRK
             Object(Matching, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
             Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD
             Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
@@ -3638,8 +3644,15 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/fight_range_exact_8022BB84.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
-                "game/fight_range_8022BB84.c",
+                "game/fight_range_8022BE2C.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
