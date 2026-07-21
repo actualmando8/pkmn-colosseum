@@ -927,9 +927,9 @@ config.libs = [
                     progress_category="musyx",
                 )
                 for status, path in [
-                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80150C78.c"),
+                    (Matching, "musyx/runtime/synthdata_candidate_80150C78.c"),
                     (Matching, "musyx/runtime/synthdata_exact_80150E68.c"),
-                    (CodeCandidate, "musyx/runtime/synthdata_candidate_80150FE4.c"),
+                    (Matching, "musyx/runtime/synthdata_candidate_80150FE4.c"),
                     (Matching, "musyx/runtime/synthdata_exact_8015122C.c"),
                     (CodeCandidate, "musyx/runtime/synthdata_candidate_80151B84.c"),
                     (Matching, "musyx/runtime/synthdata_exact_8015210C.c"),
