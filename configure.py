@@ -2577,6 +2577,13 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "game/field_range_exact_80115250.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
                 "game/musyx_range_801652DC.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
