@@ -47,14 +47,8 @@ game/data/sdata2_8047C0A0.c:
 game/data/sdata2_8047C1A0.c:
 	.sdata2     start:0x8047C1A0 end:0x8047C2A0
 
-game/data/sdata2_8047C2A0.c:
-	.sdata2     start:0x8047C2A0 end:0x8047C3A0
-
-game/data/sdata2_8047C3A0.c:
-	.sdata2     start:0x8047C3A0 end:0x8047C4A0
-
-crt/sdata2_math.c:
-	.sdata2     start:0x8047C4A0 end:0x8047C528
+game/data/sdata2_8047C2A0_prefix.c:
+	.sdata2     start:0x8047C2A0 end:0x8047C348
 
 game/data/bss_8039A700.c:
 	.bss        start:0x8039A700 end:0x8039E700
@@ -974,30 +968,6 @@ dolphin/gx/GX_exact_800B857C.c:
 game/data/data_80312C40_suffix.c:
 	.data       start:0x80312C40 end:0x80313364
 
-game/data/data_80313368.c:
-	.data       start:0x80313368 end:0x8031358C
-
-game/data/data_80313590.c:
-	.data       start:0x80313590 end:0x803137DC
-
-game/data/data_803137E0.c:
-	.data       start:0x803137E0 end:0x80313818
-
-game/data/data_80313824.c:
-	.data       start:0x80313824 end:0x803138B0
-
-game/data/data_803139F0.c:
-	.data       start:0x803139F0 end:0x80313B14
-
-game/data/data_80313B18.c:
-	.data       start:0x80313B18 end:0x80313D18
-
-game/data/data_80313D9C.c:
-	.data       start:0x80313D9C end:0x80313F44
-
-game/data/data_80313F48.c:
-	.data       start:0x80313F48 end:0x80314060
-
 dolphin/gx/GX_exact_800B884C.c:
 	.text       start:0x800B884C end:0x800B8AE8
 
@@ -1039,6 +1009,35 @@ dolphin/gx/GX_exact_800BA4C8.c:
 
 dolphin/sdk_range_800BA7C0.c:
 	.text       start:0x800BA7C0 end:0x800BAE5C
+	.data       start:0x80313368 end:0x8031358C
+	.sdata2     start:0x8047C348 end:0x8047C370
+
+game/data/sdata2_8047C370_suffix.c:
+	.sdata2     start:0x8047C370 end:0x8047C3A0
+
+game/data/sdata2_8047C3A0.c:
+	.sdata2     start:0x8047C3A0 end:0x8047C4A0
+
+game/data/data_80313590.c:
+	.data       start:0x80313590 end:0x803137DC
+
+game/data/data_803137E0.c:
+	.data       start:0x803137E0 end:0x80313818
+
+game/data/data_80313824.c:
+	.data       start:0x80313824 end:0x803138B0
+
+game/data/data_803139F0.c:
+	.data       start:0x803139F0 end:0x80313B14
+
+game/data/data_80313B18.c:
+	.data       start:0x80313B18 end:0x80313D18
+
+game/data/data_80313D9C.c:
+	.data       start:0x80313D9C end:0x80313F44
+
+game/data/data_80313F48.c:
+	.data       start:0x80313F48 end:0x80314060
 
 dolphin/gx/GX_fn_800BAE5C.c:
 	.text       start:0x800BAE5C end:0x800BAE64
@@ -1301,6 +1300,7 @@ crt/string.c:
 
 crt/math_range_800CAA58.c:
 	.text       start:0x800CAA58 end:0x800CB024
+	.sdata2     start:0x8047C4A0 end:0x8047C528
 
 crt/math_ieee754_atan2.c:
 	.text       start:0x800CB024 end:0x800CB2B4
@@ -1331,10 +1331,7 @@ game/gs_render_util_sdata2.c:
 	.sdata2     start:0x8047C990 end:0x8047C99C
 
 game/data/sdata2_8047C9A0.c:
-	.sdata2     start:0x8047C9A0 end:0x8047CA9D
-
-game/data/sdata2_8047CAA0.c:
-	.sdata2     start:0x8047CAA0 end:0x8047CB88
+	.sdata2     start:0x8047C9A0 end:0x8047CA58
 
 crt/math_range_800CD648.c:
 	.text       start:0x800CD648 end:0x800CDBB8
@@ -1481,6 +1478,13 @@ game/gs_gfx_layer_candidate_800D892C.c:
 
 game/gs_gfx_range_800D9AF0.c:
 	.text       start:0x800D9AF0 end:0x800D9D68
+	.sdata2     start:0x8047CA58 end:0x8047CA70
+
+game/data/sdata2_8047CA70.c:
+	.sdata2     start:0x8047CA70 end:0x8047CA9D
+
+game/data/sdata2_8047CAA0.c:
+	.sdata2     start:0x8047CAA0 end:0x8047CB88
 
 game/gs_gfx_exact_800D9D68.c:
 	.text       start:0x800D9D68 end:0x800DA578

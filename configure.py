@@ -244,7 +244,13 @@ config.libs = [
             Object(Matching, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD1
             Object(Matching, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_VECINIT
             Object(Matching, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD2
-            Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_CRT
+            Object(
+                Matching,
+                "crt/stdio_range_800C7558.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="runtime",
+            ),  # CALIB_CRT
             Object(
                 Matching,
                 "trk/ddh_cc_range_800C3C00.c",
@@ -2200,13 +2206,13 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800BA7C0.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800BAE64.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2267,8 +2273,9 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/math_range_800CAA58.c",
+                source="crt_matching/math_range_800CAA58.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
@@ -4973,7 +4980,7 @@ config.libs = [
                 ]
             ],
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_gfx_range_800D9AF0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -5812,12 +5819,6 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "crt/sdata2_math.c",
-                source="crt_data/sdata2_math.c",
-                progress_category="runtime",
-            ),
-            Object(
-                Matching,
                 "crt/sdata2_math_8047C580.c",
                 source="crt_data/sdata2_math_8047C580.c",
                 progress_category="runtime",
@@ -6122,11 +6123,6 @@ config.libs = [
             Object(
                 Matching,
                 "game/data/data_80312C40_suffix.c",
-                progress_category="game",
-            ),
-            Object(
-                Matching,
-                "game/data/data_80313368.c",
                 progress_category="game",
             ),
             Object(
@@ -6571,7 +6567,12 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "game/data/sdata2_8047C2A0.c",
+                "game/data/sdata2_8047C2A0_prefix.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/sdata2_8047C370_suffix.c",
                 progress_category="game",
             ),
             Object(
@@ -6594,6 +6595,11 @@ config.libs = [
             Object(
                 Matching,
                 "game/data/sdata2_8047C9A0.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/sdata2_8047CA70.c",
                 progress_category="game",
             ),
             Object(
