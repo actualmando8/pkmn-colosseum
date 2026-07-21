@@ -254,8 +254,7 @@ static inline void CompleteTransfer(s32 chan) {
     exi = &lbl_803FB3C8[chan];
     if (exi->state & 3) {
         if (exi->state & 2) {
-            len = exi->immLen;
-            if (len != 0) {
+            if ((len = exi->immLen) != 0) {
                 buf = exi->immBuf;
                 data = __EXIRegs[(chan * 5) + 4];
                 for (i = 0; i < len; i++) {
