@@ -50,7 +50,7 @@ extern u32 lbl_8047ACC4;
 extern u32 lbl_8047ACC8;
 extern GSFloorResource* lbl_8047ACCC;
 extern volatile u32 lbl_8047ACD8;
-extern u32 lbl_8047ACDC;
+extern volatile u32 lbl_8047ACDC;
 extern u32 lbl_8047ACE0;
 extern GSFloorResHandler lbl_80404918[];
 
@@ -215,10 +215,10 @@ void fn_800FF58C(u32 floorId) {
             resource++;
         }
         currentFloor->isActive = 5;
-        *(volatile u32*)&lbl_80478B18 = (u32)-1;
+        lbl_80478B18 = (u32)-1;
     }
-    *(volatile u32*)&lbl_8047ACDC = 3;
-    *(volatile u32*)&lbl_80478B18 = floorId;
+    lbl_8047ACDC = 3;
+    lbl_80478B18 = floorId;
 }
 
 #endif
