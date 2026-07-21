@@ -417,25 +417,26 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current master: aac025cb (PR #388 merged, 30 linked functions)
-Campaign head: PR #389 (integration/sixteenth-refill-20260721)
-Open PRs: #389 only
+Current decompilation head: a5fe88ae (PR #389 merged)
+Open PRs: none after reconciliation
 Exact-source delta from goal baseline: +9 functions / +4,116 code bytes
-Sixteenth-refill delta from master: +2 exact functions / +1,080 matched code;
+PR #388 batch: +30 linked functions / +7 linked units / +5,664 linked code bytes
+PR #389 batch: +2 exact functions / +1,080 matched code;
   +3 linked functions / +3 units / +1,176 linked code / +0 linked data
 Newly linked function delta from goal baseline: +44
 Newly linked unit/code/data delta from goal baseline: +16 units / +8,656 code / +177 data
 Head report: 6,277 / 8,603 matched functions; 890,612 matched code bytes
 Head linked: 701 / 1,301 units; 574,816 complete code bytes
-README/report: synced on the validated sixteenth-refill head
+README/report/decomp.dev: synced at a5fe88ae
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: 543-entry queue, 21 workers; dataInsertLayer WIN? reconciled as a duplicate
-  with allocation-only temporaries; refresh after the sixteenth refill merges
-Windows: 49 active-valid units, 12 workers, no new wins; refresh after the
-  sixteenth refill merges
-Active worktrees: clean master plus the sixteenth integration tree only
-Integrated next batch: 493e729f (MusyX dataInsertKeymap/dataInsertLayer) and
-  e03624c4 (effect teardown callback)
+3090: 541-entry 80%-plus queue, 21 workers, no actionable wins; historical
+  dataInsertLayer WIN? rejected as a shaped duplicate and retired from the queue
+Windows: 77 active-valid 70%-to-80% units, 12 workers, no wins; refreshed with
+  29 newly valid functions while retaining useful prior workunits
+Active worktrees after reconciliation: clean master only
+Banked commits not merged: none
+Integrated: PR #388 (30-function linked batch) and PR #389 (MusyX table
+  insertions plus effect teardown callback)
 Rejected: fight_timer (private conversion constants break canonical relocations);
   THP decoder (293 relocation mismatches, extra data, and asm outside allowlist);
   pokemonGetDp (private conversion constant); fight residuals that require register,
