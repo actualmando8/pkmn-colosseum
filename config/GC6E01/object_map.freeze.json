@@ -4,7 +4,7 @@
   "purpose": "Freeze the dtk/objdiff denominator and object topology used for published GC6E01 progress. Progress counters may increase without updating this file.",
   "invariants": {
     "total_code": 2495108,
-    "total_data": 2196103,
+    "total_data": 2196100,
     "total_functions": 8603,
     "total_units": 1301
   },
@@ -17,13 +17,13 @@
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "887544",
-    "matched_code_percent": 35.571365,
-    "matched_data": "2136500",
+    "matched_code": "887736",
+    "matched_code_percent": 35.579063,
+    "matched_data": "2136497",
     "matched_data_percent": 97.285965,
-    "matched_functions": 6270,
-    "matched_functions_percent": 72.88155,
-    "fuzzy_match_percent": 57.410324
+    "matched_functions": 6271,
+    "matched_functions_percent": 72.89318,
+    "fuzzy_match_percent": 57.410416
   },
   "unit_topology": [
     {
@@ -5605,51 +5605,12 @@
       "sections": [
         {
           "name": ".rodata",
-          "size": 268,
+          "size": 44,
           "virtual_address": 2150038860
         }
       ],
       "total_code": 0,
-      "total_data": 268,
-      "total_functions": 0
-    },
-    {
-      "name": "main/game/data/rodata_8026FE58",
-      "sections": [
-        {
-          "name": ".rodata",
-          "size": 392,
-          "virtual_address": 2150039128
-        }
-      ],
-      "total_code": 0,
-      "total_data": 392,
-      "total_functions": 0
-    },
-    {
-      "name": "main/auto_04_8026FFE0_rodata",
-      "sections": [
-        {
-          "name": ".rodata",
-          "size": 40,
-          "virtual_address": 2150039520
-        }
-      ],
-      "total_code": 0,
-      "total_data": 40,
-      "total_functions": 0
-    },
-    {
-      "name": "main/game/data/rodata_80270008",
-      "sections": [
-        {
-          "name": ".rodata",
-          "size": 42216,
-          "virtual_address": 2150039560
-        }
-      ],
-      "total_code": 0,
-      "total_data": 42216,
+      "total_data": 44,
       "total_functions": 0
     },
     {
@@ -5721,14 +5682,58 @@
       "name": "main/trk/gdev_cc_range_800C41AC",
       "sections": [
         {
+          "name": ".rodata",
+          "size": 177,
+          "virtual_address": 2150038904
+        },
+        {
           "name": ".text",
           "size": 656,
           "virtual_address": 2148286892
         }
       ],
       "total_code": 656,
-      "total_data": 0,
+      "total_data": 177,
       "total_functions": 6
+    },
+    {
+      "name": "main/game/data/rodata_8026FE58",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 436,
+          "virtual_address": 2150039084
+        }
+      ],
+      "total_code": 0,
+      "total_data": 436,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_04_8026FFE0_rodata",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 40,
+          "virtual_address": 2150039520
+        }
+      ],
+      "total_code": 0,
+      "total_data": 40,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/rodata_80270008",
+      "sections": [
+        {
+          "name": ".rodata",
+          "size": 42216,
+          "virtual_address": 2150039560
+        }
+      ],
+      "total_code": 0,
+      "total_data": 42216,
+      "total_functions": 0
     },
     {
       "name": "main/trk/gdev_cc_close",
