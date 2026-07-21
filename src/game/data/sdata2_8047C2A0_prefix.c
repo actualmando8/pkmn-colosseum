@@ -6,9 +6,7 @@
 extern u8 gxData_803FC860[];
 
 /*
- * Mixed Dolphin SDK .sdata2 constants. Target relocations tie the first run to
- * C_MTX/projection, vector normalization, and C_QUATSlerp; the pointer and tail
- * constants are referenced by DVD/VI, GX init, GX transform, geometry, and fog.
+ * Mixed Dolphin SDK .sdata2 constants before the GXTexture literal pool.
  */
 SDATA2 const f32 lbl_8047C2A0[2] = { 0.017453292f, 0.0f };
 SDATA2 const f32 lbl_8047C2A8 = 1.0f;
@@ -47,19 +45,3 @@ SDATA2 const f32 lbl_8047C338 = -4.0f;
 SDATA2 const f32 lbl_8047C33C = 4.0f;
 SDATA2 const f32 lbl_8047C340 = -2.0f;
 SDATA2 const f32 lbl_8047C344 = 0.5f;
-SDATA2 const f32 lbl_8047C348 = 16.0f;
-SDATA2 const f64 lbl_8047C350 = 4.503599627370496e+15;
-SDATA2 const f32 lbl_8047C358 = -4.0f;
-SDATA2 const f32 lbl_8047C35C = 4.0f;
-SDATA2 const f32 lbl_8047C360 = 3.99f;
-SDATA2 const f32 lbl_8047C364 = 32.0f;
-SDATA2 const f32 lbl_8047C368 = 0.0f;
-SDATA2 const f32 lbl_8047C36C = 10.0f;
-SDATA2 const f32 lbl_8047C370 = 1024.0f;
-SDATA2 const f32 lbl_8047C374 = 0.0009765625f;
-SDATA2 const f32 lbl_8047C378 = 0.0f;
-SDATA2 const f64 lbl_8047C380 = 4.503599627370496e+15;
-SDATA2 const f32 lbl_8047C388 = 0.0f;
-SDATA2 const f32 lbl_8047C38C = 1.0f;
-SDATA2 const f32 lbl_8047C390 = 0.5f;
-SDATA2 const f64 lbl_8047C398 = 1.0;
