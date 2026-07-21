@@ -418,8 +418,8 @@ Next three unit closers:
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master: aac025cb (PR #388 merged, 30 linked functions)
-Campaign head: integration/sixteenth-refill-20260721 (next PR)
-Open PRs: none before publishing the sixteenth refill
+Campaign head: PR #389 (integration/sixteenth-refill-20260721)
+Open PRs: #389 only
 Exact-source delta from goal baseline: +9 functions / +4,116 code bytes
 Sixteenth-refill delta from master: +2 exact functions / +1,080 matched code;
   +3 linked functions / +3 units / +1,176 linked code / +0 linked data
