@@ -244,7 +244,13 @@ config.libs = [
             Object(Matching, "hsd/hsd_mobj_range_801A8478.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD1
             Object(Matching, "hsd/hsd_mobj_range_801A84B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_VECINIT
             Object(Matching, "hsd/hsd_mtx.c", mw_version="GC/1.3", progress_category="hsd"),  # CALIB_HSD2
-            Object(CodeCandidate, "crt/stdio_range_800C7558.c", mw_version="GC/1.3", progress_category="runtime"),  # CALIB_CRT
+            Object(
+                Matching,
+                "crt/stdio_range_800C7558.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="runtime",
+            ),  # CALIB_CRT
             Object(
                 Matching,
                 "trk/ddh_cc_range_800C3C00.c",
