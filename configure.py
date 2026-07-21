@@ -380,7 +380,8 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "dolphin/dvd/DVDFsExtras.c",
+                "dolphin/dvd/DVD_exact_800A7CCC.c",
+                mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
             Object(
@@ -440,7 +441,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/pad/PAD_suffix_800ABD68.c",
                 progress_category="sdk",
             ),
@@ -1944,7 +1945,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_8009F77C_prefix.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -1998,7 +1999,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/dvd/dvdfs_range_800A4D28.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -3281,10 +3282,10 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/battle/battle_range_candidate_801EEE6C.c",
                 mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
@@ -3658,10 +3659,10 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/fight_range_8022D20C.c",
                 mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
@@ -5248,7 +5249,6 @@ config.libs = [
                     (Matching, "hsd/hsd_cobj_exact_80194CC4.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194D60.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194D94.c"),
-                    (CodeCandidate, "hsd/hsd_cobj_candidate_80194DA4.c"),
                     (Matching, "hsd/hsd_cobj_exact_80195794.c"),
                     (Matching, "hsd/hsd_cobj_exact_80195904.c"),
                     (Matching, "hsd/hsd_cobj_exact_80195970.c"),
@@ -5260,6 +5260,13 @@ config.libs = [
                     (CodeCandidate, "hsd/hsd_cobj_candidate_80197344.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "hsd/hsd_cobj_candidate_80194DA4.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O1"],
+                progress_category="hsd",
+            ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_jobj.c",
@@ -5380,7 +5387,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_floor_data_residual_800FF58C.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -5394,7 +5401,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_floor_data_residual_800FF730.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],

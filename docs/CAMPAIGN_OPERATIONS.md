@@ -417,22 +417,30 @@ Next three unit closers:
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current master: 4fbfc965 (PR #386 merged)
-Campaign head: PR #387 (integration/fourteenth-refill-20260721)
-Open PRs: #387 only
-Exact-source delta from goal baseline: +3 functions / +1,240 code bytes
-Newly linked function delta: +11
-Newly linked unit/code/data delta: +6 units / +1,816 code / +177 data
-Head report: 6,271 / 8,603 matched functions; 887,736 matched code bytes
-Head linked: 691 / 1,301 units; 567,976 complete code bytes
-README/report: synced on PR #387
+Current master: 4b68d012 (PR #387 merged)
+Campaign head: PR #388 (integration/fifteenth-refill-20260721)
+Open PRs: #388 only
+Exact-source delta from goal baseline: +7 functions / +3,036 code bytes
+PR #388 delta from master: +4 exact functions / +1,796 matched code;
+  +30 linked functions / +7 units / +5,664 linked code / +0 linked data
+Newly linked function delta from goal baseline: +41
+Newly linked unit/code/data delta from goal baseline: +13 units / +7,480 code / +177 data
+Head report: 6,275 / 8,603 matched functions; 889,532 matched code bytes
+Head linked: 698 / 1,301 units; 573,640 complete code bytes
+README/report: synced on the final 30-function fifteenth-refill head
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: current-master 80-100% queue, 545 entries, 21 workers; no pending wins
-Windows: disjoint 70-80% batch, 49 units, 12 workers; no pending wins
-Active worktrees: PR #387 integration plus its three reconciled scout trees
-Banked commits: f530aaeb (GDEV), 7c847ee0 (fn_8022BB84), both in PR #387
-Rejected: floor_character (pragma/register blocker); fight_gsfloor (legacy shaping);
-  fn_8022B2CC (register allocation and jump-table blocker)
-Next unit closers: DVDConvertPathToEntrynum/entryToPath;
-  DVDCancelAsync/__DVDPrepareResetAsync; clean HSD CObj/JObj suffix candidates
+3090: pre-merge current-master queue has 543 entries and 21 workers; no pending wins;
+  refresh to the merged #388 head after integration
+Windows: pre-merge disjoint batch has 49 active-valid units and 12 workers; no
+  pending wins; refresh to the merged #388 head after integration
+Active worktrees: fifteenth integration plus validated next-batch MusyX/effect
+  scouts and clean/rejected audit trees queued for post-merge reconciliation
+Banked next batch: 8a31a866 (MusyX dataInsertKeymap/dataInsertLayer, +2 functions /
+  +1,080 linked code) and b050e547 (effect teardown callback, +1 / +96)
+Rejected: fight_timer (private conversion constants break canonical relocations);
+  THP decoder (293 relocation mismatches, extra data, and asm outside allowlist);
+  pokemonGetDp (private conversion constant); fight residuals that require register,
+  inline, pragma, jump-table, or volatile-only shaping
+Next unit closers: integrate the three banked MusyX/effect functions, then audit
+  strict CObjLoad and HSD JObj islands against full relocation/data ownership
 ```

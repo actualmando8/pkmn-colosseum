@@ -16,53 +16,69 @@ extern u32 lbl_8047A8B0;
 extern u32 lbl_8047A8B4;
 extern u32 lbl_8047A8B8;
 extern PADSamplingCallback lbl_8047A8BC;
-extern u32 lbl_8047A8C0;
+extern BOOL lbl_8047A8C0;
 extern PADStatus lbl_803FC5E0[4];
+extern u8 GameChoice : 0x800030E3;
 
 extern u32 SIDisablePolling(u32 poll);
 extern void SIGetTypeAsync(s32 chan, SITypeAndStatusCallback cb);
 extern BOOL fn_800CF708(void);
 extern void PADTypeAndStatusCallback(s32 chan, u32 type);
 
+/*
+ * The retail PAD translation unit defines PADSync and PADRecalibrate before
+ * OnReset, and MWCC inlines both calls here. This reconstructed object is split
+ * at OnReset, so retain split-local copies of those authentic SDK routines to
+ * preserve the original call/inlining boundary.
+ */
+static inline BOOL PADSyncForOnReset(void) {
+    return lbl_8047A8A8 == 0 && lbl_80478A0C == 0x20 && !fn_800CF708();
+}
+
+static inline BOOL PADRecalibrateForOnReset(u32 mask) {
+    BOOL enabled;
+    u32 disableBits;
+
+    enabled = OSDisableInterrupts();
+
+    mask |= lbl_8047A8B8;
+    lbl_8047A8B8 = 0;
+    mask &= ~(lbl_8047A8B0 | lbl_8047A8B4);
+    lbl_8047A8A8 |= mask;
+    disableBits = lbl_8047A8A8 & lbl_8047A8A4;
+    lbl_8047A8A4 &= ~mask;
+
+    if ((GameChoice & 0x40) == 0) {
+        lbl_8047A8AC |= mask;
+    }
+
+    SIDisablePolling(disableBits);
+
+    if (lbl_80478A0C == 0x20) {
+        lbl_80478A0C = __cntlzw(lbl_8047A8A8);
+        if (lbl_80478A0C != 0x20) {
+            u32 chanBit = 0x80000000u >> lbl_80478A0C;
+            lbl_8047A8A8 &= ~chanBit;
+            memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
+            SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+    return TRUE;
+}
+
 BOOL fn_800ABD68(BOOL final) {
-    BOOL wasSampling;
     BOOL sync;
 
-    wasSampling = (lbl_8047A8BC != 0);
-    if (wasSampling) {
+    if (lbl_8047A8BC != NULL) {
         PADSetSamplingCallback(0);
     }
 
     if (final == 0) {
-        sync = (lbl_8047A8A8 == 0) && (lbl_80478A0C == 0x20);
-        if (sync) {
-            sync = fn_800CF708();
-        }
-
+        sync = PADSyncForOnReset();
         if (lbl_8047A8C0 == 0 && sync) {
-            BOOL enabled = OSDisableInterrupts();
-            u32 mask = 0xF0000000;
-
-            mask |= lbl_8047A8B8;
-            lbl_8047A8B8 = 0;
-            mask &= ~(lbl_8047A8B0 | lbl_8047A8B4);
-            lbl_8047A8A8 |= mask;
-            lbl_8047A8A4 &= ~mask;
-            lbl_8047A8AC |= mask;
-            SIDisablePolling(lbl_8047A8A8);
-
-            if (lbl_80478A0C == 0x20) {
-                lbl_80478A0C = __cntlzw(lbl_8047A8A8);
-                if (lbl_80478A0C != 0x20) {
-                    u32 chanBit = 0x80000000u >> lbl_80478A0C;
-                    lbl_8047A8A8 &= ~chanBit;
-                    memset(&lbl_803FC5E0[lbl_80478A0C], 0, sizeof(PADStatus));
-                    SIGetTypeAsync(lbl_80478A0C, (SITypeAndStatusCallback)PADTypeAndStatusCallback);
-                }
-            }
-
-            OSRestoreInterrupts(enabled);
-            lbl_8047A8C0 = 1;
+            lbl_8047A8C0 = PADRecalibrateForOnReset(0xF0000000);
             return FALSE;
         }
         return sync;

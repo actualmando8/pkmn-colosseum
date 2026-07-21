@@ -852,14 +852,14 @@ dolphin/dvd/DVD_range_800A7728.c:
 	.text       start:0x800A7728 end:0x800A7820
 
 dolphin/sdk_range_800A7820.c:
-	.text       start:0x800A7820 end:0x800A7F28
+	.text       start:0x800A7820 end:0x800A7CCC
+
+dolphin/dvd/DVD_exact_800A7CCC.c:
+	.text       start:0x800A7CCC end:0x800A7DE8
 
 dolphin/dvd/DVDQueue.c:
-	.text       start:0x800A7F28 end:0x800A7F80
+	.text       start:0x800A7DE8 end:0x800A7FE0
 	.bss        start:0x803FC3F8 end:0x803FC418
-
-dolphin/dvd/DVDFsExtras.c:
-	.text       start:0x800A7F80 end:0x800A7FE0
 
 dolphin/dvd/DVDError_ErrorCode2Num.c:
 	.text       start:0x800A7FE0 end:0x800A80FC
