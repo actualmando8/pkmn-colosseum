@@ -380,7 +380,8 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "dolphin/dvd/DVDFsExtras.c",
+                "dolphin/dvd/DVD_exact_800A7CCC.c",
+                mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
             Object(

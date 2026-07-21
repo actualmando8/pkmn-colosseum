@@ -1,21 +1,16 @@
 /**
  * @file sdk_range_800A7820.c
- * @brief dolphin-sdk code, 0x800A7820 - 0x800A7F28 (11 fns).
+ * @brief dolphin-sdk code, 0x800A7820 - 0x800A7CCC (7 fns).
  *
  * Range unit assigned from the propagated subsystem map
  * (tools/subsystem_propagation.py, >=80% single-label dominance;
- * campaign 2026-07-01). All functions asm-only until matched; the
- * range name stays honest until internal TU structure is proven.
+ * campaign 2026-07-01). DVDCancelAsync remains in the extracted object until
+ * byte-exact source is proven; the range name preserves address traceability.
  */
 #include "dolphin/types.h"
 #include "dolphin/dvd/dvd.h"
 #include "dolphin/os/OSInterrupt.h"
 #include "dolphin/os/OSThread.h"
-
-typedef struct DVDQueueNode {
-    struct DVDQueueNode* next;
-    struct DVDQueueNode* prev;
-} DVDQueueNode;
 
 s32 fn_800A7820(s32 arg0) {
     extern s32 autoInvalidation_804789CC;
@@ -138,66 +133,4 @@ BOOL DVDCheckDisk(void) {
 
     OSRestoreInterrupts(enabled);
     return result;
-}
-
-extern DVDQueueNode WaitingQueue_803FC3F8[4];
-
-void __DVDClearWaitingQueue(void) {
-    DVDQueueNode* queue;
-
-    queue = WaitingQueue_803FC3F8;
-    queue->next = queue;
-    queue->prev = queue;
-
-    queue = &WaitingQueue_803FC3F8[1];
-    queue->next = queue;
-    queue->prev = queue;
-
-    queue = &WaitingQueue_803FC3F8[2];
-    queue->next = queue;
-    queue->prev = queue;
-
-    queue = &WaitingQueue_803FC3F8[3];
-    queue->next = queue;
-    queue->prev = queue;
-}
-
-BOOL __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
-    BOOL enabled;
-    DVDQueueNode* queue;
-
-    enabled = OSDisableInterrupts();
-    queue = &WaitingQueue_803FC3F8[prio];
-    queue->prev->next = (DVDQueueNode*)block;
-    block->prev = (DVDCommandBlock*)queue->prev;
-    block->next = (DVDCommandBlock*)queue;
-    queue->prev = (DVDQueueNode*)block;
-    OSRestoreInterrupts(enabled);
-    return TRUE;
-}
-
-DVDCommandBlock* __DVDPopWaitingQueue(void) {
-    BOOL enabled;
-    DVDQueueNode* queue;
-    DVDCommandBlock* block;
-    s32 i;
-
-    enabled = OSDisableInterrupts();
-    for (i = 0; i < 4; i++) {
-        queue = &WaitingQueue_803FC3F8[i];
-        if (queue->next != queue) {
-            OSRestoreInterrupts(enabled);
-            enabled = OSDisableInterrupts();
-            queue = &WaitingQueue_803FC3F8[i];
-            block = (DVDCommandBlock*)queue->next;
-            queue->next = (DVDQueueNode*)block->next;
-            block->next->prev = (DVDCommandBlock*)queue;
-            OSRestoreInterrupts(enabled);
-            block->next = NULL;
-            block->prev = NULL;
-            return block;
-        }
-    }
-    OSRestoreInterrupts(enabled);
-    return NULL;
 }
