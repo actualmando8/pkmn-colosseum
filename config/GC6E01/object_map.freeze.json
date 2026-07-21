@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1301
+    "total_units": 1303
   },
   "topology_status": {
     "auto_units": 66,
-    "named_units": 1235,
-    "source_backed_units": 1219,
+    "named_units": 1237,
+    "source_backed_units": 1221,
     "auto_code": 0,
     "auto_data": 57703,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "896312",
-    "matched_code_percent": 35.922775,
+    "matched_code": "899332",
+    "matched_code_percent": 36.04381,
     "matched_data": "2136497",
     "matched_data_percent": 97.285965,
-    "matched_functions": 6289,
-    "matched_functions_percent": 73.10241,
-    "fuzzy_match_percent": 57.69073
+    "matched_functions": 6301,
+    "matched_functions_percent": 73.24189,
+    "fuzzy_match_percent": 57.71637
   },
   "unit_topology": [
     {
@@ -200,12 +200,12 @@
       "sections": [
         {
           "name": ".sdata2",
-          "size": 168,
+          "size": 104,
           "virtual_address": 2152186528
         }
       ],
       "total_code": 0,
-      "total_data": 168,
+      "total_data": 104,
       "total_functions": 0
     },
     {
@@ -4547,14 +4547,32 @@
       "name": "main/dolphin/sdk_range_800B9578",
       "sections": [
         {
+          "name": ".sdata2",
+          "size": 16,
+          "virtual_address": 2152186632
+        },
+        {
           "name": ".text",
           "size": 3104,
           "virtual_address": 2148242808
         }
       ],
       "total_code": 3104,
-      "total_data": 0,
+      "total_data": 16,
       "total_functions": 15
+    },
+    {
+      "name": "main/game/data/sdata2_8047C318",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 48,
+          "virtual_address": 2152186648
+        }
+      ],
+      "total_code": 0,
+      "total_data": 48,
+      "total_functions": 0
     },
     {
       "name": "main/dolphin/gx/GX_fn_800BA198",
@@ -8751,13 +8769,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 1952,
+          "size": 1904,
           "virtual_address": 2148616928
         }
       ],
-      "total_code": 1952,
+      "total_code": 1904,
       "total_data": 0,
-      "total_functions": 22
+      "total_functions": 18
+    },
+    {
+      "name": "main/game/field_range_exact_80115250",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2148618832
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 4
     },
     {
       "name": "main/game/floor_data",
