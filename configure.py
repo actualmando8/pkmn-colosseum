@@ -266,7 +266,12 @@ config.libs = [
                 extra_cflags=["-rostr"],
             ),  # BANK_TRK
             Object(Matching, "trk/gdev_cc_range_800C4444.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK
-            Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD
+            Object(CodeCandidate, "hsd/hsd_mobj_range_801A86B4.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 residual
+            Object(Matching, "hsd/hsd_mtx_get_translate_exact_801A9570.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 exact
+            Object(CodeCandidate, "hsd/hsd_mobj_candidate_801A958C.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 residual
+            Object(Matching, "hsd/hsd_obj_forget_exact_801AA350.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 exact
+            Object(CodeCandidate, "hsd/hsd_mobj_candidate_801AA35C.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 residual
+            Object(Matching, "hsd/hsd_obj_info_exact_801AA568.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 exact
             Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
             Object(Matching, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
             Object(
@@ -1110,6 +1115,12 @@ config.libs = [
                     (CodeCandidate, "musyx/musyx_candidate_80157280.c"),
                     (Matching, "musyx/musyx_voice_last_exact_80158934.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80158BB4.c"),
+                    (Matching, "musyx/runtime/hw_dspctrl_exact_8015A838.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_8015A950.c"),
+                    (Matching, "musyx/runtime/hw_dspctrl_exact_8015AAA0.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_8015AD1C.c"),
+                    (Matching, "musyx/runtime/hw_dspctrl_exact_8015D408.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_8015D678.c"),
                 ]
             ],
             *[
@@ -2765,6 +2776,8 @@ config.libs = [
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
+            Object(Matching, "dolphin/gx/GX_exact_800BB780.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BB81C.c", mw_version="GC/1.2.5n", progress_category="sdk"),
             Object(
                 Matching,
                 "dolphin/gx/GX_exact_800BC580.c",
@@ -2777,6 +2790,20 @@ config.libs = [
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
+            Object(Matching, "dolphin/gx/GX_exact_800BC8C8.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BC8F8.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(Matching, "dolphin/gx/GX_exact_800BCEBC.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BCFDC.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(Matching, "dolphin/gx/GX_exact_800BD07C.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BD16C.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(Matching, "dolphin/gx/GX_exact_800BD394.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BD454.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(Matching, "dolphin/gx/GX_exact_800BD554.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BD58C.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(Matching, "dolphin/gx/GX_exact_800BD744.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BD7A0.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(Matching, "dolphin/gx/GX_exact_800BE30C.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BE348.c", mw_version="GC/1.2.5n", progress_category="sdk"),
             Object(
                 CodeCandidate,
                 "dolphin/sdk_range_800BF33C.c",
@@ -3279,6 +3306,8 @@ config.libs = [
                     (CodeCandidate, "game/ps_candidate_8016F300.c"),
                     (Matching, "game/ps_exact_80172928.c"),
                     (CodeCandidate, "game/ps_candidate_80172930.c"),
+                    (Matching, "game/ps_get_time_exact_801735BC.c"),
+                    (CodeCandidate, "game/ps_candidate_801735EC.c"),
                 ]
             ],
             Object(

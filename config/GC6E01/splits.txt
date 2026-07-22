@@ -1226,13 +1226,61 @@ dolphin/gx/GX_fn_800BB2F8.c:
 	.text       start:0x800BB2F8 end:0x800BB30C
 
 dolphin/sdk_range_800BB30C_prefix.c:
-	.text       start:0x800BB30C end:0x800BC580
+	.text       start:0x800BB30C end:0x800BB780
+
+dolphin/gx/GX_exact_800BB780.c:
+	.text       start:0x800BB780 end:0x800BB81C
+
+dolphin/sdk_candidate_800BB81C.c:
+	.text       start:0x800BB81C end:0x800BC580
 
 dolphin/gx/GX_exact_800BC580.c:
 	.text       start:0x800BC580 end:0x800BC618
 
 dolphin/sdk_range_800BC618.c:
-	.text       start:0x800BC618 end:0x800BE464
+	.text       start:0x800BC618 end:0x800BC8C8
+
+dolphin/gx/GX_exact_800BC8C8.c:
+	.text       start:0x800BC8C8 end:0x800BC8F8
+
+dolphin/sdk_candidate_800BC8F8.c:
+	.text       start:0x800BC8F8 end:0x800BCEBC
+
+dolphin/gx/GX_exact_800BCEBC.c:
+	.text       start:0x800BCEBC end:0x800BCFDC
+
+dolphin/sdk_candidate_800BCFDC.c:
+	.text       start:0x800BCFDC end:0x800BD07C
+
+dolphin/gx/GX_exact_800BD07C.c:
+	.text       start:0x800BD07C end:0x800BD16C
+
+dolphin/sdk_candidate_800BD16C.c:
+	.text       start:0x800BD16C end:0x800BD394
+
+dolphin/gx/GX_exact_800BD394.c:
+	.text       start:0x800BD394 end:0x800BD454
+
+dolphin/sdk_candidate_800BD454.c:
+	.text       start:0x800BD454 end:0x800BD554
+
+dolphin/gx/GX_exact_800BD554.c:
+	.text       start:0x800BD554 end:0x800BD58C
+
+dolphin/sdk_candidate_800BD58C.c:
+	.text       start:0x800BD58C end:0x800BD744
+
+dolphin/gx/GX_exact_800BD744.c:
+	.text       start:0x800BD744 end:0x800BD7A0
+
+dolphin/sdk_candidate_800BD7A0.c:
+	.text       start:0x800BD7A0 end:0x800BE30C
+
+dolphin/gx/GX_exact_800BE30C.c:
+	.text       start:0x800BE30C end:0x800BE348
+
+dolphin/sdk_candidate_800BE348.c:
+	.text       start:0x800BE348 end:0x800BE464
 
 trk/TRKConstructEvent.c:
 	.text       start:0x800BE464 end:0x800BE47C
@@ -3063,7 +3111,25 @@ musyx/musyx_voice_last_exact_80158934.c:
 	.text       start:0x80158934 end:0x80158BB4
 
 musyx/musyx_candidate_80158BB4.c:
-	.text       start:0x80158BB4 end:0x801609C8
+	.text       start:0x80158BB4 end:0x8015A838
+
+musyx/runtime/hw_dspctrl_exact_8015A838.c:
+	.text       start:0x8015A838 end:0x8015A950
+
+musyx/musyx_candidate_8015A950.c:
+	.text       start:0x8015A950 end:0x8015AAA0
+
+musyx/runtime/hw_dspctrl_exact_8015AAA0.c:
+	.text       start:0x8015AAA0 end:0x8015AD1C
+
+musyx/musyx_candidate_8015AD1C.c:
+	.text       start:0x8015AD1C end:0x8015D408
+
+musyx/runtime/hw_dspctrl_exact_8015D408.c:
+	.text       start:0x8015D408 end:0x8015D678
+
+musyx/musyx_candidate_8015D678.c:
+	.text       start:0x8015D678 end:0x801609C8
 
 musyx/musyx_midi_exact_801609C8.c:
 	.text       start:0x801609C8 end:0x80161134
@@ -3211,7 +3277,13 @@ game/ps_exact_80172928.c:
 	.text       start:0x80172928 end:0x80172930
 
 game/ps_candidate_80172930.c:
-	.text       start:0x80172930 end:0x8017572C
+	.text       start:0x80172930 end:0x801735BC
+
+game/ps_get_time_exact_801735BC.c:
+	.text       start:0x801735BC end:0x801735EC
+
+game/ps_candidate_801735EC.c:
+	.text       start:0x801735EC end:0x8017572C
 
 game/ps_generator_range_8017572C.c:
 	.text       start:0x8017572C end:0x80175F6C
@@ -3613,7 +3685,22 @@ hsd/hsd_mtx_scaled_add.c:
 	.text       start:0x801A85F0 end:0x801A86B4
 
 hsd/hsd_mobj_range_801A86B4.c:
-	.text       start:0x801A86B4 end:0x801AA608
+	.text       start:0x801A86B4 end:0x801A9570
+
+hsd/hsd_mtx_get_translate_exact_801A9570.c:
+	.text       start:0x801A9570 end:0x801A958C
+
+hsd/hsd_mobj_candidate_801A958C.c:
+	.text       start:0x801A958C end:0x801AA350
+
+hsd/hsd_obj_forget_exact_801AA350.c:
+	.text       start:0x801AA350 end:0x801AA35C
+
+hsd/hsd_mobj_candidate_801AA35C.c:
+	.text       start:0x801AA35C end:0x801AA568
+
+hsd/hsd_obj_info_exact_801AA568.c:
+	.text       start:0x801AA568 end:0x801AA608
 
 hsd/hsd_pobj_range_801AA608.c:
 	.text       start:0x801AA608 end:0x801ADD48
