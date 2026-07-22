@@ -1164,6 +1164,11 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "musyx/musyx_candidate_80162FB0.c"),
+                    (Matching, "musyx/musyx_exact_8016300C.c"),
+                    (Matching, "musyx/musyx_exact_80163030.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163050.c"),
+                    (Matching, "musyx/musyx_exact_801630E4.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163104.c"),
                     (Matching, "musyx/musyx_exact_801631CC.c"),
                     (CodeCandidate, "musyx/musyx_candidate_801631F4.c"),
                     (Matching, "musyx/musyx_exact_80163BCC.c"),
@@ -1191,13 +1196,13 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "game/people/people_data.c"),
                     (Matching, "game/people/people_item_effort_exact_80143718.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_80143778.c"),
+                    (Matching, "game/people/people_data_candidate_80143778.c"),
                     (Matching, "game/people/people_item_ppup_exact_801437A0.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_801437B8.c"),
+                    (Matching, "game/people/people_data_candidate_801437B8.c"),
                     (Matching, "game/people/people_item_hpup_exact_801437E0.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_801437F8.c"),
+                    (Matching, "game/people/people_data_candidate_801437F8.c"),
                     (Matching, "game/people/people_item_battle_boost_exact_801439B8.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_80143A44.c"),
+                    (Matching, "game/people/people_data_candidate_80143A44.c"),
                     (Matching, "game/people/people_item_tables_setters_exact_80143A94.c"),
                 ]
             ],
@@ -1537,7 +1542,7 @@ config.libs = [
                     progress_category="game",
                 )
                 for status, path in [
-                    (CodeCandidate, "game/fight_action_candidate_8020AED0.c"),
+                    (Matching, "game/fight_action_exact_8020AED0.c"),
                     (Matching, "game/fight_action_exact_8020AF30.c"),
                     (CodeCandidate, "game/fight_action_candidate_8020B058.c"),
                     (Matching, "game/fight_action_exact_8020D784.c"),
@@ -1783,6 +1788,7 @@ config.libs = [
                     progress_category="game",
                 )
                 for status, path in [
+                    (Matching, "game/window_exact_80103FE4.c"),
                     (CodeCandidate, "game/window.c"),
                     (Matching, "game/window_exact_801040A0.c"),
                     (CodeCandidate, "game/window_candidate_801040F0.c"),
@@ -2698,8 +2704,8 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
-                "dolphin/sdk_candidate_800B5AE0.c",
+                Matching,
+                "dolphin/sdk_exact_800B5AE0.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -3219,7 +3225,7 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "game/gs_range_8010CBD0.c"),
                     (Matching, "game/gs_colsys_exact_8010F4B8.c"),
-                    (CodeCandidate, "game/gs_colsys_candidate_8010F5A4.c"),
+                    (Matching, "game/gs_colsys_exact_8010F5A4.c"),
                 ]
             ],
             Object(
@@ -3328,7 +3334,7 @@ config.libs = [
                     (Matching, "game/ps_app_srt_exact_8016A644.c"),
                     (CodeCandidate, "game/ps_candidate_8016A79C.c"),
                     (Matching, "game/ps_app_srt_exact_8016A93C.c"),
-                    (CodeCandidate, "game/ps_candidate_8016A9B4.c"),
+                    (Matching, "game/ps_exact_8016A9B4.c"),
                     (Matching, "game/ps_app_srt_exact_8016AAAC.c"),
                     (CodeCandidate, "game/ps_candidate_8016AB94.c"),
                     (Matching, "game/ps_exact_8016F2F4.c"),
@@ -4977,8 +4983,8 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
-                "game/fight_timer_candidate_80265DB0.c",
+                Matching,
+                "game/fight_timer_exact_80265DB0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -5806,7 +5812,7 @@ config.libs = [
                 )
                 for status, path in [
                     (Matching, "game/gs_texture_exact_800EF548.c"),
-                    (CodeCandidate, "game/gs_texture_candidate_800EF578.c"),
+                    (Matching, "game/gs_texture_exact_800EF578.c"),
                     (Matching, "game/gs_texture_exact_800EF5A4.c"),
                     (CodeCandidate, "game/gs_texture_candidate_800EF5FC.c"),
                 ]
@@ -6208,15 +6214,15 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
-                "game/gs_math_random_candidate_800E0CA0.c",
+                Matching,
+                "game/gs_math_random_exact_800E0CA0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
-                "game/gs_math_util.c",
+                Matching,
+                "game/gs_math_util_exact_800E0D24.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -6344,7 +6350,7 @@ config.libs = [
                     (Matching, "game/camera_exact_801768F0.c"),
                     (Matching, "game/camera_exact_80176948.c"),
                     (Matching, "game/camera_exact_801769E4.c"),
-                    (CodeCandidate, "game/camera_candidate_80176B48.c"),
+                    (Matching, "game/camera_exact_80176B48.c"),
                     (Matching, "game/camera_exact_80176C04.c"),
                     (CodeCandidate, "game/camera_candidate_80176C78.c"),
                     (Matching, "game/camera_exact_80176F68.c"),
@@ -7948,6 +7954,11 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "game/data/sdata2_8047CB48.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
                 "game/data/sdata2_8047CB98.c",
                 progress_category="game",
             ),
@@ -8109,6 +8120,11 @@ config.libs = [
             Object(
                 Matching,
                 "game/colosseum_battle_sdata2.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/colosseum_battle_sdata2_8047E6E8.c",
                 progress_category="game",
             ),
         ],

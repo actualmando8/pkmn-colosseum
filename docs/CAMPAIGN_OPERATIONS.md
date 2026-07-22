@@ -1444,3 +1444,78 @@ Independent audit: PASS for exact composition, direct text and relocation
 Next action: obtain independent PASS, publish and merge PR #421, reconcile and
   rotate Windows from the merged head, then integrate exact-30 #422
 ```
+
+### Batch snapshot — 2026-07-22 (PR #422)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 3acb75f1 (PR #421 merged)
+Batch branch: `integration/pr422-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +19 complete units / +8 total-unit topology /
+  +2,204 linked code / +0 linked data
+Goal cumulative from PR #381: +933 linked functions / +287 complete units /
+  +74,944 linked code / +193 linked data; 67 linked functions remain in the
+  current +1,000 campaign
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,701 functions; 972 / 1,706 units;
+  641,104 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.69% linked / 641.10 kB
+  complete code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole authorized permutation farm
+Windows: post-#421 reconciliation classified all 39 preserved artifacts as
+  32 already exact plus seven strict rejects, with zero recoverable survivors.
+  The old Windows processes were stopped before rotation. The fresh,
+  owner-disjoint queue has 60 functions across 45 objects, queue SHA-256
+  `5a6d5579e68725bcf1975f17cda7918184200f4a05767ef1b9acd97ea9af0a4f`
+  and manifest SHA-256
+  `9ee1e38ed3c84f701403180720d5993dfee0d4b713d3d367042f3fff782f1b9e`;
+  supervisor PID 53508 and 12 / 12 workers were live at round three with zero
+  wins or bad units at the rotation checkpoint. None of this batch's 30
+  functions overlaps that queue.
+Kimi K3: the full-owner source guard passed all 67 tests, an independent audit
+  of 60 rejected mutations and nine accepted variants, semantic64, and the
+  final 1,000 / 1,000 ModernGekko differential fixtures before any API use.
+  The bounded pilot made exactly three Moonshot requests, all served by
+  `kimi-k3`: 65,217 prompt tokens (38,912 cached), 17,985 completion tokens,
+  and 83,202 total. The API returned no billed-dollar field; the official-rate
+  pre-tax list-cost estimate is $0.3603636. The guard rejected two noncanonical
+  outputs before MWCC and the third response ended at its length limit without
+  a function, yielding zero compiled candidates and zero bankable source wins.
+  The audited guard/tooling is retained on its isolated tooling branch for a
+  separate tooling-only review; no model response or generated report enters
+  this source batch.
+Integrated: 16 typed item-parameter flag accessors; canonical SDK
+  `CARDGetSerialNo`; cosine-table initialization and lookup; two texture-state
+  setters; window allocation access; closest-point line math; particle
+  generator SRT allocation; camera animation synchronization; a fight-action
+  setup helper; the battle-timer thread; and three MusyX hardware wrappers
+Type recovery: the item bitfields use the shared `ItemParamData` layout; the
+  CARD function reuses the canonical private SDK control block and ID layout;
+  camera uses the evidenced 0xFC state and emits only its retail function; and
+  window, texture, particle, fight-action, timer, and vector types preserve
+  caller ABI and corroborated field offsets.
+Residual/data policy: the window and MusyX ranges remain contiguous and
+  disjoint after splitting. Compiler-owned conversion constants at 0x8047CB40
+  and 0x8047E6E0 are paired with their authentic text owners, while new suffix
+  units preserve every trailing byte. `pokemonGetDp` was rejected because its
+  shared 0x8047D008 symbol could not be linked naturally and remains
+  `CodeCandidate`.
+Validation: all 30 functions / 2,204 bytes are raw 100%; all 17 selected text
+  units have equal target/source sizes and all 61 normalized relocations pair.
+  Every symbol survives in main.elf at its retail VA and size, with 145 genuine
+  incoming relocations in aggregate and none at zero; `FORCEACTIVE` remains
+  empty. The camera object contains no dead private sibling.
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, direct text and relocation
+  parity, typed semantics and ABI, linker liveness, residual/data topology,
+  strict policy, Windows owner exclusion, zero regression, and the full retail
+  link
+Next action: publish and merge PR #422, reconcile and rotate Windows from the
+  merged head, bank the audited Kimi guard separately, then integrate exact-30
+  #423 toward the remaining 67 functions
+```

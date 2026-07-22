@@ -49,6 +49,16 @@ typedef struct CARDControl {
     /* 0x10C */ DVDDiskID* diskId;
 } CARDControl;
 
+typedef struct CARDID {
+    u8 serial[32];
+    u16 deviceID;
+    u16 size;
+    u16 encode;
+    u8 padding[470];
+    u16 checkSum;
+    u16 checkSumInv;
+} CARDID;
+
 typedef struct CARDDirEntry {
     /* 0x00 */ u8 gameName[4];
     /* 0x04 */ u8 company[2];
@@ -105,5 +115,8 @@ extern DSPTaskInfo* lbl_8047A968;
 extern DSPTaskInfo* lbl_8047A96C;
 extern u16 lbl_80478A58;
 extern s32 lbl_80312960[];
+
+s32 __CARDGetControlBlock(s32 chan, CARDControl** card);
+s32 __CARDPutControlBlock(CARDControl* card, s32 result);
 
 #endif
