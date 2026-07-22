@@ -507,7 +507,7 @@ Newly linked unit/code/data delta from goal baseline: +46 units / +30,288 code /
 Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
 Head linked: 731 / 1,328 units; 596,448 complete code bytes;
   752,761 complete data bytes
-README/report: synced on PR #396; decomp.dev pending PR #396 ingestion
+README/report/decomp.dev: synced on PR #396 at merge `d856c1a5`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: 535-entry current queue; 21 workers/permuters/timeouts/claims;
   zero new recoverable wins; one stale terminal WIN? retained
