@@ -45,6 +45,7 @@ SEMANTIC_PINS = (
 SEMANTIC_DOL = REPO / "orig" / "GC6E01" / "sys" / "main.dol"
 SEMANTIC_PROFILE_FUNCTIONS = {
     "GStextureLockImage-v2": "GStextureLockImage",
+    "fn_801A6DA0-v1": "fn_801A6DA0",
 }
 SEMANTIC_ENGINE = "dolphin-interpreter-from-moderngekko-tree"
 SEMANTIC_NATIVE_ENGINE = "moderngekko-dolrecomp-native-original"
@@ -52,6 +53,11 @@ SEMANTIC_PROFILE_AUTHORITIES = {
     "GStextureLockImage-v2": {
         "virtual_address": "0x800ef548",
         "size": 0x30,
+        "dol_sha1": "870e8b9693ca780782d80f22a6a4572d8ba9458f",
+    },
+    "fn_801A6DA0-v1": {
+        "virtual_address": "0x801a6da0",
+        "size": 0x24,
         "dol_sha1": "870e8b9693ca780782d80f22a6a4572d8ba9458f",
     },
 }

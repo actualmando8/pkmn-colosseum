@@ -30,9 +30,9 @@ cmake --build build/semantic_oracle/gpl-sidecar \
 CMake refuses dirty or wrongly pinned ModernGekko, RecompCore, and DolRecomp
 checkouts and refuses an in-repository build outside `build/`. The native build
 regenerates the exact GC6E01 output, canonicalizes generated text to LF, verifies
-zero drift in the DOL/tool/pins, and compiles only the two reviewed chunks
-containing `msgctrlWait` and `GStextureLockImage`. Generated C and all binaries
-remain in the ignored build directory.
+zero drift in the DOL/tool/pins, and compiles only the three reviewed chunks
+containing `msgctrlWait`, `GStextureLockImage`, and `fn_801A6DA0`. Generated C
+and all binaries remain in the ignored build directory.
 
 Each executable receives an adjacent `.attestation.json`. The native executable
 also receives `.generated-manifest.json`, binding the exact DOL hashes, all

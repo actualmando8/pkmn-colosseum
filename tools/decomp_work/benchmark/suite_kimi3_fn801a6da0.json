@@ -1,0 +1,20 @@
+{
+  "name": "GC6E01 Kimi K3 fn_801A6DA0 semantic round",
+  "source_commit": "76ecf7c4134d3e3f0944827be1933a5a96f47555",
+  "workunit_root": "build/permuter_workunits/kimi3-fn801a6da0-76ecf7c4",
+  "targets": [
+    {
+      "function": "fn_801A6DA0",
+      "workunit_sha256": "fcc4c5043a87ed715c03a4a388314e6ea8c820f42f69152d8e69ee30d27378bd",
+      "class": "integer-pointer-store-leaf",
+      "baseline_match_percent": 88.333336,
+      "semantic_oracle": {
+        "profile": "fn_801A6DA0-v1",
+        "fixture_count": 1000,
+        "seed": "0x6c6f7373",
+        "timeout": 120,
+        "mismatch_limit": 8
+      }
+    }
+  ]
+}

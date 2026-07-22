@@ -718,6 +718,7 @@ class CompileLoopTests(unittest.TestCase):
                 bound.expected_native_attestation_sha256,
                 hashes["semantic-native-sidecar-attestation"],
             )
+
             self.assertEqual(
                 bound.expected_native_manifest_sha256,
                 hashes["semantic-native-manifest"],
@@ -733,6 +734,20 @@ class CompileLoopTests(unittest.TestCase):
             wrong_target["function"] = "differentFunction"
             with self.assertRaisesRegex(compile_loop.BenchError, "is for"):
                 compile_loop.resolve_semantic_config(wrong_target, args)
+
+    def test_mobj_semantic_profile_is_bound_to_its_function_and_authority(self) -> None:
+        self.assertEqual(
+            compile_loop.SEMANTIC_PROFILE_FUNCTIONS["fn_801A6DA0-v1"],
+            "fn_801A6DA0",
+        )
+        self.assertEqual(
+            compile_loop.SEMANTIC_PROFILE_AUTHORITIES["fn_801A6DA0-v1"],
+            {
+                "virtual_address": "0x801a6da0",
+                "size": 0x24,
+                "dol_sha1": "870e8b9693ca780782d80f22a6a4572d8ba9458f",
+            },
+        )
 
     def test_semantic_feedback_does_not_replace_objdiff_ranking_or_termination(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_value:
