@@ -4037,7 +4037,25 @@ game/gs_range_801C766C.c:
 	.text       start:0x801C766C end:0x801CA7EC
 
 game/field_range_801CA7EC_prefix.c:
-	.text       start:0x801CA7EC end:0x801CAEA0
+	.text       start:0x801CA7EC end:0x801CA9F0
+
+game/field_exact_801CA9F0.c:
+	.text       start:0x801CA9F0 end:0x801CA9F8
+
+game/field_exact_801CA9F8.c:
+	.text       start:0x801CA9F8 end:0x801CAA08
+
+game/field_candidate_801CAA08.c:
+	.text       start:0x801CAA08 end:0x801CADA0
+
+game/field_exact_801CADA0.c:
+	.text       start:0x801CADA0 end:0x801CADA8
+
+game/field_candidate_801CADA8.c:
+	.text       start:0x801CADA8 end:0x801CAE80
+
+game/field_exact_801CAE80.c:
+	.text       start:0x801CAE80 end:0x801CAEA0
 
 game/field_exact_801CAEA0.c:
 	.text       start:0x801CAEA0 end:0x801CAF0C
@@ -4058,13 +4076,25 @@ game/battle/battle_candidate_801D0C30.c:
 	.text       start:0x801D0C30 end:0x801D1338
 
 game/mail_candidate_801D1338.c:
-	.text       start:0x801D1338 end:0x801D1470
+	.text       start:0x801D1338 end:0x801D13E4
+
+game/mail_exact_801D13E4.c:
+	.text       start:0x801D13E4 end:0x801D142C
+
+game/mail_candidate_801D142C.c:
+	.text       start:0x801D142C end:0x801D1470
 
 game/mail_exact_801D1470.c:
 	.text       start:0x801D1470 end:0x801D167C
 
 game/mail_candidate_801D167C.c:
-	.text       start:0x801D167C end:0x801D1A44
+	.text       start:0x801D167C end:0x801D16F0
+
+game/mail_exact_801D16F0.c:
+	.text       start:0x801D16F0 end:0x801D1734
+
+game/mail_candidate_801D1734.c:
+	.text       start:0x801D1734 end:0x801D1A44
 
 game/mail_exact_801D1A44.c:
 	.text       start:0x801D1A44 end:0x801D1B10
@@ -4581,8 +4611,17 @@ game/fight_trainer.c:
 game/fight_waza.c:
 	.text       start:0x8020EE1C end:0x80211170
 
-game/fight_seq.c:
-	.text       start:0x80211170 end:0x80211A00
+game/fight_seq_candidate_80211170.c:
+	.text       start:0x80211170 end:0x802117FC
+
+game/fight_seq_exact_802117FC.c:
+	.text       start:0x802117FC end:0x80211810
+
+game/fight_seq_candidate_80211810.c:
+	.text       start:0x80211810 end:0x802119D4
+
+game/fight_seq_exact_802119D4.c:
+	.text       start:0x802119D4 end:0x80211A00
 
 game/fight_range_80211A00.c:
 	.text       start:0x80211A00 end:0x80212840
@@ -4994,8 +5033,14 @@ game/gba/GBAWrite.c:
 game/gba/GBAXfer.c:
 	.text       start:0x8025F70C end:0x8025FA20
 
-game/memo.c:
-	.text       start:0x8025FA20 end:0x802600E4
+game/memo_candidate_8025FA20.c:
+	.text       start:0x8025FA20 end:0x8025FEE4
+
+game/memo_exact_8025FEE4.c:
+	.text       start:0x8025FEE4 end:0x8025FF18
+
+game/memo_candidate_8025FF18.c:
+	.text       start:0x8025FF18 end:0x802600E4
 
 game/evolution.c:
 	.text       start:0x802600E4 end:0x80261388

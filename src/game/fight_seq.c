@@ -58,6 +58,8 @@ extern ColosseumEventRow6 lbl_80478D30[]; /* Event table base (6 bytes per entry
 extern u32 lbl_80478D28; /* Pair-row table count */
 extern ColosseumEventPairRow lbl_80375A08[]; /* 0x18-byte pair rows */
 
+#if !defined(PR424_FIGHT_SEQ_SPLIT) || \
+    defined(PR424_FIGHT_SEQ_80211170_802117FC)
 /* Address: 0x80211170 | Size: 0x68c | Ghidra import */
 u32
 fightSeqGetNromalWazaDamage(u32 r3, u32 r4, u32 r5, u32 r6, u8 r7, u8 r8, void *r9, void *r10)
@@ -251,13 +253,18 @@ LAB_0020e58c:
   fn_801FCEC4(r6,auStack_e14);
   return uVar4;
 }
+#endif
 
+#if !defined(PR424_FIGHT_SEQ_SPLIT)
 /* 0x802117FC | size: 0x14 | tiny */
 u32 fightSeqGetEffectAminFlag(void) {
     extern u32 lbl_8047B618;
     return !(lbl_8047B618 & 0x80);
 }
+#endif
 
+#if !defined(PR424_FIGHT_SEQ_SPLIT) || \
+    defined(PR424_FIGHT_SEQ_80211810_802119D4)
 /* fightSeqSetEffectAminFlag | Size: 0x20 | Set/clear bit 0x80 in flags */
 void fightSeqSetEffectAminFlag(u8 enable) {
     extern u32 lbl_8047B618;
@@ -335,7 +342,9 @@ void fightSeqFightActionCreateAndFlowFifo(
   }
   return;
 }
+#endif
 
+#if !defined(PR424_FIGHT_SEQ_SPLIT)
 /* fightSeqPost | Size: 0x2C | Clear bit 20 in flags and call fn_80213270 */
 void fightSeqPost(void) {
     extern u32 lbl_8047B618;
@@ -343,7 +352,9 @@ void fightSeqPost(void) {
     lbl_8047B618 &= ~0x00100000u;
     fn_80213270();
 }
+#endif
 
+#if !defined(PR424_FIGHT_SEQ_SPLIT)
 /* Address: 0x80211A00 | Size: 0x78 | Ghidra import */
 void fn_80211A00(void)
 
@@ -830,3 +841,4 @@ void fn_80211E18(u32 r3,u32 r4)
   }
   return;
 }
+#endif

@@ -1644,13 +1644,21 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/fight_seq.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/fight_seq_candidate_80211170.c"),
+                    (Matching, "game/fight_seq_exact_802117FC.c"),
+                    (CodeCandidate, "game/fight_seq_candidate_80211810.c"),
+                    (Matching, "game/fight_seq_exact_802119D4.c"),
+                ]
+            ],
             *[
                 Object(
                     status,
@@ -1661,8 +1669,12 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/mail_candidate_801D1338.c"),
+                    (Matching, "game/mail_exact_801D13E4.c"),
+                    (CodeCandidate, "game/mail_candidate_801D142C.c"),
                     (Matching, "game/mail_exact_801D1470.c"),
                     (CodeCandidate, "game/mail_candidate_801D167C.c"),
+                    (Matching, "game/mail_exact_801D16F0.c"),
+                    (CodeCandidate, "game/mail_candidate_801D1734.c"),
                     (Matching, "game/mail_exact_801D1A44.c"),
                     (CodeCandidate, "game/mail_candidate_801D1B10.c"),
                     (Matching, "game/mail_exact_801D1E50.c"),
@@ -3868,13 +3880,24 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/field_range_801CA7EC_prefix.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/field_range_801CA7EC_prefix.c"),
+                    (Matching, "game/field_exact_801CA9F0.c"),
+                    (Matching, "game/field_exact_801CA9F8.c"),
+                    (CodeCandidate, "game/field_candidate_801CAA08.c"),
+                    (Matching, "game/field_exact_801CADA0.c"),
+                    (CodeCandidate, "game/field_candidate_801CADA8.c"),
+                    (Matching, "game/field_exact_801CAE80.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/field_exact_801CAEA0.c",
@@ -4917,13 +4940,20 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/memo.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/memo_candidate_8025FA20.c"),
+                    (Matching, "game/memo_exact_8025FEE4.c"),
+                    (CodeCandidate, "game/memo_candidate_8025FF18.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/evolution.c",

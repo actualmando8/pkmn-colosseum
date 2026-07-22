@@ -81,6 +81,8 @@ s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2
 u32 fightTrainerAiWazaHit045(void* trainerCtx, u32 trainerSlot, u32 resultSlot, u32 resultType);
 u32 fightMenuFightTrainerGcHeroOpenMenu(void* ctx, u32 param1, u32 param2);
 
+#if !defined(PR424_MEMO_SPLIT) || \
+    defined(PR424_MEMO_8025FA20_8025FEE4)
 /* Address: 0x8025FA20 | Size: 0x1AC | Ghidra import */
 void memoGetScaleAngle(u16 r3, f32 *r4, f32 *r5)
 
@@ -325,7 +327,9 @@ u16 memoDataGetPokemonID(u16 *r3, u32 r4)
     }
     return res;
 }
+#endif
 
+#if !defined(PR424_MEMO_SPLIT)
 /* Address: 0x8025FEE4 | Size: 0x34 | Ghidra import */
 u16 memoDataGetCount(u16 *r3)
 
@@ -335,7 +339,10 @@ u16 memoDataGetCount(u16 *r3)
   }
   return *r3;
 }
+#endif
 
+#if !defined(PR424_MEMO_SPLIT) || \
+    defined(PR424_MEMO_8025FF18_802600E4)
 /* Address: 0x8025FF18 | Size: 0x84 | Ghidra import */
 u32 memoDataSetMemoFlag(u16 *r3)
 
@@ -438,3 +445,4 @@ void memoInit(u16 *r3) {
     r31 += 12;
   }
 }
+#endif
