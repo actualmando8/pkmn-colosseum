@@ -651,8 +651,14 @@ dolphin/os/OSArena.c:
 dolphin/sdk_range_8009AFD0.c:
 	.text       start:0x8009AFD0 end:0x8009B290
 
-dolphin/os/OSCache.c:
-	.text       start:0x8009B290 end:0x8009B914
+dolphin/os/OSCache_privileged_prefix.c:
+	.text       start:0x8009B290 end:0x8009B4D8
+
+dolphin/os/OSCache_exact_8009B4D8.c:
+	.text       start:0x8009B4D8 end:0x8009B510
+
+dolphin/os/OSCache_privileged_suffix.c:
+	.text       start:0x8009B510 end:0x8009B914
 
 dolphin/os/OSContext_range_8009B914.c:
 	.text       start:0x8009B914 end:0x8009BBC4

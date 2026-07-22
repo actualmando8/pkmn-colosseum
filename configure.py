@@ -5575,7 +5575,17 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/os/OSCache.c",
+                "dolphin/os/OSCache_privileged_prefix.c",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/os/OSCache_exact_8009B4D8.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSCache_privileged_suffix.c",
                 progress_category="sdk",
             ),
             Object(
