@@ -2089,8 +2089,11 @@ game/gs_model_shadow_candidate_800E8F80.c:
 game/gs_model_shadow_exact_800E8FE8.c:
 	.text       start:0x800E8FE8 end:0x800E90C8
 
-game/gs_model_shadow_candidate_800E90C8.c:
-	.text       start:0x800E90C8 end:0x800E9288
+game/gs_model_shadow_flags_exact_800E90C8.c:
+	.text       start:0x800E90C8 end:0x800E9148
+
+game/gs_model_shadow_candidate_800E9148.c:
+	.text       start:0x800E9148 end:0x800E9288
 
 game/gs_model_shadow_exact_800E9288.c:
 	.text       start:0x800E9288 end:0x800E92D8
@@ -2349,7 +2352,13 @@ game/gs_range_80109C88.c:
 	.text       start:0x80109C88 end:0x8010C364
 
 game/gs_colsys.c:
-	.text       start:0x8010C364 end:0x8010CBD0
+	.text       start:0x8010C364 end:0x8010C7BC
+
+game/gs_colsys_obj_enable_exact_8010C7BC.c:
+	.text       start:0x8010C7BC end:0x8010C8D0
+
+game/gs_colsys_candidate_8010C8D0.c:
+	.text       start:0x8010C8D0 end:0x8010CBD0
 
 game/gs_range_8010CBD0.c:
 	.text       start:0x8010CBD0 end:0x8010F4B8
@@ -2844,8 +2853,11 @@ game/people/people_data_suffix_801441A8.c:
 game/item_range_80144574.c:
 	.text       start:0x80144574 end:0x8014635C
 
-musyx/runtime/seq.c:
-	.text       start:0x8014635C end:0x80146E88
+musyx/runtime/seq_get_private_id_exact_8014635C.c:
+	.text       start:0x8014635C end:0x801463C4
+
+musyx/runtime/seq_candidate_801463C4.c:
+	.text       start:0x801463C4 end:0x80146E88
 
 musyx/runtime/seq_exact_80146E88.c:
 	.text       start:0x80146E88 end:0x801485FC

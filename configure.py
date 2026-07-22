@@ -905,8 +905,15 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "musyx/runtime/seq_get_private_id_exact_8014635C.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                progress_category="musyx",
+            ),
+            Object(
                 CodeCandidate,
-                "musyx/runtime/seq.c",
+                "musyx/runtime/seq_candidate_801463C4.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
@@ -3091,7 +3098,8 @@ config.libs = [
                     (Matching, "game/gs_model_shadow_exact_800E8EFC.c"),
                     (CodeCandidate, "game/gs_model_shadow_candidate_800E8F80.c"),
                     (Matching, "game/gs_model_shadow_exact_800E8FE8.c"),
-                    (CodeCandidate, "game/gs_model_shadow_candidate_800E90C8.c"),
+                    (Matching, "game/gs_model_shadow_flags_exact_800E90C8.c"),
+                    (CodeCandidate, "game/gs_model_shadow_candidate_800E9148.c"),
                     (Matching, "game/gs_model_shadow_exact_800E9288.c"),
                     (CodeCandidate, "game/gs_model_shadow_candidate_800E92D8.c"),
                 ]
@@ -5198,13 +5206,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_colsys.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_colsys.c"),
+                    (Matching, "game/gs_colsys_obj_enable_exact_8010C7BC.c"),
+                    (CodeCandidate, "game/gs_colsys_candidate_8010C8D0.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gs_field_resource.c",
