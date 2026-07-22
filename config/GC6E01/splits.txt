@@ -1128,7 +1128,7 @@ dolphin/sdk_exact_800B5184.c:
 dolphin/sdk_candidate_800B5228.c:
 	.text       start:0x800B5228 end:0x800B5AE0
 
-dolphin/sdk_candidate_800B5AE0.c:
+dolphin/sdk_exact_800B5AE0.c:
 	.text       start:0x800B5AE0 end:0x800B5BA4
 
 dolphin/sdk_exact_800B5BA4.c:
@@ -1824,7 +1824,7 @@ game/data/sdata2_8047CA70.c:
 	.sdata2     start:0x8047CA70 end:0x8047CA9D
 
 game/data/sdata2_8047CAA0.c:
-	.sdata2     start:0x8047CAA0 end:0x8047CB88
+	.sdata2     start:0x8047CAA0 end:0x8047CB40
 
 game/gs_gfx_exact_800D9D68.c:
 	.text       start:0x800D9D68 end:0x800DA578
@@ -1916,11 +1916,15 @@ game/gs_math_random_candidate_800E0C04.c:
 game/gs_math_random_exact_800E0C54.c:
 	.text       start:0x800E0C54 end:0x800E0CA0
 
-game/gs_math_random_candidate_800E0CA0.c:
+game/gs_math_random_exact_800E0CA0.c:
 	.text       start:0x800E0CA0 end:0x800E0D24
 
-game/gs_math_util.c:
+game/gs_math_util_exact_800E0D24.c:
 	.text       start:0x800E0D24 end:0x800E0DDC
+	.sdata2     start:0x8047CB40 end:0x8047CB48
+
+game/data/sdata2_8047CB48.c:
+	.sdata2     start:0x8047CB48 end:0x8047CB88
 
 game/gs_range_800E0DDC.c:
 	.text       start:0x800E0DDC end:0x800E202C
@@ -2206,7 +2210,7 @@ game/gs_texture_exact_800EF504.c:
 game/gs_texture_exact_800EF548.c:
 	.text       start:0x800EF548 end:0x800EF578
 
-game/gs_texture_candidate_800EF578.c:
+game/gs_texture_exact_800EF578.c:
 	.text       start:0x800EF578 end:0x800EF5A4
 
 game/gs_texture_exact_800EF5A4.c:
@@ -2290,8 +2294,11 @@ game/menu.c:
 game/cursor_bios.c:
 	.text       start:0x80103E68 end:0x80103FE4
 
+game/window_exact_80103FE4.c:
+	.text       start:0x80103FE4 end:0x80103FFC
+
 game/window.c:
-	.text       start:0x80103FE4 end:0x801040A0
+	.text       start:0x80103FFC end:0x801040A0
 
 game/window_exact_801040A0.c:
 	.text       start:0x801040A0 end:0x801040F0
@@ -2332,7 +2339,7 @@ game/gs_range_8010CBD0.c:
 game/gs_colsys_exact_8010F4B8.c:
 	.text       start:0x8010F4B8 end:0x8010F5A4
 
-game/gs_colsys_candidate_8010F5A4.c:
+game/gs_colsys_exact_8010F5A4.c:
 	.text       start:0x8010F5A4 end:0x8010F6A0
 
 game/GScolsys2Util.c:
@@ -3342,7 +3349,7 @@ game/ps_candidate_8016A79C.c:
 game/ps_app_srt_exact_8016A93C.c:
 	.text       start:0x8016A93C end:0x8016A9B4
 
-game/ps_candidate_8016A9B4.c:
+game/ps_exact_8016A9B4.c:
 	.text       start:0x8016A9B4 end:0x8016AAAC
 
 game/ps_app_srt_exact_8016AAAC.c:
@@ -3393,7 +3400,7 @@ game/camera_exact_80176948.c:
 game/camera_exact_801769E4.c:
 	.text       start:0x801769E4 end:0x80176B48
 
-game/camera_candidate_80176B48.c:
+game/camera_exact_80176B48.c:
 	.text       start:0x80176B48 end:0x80176C04
 
 game/camera_exact_80176C04.c:
@@ -4451,7 +4458,7 @@ game/fight_out_pokemon_suffix_8020A8E0.c:
 game/fight_action_exact_8020AE30.c:
 	.text       start:0x8020AE30 end:0x8020AED0
 
-game/fight_action_candidate_8020AED0.c:
+game/fight_action_exact_8020AED0.c:
 	.text       start:0x8020AED0 end:0x8020AF30
 
 game/fight_action_exact_8020AF30.c:
@@ -4730,7 +4737,7 @@ game/data/sdata2_8047E628.c:
 	.sdata2     start:0x8047E628 end:0x8047E658
 
 game/colosseum_battle_sdata2.c:
-	.sdata2     start:0x8047E658 end:0x8047E700
+	.sdata2     start:0x8047E658 end:0x8047E6E0
 
 game/fight_range_8023753C_exact.c:
 	.text       start:0x8023753C end:0x80238060
@@ -4948,8 +4955,12 @@ game/fight_timer_candidate_80265C84.c:
 game/fight_timer_exact_80265D54.c:
 	.text       start:0x80265D54 end:0x80265DB0
 
-game/fight_timer_candidate_80265DB0.c:
+game/fight_timer_exact_80265DB0.c:
 	.text       start:0x80265DB0 end:0x80265E34
+	.sdata2     start:0x8047E6E0 end:0x8047E6E8
+
+game/colosseum_battle_sdata2_8047E6E8.c:
+	.sdata2     start:0x8047E6E8 end:0x8047E700
 
 game/d2present.c:
 	.text       start:0x80265E34 end:0x80265EC4
