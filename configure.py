@@ -2026,6 +2026,23 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
+                Matching,
+                "dolphin/sdk_exact_800A7AFC.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_800A7BD4.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_80311C00.c",
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
                 "dolphin/vi/VI_range_800A8178.c",
                 mw_version="GC/1.2.5n",

@@ -466,13 +466,7 @@ game/data/data_803119F0.c:
 	.data       start:0x803119F0 end:0x80311A24
 
 game/data/data_80311AD4.c:
-	.data       start:0x80311AD4 end:0x80311CB8
-
-game/data/data_80311D38.c:
-	.data       start:0x80311D38 end:0x80311DB8
-
-game/data/data_80311E54.c:
-	.data       start:0x80311E54 end:0x80311FEC
+	.data       start:0x80311AD4 end:0x80311BCC
 
 game/menu/menuCB_range_800676EC.c:
 	.text       start:0x800676EC end:0x80068738
@@ -849,7 +843,23 @@ dolphin/dvd/DVD_range_800A7728.c:
 	.text       start:0x800A7728 end:0x800A7820
 
 dolphin/sdk_range_800A7820.c:
-	.text       start:0x800A7820 end:0x800A7CCC
+	.text       start:0x800A7820 end:0x800A7AFC
+
+dolphin/sdk_exact_800A7AFC.c:
+	.text       start:0x800A7AFC end:0x800A7BD4
+
+dolphin/sdk_range_800A7BD4.c:
+	.text       start:0x800A7BD4 end:0x800A7CCC
+	.data       start:0x80311BCC end:0x80311C00
+
+game/data/data_80311C00.c:
+	.data       start:0x80311C00 end:0x80311CB8
+
+game/data/data_80311D38.c:
+	.data       start:0x80311D38 end:0x80311DB8
+
+game/data/data_80311E54.c:
+	.data       start:0x80311E54 end:0x80311FEC
 
 dolphin/dvd/DVD_exact_800A7CCC.c:
 	.text       start:0x800A7CCC end:0x800A7DE8
