@@ -2663,7 +2663,13 @@ musyx/runtime/synthmacros_exact_80157218.c:
 	.text       start:0x80157218 end:0x80157280
 
 musyx/musyx_candidate_80157280.c:
-	.text       start:0x80157280 end:0x801609C8
+	.text       start:0x80157280 end:0x80158934
+
+musyx/musyx_voice_last_exact_80158934.c:
+	.text       start:0x80158934 end:0x80158BB4
+
+musyx/musyx_candidate_80158BB4.c:
+	.text       start:0x80158BB4 end:0x801609C8
 
 musyx/musyx_midi_exact_801609C8.c:
 	.text       start:0x801609C8 end:0x80161134
@@ -3497,7 +3503,10 @@ game/fight_action.c:
 	.text       start:0x8020AE30 end:0x8020D968
 
 game/fight.c:
-	.text       start:0x8020D968 end:0x8020E4E8
+	.text       start:0x8020D968 end:0x8020E1A4
+
+game/fight_exact_8020E1A4.c:
+	.text       start:0x8020E1A4 end:0x8020E4E8
 
 game/fight_trainer.c:
 	.text       start:0x8020E4E8 end:0x8020EE1C

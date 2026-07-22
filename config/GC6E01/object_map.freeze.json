@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1351
+    "total_units": 1354
   },
   "topology_status": {
     "auto_units": 66,
-    "named_units": 1285,
-    "source_backed_units": 1269,
+    "named_units": 1288,
+    "source_backed_units": 1272,
     "auto_code": 0,
     "auto_data": 57691,
     "auto_functions": 0
@@ -12150,13 +12150,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 38728,
+          "size": 5812,
           "virtual_address": 2148889216
         }
       ],
-      "total_code": 38728,
+      "total_code": 5812,
       "total_data": 0,
-      "total_functions": 77
+      "total_functions": 13
+    },
+    {
+      "name": "main/musyx/musyx_voice_last_exact_80158934",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 640,
+          "virtual_address": 2148895028
+        }
+      ],
+      "total_code": 640,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/musyx/musyx_candidate_80158BB4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32276,
+          "virtual_address": 2148895668
+        }
+      ],
+      "total_code": 32276,
+      "total_data": 0,
+      "total_functions": 60
     },
     {
       "name": "main/musyx/musyx_midi_exact_801609C8",
@@ -16000,13 +16026,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 2944,
+          "size": 2108,
           "virtual_address": 2149636456
         }
       ],
-      "total_code": 2944,
+      "total_code": 2108,
       "total_data": 0,
-      "total_functions": 66
+      "total_functions": 33
+    },
+    {
+      "name": "main/game/fight_exact_8020E1A4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 836,
+          "virtual_address": 2149638564
+        }
+      ],
+      "total_code": 836,
+      "total_data": 0,
+      "total_functions": 33
     },
     {
       "name": "main/game/fight_trainer",
