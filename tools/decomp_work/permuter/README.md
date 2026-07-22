@@ -64,11 +64,6 @@ ssh win "schtasks /query /tn PkmnPermuterFarm"
 ssh win "schtasks /run /tn PkmnPermuterFarm"
 ssh win "schtasks /end /tn PkmnPermuterFarm"
 ssh win "type C:\Users\douglaswhittingham\gamecube-decomp\pkmn-permuter\state\status.json"
-
-# 3090: controlled queue reload (kills worker, timeout, permuter, and
-# compiler process groups; releases only interrupted CLAIMED entries)
-ssh douglaswhittingham@192.168.50.101 "bash /storage/finetune/pkmn-colosseum-2026/farm/stop_farm.sh --requeue"
-ssh douglaswhittingham@192.168.50.101 "WORKERS=21 BUDGET=10800 bash /storage/finetune/pkmn-colosseum-2026/farm/launch_farm.sh"
 ```
 
 The farm runs as scheduled task `PkmnPermuterFarm` (S4U, at-startup trigger,
