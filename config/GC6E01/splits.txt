@@ -180,7 +180,19 @@ game/gs_range_80011EA4.c:
 	.text       start:0x80011EA4 end:0x80012D20
 
 game/gs_event_exec.c:
-	.text       start:0x80012D20 end:0x8001501C
+	.text       start:0x80012D20 end:0x80014110
+
+game/gs_event_exec_exact_80014110.c:
+	.text       start:0x80014110 end:0x80014118
+
+game/gs_event_exec_candidate_80014118.c:
+	.text       start:0x80014118 end:0x80014198
+
+game/gs_event_exec_exact_80014198.c:
+	.text       start:0x80014198 end:0x800141BC
+
+game/gs_event_exec_candidate_800141BC.c:
+	.text       start:0x800141BC end:0x8001501C
 
 game/gs_pokemon_summary.c:
 	.text       start:0x8001501C end:0x800181C4
@@ -600,8 +612,11 @@ game/gba/gba_conv.c:
 game/pokeconv.c:
 	.text       start:0x80089048 end:0x800896B8
 
-game/gba/gba_misc.c:
-	.text       start:0x800896B8 end:0x8008A9AC
+game/gba/gba_misc_exact_800896B8.c:
+	.text       start:0x800896B8 end:0x800896E8
+
+game/gba/gba_misc_candidate_800896E8.c:
+	.text       start:0x800896E8 end:0x8008A9AC
 
 game/gba/gba_misc_exact_8008A9AC.c:
 	.text       start:0x8008A9AC end:0x8008A9E4
@@ -1622,7 +1637,40 @@ game/gs_render_util_exact_800D1F58.c:
 	.text       start:0x800D1F58 end:0x800D207C
 
 game/gs_render_util_candidate_800D207C.c:
-	.text       start:0x800D207C end:0x800D3074
+	.text       start:0x800D207C end:0x800D20CC
+
+game/gs_render_util_exact_800D20CC.c:
+	.text       start:0x800D20CC end:0x800D2150
+
+game/gs_render_util_candidate_800D2150.c:
+	.text       start:0x800D2150 end:0x800D21C8
+
+game/gs_render_util_exact_800D21C8.c:
+	.text       start:0x800D21C8 end:0x800D2248
+
+game/gs_render_util_candidate_800D2248.c:
+	.text       start:0x800D2248 end:0x800D2584
+
+game/gs_render_util_exact_800D2584.c:
+	.text       start:0x800D2584 end:0x800D258C
+
+game/gs_render_util_candidate_800D258C.c:
+	.text       start:0x800D258C end:0x800D2738
+
+game/gs_render_util_exact_800D2738.c:
+	.text       start:0x800D2738 end:0x800D27FC
+
+game/gs_render_util_candidate_800D27FC.c:
+	.text       start:0x800D27FC end:0x800D2B44
+
+game/gs_render_util_exact_800D2B44.c:
+	.text       start:0x800D2B44 end:0x800D2B90
+
+game/gs_render_util_candidate_800D2B90.c:
+	.text       start:0x800D2B90 end:0x800D305C
+
+game/gs_render_util_exact_800D305C.c:
+	.text       start:0x800D305C end:0x800D3074
 
 game/gs_gfx.c:
 	.text       start:0x800D3074 end:0x800D3E4C
@@ -1957,7 +2005,13 @@ game/gs_model_shadow_exact_800E8FE8.c:
 	.text       start:0x800E8FE8 end:0x800E90C8
 
 game/gs_model_shadow_candidate_800E90C8.c:
-	.text       start:0x800E90C8 end:0x800E9B2C
+	.text       start:0x800E90C8 end:0x800E9288
+
+game/gs_model_shadow_exact_800E9288.c:
+	.text       start:0x800E9288 end:0x800E92D8
+
+game/gs_model_shadow_candidate_800E92D8.c:
+	.text       start:0x800E92D8 end:0x800E9B2C
 
 game/gs_model_state.c:
 	.text       start:0x800E9B2C end:0x800E9E34
@@ -2068,8 +2122,17 @@ game/gs_texture_getters_exact_800EF3E0.c:
 game/gs_texture_exact_800EF504.c:
 	.text       start:0x800EF504 end:0x800EF548
 
-game/gs_texture_range_800EF548.c:
-	.text       start:0x800EF548 end:0x800F0030
+game/gs_texture_exact_800EF548.c:
+	.text       start:0x800EF548 end:0x800EF578
+
+game/gs_texture_candidate_800EF578.c:
+	.text       start:0x800EF578 end:0x800EF5A4
+
+game/gs_texture_exact_800EF5A4.c:
+	.text       start:0x800EF5A4 end:0x800EF5FC
+
+game/gs_texture_candidate_800EF5FC.c:
+	.text       start:0x800EF5FC end:0x800F0030
 
 game/gs_thread.c:
 	.text       start:0x800F0030 end:0x800F036C
@@ -2246,7 +2309,19 @@ game/field_camera_exact_8011711C.c:
 	.text       start:0x8011711C end:0x801171C8
 
 game/field_camera.c:
-	.text       start:0x801171C8 end:0x80117E58
+	.text       start:0x801171C8 end:0x801174C4
+
+game/field_camera_exact_801174C4.c:
+	.text       start:0x801174C4 end:0x80117514
+
+game/field_camera_candidate_80117514.c:
+	.text       start:0x80117514 end:0x80117AD4
+
+game/field_camera_exact_80117AD4.c:
+	.text       start:0x80117AD4 end:0x80117AE4
+
+game/field_camera_candidate_80117AE4.c:
+	.text       start:0x80117AE4 end:0x80117E58
 
 game/field_exact_80117E58.c:
 	.text       start:0x80117E58 end:0x801183EC
@@ -2425,7 +2500,13 @@ game/msgctrl_candidate_80131FF4.c:
 	.text       start:0x80131FF4 end:0x80132C6C
 
 game/dbgMenu.c:
-	.text       start:0x80132C6C end:0x8013433C
+	.text       start:0x80132C6C end:0x801337A0
+
+game/dbgMenu_exact_801337A0.c:
+	.text       start:0x801337A0 end:0x801337E4
+
+game/dbgMenu_candidate_801337E4.c:
+	.text       start:0x801337E4 end:0x8013433C
 
 game/pcbox.c:
 	.text       start:0x8013433C end:0x80135030
@@ -3112,7 +3193,13 @@ game/gs_spline.c:
 	.text       start:0x80176068 end:0x801765F4
 
 game/camera.c:
-	.text       start:0x801765F4 end:0x8017A5FC
+	.text       start:0x801765F4 end:0x80179DFC
+
+game/camera_exact_80179DFC.c:
+	.text       start:0x80179DFC end:0x80179E04
+
+game/camera_candidate_80179E04.c:
+	.text       start:0x80179E04 end:0x8017A5FC
 
 game/gs_range_8017A5FC.c:
 	.text       start:0x8017A5FC end:0x8017B07C
@@ -3490,7 +3577,22 @@ hsd/hsd_range_801B0158.c:
 	.text       start:0x801B0158 end:0x801B019C
 
 hsd/hsd_shadow.c:
-	.text       start:0x801B019C end:0x801B1730
+	.text       start:0x801B019C end:0x801B03A0
+
+hsd/hsd_shadow_exact_801B03A0.c:
+	.text       start:0x801B03A0 end:0x801B0408
+
+hsd/hsd_shadow_candidate_801B0408.c:
+	.text       start:0x801B0408 end:0x801B06D4
+
+hsd/hsd_shadow_exact_801B06D4.c:
+	.text       start:0x801B06D4 end:0x801B06DC
+
+hsd/hsd_shadow_candidate_801B06DC.c:
+	.text       start:0x801B06DC end:0x801B16C0
+
+hsd/hsd_shadow_exact_801B16C0.c:
+	.text       start:0x801B16C0 end:0x801B1730
 
 hsd/hsd_texp_candidate_801B1730.c:
 	.text       start:0x801B1730 end:0x801B1854

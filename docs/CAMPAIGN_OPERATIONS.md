@@ -1113,12 +1113,12 @@ Next action: reconcile/rotate Windows, then replay the linker-live PR #415
   exact-30 batch from the merged head
 ```
 
-### Batch snapshot — 2026-07-21 (PR #415)
+### Merged batch snapshot — 2026-07-21 (PR #415)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: 99ab9e5b (PR #414 merged)
-Batch PR: #415, `integration/pr415-exact30`
+Merged batch: PR #415, source `6ed99f1b`, merge `76ecf7c4`
 Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +15 complete units / +30 total-unit topology /
@@ -1129,8 +1129,8 @@ Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
   2,136,513 matched data bytes
 Head linked: 4,521 functions; 875 / 1,580 units;
   628,780 complete code bytes; 752,777 complete data bytes
-README/report: synced at the PR head at 25.20% linked / 628.78 kB complete
-  code; decomp.dev publication is checked again after merge
+README/report/decomp.dev: synced at merge `76ecf7c4`; decomp.dev reports
+  25.20% linked / 628.78 kB complete code
 Retired 3090 farm: remains absent and was neither contacted nor recreated;
   Windows remains the sole active permutation farm
 Windows: post-#414 reconciliation found no recoverable survivors among seven
@@ -1152,6 +1152,60 @@ Regression/link: all 8,603 function scores have zero regressions; full retail
   SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
 Independent audit: PASS for exact composition, source/target text, liveness,
   semantic and ABI fidelity, residual coverage, policy, and full retail link
-Next action: publish and merge PR #415, rotate the Windows-only queue from the
-  merged head, then integrate the next vetted exact-30 batch
+Next action: rotate the Windows-only queue from the merged head, then integrate
+  the next vetted exact-30 batch
+```
+
+### Batch snapshot — 2026-07-21 (PR #416)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 76ecf7c4 (PR #415 merged)
+Batch PR: #416, `integration/pr416-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +19 complete units / +34 total-unit topology /
+  +1,268 linked code / +0 linked data
+Goal cumulative from PR #381: +783 linked functions / +209 complete units /
+  +63,888 linked code / +193 linked data
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,551 functions; 894 / 1,614 units;
+  630,048 complete code bytes; 752,777 complete data bytes
+README/report: synced at the PR head at 25.25% linked / 630.05 kB complete
+  code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole active permutation farm
+Windows: post-#415 reconciliation found 32 already-exact artifacts, the same
+  seven strict rejects, and zero recoverable survivors; the fresh queue has 138
+  records, 69 runnable units across 42 objects, and 69 documented skips, with
+  manifest SHA-256
+  `019ff556c2328192d60c2d17b0ecc8a2fd2c9bd6a70e759ef71abdba2aae2277`;
+  one supervisor and 12 / 12 workers are live with zero wins or bad units
+Integrated: two texture lifetime helpers, two event-state helpers, seven typed
+  render-camera/state helpers, three typed HSD shadow helpers, three debug-menu
+  state helpers, six typed GBA globals, five field-camera state helpers, one
+  model-shadow buffer release, and one camera-state size query
+ABI rejection gate: `GStextureSetFilter` and `GStextureSetWrap` were report
+  exact but depended on zero-argument inherited-register callsites; two natural,
+  live event helpers replaced them byte-for-byte. Pragma-, volatile-, raw-alias-,
+  and asm-wrapper-dependent alternates remain unlinked and are not counted.
+Type recovery: viewing-rectangle, shadow-owner/data, GS render-camera/state,
+  AObj, texture-handle, model-shadow, and field-resource layouts are explicit;
+  the HSD shadow enable byte and active-camera pointer ABI match their callers
+Residual policy: nine affected original objects become 19 Matching units plus
+  24 explicit non-auto CodeCandidate ranges; coverage is gapless and disjoint
+Validation: all 30 functions / 1,268 bytes are raw 100%; all 19 Matching units
+  emit target-identical text and exactly 53 normalized target/source relocations;
+  every selected symbol survives in main.elf at its retail VA and size and has
+  a genuine incoming relocation from an active linker input; `FORCEACTIVE` is
+  empty. The two `fn_800D2B44` `.sdata2` declarations are narrowly retained as
+  canonical storage-class metadata required for the retail SDA21 relocations.
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, text and relocation parity,
+  liveness, ABI/type fidelity, residual topology, strict-policy compliance,
+  zero regression, and the full retail link
+Next action: publish and merge PR #416 after final review, rotate Windows from
+  the merged head, then integrate the next vetted exact-30 batch
 ```
