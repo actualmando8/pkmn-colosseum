@@ -1070,13 +1070,20 @@ config.libs = [
                     (Matching, "musyx/runtime/synthmacros_exact_80157218.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "musyx/musyx_candidate_80157280.c",
-                mw_version="GC/1.3.2",
-                extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
-                progress_category="musyx",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3.2",
+                    extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                    progress_category="musyx",
+                )
+                for status, path in [
+                    (CodeCandidate, "musyx/musyx_candidate_80157280.c"),
+                    (Matching, "musyx/musyx_voice_last_exact_80158934.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80158BB4.c"),
+                ]
+            ],
             *[
                 Object(
                     status,
