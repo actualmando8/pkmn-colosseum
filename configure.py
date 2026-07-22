@@ -2197,7 +2197,31 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/sdk_range_800A07C4.c",
+                "dolphin/sdk_range_800A07C4_prefix.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/os/OSSram_lock_exact_800A08F8.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_800A09B0.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/os/OSSram_unlock_exact_800A0CB8.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_800A0D00.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),

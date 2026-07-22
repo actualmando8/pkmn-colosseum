@@ -719,8 +719,20 @@ dolphin/os/OSReboot_fn_800A064C.c:
 dolphin/os/OSReboot_WriteSram.c:
 	.text       start:0x800A06AC end:0x800A07C4
 
-dolphin/sdk_range_800A07C4.c:
-	.text       start:0x800A07C4 end:0x800A13E8
+dolphin/sdk_range_800A07C4_prefix.c:
+	.text       start:0x800A07C4 end:0x800A08F8
+
+dolphin/os/OSSram_lock_exact_800A08F8.c:
+	.text       start:0x800A08F8 end:0x800A09B0
+
+dolphin/sdk_range_800A09B0.c:
+	.text       start:0x800A09B0 end:0x800A0CB8
+
+dolphin/os/OSSram_unlock_exact_800A0CB8.c:
+	.text       start:0x800A0CB8 end:0x800A0D00
+
+dolphin/sdk_range_800A0D00.c:
+	.text       start:0x800A0D00 end:0x800A13E8
 
 dolphin/os/OSThreadQueue.c:
 	.text       start:0x800A13E8 end:0x800A1404
