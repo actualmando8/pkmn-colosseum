@@ -2026,6 +2026,23 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
+                Matching,
+                "dolphin/sdk_exact_800A7AFC.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_range_800A7BD4.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                DataCandidate,
+                "game/data/data_80311C00.c",
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
                 "dolphin/vi/VI_range_800A8178.c",
                 mw_version="GC/1.2.5n",
@@ -2352,8 +2369,35 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
+                Matching,
+                "dolphin/sdk_exact_800CEB64.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
                 CodeCandidate,
-                "dolphin/sdk_range_800CEB64.c",
+                "dolphin/sdk_candidate_800CED58.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800CEF10.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800CF254.c",
+                mw_version="GC/1.2.5n",
+                # This original EXIBios island alone was built without
+                # instruction scheduling; adjacent Odemu/EXIUart code was not.
+                extra_cflags=["-schedule off"],
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800CF47C.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -4122,8 +4166,43 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/fight_timer_exact_802658C8.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
-                "game/fight_timer.c",
+                "game/fight_timer_candidate_80265A6C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_timer_exact_80265B3C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_timer_candidate_80265C84.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_timer_exact_80265D54.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_timer_candidate_80265DB0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -4904,8 +4983,13 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                Matching,
+                "dolphin/os/OSMemory_exact_8009F1B8.c",
+                progress_category="sdk",
+            ),
+            Object(
                 CodeCandidate,
-                "dolphin/os/OSMemory.c",
+                "dolphin/os/OSMemory_privileged.c",
                 progress_category="sdk",
             ),
             Object(
@@ -5553,7 +5637,17 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "dolphin/os/OSCache.c",
+                "dolphin/os/OSCache_privileged_prefix.c",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/os/OSCache_exact_8009B4D8.c",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/os/OSCache_privileged_suffix.c",
                 progress_category="sdk",
             ),
             Object(

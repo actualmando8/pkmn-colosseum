@@ -460,3 +460,35 @@ Rejected: fight_timer (private conversion constants break canonical relocations)
 Next unit closers: strict SDK 800A7820 exact islands, Dolphin OSMemory, then
   fresh non-overlapping 3090/Windows targets after PR #394 reconciliation
 ```
+
+### Batch snapshot — 2026-07-21 (PR #395)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 079a4f4a (PR #394 merged)
+Batch PR: #395, `campaign/post394-batch-20260721`
+Exact-source delta from goal baseline: +36 functions / +14,412 code bytes
+PR #395 batch: +3 exact functions / +1,576 matched code;
+  +33 linked functions / +10 units / +4,568 linked code / +0 linked data
+Newly linked function delta from goal baseline: +141
+Newly linked unit/code/data delta from goal baseline: +39 units / +27,644 code / +177 data
+Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
+Head linked: 724 / 1,318 units; 593,804 complete code bytes;
+  752,761 complete data bytes
+README/report: synced on PR #395; decomp.dev pending merged PR report
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: 535-entry current queue; 21 workers/permuters/timeouts/claims;
+  zero new recoverable wins; one stale terminal WIN? retained
+Windows: 58 active-valid post-#394 units; 12 workers; zero live wins;
+  one bad unit retained for the next reconciliation pass
+Active campaign worktrees at snapshot: PR #395 integration and the banked
+  fight_trainer_ai2 closer; completed audit trees pending post-merge cleanup
+Banked commits not merged: dae86488, strict fight_trainer_ai2 split
+  (+9 linked functions / +3 units / +1,132 linked code)
+Rejected: DVDCheckDisk (unaligned jump-table padding); DVDCancelAsync
+  (dead-local frame shaping); OSCache privileged/pragma functions; OSMemory
+  privileged assembly tail; DBGWrite/DBGRead (unused volatile scratch shaping);
+  three fight-timer conversion functions (private unowned sdata2 constants)
+Next unit closers: banked fight_trainer_ai2 (+9), then fresh strict islands
+  from current-master reports while both farms continue their refreshed queues
+```

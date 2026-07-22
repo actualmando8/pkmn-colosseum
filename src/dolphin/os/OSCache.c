@@ -34,6 +34,8 @@
  * See each function's own comment below for details.
  */
 
+#if !defined(OSCACHE_SPLIT_ACTIVE) || defined(OSCACHE_PREFIX_ACTIVE)
+
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -154,6 +156,10 @@ asm void ICEnable(void) {
     blr
 }
 #pragma pop
+
+#endif
+
+#if !defined(OSCACHE_SPLIT_ACTIVE) || defined(OSCACHE_SUFFIX_ACTIVE)
 
 #pragma push
 #pragma optimization_level 0
@@ -290,6 +296,8 @@ void __OSCacheInit(void) {
 }
 #pragma pop
 
+#endif
+
 /* ===================================================================
  * Stub functions for coverage -- TODO: decompile
  * 9 function(s)
@@ -303,6 +311,8 @@ void __OSCacheInit(void) {
  *
  * 0x8009B300 | size: 0x30
  */
+#if !defined(OSCACHE_SPLIT_ACTIVE) || defined(OSCACHE_PREFIX_ACTIVE)
+
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -458,6 +468,8 @@ _loop_lce_zero:
 }
 #pragma pop
 
+#endif
+
 /*
  * LCEnable - Enable locked cache with interrupts disabled.
  *
@@ -472,6 +484,8 @@ _loop_lce_zero:
  *
  * 0x8009B4D8 | size: 0x38
  */
+#if !defined(OSCACHE_SPLIT_ACTIVE)
+
 void LCEnable(void) {
     BOOL enabled;
 
@@ -479,6 +493,8 @@ void LCEnable(void) {
     __LCEnable();
     OSRestoreInterrupts(enabled);
 }
+
+#endif
 
 /*
  * LCStoreBlocks - Initiate a locked cache DMA store transfer.
@@ -488,6 +504,8 @@ void LCEnable(void) {
  *
  * 0x8009B538 | size: 0x24
  */
+#if !defined(OSCACHE_SPLIT_ACTIVE) || defined(OSCACHE_SUFFIX_ACTIVE)
+
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
@@ -573,3 +591,5 @@ _loop_lcqw:
     blr
 }
 #pragma pop
+
+#endif

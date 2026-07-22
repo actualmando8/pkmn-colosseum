@@ -91,6 +91,8 @@ typedef struct ColosseumBattleTimerState {
 } ColosseumBattleTimerState;
 
 /* Address: 0x802658C8 | Size: 0x5C | Ghidra import */
+#if !defined(FIGHT_TIMER_SPLIT_ACTIVE) || defined(FIGHT_TIMER_PREFIX_ACTIVE)
+
 void fightTimerCommandTerminate(void)
 {
     extern ColosseumBattleTimerState lbl_80478800;
@@ -181,7 +183,11 @@ void fightTimerCommandStart(void)
     }
 }
 
+#endif
+
 /* Address: 0x80265A6C | Size: 0xD0 | Ghidra import */
+#if !defined(FIGHT_TIMER_SPLIT_ACTIVE) || defined(FIGHT_TIMER_COMMAND_INIT_ACTIVE)
+
 void fightTimerCommandInit(void)
 {
     extern ColosseumBattleTimerState lbl_80478800;
@@ -217,7 +223,11 @@ void fightTimerCommandInit(void)
     state->thread = 0;
 }
 
+#endif
+
 /* Address: 0x80265B3C | Size: 0x38 | Ghidra import */
+#if !defined(FIGHT_TIMER_SPLIT_ACTIVE) || defined(FIGHT_TIMER_MIDDLE_ACTIVE)
+
 u32 fightTimerAllIsOver(void)
 {
     extern ColosseumBattleTimerState lbl_80478810;
@@ -289,7 +299,11 @@ void fightTimerAllStart(void)
     }
 }
 
+#endif
+
 /* Address: 0x80265C84 | Size: 0xD0 | Ghidra import */
+#if !defined(FIGHT_TIMER_SPLIT_ACTIVE) || defined(FIGHT_TIMER_ALL_INIT_ACTIVE)
+
 void fightTimerAllInit(void)
 {
     extern ColosseumBattleTimerState lbl_80478810;
@@ -325,7 +339,11 @@ void fightTimerAllInit(void)
     state->thread = 0;
 }
 
+#endif
+
 /* Address: 0x80265D54 | Size: 0x5C | Ghidra import */
+#if !defined(FIGHT_TIMER_SPLIT_ACTIVE) || defined(FIGHT_TIMER_TERMINATE_ACTIVE)
+
 void fightTimerAllTerminate(void)
 {
     extern ColosseumBattleTimerState lbl_80478810;
@@ -344,7 +362,11 @@ void fightTimerAllTerminate(void)
     lbl_80478810.forceDone = 0;
 }
 
+#endif
+
 /* Address: 0x80265DB0 | Size: 0x84 | Ghidra import (PSQ removed) */
+#if !defined(FIGHT_TIMER_SPLIT_ACTIVE) || defined(FIGHT_TIMER_THREAD_ACTIVE)
+
 void fightTimerThreadFunc(ColosseumBattleTimerState *r3)
 {
     extern f32 lbl_8047E6D8;
@@ -362,3 +384,5 @@ void fightTimerThreadFunc(ColosseumBattleTimerState *r3)
     _threadSwitch();
   } while (1);
 }
+
+#endif

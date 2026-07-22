@@ -466,13 +466,7 @@ game/data/data_803119F0.c:
 	.data       start:0x803119F0 end:0x80311A24
 
 game/data/data_80311AD4.c:
-	.data       start:0x80311AD4 end:0x80311CB8
-
-game/data/data_80311D38.c:
-	.data       start:0x80311D38 end:0x80311DB8
-
-game/data/data_80311E54.c:
-	.data       start:0x80311E54 end:0x80311FEC
+	.data       start:0x80311AD4 end:0x80311BCC
 
 game/menu/menuCB_range_800676EC.c:
 	.text       start:0x800676EC end:0x80068738
@@ -657,8 +651,14 @@ dolphin/os/OSArena.c:
 dolphin/sdk_range_8009AFD0.c:
 	.text       start:0x8009AFD0 end:0x8009B290
 
-dolphin/os/OSCache.c:
-	.text       start:0x8009B290 end:0x8009B914
+dolphin/os/OSCache_privileged_prefix.c:
+	.text       start:0x8009B290 end:0x8009B4D8
+
+dolphin/os/OSCache_exact_8009B4D8.c:
+	.text       start:0x8009B4D8 end:0x8009B510
+
+dolphin/os/OSCache_privileged_suffix.c:
+	.text       start:0x8009B510 end:0x8009B914
 
 dolphin/os/OSContext_range_8009B914.c:
 	.text       start:0x8009B914 end:0x8009BBC4
@@ -691,8 +691,11 @@ dolphin/os/OSEXI_fn_8009E7AC.c:
 dolphin/sdk_range_8009E7B0.c:
 	.text       start:0x8009E7B0 end:0x8009F1B8
 
-dolphin/os/OSMemory.c:
-	.text       start:0x8009F1B8 end:0x8009F77C
+dolphin/os/OSMemory_exact_8009F1B8.c:
+	.text       start:0x8009F1B8 end:0x8009F54C
+
+dolphin/os/OSMemory_privileged.c:
+	.text       start:0x8009F54C end:0x8009F77C
 
 dolphin/sdk_range_8009F77C_prefix.c:
 	.text       start:0x8009F77C end:0x8009F958
@@ -846,7 +849,23 @@ dolphin/dvd/DVD_range_800A7728.c:
 	.text       start:0x800A7728 end:0x800A7820
 
 dolphin/sdk_range_800A7820.c:
-	.text       start:0x800A7820 end:0x800A7CCC
+	.text       start:0x800A7820 end:0x800A7AFC
+
+dolphin/sdk_exact_800A7AFC.c:
+	.text       start:0x800A7AFC end:0x800A7BD4
+
+dolphin/sdk_range_800A7BD4.c:
+	.text       start:0x800A7BD4 end:0x800A7CCC
+	.data       start:0x80311BCC end:0x80311C00
+
+game/data/data_80311C00.c:
+	.data       start:0x80311C00 end:0x80311CB8
+
+game/data/data_80311D38.c:
+	.data       start:0x80311D38 end:0x80311DB8
+
+game/data/data_80311E54.c:
+	.data       start:0x80311E54 end:0x80311FEC
 
 dolphin/dvd/DVD_exact_800A7CCC.c:
 	.text       start:0x800A7CCC end:0x800A7DE8
@@ -1364,8 +1383,20 @@ dolphin/sdk_range_800CE7DC.c:
 dolphin/exi/EXI2_range_800CEA3C.c:
 	.text       start:0x800CEA3C end:0x800CEB64
 
-dolphin/sdk_range_800CEB64.c:
-	.text       start:0x800CEB64 end:0x800CF708
+dolphin/sdk_exact_800CEB64.c:
+	.text       start:0x800CEB64 end:0x800CED58
+
+dolphin/sdk_candidate_800CED58.c:
+	.text       start:0x800CED58 end:0x800CEF10
+
+dolphin/sdk_exact_800CEF10.c:
+	.text       start:0x800CEF10 end:0x800CF254
+
+dolphin/sdk_exact_800CF254.c:
+	.text       start:0x800CF254 end:0x800CF47C
+
+dolphin/sdk_exact_800CF47C.c:
+	.text       start:0x800CF47C end:0x800CF708
 
 dolphin/si/SI_fn_800CF708.c:
 	.text       start:0x800CF708 end:0x800CF728
@@ -3766,8 +3797,23 @@ game/fight_menu.c:
 game/fight_menu_exact_8026503C.c:
 	.text       start:0x8026503C end:0x802658C8
 
-game/fight_timer.c:
-	.text       start:0x802658C8 end:0x80265E34
+game/fight_timer_exact_802658C8.c:
+	.text       start:0x802658C8 end:0x80265A6C
+
+game/fight_timer_candidate_80265A6C.c:
+	.text       start:0x80265A6C end:0x80265B3C
+
+game/fight_timer_exact_80265B3C.c:
+	.text       start:0x80265B3C end:0x80265C84
+
+game/fight_timer_candidate_80265C84.c:
+	.text       start:0x80265C84 end:0x80265D54
+
+game/fight_timer_exact_80265D54.c:
+	.text       start:0x80265D54 end:0x80265DB0
+
+game/fight_timer_candidate_80265DB0.c:
+	.text       start:0x80265DB0 end:0x80265E34
 
 game/d2present.c:
 	.text       start:0x80265E34 end:0x80265EC4
