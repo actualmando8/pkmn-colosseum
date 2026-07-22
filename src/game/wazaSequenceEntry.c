@@ -17,7 +17,7 @@
  * Address: 0x801D7E58 | Size: 0x374
  * Proposed name from symbols: wazaSequenceEntryStop.
  */
-void wazaSequenceEntryStop(void* entry) {
+void wazaSequenceEntryStop(void* entry, BOOL immediate) {
     /* TODO: Waza entry stop (0x374 bytes)
      * Stops and cleans up a single waza entry:
      * - Particle: destroys particle system
@@ -122,6 +122,6 @@ void fn_801D9950(s32 slot, s32 motionType) {
  * wazaSequencePokemonMotionStart - Pokemon motion update.
  * Address: 0x801D9C1C | Size: 0x200
  */
-void wazaSequencePokemonMotionStart(s32 slot) {
+void wazaSequencePokemonMotionStart(void* owner, BOOL enabled) {
     /* TODO: Pokemon motion update (0x200 bytes) */
 }

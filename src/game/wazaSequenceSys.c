@@ -7,31 +7,7 @@
  * include/game/battle/battle_waza_types.h.
  */
 
-#define fn_801DA698 fn_801DA698_decl
-#define fn_801DA5C4 fn_801DA5C4_decl
-#define fn_801DA224 fn_801DA224_decl
-#define fn_801DA448 fn_801DA448_decl
-#define fn_801DA4E8 fn_801DA4E8_decl
-#define fn_801DA74C fn_801DA74C_decl
-#define fn_801DA7AC fn_801DA7AC_decl
-#define fn_801DA9E8 fn_801DA9E8_decl
-#define fn_801DAAAC fn_801DAAAC_decl
-#define fn_801DABAC fn_801DABAC_decl
-#define fn_801DB8FC fn_801DB8FC_decl
-#define wazaSequenceSysResetAnimationExcept wazaSequenceSysResetAnimationExcept_decl
 #include "game/battle/battle_waza_types.h"
-#undef fn_801DA698
-#undef fn_801DA5C4
-#undef fn_801DA224
-#undef fn_801DA448
-#undef fn_801DA4E8
-#undef fn_801DA74C
-#undef fn_801DA7AC
-#undef fn_801DA9E8
-#undef fn_801DAAAC
-#undef fn_801DABAC
-#undef fn_801DB8FC
-#undef wazaSequenceSysResetAnimationExcept
 
 
 /**
@@ -50,11 +26,12 @@ u8 fn_801D9E1C(void* obj) {
  * Address: 0x801D9E34 | Size: 0x58
  */
 void fn_801D9E34(void* obj) {
-    extern void fn_80118A68();
+    extern void fn_80118A68(u8* resource, u32 notify);
+    WazaEffect* effect = obj;
 
-    if (*(u32*)(lbl_80467CC0 + 0xC) != 0 && *(u32*)((u8*)obj + 0x84) != 0) {
-        fn_80118A68(*(u32*)((u8*)obj + 0x84), 1);
-        *(u32*)((u8*)obj + 0x84) = 0;
+    if (*(u32*)(lbl_80467CC0 + 0xC) != 0 && effect->effect_handle != NULL) {
+        fn_80118A68(effect->effect_handle, 1);
+        effect->effect_handle = NULL;
     }
 }
 
@@ -80,15 +57,15 @@ WAZA_SDATA2_FLOAT(8047E39C);
  */
 void fn_801D9E8C(void* effect) {
     WazaEffect* fx;
-    void* target;
-    u32 ctx;
+    GSpart* target;
+    u8* ctx;
     f32 val;
     s32 scale_selector;
-    u8 scale_buf[4];
+    f32 scale[3];
 
     if (effect == NULL) return;
     fx = (WazaEffect*)effect;
-    ctx = *(s32*)(lbl_80467CC0 + 0xC);
+    ctx = *(u8**)(lbl_80467CC0 + 0xC);
     if (ctx == 0) return;
     if (fx->effect_handle != 0) return;
 
@@ -100,9 +77,10 @@ void fn_801D9E8C(void* effect) {
     }
 
     {
-        s32 val_idx = *(s32*)(fx->table_bytes + fx->index * sizeof(WazaEffectTblEntry) + 0x50);
+        s32 val_idx = *(s32*)((u8*)fx->table +
+                              fx->index * sizeof(WazaEffectTblEntry) + 0x50);
         if (val_idx > 0) {
-            target = GSmodelGetPart(fx->handle, val_idx);
+            target = GSmodelGetPart(fx->model, val_idx);
         } else {
             target = NULL;
         }
@@ -125,12 +103,12 @@ void fn_801D9E8C(void* effect) {
     default: val = WAZA_SDATA2_VALUE(8047E39C); break;
     }
 
-    set__5GSvecFfff(scale_buf, val, val, val);
+    set__5GSvecFfff(scale, val, val, val);
 
-    fn_80118FB0(fx->effect_handle, (s32)target, 4, 0, 1, 0);
+    fn_80118FB0(fx->effect_handle, target, 4, 0, 1, 0);
     fn_80118D18(fx->effect_handle, 1);
-    fn_80118DE0(fx->effect_handle, scale_buf, 1, 0);
-    GSpartFree((s32)target);
+    fn_80118DE0(fx->effect_handle, scale, 1, 0);
+    GSpartFree(target);
 }
 #undef WAZA_SDATA2_VALUE
 
@@ -140,11 +118,12 @@ void fn_801D9E8C(void* effect) {
  */
 #pragma dont_inline on
 void fn_801DA014(void* effect) {
-    extern void fn_80118A68();
+    extern void fn_80118A68(u8* resource, u32 notify);
+    WazaEffect* fx = effect;
 
-    if (effect != NULL && *(u32*)(lbl_80467CC0 + 0x8) != 0 && *(u32*)((u8*)effect + 0x80) != 0) {
-        fn_80118A68(*(u32*)((u8*)effect + 0x80), 1);
-        *(u32*)((u8*)effect + 0x80) = 0;
+    if (fx != NULL && *(u32*)(lbl_80467CC0 + 0x8) != 0 && fx->field_80 != NULL) {
+        fn_80118A68(fx->field_80, 1);
+        fx->field_80 = NULL;
     }
 }
 #pragma dont_inline reset
@@ -156,17 +135,17 @@ void fn_801DA014(void* effect) {
 #define WAZA_SDATA2_VALUE(addr) lbl_##addr
 void fn_801DA070(void* effect) {
     WazaEffect* fx;
-    void* target;
+    GSpart* target;
     void* entry;
-    u32 ctx;
+    u8* ctx;
     s32 n;
     f32 val;
     s32 scale_selector;
-    u8 scale_buf[4];
+    f32 scale[3];
 
     fx = (WazaEffect*)effect;
     if (fx == NULL) return;
-    ctx = *(u32*)(lbl_80467CC0 + 0x8);
+    ctx = *(u8**)(lbl_80467CC0 + 0x8);
     if (ctx == 0) return;
     if (fx->field_80 != 0) return;
 
@@ -177,15 +156,15 @@ void fn_801DA070(void* effect) {
         fn_80118C88(fx->field_80, 0);
     }
 
-    entry = fx->table_bytes + fx->index * sizeof(WazaEffectTblEntry);
-    if ((u8)GSmodelCenterNull(fx->handle) != 0) {
-        n = fn_800EE0E8(fx->handle) - 1;
+    entry = (u8*)fx->table + fx->index * sizeof(WazaEffectTblEntry);
+    if ((u8)GSmodelCenterNull(fx->model) != 0) {
+        n = fn_800EE0E8(fx->model) - 1;
     } else {
         n = *(s32*)((u8*)entry + 0x54);
     }
 
     if (n > 0) {
-        target = GSmodelGetPart(fx->handle, n);
+        target = GSmodelGetPart(fx->model, n);
     } else {
         target = NULL;
     }
@@ -207,13 +186,13 @@ void fn_801DA070(void* effect) {
     default: val = WAZA_SDATA2_VALUE(8047E39C); break;
     }
 
-    set__5GSvecFfff(scale_buf, val, val, val);
+    set__5GSvecFfff(scale, val, val, val);
 
-    fn_80118FB0(fx->field_80, (s32)target, 4, 0, 1, 0);
+    fn_80118FB0(fx->field_80, target, 4, 0, 1, 0);
     fn_80118D18(fx->field_80, 1);
     fn_80118CAC(fx->field_80, 1);
-    fn_80118DE0(fx->field_80, scale_buf, 1, 0);
-    GSpartFree((s32)target);
+    fn_80118DE0(fx->field_80, scale, 1, 0);
+    GSpartFree(target);
 }
 #undef WAZA_SDATA2_VALUE
 
@@ -222,8 +201,6 @@ void fn_801DA070(void* effect) {
  * Address: 0x801DA224 | Size: 0xA0
  */
 void fn_801DA224(void* effect, s32 flags) {
-    extern void fn_801DCF00();
-
     if (effect != NULL) {
         u8 value = flags;
 
@@ -255,16 +232,16 @@ void fn_801DA224(void* effect, s32 flags) {
  */
 void fn_801DA2C4(void* effect, f32 radius, f32 t) {
     WazaEffect* fx = effect;
-    u32 handle;
+    struct GSmodel* model;
 
     if (fx != NULL) {
         fn_801DD028(fx);
         fn_801DCF84(fx);
         fn_801DCEA8(fx);
 
-        if (fx != NULL && (handle = fx->handle) != 0) {
+        if (fx != NULL && (model = fx->model) != NULL) {
             fx->flags |= 1;
-            GSmodelSetVisibility(handle, 1);
+            GSmodelSetVisibility(model, 1);
             if (fx->field_80 != 0) {
                 fn_80118C88(fx->field_80, 1);
             }
@@ -291,10 +268,6 @@ u8 fn_801DA354(void* effect) {
  * Address: 0x801DA36C | Size: 0x60
  */
 void fn_801DA36C(void* effect, s32 trajType) {
-    extern void fn_801DCEA8();
-    extern void fn_801DCF84();
-    extern void fn_801DD028();
-
     if (effect != NULL) {
         switch ((u8)trajType) {
         case 1:
@@ -315,10 +288,6 @@ void fn_801DA36C(void* effect, s32 trajType) {
  * Address: 0x801DA3CC | Size: 0x60
  */
 void fn_801DA3CC(void* effect, s32 trajType) {
-    extern void fn_801DCF00();
-    extern void fn_801DCFD8();
-    extern void fn_801DD078();
-
     if (effect != NULL) {
         switch ((u8)trajType) {
         case 1:
@@ -350,7 +319,7 @@ u32 fn_801DA42C(void* effect) {
  * Address: 0x801DA448 | Size: 0xA0
  */
 void fn_801DA448(void* effect, u32 visible) {
-    extern void fn_80118C20();
+    extern void fn_80118C20(void* bank, u32 visible);
     u8* sequence;
     u8* model;
 
@@ -378,12 +347,12 @@ void fn_801DA448(void* effect, u32 visible) {
  */
 void fn_801DA4E8(void* effect, u32 visible) {
     WazaEffect* fx = effect;
-    u32 handle;
+    struct GSmodel* model;
 
-    if (fx != NULL && (handle = fx->handle) != 0) {
+    if (fx != NULL && (model = fx->model) != NULL) {
         if ((u8)visible != 0) {
             fx->flags |= 1;
-            GSmodelSetVisibility(handle, 1);
+            GSmodelSetVisibility(model, 1);
             if (fx->field_80 != 0) {
                 fn_80118C88(fx->field_80, 1);
             }
@@ -396,7 +365,7 @@ void fn_801DA4E8(void* effect, u32 visible) {
             if ((flags & 1) != 0) {
                 fx->flags = flags ^ 1;
             }
-            GSmodelSetVisibility(handle, 0);
+            GSmodelSetVisibility(model, 0);
             if (fx->field_80 != 0) {
                 fn_80118C88(fx->field_80, 0);
             }
@@ -422,7 +391,6 @@ void fn_801DA5AC(void* effect, u8 val) {
  * Address: 0x801DA5C4 | Size: 0xD4
  */
 u8 fn_801DA5C4(s32 timeType) {
-    extern s32 wazaSequenceSysGetWazaTime();
     u8* pool = lbl_80467CC0;
     WazaEffect* effect;
     s32 i = 0;
@@ -459,7 +427,6 @@ u8 fn_801DA5C4(s32 timeType) {
  * Address: 0x801DA698 | Size: 0xB4
  */
 u8 fn_801DA698(void* sequence, s32 moveID, s32 variant, s32 timeType) {
-    extern s32 wazaSequenceSysGetWazaTime();
     void* waza;
 
     if (sequence == NULL) {
@@ -486,7 +453,6 @@ u8 fn_801DA698(void* sequence, s32 moveID, s32 variant, s32 timeType) {
  * Address: 0x801DA74C | Size: 0x60
  */
 s32 fn_801DA74C(void* sequence, s32 moveID, s32 variant, s32 timeType) {
-    extern s32 wazaSequenceSysGetWazaTime();
     void* waza;
 
     if (sequence == NULL) {
@@ -565,13 +531,10 @@ void fn_801DA83C(void* effect) {
  * fn_801DA8C4 - Waza resolve/update helper.
  * Address: 0x801DA8C4 | Size: 0x50
  */
-extern void* GetWaza__12NullSequenceCFUsUs();
-extern void wazaSequenceApplyStop(void* obj);
-extern void wazaSequenceFree(void* obj);
-void fn_801DA8C4(void* obj) {
+void fn_801DA8C4(void* obj, s32 search_key1, s32 search_key2) {
     void* resolved;
     if (obj != NULL) {
-        resolved = GetWaza__12NullSequenceCFUsUs(obj);
+        resolved = GetWaza__12NullSequenceCFUsUs(obj, search_key1, search_key2);
         if (resolved != NULL) {
             if (*(u8*)((u8*)resolved + 0x14) != 0) {
                 wazaSequenceApplyStop(resolved);
@@ -585,10 +548,10 @@ void fn_801DA8C4(void* obj) {
  * fn_801DA914 - Waza effect pool get used count.
  * Address: 0x801DA914 | Size: 0x38
  */
-void fn_801DA914(void* obj) {
+void fn_801DA914(void* obj, s32 search_key1, s32 search_key2) {
     void* resolved;
     if (obj != NULL) {
-        resolved = GetWaza__12NullSequenceCFUsUs(obj);
+        resolved = GetWaza__12NullSequenceCFUsUs(obj, search_key1, search_key2);
         if (resolved != NULL) {
             *(u8*)((u8*)resolved + 0x16) = 0;
         }
@@ -599,13 +562,13 @@ void fn_801DA914(void* obj) {
  * fn_801DA94C - Waza resolved effect has active non-minus-one byte.
  * Address: 0x801DA94C | Size: 0x68
  */
-s32 fn_801DA94C(void* obj) {
+s32 fn_801DA94C(void* obj, s32 search_key1, s32 search_key2) {
     void* resolved;
     u8 result;
     if (obj == NULL) {
         return 0;
     }
-    resolved = GetWaza__12NullSequenceCFUsUs(obj);
+    resolved = GetWaza__12NullSequenceCFUsUs(obj, search_key1, search_key2);
     if (resolved != NULL) {
         result = 0;
         if (*(u8*)((u8*)resolved + 0x14) != 0) {
@@ -622,10 +585,10 @@ s32 fn_801DA94C(void* obj) {
  * fn_801DA9B4 - Waza effect pool clear all.
  * Address: 0x801DA9B4 | Size: 0x34
  */
-void fn_801DA9B4(void* obj) {
+void fn_801DA9B4(void* obj, s32 search_key1, s32 search_key2) {
     void* resolved;
     if (obj != NULL) {
-        resolved = GetWaza__12NullSequenceCFUsUs(obj);
+        resolved = GetWaza__12NullSequenceCFUsUs(obj, search_key1, search_key2);
         if (resolved != NULL) {
             wazaSequenceApplyStop(resolved);
         }
@@ -661,7 +624,7 @@ void fn_801DA9E8(void* sequence, s32 moveID, s32 variant) {
             *(u8*)((u8*)sequence + 0x17) = 0;
         }
         if (waza != NULL) {
-            wazaSequenceStart((s32)waza);
+            wazaSequenceStart(waza);
         }
     }
 }
@@ -671,15 +634,12 @@ void fn_801DA9E8(void* sequence, s32 moveID, s32 variant) {
  * Address: 0x801DAAAC | Size: 0x100
  */
 void fn_801DAAAC(void* effectPtr) {
-    extern void GSmodelForceAnimTransformUpdate(void* model);
-    extern u32 fn_800E3CBC(void* model);
-    extern void GSmodelDrawModel(void* model, u32 flags);
-    extern void fn_801DB8FC();
     extern void* GScameraGetActiveCamera(void);
     extern s32 HSD_CObjSetCurrent(void* cobj);
-    extern void fn_80118104();
+    extern void fn_80118104(u32 drawFlags, u8 modelID);
     extern void fn_80195A48(void);
-    u8* effect = effectPtr;
+    WazaEffect* effect = effectPtr;
+    u8* effectBytes = effectPtr;
     u32 flags;
     u8* entry;
     u32 modelID;
@@ -688,7 +648,7 @@ void fn_801DAAAC(void* effectPtr) {
     void* camera;
 
     if (effect != NULL) {
-        GSmodelForceAnimTransformUpdate(*(void**)(effect + 0x24));
+        GSmodelForceAnimTransformUpdate(effect->model);
         for (modelGroup = 0; modelGroup < 2; modelGroup++) {
             modelID = modelGroup != 0;
             for (pass = 0; pass < 3; pass++) {
@@ -700,11 +660,11 @@ void fn_801DAAAC(void* effectPtr) {
                     flags = 0x2000;
                 }
 
-                if (modelID == (u8)fn_800E3CBC(*(void**)(effect + 0x24))) {
-                    GSmodelDrawModel(*(void**)(effect + 0x24), flags);
+                if (modelID == (u8)fn_800E3CBC(effect->model)) {
+                    GSmodelDrawModel(effect->model, flags);
                 }
 
-                entry = *(u8**)(effect + 0x68);
+                entry = *(u8**)(effectBytes + 0x68);
                 while (entry != NULL) {
                     if (*(u8*)(entry + 0x14) != 0) {
                         fn_801DB8FC(entry, flags, modelID);

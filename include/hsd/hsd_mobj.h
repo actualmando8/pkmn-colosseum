@@ -217,6 +217,7 @@ void HSD_MObjUnset(HSD_MObj* mobj, u32 rendermode);
 void HSD_MObjSetAlpha(HSD_MObj* mobj, f32 alpha);
 
 HSD_TExp* MObjMakeTExp(HSD_MObj* mobj, HSD_TObj* tobj_top, HSD_TExp** list);
+void fn_801B45A4(HSD_TExpTevDesc* tevdesc, HSD_TExp* texp);
 void MObjSetupTev(HSD_MObj* mobj, HSD_TObj* tobj, u32 rendermode);
 int MObjLoad(HSD_MObj* mobj, HSD_MObjDesc* desc);
 void MObjUpdateFunc(void* obj, u32 type, HSD_ObjData* val);

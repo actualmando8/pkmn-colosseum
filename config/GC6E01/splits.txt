@@ -3105,8 +3105,32 @@ hsd/hsd_lobj_tail_exact_801A68D0.c:
 hsd/hsd_memory.c:
 	.text       start:0x801A69C0 end:0x801A6CA4
 
-hsd/hsd_mobj.c:
-	.text       start:0x801A6CA4 end:0x801A8428
+hsd/hsd_mobj_candidate_801A6CA4.c:
+	.text       start:0x801A6CA4 end:0x801A6DC4
+
+hsd/hsd_mobj_exact_801A6DC4.c:
+	.text       start:0x801A6DC4 end:0x801A6DDC
+
+hsd/hsd_mobj_candidate_801A6DDC.c:
+	.text       start:0x801A6DDC end:0x801A6E00
+
+hsd/hsd_mobj_exact_801A6E00.c:
+	.text       start:0x801A6E00 end:0x801A6E24
+
+hsd/hsd_mobj_candidate_801A6E24.c:
+	.text       start:0x801A6E24 end:0x801A6F78
+
+hsd/hsd_mobj_exact_801A6F78.c:
+	.text       start:0x801A6F78 end:0x801A6FF0
+
+hsd/hsd_mobj_candidate_801A6FF0.c:
+	.text       start:0x801A6FF0 end:0x801A7E3C
+
+hsd/hsd_mobj_exact_801A7E3C.c:
+	.text       start:0x801A7E3C end:0x801A7E84
+
+hsd/hsd_mobj_candidate_801A7E84.c:
+	.text       start:0x801A7E84 end:0x801A8428
 
 hsd/hsd_mobj_clear_flags.c:
 	.text       start:0x801A8428 end:0x801A8440
@@ -3318,8 +3342,20 @@ game/battle/battle_exact_801D0AA0.c:
 game/battle/battle_candidate_801D0C30.c:
 	.text       start:0x801D0C30 end:0x801D1338
 
-game/mail.c:
-	.text       start:0x801D1338 end:0x801D2080
+game/mail_candidate_801D1338.c:
+	.text       start:0x801D1338 end:0x801D1470
+
+game/mail_exact_801D1470.c:
+	.text       start:0x801D1470 end:0x801D167C
+
+game/mail_candidate_801D167C.c:
+	.text       start:0x801D167C end:0x801D1A44
+
+game/mail_exact_801D1A44.c:
+	.text       start:0x801D1A44 end:0x801D1B10
+
+game/mail_candidate_801D1B10.c:
+	.text       start:0x801D1B10 end:0x801D2080
 
 game/mailMain.c:
 	.text       start:0x801D2080 end:0x801D2B4C
@@ -3327,8 +3363,14 @@ game/mailMain.c:
 game/wazaSequenceCamera.c:
 	.text       start:0x801D2B4C end:0x801D5328
 
-game/wazaViewer.c:
-	.text       start:0x801D5328 end:0x801D7E58
+game/wazaViewer_candidate_801D5328.c:
+	.text       start:0x801D5328 end:0x801D53D4
+
+game/wazaViewer_exact_801D53D4.c:
+	.text       start:0x801D53D4 end:0x801D53D8
+
+game/wazaViewer_candidate_801D53D8.c:
+	.text       start:0x801D53D8 end:0x801D7E58
 
 game/wazaSequenceEntry.c:
 	.text       start:0x801D7E58 end:0x801D9E1C
@@ -3348,8 +3390,20 @@ game/wazaSequenceSys_tail_candidate_801DB288.c:
 game/wazaSequenceSys_tail_exact_801DB848.c:
 	.text       start:0x801DB848 end:0x801DB988
 
-game/wazaSequence.c:
-	.text       start:0x801DB988 end:0x801DCDA8
+game/wazaSequence_candidate_801DB988.c:
+	.text       start:0x801DB988 end:0x801DBB10
+
+game/wazaSequence_exact_801DBB10.c:
+	.text       start:0x801DBB10 end:0x801DBDDC
+
+game/wazaSequence_candidate_801DBDDC.c:
+	.text       start:0x801DBDDC end:0x801DBFB0
+
+game/wazaSequence_exact_801DBFB0.c:
+	.text       start:0x801DBFB0 end:0x801DC014
+
+game/wazaSequence_candidate_801DC014.c:
+	.text       start:0x801DC014 end:0x801DCDA8
 
 game/sequence_exact_801DCDA8.c:
 	.text       start:0x801DCDA8 end:0x801DCF00
@@ -3755,8 +3809,14 @@ game/fight_out_pokemon_suffix_8020A8E0.c:
 game/fight_action_exact_8020AE30.c:
 	.text       start:0x8020AE30 end:0x8020AED0
 
-game/fight_action.c:
-	.text       start:0x8020AED0 end:0x8020D868
+game/fight_action_candidate_8020AED0.c:
+	.text       start:0x8020AED0 end:0x8020D784
+
+game/fight_action_exact_8020D784.c:
+	.text       start:0x8020D784 end:0x8020D844
+
+game/fight_action_candidate_8020D844.c:
+	.text       start:0x8020D844 end:0x8020D868
 
 game/fight_action_exact_8020D868.c:
 	.text       start:0x8020D868 end:0x8020D968

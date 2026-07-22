@@ -11,65 +11,61 @@
 
 #include "game/battle/battle_waza_types.h"
 
+#if !defined(PR409_WAZA_SEQUENCE_SPLIT) || defined(PR409_WAZA_SEQUENCE_B988_BB10)
 
 /**
  * wazaSequenceUpdate - Waza rendering setup.
  * Address: 0x801DB988 | Size: 0x188
  */
-void wazaSequenceUpdate(void) {
+void wazaSequenceUpdate(void* sequence) {
     /* TODO: Waza rendering setup (0x188 bytes) */
 }
+
+#endif
+
+#if !defined(PR409_WAZA_SEQUENCE_SPLIT) || defined(PR409_WAZA_SEQUENCE_BB10_BDDC)
 
 /**
  * wazaSequenceApplyStop - Waza rendering update.
  * Address: 0x801DBB10 | Size: 0x120
  */
 void wazaSequenceApplyStop(void* obj) {
-    extern void GSmodelLinkToGSparticleBank(s32, s32);
-    extern void fn_800E3CC8(s32, s32);
-    extern void fn_80118874();
-    extern void battleGridResetModelVisibilityFlags(void);
-    extern void fn_801D3034();
-    extern void wazaSequenceEntryStop();
-    extern void fn_801DEF0C(void*, s32, s32);
+    WazaSequence* effect;
+    WazaSequenceOwner* owner;
+    WazaSequenceNode* node;
 
-    u8* effect;
-    u8* owner;
-    void* node;
-
-    effect = (u8*)obj;
+    effect = obj;
     if (effect != NULL) {
-        owner = *(u8**)(effect + 0x3C);
-        if (*(u8*)(effect + 0x14) != 0) {
-            if (*(u8*)(effect + 0x16) != 0) {
+        owner = effect->owner;
+        if (effect->active != 0) {
+            if (effect->cameraActive != 0) {
                 fn_801D3034(owner);
             }
-            if (*(u8*)(owner + 0x75) == 0) {
+            if (owner->animationActive == 0) {
                 fn_801DEF0C(owner, 1, 0);
             }
-            fn_800E3CC8(*(s32*)(owner + 0x24), 0);
-            if ((*(u32*)(effect + 0x8) & 0x08000000) != 0) {
-                GSmodelLinkToGSparticleBank(*(s32*)(owner + 0x24), *(s32*)(owner + 0x28));
+            fn_800E3CC8(owner->model, 0);
+            if ((effect->flags & 0x08000000) != 0) {
+                GSmodelLinkToGSparticleBank(owner->model, owner->particleBank);
             }
-            if ((*(u32*)(effect + 0x8) & 0x04000000) != 0) {
+            if ((effect->flags & 0x04000000) != 0) {
                 battleGridResetModelVisibilityFlags();
             }
-            node = *(void**)(effect + 0x24);
+            node = effect->firstNode;
             while (node != NULL) {
                 wazaSequenceEntryStop(node, 1);
-                node = *(void**)((u8*)node + 0xA8);
+                node = node->next;
             }
-            node = *(void**)(effect + 0x24);
+            node = effect->firstNode;
             while (node != NULL) {
-                if (*(s32*)((u8*)node + 0x4) == 3 && *(s32*)((u8*)node + 0x18) == 0
-                    && *(u32*)((u8*)node + 0x88) != 0) {
-                    fn_80118874(*(u32*)((u8*)node + 0x88), 1);
+                if (node->kind == 3 && node->state == 0 && node->resource != NULL) {
+                    fn_80118874(node->resource, 1);
                 }
-                node = *(void**)((u8*)node + 0xA8);
+                node = node->next;
             }
-            *(u32*)(owner + 0x6C) = 0;
-            *(u8*)(effect + 0x14) = 0;
-            *(u8*)(effect + 0x15) = 0;
+            owner->currentSequence = NULL;
+            effect->active = 0;
+            effect->stopping = 0;
         }
     }
 }
@@ -79,25 +75,23 @@ void wazaSequenceApplyStop(void* obj) {
  * Address: 0x801DBC30 | Size: 0x9C
  */
 void fn_801DBC30(void* obj) {
-    extern void fn_800E3CC8(s32, s32);
-    extern void fn_801D3034(void*);
-    extern void fn_801DEF0C(void*, s32, s32);
-
-    void* owner;
+    WazaSequence* sequence;
+    WazaSequenceOwner* owner;
     s32 kind;
 
-    if (obj != NULL) {
-        owner = *(void**)((u8*)obj + 0x3C);
-        if (*(u8*)((u8*)obj + 0x14) != 0 && *(void**)((u8*)owner + 0x6C) == obj) {
-            kind = *(s32*)((u8*)obj + 0xC);
+    sequence = obj;
+    if (sequence != NULL) {
+        owner = sequence->owner;
+        if (sequence->active != 0 && owner->currentSequence == sequence) {
+            kind = sequence->kind;
             if (kind >= 0xB || kind < 9) {
                 fn_801DEF0C(owner, 1, 0);
             }
-            if (*(u8*)((u8*)obj + 0x16) != 0) {
+            if (sequence->cameraActive != 0) {
                 fn_801D3034(owner);
             }
-            fn_800E3CC8(*(s32*)((u8*)owner + 0x24), 0);
-            *(u32*)((u8*)owner + 0x6C) = 0;
+            fn_800E3CC8(owner->model, 0);
+            owner->currentSequence = NULL;
         }
     }
 }
@@ -106,61 +100,56 @@ void fn_801DBC30(void* obj) {
  * wazaSequenceStart - Waza blend effect setup.
  * Address: 0x801DBCCC | Size: 0x110
  */
-void wazaSequenceStart(s32 blendType) {
-    extern void wazaSequenceApplyStop();
-    extern void wazaSequenceSysResetAnimationExcept();
-    extern void fn_801DD100();
-    extern void GSmodelLinkToGSparticleBank(s32, s32);
-    extern void wazaSequencePokemonMotionStart();
-    extern void battleGridHideModelsExcept();
-    extern void battleCameraStartWaza();
-    extern void wazaSequenceUpdate();
-
-    u8* obj;
-    u8* owner;
-    u8* node;
-    void* current;
+void wazaSequenceStart(void* sequence) {
+    WazaSequence* obj;
+    WazaSequenceOwner* owner;
+    WazaSequenceNode* node;
+    WazaSequence* current;
     s32 bit;
-    s32 handle;
+    struct GSmodel* model;
     u32 flags;
 
-    obj = (u8*)blendType;
-    if (*(u8*)(obj + 0x14) == 0) {
-        owner = *(u8**)(obj + 0x3C);
-        flags = *(u32*)(obj + 0x08);
-        current = *(void**)(owner + 0x6C);
+    obj = sequence;
+    if (obj->active == 0) {
+        owner = obj->owner;
+        flags = obj->flags;
+        current = owner->currentSequence;
         flags = (flags >> 1) & 1;
-        node = *(u8**)(obj + 0x24);
-        handle = *(s32*)(owner + 0x24);
+        node = obj->firstNode;
+        model = owner->model;
         bit = flags;
         if (current != NULL) {
             wazaSequenceApplyStop(current);
         }
-        if (*(u8*)(owner + 0x75) != 0 && *(u16*)(obj + 0x2E) == 2) {
+        if (owner->animationActive != 0 && obj->animationMode == 2) {
             wazaSequenceSysResetAnimationExcept(owner);
         }
         fn_801DD100(owner, obj);
-        if ((*(u32*)(obj + 0x08) & 0x08000000) != 0) {
-            GSmodelLinkToGSparticleBank(handle, 0);
+        if ((obj->flags & 0x08000000) != 0) {
+            GSmodelLinkToGSparticleBank(model, NULL);
         }
         wazaSequencePokemonMotionStart(owner, bit);
-        *(u8**)(owner + 0x6C) = obj;
-        *(u8*)(obj + 0x14) = 1;
-        if ((*(u32*)(obj + 0x08) & 0x04000000) != 0) {
+        owner->currentSequence = obj;
+        obj->active = 1;
+        if ((obj->flags & 0x04000000) != 0) {
             battleGridHideModelsExcept(owner);
         }
-        if (*(u8*)(obj + 0x16) != 0) {
+        if (obj->cameraActive != 0) {
             battleCameraStartWaza(owner, obj);
         }
         while (node != NULL) {
-            *(u32*)(node + 0x6C) = 0;
-            node = *(u8**)(node + 0xA8);
+            node->runtimeState = 0;
+            node = node->next;
         }
-        *(u32*)(obj + 0x00) = 0;
-        *(u8*)(obj + 0x15) = 0;
+        obj->state = 0;
+        obj->stopping = 0;
         wazaSequenceUpdate(obj);
     }
 }
+
+#endif
+
+#if !defined(PR409_WAZA_SEQUENCE_SPLIT) || defined(PR409_WAZA_SEQUENCE_BDDC_BFB0)
 
 /**
  * wazaSequenceFree - Waza blend effect update.
@@ -170,26 +159,34 @@ void wazaSequenceFree(void* obj) {
     /* TODO: Blend effect update (0x1D4 bytes) */
 }
 
+#endif
+
+#if !defined(PR409_WAZA_SEQUENCE_SPLIT) || defined(PR409_WAZA_SEQUENCE_BFB0_C014)
+
 /**
  * fn_801DBFB0 - Waza blend effect get state.
  * Address: 0x801DBFB0 | Size: 0x64
  */
-s32 fn_801DBFB0(void) {
+WazaSequence* fn_801DBFB0(void) {
     extern u16 _toolentryAlloc__FUl(u32 size);
     extern void* fn_800E27B0(u16 handle);
 
     u16 handle;
-    void* obj;
+    WazaSequence* obj;
 
     handle = _toolentryAlloc__FUl(0x40);
     if (handle != 0) {
         obj = fn_800E27B0(handle);
         memset(obj, 0, 0x40);
-        *(u16*)((u8*)obj + 0x2A) = handle;
-        return (s32)obj;
+        obj->handle = handle;
+        return obj;
     }
-    return 0;
+    return NULL;
 }
+
+#endif
+
+#if !defined(PR409_WAZA_SEQUENCE_SPLIT) || defined(PR409_WAZA_SEQUENCE_C014_CDA8)
 
 /**
  * wazaSequenceLoadData - Waza screen distortion effect.
@@ -248,3 +245,5 @@ void _wazaSequenceModelEntryLoad(s32 fieldEffect) {
      * Handles field-wide effects like weather, terrain changes.
      */
 }
+
+#endif

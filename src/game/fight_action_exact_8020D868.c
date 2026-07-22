@@ -1,105 +1,106 @@
 #include "game/colosseum.h"
+#include "game/fight_action.h"
 
-void fightActionBiosSetMotoFightActionDataPtr(u8* ptr, u32 val)
+void fightActionBiosSetMotoFightActionDataPtr(FightAction* action, void* motoData)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u32*)(&ptr[0x18]) = val;
+    action->motoActionData = motoData;
 }
 
-void fightActionBiosSetBuffDataId(u8* ptr, u32 val)
+void fightActionBiosSetBuffDataId(FightAction* action, u32 buffDataId)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u32*)(&ptr[0x10]) = val;
+    action->buffDataId = buffDataId;
 }
 
-void fightActionBiosSetBuffDataPtr(u8* ptr, u32 val)
+void fightActionBiosSetBuffDataPtr(FightAction* action, void* buffData)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u32*)(&ptr[0xC]) = val;
+    action->buffData = buffData;
 }
 
-void fightActionBiosSetActorFightTargetPtr(u8* ptr, u32 val)
+void fightActionBiosSetActorFightTargetPtr(FightAction* action, void* actorTarget)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u32*)(&ptr[0x14]) = val;
+    action->actorTarget = actorTarget;
 }
 
-void fightActionBiosSetFightActionDataPtr(u8* ptr, u32 val)
+void fightActionBiosSetFightActionDataPtr(FightAction* action, FightActionData* data)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u32*)(&ptr[0x8]) = val;
+    action->data = data;
 }
 
-void fightActionBiosSetBuff(u8* ptr, u32 val)
+void fightActionBiosSetBuff(FightAction* action, u32 buff)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u32*)(&ptr[0x4]) = val;
+    action->buff = buff;
 }
 
-void fightActionBiosSetKind(u8* ptr, u16 val)
+void fightActionBiosSetKind(FightAction* action, u32 kind)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return;
     }
-    *(u16*)(&ptr[0x0]) = val;
+    action->kind = kind;
 }
 
-u32 fightActionBiosGetBuffDataId(u8* ptr)
+u32 fightActionBiosGetBuffDataId(FightAction* action)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return 0;
     }
-    return *(u32*)(&ptr[0x10]);
+    return action->buffDataId;
 }
 
-u32 fightActionBiosGetBuffDataPtr(u8* ptr)
+void* fightActionBiosGetBuffDataPtr(FightAction* action)
 {
-    if (ptr == NULL) {
-        return 0;
+    if (action == NULL) {
+        return NULL;
     }
-    return *(u32*)(&ptr[0xC]);
+    return action->buffData;
 }
 
-u32 fightActionBiosGetActorFightTargetPtr(u8* ptr)
+void* fightActionBiosGetActorFightTargetPtr(FightAction* action)
 {
-    if (ptr == NULL) {
-        return 0;
+    if (action == NULL) {
+        return NULL;
     }
-    return *(u32*)(&ptr[0x14]);
+    return action->actorTarget;
 }
 
-u32 fightActionBiosGetFightActionDataPtr(u8* ptr)
+FightActionData* fightActionBiosGetFightActionDataPtr(FightAction* action)
 {
-    if (ptr == NULL) {
-        return 0;
+    if (action == NULL) {
+        return NULL;
     }
-    return *(u32*)(&ptr[0x8]);
+    return action->data;
 }
 
-u32 fightActionBiosGetBuff(u8* ptr)
+u32 fightActionBiosGetBuff(FightAction* action)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return 0;
     }
-    return *(u32*)(&ptr[0x4]);
+    return action->buff;
 }
 
-u16 fightActionBiosGetKind(u8* ptr)
+u16 fightActionBiosGetKind(FightAction* action)
 {
-    if (ptr == NULL) {
+    if (action == NULL) {
         return 0;
     }
-    return *(u16*)(&ptr[0x0]);
+    return action->kind;
 }

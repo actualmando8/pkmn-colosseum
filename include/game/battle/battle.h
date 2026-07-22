@@ -320,7 +320,7 @@ typedef struct TypeMatchup {
 /* HSD_AObjInitAllocData (was fn_801C2AB8) */ void HSD_AObjInitAllocData(s32 slot, s32 animState);
 /* battleGridGetNumPokemonsForTrainer (was fn_801C2AE8) */ u16 battleGridGetNumPokemonsForTrainer(u32 id);
 /* battleGridResetModelVisibilityFlags (was fn_801C2B2C) */ void battleGridResetModelVisibilityFlags(void);
-/* battleGridHideModelsExcept (was fn_801C2Be0) */ void battleGridHideModelsExcept(void* ctx, s32 arg1);
+/* battleGridHideModelsExcept (was fn_801C2Be0) */ void battleGridHideModelsExcept(void* ctx);
 
 /* Grid tick / state (0x801C2D54 - 0x801C3108) [game/battle/battle_camera.c] */
 /* battleCameraIsSimple (was fn_801C2D54) */ void battleCameraIsSimple(void);                        /* grid tick 1 */
@@ -451,16 +451,16 @@ typedef struct TypeMatchup {
 /* fn_801D1338 */ s32  fn_801D1338(void* wazaCtx);
 /* fn_801D1364 */ void* fn_801D1364(u16 handle, s32 idx);
 /* fn_801D139C */ s32  fn_801D139C(void* entry);
-/* fn_801D13E4 */ u32  fn_801D13E4(void* entry);
+/* fn_801D13E4 */ u32  fn_801D13E4(s32 idx);
 /* fn_801D142C */ f32  fn_801D142C(void* entry);
 
 /* Waza animation controllers */
 /* fn_801D1734 */ void fn_801D1734(s32 attackerSlot, s32 targetSlot, s32 moveID);
 /* fn_801D1864 */ void fn_801D1864(s32 attackerSlot, s32 targetSlot, s32 moveID, s32 cameraMode);
-/* fn_801D2D28 */ void fn_801D2D28(s32 moveID, s32 attackerSlot, s32 targetSlot);
+/* fn_801D2D28 */ void fn_801D2D28(void);
 
 /* Waza animation state machines */
-/* battleCameraStartWaza */ void battleCameraStartWaza(void);                        /* dispatcher 0x3E0 */
+/* battleCameraStartWaza */ void battleCameraStartWaza(void* owner, void* sequence); /* dispatcher 0x3E0 */
 /* fn_801D349C */ void fn_801D349C(void);                        /* state machine A 0xAE0 */
 /* fn_801D3F7C */ void fn_801D3F7C(void);                        /* state machine B 0x548 */
 /* _wazaSequenceCameraDoFOV__FP13ModelSequenceP24wazaSequenceCameraParamsif */ void _wazaSequenceCameraDoFOV__FP13ModelSequenceP24wazaSequenceCameraParamsif(void);                        /* state machine C 0x514 */

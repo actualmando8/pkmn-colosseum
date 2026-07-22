@@ -65,7 +65,7 @@ extern u8* fightFloorBiosGetFightFloorPtr(void);
 extern struct Pokemon* fightFloorGetNowPtr(void);
 
 /* fightOutPokemonGetFightActionPri: Pokemon nature/friendship comparison helper */
-extern s8 fightOutPokemonGetFightActionPri(struct Pokemon* pokemon);
+extern s32 fightOutPokemonGetFightActionPri(struct Pokemon* pokemon);
 
 /* Forward declarations for fightFloorGetStatus asm wrapper */
 extern u32 jumptable_803754AC[];

@@ -94,7 +94,6 @@ void fn_801DB088(void)
     }
 
     {
-        void fn_801D2D28();
         fn_801D2D28();
     }
 }
@@ -191,8 +190,9 @@ void wazaSequenceSysFreeWazaResource(void* seqData, s32 moveID) {
  * wazaSequenceSysGetWazaTime - Waza sequence data complex parse.
  * Address: 0x801DB3F8 | Size: 0x450
  */
-void wazaSequenceSysGetWazaTime(void* seqData) {
+s32 wazaSequenceSysGetWazaTime(void* owner, void* sequence, s32 timeType) {
     /* TODO: Complex sequence data parse (0x450 bytes) */
+    return 0;
 }
 
 #endif
@@ -230,7 +230,7 @@ void* wazaSequenceSysGetModelShadowList__Fv(void) {
  * wazaSequenceSysResetAnimationExcept - Reset every active animation except one.
  * Address: 0x801DB864 | Size: 0x98
  */
-void wazaSequenceSysResetAnimationExcept(WazaEffect* except) {
+void wazaSequenceSysResetAnimationExcept(void* except) {
     u8* pool = lbl_80467CC0;
     WazaEffect* effect;
     s32 i = 0;
@@ -239,7 +239,7 @@ void wazaSequenceSysResetAnimationExcept(WazaEffect* except) {
     effect = *(WazaEffect**)pool;
     count = *(u16*)(pool + 4);
     for (; i < count; i++, effect++) {
-        if (except != effect && effect->active != 0 && *(void**)((u8*)effect + 0x24) != NULL) {
+        if (except != effect && effect->active != 0 && effect->model != NULL) {
             fn_801DEF0C(effect, 1, 0);
         }
     }
@@ -250,8 +250,6 @@ void wazaSequenceSysResetAnimationExcept(WazaEffect* except) {
  * Address: 0x801DB8FC | Size: 0x8C
  */
 void fn_801DB8FC(void* entry, u32 drawFlags, u8 modelID) {
-    extern u32 fn_800E3CBC(void* model);
-    extern void GSmodelDrawModel(void* model, u32 flags);
     u8* node;
 
     node = *(u8**)((u8*)entry + 0x24);
@@ -259,8 +257,11 @@ void fn_801DB8FC(void* entry, u32 drawFlags, u8 modelID) {
         if (*(s32*)(node + 0x6C) == 1) {
             switch (*(s32*)(node + 4)) {
             case 2:
-                if (modelID == (u8)fn_800E3CBC(*(void**)(node + 0xA4))) {
-                    GSmodelDrawModel(*(void**)(node + 0xA4), drawFlags);
+                if (modelID ==
+                    (u8)fn_800E3CBC(
+                        *(struct GSmodel**)(node + 0xA4))) {
+                    GSmodelDrawModel(
+                        *(struct GSmodel**)(node + 0xA4), drawFlags);
                 }
                 break;
             }

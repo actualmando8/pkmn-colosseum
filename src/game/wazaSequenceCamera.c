@@ -45,8 +45,8 @@ void wazaSequenceCameraGetPattern__Fbi(void) {
  * fn_801D2C6C - Waza get global state from SDA.
  * Address: 0x801D2C6C | Size: 0x8
  */
-extern u32 lbl_8047B3EC;
-extern u32 lbl_8047B3F0;
+extern void* lbl_8047B3EC;
+extern void* lbl_8047B3F0;
 extern s32 lbl_8047B410;
 
 extern u8 lbl_80467CC0[];
@@ -58,7 +58,7 @@ extern void _threadSwitch(void);
 extern s32 fn_8017B2CC(s32 id);
 extern void fn_800F915C(s32 id);
 extern void fn_8017B1CC(s32 id);
-u32 fn_801D2C6C(void) {
+void* fn_801D2C6C(void) {
     return lbl_8047B3EC;
 }
 
@@ -73,37 +73,34 @@ u32 fn_801D2C6C(void) {
  * fn_801D2C74 - Waza animation pre-check.
  * Address: 0x801D2C74 | Size: 0xB4
  */
-void fn_801D2C74(s32 moveID) {
-    extern void battleCameraStartWaza();
+void fn_801D2C74(void* owner) {
     extern void GSscene_SetMode(s32 arg);
     extern void cameraStopAnime(void* arg);
     extern void fn_801765F4(s32 arg);
     extern s32  fn_800057A8(void);
     extern u8   lbl_8047B3F4;
-    extern u32  lbl_8047B3F0;
-    extern u32  lbl_8047B3EC;
 
     void* obj;
 
     if (lbl_8047B3F4 != 0) {
-        obj = (void*)lbl_8047B3F0;
+        obj = lbl_8047B3F0;
         if (obj == NULL) {
-            if (lbl_8047B3EC != 0) {
+            if (lbl_8047B3EC != NULL) {
                 if (obj == NULL) {
                     GSscene_SetMode(8);
                 } else {
                     if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
                         cameraStopAnime(obj);
                     }
-                    lbl_8047B3F0 = 0;
+                    lbl_8047B3F0 = NULL;
                 }
                 fn_801765F4(0);
-                lbl_8047B3EC = 0;
+                lbl_8047B3EC = NULL;
                 if (fn_800057A8() == 2) {
                     GSscene_SetMode(2);
                 }
             }
-            battleCameraStartWaza(moveID, 0);
+            battleCameraStartWaza(owner, NULL);
         }
     }
 }
@@ -112,7 +109,7 @@ void fn_801D2C74(s32 moveID) {
  * fn_801D2D28 - Waza animation setup from move data.
  * Address: 0x801D2D28 | Size: 0x26C
  */
-void fn_801D2D28() {
+void fn_801D2D28(void) {
     /* TODO: Waza animation setup (0x26C bytes) */
 }
 
@@ -126,18 +123,18 @@ extern void fn_801765F4(s32 arg);
 extern s32  fn_800057A8(void);
 void fn_801D2F94(void) {
     void* obj;
-    if (lbl_8047B3EC != 0) {
-        obj = (void*)lbl_8047B3F0;
+    if (lbl_8047B3EC != NULL) {
+        obj = lbl_8047B3F0;
         if (obj == NULL) {
             GSscene_SetMode(8);
         } else {
             if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
                 cameraStopAnime(obj);
             }
-            lbl_8047B3F0 = 0;
+            lbl_8047B3F0 = NULL;
         }
         fn_801765F4(0);
-        lbl_8047B3EC = 0;
+        lbl_8047B3EC = NULL;
         if (fn_800057A8() == 2) {
             GSscene_SetMode(2);
         }
@@ -151,28 +148,28 @@ void fn_801D2F94(void) {
 extern u8  lbl_8047B3F4;
 void fn_801D301C(void) {
     lbl_8047B3F4 = 1;
-    lbl_8047B3EC = 0;
-    lbl_8047B3F0 = 0;
+    lbl_8047B3EC = NULL;
+    lbl_8047B3F0 = NULL;
 }
 
 /**
  * fn_801D3034 - Waza animation frame step.
  * Address: 0x801D3034 | Size: 0x88
  */
-void fn_801D3034(u32 state) {
+void fn_801D3034(void* state) {
     void* obj;
     if (state == lbl_8047B3EC) {
-        obj = (void*)lbl_8047B3F0;
+        obj = lbl_8047B3F0;
         if (obj == NULL) {
             GSscene_SetMode(8);
         } else {
             if (*(u32*)((u8*)obj + 0x18) != 0 && *(u32*)((u8*)obj + 0x20) != 0) {
                 cameraStopAnime(obj);
             }
-            lbl_8047B3F0 = 0;
+            lbl_8047B3F0 = NULL;
         }
         fn_801765F4(0);
-        lbl_8047B3EC = 0;
+        lbl_8047B3EC = NULL;
         if (fn_800057A8() == 2) {
             GSscene_SetMode(2);
         }
@@ -183,7 +180,7 @@ void fn_801D3034(u32 state) {
  * battleCameraStartWaza - Waza animation state machine dispatcher.
  * Address: 0x801D30BC | Size: 0x3E0
  */
-void battleCameraStartWaza(void) {
+void battleCameraStartWaza(void* owner, void* sequence) {
     /* TODO: Waza animation state dispatcher (0x3E0 bytes)
      * Dispatches to type-specific animation handlers based on move type.
      */

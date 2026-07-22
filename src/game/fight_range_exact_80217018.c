@@ -553,8 +553,8 @@ void fn_802175A8(void)
     extern u16 wazaGetStatus();
     extern u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId();
     extern u32 fightTargetGetPtrAsNowFightType();
-    extern u16 fightActionGetKindDataId();
-    extern u8 fightActionCheckValid();
+    extern u16 fightActionGetKindDataId(void* action);
+    extern u32 fightActionCheckValid(void* action);
     extern void fightFloorSetStatus();
     extern u32 fightFloorGetStatus();
     extern u8 fn_802026E4();
@@ -587,8 +587,8 @@ void fn_802175A8(void)
       if (candidate != 0 && fightOutPokemonCheckFightOut(candidate) != 0 &&
           context != candidate && fightOutPokemonIsAlly(context,candidate) != 1 &&
           (action = pokemonGetStatus(candidate,0,0xfe,0)) != 0 &&
-          fightActionCheckValid() != 0 &&
-          fightActionGetKindDataId(action) == 0x13) {
+          (u8)fightActionCheckValid((void*)action) != 0 &&
+          fightActionGetKindDataId((void*)action) == 0x13) {
         waza = pokemonGetStatus(candidate,0,0xd9,0);
         if (fightOutPokemonGetUseWazaDataId(candidate) == 0xe4 &&
             (u16)relativeTarget == wazaGetStatus(waza,0,0x29,0) &&

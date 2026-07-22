@@ -11,6 +11,7 @@
  */
 #include "game/trainer.h"
 #include "game/pokemon.h"
+#include "game/fight_action.h"
 
 /* =========================================================================
  * External declarations (duplicated verbatim from the original
@@ -1051,11 +1052,10 @@ void* fightTrainerIsMineFightPokemon(void* arg0, void* arg1) {
 #pragma push
 #pragma optimization_level 2
 void fightTrainerTimeOutSelectFightAction(void* unused, void* trainer, void* pokemon) {
-    extern u8 lbl_80375CA8[];
+    extern FightActionData lbl_80375CA8[];
     extern u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(void* ptr, void* pokemon);
     extern u8 fightOutPokemonCheckFightActionWazaSelect(void* trainer, u32 mode);
     extern u8 fightOutPokemonCheckCanOutOkWazaBanme(void* trainer, s32 slot, u32 field, u32 flags);
-    extern void fightOutPokemonCreateFightActionAttackWaza(void* trainer, u32 p1, u32 p2, u32 p3, void* table, u16 moveId, u32 nameId, u32 slotIdx);
     extern void* fightOutPokemonGetPokemonPtr(void* trainer);
     extern void fn_8022B2CC(void* trainer, u16 moveId, void* pokemon, u32 p3, u32 p4, u32 p5, s32 p6);
     s32 slot;
@@ -1074,7 +1074,10 @@ void fightTrainerTimeOutSelectFightAction(void* unused, void* trainer, void* pok
         }
     }
     fn_8022B2CC(trainer, moveId, pokemon, 0, 1, 0, -1);
-    fightOutPokemonCreateFightActionAttackWaza(trainer, 0, 0x13, 0, (void*)lbl_80375CA8, moveId, fightTargetGetTragetPtrToRelativeHostSideFightTargetId(trainer, pokemon), (u32)i);
+    fightOutPokemonCreateFightActionAttackWaza(
+        trainer, NULL, 0x13, 0, lbl_80375CA8, moveId,
+        fightTargetGetTragetPtrToRelativeHostSideFightTargetId(trainer, pokemon),
+        (u32)i, 0);
 }
 #pragma pop
 

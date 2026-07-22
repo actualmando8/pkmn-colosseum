@@ -441,8 +441,9 @@ static inline void TExpStateSetDither(s32 enable)
     }
 }
 
-typedef struct HSD_TevDesc {
-    /* 0x00 */ u32 pad0;
+typedef struct HSD_TevDesc HSD_TevDesc;
+struct HSD_TevDesc {
+    /* 0x00 */ HSD_TevDesc* next;
     /* 0x04 */ u32 flag;
     /* 0x08 */ u32 stage;
     /* 0x0C */ u32 coord;
@@ -477,7 +478,7 @@ typedef struct HSD_TevDesc {
     /* 0x78 */ u32 kg;
     /* 0x7C */ u32 kb;
     /* 0x80 */ u32 ka;
-} HSD_TevDesc;
+};
 
 s32 fn_801B387C(void);
 s32 HSD_StateAssignTev(void);
@@ -1128,16 +1129,25 @@ void fn_801B3AE8(s32 chan)
 }
 #pragma pop
 
-/*
- * HSD_TExpValidateInputs - 0x801B45A4 | Size: 0x70
- * Validate that all inputs are properly connected.
- */
-BOOL fn_801B45A4(u8* root) {
-    if (root == NULL) {
-        return FALSE;
+struct _HSD_TExpTevDesc {
+    /* 0x00 */ HSD_TevDesc desc;
+    /* 0x84 */ HSD_TObj* tobj;
+};
+
+void HSD_TExpSetReg(HSD_TExp* texp);
+
+/* HSD_TExpSetupTev - 0x801B45A4 | Size: 0x70 */
+void fn_801B45A4(HSD_TExpTevDesc* tevdesc, HSD_TExp* texp) {
+    HSD_TExpSetReg(texp);
+    while (tevdesc != NULL) {
+        if (tevdesc->tobj != NULL) {
+            tevdesc->desc.map = tevdesc->tobj->id;
+            tevdesc->desc.coord = tevdesc->tobj->coord;
+        }
+        HSD_StateAssignTev();
+        fn_801B3638(&tevdesc->desc);
+        tevdesc = (HSD_TExpTevDesc*)tevdesc->desc.next;
     }
-    /* Check that the expression tree has valid structure */
-    return TRUE;
 }
 
 /*
@@ -1146,16 +1156,16 @@ BOOL fn_801B45A4(u8* root) {
  * from the validated expression tree. Maps expression nodes
  * to TEV stages, assigns texture coordinates and maps.
  */
-void HSD_TExpSetReg(u8* root, u32 start_stage) {
+void HSD_TExpSetReg(HSD_TExp* texp) {
     u32 stage;
     u8* node;
 
-    if (root == NULL) {
+    if (texp == NULL) {
         return;
     }
 
-    stage = start_stage;
-    node = root;
+    stage = 0;
+    node = (u8*)texp;
 
     while (node != NULL && stage < 16) {
         u32 type = *(u32*)(node + 0x0);

@@ -11,6 +11,7 @@
  */
 
 #include "game/colosseum.h"
+#include "game/fight_action.h"
 #include "game/trainer.h"
 #include "game/pokemon.h"
 
@@ -49,7 +50,6 @@ extern void  fn_80119ED0(void);
 extern void  fn_80121ADC(void);
 extern void  fn_8011B67C(void);
 extern void  pokemonGetSoubiItemDataId(void);
-extern void* fightActionGetPri(void* p);
 extern void  wazaGetStatus(void);
 
 /* SDA table pointers for event data arrays */
@@ -317,29 +317,21 @@ s32 _fightSeqInitSubFightOutPokemon__FPvUsPv(void* ctx) {
 #pragma pop
 
 /* Address: 0x80211948 | Size: 0x8c | Ghidra import */
-void fightSeqFightActionCreateAndFlowFifo(void)
-
+void fightSeqFightActionCreateAndFlowFifo(
+    void* motoAction, void* actorTarget, u32 kind, u32 buff,
+    FightActionData* actionData, void* buffData)
 {
-    u32 r3;
-    u32 r4;
-    u32 r5;
-    u32 r6;
-    u32 r7;
-    u32 r8;
-
-    extern void fightActionFlowFifo();
-    extern s8 fightActionCreate();
-    extern void fightActionBiosSetBuffDataPtr();
-  s8 cVar1;
-  u8 auStack_38 [52];
+  u8 result;
+  FightAction action;
   
-  cVar1 = fightActionCreate(auStack_38,r3,r4,r5,r6,r7);
-  if (cVar1 == 1) {
-    fightActionBiosSetBuffDataPtr(auStack_38,r8);
-    cVar1 = 1;
+  result = fightActionCreate(&action, motoAction, actorTarget, kind, buff,
+                             actionData);
+  if (result == 1) {
+    fightActionBiosSetBuffDataPtr(&action, buffData);
+    result = 1;
   }
-  if (cVar1 == 1) {
-    fightActionFlowFifo(auStack_38);
+  if (result == 1) {
+    fightActionFlowFifo(&action);
   }
   return;
 }
@@ -382,18 +374,13 @@ void fn_80211A00(void)
 u32 fn_80211A78(void* ctx) {
     extern u8 lbl_80375D30[];
     extern u8 lbl_803791FE[];
-    extern u32 lbl_8047B62C;
-    extern void fightActionFlowFifo();
-    extern u8 fightActionCheckValid();
-    extern u8 fightActionCreate();
+    extern void* lbl_8047B62C;
     extern u8 fn_802026E4();
     extern u16 fightOutPokemonGetMotoWazaDataId();
     extern u8 fightOutPokemonCheckFightOut();
-    extern void fightActionBiosSetBuffDataPtr();
-    extern u32 fightActionBiosGetFightActionDataPtr();
     u8 localBuf[0x30];
     void* feData;
-    u32 d920val;
+    FightActionData* d920val;
     u8 result;
 
     if ((u8)fightOutPokemonCheckFightOut(ctx) == 0) { return 1; }
@@ -403,10 +390,11 @@ u32 fn_80211A78(void* ctx) {
     if (fightOutPokemonGetMotoWazaDataId(ctx) != 0x108) { goto done; }
     if ((u8)fn_802026E4(ctx, 8) != 0) { goto done; }
     if ((u8)(u32)pokemonGetStatus(ctx, 0, 0xF9, 0) != 0) { goto done; }
-    d920val = fightActionBiosGetFightActionDataPtr(lbl_8047B62C);
-    result = fightActionCreate(localBuf, d920val, ctx, 0xC, 0, lbl_80375D30);
+    d920val = fightActionBiosGetFightActionDataPtr((FightAction*)lbl_8047B62C);
+    result = fightActionCreate((FightAction*)localBuf, d920val, ctx, 0xC, 0,
+                               (FightActionData*)lbl_80375D30);
     if (result == 1) {
-        fightActionBiosSetBuffDataPtr(localBuf, (u32)lbl_803791FE);
+        fightActionBiosSetBuffDataPtr((FightAction*)localBuf, lbl_803791FE);
         result = 1;
     }
     if (result == 1) {
