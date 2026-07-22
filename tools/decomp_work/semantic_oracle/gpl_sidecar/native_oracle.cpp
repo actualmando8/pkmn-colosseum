@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// This executable links DolRecomp's standalone CPU runtime and two generated
+// This executable links DolRecomp's standalone CPU runtime and three generated
 // GC6E01 chunks. It intentionally remains a separate process from the MIT
 // decompilation tooling and executes only pinned, original-DOL functions.
 
@@ -26,6 +26,7 @@ extern "C"
 
 void func_800ED5E0(CPUState* ctx);
 void func_801315E0(CPUState* ctx);
+void func_801A55E0(CPUState* ctx);
 }
 
 #include "picojson.h"
@@ -74,6 +75,7 @@ struct SupportedFunction
 constexpr SupportedFunction kSupportedFunctions[] = {
     {"GStextureLockImage", 0x800ef548u, 0x30u, 0x800ed5e0u, 0x800f15e0u, func_800ED5E0},
     {"msgctrlWait", 0x80132454u, 0x78u, 0x801315e0u, 0x801355e0u, func_801315E0},
+    {"fn_801A6DA0", 0x801a6da0u, 0x24u, 0x801a55e0u, 0x801a95e0u, func_801A55E0},
 };
 
 [[noreturn]] void Fail(const std::string& message)

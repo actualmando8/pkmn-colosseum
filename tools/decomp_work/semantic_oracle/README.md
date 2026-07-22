@@ -62,7 +62,8 @@ The pilot is deliberately limited to reviewed relocation-free integer/control
 profiles:
 
 - `msgctrlWait-v1`: `0x80132454`, `0x78` bytes;
-- `GStextureLockImage-v2`: `0x800EF548`, `0x30` bytes.
+- `GStextureLockImage-v2`: `0x800EF548`, `0x30` bytes;
+- `fn_801A6DA0-v1`: `0x801A6DA0`, `0x24` bytes.
 - GC6E01 `main.dol` SHA-1:
   `870e8b9693ca780782d80f22a6a4572d8ba9458f`
 
@@ -91,7 +92,8 @@ wraparound. Version-stable xorshift cases follow. Each profile declares its
 register/RAM setup and watches. The comparison contract is:
 
 - execution status and final return PC;
-- requested `r3`;
+- profile-requested GPRs (`r3` where declared, none for void
+  `fn_801A6DA0-v1`);
 - readable object and stream RAM watches;
 - FNV-1a-64 over all MEM1 except the fixed 4,096-byte code sandbox.
 
@@ -102,6 +104,16 @@ fixtures. A fresh 1,000-fixture `msgctrlWait-v1` replay also returned zero
 native-vs-Dolphin and zero authoritative-candidate mismatches. Its deterministic
 corpus SHA-256 is
 `690b1b4851d861bd4d8503d5f18e0b3bff147d4d42320722ae38933a23c09350`.
+
+`fn_801A6DA0-v1` covers null `mobj`, null `tobj`, and valid insertion with
+both null and non-null old list heads. It watches complete `HSD_MObj` and
+`HSD_TObj` regions, including both `+0x08` pointer fields, and intentionally
+declares no GPR equality contract for this void function. Its seed
+`0x6c6f7373` 1,000-fixture corpus has SHA-256
+`45f612466208aef474c6f2c89b3a5a1bbe9009dd886e20d97ea70768cc3858bc`.
+The current baseline passed with zero native-vs-Dolphin and zero candidate
+mismatches. The archived known-bad partial was rejected with 1,248 semantic
+mismatches, including null-`tobj` alerts and incorrect `tobj+0x08` state.
 
 Digest mismatches include the first bounded before/after RAM change from each
 run. The sidecar also limits its diagnostic change list to 32 spans and 512

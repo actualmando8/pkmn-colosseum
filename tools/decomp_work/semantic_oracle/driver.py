@@ -66,6 +66,9 @@ NATIVE_SELECTED_GENERATED_SHA256 = {
     "chunks/chunk_0076_text1_801315E0.c": (
         "2755b985feecd5645aebc69b9708796459a365bc95c6986ef49af5dfaa32c794"
     ),
+    "chunks/chunk_0105_text1_801A55E0.c": (
+        "e63d85dfff5588fc1a71fa921dd79f5270ff91ea35411ba081be02d99e90a39f"
+    ),
     "generated.h": "4a7a53d36da85ee05c7e2a6db98efebb90662e26c53580103b17cc4daa8de71e",
 }
 NATIVE_SELECTED_GENERATED_FILES = set(NATIVE_SELECTED_GENERATED_SHA256)
@@ -79,6 +82,16 @@ TEXTURE_TARGET_TEXT_SIZE = 0x30
 TEXTURE_MAX_INSTRUCTIONS = 32
 TEXTURE_OBJECT_BASE = 0x80410000
 TEXTURE_OBJECT_SIZE = 0x60
+MOBJ_ADD_TOBJ_PROFILE = "fn_801A6DA0-v1"
+MOBJ_ADD_TOBJ_FUNCTION_NAME = "fn_801A6DA0"
+MOBJ_ADD_TOBJ_ENTRY_PC = 0x801A6DA0
+MOBJ_ADD_TOBJ_TARGET_TEXT_SIZE = 0x24
+MOBJ_ADD_TOBJ_MAX_INSTRUCTIONS = 32
+MOBJ_BASE = 0x80420000
+MOBJ_SIZE = 0x20
+TOBJ_BASE = 0x80421000
+TOBJ_SIZE = 0xAC
+OLD_TOBJ_BASE = 0x80422000
 OBJECT_BASE = 0x80010000
 OBJECT_SIZE = 0x50
 OBJECT_STRIDE = 0x100
@@ -145,9 +158,24 @@ GSTEXTURE_PROFILE = OracleProfile(
     max_instructions=TEXTURE_MAX_INSTRUCTIONS,
     memory_contract=("texture[0x00:0x60]",),
 )
+MOBJ_ADD_TOBJ_ORACLE_PROFILE = OracleProfile(
+    identifier=MOBJ_ADD_TOBJ_PROFILE,
+    spec=FunctionSpec(
+        name=MOBJ_ADD_TOBJ_FUNCTION_NAME,
+        virtual_address=MOBJ_ADD_TOBJ_ENTRY_PC,
+        size=MOBJ_ADD_TOBJ_TARGET_TEXT_SIZE,
+        original_dol_sha1=ORIGINAL_DOL_SHA1,
+    ),
+    max_instructions=MOBJ_ADD_TOBJ_MAX_INSTRUCTIONS,
+    memory_contract=(
+        "mobj[0x00:0x20] (tobj at +0x08)",
+        "tobj[0x00:0xac] (next at +0x08)",
+    ),
+)
 PROFILES = {
     MSGCTRL_PROFILE.identifier: MSGCTRL_PROFILE,
     GSTEXTURE_PROFILE.identifier: GSTEXTURE_PROFILE,
+    MOBJ_ADD_TOBJ_ORACLE_PROFILE.identifier: MOBJ_ADD_TOBJ_ORACLE_PROFILE,
 }
 
 
@@ -1220,6 +1248,89 @@ def generate_texture_fixtures(
     return fixtures
 
 
+MOBJ_ADD_TOBJ_EDGE_CASES: tuple[tuple[str, bool, bool, int], ...] = (
+    ("edge-mobj-null", False, True, OLD_TOBJ_BASE),
+    ("edge-tobj-null", True, False, OLD_TOBJ_BASE),
+    ("edge-valid-old-head-null", True, True, 0),
+    ("edge-valid-old-head-non-null", True, True, OLD_TOBJ_BASE),
+)
+
+
+def make_mobj_add_tobj_fixture(
+    *,
+    index: int,
+    identifier: str,
+    mobj_present: bool,
+    tobj_present: bool,
+    old_head: int,
+    rng: XorShift32,
+) -> dict[str, Any]:
+    mobj_data = bytearray(rng.bytes(MOBJ_SIZE))
+    tobj_data = bytearray(rng.bytes(TOBJ_SIZE))
+    mobj_data[0x08:0x0C] = old_head.to_bytes(4, "big")
+    old_next = OLD_TOBJ_BASE + 0x1000 + ((index & 0xFF) * 0x20)
+    tobj_data[0x08:0x0C] = old_next.to_bytes(4, "big")
+    return {
+        "id": identifier,
+        "initial": {
+            "pc": hex32(MOBJ_ADD_TOBJ_ENTRY_PC),
+            "gpr": {
+                "1": hex32(STACK_POINTER),
+                "3": hex32(MOBJ_BASE if mobj_present else 0),
+                "4": hex32(TOBJ_BASE if tobj_present else 0),
+            },
+            "lr": hex32(RETURN_PC),
+            "memory": [
+                {"address": hex32(MOBJ_BASE), "data_hex": mobj_data.hex()},
+                {"address": hex32(TOBJ_BASE), "data_hex": tobj_data.hex()},
+            ],
+        },
+        "observe": {
+            # This void function's volatile register aftermath is not part of
+            # the contract. Both pointer writes are covered by RAM instead.
+            "gpr": [],
+            "memory": [
+                {"address": hex32(MOBJ_BASE), "size": MOBJ_SIZE},
+                {"address": hex32(TOBJ_BASE), "size": TOBJ_SIZE},
+            ],
+        },
+    }
+
+
+def generate_mobj_add_tobj_fixtures(
+    count: int = DEFAULT_FIXTURE_COUNT, seed: int = DEFAULT_SEED
+) -> list[dict[str, Any]]:
+    if not 1 <= count <= MAX_FIXTURES:
+        raise OracleError(f"fixture count must be between 1 and {MAX_FIXTURES}")
+    rng = XorShift32(seed)
+    fixtures: list[dict[str, Any]] = []
+    for index in range(count):
+        if index < len(MOBJ_ADD_TOBJ_EDGE_CASES):
+            identifier, mobj_present, tobj_present, old_head = (
+                MOBJ_ADD_TOBJ_EDGE_CASES[index]
+            )
+        else:
+            random_index = index - len(MOBJ_ADD_TOBJ_EDGE_CASES)
+            mode = random_index & 3
+            identifier = f"random-{random_index:04d}-mode-{mode}"
+            mobj_present = mode != 0
+            tobj_present = mode != 1
+            old_head = 0
+            if mode in (0, 1, 3):
+                old_head = OLD_TOBJ_BASE + ((rng.next_u32() & 0xFF) * 0x20)
+        fixtures.append(
+            make_mobj_add_tobj_fixture(
+                index=index,
+                identifier=identifier,
+                mobj_present=mobj_present,
+                tobj_present=tobj_present,
+                old_head=old_head,
+                rng=rng,
+            )
+        )
+    return fixtures
+
+
 def generate_profile_fixtures(
     profile: OracleProfile, count: int = DEFAULT_FIXTURE_COUNT, seed: int = DEFAULT_SEED
 ) -> list[dict[str, Any]]:
@@ -1227,6 +1338,8 @@ def generate_profile_fixtures(
         return generate_fixtures(count, seed)
     if profile.identifier == GSTEXTURE_PROFILE.identifier:
         return generate_texture_fixtures(count, seed)
+    if profile.identifier == MOBJ_ADD_TOBJ_ORACLE_PROFILE.identifier:
+        return generate_mobj_add_tobj_fixtures(count, seed)
     raise OracleError(f"profile has no fixture generator: {profile.identifier}")
 
 
@@ -1676,6 +1789,18 @@ def compare_results(
     )
 
 
+def observed_gpr_contract(fixtures: list[dict[str, Any]]) -> list[int]:
+    """Return the GPRs compared by at least one fixture in this corpus."""
+    registers: set[int] = set()
+    for fixture in fixtures:
+        observe = fixture.get("observe")
+        if not isinstance(observe, dict) or not isinstance(observe.get("gpr"), list):
+            identifier = fixture.get("id", "<unknown>")
+            raise OracleError(f"fixture has no observed GPR list: {identifier}")
+        registers.update(int(register) for register in observe["gpr"])
+    return sorted(registers)
+
+
 def configured_io_paths(args: argparse.Namespace, temporary: Path) -> tuple[Path, Path, Path, Path]:
     option_names = (
         "reference_request_file",
@@ -1887,7 +2012,7 @@ def command_run(args: argparse.Namespace) -> int:
                 json.dumps(fixtures, separators=(",", ":"), sort_keys=True).encode("utf-8")
             ).hexdigest(),
             "observable_contract": {
-                "gpr": [3],
+                "gpr": observed_gpr_contract(fixtures),
                 "memory": list(profile.memory_contract),
                 "whole_ram": "FNV-1a-64 excluding the validated 4096-byte code sandbox",
                 "control": ["status", "return_pc"],

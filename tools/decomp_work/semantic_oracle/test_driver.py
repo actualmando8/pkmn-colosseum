@@ -186,6 +186,54 @@ class FixtureTests(unittest.TestCase):
         self.assertGreaterEqual(sum(level < 8 for level in levels), 500)
         self.assertTrue(all(level in levels for level in range(8)))
 
+    def test_mobj_add_tobj_profile_covers_nulls_and_both_pointer_writes(self) -> None:
+        profile = driver.resolve_profile("fn_801A6DA0-v1")
+        fixtures = driver.generate_profile_fixtures(profile, 8, 0x12345678)
+        self.assertEqual(
+            fixtures,
+            driver.generate_profile_fixtures(profile, 8, 0x12345678),
+        )
+        self.assertNotEqual(
+            fixtures,
+            driver.generate_profile_fixtures(profile, 8, 0x12345679),
+        )
+        self.assertEqual(
+            [row["id"] for row in fixtures[:4]],
+            [
+                "edge-mobj-null",
+                "edge-tobj-null",
+                "edge-valid-old-head-null",
+                "edge-valid-old-head-non-null",
+            ],
+        )
+        self.assertEqual(fixtures[0]["initial"]["gpr"]["3"], "0x00000000")
+        self.assertEqual(fixtures[0]["initial"]["gpr"]["4"], driver.hex32(driver.TOBJ_BASE))
+        self.assertEqual(fixtures[1]["initial"]["gpr"]["3"], driver.hex32(driver.MOBJ_BASE))
+        self.assertEqual(fixtures[1]["initial"]["gpr"]["4"], "0x00000000")
+
+        null_head = bytes.fromhex(fixtures[2]["initial"]["memory"][0]["data_hex"])
+        nonnull_head = bytes.fromhex(fixtures[3]["initial"]["memory"][0]["data_hex"])
+        self.assertEqual(int.from_bytes(null_head[0x08:0x0C], "big"), 0)
+        self.assertEqual(
+            int.from_bytes(nonnull_head[0x08:0x0C], "big"),
+            driver.OLD_TOBJ_BASE,
+        )
+        for fixture in fixtures:
+            self.assertEqual(fixture["observe"]["gpr"], [])
+            self.assertEqual(
+                fixture["observe"]["memory"],
+                [
+                    {"address": driver.hex32(driver.MOBJ_BASE), "size": driver.MOBJ_SIZE},
+                    {"address": driver.hex32(driver.TOBJ_BASE), "size": driver.TOBJ_SIZE},
+                ],
+            )
+        self.assertEqual(driver.observed_gpr_contract(fixtures), [])
+
+        request = driver.build_request(b"\x00" * 0x24, fixtures, profile)
+        self.assertEqual(request["function"]["name"], "fn_801A6DA0")
+        self.assertEqual(request["function"]["entry_pc"], "0x801a6da0")
+        self.assertEqual(request["function"]["original"]["size"], 0x24)
+
 
 class PinTests(unittest.TestCase):
     def test_repository_manifest_contains_exact_reviewed_pins(self) -> None:

@@ -39,6 +39,7 @@ SELECTED_GENERATED_FILES = (
     "generated.h",
     "chunks/chunk_0059_text1_800ED5E0.c",
     "chunks/chunk_0076_text1_801315E0.c",
+    "chunks/chunk_0105_text1_801A55E0.c",
 )
 
 SELECTED_CHUNK_MARKERS = {
@@ -51,6 +52,11 @@ SELECTED_CHUNK_MARKERS = {
         "void func_801315E0(CPUState* ctx)",
         "case 0x80132454u: goto label_80132454;",
         "label_80132454:",
+    ),
+    "chunks/chunk_0105_text1_801A55E0.c": (
+        "void func_801A55E0(CPUState* ctx)",
+        "case 0x801A6DA0u: goto label_801A6DA0;",
+        "label_801A6DA0:",
     ),
 }
 

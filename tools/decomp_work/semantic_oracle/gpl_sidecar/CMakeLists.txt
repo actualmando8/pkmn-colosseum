@@ -169,7 +169,7 @@ target_compile_definitions(moderngekko-dolphin-oracle PRIVATE
 
 # The pinned checkout's full RecompCore module path currently has incompatible
 # generated/runtime CPU layouts.  This second out-of-process executable instead
-# compiles two exact DolRecomp chunks against the matching standalone dr_cpu
+# compiles three exact DolRecomp chunks against the matching standalone dr_cpu
 # ABI.  The Python driver admits its result only after fixture-for-fixture
 # parity with Dolphin's interpreter; it is never a matching authority.
 set(ORACLE_NATIVE_OUTPUT_ROOT "${CMAKE_CURRENT_BINARY_DIR}/native_codegen")
@@ -181,6 +181,8 @@ set(ORACLE_NATIVE_TEXTURE_CHUNK
   "${ORACLE_NATIVE_GENERATED_DIR}/chunks/chunk_0059_text1_800ED5E0.c")
 set(ORACLE_NATIVE_MSGCTRL_CHUNK
   "${ORACLE_NATIVE_GENERATED_DIR}/chunks/chunk_0076_text1_801315E0.c")
+set(ORACLE_NATIVE_MOBJ_CHUNK
+  "${ORACLE_NATIVE_GENERATED_DIR}/chunks/chunk_0105_text1_801A55E0.c")
 
 add_custom_command(
   OUTPUT
@@ -188,6 +190,7 @@ add_custom_command(
     "${ORACLE_NATIVE_HEADER}"
     "${ORACLE_NATIVE_TEXTURE_CHUNK}"
     "${ORACLE_NATIVE_MSGCTRL_CHUNK}"
+    "${ORACLE_NATIVE_MOBJ_CHUNK}"
   COMMAND "${Python3_EXECUTABLE}" "${ORACLE_NATIVE_GENERATOR}"
     --checkout "${MODERNGEKKO_SOURCE_DIR}"
     --dolrecomp "$<TARGET_FILE:dolrecomp>"
@@ -205,12 +208,14 @@ add_custom_command(
 set_source_files_properties(
   "${ORACLE_NATIVE_TEXTURE_CHUNK}"
   "${ORACLE_NATIVE_MSGCTRL_CHUNK}"
+  "${ORACLE_NATIVE_MOBJ_CHUNK}"
   PROPERTIES GENERATED TRUE)
 
 add_executable(moderngekko-native-oracle
   native_oracle.cpp
   "${ORACLE_NATIVE_TEXTURE_CHUNK}"
-  "${ORACLE_NATIVE_MSGCTRL_CHUNK}")
+  "${ORACLE_NATIVE_MSGCTRL_CHUNK}"
+  "${ORACLE_NATIVE_MOBJ_CHUNK}")
 add_dependencies(moderngekko-native-oracle
   moderngekko-dolphin-oracle-preflight)
 target_compile_features(moderngekko-native-oracle PRIVATE cxx_std_23)
