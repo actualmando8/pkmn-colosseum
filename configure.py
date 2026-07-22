@@ -905,8 +905,15 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "musyx/runtime/seq_get_private_id_exact_8014635C.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                progress_category="musyx",
+            ),
+            Object(
                 CodeCandidate,
-                "musyx/runtime/seq.c",
+                "musyx/runtime/seq_candidate_801463C4.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
@@ -1195,6 +1202,10 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/people/people_data.c"),
+                    (Matching, "game/people/people_field_lookup_exact_80142984.c"),
+                    (CodeCandidate, "game/people/people_data_candidate_80142A88.c"),
+                    (Matching, "game/people/people_item_friend_exact_8014369C.c"),
+                    (CodeCandidate, "game/people/people_data_candidate_801436F0.c"),
                     (Matching, "game/people/people_item_effort_exact_80143718.c"),
                     (Matching, "game/people/people_data_candidate_80143778.c"),
                     (Matching, "game/people/people_item_ppup_exact_801437A0.c"),
@@ -1633,13 +1644,21 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/fight_seq.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/fight_seq_candidate_80211170.c"),
+                    (Matching, "game/fight_seq_exact_802117FC.c"),
+                    (CodeCandidate, "game/fight_seq_candidate_80211810.c"),
+                    (Matching, "game/fight_seq_exact_802119D4.c"),
+                ]
+            ],
             *[
                 Object(
                     status,
@@ -1650,8 +1669,12 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/mail_candidate_801D1338.c"),
+                    (Matching, "game/mail_exact_801D13E4.c"),
+                    (CodeCandidate, "game/mail_candidate_801D142C.c"),
                     (Matching, "game/mail_exact_801D1470.c"),
                     (CodeCandidate, "game/mail_candidate_801D167C.c"),
+                    (Matching, "game/mail_exact_801D16F0.c"),
+                    (CodeCandidate, "game/mail_candidate_801D1734.c"),
                     (Matching, "game/mail_exact_801D1A44.c"),
                     (CodeCandidate, "game/mail_candidate_801D1B10.c"),
                     (Matching, "game/mail_exact_801D1E50.c"),
@@ -1684,6 +1707,8 @@ config.libs = [
                     (CodeCandidate, "game/wazaViewer_candidate_801D5328.c"),
                     (Matching, "game/wazaViewer_exact_801D53D4.c"),
                     (CodeCandidate, "game/wazaViewer_candidate_801D53D8.c"),
+                    (Matching, "game/wazaViewer_exact_801D744C.c"),
+                    (CodeCandidate, "game/wazaViewer_candidate_801D7464.c"),
                 ]
             ],
             Object(
@@ -1792,15 +1817,28 @@ config.libs = [
                     (CodeCandidate, "game/window.c"),
                     (Matching, "game/window_exact_801040A0.c"),
                     (CodeCandidate, "game/window_candidate_801040F0.c"),
+                    (Matching, "game/window_exact_801046B8.c"),
+                    (CodeCandidate, "game/window_candidate_801046C8.c"),
+                    (Matching, "game/window_exact_80104704.c"),
+                    (CodeCandidate, "game/window_candidate_8010474C.c"),
+                    (Matching, "game/window_exact_80105624.c"),
+                    (CodeCandidate, "game/window_candidate_80105634.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/win_msg.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/win_msg.c"),
+                    (Matching, "game/win_msg_exact_80105C30.c"),
+                    (CodeCandidate, "game/win_msg_candidate_80105C68.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/win_sequence.c",
@@ -3081,7 +3119,8 @@ config.libs = [
                     (Matching, "game/gs_model_shadow_exact_800E8EFC.c"),
                     (CodeCandidate, "game/gs_model_shadow_candidate_800E8F80.c"),
                     (Matching, "game/gs_model_shadow_exact_800E8FE8.c"),
-                    (CodeCandidate, "game/gs_model_shadow_candidate_800E90C8.c"),
+                    (Matching, "game/gs_model_shadow_flags_exact_800E90C8.c"),
+                    (CodeCandidate, "game/gs_model_shadow_candidate_800E9148.c"),
                     (Matching, "game/gs_model_shadow_exact_800E9288.c"),
                     (CodeCandidate, "game/gs_model_shadow_candidate_800E92D8.c"),
                 ]
@@ -3850,13 +3889,24 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/field_range_801CA7EC_prefix.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/field_range_801CA7EC_prefix.c"),
+                    (Matching, "game/field_exact_801CA9F0.c"),
+                    (Matching, "game/field_exact_801CA9F8.c"),
+                    (CodeCandidate, "game/field_candidate_801CAA08.c"),
+                    (Matching, "game/field_exact_801CADA0.c"),
+                    (CodeCandidate, "game/field_candidate_801CADA8.c"),
+                    (Matching, "game/field_exact_801CAE80.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/field_exact_801CAEA0.c",
@@ -4899,13 +4949,20 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/memo.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/memo_candidate_8025FA20.c"),
+                    (Matching, "game/memo_exact_8025FEE4.c"),
+                    (CodeCandidate, "game/memo_candidate_8025FF18.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/evolution.c",
@@ -5081,20 +5138,35 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/effect/fade.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
-            Object(
-                CodeCandidate,
-                "game/effect/fade_effect.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/effect/fade.c"),
+                    (Matching, "game/effect/fade_exact_801C431C.c"),
+                    (CodeCandidate, "game/effect/fade_candidate_801C432C.c"),
+                    (Matching, "game/effect/fade_exact_801C43E4.c"),
+                    (CodeCandidate, "game/effect/fade_candidate_801C43F4.c"),
+                ]
+            ],
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/effect/fade_effect_candidate_801C4814.c"),
+                    (Matching, "game/effect/fade_effect_exact_801C4C98.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gs_party_access.c",
@@ -5124,13 +5196,22 @@ config.libs = [
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008A9E4.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/gba/gba_conv.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gba/gba_conv.c"),
+                    (Matching, "game/gba/gba_conv_exact_80088EA8.c"),
+                    (CodeCandidate, "game/gba/gba_conv_candidate_80088F58.c"),
+                    (Matching, "game/gba/gba_conv_exact_80089028.c"),
+                    (CodeCandidate, "game/gba/gba_conv_candidate_80089030.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/GScolsys2Util.c",
@@ -5173,13 +5254,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_colsys.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_colsys.c"),
+                    (Matching, "game/gs_colsys_obj_enable_exact_8010C7BC.c"),
+                    (CodeCandidate, "game/gs_colsys_candidate_8010C8D0.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gs_field_resource.c",
@@ -6361,6 +6449,8 @@ config.libs = [
                     (Matching, "game/camera_exact_80177478.c"),
                     (Matching, "game/camera_exact_801778B4.c"),
                     (CodeCandidate, "game/camera_candidate_801779B0.c"),
+                    (Matching, "game/camera_exact_8017865C.c"),
+                    (CodeCandidate, "game/camera_candidate_801786F4.c"),
                     (Matching, "game/camera_exact_80179DFC.c"),
                     (CodeCandidate, "game/camera_candidate_80179E04.c"),
                 ]

@@ -224,6 +224,30 @@ The retired accelerator farm must not be contacted, restarted, or recreated
 from this repository. Its former activity remains only as historical evidence
 in the handoff ledger and benchmark records below.
 
+### Keep farm tools isolated from validation builds
+
+Farm generation, reconciliation, and integration builds must never share a
+writable `build/tools/` or `build/compilers/` directory. In particular, do not
+symlink a live farm's tool directories into another worktree. A generator can
+download or replace a tool while a verifier is reading it, producing a result
+that is neither reproducible nor attributable to one toolchain snapshot.
+
+Use this sequence whenever farm state and source work overlap:
+
+1. stop the queue generator or give it a private copied tool/compiler tree;
+2. record the tool paths, SHA-256 values, sizes, and mtimes used by the audit;
+3. run reconciliation and the full validation from a worktree-local build;
+4. verify those fingerprints again before restarting the supervisor;
+5. if any fingerprint or mtime moved, discard the affected result and rebuild;
+6. never run two `configure.py`/Ninja jobs in the same worktree concurrently;
+7. after an interrupted local build, finish all surviving processes, run
+   `ninja -t recompact`, regenerate deliberately, and repeat the required gate.
+
+The post-PR #422 rotation caught a shared-tool race fail-closed before any
+candidate was admitted. The operational fix is private tool directories (or a
+single explicit mutex), not accepting a later successful retry without
+provenance.
+
 ### Refresh the Windows farm
 
 Generate fidelity-gated work units from a current-report queue. Exclude names
@@ -1518,4 +1542,69 @@ Independent audit: PASS for exact composition, direct text and relocation
 Next action: publish and merge PR #422, reconcile and rotate Windows from the
   merged head, bank the audited Kimi guard separately, then integrate exact-30
   #423 toward the remaining 67 functions
+```
+
+### Batch snapshot — 2026-07-22 (PR #424)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 7c01bc79 (PR #423 merged)
+Batch branch: `integration/pr424-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +25 complete units / +44 total-unit topology /
+  +1,756 linked code / +0 linked data
+Goal cumulative from PR #381: +963 linked functions / +312 complete units /
+  +76,700 linked code / +193 linked data; 37 linked functions remain in the
+  current +1,000 campaign
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes; fuzzy progress 57.809658%
+Head linked: 4,731 functions; 997 / 1,750 units;
+  642,860 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.76% linked / 642.86 kB
+  complete code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole authorized permutation farm
+Windows: post-#422 reconciliation classified all 39 preserved artifacts as
+  32 already exact plus the same seven strict rejects, with zero recoverable
+  survivors. The old supervisor and 12 orphan workers were stopped before
+  rotation. The fresh owner-disjoint queue has 60 functions across 46 objects,
+  queue SHA-256
+  `188f40770a2411d3a75b8e330bf5817d0defe19bab8365a37dc72b78d9c5fcd2`
+  and manifest SHA-256
+  `8c85f5d40c7b310cbca7083501c79b7e607bbe9de2be6d967034efb0d097f8ae`;
+  supervisor PID 15728 and 12 / 12 workers were live at the rotation checkpoint
+  with zero wins or bad units. None of this batch, the raw-100 pool, the Kimi
+  target, or historical owners overlaps that queue. The queue is rotated again
+  only after this batch merges.
+Kimi K3: the PR #423 full-owner guard is merged. One bounded compile-loop
+  request tested `GSmaterialCreate` at a 97.386% baseline using 7,644 prompt
+  and 8,192 completion tokens (15,836 total). The completion budget was spent
+  almost entirely on reasoning and yielded no compilable primary proposal, no
+  score lift, and no bankable source. The trial stopped after that zero-lift
+  round; no model response enters this batch.
+Integrated: two people field lookups and three friendship-item accessors;
+  three fade hooks; three window accessors; four field script helpers; two
+  fight-sequence flags; memo count; two mail helpers; camera target refresh;
+  two GBA conversion helpers; one MusyX private-ID lookup; the waza viewer and
+  window-message helpers; two model-shadow flag helpers; and two collision
+  object-enable helpers
+Residual/data policy: 25 Matching units and their explicit CodeCandidate
+  neighbors preserve gapless, disjoint text ownership. The unrelated four-byte
+  GBA `.sdata2` residual remains with its original prefix owner rather than
+  being absorbed into either exact unit.
+Validation: all 30 functions / 1,756 bytes are raw 100%; all 25 Matching units
+  emit target-identical text and all 58 normalized target/source relocations;
+  every selected symbol is linker-live at its retail address and size, with
+  579 genuine incoming references in aggregate and none at zero; `FORCEACTIVE`
+  remains empty
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, direct text and 58 / 58
+  relocation parity, typed semantics and ABI, linker liveness, residual/data
+  topology, strict source policy, Windows owner exclusion, zero regression,
+  and the full retail link
+Next action: publish and merge PR #424, reconcile and rotate Windows from the
+  merged head, then integrate the next exact-30 batch toward the remaining 37
+  functions
 ```

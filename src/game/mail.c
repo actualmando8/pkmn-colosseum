@@ -25,10 +25,13 @@
  * fn_801D1338 - Waza get sequence count.
  * Address: 0x801D1338 | Size: 0x2C
  */
+#if !defined(PR424_MAIL_SPLIT_1338_1470) || \
+    defined(PR424_MAIL_1338_13E4)
 s32 fn_801D1338(void* wazaCtx) {
     if (wazaCtx == NULL) return 0;
     return *(s32*)((u8*)wazaCtx + 0x00);
 }
+#endif
 
 /* Extended view of party scratch to access u16 field at offset 0x444.
  * TODO: fold field_444 into WazaPartyScratch when full layout confirmed. */
@@ -39,6 +42,8 @@ typedef struct MailPartyScratchExt {
 
 #if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_1338_1470)
 
+#if !defined(PR424_MAIL_SPLIT_1338_1470) || \
+    defined(PR424_MAIL_1338_13E4)
 /**
  * fn_801D1364 - Set u16 handle in battle party scratch at offset 0x444.
  * Address: 0x801D1364 | Size: 0x38
@@ -61,7 +66,9 @@ s32 fn_801D139C(void* entry) {
     if (entry == NULL) return -1;
     return *(s32*)((u8*)entry + 0x00);
 }
+#endif
 
+#if !defined(PR424_MAIL_SPLIT_1338_1470)
 /**
  * fn_801D13E4 - Waza get entry field at +0x04 (u16), by index.
  * Address: 0x801D13E4 | Size: 0x48
@@ -78,7 +85,10 @@ u32 fn_801D13E4(s32 idx) {
     if (sequenceEntry == NULL) return 0xFFFF;
     return sequenceEntry->field_04;
 }
+#endif
 
+#if !defined(PR424_MAIL_SPLIT_1338_1470) || \
+    defined(PR424_MAIL_142C_1470)
 /**
  * fn_801D142C - Waza get entry duration.
  * Address: 0x801D142C | Size: 0x44
@@ -87,6 +97,7 @@ f32 fn_801D142C(void* entry) {
     if (entry == NULL) return 0.0f;
     return *(f32*)((u8*)entry + 0x08);
 }
+#endif
 
 #endif
 
@@ -240,6 +251,8 @@ u32 fn_801D1650(u32 idx) {
 
 #if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_167C_1A44)
 
+#if !defined(PR424_MAIL_SPLIT_167C_1A44) || \
+    defined(PR424_MAIL_167C_16F0)
 /**
  * fn_801D167C - Waza set current handle.
  * Address: 0x801D167C | Size: 0x48
@@ -265,7 +278,9 @@ u8 fn_801D16C4(void) {
     return party->currentHandle;
 }
 #pragma scheduling on
+#endif
 
+#if !defined(PR424_MAIL_SPLIT_167C_1A44)
 /**
  * mailGetAttachFileGroup - Waza entry get field 0x18 by index.
  * Address: 0x801D16F0 | Size: 0x44
@@ -280,7 +295,10 @@ u32 mailGetAttachFileGroup(s32 idx) {
     if (entry == NULL) return 0;
     return entry->field_18;
 }
+#endif
 
+#if !defined(PR424_MAIL_SPLIT_167C_1A44) || \
+    defined(PR424_MAIL_1734_1A44)
 /* =========================================================================
  * WAZA ANIMATION CONTROLLERS (0x801D1734 - 0x801D2C6C)
  *
@@ -310,6 +328,7 @@ void fn_801D1864(s32 attackerSlot, s32 targetSlot, s32 moveID, s32 cameraMode) {
 void fn_801D19A4(s32 seqHandle, f32 speed) {
     /* TODO: Waza animation speed control (0xA0 bytes) */
 }
+#endif
 
 #endif
 

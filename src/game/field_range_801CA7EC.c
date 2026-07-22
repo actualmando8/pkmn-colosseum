@@ -66,6 +66,8 @@ extern u32 exribbonSetEarthRibbon(void* mon);
 extern void etctoolSetPokemonNakigoe();
 
 #if defined(FIELD_801CA7EC_PREFIX_ACTIVE)
+#if !defined(PR424_FIELD_PREFIX_SPLIT) || \
+    defined(PR424_FIELD_801CA7EC_801CA9F0)
 u32 scriptAddPokecoupon(s32 delta)
 {
     heroGetStatus((u8*)0, 0xd, 0);
@@ -148,7 +150,9 @@ s32 scriptSetEventCol(u8 enable)
     }
     return id;
 }
+#endif
 
+#if !defined(PR424_FIELD_PREFIX_SPLIT)
 s32 scriptGetEventColID(void)
 {
     return lbl_80478CB0;
@@ -160,7 +164,10 @@ s32 scriptSetEventColID(s32 id)
     lbl_80478CB0 = id;
     return old;
 }
+#endif
 
+#if !defined(PR424_FIELD_PREFIX_SPLIT) || \
+    defined(PR424_FIELD_801CAA08_801CADA0)
 #pragma push
 #pragma scheduling off
 s32 scriptSetCol(s32 index, u8 enable)
@@ -281,12 +288,17 @@ u32 scriptGetEarthRibbon(void)
     return 0;
 }
 #pragma pop
+#endif
 
+#if !defined(PR424_FIELD_PREFIX_SPLIT)
 u32 fn_801CADA0(void)
 {
     return 0;
 }
+#endif
 
+#if !defined(PR424_FIELD_PREFIX_SPLIT) || \
+    defined(PR424_FIELD_801CADA8_801CAE80)
 #pragma push
 #pragma peephole off
 void* fn_801CADA8(u8 kind)
@@ -317,11 +329,14 @@ void* fn_801CADA8(u8 kind)
     return result;
 }
 #pragma pop
+#endif
 
+#if !defined(PR424_FIELD_PREFIX_SPLIT)
 void scriptSetPokemonNakigoe(void) {
     extern void etctoolSetPokemonNakigoe(void);
     etctoolSetPokemonNakigoe();
 }
+#endif
 #endif
 
 #if defined(FIELD_EXACT_801CAEA0)

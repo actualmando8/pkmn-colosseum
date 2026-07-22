@@ -610,7 +610,19 @@ game/menu/cardesavedata.c:
 	.text       start:0x8007FD64 end:0x80088428
 
 game/gba/gba_conv.c:
-	.text       start:0x80088428 end:0x80089048
+	.text       start:0x80088428 end:0x80088EA8
+
+game/gba/gba_conv_exact_80088EA8.c:
+	.text       start:0x80088EA8 end:0x80088F58
+
+game/gba/gba_conv_candidate_80088F58.c:
+	.text       start:0x80088F58 end:0x80089028
+
+game/gba/gba_conv_exact_80089028.c:
+	.text       start:0x80089028 end:0x80089030
+
+game/gba/gba_conv_candidate_80089030.c:
+	.text       start:0x80089030 end:0x80089048
 
 game/pokeconv.c:
 	.text       start:0x80089048 end:0x800896B8
@@ -2089,8 +2101,11 @@ game/gs_model_shadow_candidate_800E8F80.c:
 game/gs_model_shadow_exact_800E8FE8.c:
 	.text       start:0x800E8FE8 end:0x800E90C8
 
-game/gs_model_shadow_candidate_800E90C8.c:
-	.text       start:0x800E90C8 end:0x800E9288
+game/gs_model_shadow_flags_exact_800E90C8.c:
+	.text       start:0x800E90C8 end:0x800E9148
+
+game/gs_model_shadow_candidate_800E9148.c:
+	.text       start:0x800E9148 end:0x800E9288
 
 game/gs_model_shadow_exact_800E9288.c:
 	.text       start:0x800E9288 end:0x800E92D8
@@ -2304,10 +2319,34 @@ game/window_exact_801040A0.c:
 	.text       start:0x801040A0 end:0x801040F0
 
 game/window_candidate_801040F0.c:
-	.text       start:0x801040F0 end:0x801058CC
+	.text       start:0x801040F0 end:0x801046B8
+
+game/window_exact_801046B8.c:
+	.text       start:0x801046B8 end:0x801046C8
+
+game/window_candidate_801046C8.c:
+	.text       start:0x801046C8 end:0x80104704
+
+game/window_exact_80104704.c:
+	.text       start:0x80104704 end:0x8010474C
+
+game/window_candidate_8010474C.c:
+	.text       start:0x8010474C end:0x80105624
+
+game/window_exact_80105624.c:
+	.text       start:0x80105624 end:0x80105634
+
+game/window_candidate_80105634.c:
+	.text       start:0x80105634 end:0x801058CC
 
 game/win_msg.c:
-	.text       start:0x801058CC end:0x80106F98
+	.text       start:0x801058CC end:0x80105C30
+
+game/win_msg_exact_80105C30.c:
+	.text       start:0x80105C30 end:0x80105C68
+
+game/win_msg_candidate_80105C68.c:
+	.text       start:0x80105C68 end:0x80106F98
 
 game/win_sequence.c:
 	.text       start:0x80106F98 end:0x80108580
@@ -2331,7 +2370,13 @@ game/gs_range_80109C88.c:
 	.text       start:0x80109C88 end:0x8010C364
 
 game/gs_colsys.c:
-	.text       start:0x8010C364 end:0x8010CBD0
+	.text       start:0x8010C364 end:0x8010C7BC
+
+game/gs_colsys_obj_enable_exact_8010C7BC.c:
+	.text       start:0x8010C7BC end:0x8010C8D0
+
+game/gs_colsys_candidate_8010C8D0.c:
+	.text       start:0x8010C8D0 end:0x8010CBD0
 
 game/gs_range_8010CBD0.c:
 	.text       start:0x8010CBD0 end:0x8010F4B8
@@ -2770,7 +2815,19 @@ game/effect/effect_visual_candidate_801402AC.c:
 	.text       start:0x801402AC end:0x80140588
 
 game/people/people_data.c:
-	.text       start:0x80140588 end:0x80143718
+	.text       start:0x80140588 end:0x80142984
+
+game/people/people_field_lookup_exact_80142984.c:
+	.text       start:0x80142984 end:0x80142A88
+
+game/people/people_data_candidate_80142A88.c:
+	.text       start:0x80142A88 end:0x8014369C
+
+game/people/people_item_friend_exact_8014369C.c:
+	.text       start:0x8014369C end:0x801436F0
+
+game/people/people_data_candidate_801436F0.c:
+	.text       start:0x801436F0 end:0x80143718
 
 game/people/people_item_effort_exact_80143718.c:
 	.text       start:0x80143718 end:0x80143778
@@ -2814,8 +2871,11 @@ game/people/people_data_suffix_801441A8.c:
 game/item_range_80144574.c:
 	.text       start:0x80144574 end:0x8014635C
 
-musyx/runtime/seq.c:
-	.text       start:0x8014635C end:0x80146E88
+musyx/runtime/seq_get_private_id_exact_8014635C.c:
+	.text       start:0x8014635C end:0x801463C4
+
+musyx/runtime/seq_candidate_801463C4.c:
+	.text       start:0x801463C4 end:0x80146E88
 
 musyx/runtime/seq_exact_80146E88.c:
 	.text       start:0x80146E88 end:0x801485FC
@@ -3446,7 +3506,13 @@ game/camera_exact_801778B4.c:
 	.text       start:0x801778B4 end:0x801779B0
 
 game/camera_candidate_801779B0.c:
-	.text       start:0x801779B0 end:0x80179DFC
+	.text       start:0x801779B0 end:0x8017865C
+
+game/camera_exact_8017865C.c:
+	.text       start:0x8017865C end:0x801786F4
+
+game/camera_candidate_801786F4.c:
+	.text       start:0x801786F4 end:0x80179DFC
 
 game/camera_exact_80179DFC.c:
 	.text       start:0x80179DFC end:0x80179E04
@@ -3968,10 +4034,25 @@ game/battle/battle_grid_exact_801C3F10.c:
 	.text       start:0x801C3F10 end:0x801C4078
 
 game/effect/fade.c:
-	.text       start:0x801C4078 end:0x801C4814
+	.text       start:0x801C4078 end:0x801C431C
 
-game/effect/fade_effect.c:
-	.text       start:0x801C4814 end:0x801C4CB8
+game/effect/fade_exact_801C431C.c:
+	.text       start:0x801C431C end:0x801C432C
+
+game/effect/fade_candidate_801C432C.c:
+	.text       start:0x801C432C end:0x801C43E4
+
+game/effect/fade_exact_801C43E4.c:
+	.text       start:0x801C43E4 end:0x801C43F4
+
+game/effect/fade_candidate_801C43F4.c:
+	.text       start:0x801C43F4 end:0x801C4814
+
+game/effect/fade_effect_candidate_801C4814.c:
+	.text       start:0x801C4814 end:0x801C4C98
+
+game/effect/fade_effect_exact_801C4C98.c:
+	.text       start:0x801C4C98 end:0x801C4CB8
 
 game/effect/fade_range_801C4CB8.c:
 	.text       start:0x801C4CB8 end:0x801C766C
@@ -3980,7 +4061,25 @@ game/gs_range_801C766C.c:
 	.text       start:0x801C766C end:0x801CA7EC
 
 game/field_range_801CA7EC_prefix.c:
-	.text       start:0x801CA7EC end:0x801CAEA0
+	.text       start:0x801CA7EC end:0x801CA9F0
+
+game/field_exact_801CA9F0.c:
+	.text       start:0x801CA9F0 end:0x801CA9F8
+
+game/field_exact_801CA9F8.c:
+	.text       start:0x801CA9F8 end:0x801CAA08
+
+game/field_candidate_801CAA08.c:
+	.text       start:0x801CAA08 end:0x801CADA0
+
+game/field_exact_801CADA0.c:
+	.text       start:0x801CADA0 end:0x801CADA8
+
+game/field_candidate_801CADA8.c:
+	.text       start:0x801CADA8 end:0x801CAE80
+
+game/field_exact_801CAE80.c:
+	.text       start:0x801CAE80 end:0x801CAEA0
 
 game/field_exact_801CAEA0.c:
 	.text       start:0x801CAEA0 end:0x801CAF0C
@@ -4001,13 +4100,25 @@ game/battle/battle_candidate_801D0C30.c:
 	.text       start:0x801D0C30 end:0x801D1338
 
 game/mail_candidate_801D1338.c:
-	.text       start:0x801D1338 end:0x801D1470
+	.text       start:0x801D1338 end:0x801D13E4
+
+game/mail_exact_801D13E4.c:
+	.text       start:0x801D13E4 end:0x801D142C
+
+game/mail_candidate_801D142C.c:
+	.text       start:0x801D142C end:0x801D1470
 
 game/mail_exact_801D1470.c:
 	.text       start:0x801D1470 end:0x801D167C
 
 game/mail_candidate_801D167C.c:
-	.text       start:0x801D167C end:0x801D1A44
+	.text       start:0x801D167C end:0x801D16F0
+
+game/mail_exact_801D16F0.c:
+	.text       start:0x801D16F0 end:0x801D1734
+
+game/mail_candidate_801D1734.c:
+	.text       start:0x801D1734 end:0x801D1A44
 
 game/mail_exact_801D1A44.c:
 	.text       start:0x801D1A44 end:0x801D1B10
@@ -4034,7 +4145,13 @@ game/wazaViewer_exact_801D53D4.c:
 	.text       start:0x801D53D4 end:0x801D53D8
 
 game/wazaViewer_candidate_801D53D8.c:
-	.text       start:0x801D53D8 end:0x801D7E58
+	.text       start:0x801D53D8 end:0x801D744C
+
+game/wazaViewer_exact_801D744C.c:
+	.text       start:0x801D744C end:0x801D7464
+
+game/wazaViewer_candidate_801D7464.c:
+	.text       start:0x801D7464 end:0x801D7E58
 
 game/wazaSequenceEntry.c:
 	.text       start:0x801D7E58 end:0x801D9E1C
@@ -4524,8 +4641,17 @@ game/fight_trainer.c:
 game/fight_waza.c:
 	.text       start:0x8020EE1C end:0x80211170
 
-game/fight_seq.c:
-	.text       start:0x80211170 end:0x80211A00
+game/fight_seq_candidate_80211170.c:
+	.text       start:0x80211170 end:0x802117FC
+
+game/fight_seq_exact_802117FC.c:
+	.text       start:0x802117FC end:0x80211810
+
+game/fight_seq_candidate_80211810.c:
+	.text       start:0x80211810 end:0x802119D4
+
+game/fight_seq_exact_802119D4.c:
+	.text       start:0x802119D4 end:0x80211A00
 
 game/fight_range_80211A00.c:
 	.text       start:0x80211A00 end:0x80212840
@@ -4937,8 +5063,14 @@ game/gba/GBAWrite.c:
 game/gba/GBAXfer.c:
 	.text       start:0x8025F70C end:0x8025FA20
 
-game/memo.c:
-	.text       start:0x8025FA20 end:0x802600E4
+game/memo_candidate_8025FA20.c:
+	.text       start:0x8025FA20 end:0x8025FEE4
+
+game/memo_exact_8025FEE4.c:
+	.text       start:0x8025FEE4 end:0x8025FF18
+
+game/memo_candidate_8025FF18.c:
+	.text       start:0x8025FF18 end:0x802600E4
 
 game/evolution.c:
 	.text       start:0x802600E4 end:0x80261388
