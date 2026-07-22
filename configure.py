@@ -4904,8 +4904,13 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                Matching,
+                "dolphin/os/OSMemory_exact_8009F1B8.c",
+                progress_category="sdk",
+            ),
+            Object(
                 CodeCandidate,
-                "dolphin/os/OSMemory.c",
+                "dolphin/os/OSMemory_privileged.c",
                 progress_category="sdk",
             ),
             Object(

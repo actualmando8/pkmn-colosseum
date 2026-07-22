@@ -691,8 +691,11 @@ dolphin/os/OSEXI_fn_8009E7AC.c:
 dolphin/sdk_range_8009E7B0.c:
 	.text       start:0x8009E7B0 end:0x8009F1B8
 
-dolphin/os/OSMemory.c:
-	.text       start:0x8009F1B8 end:0x8009F77C
+dolphin/os/OSMemory_exact_8009F1B8.c:
+	.text       start:0x8009F1B8 end:0x8009F54C
+
+dolphin/os/OSMemory_privileged.c:
+	.text       start:0x8009F54C end:0x8009F77C
 
 dolphin/sdk_range_8009F77C_prefix.c:
 	.text       start:0x8009F77C end:0x8009F958
