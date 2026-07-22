@@ -2995,13 +2995,28 @@ hsd/hsd_displayfunc.c:
 	.text       start:0x80197A64 end:0x80198F7C
 
 hsd/hsd_dobj.c:
-	.text       start:0x80198F7C end:0x8019B7C0
+	.text       start:0x80198F7C end:0x8019B750
+
+hsd/hsd_fobj_tail_exact_8019B750.c:
+	.text       start:0x8019B750 end:0x8019B7C0
 
 hsd/hsd_fog.c:
-	.text       start:0x8019B7C0 end:0x8019C690
+	.text       start:0x8019B7C0 end:0x8019C358
+
+hsd/hsd_id_tail_exact_8019C358.c:
+	.text       start:0x8019C358 end:0x8019C3C4
+
+hsd/hsd_id_tail_candidate_8019C3C4.c:
+	.text       start:0x8019C3C4 end:0x8019C690
 
 hsd/hsd_initialize.c:
-	.text       start:0x8019C690 end:0x8019CE50
+	.text       start:0x8019C690 end:0x8019C7B0
+
+hsd/hsd_render_pass_exact_8019C7B0.c:
+	.text       start:0x8019C7B0 end:0x8019C7B8
+
+hsd/hsd_initialize_candidate_8019C7B8.c:
+	.text       start:0x8019C7B8 end:0x8019CE50
 
 hsd/hsd_jobj.c:
 	.text       start:0x8019CE50 end:0x8019F718
@@ -3175,7 +3190,13 @@ hsd/hsd_texp_candidate_801B4300.c:
 	.text       start:0x801B4300 end:0x801BBAC8
 
 hsd/hsd_tobj.c:
-	.text       start:0x801BBAC8 end:0x801BF098
+	.text       start:0x801BBAC8 end:0x801BBD3C
+
+hsd/hsd_tobj_image_exact_801BBD3C.c:
+	.text       start:0x801BBD3C end:0x801BBDDC
+
+hsd/hsd_tobj_candidate_801BBDDC.c:
+	.text       start:0x801BBDDC end:0x801BF098
 
 hsd/hsd_util.c:
 	.text       start:0x801BF098 end:0x801BF6AC

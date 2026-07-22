@@ -3038,6 +3038,18 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "hsd/hsd_tobj_image_exact_801BBD3C.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_tobj_candidate_801BBDDC.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
                 "game/fight_range_80201764.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -5355,6 +5367,12 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "hsd/hsd_fobj_tail_exact_8019B750.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
                 "hsd/hsd_wobj.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
@@ -5366,8 +5384,32 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                Matching,
+                "hsd/hsd_id_tail_exact_8019C358.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_id_tail_candidate_8019C3C4.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
                 CodeCandidate,
                 "hsd/hsd_initialize.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
+                "hsd/hsd_render_pass_exact_8019C7B0.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_initialize_candidate_8019C7B8.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
