@@ -493,12 +493,12 @@ Next unit closers: banked fight_trainer_ai2 (+9), then fresh strict islands
   from current-master reports while both farms continue their refreshed queues
 ```
 
-### Batch snapshot — 2026-07-21 (30-function batch; PR pending)
+### Batch snapshot — 2026-07-21 (PR #396)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: 53492f21 (PR #395 merged)
-Batch branch: `campaign/post395-batch-20260721`
+Batch PR: #396, `campaign/post395-batch-20260721`
 Exact-source delta from goal baseline: +36 functions / +14,412 code bytes
 This batch: +0 exact functions / +0 matched code;
   +30 linked functions / +7 units / +2,644 linked code / +0 linked data
@@ -507,7 +507,7 @@ Newly linked unit/code/data delta from goal baseline: +46 units / +30,288 code /
 Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
 Head linked: 731 / 1,328 units; 596,448 complete code bytes;
   752,761 complete data bytes
-README/report: synced on the batch branch; decomp.dev confirmed through PR #395
+README/report: synced on PR #396; decomp.dev pending PR #396 ingestion
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: 535-entry current queue; 21 workers/permuters/timeouts/claims;
   zero new recoverable wins; one stale terminal WIN? retained
