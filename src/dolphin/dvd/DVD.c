@@ -109,6 +109,7 @@ extern s32 lbl_8047A81C;
 extern BOOL lbl_8047A7FC;
 extern void (*lbl_8047A82C)(DVDCommandBlock* block);
 extern void fn_800A59CC(u32 intType);
+extern void fn_800A5784(u32 intType);
 extern void fn_800A5C60(u32 intType);
 extern void fn_800A5CC8(u32 intType);
 extern void fn_800A5D60(void);
@@ -132,6 +133,29 @@ extern BOOL DVDLowAudioStream(u32 subcmd, u32 length, u32 offset,
 extern BOOL DVDLowRequestAudioStatus(u32 subcmd, DVDLowCallback callback);
 extern BOOL DVDLowAudioBufferConfig(u32 enable, u32 size,
                                     DVDLowCallback callback);
+extern void fn_800060F0(const char* file, s32 line, const char* fmt, ...);
+extern char lbl_80311AD4[0x34];
+extern char lbl_804789D4[6];
+
+typedef struct DVDBB2 {
+    u32 bootFilePosition;
+    u32 FSTPosition;
+    u32 FSTLength;
+    u32 FSTMaxLength;
+    void* FSTAddress;
+    u32 userPosition;
+    u32 userLength;
+    u32 padding0;
+} DVDBB2;
+
+typedef struct DVDStaticData {
+    DVDBB2 bb2;
+    DVDDiskID currentDiskID;
+    DVDCommandBlock dummyCommandBlock;
+    OSAlarm resetAlarm;
+} DVDStaticData;
+
+extern DVDStaticData BB2_803FC360;
 
 /* 0x800A5784 | size: 0x8C */
 #if !defined(DVD_BANK_EXACT_ACTIVE) || \
@@ -271,7 +295,8 @@ void fn_800A6508(u32 intType)
  * DVDInit - Initialize the DVD subsystem
  * 0x800A5624 | size: 0xCC
  */
-#if !defined(DVD_BANK_EXACT_ACTIVE)
+#if !defined(DVD_BANK_EXACT_ACTIVE) || \
+    defined(DVD_EXACT_800A5624_800A5784)
 void DVDInit(void) {
     u32* new_var;
     u32 debugMonSize;
@@ -313,12 +338,28 @@ void DVDInit(void) {
     debugMonSize = *new_var;
     if (debugMonSize + 0x1AE00000 == 0x7C22) {
         /* Debugging monitor detected */
-        OSReport("@18_80311AC8");
+        OSReport("load fst\n");
         __fstLoad();
     } else if ((*new_var) + 0xF2EB0000 != 0xEA5E) {
         /* Not running from NDEV, first time in bootrom */
         FirstTimeInBootrom_8047A824 = TRUE;
     }
+}
+#endif
+
+/* 0x800A56F0 | size: 0x94 */
+#if !defined(DVD_BANK_EXACT_ACTIVE) || \
+    defined(DVD_EXACT_800A5624_800A5784)
+void stateReadingFST(void)
+{
+    lbl_8047A82C = (void (*)(DVDCommandBlock*))stateReadingFST;
+    if (bootInfo_8047A7F0[0x3C / sizeof(u32)] <
+        BB2_803FC360.bb2.FSTLength) {
+        fn_800060F0(lbl_804789D4, 0x287, lbl_80311AD4);
+    }
+    DVDLowRead((void*)bootInfo_8047A7F0[0x38 / sizeof(u32)],
+               (BB2_803FC360.bb2.FSTLength + 0x1F) & ~0x1F,
+               BB2_803FC360.bb2.FSTPosition, fn_800A5784);
 }
 #endif
 
@@ -565,25 +606,6 @@ void stateBusy_800A68B4(DVDCommandBlock* block) {
 extern u32 CurrCommand_8047A804;
 extern u32 lbl_804789DC;
 extern u32 lbl_80311B48[3];
-typedef struct DVDBB2 {
-    u32 bootFilePosition;
-    u32 FSTPosition;
-    u32 FSTLength;
-    u32 FSTMaxLength;
-    void* FSTAddress;
-    u32 userPosition;
-    u32 userLength;
-    u32 padding0;
-} DVDBB2;
-
-typedef struct DVDStaticData {
-    DVDBB2 bb2;
-    DVDDiskID currentDiskID;
-    DVDCommandBlock dummyCommandBlock;
-    OSAlarm resetAlarm;
-} DVDStaticData;
-
-extern DVDStaticData BB2_803FC360;
 extern DVDDiskID lbl_803FC380;
 
 #if !defined(DVD_BANK_EXACT_ACTIVE) || \

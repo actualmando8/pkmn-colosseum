@@ -465,9 +465,6 @@ game/data/data_80311868.c:
 game/data/data_803119F0.c:
 	.data       start:0x803119F0 end:0x80311A24
 
-game/data/data_80311AD4.c:
-	.data       start:0x80311AD4 end:0x80311BCC
-
 game/menu/menuCB_range_800676EC.c:
 	.text       start:0x800676EC end:0x80068738
 
@@ -782,8 +779,12 @@ dolphin/dvd/DVDFs.c:
 dolphin/dvd/dvdfs_range_800A4D28.c:
 	.text       start:0x800A4D28 end:0x800A5624
 
-dolphin/dvd/DVD.c:
+dolphin/dvd/DVD_exact_800A5624.c:
 	.text       start:0x800A5624 end:0x800A5784
+	.data       start:0x80311AC8 end:0x80311AD4
+
+game/data/data_80311AD4.c:
+	.data       start:0x80311AD4 end:0x80311BCC
 
 dolphin/dvd/DVD_exact_800A5784.c:
 	.text       start:0x800A5784 end:0x800A5810
