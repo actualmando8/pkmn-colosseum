@@ -14,7 +14,7 @@ A matching decompilation project for the GameCube game **Pokémon Colosseum**
 | Function match | 73.28% (6,304 / 8,603 functions) |
 | Code match | 36.11% (900,908 / 2,495,108 matched code bytes) |
 | Data match | 97.29% (2,136,497 / 2,196,100 matched data bytes) |
-| Linked into DOL | 731 / 1,328 units (23.90% of code) |
+| Linked into DOL | 736 / 1,337 units (24.07% of code) |
 
 These numbers come from the canonical dtk/objdiff report generated at
 `build/GC6E01/report.json`. Old campaign metrics and helper reports are archived

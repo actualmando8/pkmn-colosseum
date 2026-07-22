@@ -524,3 +524,29 @@ Rejected: SDK 80098108 exacts (local pragmas/asm/shaping); remaining input
 Next unit closers: banked fight-range 16, banked MusyX 21, then fresh farm
   wins or a strict small-residual object closer
 ```
+
+### Batch snapshot — 2026-07-21 (post-396 bank)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: d856c1a5 (PR #396 merged)
+Batch branch: `campaign/post396-batch-20260721`; PR pending
+Exact-source delta from goal baseline: +36 functions / +14,412 code bytes
+This batch: +0 exact functions / +0 matched code;
+  +37 linked functions / +5 units / +4,020 linked code / +0 linked data
+Newly linked function delta from goal baseline: +208
+Newly linked unit/code/data delta from goal baseline: +51 units / +34,308 code / +177 data
+Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
+Head linked: 736 / 1,337 units; 600,468 complete code bytes;
+  752,761 complete data bytes
+README/report: synced locally; decomp.dev pending merge ingestion
+Retail SHA: pending final batch gate
+3090: healthy post-#395 queue; 535 entries, 21 workers, zero new wins
+Windows: healthy post-#395 manifest; 58 units, 12 workers, zero new wins
+Integrated bank: 16 strict fight-sequence/status functions and 21 strict
+  MusyX MIDI/input-getter functions
+Active campaign worktrees: post-396 integration plus isolated game, HSD,
+  and SDK/MusyX closer scouts
+Next unit closers: strict survivors from the three parallel closer scouts,
+  then non-overlapping post-merge farm queues
+```
