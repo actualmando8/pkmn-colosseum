@@ -1265,3 +1265,68 @@ Independent audit: PASS for exact composition, text and relocation parity,
 Next action: publish and merge PR #418 after final review, rotate Windows from
   the merged head, then integrate the next vetted exact-30 batch
 ```
+
+### Batch snapshot — 2026-07-22 (PR #419)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 0b79a8af (PR #418 merged)
+Batch branch: `integration/pr419-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +15 complete units / +29 total-unit topology /
+  +2,920 linked code / +0 linked data
+Goal cumulative from PR #381: +843 linked functions / +237 complete units /
+  +68,816 linked code / +193 linked data
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,611 functions; 922 / 1,668 units;
+  634,976 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.45% linked / 634.98 kB
+  complete code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole active permutation farm
+Windows: post-#418 reconciliation classified all 39 artifacts as 32 already
+  exact plus the same seven strict rejects, with zero recoverable survivors;
+  136 transients were preserved (minimum score 105, none at or below 25). The
+  final overlap-free queue has 129 records across 68 objects, 60 runnable
+  units across 40 objects, and 69 skips (67 full-TU-fidelity, two parser),
+  with queue SHA-256
+  `a29e3e199380cdf80c3ecf0de432ce5b864f5a9dd41d2afc931f272d7ed97bd0`
+  and manifest SHA-256
+  `ffd1525548fd474c00b79cf99abe034465bb2deffa239e4421771bcbb2b54b86`;
+  supervisor PID 37836 and 12 / 12 parented workers are live at round three
+  with 60 units and zero wins or bad units. Evidence:
+  `reconciliation_post418_pr419final_0b79a8af.json`,
+  `post418-pr419final-pre-0b79a8af-20260722T124401Z` and
+  `post418-pr419final-live-0b79a8af-20260722T124700Z`; all PR #419 functions
+  are excluded through their five owning source units. Nine stale directories
+  from those owners were archived remotely after their candidates were
+  preserved.
+Integrated: 13 natural typed GX helpers, 12 MusyX DSP-control helpers, four
+  typed HSD helpers, and the zero-relocation particle byte-stream time decoder
+Type recovery: a shared GX context preserves the retail field offsets and
+  confines volatility to the 0xCC008000 FIFO and 0xCC000000 CP MMIO; the
+  MusyX DSPvoice, DSPstudioinfo, parameter block, and studio-input layouts are
+  consolidated from the v2.0.0 ABI (`DSPvoice` 0xF4, `DSPstudioinfo` 0xBC);
+  HSD class/string declarations use their authentic array/object types
+Strict rejection gate: `GXSetBlendMode` and `GXSetDstAlpha` were byte-exact
+  only with direct `__rlwimi` instruction shaping. Natural mask and bitfield
+  forms were not exact, so both remain residual and are not counted. The
+  report-100 `fn_800BD454` also remains residual because its normalized
+  relocation owner differs from retail.
+Residual policy: five affected original ranges become 15 Matching units plus
+  19 explicit non-auto CodeCandidate ranges; coverage is gapless and disjoint
+Validation: all 30 functions / 2,920 bytes are raw 100%; all 15 Matching units
+  emit target-identical text and exactly 85 normalized target/source
+  relocations; every selected symbol survives in main.elf at its retail VA and
+  size, with 154 genuine incoming relocations in aggregate; `FORCEACTIVE` is
+  empty
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, text and relocation parity,
+  liveness, ABI/type fidelity, residual topology, strict-policy compliance,
+  farm-owner exclusion, zero regression, and the full retail link
+Next action: publish and merge PR #419 after final review, rotate Windows from
+  the merged head, then integrate the next vetted exact-30 batch
+```
