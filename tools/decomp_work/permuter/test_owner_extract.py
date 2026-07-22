@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import os
 import shutil
@@ -8,7 +9,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
+from unittest import mock
 
 
 MODULE_PATH = Path(__file__).with_name("owner_extract.py")
@@ -148,6 +151,9 @@ owner_data:
                 report["candidate"]["fingerprint_sha256"],
                 report["output"]["fingerprint_sha256"],
             )
+            self.assertEqual(
+                report["candidate"]["topology"], report["output"]["topology"]
+            )
 
     def test_rejects_sibling_text_drift(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -252,6 +258,218 @@ owner_data:
                     objcopy=self.objcopy,
                     readelf=self.readelf,
                 )
+
+    def test_rejects_target_symbol_topology_drift_without_sibling_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = """
+.text
+.globl before
+.type before,@function
+before:
+  blr
+.size before,.-before
+
+.globl target
+.type target,@function
+target:
+  bl ext_target
+  blr
+.size target,.-target
+
+.globl after
+.type after,@function
+after:
+  blr
+.size after,.-after
+"""
+            baseline = self.assemble(root, "baseline", source)
+            baseline_owner = owner_extract.read_elf(baseline)
+            baseline_target = owner_extract.find_target(baseline_owner, "target")
+            target_relocations = owner_extract.target_relocations(
+                baseline_owner, baseline_target
+            )
+            self.assertEqual(len(target_relocations), 1)
+            self.assertEqual(
+                [
+                    relocation
+                    for relocation in baseline_owner.relocations
+                    if relocation not in target_relocations
+                ],
+                [],
+            )
+            candidates = {
+                "binding": source.replace(
+                    ".globl target\n.type target,@function",
+                    ".local target\n.type target,@function",
+                ),
+                "visibility": source.replace(
+                    ".globl target\n.type target,@function",
+                    ".globl target\n.hidden target\n.type target,@function",
+                ),
+            }
+            for label, candidate_source in candidates.items():
+                with self.subTest(label=label):
+                    candidate = self.assemble(root, f"candidate-{label}", candidate_source)
+                    with self.assertRaisesRegex(
+                        owner_extract.ExtractError, "target symbol topology drifted"
+                    ):
+                        owner_extract.extract(
+                            baseline_path=baseline,
+                            candidate_path=candidate,
+                            function="target",
+                            output_path=root / f"target-{label}.o",
+                            objcopy=self.objcopy,
+                            readelf=self.readelf,
+                        )
+
+    def test_rejects_target_text_section_topology_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = self.owner_source().replace("  .long target\n", "  .long 0\n")
+            path = self.assemble(root, "owner", source)
+            baseline = owner_extract.read_elf(path)
+            baseline_target = owner_extract.find_target(baseline, "target")
+            changes = {
+                "flags": {"flags": baseline_target.section.flags ^ 1},
+                "address": {"addr": baseline_target.section.addr + 4},
+                "alignment": {
+                    "addralign": 8 if baseline_target.section.addralign != 8 else 4
+                },
+            }
+            for label, values in changes.items():
+                with self.subTest(label=label):
+                    sections = list(baseline.sections)
+                    sections[baseline_target.section.index] = replace(
+                        baseline_target.section, **values
+                    )
+                    candidate = replace(baseline, sections=tuple(sections))
+                    candidate_target = owner_extract.Target(
+                        baseline_target.symbol,
+                        candidate.sections[baseline_target.section.index],
+                    )
+                    with self.assertRaisesRegex(
+                        owner_extract.ExtractError,
+                        "target text section topology drifted",
+                    ):
+                        owner_extract.audit_siblings(
+                            baseline,
+                            candidate,
+                            baseline_target,
+                            candidate_target,
+                        )
+
+    def test_report_hashes_parsed_owners_across_symlink_swap(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            audited_baseline = self.assemble(root, "baseline", self.owner_source())
+            replacement_baseline = self.assemble(
+                root,
+                "replacement-baseline",
+                self.owner_source(data_value=1),
+            )
+            audited = self.assemble(
+                root,
+                "audited-candidate",
+                self.owner_source(target_nops=1),
+            )
+            replacement = self.assemble(
+                root,
+                "replacement-candidate",
+                self.owner_source(target_nops=1, data_value=1),
+            )
+            baseline = root / "baseline-link.o"
+            candidate = root / "candidate-link.o"
+            baseline.symlink_to(audited_baseline)
+            candidate.symlink_to(audited)
+            audited_baseline_sha256 = hashlib.sha256(
+                audited_baseline.read_bytes()
+            ).hexdigest()
+            replacement_baseline_sha256 = hashlib.sha256(
+                replacement_baseline.read_bytes()
+            ).hexdigest()
+            audited_sha256 = hashlib.sha256(audited.read_bytes()).hexdigest()
+            replacement_sha256 = hashlib.sha256(replacement.read_bytes()).hexdigest()
+            self.assertNotEqual(
+                audited_baseline_sha256, replacement_baseline_sha256
+            )
+            self.assertNotEqual(audited_sha256, replacement_sha256)
+
+            real_run_tool = owner_extract._run_tool
+            swapped = False
+
+            def swap_after_objcopy(argv: list[str], label: str) -> None:
+                nonlocal swapped
+                real_run_tool(argv, label)
+                if label == "powerpc-eabi-objcopy" and not swapped:
+                    baseline.unlink()
+                    baseline.symlink_to(replacement_baseline)
+                    candidate.unlink()
+                    candidate.symlink_to(replacement)
+                    swapped = True
+
+            with mock.patch.object(
+                owner_extract, "_run_tool", side_effect=swap_after_objcopy
+            ):
+                report = owner_extract.extract(
+                    baseline_path=baseline,
+                    candidate_path=candidate,
+                    function="target",
+                    output_path=root / "target.o",
+                    objcopy=self.objcopy,
+                    readelf=self.readelf,
+                )
+
+            self.assertTrue(swapped)
+            self.assertEqual(
+                report["baseline_owner_sha256"], audited_baseline_sha256
+            )
+            self.assertEqual(report["candidate_owner_sha256"], audited_sha256)
+            self.assertEqual(
+                owner_extract.file_sha256(baseline), replacement_baseline_sha256
+            )
+            self.assertEqual(owner_extract.file_sha256(candidate), replacement_sha256)
+
+    def test_report_hashes_parsed_output_across_path_swap(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            baseline = self.assemble(root, "baseline", self.owner_source())
+            candidate = self.assemble(
+                root, "candidate", self.owner_source(target_nops=1)
+            )
+            replacement = self.assemble(
+                root, "replacement", self.owner_source(data_value=1)
+            )
+            replacement_sha256 = hashlib.sha256(replacement.read_bytes()).hexdigest()
+            output = root / "target.o"
+            real_read_elf = owner_extract.read_elf
+            audited_output_sha256: str | None = None
+
+            def swap_after_output_parse(path: Path) -> owner_extract.ElfObject:
+                nonlocal audited_output_sha256
+                parsed = real_read_elf(path)
+                if path == output and audited_output_sha256 is None:
+                    audited_output_sha256 = hashlib.sha256(parsed.data).hexdigest()
+                    output.unlink()
+                    output.symlink_to(replacement)
+                return parsed
+
+            with mock.patch.object(
+                owner_extract, "read_elf", side_effect=swap_after_output_parse
+            ):
+                report = owner_extract.extract(
+                    baseline_path=baseline,
+                    candidate_path=candidate,
+                    function="target",
+                    output_path=output,
+                    objcopy=self.objcopy,
+                    readelf=self.readelf,
+                )
+
+            self.assertIsNotNone(audited_output_sha256)
+            self.assertNotEqual(audited_output_sha256, replacement_sha256)
+            self.assertEqual(report["output"]["elf_sha256"], audited_output_sha256)
+            self.assertEqual(owner_extract.file_sha256(output), replacement_sha256)
 
     def test_expected_baseline_fingerprint_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

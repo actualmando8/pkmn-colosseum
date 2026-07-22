@@ -55,10 +55,13 @@ is 92.5%, not the refused 99.5% shaped lane.
 
 Both transitions run through `owner_extract.py`. The extractor rejects changes
 to sibling text, named/static/data symbols, allocatable non-text sections, or
-sibling relocations. Compiler-generated local ASCII `@[0-9]+` names alone may
-renumber; they are compared by stable section/value/type identity. It emits one
-PowerPC ELF function and preserves only target-owned relocations; a relocation
-to a sibling or data definition is rejected.
+sibling relocations. Target binding/visibility and `.text` flags, address, and
+alignment are immutable fingerprint inputs as well. Compiler-generated local
+ASCII `@[0-9]+` names alone may renumber; they are compared by stable
+section/value/type identity. It emits one PowerPC ELF function and preserves
+only target-owned relocations; a relocation to a sibling or data definition is
+rejected. Reported ELF hashes bind the already-audited byte snapshots rather
+than reopening mutable paths.
 
 The seed itself must retain the incumbent signature. A real Clang AST over the
 authentic, sibling-pruned owner first binds `msgctrlWait` to its reviewed

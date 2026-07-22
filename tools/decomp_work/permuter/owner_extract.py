@@ -409,20 +409,42 @@ def target_relocations(owner: ElfObject, target: Target) -> list[Relocation]:
     )
 
 
+def _target_topology(target: Target) -> dict[str, Any]:
+    """Return link-visible target state which candidate code may not change."""
+    return {
+        "symbol": {
+            "st_info": target.symbol.info,
+            "st_other": target.symbol.other,
+        },
+        "text_section": {
+            "sh_flags": target.section.flags,
+            "sh_addr": target.section.addr,
+            "sh_addralign": target.section.addralign,
+        },
+    }
+
+
 def target_record(owner: ElfObject, target: Target) -> dict[str, Any]:
     code = target.section.data[target.start : target.end]
     relocations = _normalized_relocations(
         owner, target, target_relocations(owner, target), position_mode="target"
     )
+    topology = _target_topology(target)
     record = {
         "start": target.start,
         "size": target.symbol.size,
         "bytes_sha256": _sha256_bytes(code),
         "relocations": relocations,
         "relocations_sha256": _canonical_sha256(relocations),
+        "topology": topology,
     }
     record["fingerprint_sha256"] = _canonical_sha256(
-        {"bytes_sha256": record["bytes_sha256"], "relocations": relocations}
+        {
+            "size": record["size"],
+            "bytes_sha256": record["bytes_sha256"],
+            "relocations": relocations,
+            "topology": topology,
+        }
     )
     return record
 
@@ -512,7 +534,7 @@ def standalone_text_record(path: Path) -> dict[str, Any]:
         "bytes_sha256": _sha256_bytes(text.data),
         "relocations": relocations,
         "relocations_sha256": _canonical_sha256(relocations),
-        "elf_sha256": file_sha256(path),
+        "elf_sha256": _sha256_bytes(owner.data),
     }
     record["fingerprint_sha256"] = _canonical_sha256(
         {"bytes_sha256": record["bytes_sha256"], "relocations": relocations}
@@ -528,6 +550,18 @@ def audit_siblings(
 ) -> dict[str, Any]:
     if baseline.flags != candidate.flags:
         raise ExtractError("owner ELF flags drifted")
+    if (
+        baseline_target.symbol.info,
+        baseline_target.symbol.other,
+    ) != (
+        candidate_target.symbol.info,
+        candidate_target.symbol.other,
+    ):
+        raise ExtractError("target symbol topology drifted")
+    if _target_topology(baseline_target)["text_section"] != _target_topology(
+        candidate_target
+    )["text_section"]:
+        raise ExtractError("target text section topology drifted")
     if baseline_target.start != candidate_target.start:
         raise ExtractError("target start drifted; a preceding definition changed")
     if baseline_target.section.data[: baseline_target.start] != candidate_target.section.data[: candidate_target.start]:
@@ -802,13 +836,13 @@ def build_single_target_elf(owner: ElfObject, target: Target) -> bytes:
             ">IIIIIIIIII",
             shstr_offsets[".text"],
             SHT_PROGBITS,
-            0x6,
-            0,
+            target.section.flags,
+            target.section.addr,
             section_offsets[".text"],
             len(code),
             0,
             0,
-            max(1, target.section.addralign),
+            target.section.addralign,
             0,
         )
     )
@@ -952,23 +986,19 @@ def extract(
     if functions != [function]:
         raise ExtractError(f"extracted ELF is not single-target: {functions}")
     extracted_record = target_record(extracted, extracted_target)
-    if (
-        extracted_record["bytes_sha256"] != candidate_record["bytes_sha256"]
-        or extracted_record["relocations_sha256"]
-        != candidate_record["relocations_sha256"]
-    ):
-        raise ExtractError("objcopy changed target bytes or relocations")
+    if extracted_record["fingerprint_sha256"] != candidate_record["fingerprint_sha256"]:
+        raise ExtractError("objcopy changed target bytes, relocations, or topology")
     return {
         "schema": 1,
         "function": function,
-        "baseline_owner_sha256": file_sha256(baseline_path),
-        "candidate_owner_sha256": file_sha256(candidate_path),
+        "baseline_owner_sha256": _sha256_bytes(baseline.data),
+        "candidate_owner_sha256": _sha256_bytes(candidate.data),
         "baseline": baseline_record,
         "candidate": candidate_record,
         "sibling_audit": sibling_audit,
         "output": {
             **extracted_record,
-            "elf_sha256": file_sha256(output_path),
+            "elf_sha256": _sha256_bytes(extracted.data),
             "functions": functions,
         },
     }
