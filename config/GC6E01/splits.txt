@@ -326,8 +326,11 @@ game/menuShop.c:
 game/menuPokemonChange.c:
 	.text       start:0x8002DD24 end:0x80030170
 
-game/gs_npc_event.c:
-	.text       start:0x80030170 end:0x80030370
+game/gs_npc_event_exact_80030170.c:
+	.text       start:0x80030170 end:0x800301B0
+
+game/gs_npc_event_candidate_800301B0.c:
+	.text       start:0x800301B0 end:0x80030370
 
 game/gs_npc_event_exact_80030370.c:
 	.text       start:0x80030370 end:0x8003037C
@@ -616,7 +619,28 @@ game/gba/gba_misc_exact_800896B8.c:
 	.text       start:0x800896B8 end:0x800896E8
 
 game/gba/gba_misc_candidate_800896E8.c:
-	.text       start:0x800896E8 end:0x8008A9AC
+	.text       start:0x800896E8 end:0x80089CA8
+
+game/gba/gba_misc_exact_80089CA8.c:
+	.text       start:0x80089CA8 end:0x80089D30
+
+game/gba/gba_misc_candidate_80089D30.c:
+	.text       start:0x80089D30 end:0x80089D98
+
+game/gba/gba_misc_exact_80089D98.c:
+	.text       start:0x80089D98 end:0x80089E20
+
+game/gba/gba_misc_candidate_80089E20.c:
+	.text       start:0x80089E20 end:0x80089F58
+
+game/gba/gba_misc_exact_80089F58.c:
+	.text       start:0x80089F58 end:0x80089F78
+
+game/gba/gba_misc_candidate_80089F78.c:
+	.text       start:0x80089F78 end:0x8008A99C
+
+game/gba/gba_misc_exact_8008A99C.c:
+	.text       start:0x8008A99C end:0x8008A9AC
 
 game/gba/gba_misc_exact_8008A9AC.c:
 	.text       start:0x8008A9AC end:0x8008A9E4
@@ -1720,8 +1744,17 @@ game/gs_render_util_candidate_800D2B90.c:
 game/gs_render_util_exact_800D305C.c:
 	.text       start:0x800D305C end:0x800D3074
 
-game/gs_gfx.c:
-	.text       start:0x800D3074 end:0x800D3E4C
+game/gs_gfx_exact_800D3074.c:
+	.text       start:0x800D3074 end:0x800D3190
+
+game/gs_gfx_candidate_800D3190.c:
+	.text       start:0x800D3190 end:0x800D377C
+
+game/gs_gfx_exact_800D377C.c:
+	.text       start:0x800D377C end:0x800D37D4
+
+game/gs_gfx_candidate_800D37D4.c:
+	.text       start:0x800D37D4 end:0x800D3E4C
 
 game/gs_gfx_core.c:
 	.text       start:0x800D3E4C end:0x800D3FA4
@@ -2556,8 +2589,17 @@ game/dbgMenu_exact_801337A0.c:
 game/dbgMenu_candidate_801337E4.c:
 	.text       start:0x801337E4 end:0x8013433C
 
-game/pcbox.c:
-	.text       start:0x8013433C end:0x80135030
+game/pcbox_candidate_8013433C.c:
+	.text       start:0x8013433C end:0x801347D0
+
+game/pcbox_exact_801347D0.c:
+	.text       start:0x801347D0 end:0x801347E8
+
+game/pcbox_candidate_801347E8.c:
+	.text       start:0x801347E8 end:0x80135028
+
+game/pcbox_exact_80135028.c:
+	.text       start:0x80135028 end:0x80135030
 
 game/gamedatasave_status.c:
 	.text       start:0x80135030 end:0x8013528C
@@ -3149,8 +3191,50 @@ musyx/musyx_candidate_80161D20.c:
 musyx/musyx_hw_exact_80162858.c:
 	.text       start:0x80162858 end:0x80162FB0
 
-musyx/musyx_range_80157280.c:
-	.text       start:0x80162FB0 end:0x801652DC
+musyx/musyx_candidate_80162FB0.c:
+	.text       start:0x80162FB0 end:0x801631CC
+
+musyx/musyx_exact_801631CC.c:
+	.text       start:0x801631CC end:0x801631F4
+
+musyx/musyx_candidate_801631F4.c:
+	.text       start:0x801631F4 end:0x80163BCC
+
+musyx/musyx_exact_80163BCC.c:
+	.text       start:0x80163BCC end:0x80163BE4
+
+musyx/musyx_candidate_80163BE4.c:
+	.text       start:0x80163BE4 end:0x80163F88
+
+musyx/musyx_exact_80163F88.c:
+	.text       start:0x80163F88 end:0x80163F98
+
+musyx/musyx_candidate_80163F98.c:
+	.text       start:0x80163F98 end:0x801640E4
+
+musyx/musyx_exact_801640E4.c:
+	.text       start:0x801640E4 end:0x80164118
+
+musyx/musyx_candidate_80164118.c:
+	.text       start:0x80164118 end:0x80164204
+
+musyx/musyx_exact_80164204.c:
+	.text       start:0x80164204 end:0x80164238
+
+musyx/musyx_candidate_80164238.c:
+	.text       start:0x80164238 end:0x80164328
+
+musyx/musyx_exact_80164328.c:
+	.text       start:0x80164328 end:0x80164360
+
+musyx/musyx_candidate_80164360.c:
+	.text       start:0x80164360 end:0x80164488
+
+musyx/musyx_exact_80164488.c:
+	.text       start:0x80164488 end:0x801644E0
+
+musyx/musyx_candidate_801644E0.c:
+	.text       start:0x801644E0 end:0x801652DC
 
 game/musyx_range_801652DC.c:
 	.text       start:0x801652DC end:0x801653BC
@@ -3907,7 +3991,13 @@ game/mail_exact_801D1A44.c:
 	.text       start:0x801D1A44 end:0x801D1B10
 
 game/mail_candidate_801D1B10.c:
-	.text       start:0x801D1B10 end:0x801D2080
+	.text       start:0x801D1B10 end:0x801D1E50
+
+game/mail_exact_801D1E50.c:
+	.text       start:0x801D1E50 end:0x801D1F0C
+
+game/mail_candidate_801D1F0C.c:
+	.text       start:0x801D1F0C end:0x801D2080
 
 game/mailMain.c:
 	.text       start:0x801D2080 end:0x801D2B4C

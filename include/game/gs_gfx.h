@@ -3,8 +3,7 @@
  * @brief GSgfx -- Genius Sonority graphics subsystem for Pokemon Colosseum.
  *
  * The GSgfxState layout below documents the 0x5A0-byte state structure
- * referenced (by raw offset, not by this typedef) from gs_gfx.c's real
- * fn_ functions via lbl_8047AA80.
+ * referenced by the gs_gfx.c functions through lbl_8047AA80.
  *
  * This header previously also declared a set of friendly-named wrapper
  * functions (GSgfxInit, GSgfxSetVideoMode, GSgfxEnableRendering,
@@ -26,10 +25,10 @@
  * Allocated from GSmem, pointer stored at lbl_8047AA80.
  * ----------------------------------------------------------------------- */
 typedef struct GSgfxState {
-    /* 0x000 */ u32  mode;           /* rendering mode (0=off, 1=init, 2=active) */
+    /* 0x000 */ s32  mode;           /* rendering mode (0=off, 1=init, 2=active) */
     /* 0x004 */ s32  frameCounter;   /* current frame number (-1 = uninit) */
     /* 0x008 */ u32  fifoSize;       /* GX command FIFO entry count */
-    /* 0x00C */ u32  clearColor;     /* packed RGBA clear colour */
+    /* 0x00C */ void* renderTarget;  /* texture receiving the current frame */
     /* 0x010 */ u32  field_10;
     /* 0x014 */ u32  drawFlags;      /* GX draw control flags */
     /* 0x018 */ u8   matrixDirty;    /* set when model-view needs reload */

@@ -761,13 +761,21 @@ config.libs = [
                     (CodeCandidate, "game/dbgMenu_candidate_801337E4.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/pcbox.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/pcbox_candidate_8013433C.c"),
+                    (Matching, "game/pcbox_exact_801347D0.c"),
+                    (CodeCandidate, "game/pcbox_candidate_801347E8.c"),
+                    (Matching, "game/pcbox_exact_80135028.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gamedatasave_status.c",
@@ -1146,13 +1154,32 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
             ),
-            Object(
-                CodeCandidate,
-                "musyx/musyx_range_80157280.c",
-                mw_version="GC/1.3.2",
-                extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
-                progress_category="musyx",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3.2",
+                    extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                    progress_category="musyx",
+                )
+                for status, path in [
+                    (CodeCandidate, "musyx/musyx_candidate_80162FB0.c"),
+                    (Matching, "musyx/musyx_exact_801631CC.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_801631F4.c"),
+                    (Matching, "musyx/musyx_exact_80163BCC.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163BE4.c"),
+                    (Matching, "musyx/musyx_exact_80163F88.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163F98.c"),
+                    (Matching, "musyx/musyx_exact_801640E4.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80164118.c"),
+                    (Matching, "musyx/musyx_exact_80164204.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80164238.c"),
+                    (Matching, "musyx/musyx_exact_80164328.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80164360.c"),
+                    (Matching, "musyx/musyx_exact_80164488.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_801644E0.c"),
+                ]
+            ],
             *[
                 Object(
                     status,
@@ -1622,6 +1649,8 @@ config.libs = [
                     (CodeCandidate, "game/mail_candidate_801D167C.c"),
                     (Matching, "game/mail_exact_801D1A44.c"),
                     (CodeCandidate, "game/mail_candidate_801D1B10.c"),
+                    (Matching, "game/mail_exact_801D1E50.c"),
+                    (CodeCandidate, "game/mail_candidate_801D1F0C.c"),
                 ]
             ],
             Object(
@@ -5078,6 +5107,13 @@ config.libs = [
                 for status, path in [
                     (Matching, "game/gba/gba_misc_exact_800896B8.c"),
                     (CodeCandidate, "game/gba/gba_misc_candidate_800896E8.c"),
+                    (Matching, "game/gba/gba_misc_exact_80089CA8.c"),
+                    (CodeCandidate, "game/gba/gba_misc_candidate_80089D30.c"),
+                    (Matching, "game/gba/gba_misc_exact_80089D98.c"),
+                    (CodeCandidate, "game/gba/gba_misc_candidate_80089E20.c"),
+                    (Matching, "game/gba/gba_misc_exact_80089F58.c"),
+                    (CodeCandidate, "game/gba/gba_misc_candidate_80089F78.c"),
+                    (Matching, "game/gba/gba_misc_exact_8008A99C.c"),
                     (Matching, "game/gba/gba_misc_exact_8008A9AC.c"),
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008A9E4.c"),
                 ]
@@ -5705,7 +5741,8 @@ config.libs = [
                     progress_category="game",
                 )
                 for status, path in [
-                    (CodeCandidate, "game/gs_npc_event.c"),
+                    (Matching, "game/gs_npc_event_exact_80030170.c"),
+                    (CodeCandidate, "game/gs_npc_event_candidate_800301B0.c"),
                     (Matching, "game/gs_npc_event_exact_80030370.c"),
                     (CodeCandidate, "game/gs_npc_event_candidate_8003037C.c"),
                 ]
@@ -5809,13 +5846,21 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_gfx.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/gs_gfx_exact_800D3074.c"),
+                    (CodeCandidate, "game/gs_gfx_candidate_800D3190.c"),
+                    (Matching, "game/gs_gfx_exact_800D377C.c"),
+                    (CodeCandidate, "game/gs_gfx_candidate_800D37D4.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "hsd/hsd_dobj.c",
