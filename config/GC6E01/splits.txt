@@ -1065,7 +1065,7 @@ dolphin/sdk_range_800AF8A0.c:
 dolphin/sdk_exact_800B016C.c:
 	.text       start:0x800B016C end:0x800B0174
 
-dolphin/sdk_candidate_800B0174.c:
+dolphin/sdk_exact_800B0174.c:
 	.text       start:0x800B0174 end:0x800B01AC
 
 dolphin/sdk_exact_800B01AC.c:
@@ -1708,7 +1708,7 @@ game/gs_render_util_exact_800D1EB8.c:
 game/gs_render_util_exact_800D1F58.c:
 	.text       start:0x800D1F58 end:0x800D207C
 
-game/gs_render_util_candidate_800D207C.c:
+game/gs_render_util_exact_800D207C.c:
 	.text       start:0x800D207C end:0x800D20CC
 
 game/gs_render_util_exact_800D20CC.c:
@@ -1868,7 +1868,7 @@ game/gs_material_candidate_800DF140.c:
 game/gs_material_exact_800DF1B8.c:
 	.text       start:0x800DF1B8 end:0x800DF21C
 
-game/gs_material_candidate_800DF21C.c:
+game/gs_material_exact_800DF21C.c:
 	.text       start:0x800DF21C end:0x800DF240
 
 game/gs_material_exact_800DF240.c:
@@ -3381,13 +3381,13 @@ game/gs_spline.c:
 game/camera_exact_801765F4.c:
 	.text       start:0x801765F4 end:0x801766A8
 
-game/camera_candidate_801766A8.c:
+game/camera_exact_801766A8.c:
 	.text       start:0x801766A8 end:0x801768F0
 
 game/camera_exact_801768F0.c:
 	.text       start:0x801768F0 end:0x80176948
 
-game/camera_candidate_80176948.c:
+game/camera_exact_80176948.c:
 	.text       start:0x80176948 end:0x801769E4
 
 game/camera_exact_801769E4.c:
@@ -3405,7 +3405,7 @@ game/camera_candidate_80176C78.c:
 game/camera_exact_80176F68.c:
 	.text       start:0x80176F68 end:0x80176F98
 
-game/camera_candidate_80176F98.c:
+game/camera_exact_80176F98.c:
 	.text       start:0x80176F98 end:0x80177004
 
 game/camera_exact_80177004.c:
@@ -3417,7 +3417,7 @@ game/camera_candidate_8017707C.c:
 game/camera_exact_801773F4.c:
 	.text       start:0x801773F4 end:0x80177478
 
-game/camera_candidate_80177478.c:
+game/camera_exact_80177478.c:
 	.text       start:0x80177478 end:0x801778B4
 
 game/camera_exact_801778B4.c:
@@ -3513,13 +3513,13 @@ game/people/people_candidate_8018F730.c:
 game/people/people_exact_8018FB2C.c:
 	.text       start:0x8018FB2C end:0x8018FB94
 
-game/people/people_candidate_8018FB94.c:
+game/people/people_exact_8018FB94.c:
 	.text       start:0x8018FB94 end:0x8018FBAC
 
 game/people/people_exact_8018FBAC.c:
 	.text       start:0x8018FBAC end:0x8018FC50
 
-game/people/people_candidate_8018FC50.c:
+game/people/people_exact_8018FC50.c:
 	.text       start:0x8018FC50 end:0x8018FC74
 
 game/people/people_exact_8018FC74.c:
@@ -4463,7 +4463,7 @@ game/fight_action_candidate_8020B058.c:
 game/fight_action_exact_8020D784.c:
 	.text       start:0x8020D784 end:0x8020D844
 
-game/fight_action_candidate_8020D844.c:
+game/fight_action_exact_8020D844.c:
 	.text       start:0x8020D844 end:0x8020D868
 
 game/fight_action_exact_8020D868.c:
@@ -4478,13 +4478,13 @@ game/fight_candidate_8020DA14.c:
 game/fight_encount_exact_8020DD44.c:
 	.text       start:0x8020DD44 end:0x8020DF10
 
-game/fight_encount_candidate_8020DF10.c:
+game/fight_encount_exact_8020DF10.c:
 	.text       start:0x8020DF10 end:0x8020DF90
 
 game/fight_encount_exact_8020DF90.c:
 	.text       start:0x8020DF90 end:0x8020E020
 
-game/fight_encount_candidate_8020E020.c:
+game/fight_encount_exact_8020E020.c:
 	.text       start:0x8020E020 end:0x8020E0B0
 
 game/fight_encount_exact_8020E0B0.c:
@@ -4888,13 +4888,13 @@ game/toolentry_candidate_8025D788.c:
 game/toolentry_exact_8025D914.c:
 	.text       start:0x8025D914 end:0x8025D938
 
-game/toolentry_candidate_8025D938.c:
+game/toolentry_exact_8025D938.c:
 	.text       start:0x8025D938 end:0x8025D9A8
 
 game/toolentry_exact_8025D9A8.c:
 	.text       start:0x8025D9A8 end:0x8025DBB0
 
-game/toolentry_candidate_8025DBB0.c:
+game/toolentry_exact_8025DBB0.c:
 	.text       start:0x8025DBB0 end:0x8025DBD4
 
 game/table_res_bios.c:

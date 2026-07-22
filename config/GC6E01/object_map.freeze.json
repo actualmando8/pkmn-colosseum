@@ -4900,7 +4900,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/dolphin/sdk_candidate_800B0174",
+      "name": "main/dolphin/sdk_exact_800B0174",
       "sections": [
         {
           "name": ".text",
@@ -7816,7 +7816,7 @@
       "total_functions": 4
     },
     {
-      "name": "main/game/gs_render_util_candidate_800D207C",
+      "name": "main/game/gs_render_util_exact_800D207C",
       "sections": [
         {
           "name": ".text",
@@ -8510,7 +8510,7 @@
       "total_functions": 4
     },
     {
-      "name": "main/game/gs_material_candidate_800DF21C",
+      "name": "main/game/gs_material_exact_800DF21C",
       "sections": [
         {
           "name": ".text",
@@ -15289,7 +15289,7 @@
       "total_functions": 7
     },
     {
-      "name": "main/game/camera_candidate_801766A8",
+      "name": "main/game/camera_exact_801766A8",
       "sections": [
         {
           "name": ".text",
@@ -15315,7 +15315,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/camera_candidate_80176948",
+      "name": "main/game/camera_exact_80176948",
       "sections": [
         {
           "name": ".text",
@@ -15393,7 +15393,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/camera_candidate_80176F98",
+      "name": "main/game/camera_exact_80176F98",
       "sections": [
         {
           "name": ".text",
@@ -15445,7 +15445,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/camera_candidate_80177478",
+      "name": "main/game/camera_exact_80177478",
       "sections": [
         {
           "name": ".text",
@@ -15861,7 +15861,7 @@
       "total_functions": 2
     },
     {
-      "name": "main/game/people/people_candidate_8018FB94",
+      "name": "main/game/people/people_exact_8018FB94",
       "sections": [
         {
           "name": ".text",
@@ -15887,7 +15887,7 @@
       "total_functions": 8
     },
     {
-      "name": "main/game/people/people_candidate_8018FC50",
+      "name": "main/game/people/people_exact_8018FC50",
       "sections": [
         {
           "name": ".text",
@@ -20213,7 +20213,7 @@
       "total_functions": 8
     },
     {
-      "name": "main/game/fight_action_candidate_8020D844",
+      "name": "main/game/fight_action_exact_8020D844",
       "sections": [
         {
           "name": ".text",
@@ -20278,7 +20278,7 @@
       "total_functions": 10
     },
     {
-      "name": "main/game/fight_encount_candidate_8020DF10",
+      "name": "main/game/fight_encount_exact_8020DF10",
       "sections": [
         {
           "name": ".text",
@@ -20304,7 +20304,7 @@
       "total_functions": 7
     },
     {
-      "name": "main/game/fight_encount_candidate_8020E020",
+      "name": "main/game/fight_encount_exact_8020E020",
       "sections": [
         {
           "name": ".text",
@@ -22084,7 +22084,7 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/toolentry_candidate_8025D938",
+      "name": "main/game/toolentry_exact_8025D938",
       "sections": [
         {
           "name": ".text",
@@ -22110,7 +22110,7 @@
       "total_functions": 12
     },
     {
-      "name": "main/game/toolentry_candidate_8025DBB0",
+      "name": "main/game/toolentry_exact_8025DBB0",
       "sections": [
         {
           "name": ".text",

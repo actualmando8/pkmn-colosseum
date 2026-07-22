@@ -1524,8 +1524,8 @@ asm void peopleGetPosition(void) {
 #include "src/game/people/people_fn_8018FC50.inc"
 }
 #else
-void peopleGetPosition(PeopleEntry* entry) {
-    GSmodelGetRotationPtr(entry->modelHandle);
+struct GSvec* peopleGetPosition(PeopleEntry* entry) {
+    return GSmodelGetRotationPtr(entry->modelHandle);
 }
 #endif
 #pragma pop

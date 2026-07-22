@@ -56,8 +56,32 @@
 /** 0x80177A38 */ u32    GSscene_GetMode(void);
 /** 0x80177A44 */ u32    GSscene_SetMode(u32 mode);
 /** unnamed scaffold */ void   fn_80179FA4(void);
-/** unnamed scaffold */ void   fn_80176948(void);
-/** unnamed scaffold */ void   cameraSetTargetPosXYZ(void);
-/** unnamed scaffold */ void   cameraSetTargetOfsXYZ(void);
+/** 0x801766A8 */ void   cameraSetFov(f32 fov);
+/** 0x80176758 */ void   cameraSetRotY(f32 angle);
+/** 0x801767E0 */ void   cameraSetDistance(f32 distance);
+/** 0x80176868 */ void   cameraSetHeight(f32 height);
+/** 0x80176948 */ void   fn_80176948(f32 x, f32 y, f32 z);
+/** 0x8017697C */ void   cameraSetTargetPosXYZ(f32 x, f32 y, f32 z);
+/** 0x801769B0 */ void   cameraSetTargetOfsXYZ(f32 x, f32 y, f32 z);
+/** 0x80176B48 */ s32    cameraWaitSyncAnime(s32 sync);
+/** 0x80176F98 */ u32    cameraMoveEndCheckSpecial(u8 wait);
+/** 0x80177478 */ void   cameraMoveRotation(void* unused,
+                                            GSSceneVec3* rotation,
+                                            f32 duration);
+/** 0x801774F0 */ void   cameraMovePositionXYZ(f32 x, f32 y, f32 z,
+                                               f32 duration);
+/** 0x80177574 */ void   cameraMovePosition(void* unused,
+                                            GSSceneVec3* position,
+                                            f32 duration);
+/** 0x801775EC */ void   cameraMoveTargetXYZ(f32 x, f32 y, f32 z,
+                                             f32 duration);
+/** 0x80177670 */ void   cameraMoveTargetOfs(void* unused,
+                                             GSSceneVec3* offset,
+                                             f32 duration);
+/** 0x801776E8 */ void   cameraMoveTargetPos(void* unused,
+                                             GSSceneVec3* target,
+                                             f32 duration);
+/** 0x80177760 */ void   cameraMoveTarget(void* unused, u32 group, u32 id,
+                                          f32 duration);
 
 #endif /* GS_SCENE_H */

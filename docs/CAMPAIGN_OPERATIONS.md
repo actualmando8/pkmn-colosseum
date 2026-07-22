@@ -1378,3 +1378,69 @@ Independent audit: PASS after replacing two scalar-pointer GBA aliases with
 Next action: independently audit, publish, and merge PR #420; then reconcile
   and rotate Windows from the merged head before selecting exact-30 #421
 ```
+
+### Batch snapshot — 2026-07-22 (PR #421)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 1e9fbb29 (PR #420 merged)
+Batch branch: `integration/pr421-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +14 complete units / +0 total-unit topology /
+  +2,620 linked code / +0 linked data
+Goal cumulative from PR #381: +903 linked functions / +268 complete units /
+  +72,740 linked code / +193 linked data; 97 linked functions remain in the
+  current +1,000 campaign
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,671 functions; 953 / 1,698 units;
+  638,900 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.61% linked / 638.90 kB
+  complete code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole authorized permutation farm
+Windows: post-#420 reconciliation classified all 39 cumulative artifacts as
+  32 already exact plus the same seven strict rejects, with zero recoverable
+  survivors. All stale farm processes were stopped before rotation. The fresh,
+  owner-disjoint queue has 60 runnable units across 44 objects, queue SHA-256
+  `7cc0baca6f575aabfa01068d030929b749a97e18fa5dc47dde191cb20227789e`
+  and manifest SHA-256
+  `f9faa1a6daf4811ce41a99217e0f5d9fce7ca5da80c06bf4bdb61175e0b905b5`;
+  supervisor PID 61800 and 12 / 12 workers were live at round three with zero
+  wins or bad units at the rotation checkpoint. None of the 30 functions in
+  this batch overlaps that queue.
+Kimi: the full-owner compile-loop trial remains fail-closed behind an
+  adversarial source-policy audit; no Moonshot request, token, or spend is
+  permitted before explicit PASS. The API remains at zero requests and zero
+  spend at this snapshot.
+Integrated: 18 typed camera render, state, movement, and vector helpers; one
+  material-alpha helper; canonical SDK `__CARDSetDiskID`; two NPC
+  flag/model-vector helpers; one fight-action display-buffer setter; four
+  encounter trainer-slot accessors; and two tool-entry Pokémon pointers plus
+  one battle counter getter
+Type recovery: the camera floor table, 0xFC camera state, render camera/vector,
+  encounter trainer slot, fight action, material, NPC model-vector return, and
+  tool-entry battle-state layouts preserve their caller ABI and evidenced field
+  offsets. The camera target initializer is a typed `GSSceneVec3` rodata prefix,
+  and the SDK disk ID uses the existing `CARDControl` / `DVDDiskID` ABI.
+  `fn_8025DBB0` names offset 0x14 as `count_14`, consistently with the
+  neighboring exact unit; the historical `peopleGetPosition` symbol name is
+  retained for address traceability while its pointer-return ABI and rotation
+  accessor behavior are explicit.
+Residual policy: 14 existing CodeCandidate ranges become one-for-one Matching
+  units; total topology is unchanged and all neighboring residual coverage
+  remains gapless and disjoint
+Validation: all 30 functions / 2,620 bytes are raw 100%; all 14 Matching units
+  emit target-identical text and exactly 118 normalized target/source
+  relocations; every selected symbol survives in main.elf at its retail VA and
+  size, with 185 genuine incoming relocations in aggregate and none at zero;
+  `FORCEACTIVE` remains empty
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, direct text and relocation
+  parity, typed semantics and ABI, linker liveness, residual topology, strict
+  policy, farm-owner exclusion, zero regression, and the full retail link
+Next action: obtain independent PASS, publish and merge PR #421, reconcile and
+  rotate Windows from the merged head, then integrate exact-30 #422
+```

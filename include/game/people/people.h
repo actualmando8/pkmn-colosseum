@@ -27,6 +27,8 @@
 
 #include "dolphin/types.h"
 
+struct GSvec;
+
 /* =========================================================================
  * Constants
  * ========================================================================= */
@@ -378,8 +380,8 @@ void peopleSetShadowAnim(PeopleEntry* entry, u8 animId);
 /** Get rotation data from model. fn_8018FC2C */
 void peopleGetRotation(PeopleEntry* entry);
 
-/** Get position data from model. fn_8018FC50 */
-void peopleGetPosition(PeopleEntry* entry);
+/** Historical name; returns the model rotation-vector pointer. fn_8018FC50 */
+struct GSvec* peopleGetPosition(PeopleEntry* entry);
 
 /** Get scale data from model. fn_8018FC74 */
 void peopleGetScale(PeopleEntry* entry);
