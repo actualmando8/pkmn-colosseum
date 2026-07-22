@@ -103,8 +103,8 @@ Payoff = member_count x avg_fn_size.
 
 ## v1 plan
 
-- GPU embeddings on the 3090: per-function encoder (e.g. a small transformer
-  over normalized instruction tokens, contrastively trained with
+- Embeddings on an available accelerator: per-function encoder (e.g. a small
+  transformer over normalized instruction tokens, contrastively trained with
   compile-time augmentations: register permutations, scheduling jitter,
   immediate perturbation) -> FAISS index. Captures semantic-level similarity
   (same C template, different codegen) that 4-gram shingles miss — this is

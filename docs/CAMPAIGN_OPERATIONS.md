@@ -198,10 +198,10 @@ as a human or permuter proposal.
 
 ## Farm reconciliation
 
-Poll before restarting or replacing queues so results are not stranded:
+Windows is the sole active farm. Poll it before restarting or replacing its
+queue so results are not stranded:
 
 ```bash
-tools/decomp_work/permuter/poll_3090.sh
 tools/decomp_work/permuter/poll_win.sh
 tools/decomp_work/permuter/poll_win.sh --status
 ```
@@ -220,55 +220,16 @@ Windows `outbox/` is cumulative. A pull reporting many wins can contain old
 artifacts; compare against current source and timestamps before claiming a new
 result. Do not clear outboxes or terminal state until reconciliation is done.
 
-### Refresh the 3090 farm
-
-The normal near-match band is 80–100%. Generate the queue and exact compile
-manifest from the current report:
-
-```bash
-ninja all_source build/GC6E01/report.json
-python3 tools/decomp_work/permuter/gen_queue_3090.py --min-pct 80
-python3 tools/decomp_work/permuter/extract_unit_flags.py
-```
-
-Ship a faithful mirror of source, headers, config, live base objects, target
-objects, and asm to the user-owned 3090 box. These generated/extracted files
-are farm inputs only and must never be staged.
-
-```bash
-HOST=douglaswhittingham@192.168.50.101
-BASE=/storage/finetune/pkmn-colosseum-2026
-
-ssh "$HOST" "bash $BASE/farm/stop_farm.sh --requeue"
-rsync -az --delete src/ "$HOST:$BASE/repo/src/"
-rsync -az --delete include/ "$HOST:$BASE/repo/include/"
-rsync -az --delete config/ "$HOST:$BASE/repo/config/"
-rsync -az --delete build/GC6E01/src/ "$HOST:$BASE/repo/build/GC6E01/src/"
-rsync -az --delete build/GC6E01/obj/ "$HOST:$BASE/repo/build/GC6E01/obj/"
-rsync -az --delete build/GC6E01/asm/ "$HOST:$BASE/repo/build/GC6E01/asm/"
-rsync -az configure.py build.ninja objdiff.json README.md "$HOST:$BASE/repo/"
-rsync -az build/permuter_queue_3090.tsv build/permuter_units_3090.json \
-  "$HOST:$BASE/repo/build/"
-rsync -az tools/decomp_work/permuter/3090/ "$HOST:$BASE/farm/"
-
-ssh "$HOST" \
-  "cp $BASE/repo/build/permuter_queue_3090.tsv $BASE/farm/queue.tsv && \
-   WORKERS=21 BUDGET=10800 bash $BASE/farm/launch_farm.sh"
-tools/decomp_work/permuter/poll_3090.sh
-```
-
-Keep existing terminal state during an ordinary refresh: old targets remain
-terminal and only newly added queue entries run. Archive/reset state only for
-an intentional second-round campaign, and say so in the handoff.
-
-Healthy 3090 status is 21 workers, 21 permuters, 21 timeouts, and 21 active
-claims. Zero workers with a nonempty queue usually means every queued name is
-terminal; expand/refill the queue instead of repeatedly relaunching it.
+The retired accelerator farm must not be contacted, restarted, or recreated
+from this repository. Its former activity remains only as historical evidence
+in the handoff ledger and benchmark records below.
 
 ### Refresh the Windows farm
 
-Generate fidelity-gated work units from a queue. Use a band disjoint from the
-3090 when possible; after the 3090 takes 80–100%, Windows can explore 70–80%.
+Generate fidelity-gated work units from a current-report queue. Exclude names
+already exact on the integration head and targets already being integrated; a
+70–100% near-match band is a useful starting point before ranking by object
+closure payoff.
 
 ```bash
 python3 tools/decomp_work/permuter/gen_workunits.py \
@@ -367,11 +328,11 @@ After merge:
 
 1. fast-forward local `master` and rebuild its report;
 2. verify README metrics against that report and decomp.dev's PR report;
-3. reconcile newly exact names out of both farm queues/manifests;
+3. reconcile newly exact names out of the Windows queue and manifest;
 4. pull any results produced during CI;
 5. remove merged/rejected worktrees and prune registrations;
 6. delete only merged/rejected branches;
-7. refill both farms with new, preferably non-overlapping targets;
+7. refill the Windows farm with fresh targets that do not overlap integration;
 8. update the handoff ledger below.
 
 ## Common failure modes
@@ -390,8 +351,6 @@ After merge:
   silently loses the residual functions.
 - **Windows pull appears to find many new wins:** cumulative outbox contains
   history. Deduplicate against current master and timestamps.
-- **3090 relaunch exits immediately:** queue entries are terminal. Add new
-  targets; do not loop the launcher.
 - **Dirty detached tree:** inspect and bank/reject its diff before `--force`.
 - **README/decomp.dev disagree:** rebuild the canonical report, sync README,
   and compare the PR base/head reported by CI.
@@ -409,7 +368,6 @@ Newly linked function delta:
 Newly linked unit/code/data delta:
 README/report status:
 Retail SHA status:
-3090 workers / queue / wins pending:
 Windows workers / queue / wins pending:
 Active worktrees and owners:
 Banked commits not merged:
@@ -1034,33 +992,33 @@ Next action: continue the Windows-only farm while the ranked PR #412 batch
   proceeds in an isolated current-master integration tree
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #412)
+### Merged batch snapshot — 2026-07-21 (PR #412)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: c4ab1d16 (PR #411 merged)
-Pending batch: PR #412, `integration/pr412-exact30`
+Merged batch: PR #412, source `2b057335`, merge `c7701bef`
 Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +8 complete units / +13 total-unit topology /
   +1,384 linked code / +0 linked data
 Goal cumulative from PR #381: +693 linked functions / +163 complete units /
   +60,224 linked code / +193 linked data
-Pending report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+Merged report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,461 functions; 848 / 1,530 units;
+Merged linked: 4,461 functions; 848 / 1,530 units;
   626,384 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #412; decomp.dev base is synced through
-  PR #411 (`c4ab1d16`) at 25.05% linked / 625.00 kB complete code
+README/report/decomp.dev: synced at merge `c7701bef`; decomp.dev reports
+  25.10% linked / 626.38 kB complete code
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 Retired 3090 farm: remote checkout, processes, cron entries, and services
-  remain absent; dedicated tracked launch/poll tooling is queued for deletion
-  in a separate cleanup PR so this exact-30 batch stays source-scoped
+  remain absent; this follow-up removes its dedicated tracked launch, queue,
+  harvest, and poll tooling while preserving historical campaign evidence
 Windows: sole active farm; post-#411 rotation on `c4ab1d16` has a 140-record
   manifest with 71 fidelity-valid units, zero exact overlap, 12 / 12 workers,
   zero bad units, and SHA-256
   `4f87af1c09ac3ab6609b54c036700b027498c7cbc09a58566a94e280e6e40a5a`
-Integrated pending: four typed GS camera accessors, three typed window-work
+Integrated: four typed GS camera accessors, three typed window-work
   accessors, three field-camera state helpers, 17 People/model helpers, and
   three weather-flow functions
 Residual policy: all ten affected prefix/interstitial/suffix ranges remain
@@ -1078,6 +1036,6 @@ Regression: all 8,603 per-function scores compared with `c4ab1d16`; zero
   regressions and no score-only progress claimed
 Independent audit: PASS from two independent reviews; exact composition,
   emitted text, all 52 relocations, prototypes, topology, and policy checks agree
-Next action: publish PR #412, wait for required checks, merge, clean its tree,
-  then retire tracked 3090 tooling in a separate cleanup PR
+Next action: merge this tracked-tooling cleanup, rotate the Windows-only farm
+  to `c7701bef`, and integrate the next exact-30 batch
 ```
