@@ -3612,13 +3612,22 @@ config.libs = [
                 extra_cflags=["-i src/dolphin/thp"],
                 progress_category="sdk",
             ),
-            Object(
-                CodeCandidate,
-                "game/field_range_801ECFE0.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/field_range_801ECFE0.c"),
+                    (Matching, "game/field_exact_801ED218.c"),
+                    (CodeCandidate, "game/field_candidate_801ED310.c"),
+                    (Matching, "game/field_exact_801ED388.c"),
+                    (CodeCandidate, "game/field_candidate_801ED3B8.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/battle/battle_range_exact_801ED640.c",
@@ -4458,13 +4467,31 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/toolentry.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/toolentry_exact_8025CD64.c"),
+                    (CodeCandidate, "game/toolentry.c"),
+                    (Matching, "game/toolentry_exact_8025D06C.c"),
+                    (CodeCandidate, "game/toolentry_candidate_8025D164.c"),
+                    (Matching, "game/toolentry_exact_8025D28C.c"),
+                    (CodeCandidate, "game/toolentry_candidate_8025D364.c"),
+                    (Matching, "game/toolentry_exact_8025D560.c"),
+                    (CodeCandidate, "game/toolentry_candidate_8025D644.c"),
+                    (Matching, "game/toolentry_exact_8025D744.c"),
+                    (CodeCandidate, "game/toolentry_candidate_8025D788.c"),
+                    (Matching, "game/toolentry_exact_8025D914.c"),
+                    (CodeCandidate, "game/toolentry_candidate_8025D938.c"),
+                    (Matching, "game/toolentry_exact_8025D9A8.c"),
+                    (CodeCandidate, "game/toolentry_candidate_8025DBB0.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/table_res_bios.c",
@@ -4648,6 +4675,7 @@ config.libs = [
                     progress_category="game",
                 )
                 for status, path in [
+                    (Matching, "game/battle/battle_camera_exact_801C2AE8.c"),
                     (CodeCandidate, "game/battle/battle_camera.c"),
                     (Matching, "game/battle/battle_camera_exact_801C2D5C.c"),
                     (CodeCandidate, "game/battle/battle_camera_candidate_801C2D80.c"),

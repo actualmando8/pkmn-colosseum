@@ -3225,8 +3225,11 @@ hsd/hsd_aobj_candidate_801C2A60.c:
 hsd/hsd_aobj_exact_801C2AAC.c:
 	.text       start:0x801C2AAC end:0x801C2AE8
 
+game/battle/battle_camera_exact_801C2AE8.c:
+	.text       start:0x801C2AE8 end:0x801C2BE0
+
 game/battle/battle_camera.c:
-	.text       start:0x801C2AE8 end:0x801C2D5C
+	.text       start:0x801C2BE0 end:0x801C2D5C
 
 game/battle/battle_camera_exact_801C2D5C.c:
 	.text       start:0x801C2D5C end:0x801C2D80
@@ -3367,7 +3370,19 @@ dolphin/thp/THPDec_range_801ECAB0.c:
 	.text       start:0x801ECAB0 end:0x801ECFE0
 
 game/field_range_801ECFE0.c:
-	.text       start:0x801ECFE0 end:0x801ED640
+	.text       start:0x801ECFE0 end:0x801ED218
+
+game/field_exact_801ED218.c:
+	.text       start:0x801ED218 end:0x801ED310
+
+game/field_candidate_801ED310.c:
+	.text       start:0x801ED310 end:0x801ED388
+
+game/field_exact_801ED388.c:
+	.text       start:0x801ED388 end:0x801ED3B8
+
+game/field_candidate_801ED3B8.c:
+	.text       start:0x801ED3B8 end:0x801ED640
 
 game/battle/battle_range_exact_801ED640.c:
 	.text       start:0x801ED640 end:0x801ED780
@@ -4078,8 +4093,47 @@ game/fight_trainer_ai2_candidate_8025C808.c:
 game/fight_trainer_ai2_exact_8025CAA8.c:
 	.text       start:0x8025CAA8 end:0x8025CD64
 
+game/toolentry_exact_8025CD64.c:
+	.text       start:0x8025CD64 end:0x8025CDB8
+
 game/toolentry.c:
-	.text       start:0x8025CD64 end:0x8025DBD4
+	.text       start:0x8025CDB8 end:0x8025D06C
+
+game/toolentry_exact_8025D06C.c:
+	.text       start:0x8025D06C end:0x8025D164
+
+game/toolentry_candidate_8025D164.c:
+	.text       start:0x8025D164 end:0x8025D28C
+
+game/toolentry_exact_8025D28C.c:
+	.text       start:0x8025D28C end:0x8025D364
+
+game/toolentry_candidate_8025D364.c:
+	.text       start:0x8025D364 end:0x8025D560
+
+game/toolentry_exact_8025D560.c:
+	.text       start:0x8025D560 end:0x8025D644
+
+game/toolentry_candidate_8025D644.c:
+	.text       start:0x8025D644 end:0x8025D744
+
+game/toolentry_exact_8025D744.c:
+	.text       start:0x8025D744 end:0x8025D788
+
+game/toolentry_candidate_8025D788.c:
+	.text       start:0x8025D788 end:0x8025D914
+
+game/toolentry_exact_8025D914.c:
+	.text       start:0x8025D914 end:0x8025D938
+
+game/toolentry_candidate_8025D938.c:
+	.text       start:0x8025D938 end:0x8025D9A8
+
+game/toolentry_exact_8025D9A8.c:
+	.text       start:0x8025D9A8 end:0x8025DBB0
+
+game/toolentry_candidate_8025DBB0.c:
+	.text       start:0x8025DBB0 end:0x8025DBD4
 
 game/table_res_bios.c:
 	.text       start:0x8025DBD4 end:0x8025DC2C
