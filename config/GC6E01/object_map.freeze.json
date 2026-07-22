@@ -13737,17 +13737,121 @@
       "total_functions": 14
     },
     {
-      "name": "main/hsd/hsd_texp",
+      "name": "main/hsd/hsd_texp_candidate_801B1730",
       "sections": [
         {
           "name": ".text",
-          "size": 8524,
+          "size": 292,
           "virtual_address": 2149259056
         }
       ],
-      "total_code": 8524,
+      "total_code": 292,
       "total_data": 0,
-      "total_functions": 31
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_texp_exact_801B1854",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 132,
+          "virtual_address": 2149259348
+        }
+      ],
+      "total_code": 132,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/hsd/hsd_texp_candidate_801B18D8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4064,
+          "virtual_address": 2149259480
+        }
+      ],
+      "total_code": 4064,
+      "total_data": 0,
+      "total_functions": 12
+    },
+    {
+      "name": "main/hsd/hsd_texp_exact_801B28B8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2149263544
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_texp_candidate_801B28C8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2208,
+          "virtual_address": 2149263560
+        }
+      ],
+      "total_code": 2208,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/hsd/hsd_texp_exact_801B3168",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2149265768
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_texp_candidate_801B3174",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1532,
+          "virtual_address": 2149265780
+        }
+      ],
+      "total_code": 1532,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/hsd/hsd_texp_exact_801B3770",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2149267312
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_texp_candidate_801B37A0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 220,
+          "virtual_address": 2149267360
+        }
+      ],
+      "total_code": 220,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_texp_exact_801B387C",
@@ -13867,17 +13971,82 @@
       "total_functions": 7
     },
     {
-      "name": "main/hsd/hsd_aobj_range_801C01C8",
+      "name": "main/hsd/hsd_aobj_candidate_801C01C8",
       "sections": [
         {
           "name": ".text",
-          "size": 10528,
+          "size": 168,
           "virtual_address": 2149319112
         }
       ],
-      "total_code": 10528,
+      "total_code": 168,
       "total_data": 0,
-      "total_functions": 19
+      "total_functions": 2
+    },
+    {
+      "name": "main/hsd/hsd_aobj_exact_801C0270",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 28,
+          "virtual_address": 2149319280
+        }
+      ],
+      "total_code": 28,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/hsd/hsd_aobj_candidate_801C028C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10040,
+          "virtual_address": 2149319308
+        }
+      ],
+      "total_code": 10040,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/hsd/hsd_aobj_exact_801C29C4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 156,
+          "virtual_address": 2149329348
+        }
+      ],
+      "total_code": 156,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/hsd/hsd_aobj_candidate_801C2A60",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2149329504
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/hsd/hsd_aobj_exact_801C2AAC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 60,
+          "virtual_address": 2149329580
+        }
+      ],
+      "total_code": 60,
+      "total_data": 0,
+      "total_functions": 2
     },
     {
       "name": "main/game/battle/battle_camera",

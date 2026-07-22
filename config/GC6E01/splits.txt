@@ -3029,8 +3029,32 @@ hsd/hsd_range_801B0158.c:
 hsd/hsd_shadow.c:
 	.text       start:0x801B019C end:0x801B1730
 
-hsd/hsd_texp.c:
-	.text       start:0x801B1730 end:0x801B387C
+hsd/hsd_texp_candidate_801B1730.c:
+	.text       start:0x801B1730 end:0x801B1854
+
+hsd/hsd_texp_exact_801B1854.c:
+	.text       start:0x801B1854 end:0x801B18D8
+
+hsd/hsd_texp_candidate_801B18D8.c:
+	.text       start:0x801B18D8 end:0x801B28B8
+
+hsd/hsd_texp_exact_801B28B8.c:
+	.text       start:0x801B28B8 end:0x801B28C8
+
+hsd/hsd_texp_candidate_801B28C8.c:
+	.text       start:0x801B28C8 end:0x801B3168
+
+hsd/hsd_texp_exact_801B3168.c:
+	.text       start:0x801B3168 end:0x801B3174
+
+hsd/hsd_texp_candidate_801B3174.c:
+	.text       start:0x801B3174 end:0x801B3770
+
+hsd/hsd_texp_exact_801B3770.c:
+	.text       start:0x801B3770 end:0x801B37A0
+
+hsd/hsd_texp_candidate_801B37A0.c:
+	.text       start:0x801B37A0 end:0x801B387C
 
 hsd/hsd_texp_exact_801B387C.c:
 	.text       start:0x801B387C end:0x801B3D1C
@@ -3059,8 +3083,23 @@ hsd/hsd_util.c:
 hsd/hsd_video.c:
 	.text       start:0x801BF6AC end:0x801C01C8
 
-hsd/hsd_aobj_range_801C01C8.c:
-	.text       start:0x801C01C8 end:0x801C2AE8
+hsd/hsd_aobj_candidate_801C01C8.c:
+	.text       start:0x801C01C8 end:0x801C0270
+
+hsd/hsd_aobj_exact_801C0270.c:
+	.text       start:0x801C0270 end:0x801C028C
+
+hsd/hsd_aobj_candidate_801C028C.c:
+	.text       start:0x801C028C end:0x801C29C4
+
+hsd/hsd_aobj_exact_801C29C4.c:
+	.text       start:0x801C29C4 end:0x801C2A60
+
+hsd/hsd_aobj_candidate_801C2A60.c:
+	.text       start:0x801C2A60 end:0x801C2AAC
+
+hsd/hsd_aobj_exact_801C2AAC.c:
+	.text       start:0x801C2AAC end:0x801C2AE8
 
 game/battle/battle_camera.c:
 	.text       start:0x801C2AE8 end:0x801C3108
