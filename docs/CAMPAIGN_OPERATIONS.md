@@ -413,31 +413,35 @@ Rejected candidates and one-line reasons:
 Next three unit closers:
 ```
 
-### Last reconciled snapshot — 2026-07-21
+### Batch snapshot — 2026-07-21 (PR #394)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
-Current decompilation head: 750c2f61 (PR #392 merged)
-Open PRs: none after reconciliation
-Exact-source delta from goal baseline: +21 functions / +9,816 code bytes
+Current master before batch: fd1ae92a (PR #393 merged)
+Batch PR: #394, `campaign/next-batch-20260721`
+Exact-source delta from goal baseline: +33 functions / +12,836 code bytes
 PR #388 batch: +30 linked functions / +7 linked units / +5,664 linked code bytes
 PR #389 batch: +2 exact functions / +1,080 matched code;
   +3 linked functions / +3 units / +1,176 linked code / +0 linked data
 PR #391 batch: +12 exact functions / +5,700 matched code;
   +30 linked functions / +5 units / +7,616 linked code / +0 linked data
-Newly linked function delta from goal baseline: +74
-Newly linked unit/code/data delta from goal baseline: +21 units / +16,272 code / +177 data
-Head report: 6,289 / 8,603 matched functions; 896,312 matched code bytes
-Head linked: 706 / 1,301 units; 582,432 complete code bytes
-README/report/decomp.dev: synced at 750c2f61
+PR #394 batch: +12 exact functions / +3,020 matched code;
+  +34 linked functions / +8 units / +6,804 linked code / +0 linked data
+Newly linked function delta from goal baseline: +108
+Newly linked unit/code/data delta from goal baseline: +29 units / +23,076 code / +177 data
+Head report: 6,301 / 8,603 matched functions; 899,332 matched code bytes
+Head linked: 714 / 1,303 units; 589,236 complete code bytes;
+  752,761 complete data bytes
+README/report: synced on PR #394; decomp.dev pending PR report
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: 535-entry 80%-plus queue across 210 units; 21 workers/permuters/
   timeouts/claims; no new recoverable wins; terminal state retained
 Windows: 74 active-valid 70%-to-80% units, 12 workers, zero live wins/bad;
   persisted state pruned to the new manifest
-Active worktrees after reconciliation: clean master only
-Banked commits not merged: 4d8512e9, 3 strict CObj getter functions across
-  2 units / +496 linked code bytes; branch retained without a worktree
+Active campaign worktrees at snapshot: PR #394 integration; SDK 800A7820
+  island audit; OSMemory closer; completed GX/gamedata/fdlibm trees pending
+  post-merge cleanup
+Banked commits not merged: SDK 800A7820 and OSMemory audits still in flight
 Integrated: PR #388 (30-function linked batch) and PR #389 (MusyX table
   insertions plus effect teardown callback), and PR #391 (30 linked functions)
 Rejected: fight_timer (private conversion constants break canonical relocations);
@@ -450,9 +454,9 @@ Rejected: fight_timer (private conversion constants break canonical relocations)
   hsd_class (initializer is 27.375%; exact siblings rely on local pragmas or a
   volatile codegen reread);
   HSD_MObjReqAnimByFlags (goto/dummy-label zero changes null behavior);
-  pokemonGetDp (private conversion constant); fight residuals that require register,
-  inline, pragma, jump-table, or volatile-only shaping
-Next unit closers: integrate banked CObj getter islands 80193C24 and 80194510,
-  then use new strict farm wins or clean low-residual SDK/game objects with full
-  relocation/data ownership
+  pokemonGetDp (private conversion constant); fightSideGetStatus (text exact,
+  but linked retail SHA fails from relocation mismatch); fight residuals that
+  require register, inline, pragma, jump-table, or volatile-only shaping
+Next unit closers: strict SDK 800A7820 exact islands, Dolphin OSMemory, then
+  fresh non-overlapping 3090/Windows targets after PR #394 reconciliation
 ```

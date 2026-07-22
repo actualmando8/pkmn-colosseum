@@ -687,7 +687,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gamedata.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -2182,7 +2182,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800B9578.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2322,7 +2322,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/math_range_800CDBE0.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
@@ -2571,6 +2571,13 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/field_range_80114AE0.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/field_range_exact_80115250.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -5133,6 +5140,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
+            Object(
+                Matching,
+                "game/gs_title_candidate_800205C8.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-opt nopeephole",
+                    "-O1",
+                ],
+                progress_category="game",
+            ),
             *[
                 Object(
                     status,
@@ -5148,7 +5168,6 @@ config.libs = [
                     (Matching, "game/gs_title_exact_8002058C.c"),
                     (Matching, "game/gs_title_exact_800205B8.c"),
                     (Matching, "game/gs_title_exact_800205C0.c"),
-                    (CodeCandidate, "game/gs_title_candidate_800205C8.c"),
                     (Matching, "game/gs_title_exact_8002060C.c"),
                     (CodeCandidate, "game/gs_title_candidate_80020618.c"),
                     (Matching, "game/gs_title_exact_8002091C.c"),
@@ -5249,16 +5268,25 @@ config.libs = [
                     status,
                     path,
                     mw_version="GC/1.3",
+                    extra_cflags=(
+                        ["-O1"]
+                        if path
+                        in (
+                            "hsd/hsd_cobj_candidate_80193C24.c",
+                            "hsd/hsd_cobj_candidate_80194510.c",
+                        )
+                        else []
+                    ),
                     progress_category="hsd",
                 )
                 for status, path in [
-                    (CodeCandidate, "hsd/hsd_cobj_candidate_80193C24.c"),
+                    (Matching, "hsd/hsd_cobj_candidate_80193C24.c"),
                     (Matching, "hsd/hsd_cobj_exact_80193CD0.c"),
                     (CodeCandidate, "hsd/hsd_cobj_candidate_80193D30.c"),
                     (Matching, "hsd/hsd_cobj_exact_801942B8.c"),
                     (CodeCandidate, "hsd/hsd_cobj_candidate_80194400.c"),
                     (Matching, "hsd/hsd_cobj_exact_801944A4.c"),
-                    (CodeCandidate, "hsd/hsd_cobj_candidate_80194510.c"),
+                    (Matching, "hsd/hsd_cobj_candidate_80194510.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194654.c"),
                     (Matching, "hsd/hsd_cobj_exact_80194788.c"),
                     (CodeCandidate, "hsd/hsd_cobj_candidate_801947C8.c"),
@@ -6568,6 +6596,11 @@ config.libs = [
             Object(
                 Matching,
                 "game/data/sdata2_8047C2A0_prefix.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/sdata2_8047C318.c",
                 progress_category="game",
             ),
             Object(

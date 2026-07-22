@@ -5,9 +5,7 @@
 
 extern u8 gxData_803FC860[];
 
-/*
- * Mixed Dolphin SDK .sdata2 constants before the GXTexture literal pool.
- */
+/* Mixed Dolphin SDK .sdata2 constants before the GXFrameBuf literal pool. */
 SDATA2 const f32 lbl_8047C2A0[2] = { 0.017453292f, 0.0f };
 SDATA2 const f32 lbl_8047C2A8 = 1.0f;
 SDATA2 const f32 lbl_8047C2AC = 2.0f;
@@ -31,17 +29,3 @@ SDATA2 const f32 lbl_8047C2F0 = 1.0f;
 SDATA2 const f32 lbl_8047C2F4 = 0.0f;
 SDATA2 const f32 lbl_8047C2F8 = 0.1f;
 SDATA2 const f64 lbl_8047C300 = 4.503599627370496e+15;
-SDATA2 const f32 lbl_8047C308 = 256.0f;
-SDATA2 const f64 lbl_8047C310 = 4.503599627370496e+15;
-SDATA2 const f32 lbl_8047C318 = 0.0f;
-SDATA2 const f32 lbl_8047C31C = 90.0f;
-SDATA2 const f32 lbl_8047C320 = 3.1415927f;
-SDATA2 const f32 lbl_8047C324 = 180.0f;
-SDATA2 const f32 lbl_8047C328 = -1000.0f;
-SDATA2 const f32 lbl_8047C32C = 1000.0f;
-SDATA2 const f32 lbl_8047C330 = 1.0f;
-SDATA2 const f32 lbl_8047C334 = 2.0f;
-SDATA2 const f32 lbl_8047C338 = -4.0f;
-SDATA2 const f32 lbl_8047C33C = 4.0f;
-SDATA2 const f32 lbl_8047C340 = -2.0f;
-SDATA2 const f32 lbl_8047C344 = 0.5f;

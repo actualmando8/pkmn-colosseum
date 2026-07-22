@@ -18,11 +18,53 @@
 typedef struct GameData GameData;
 typedef struct GameDataAttest GameDataAttest;
 
-static inline u32 gamedataGetStatusInline(GameData* ptr, u32 effect_type)
+static inline void gamedataSetStatusInline(GameData* ptr, u32 kind, u32 value)
 {
-    GameDataAttest* base;
+    GameDataAttest* attest;
 
-    if ((u16)effect_type == 0 || (u16)effect_type >= 7) {
+    if ((u16)kind == 0 || (u16)kind >= 7) {
+        return;
+    }
+    if (ptr == NULL) {
+        ptr = (GameData*)savedataGetStatus(0, 0);
+        if (ptr == NULL) {
+            return;
+        }
+        ptr = (GameData*)savedataGetStatus((u32)ptr, 1);
+        if (ptr == NULL) {
+            return;
+        }
+    }
+    attest = (GameDataAttest*)gamedataBiosGetGamedataAtttestPtr(ptr);
+    if (attest == NULL) {
+        return;
+    }
+    switch ((u16)kind) {
+    case 1:
+        gamedataBiosSetGamedataAtttestPtr((u32*)ptr, (u32*)value);
+        break;
+    case 2:
+        gamedataAttestBiosSetVerId(attest, (u8)value);
+        break;
+    case 3:
+        gamedataAttestBiosSetGenId(attest, (u8)value);
+        break;
+    case 4:
+        gamedataAttestBiosSetAreaId(attest, (u8)value);
+        break;
+    case 5:
+        gamedataAttestBiosSetLangareaId(attest, (u8)value);
+        break;
+    default:
+        break;
+    }
+}
+
+static inline u32 gamedataGetStatusInline(GameData* ptr, u32 kind)
+{
+    GameDataAttest* attest;
+
+    if ((u16)kind == 0 || (u16)kind >= 7) {
         return 0;
     }
     if (ptr == NULL) {
@@ -35,153 +77,74 @@ static inline u32 gamedataGetStatusInline(GameData* ptr, u32 effect_type)
             return 0;
         }
     }
-    base = (GameDataAttest*)gamedataBiosGetGamedataAtttestPtr(ptr);
-    if (base == NULL) {
+    attest = (GameDataAttest*)gamedataBiosGetGamedataAtttestPtr(ptr);
+    if (attest == NULL) {
         return 0;
     }
-    switch ((u16)effect_type) {
+    switch ((u16)kind) {
     case 1:
-        return (u32)base;
+        return (u32)attest;
     case 2:
-        return gamedataAttestBiosGetVerId(base);
+        return gamedataAttestBiosGetVerId(attest);
     case 3:
-        return gamedataAttestBiosGetGenId(base);
+        return gamedataAttestBiosGetGenId(attest);
     case 4:
-        return gamedataAttestBiosGetAreaId(base);
+        return gamedataAttestBiosGetAreaId(attest);
     case 5:
-        return gamedataAttestBiosGetLangareaId(base);
+        return gamedataAttestBiosGetLangareaId(attest);
     default:
         return 0;
     }
 }
 
 /* 0x8013528C | 0xAC */
-#if 0
-asm void fn_8013528C(void) {
-#include "src/game/effect/effect_util_fn_8013528C.inc"
-}
-#else
-#pragma optimization_level 4
 void gamedataCreate(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
-    void* base;
-
-    if (ptr == 0) {
+    if (ptr == NULL) {
         return;
     }
     gamedataInit(ptr);
-
-    base = ptr;
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) {
-            base = 0;
-            goto done;
-        } else {
-            base = (void*)savedataGetStatus((u32)base, 1);
-            if (base == 0) {
-                base = 0;
-                goto done;
-            }
-        }
-    }
-
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) {
-        base = 0;
-    }
-
-done:
-    if (base == 0) {
+    ptr = (void*)gamedataGetStatusInline((GameData*)ptr, 1);
+    if (ptr == NULL) {
         return;
     }
-    gamedataAttestCreate(base, r4, r5, r6, r7);
+    gamedataAttestCreate(ptr, r4, r5, r6, r7);
 }
-#endif
 
 /* 0x80135338 | 0x88 */
-#if 0
-asm void gamedataInit(void) {
-#include "src/game/effect/effect_util_gamedataInit.inc"
-}
-#else
-#pragma optimization_level 4
 void gamedataInit(void* ptr) {
-    void* base;
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) return;
-        base = (void*)savedataGetStatus((u32)base, 1);
-        if (base == 0) return;
-    } else {
-        base = ptr;
+    void* attest = (void*)gamedataGetStatusInline((GameData*)ptr, 1);
+
+    if (attest == NULL) {
+        return;
     }
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) return;
-    gamedataAttestInit(base);
+    gamedataAttestInit(attest);
     gamedatasaveInit(ptr);
 }
-#endif
 
 
 /* 0x801353C0 | 0x170 */
-#if 0
-asm void fn_801353C0(void) {
-#include "src/game/effect/effect_util_fn_801353C0.inc"
-}
-#else
-#pragma optimization_level 4
-void fn_801353C0(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
-    void* base;
-    if (ptr == 0) return;
-    if ((r4 & 0xFF) == 0) return;
-    if ((r5 & 0xFF) == 0) return;
-    if ((r6 & 0xFF) == 0) return;
-    if ((r7 & 0xFF) == 0) return;
+void gamedataAttestCreate(void* ptr, u8 r4, u8 r5, u8 r6, u8 r7) {
+    if (ptr == NULL) {
+        return;
+    }
+    if (r4 == 0) {
+        return;
+    }
+    if (r5 == 0) {
+        return;
+    }
+    if (r6 == 0) {
+        return;
+    }
+    if (r7 == 0) {
+        return;
+    }
     gamedataAttestInit(ptr);
-    /* A60 */
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) { base = 0; } else { base = (void*)savedataGetStatus((u32)base, 1); }
-        base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-        if (base != 0) { gamedataAttestBiosSetVerId(base, (u8)(r4 & 0xFF)); }
-    } else {
-        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
-        if (base != 0) { gamedataAttestBiosSetVerId(base, (u8)(r4 & 0xFF)); }
-    }
-    /* A50 */
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) { base = 0; } else { base = (void*)savedataGetStatus((u32)base, 1); }
-        base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-        if (base != 0) { gamedataAttestBiosSetGenId(base, (u8)(r5 & 0xFF)); }
-    } else {
-        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
-        if (base != 0) { gamedataAttestBiosSetGenId(base, (u8)(r5 & 0xFF)); }
-    }
-    /* A40 */
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) { base = 0; } else { base = (void*)savedataGetStatus((u32)base, 1); }
-        base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-        if (base != 0) { gamedataAttestBiosSetAreaId(base, (u8)(r6 & 0xFF)); }
-    } else {
-        base = (void*)gamedataBiosGetGamedataAtttestPtr(ptr);
-        if (base != 0) { gamedataAttestBiosSetAreaId(base, (u8)(r6 & 0xFF)); }
-    }
-    /* A30 */
-    if (ptr == 0) {
-        base = (void*)savedataGetStatus(0, 0);
-        if (base == 0) return;
-        base = (void*)savedataGetStatus((u32)base, 1);
-        if (base == 0) return;
-    } else {
-        base = ptr;
-    }
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) return;
-    gamedataAttestBiosSetLangareaId(base, (u8)(r7 & 0xFF));
+    gamedataSetStatusInline((GameData*)ptr, 2, r4);
+    gamedataSetStatusInline((GameData*)ptr, 3, r5);
+    gamedataSetStatusInline((GameData*)ptr, 4, r6);
+    gamedataSetStatusInline((GameData*)ptr, 5, r7);
 }
-#endif
 
 
 /* 0x80135530 | 0x1D8 */
@@ -203,78 +166,18 @@ u32 gamedataAttestCheckValid(GameData* ptr) {
 
 
 /* 0x80135708 | 0x134 */
-#if 0
-asm void fn_80135708(void) {
-#include "src/game/effect/effect_util_fn_80135708.inc"
-}
-#else
-#pragma optimization_level 4
-#pragma scheduling on
 void gamedataAttestInit(void* ptr) {
-    void* r31 = ptr;
-    void* base;
-    if (r31 == 0) goto _end;
-    /* A60 */
-    base = r31;
-    if (r31 != 0) goto _a60_handler;
-    base = (void*)savedataGetStatus(0, 0);
-    if (base == 0) goto _a50;
-    base = (void*)savedataGetStatus((u32)base, 1);
-    if (base == 0) goto _a50;
-_a60_handler:
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) goto _a50;
-    gamedataAttestBiosSetVerId(base, 0);
-_a50:
-    /* A50 */
-    base = r31;
-    if (r31 != 0) goto _a50_handler;
-    base = (void*)savedataGetStatus(0, 0);
-    if (base == 0) goto _a40;
-    base = (void*)savedataGetStatus((u32)base, 1);
-    if (base == 0) goto _a40;
-_a50_handler:
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) goto _a40;
-    gamedataAttestBiosSetGenId(base, 0);
-_a40:
-    /* A40 */
-    base = r31;
-    if (r31 != 0) goto _a40_handler;
-    base = (void*)savedataGetStatus(0, 0);
-    if (base == 0) goto _a30;
-    base = (void*)savedataGetStatus((u32)base, 1);
-    if (base == 0) goto _a30;
-_a40_handler:
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) goto _a30;
-    gamedataAttestBiosSetAreaId(base, 0);
-_a30:
-    /* A30 */
-    base = r31;
-    if (r31 != 0) goto _a30_handler;
-    base = (void*)savedataGetStatus(0, 0);
-    if (base == 0) goto _end;
-    base = (void*)savedataGetStatus((u32)base, 1);
-    if (base == 0) goto _end;
-_a30_handler:
-    base = (void*)gamedataBiosGetGamedataAtttestPtr(base);
-    if (base == 0) goto _end;
-    gamedataAttestBiosSetLangareaId(base, 0);
-_end:;
+    if (ptr == NULL) {
+        return;
+    }
+    gamedataSetStatusInline((GameData*)ptr, 2, 0);
+    gamedataSetStatusInline((GameData*)ptr, 3, 0);
+    gamedataSetStatusInline((GameData*)ptr, 4, 0);
+    gamedataSetStatusInline((GameData*)ptr, 5, 0);
 }
-#pragma scheduling off
-#endif
 
 
 /* 0x8013583C | 0xFC */
-#if 0
-asm void fn_8013583C(void) {
-#include "src/game/effect/effect_util_fn_8013583C.inc"
-}
-#else
-#pragma push
-#pragma scheduling on
 void gamedataSetStatus(ptr, effect_type, value)
 GameData* ptr;
 u32 effect_type;
@@ -319,13 +222,9 @@ u32 value;
         break;
     }
 }
-#pragma pop
-#endif
 
 
 /* 0x80135938 | 0xF8 */
-#pragma push
-#pragma scheduling on
 u32 gamedataGetStatus(ptr, effect_type)
 GameData* ptr;
 u32 effect_type;
@@ -364,4 +263,3 @@ u32 effect_type;
         return 0;
     }
 }
-#pragma pop
