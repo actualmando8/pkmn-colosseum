@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1412
+    "total_units": 1426
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1344,
-    "source_backed_units": 1328,
+    "named_units": 1358,
+    "source_backed_units": 1342,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -23,7 +23,7 @@
     "matched_data_percent": 97.28669,
     "matched_functions": 6307,
     "matched_functions_percent": 73.31163,
-    "fuzzy_match_percent": 57.79945
+    "fuzzy_match_percent": 57.799606
   },
   "unit_topology": [
     {
@@ -7357,13 +7357,65 @@
       "sections": [
         {
           "name": ".text",
-          "size": 828,
+          "size": 440,
           "virtual_address": 2148403688
         }
       ],
-      "total_code": 828,
+      "total_code": 440,
       "total_data": 0,
-      "total_functions": 7
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_math_random_exact_800E0BA0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 100,
+          "virtual_address": 2148404128
+        }
+      ],
+      "total_code": 100,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_math_random_candidate_800E0C04",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 80,
+          "virtual_address": 2148404228
+        }
+      ],
+      "total_code": 80,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_math_random_exact_800E0C54",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2148404308
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_math_random_candidate_800E0CA0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 132,
+          "virtual_address": 2148404384
+        }
+      ],
+      "total_code": 132,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_math_util",
@@ -8099,17 +8151,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/gs_model_bound_range_800EB464",
+      "name": "main/game/gs_model_bound_exact_800EB464",
       "sections": [
         {
           "name": ".text",
-          "size": 2696,
+          "size": 316,
           "virtual_address": 2148447332
         }
       ],
-      "total_code": 2696,
+      "total_code": 316,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gs_model_bound_candidate_800EB5A0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2380,
+          "virtual_address": 2148447648
+        }
+      ],
+      "total_code": 2380,
+      "total_data": 0,
+      "total_functions": 3
     },
     {
       "name": "main/game/gs_model_anim_candidate_800EBEEC",
@@ -8537,13 +8602,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 1132,
+          "size": 840,
           "virtual_address": 2148462744
         }
       ],
-      "total_code": 1132,
+      "total_code": 840,
       "total_data": 0,
-      "total_functions": 8
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_texture_getters_exact_800EF3E0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 292,
+          "virtual_address": 2148463584
+        }
+      ],
+      "total_code": 292,
+      "total_data": 0,
+      "total_functions": 6
     },
     {
       "name": "main/game/gs_texture_exact_800EF504",
@@ -13551,39 +13629,104 @@
       "sections": [
         {
           "name": ".text",
-          "size": 10308,
+          "size": 10196,
           "virtual_address": 2149158780
         }
       ],
-      "total_code": 10308,
+      "total_code": 10196,
       "total_data": 0,
-      "total_functions": 26
+      "total_functions": 23
+    },
+    {
+      "name": "main/hsd/hsd_fobj_tail_exact_8019B750",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 112,
+          "virtual_address": 2149168976
+        }
+      ],
+      "total_code": 112,
+      "total_data": 0,
+      "total_functions": 3
     },
     {
       "name": "main/hsd/hsd_fog",
       "sections": [
         {
           "name": ".text",
-          "size": 3792,
+          "size": 2968,
           "virtual_address": 2149169088
         }
       ],
-      "total_code": 3792,
+      "total_code": 2968,
       "total_data": 0,
-      "total_functions": 15
+      "total_functions": 11
+    },
+    {
+      "name": "main/hsd/hsd_id_tail_exact_8019C358",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 108,
+          "virtual_address": 2149172056
+        }
+      ],
+      "total_code": 108,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/hsd/hsd_id_tail_candidate_8019C3C4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 716,
+          "virtual_address": 2149172164
+        }
+      ],
+      "total_code": 716,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_initialize",
       "sections": [
         {
           "name": ".text",
-          "size": 1984,
+          "size": 288,
           "virtual_address": 2149172880
         }
       ],
-      "total_code": 1984,
+      "total_code": 288,
       "total_data": 0,
-      "total_functions": 12
+      "total_functions": 4
+    },
+    {
+      "name": "main/hsd/hsd_render_pass_exact_8019C7B0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149173168
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_initialize_candidate_8019C7B8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1688,
+          "virtual_address": 2149173176
+        }
+      ],
+      "total_code": 1688,
+      "total_data": 0,
+      "total_functions": 7
     },
     {
       "name": "main/hsd/hsd_jobj",
@@ -14331,13 +14474,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 13776,
+          "size": 628,
           "virtual_address": 2149300936
         }
       ],
-      "total_code": 13776,
+      "total_code": 628,
       "total_data": 0,
-      "total_functions": 27
+      "total_functions": 4
+    },
+    {
+      "name": "main/hsd/hsd_tobj_image_exact_801BBD3C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 160,
+          "virtual_address": 2149301564
+        }
+      ],
+      "total_code": 160,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/hsd/hsd_tobj_candidate_801BBDDC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12988,
+          "virtual_address": 2149301724
+        }
+      ],
+      "total_code": 12988,
+      "total_data": 0,
+      "total_functions": 20
     },
     {
       "name": "main/hsd/hsd_util",
@@ -14366,7 +14535,7 @@
       "total_functions": 7
     },
     {
-      "name": "main/hsd/hsd_aobj_candidate_801C01C8",
+      "name": "main/hsd/hsd_aobj_exact_801C01C8",
       "sections": [
         {
           "name": ".text",
@@ -15068,17 +15237,30 @@
       "total_functions": 9
     },
     {
-      "name": "main/game/battle/battle_range_801ED640_prefix",
+      "name": "main/game/battle/battle_range_exact_801ED640",
       "sections": [
         {
           "name": ".text",
-          "size": 2548,
+          "size": 320,
           "virtual_address": 2149504576
         }
       ],
-      "total_code": 2548,
+      "total_code": 320,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/battle/battle_range_candidate_801ED780",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2228,
+          "virtual_address": 2149504896
+        }
+      ],
+      "total_code": 2228,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/battle/battle_range_exact_801EE034",

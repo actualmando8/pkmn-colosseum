@@ -2809,13 +2809,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_model_bound_range_800EB464.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/gs_model_bound_exact_800EB464.c"),
+                    (CodeCandidate, "game/gs_model_bound_candidate_800EB5A0.c"),
+                ]
+            ],
             *[
                 Object(
                     status,
@@ -3033,6 +3039,18 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "hsd/hsd_tobj.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
+                "hsd/hsd_tobj_image_exact_801BBD3C.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_tobj_candidate_801BBDDC.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
@@ -3602,8 +3620,15 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/battle/battle_range_exact_801ED640.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
-                "game/battle/battle_range_801ED640_prefix.c",
+                "game/battle/battle_range_candidate_801ED780.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -5279,6 +5304,13 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "game/gs_texture_getters_exact_800EF3E0.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
                 "game/gs_texture_exact_800EF504.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -5341,6 +5373,12 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "hsd/hsd_fobj_tail_exact_8019B750.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
                 "hsd/hsd_wobj.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
@@ -5352,8 +5390,32 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                Matching,
+                "hsd/hsd_id_tail_exact_8019C358.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_id_tail_candidate_8019C3C4.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
                 CodeCandidate,
                 "hsd/hsd_initialize.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
+                "hsd/hsd_render_pass_exact_8019C7B0.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_initialize_candidate_8019C7B8.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
@@ -5602,6 +5664,34 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/gs_math_range_800E09E8.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/gs_math_random_exact_800E0BA0.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_math_random_candidate_800E0C04.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/gs_math_random_exact_800E0C54.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_math_random_candidate_800E0CA0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -6108,8 +6198,8 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
-                "hsd/hsd_aobj_candidate_801C01C8.c",
+                Matching,
+                "hsd/hsd_aobj_exact_801C01C8.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="hsd",

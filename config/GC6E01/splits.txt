@@ -1602,7 +1602,19 @@ game/gs_math_lerp.c:
 	.text       start:0x800E090C end:0x800E09E8
 
 game/gs_math_range_800E09E8.c:
-	.text       start:0x800E09E8 end:0x800E0D24
+	.text       start:0x800E09E8 end:0x800E0BA0
+
+game/gs_math_random_exact_800E0BA0.c:
+	.text       start:0x800E0BA0 end:0x800E0C04
+
+game/gs_math_random_candidate_800E0C04.c:
+	.text       start:0x800E0C04 end:0x800E0C54
+
+game/gs_math_random_exact_800E0C54.c:
+	.text       start:0x800E0C54 end:0x800E0CA0
+
+game/gs_math_random_candidate_800E0CA0.c:
+	.text       start:0x800E0CA0 end:0x800E0D24
 
 game/gs_math_util.c:
 	.text       start:0x800E0D24 end:0x800E0DDC
@@ -1773,8 +1785,11 @@ game/gs_model_bound.c:
 game/gs_model_bound_exact_800EB414.c:
 	.text       start:0x800EB414 end:0x800EB464
 
-game/gs_model_bound_range_800EB464.c:
-	.text       start:0x800EB464 end:0x800EBEEC
+game/gs_model_bound_exact_800EB464.c:
+	.text       start:0x800EB464 end:0x800EB5A0
+
+game/gs_model_bound_candidate_800EB5A0.c:
+	.text       start:0x800EB5A0 end:0x800EBEEC
 
 game/gs_model_anim_candidate_800EBEEC.c:
 	.text       start:0x800EBEEC end:0x800EC0E8
@@ -1844,7 +1859,10 @@ game/gs_texture_range_800EEF48.c:
 	.text       start:0x800EEF48 end:0x800EF098
 
 game/gs_texture.c:
-	.text       start:0x800EF098 end:0x800EF504
+	.text       start:0x800EF098 end:0x800EF3E0
+
+game/gs_texture_getters_exact_800EF3E0.c:
+	.text       start:0x800EF3E0 end:0x800EF504
 
 game/gs_texture_exact_800EF504.c:
 	.text       start:0x800EF504 end:0x800EF548
@@ -2980,13 +2998,28 @@ hsd/hsd_displayfunc.c:
 	.text       start:0x80197A64 end:0x80198F7C
 
 hsd/hsd_dobj.c:
-	.text       start:0x80198F7C end:0x8019B7C0
+	.text       start:0x80198F7C end:0x8019B750
+
+hsd/hsd_fobj_tail_exact_8019B750.c:
+	.text       start:0x8019B750 end:0x8019B7C0
 
 hsd/hsd_fog.c:
-	.text       start:0x8019B7C0 end:0x8019C690
+	.text       start:0x8019B7C0 end:0x8019C358
+
+hsd/hsd_id_tail_exact_8019C358.c:
+	.text       start:0x8019C358 end:0x8019C3C4
+
+hsd/hsd_id_tail_candidate_8019C3C4.c:
+	.text       start:0x8019C3C4 end:0x8019C690
 
 hsd/hsd_initialize.c:
-	.text       start:0x8019C690 end:0x8019CE50
+	.text       start:0x8019C690 end:0x8019C7B0
+
+hsd/hsd_render_pass_exact_8019C7B0.c:
+	.text       start:0x8019C7B0 end:0x8019C7B8
+
+hsd/hsd_initialize_candidate_8019C7B8.c:
+	.text       start:0x8019C7B8 end:0x8019CE50
 
 hsd/hsd_jobj.c:
 	.text       start:0x8019CE50 end:0x8019F718
@@ -3160,7 +3193,13 @@ hsd/hsd_texp_candidate_801B4300.c:
 	.text       start:0x801B4300 end:0x801BBAC8
 
 hsd/hsd_tobj.c:
-	.text       start:0x801BBAC8 end:0x801BF098
+	.text       start:0x801BBAC8 end:0x801BBD3C
+
+hsd/hsd_tobj_image_exact_801BBD3C.c:
+	.text       start:0x801BBD3C end:0x801BBDDC
+
+hsd/hsd_tobj_candidate_801BBDDC.c:
+	.text       start:0x801BBDDC end:0x801BF098
 
 hsd/hsd_util.c:
 	.text       start:0x801BF098 end:0x801BF6AC
@@ -3168,7 +3207,7 @@ hsd/hsd_util.c:
 hsd/hsd_video.c:
 	.text       start:0x801BF6AC end:0x801C01C8
 
-hsd/hsd_aobj_candidate_801C01C8.c:
+hsd/hsd_aobj_exact_801C01C8.c:
 	.text       start:0x801C01C8 end:0x801C0270
 
 hsd/hsd_aobj_exact_801C0270.c:
@@ -3330,8 +3369,11 @@ dolphin/thp/THPDec_range_801ECAB0.c:
 game/field_range_801ECFE0.c:
 	.text       start:0x801ECFE0 end:0x801ED640
 
-game/battle/battle_range_801ED640_prefix.c:
-	.text       start:0x801ED640 end:0x801EE034
+game/battle/battle_range_exact_801ED640.c:
+	.text       start:0x801ED640 end:0x801ED780
+
+game/battle/battle_range_candidate_801ED780.c:
+	.text       start:0x801ED780 end:0x801EE034
 
 game/battle/battle_range_exact_801EE034.c:
 	.text       start:0x801EE034 end:0x801EE958

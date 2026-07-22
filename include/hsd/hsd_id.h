@@ -13,6 +13,8 @@
 
 #include "dolphin/types.h"
 
+struct _HSD_ObjAllocData;
+
 /* ========================================================================= */
 /*  Structures                                                               */
 /* ========================================================================= */
@@ -31,7 +33,7 @@ typedef struct _HSD_IDTable {
 /*  Function declarations                                                    */
 /* ========================================================================= */
 
-void* HSD_IDGetAllocData(void);
+struct _HSD_ObjAllocData* HSD_IDGetAllocData(void);
 void HSD_IDInitAllocData(void);
 void HSD_IDSetup(void);
 void HSD_IDInsertToTable(HSD_IDTable* table, u32 id, void* data);

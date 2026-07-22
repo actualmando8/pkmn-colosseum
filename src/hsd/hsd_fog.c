@@ -13,6 +13,7 @@
 #include "hsd/hsd_hash.h"
 #include "hsd/hsd_id.h"
 #include "hsd/hsd_object.h"
+#include "hsd/hsd_objalloc.h"
 
 extern void* memcpy(void* dst, const void* src, u32 size);
 extern void* memset(void* dst, int val, u32 n);
@@ -562,12 +563,12 @@ void* HSD_IDGetDataFromTable(HSD_IDTable* table, u32 id, s32* success)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void HSD_ObjFree(void* list, void* data);
-extern u8 lbl_8046553C[];   /* HSD_ObjAllocData hsd_iddata */
+extern void HSD_ObjFree(HSD_ObjAllocData* list, void* data);
+extern HSD_ObjAllocData lbl_8046553C;
 
 static inline void IDEntryFree(IDEntry* entry)
 {
-    HSD_ObjFree(lbl_8046553C, entry);
+    HSD_ObjFree(&lbl_8046553C, entry);
 }
 #if 0
 asm void HSD_IDRemoveByIDFromTable(void) {
@@ -607,7 +608,6 @@ void HSD_IDRemoveByIDFromTable(HSD_IDTable* table, u32 id)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void* HSD_ObjAlloc(void* list);
 extern char lbl_8047DAA0;   /* "id.c"  */
 extern char lbl_8047DAA8;   /* "entry" */
 
@@ -615,7 +615,7 @@ static inline IDEntry* IDEntryAlloc(void)
 {
     IDEntry* entry;
 
-    entry = HSD_ObjAlloc(lbl_8046553C);
+    entry = HSD_ObjAlloc(&lbl_8046553C);
     if (entry == NULL) {
         __assert(&lbl_8047DAA0, 0x43, &lbl_8047DAA8);
     }
@@ -686,14 +686,14 @@ void HSD_IDSetup(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
+extern void HSD_ObjAllocInit(HSD_ObjAllocData* list, u32 size, u32 alignment);
 #if 0
 asm void HSD_IDInitAllocData(void) {
 #include "src/hsd/hsd_fog_HSD_IDInitAllocData.inc"
 }
 #else
 void HSD_IDInitAllocData(void) {
-    HSD_ObjAllocInit(lbl_8046553C, 0xC, 4);
+    HSD_ObjAllocInit(&lbl_8046553C, sizeof(IDEntry), 4);
 }
 #endif
 #pragma pop
@@ -707,8 +707,8 @@ asm void HSD_IDGetAllocData(void) {
 #include "src/hsd/hsd_fog_HSD_IDGetAllocData.inc"
 }
 #else
-void* HSD_IDGetAllocData(void) {
-    return lbl_8046553C;
+HSD_ObjAllocData* HSD_IDGetAllocData(void) {
+    return &lbl_8046553C;
 }
 #endif
 #pragma pop
