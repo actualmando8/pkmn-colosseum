@@ -682,7 +682,7 @@ Newly linked unit/code/data delta from goal baseline: +74 units / +41,564 code /
 Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
 Head linked: 759 / 1,373 units; 607,724 complete code bytes;
   752,773 complete data bytes
-README/report: synced on PR #402; decomp.dev pending merge ingestion
+README/report/decomp.dev: synced on PR #402 at merge `ec1874d3`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#401 queue; 537 entries, 21 workers, zero new wins;
   one stale terminal WIN? retained
@@ -695,4 +695,34 @@ Rejected: pragma/codegen-shaped HSD islands, incorrect private jump-table
   fightOutPokemonIsHinsi
 Next unit closers: current-report object closers and non-overlapping farm results
   after PR #402 reconciliation
+```
+
+### Batch snapshot — 2026-07-21 (PR #403)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: ec1874d3 (PR #402 merged)
+Batch PR: #403, `campaign/post402-batch30-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 exact functions / +0 matched code/data;
+  +30 linked functions / +6 units / +1,148 linked code / +0 linked data
+Newly linked function delta from goal baseline: +423
+Newly linked unit/code/data delta from goal baseline: +80 units / +42,712 code / +189 data
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+Head linked: 765 / 1,384 units; 608,872 complete code bytes;
+  752,773 complete data bytes
+README/report: synced on PR #403; decomp.dev pending merge ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#402 queue; 537 entries, 21 workers, zero new wins;
+  13 units retargeted and the historical WIN? retained
+Windows: healthy post-#402 manifest; 75 fidelity-valid units, 12 workers,
+  zero new wins; five exact targets retired, five fresh targets added, and
+  orphaned prior-run permuters removed without discarding outputs
+Integrated: 26 strict fight encounter/effect accessors plus four canonical
+  Dolphin SRAM lock/unlock entry points; every residual remains a candidate
+Rejected: four pragma-dependent fight accessors; MusyX candidates with broken
+  cross-split sdata/relocations; SRAM sound/progressive accessors that lose
+  exactness without inventing inline helpers
+Next unit closers: fresh current-report natural-C islands and non-overlapping
+  farm results after PR #403 reconciliation
 ```
