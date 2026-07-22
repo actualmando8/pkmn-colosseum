@@ -85,7 +85,7 @@ extern u8 lbl_8047AA90;
 
 void fn_800D30F0(u32 flag)
 {
-    u32 sc = lbl_8047AA80->clearColor;
+    u32 sc = (u32)lbl_8047AA80->renderTarget;
 
     if ((u32)(sc + 0x01020000U) == 0xFEFEU) {
         return;
@@ -107,7 +107,7 @@ void fn_800D30F0(u32 flag)
 
     if ((u8)flag != 0) {
         fn_800B8E74();
-        if (lbl_8047AA80->clearColor != 0) {
+        if (lbl_8047AA80->renderTarget != NULL) {
             GXInvalidateTexAll();
         }
     }

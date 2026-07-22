@@ -1330,3 +1330,51 @@ Independent audit: PASS for exact composition, text and relocation parity,
 Next action: publish and merge PR #419 after final review, rotate Windows from
   the merged head, then integrate the next vetted exact-30 batch
 ```
+
+### Batch snapshot — 2026-07-22 (PR #420)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 89e2aa8c (PR #419 merged)
+Batch branch: `integration/pr420-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +17 complete units / +30 total-unit topology /
+  +1,304 linked code / +0 linked data
+Goal cumulative from PR #381: +873 linked functions / +254 complete units /
+  +70,120 linked code / +193 linked data
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,641 functions; 939 / 1,698 units;
+  636,280 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.50% linked / 636.28 kB
+  complete code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole authorized permutation farm
+Windows: no queue, process, or remote state was touched by this integration
+  worktree; reconciliation and rotation remain a separate campaign operation
+Integrated: three NPC event-queue/callback helpers; seven GBA status, counter,
+  bit-extraction, and ready-state helpers; eight graphics state/frame helpers;
+  seven MusyX DSP, AI, IRQ, allocator, and reverb helpers; four PC-box capacity
+  and status helpers; and the mailbox receive-order lookup
+Type recovery: the NPC callback context is an evidenced 13-pointer queue with
+  its cursor at 0x34; the GBA retry storage is the six-u16 0xC-byte SDA object;
+  graphics state 0x0C is a render-target pointer with 0xFEFEFEFE as its empty
+  sentinel, not a packed clear color; PC-box capacities preserve their u16/s8
+  caller ABI; and the 0x1E0 `SND_AUX_REVERBHI` layout and update routine follow
+  the canonical MusyX runtime types and field order
+Residual policy: the six affected original ranges become 17 Matching units
+  plus 19 explicit non-auto CodeCandidate ranges; coverage is gapless and
+  disjoint
+Validation: all 30 functions / 1,304 bytes are raw 100%; all 17 Matching units
+  emit target-identical text and all 47 normalized target/source relocations;
+  every selected symbol survives in main.elf at its retail VA and size, with
+  613 genuine incoming relocations in aggregate; `FORCEACTIVE` remains empty
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS after replacing two scalar-pointer GBA aliases with
+  the evidenced six-u16 small-data array and replacing raw graphics offsets
+  with typed `xfbCount`, `xfbIndex`, and signed `mode` field access
+Next action: independently audit, publish, and merge PR #420; then reconcile
+  and rotate Windows from the merged head before selecting exact-30 #421
+```

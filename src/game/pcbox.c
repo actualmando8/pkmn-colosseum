@@ -176,15 +176,15 @@ void* pcboxGetItem(void* base, s16 index) {
 
 
 /* 0x801347D0 | 0x8 | return_const */
-u32 pcboxGetNbItemSlot(void) { return 235; }
+u16 pcboxGetNbItemSlot(s32 box) { return 235; }
 
 
 /* 0x801347D8 | 0x8 | return_const */
-u32 fn_801347D8(void) { return 30; }
+s8 fn_801347D8(void) { return 30; }
 
 
 /* 0x801347E0 | 0x8 | return_const */
-u32 pcboxGetNbPokemonBox(void) { return 3; }
+s8 pcboxGetNbPokemonBox(void) { return 3; }
 
 
 /* One box contains its name/header followed by 30 Pokemon records. */
