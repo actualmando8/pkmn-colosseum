@@ -727,30 +727,64 @@ Next unit closers: fresh current-report natural-C islands and non-overlapping
   farm results after PR #403 reconciliation
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #404)
+### Batch snapshot — 2026-07-21 (PR #404)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: f1c251bd (PR #403 merged)
-Pending batch: PR #404, `campaign/post403-batch30-20260721`
+Batch PR: #404, `campaign/post403-batch30-20260721`
 Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
 This batch: +0 exact functions / +0 matched code/data;
   +30 linked functions / +5 complete units / +9 total-unit topology /
   +728 linked code / +0 linked data
 Goal cumulative from PR #381: +453 linked functions / +85 complete units /
   +43,440 linked code / +189 linked data
-Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
   (unchanged)
-Pending linked: 4,221 functions; 770 / 1,393 units;
+Head linked: 4,221 functions; 770 / 1,393 units;
   609,600 complete code bytes; 752,773 complete data bytes
-3090: healthy post-#403 queue pinned to `f1c251bd` until PR #404 merges;
+README/report/decomp.dev: synced on PR #404 at merge `f3cf812a`;
+  decomp.dev reports 24.43% linked / 609.60 kB complete code
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#404 queue on `f3cf812a`;
   537 entries, 21 workers and 21 active claims, zero new wins;
   historical terminal WIN? retained
-Windows: healthy post-#403 manifest pinned to `f1c251bd` until PR #404 merges;
+Windows: healthy post-#404 manifest on `f3cf812a`;
   74 fidelity-valid units, 12 workers and 12 active units, zero new wins;
   historical score-15 partial retained
-Integrated pending: 30 strict item-parameter helpers; residual ranges remain
+Integrated: 30 strict item-parameter helpers; residual ranges remain
   explicit candidates
-Next action: merge PR #404, regenerate the authoritative report, then reconcile
+Next unit closers: strict current-report islands and non-overlapping farm results
+  after PR #404 reconciliation
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #405)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: f3cf812a (PR #404 merged)
+Pending batch: PR #405, `campaign/post404-batch30-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 matched functions / +0 matched code / +4 matched data;
+  +30 linked functions / +11 complete units / +19 total-unit topology /
+  +1,492 linked code / +4 linked data
+Goal cumulative from PR #381: +483 linked functions / +96 complete units /
+  +44,932 linked code / +193 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,251 functions; 781 / 1,412 units;
+  611,092 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #405; decomp.dev awaits merge ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#404 queue pinned to `f3cf812a` until PR #405 merges;
+  537 entries, 21 workers and 21 active claims, zero new wins;
+  historical terminal WIN? retained
+Windows: healthy post-#404 manifest pinned to `f3cf812a` until PR #405 merges;
+  74 fidelity-valid units, 12 workers and 12 active units, zero new wins;
+  historical score-15 partial retained
+Integrated pending: 11 strict SDK/runtime helpers, five strict HSD helpers,
+  11 strict floor-character helpers, and three strict battle-camera helpers;
+  residual ranges remain explicit candidates
+Next action: merge PR #405, regenerate the authoritative report, then reconcile
   and retarget both farms before resuming mutation
 ```
