@@ -2961,7 +2961,10 @@ hsd/hsd_pobj_range_801AA608.c:
 	.text       start:0x801AA608 end:0x801ADD48
 
 hsd/hsd_robj_range_801ADD48.c:
-	.text       start:0x801ADD48 end:0x801AE000
+	.text       start:0x801ADD48 end:0x801ADF54
+
+hsd/hsd_robj_exact_801ADF54.c:
+	.text       start:0x801ADF54 end:0x801AE000
 
 hsd/hsd_pobj.c:
 	.text       start:0x801AE000 end:0x801AE008
