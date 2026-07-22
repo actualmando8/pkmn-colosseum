@@ -790,29 +790,30 @@ Next unit closers: strict current-report game/HSD islands while both farms
   continue their reconciled queues
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #406)
+### Batch snapshot — 2026-07-21 (PR #406)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: 244e9d7d (PR #405 merged)
-Pending batch: PR #406, `integration/pr406-exact30`
+Batch PR: #406, `integration/pr406-exact30`
 Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +10 complete units / +14 total-unit topology /
   +1,660 linked code / +0 linked data
 Goal cumulative from PR #381: +513 linked functions / +106 complete units /
   +46,592 linked code / +193 linked data
-Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,281 functions; 791 / 1,426 units;
+Head linked: 4,281 functions; 791 / 1,426 units;
   612,752 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #406; decomp.dev awaits merge ingestion
+README/report/decomp.dev: synced on PR #406 at merge `ce1c97e5`;
+  decomp.dev reports 24.56% linked / 612.75 kB complete code
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: healthy post-#405 queue on `244e9d7d`; 537 entries, 21 workers and
+3090: healthy post-#406 queue on `ce1c97e5`; 537 entries, 21 workers and
   21 active claims, zero new recoverable wins
-Windows: healthy post-#405 manifest on `244e9d7d`; 74 fidelity-valid units,
+Windows: healthy post-#406 manifest on `ce1c97e5`; 74 fidelity-valid units,
   12 workers and 12 active units, zero new recoverable wins
-Integrated pending: six GS texture getters, four RNG helpers, five battle
+Integrated: six GS texture getters, four RNG helpers, five battle
   resource helpers, three FObj helpers, three ID helpers, one render-pass
   getter, three ImageDesc helpers, three model-bound helpers, and two AObj
   callback setters; every residual range remains an explicit candidate
@@ -820,5 +821,45 @@ Rejected: TObj 0x801BBDDC five-function probe required `-O1` and emitted a
   private jump table/relocation that broke the retail SHA
 Independent audits: PASS for all 30 functions, emitted sections, normalized
   relocations, semantics, residual coverage, and canonical type cleanup
-Next action: publish PR #406 and wait for all required checks
+Next unit closers: the strict Toolentry/field/battle exact-30 island prepared
+  for PR #407 after post-#406 farm reconciliation
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #407)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: ce1c97e5 (PR #406 merged)
+Pending batch: PR #407, `integration/pr407-exact30`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +10 complete units / +18 total-unit topology /
+  +1,944 linked code / +0 linked data
+Goal cumulative from PR #381: +543 linked functions / +116 complete units /
+  +48,536 linked code / +193 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,311 functions; 801 / 1,444 units;
+  614,696 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #407; decomp.dev awaits merge ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#406 queue on `ce1c97e5`; 537 entries, 21 workers and
+  21 active claims; queue/metadata SHA-256 snapshots preserved; zero overlap
+  with this batch and zero new recoverable wins
+Windows: healthy post-#406 manifest on `ce1c97e5`; 74 fidelity-valid units,
+  12 workers and 12 active units; zero overlap and zero new recoverable wins
+Integrated pending: 23 strict Toolentry helpers, five strict field/nursery
+  helpers, and two strict battle-camera helpers; all eight residual ranges remain
+  explicit CodeCandidate units
+Rejected farm artifacts: dataInsertLayer used artificial pointer aliases and
+  lacked live-tree validation; fn_8004E8E0 was 99.91071% and used artificial
+  aliases/control flow; Windows produced no new zero-score result
+Independent audit: PASS for exactly 30 functions / 1,944 bytes, ten text-only
+  Matching units, all 59 normalized relocations, semantics, contiguous
+  residual coverage, canonical flags, quality policy, and retail SHA
+Semantic corrections: replaced implicit return-register chaining with typed
+  value flow, corrected callback and state/accessor types, and preserved the
+  12-byte visibility array with target-evidenced extern small-data placement
+Next action: publish PR #407, wait for all required checks, merge, verify
+  decomp.dev, then remirror both farms before the ranked PR #408 exact-30 batch
 ```
