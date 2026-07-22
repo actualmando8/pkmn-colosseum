@@ -1747,13 +1747,22 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/floor_character.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/floor_character.c"),
+                    (Matching, "game/floor_character_exact_80116E6C.c"),
+                    (CodeCandidate, "game/floor_character_candidate_80116F68.c"),
+                    (Matching, "game/floor_character_exact_80117038.c"),
+                    (CodeCandidate, "game/floor_character_candidate_80117070.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/field_camera.c",
@@ -4605,13 +4614,20 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/battle/battle_camera.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/battle/battle_camera.c"),
+                    (Matching, "game/battle/battle_camera_exact_801C2D5C.c"),
+                    (CodeCandidate, "game/battle/battle_camera_candidate_801C2D80.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/battle/battle_grid_exact_801C3108.c",

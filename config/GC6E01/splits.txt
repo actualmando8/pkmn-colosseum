@@ -1991,7 +1991,19 @@ game/floor_event.c:
 	.text       start:0x80115CB4 end:0x80116D30
 
 game/floor_character.c:
-	.text       start:0x80116D30 end:0x8011711C
+	.text       start:0x80116D30 end:0x80116E6C
+
+game/floor_character_exact_80116E6C.c:
+	.text       start:0x80116E6C end:0x80116F68
+
+game/floor_character_candidate_80116F68.c:
+	.text       start:0x80116F68 end:0x80117038
+
+game/floor_character_exact_80117038.c:
+	.text       start:0x80117038 end:0x80117070
+
+game/floor_character_candidate_80117070.c:
+	.text       start:0x80117070 end:0x8011711C
 
 game/field_camera.c:
 	.text       start:0x8011711C end:0x80117E58
@@ -3175,7 +3187,13 @@ hsd/hsd_aobj_exact_801C2AAC.c:
 	.text       start:0x801C2AAC end:0x801C2AE8
 
 game/battle/battle_camera.c:
-	.text       start:0x801C2AE8 end:0x801C3108
+	.text       start:0x801C2AE8 end:0x801C2D5C
+
+game/battle/battle_camera_exact_801C2D5C.c:
+	.text       start:0x801C2D5C end:0x801C2D80
+
+game/battle/battle_camera_candidate_801C2D80.c:
+	.text       start:0x801C2D80 end:0x801C3108
 
 game/battle/battle_grid_exact_801C3108.c:
 	.text       start:0x801C3108 end:0x801C3114

@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1406
+    "total_units": 1412
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1338,
-    "source_backed_units": 1322,
+    "named_units": 1344,
+    "source_backed_units": 1328,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -9174,13 +9174,65 @@
       "sections": [
         {
           "name": ".text",
-          "size": 1004,
+          "size": 316,
           "virtual_address": 2148625712
         }
       ],
-      "total_code": 1004,
+      "total_code": 316,
       "total_data": 0,
-      "total_functions": 16
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/floor_character_exact_80116E6C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 252,
+          "virtual_address": 2148626028
+        }
+      ],
+      "total_code": 252,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/floor_character_candidate_80116F68",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 208,
+          "virtual_address": 2148626280
+        }
+      ],
+      "total_code": 208,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/floor_character_exact_80117038",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 56,
+          "virtual_address": 2148626488
+        }
+      ],
+      "total_code": 56,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/floor_character_candidate_80117070",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 172,
+          "virtual_address": 2148626544
+        }
+      ],
+      "total_code": 172,
+      "total_data": 0,
+      "total_functions": 2
     },
     {
       "name": "main/game/field_camera",
@@ -14396,13 +14448,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 1568,
+          "size": 628,
           "virtual_address": 2149329640
         }
       ],
-      "total_code": 1568,
+      "total_code": 628,
       "total_data": 0,
-      "total_functions": 9
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/battle/battle_camera_exact_801C2D5C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2149330268
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/battle/battle_camera_candidate_801C2D80",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 904,
+          "virtual_address": 2149330304
+        }
+      ],
+      "total_code": 904,
+      "total_data": 0,
+      "total_functions": 2
     },
     {
       "name": "main/game/battle/battle_grid_exact_801C3108",
