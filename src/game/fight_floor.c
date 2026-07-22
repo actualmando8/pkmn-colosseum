@@ -2500,8 +2500,8 @@ s32 fightFloorGetStatus(u8* pkm, u32 slot, u32 field, u32 arg) {
     extern u32 fightEncountDataBiosGetFightFloorDataId(u32);
     extern u32 fightEncountDataBiosGetTrainer(u32);
     extern u32 fightEncountDataBiosGetFightKind(u32);
-    extern u32 fightEncountGetBgmSndDataId(u32);
-    extern u32 fightEncountGetEnvSndDataId(u32);
+    extern u32 fightEncountGetBgmSndDataId(u16);
+    extern u32 fightEncountGetEnvSndDataId(u16);
     extern u32 fightTypeDataBiosGetPtr(u32);
     extern u32 fightTypeDataBiosGetName(u32);
     extern u32 fightTypeDataBiosGetTrainerNum(u32);

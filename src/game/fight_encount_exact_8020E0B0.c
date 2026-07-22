@@ -25,7 +25,7 @@ typedef struct FightEncountData {
     FightEncountTrainerSlot trainerSlots[4];
 } FightEncountData;
 
-u16 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr)
+u32 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr)
 {
     if (ptr == NULL) {
         return 0;

@@ -440,14 +440,16 @@ void fn_801EF644(s32 result) {
 void fn_801EF6FC(u8 a) {
     extern u8 lbl_8047B5E1;
     extern u16 fn_801EF624(void);
-    extern u32 fightEncountGetEnvSndDataId(void);
+    extern u32 fightEncountGetEnvSndDataId(u16 encountDataIndex);
     extern void fn_801659FC(u32 r3, u32 r4, u32 r5);
+    u16 encountDataIndex;
     u32 r3;
 
     if (lbl_8047B5E1 == 1) return;
     if (a == 0) return;
-    if (fn_801EF624() == 0) return;
-    r3 = fightEncountGetEnvSndDataId();
+    encountDataIndex = fn_801EF624();
+    if (encountDataIndex == 0) return;
+    r3 = fightEncountGetEnvSndDataId(encountDataIndex);
     if (r3 != 0) {
         fn_801659FC(r3, 0x3e8, 0xff);
     }
@@ -459,14 +461,16 @@ void fn_801EF6FC(u8 a) {
 void fn_801EF758(u8 a) {
     extern u8 lbl_8047B5E0;
     extern u16 fn_801EF624(void);
-    extern u32 fightEncountGetBgmSndDataId(void);
+    extern u32 fightEncountGetBgmSndDataId(u16 encountDataIndex);
     extern void fn_80165A20(u32 r3, u32 r4, u32 r5);
+    u16 encountDataIndex;
     u32 r3;
 
     if (lbl_8047B5E0 == 1) return;
     if (a == 0) return;
-    if (fn_801EF624() == 0) return;
-    r3 = fightEncountGetBgmSndDataId();
+    encountDataIndex = fn_801EF624();
+    if (encountDataIndex == 0) return;
+    r3 = fightEncountGetBgmSndDataId(encountDataIndex);
     if (r3 != 0) {
         fn_80165A20(r3, 0x0, 0xff);
     }

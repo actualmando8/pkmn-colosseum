@@ -36,31 +36,32 @@ typedef struct FightEncountData {
 
 extern FightEncountWipeData fight_encount_wipe_data[];
 
-void fightEncountGetEnvSndDataId(void)
+u32 fightEncountGetEnvSndDataId(u16 encountDataIndex)
 {
-    extern void fightFloorGetStatus();
-    extern u32 fightEncountDataBiosGetFightFloorDataId();
-    extern void fightEncountDataBiosGetPtr();
-    u32 val;
+    extern s32 fightFloorGetStatus(u8*, u32, u32, u32);
+    extern u32 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr);
+    extern FightEncountData* fightEncountDataBiosGetPtr(u16 index);
+    FightEncountData* encountData;
+    u32 fightFloorDataId;
 
-    fightEncountDataBiosGetPtr();
-    val = fightEncountDataBiosGetFightFloorDataId();
-    fightFloorGetStatus(0, val, 0x7, 0);
+    encountData = fightEncountDataBiosGetPtr(encountDataIndex);
+    fightFloorDataId = fightEncountDataBiosGetFightFloorDataId(encountData);
+    return fightFloorGetStatus(NULL, fightFloorDataId, 0x7, 0);
 }
 
 u32 fightEncountGetBgmSndDataId(u16 encountDataIndex)
 {
-    extern u32 fightFloorGetStatus(u32, u16, u32, u16);
+    extern s32 fightFloorGetStatus(u8*, u32, u32, u32);
     extern u32 fightTrainerGetStatus(u32, u16, u32, u16);
-    extern u32 fightTrainerKindDataBiosGetBgmSndId(void);
+    extern u32 fightTrainerKindDataBiosGetBgmSndId(u8* trainerKindData);
     extern u8* fightTrainerKindDataBiosGetPtr(u16);
     extern u32 fightEncountDataBiosGetBgmSndId(FightEncountData* ptr);
     extern u16 fightEncountDataBiosGetFightTrainerDataId(FightEncountData* base, u8 slot);
-    extern u16 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr);
+    extern u32 fightEncountDataBiosGetFightFloorDataId(FightEncountData* ptr);
     extern FightEncountData* fightEncountDataBiosGetPtr(u16 index);
     FightEncountData* encountData;
     u32 bgmSndId;
-    u16 fightFloorDataId;
+    u32 fightFloorDataId;
     u16 fightTrainerDataId;
     u16 trainerStatus;
     u16 i;
@@ -80,8 +81,8 @@ u32 fightEncountGetBgmSndDataId(u16 encountDataIndex)
         if (fightTrainerDataId != 0) {
             trainerStatus = fightTrainerGetStatus(0, fightTrainerDataId, 4, 0);
             if (trainerStatus != 0) {
-                fightTrainerKindDataBiosGetPtr(trainerStatus);
-                bgmSndId = fightTrainerKindDataBiosGetBgmSndId();
+                bgmSndId = fightTrainerKindDataBiosGetBgmSndId(
+                    fightTrainerKindDataBiosGetPtr(trainerStatus));
                 if (bgmSndId != 0) {
                     return bgmSndId;
                 }
