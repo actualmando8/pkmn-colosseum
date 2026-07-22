@@ -4,7 +4,7 @@
  */
 #include "dolphin/types.h"
 
-u32 itemParamGetSpAttackUp(u8* p)
+u8 itemParamGetSpAttackUp(u8* p)
 {
     if (p == NULL) {
         return 0;
@@ -12,7 +12,7 @@ u32 itemParamGetSpAttackUp(u8* p)
     return p[0x2] & 0xF;
 }
 
-u32 itemParamGetHitUp(u8* p)
+u8 itemParamGetHitUp(u8* p)
 {
     if (p == NULL) {
         return 0;
@@ -20,7 +20,7 @@ u32 itemParamGetHitUp(u8* p)
     return (p[0x2] >> 4) & 0xF;
 }
 
-u32 itemParamGetQuickUp(u8* p)
+u8 itemParamGetQuickUp(u8* p)
 {
     if (p == NULL) {
         return 0;
@@ -28,7 +28,7 @@ u32 itemParamGetQuickUp(u8* p)
     return p[0x1] & 0xF;
 }
 
-u32 itemParamGetDefenceUp(u8* p)
+u8 itemParamGetDefenceUp(u8* p)
 {
     if (p == NULL) {
         return 0;
@@ -36,7 +36,7 @@ u32 itemParamGetDefenceUp(u8* p)
     return (p[0x1] >> 4) & 0xF;
 }
 
-u32 itemParamGetAttackUp(u8* p)
+u8 itemParamGetAttackUp(u8* p)
 {
     if (p == NULL) {
         return 0;

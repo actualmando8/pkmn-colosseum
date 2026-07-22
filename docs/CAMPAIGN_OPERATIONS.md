@@ -711,7 +711,7 @@ Newly linked unit/code/data delta from goal baseline: +80 units / +42,712 code /
 Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
 Head linked: 765 / 1,384 units; 608,872 complete code bytes;
   752,773 complete data bytes
-README/report: synced on PR #403; decomp.dev pending merge ingestion
+README/report/decomp.dev: synced on PR #403 at merge `f1c251bd`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#402 queue; 537 entries, 21 workers, zero new wins;
   13 units retargeted and the historical WIN? retained
@@ -725,4 +725,32 @@ Rejected: four pragma-dependent fight accessors; MusyX candidates with broken
   exactness without inventing inline helpers
 Next unit closers: fresh current-report natural-C islands and non-overlapping
   farm results after PR #403 reconciliation
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #404)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: f1c251bd (PR #403 merged)
+Pending batch: PR #404, `campaign/post403-batch30-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 exact functions / +0 matched code/data;
+  +30 linked functions / +5 complete units / +9 total-unit topology /
+  +728 linked code / +0 linked data
+Goal cumulative from PR #381: +453 linked functions / +85 complete units /
+  +43,440 linked code / +189 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+  (unchanged)
+Pending linked: 4,221 functions; 770 / 1,393 units;
+  609,600 complete code bytes; 752,773 complete data bytes
+3090: healthy post-#403 queue pinned to `f1c251bd` until PR #404 merges;
+  537 entries, 21 workers and 21 active claims, zero new wins;
+  historical terminal WIN? retained
+Windows: healthy post-#403 manifest pinned to `f1c251bd` until PR #404 merges;
+  74 fidelity-valid units, 12 workers and 12 active units, zero new wins;
+  historical score-15 partial retained
+Integrated pending: 30 strict item-parameter helpers; residual ranges remain
+  explicit candidates
+Next action: merge PR #404, regenerate the authoritative report, then reconcile
+  and retarget both farms before resuming mutation
 ```
