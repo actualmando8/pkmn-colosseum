@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1418
+    "total_units": 1426
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1350,
-    "source_backed_units": 1334,
+    "named_units": 1358,
+    "source_backed_units": 1342,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0

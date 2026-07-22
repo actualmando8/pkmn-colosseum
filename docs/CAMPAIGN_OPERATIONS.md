@@ -758,33 +758,67 @@ Next unit closers: strict current-report islands and non-overlapping farm result
   after PR #404 reconciliation
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #405)
+### Batch snapshot — 2026-07-21 (PR #405)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: f3cf812a (PR #404 merged)
-Pending batch: PR #405, `campaign/post404-batch30-20260721`
+Batch PR: #405, `campaign/post404-batch30-20260721`
 Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
 This batch: +0 matched functions / +0 matched code / +4 matched data;
   +30 linked functions / +11 complete units / +19 total-unit topology /
   +1,492 linked code / +4 linked data
 Goal cumulative from PR #381: +483 linked functions / +96 complete units /
   +44,932 linked code / +193 linked data
-Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,251 functions; 781 / 1,412 units;
+Head linked: 4,251 functions; 781 / 1,412 units;
   611,092 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #405; decomp.dev awaits merge ingestion
+README/report/decomp.dev: synced on PR #405 at merge `244e9d7d`;
+  decomp.dev reports 24.49% linked / 611.09 kB complete code
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: healthy post-#404 queue pinned to `f3cf812a` until PR #405 merges;
+3090: healthy post-#405 queue on `244e9d7d`;
   537 entries, 21 workers and 21 active claims, zero new wins;
-  historical terminal WIN? retained
-Windows: healthy post-#404 manifest pinned to `f3cf812a` until PR #405 merges;
+  `__OSStopAudioSystem` retargeted and historical evidence retained
+Windows: healthy post-#405 manifest on `244e9d7d`;
   74 fidelity-valid units, 12 workers and 12 active units, zero new wins;
   historical score-15 partial retained
-Integrated pending: 11 strict SDK/runtime helpers, five strict HSD helpers,
+Integrated: 11 strict SDK/runtime helpers, five strict HSD helpers,
   11 strict floor-character helpers, and three strict battle-camera helpers;
   residual ranges remain explicit candidates
-Next action: merge PR #405, regenerate the authoritative report, then reconcile
-  and retarget both farms before resuming mutation
+Next unit closers: strict current-report game/HSD islands while both farms
+  continue their reconciled queues
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #406)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 244e9d7d (PR #405 merged)
+Pending batch: PR #406, `integration/pr406-exact30`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +10 complete units / +14 total-unit topology /
+  +1,660 linked code / +0 linked data
+Goal cumulative from PR #381: +513 linked functions / +106 complete units /
+  +46,592 linked code / +193 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,281 functions; 791 / 1,426 units;
+  612,752 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #406; decomp.dev awaits merge ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#405 queue on `244e9d7d`; 537 entries, 21 workers and
+  21 active claims, zero new recoverable wins
+Windows: healthy post-#405 manifest on `244e9d7d`; 74 fidelity-valid units,
+  12 workers and 12 active units, zero new recoverable wins
+Integrated pending: six GS texture getters, four RNG helpers, five battle
+  resource helpers, three FObj helpers, three ID helpers, one render-pass
+  getter, three ImageDesc helpers, three model-bound helpers, and two AObj
+  callback setters; every residual range remains an explicit candidate
+Rejected: TObj 0x801BBDDC five-function probe required `-O1` and emitted a
+  private jump table/relocation that broke the retail SHA
+Independent audits: PASS for all 30 functions, emitted sections, normalized
+  relocations, semantics, residual coverage, and canonical type cleanup
+Next action: publish PR #406 and wait for all required checks
 ```
