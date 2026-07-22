@@ -50,7 +50,6 @@ extern void menuOpenCustom(u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, ...);
 extern void fn_800D13C8(void* a, void* b);
 extern void fn_800D258C(void* a);
 extern void fn_800D1674(void* a, void* b);
-extern void GScameraSetRotation(void* a, void* b);
 extern void _threadSwitch(void);
 extern void* GSresGetResource(u32 a, u32 b);
 extern void* fn_800F92D4(u32 a);

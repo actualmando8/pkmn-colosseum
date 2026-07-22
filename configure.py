@@ -1472,6 +1472,8 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/fight_action_candidate_8020AED0.c"),
+                    (Matching, "game/fight_action_exact_8020AF30.c"),
+                    (CodeCandidate, "game/fight_action_candidate_8020B058.c"),
                     (Matching, "game/fight_action_exact_8020D784.c"),
                     (CodeCandidate, "game/fight_action_candidate_8020D844.c"),
                 ]
@@ -1704,13 +1706,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/window.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/window.c"),
+                    (Matching, "game/window_exact_801040A0.c"),
+                    (CodeCandidate, "game/window_candidate_801040F0.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/win_msg.c",
@@ -1795,13 +1804,19 @@ config.libs = [
                     (CodeCandidate, "game/floor_character_candidate_80117070.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/field_camera.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/field_camera_exact_8011711C.c"),
+                    (CodeCandidate, "game/field_camera.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/field_exact_80117E58.c",
@@ -5062,8 +5077,19 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/gs_render_util_exact_800D1F58.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                ],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
-                "game/gs_render_util_candidate_800D1F58.c",
+                "game/gs_render_util_candidate_800D207C.c",
                 mw_version="GC/1.3",
                 extra_cflags=[
                     "-use_lmw_stmw on",
@@ -6110,13 +6136,25 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/people/people.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/people/people.c"),
+                    (Matching, "game/people/people_exact_8018FB2C.c"),
+                    (CodeCandidate, "game/people/people_candidate_8018FB94.c"),
+                    (Matching, "game/people/people_exact_8018FBAC.c"),
+                    (CodeCandidate, "game/people/people_candidate_8018FC50.c"),
+                    (Matching, "game/people/people_exact_8018FC74.c"),
+                    (CodeCandidate, "game/people/people_candidate_8018FCE0.c"),
+                    (Matching, "game/people/people_exact_8018FD88.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/menuPokemon.c",

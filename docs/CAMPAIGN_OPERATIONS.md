@@ -988,24 +988,24 @@ Next action: integrate the two strict Windows recoveries with the ranked
   SDK/light complement in PR #411 while the cleaned Windows-only farm runs
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #411)
+### Batch snapshot — 2026-07-21 (PR #411)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: 1a93c215 (PR #410 merged)
-Pending batch: PR #411, `integration/pr411-exact30`
+Batch PR: #411, `integration/pr411-exact30`
 Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
 This batch: +2 matched functions / +340 matched code / +0 matched data;
   +30 linked functions / +15 complete units / +27 total-unit topology /
   +3,660 linked code / +0 linked data
 Goal cumulative from PR #381: +663 linked functions / +155 complete units /
   +58,840 linked code / +193 linked data
-Pending report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,431 functions; 840 / 1,517 units;
+Head linked: 4,431 functions; 840 / 1,517 units;
   625,000 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #411; decomp.dev base is synced through
-  PR #410 (`1a93c215`) at 24.90% linked / 621.34 kB complete code
+README/report/decomp.dev: synced at merge `c4ab1d16`; decomp.dev reports
+  25.05% linked / 625.00 kB complete code
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: disabled and removed from active operation; remote campaign checkout,
   processes, cron entries, and services remain absent; PR #411 did not use it
@@ -1013,7 +1013,7 @@ Windows: sole active farm; reconciled on `1a93c215` with 142 records, 73
   fidelity-valid units, 12 / 12 live workers, zero bad units, and manifest
   SHA-256 `80015b753741e0c382594e4304c2dbfe0ccaecbb3549d13100e5eb5bf5aa3cc0`;
   the two previously banked strict recoveries are integrated in this batch
-Integrated pending: 24 canonical Dolphin DSP/CARD functions, two typed camera
+Integrated: 24 canonical Dolphin DSP/CARD functions, two typed camera
   vector helpers, two typed GSlight vector setters, GX pixel-mode
   synchronization, and the GS layer vertex setup loop
 Residual policy: all 20 affected prefix/interstitial/suffix ranges remain
@@ -1030,6 +1030,54 @@ Regression: all 8,603 per-function scores compared with `1a93c215`; zero
   regressions and two new byte-exact matches
 Independent audit: PASS for exact composition, relocation parity, residual
   coverage, semantic/type integrity, zero regression, and retail SHA
-Next action: publish PR #411, wait for all required checks, merge and remove
-  its integration/recovery worktrees, then begin the ranked PR #412 batch
+Next action: continue the Windows-only farm while the ranked PR #412 batch
+  proceeds in an isolated current-master integration tree
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #412)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: c4ab1d16 (PR #411 merged)
+Pending batch: PR #412, `integration/pr412-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +8 complete units / +13 total-unit topology /
+  +1,384 linked code / +0 linked data
+Goal cumulative from PR #381: +693 linked functions / +163 complete units /
+  +60,224 linked code / +193 linked data
+Pending report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,461 functions; 848 / 1,530 units;
+  626,384 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #412; decomp.dev base is synced through
+  PR #411 (`c4ab1d16`) at 25.05% linked / 625.00 kB complete code
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+Retired 3090 farm: remote checkout, processes, cron entries, and services
+  remain absent; dedicated tracked launch/poll tooling is queued for deletion
+  in a separate cleanup PR so this exact-30 batch stays source-scoped
+Windows: sole active farm; post-#411 rotation on `c4ab1d16` has a 140-record
+  manifest with 71 fidelity-valid units, zero exact overlap, 12 / 12 workers,
+  zero bad units, and SHA-256
+  `4f87af1c09ac3ab6609b54c036700b027498c7cbc09a58566a94e280e6e40a5a`
+Integrated pending: four typed GS camera accessors, three typed window-work
+  accessors, three field-camera state helpers, 17 People/model helpers, and
+  three weather-flow functions
+Residual policy: all ten affected prefix/interstitial/suffix ranges remain
+  explicit CodeCandidate units; `peopleTestFlags`, `peopleGetPosition`,
+  `fn_8018FCE0`, `windowGetAllocPtr`, and pragma-dependent `windowAllocMemory`
+  remain unlinked and are not counted
+Validation: all 30 selected functions / 1,384 bytes are raw 100%; eight
+  text-only Matching units emit retail text and all 52 normalized relocations
+  under the canonical compilers and flags
+Type recovery: corrected `PeopleEntry` byte fields at 0x94-0x97; the model
+  vector wrappers now use explicit `GSmodel*` / `GSvec*` arguments, including
+  the previously hidden second output argument to `fn_8018FC2C`; field-camera,
+  GS camera, window-work, weather callback, and allocator APIs are explicit
+Regression: all 8,603 per-function scores compared with `c4ab1d16`; zero
+  regressions and no score-only progress claimed
+Independent audit: PASS from two independent reviews; exact composition,
+  emitted text, all 52 relocations, prototypes, topology, and policy checks agree
+Next action: publish PR #412, wait for required checks, merge, clean its tree,
+  then retire tracked 3090 tooling in a separate cleanup PR
 ```
