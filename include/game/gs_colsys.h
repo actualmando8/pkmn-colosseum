@@ -89,4 +89,10 @@ typedef struct GSColSysState {
     /* 0x370C */ void*  displayList;
 } GSColSysState;
 
+s32 GScolsys2UtilGetCpPlaneLine(Vec3f* intersection, f32* lineParameter,
+                                const Vec3f* normal,
+                                const Vec3f* planePoint,
+                                const Vec3f* lineStart,
+                                const Vec3f* lineEnd);
+
 #endif /* GS_COLSYS_H */

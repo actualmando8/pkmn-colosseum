@@ -306,7 +306,15 @@ config.libs = [
                 ],
                 progress_category="runtime",
             ),
-            Object(CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            *[
+                Object(status, path, mw_version="GC/1.3", progress_category="runtime")
+                for status, path in [
+                    (Matching, "trk/TRKDispatch_exact_800C0CD8.c"),
+                    (CodeCandidate, "trk/TRKDispatch_range_800C0CD8.c"),
+                    (Matching, "trk/TRKDispatch_exact_800C0DA8.c"),
+                    (CodeCandidate, "trk/TRKDispatch_candidate_800C0E60.c"),
+                ]
+            ],  # PR414_TRK_DISPATCH
             Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(Matching, "trk/TRKTarget_exact_800C1548.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKTarget_residual_800C17CC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
@@ -314,7 +322,13 @@ config.libs = [
             Object(CodeCandidate, "trk/TRKTarget_residual_800C1A08.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(Matching, "trk/TRKTarget_exact_800C24BC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKTarget_residual_800C25FC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
-            Object(CodeCandidate, "trk/TRKInit.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
+            *[
+                Object(status, path, mw_version="GC/1.3", progress_category="runtime")
+                for status, path in [
+                    (CodeCandidate, "trk/TRKInit.c"),
+                    (Matching, "trk/TRKInit_exact_800C3344.c"),
+                ]
+            ],  # PR414_TRK_INIT
             Object(
                 Matching,
                 "trk/TRKBoard_exact_800C33BC.c",
@@ -337,7 +351,14 @@ config.libs = [
                 extra_cflags=["-sdata 0"],
                 progress_category="runtime",
             ),
-            Object(CodeCandidate, "crt/printf.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_CRT_PRINTF
+            *[
+                Object(status, path, mw_version="GC/1.3", progress_category="runtime")
+                for status, path in [
+                    (CodeCandidate, "crt/printf.c"),
+                    (Matching, "crt/printf_exact_800C87F8.c"),
+                    (CodeCandidate, "crt/printf_candidate_800C8864.c"),
+                ]
+            ],  # PR414_CRT_PRINTF
             Object(
                 NonMatching,
                 "__init_cpp_exceptions.cpp",
@@ -2247,12 +2268,14 @@ config.libs = [
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
-            Object(
-                CodeCandidate,
-                "dolphin/sdk_range_8009E7B0.c",
-                mw_version="GC/1.2.5n",
-                progress_category="sdk",
-            ),
+            *[
+                Object(status, path, mw_version="GC/1.2.5n", progress_category="sdk")
+                for status, path in [
+                    (CodeCandidate, "dolphin/sdk_range_8009E7B0.c"),
+                    (Matching, "dolphin/sdk_exact_8009ED4C.c"),
+                    (CodeCandidate, "dolphin/sdk_candidate_8009ED70.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "dolphin/sdk_range_8009F77C_prefix.c",
@@ -2749,12 +2772,14 @@ config.libs = [
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
-            Object(
-                CodeCandidate,
-                "trk/trk_range_800C3EBC.c",
-                mw_version="GC/1.3",
-                progress_category="runtime",
-            ),
+            *[
+                Object(status, path, mw_version="GC/1.3", progress_category="runtime")
+                for status, path in [
+                    (Matching, "trk/trk_exact_800C3EBC.c"),
+                    (CodeCandidate, "trk/trk_range_800C3EBC.c"),
+                    (Matching, "trk/trk_exact_800C4154.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "trk/trk_range_800C4470.c",
@@ -3114,13 +3139,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_range_8010CBD0.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_range_8010CBD0.c"),
+                    (Matching, "game/gs_colsys_exact_8010F4B8.c"),
+                    (CodeCandidate, "game/gs_colsys_candidate_8010F5A4.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/field_range_801140DC.c",
@@ -3703,13 +3735,20 @@ config.libs = [
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_range_8018FE30.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_range_8018FE30.c"),
+                    (Matching, "game/gs_flag_exact_801908D4.c"),
+                    (CodeCandidate, "game/gs_flag_candidate_801909A8.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/effect/fade_range_801C4CB8.c",
@@ -5456,13 +5495,20 @@ config.libs = [
                 ],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_thread.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_thread.c"),
+                    (Matching, "game/gs_thread_exact_800F036C.c"),
+                    (CodeCandidate, "game/gs_thread_candidate_800F0424.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/gs_thread_hi_range_800F8268.c",
@@ -6146,6 +6192,10 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/people/people.c"),
+                    (Matching, "game/people/people_exact_8018F470.c"),
+                    (CodeCandidate, "game/people/people_candidate_8018F4C8.c"),
+                    (Matching, "game/people/people_exact_8018F5B4.c"),
+                    (CodeCandidate, "game/people/people_candidate_8018F730.c"),
                     (Matching, "game/people/people_exact_8018FB2C.c"),
                     (CodeCandidate, "game/people/people_candidate_8018FB94.c"),
                     (Matching, "game/people/people_exact_8018FBAC.c"),

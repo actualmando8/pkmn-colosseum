@@ -692,7 +692,13 @@ dolphin/os/OSEXI_fn_8009E7AC.c:
 	.text       start:0x8009E7AC end:0x8009E7B0
 
 dolphin/sdk_range_8009E7B0.c:
-	.text       start:0x8009E7B0 end:0x8009F1B8
+	.text       start:0x8009E7B0 end:0x8009ED4C
+
+dolphin/sdk_exact_8009ED4C.c:
+	.text       start:0x8009ED4C end:0x8009ED70
+
+dolphin/sdk_candidate_8009ED70.c:
+	.text       start:0x8009ED70 end:0x8009F1B8
 
 dolphin/os/OSMemory_exact_8009F1B8.c:
 	.text       start:0x8009F1B8 end:0x8009F54C
@@ -1272,8 +1278,17 @@ trk/TRKDispatch_range_800C0504.c:
 trk/TRKDispatchMutex.c:
 	.text       start:0x800C0CC0 end:0x800C0CD8
 
+trk/TRKDispatch_exact_800C0CD8.c:
+	.text       start:0x800C0CD8 end:0x800C0D70
+
 trk/TRKDispatch_range_800C0CD8.c:
-	.text       start:0x800C0CD8 end:0x800C0EAC
+	.text       start:0x800C0D70 end:0x800C0DA8
+
+trk/TRKDispatch_exact_800C0DA8.c:
+	.text       start:0x800C0DA8 end:0x800C0E60
+
+trk/TRKDispatch_candidate_800C0E60.c:
+	.text       start:0x800C0E60 end:0x800C0EAC
 
 trk/TRKInterrupt.c:
 	.text       start:0x800C0EAC end:0x800C1300
@@ -1312,7 +1327,10 @@ trk/TRKSaveState.c:
 	.text       start:0x800C2A10 end:0x800C2D80
 
 trk/TRKInit.c:
-	.text       start:0x800C2D80 end:0x800C33BC
+	.text       start:0x800C2D80 end:0x800C3344
+
+trk/TRKInit_exact_800C3344.c:
+	.text       start:0x800C3344 end:0x800C33BC
 
 trk/TRKBoard_exact_800C33BC.c:
 	.text       start:0x800C33BC end:0x800C3414
@@ -1363,8 +1381,14 @@ trk/ddh_cc_range_800C3E90.c:
 trk/ddh_cc_shutdown.c:
 	.text       start:0x800C3EB4 end:0x800C3EBC
 
+trk/trk_exact_800C3EBC.c:
+	.text       start:0x800C3EBC end:0x800C3F44
+
 trk/trk_range_800C3EBC.c:
-	.text       start:0x800C3EBC end:0x800C41A4
+	.text       start:0x800C3F44 end:0x800C4154
+
+trk/trk_exact_800C4154.c:
+	.text       start:0x800C4154 end:0x800C41A4
 
 trk/circle_buffer_count.c:
 	.text       start:0x800C41A4 end:0x800C41AC
@@ -1435,7 +1459,13 @@ crt/stdio_atexit.c:
 	.text       start:0x800C8510 end:0x800C8520
 
 crt/printf.c:
-	.text       start:0x800C8520 end:0x800CA78C
+	.text       start:0x800C8520 end:0x800C87F8
+
+crt/printf_exact_800C87F8.c:
+	.text       start:0x800C87F8 end:0x800C8864
+
+crt/printf_candidate_800C8864.c:
+	.text       start:0x800C8864 end:0x800CA78C
 
 crt/string_range_800CA78C.c:
 	.text       start:0x800CA78C end:0x800CA7FC
@@ -2006,7 +2036,13 @@ game/gs_texture_range_800EF548.c:
 	.text       start:0x800EF548 end:0x800F0030
 
 game/gs_thread.c:
-	.text       start:0x800F0030 end:0x800F75FC
+	.text       start:0x800F0030 end:0x800F036C
+
+game/gs_thread_exact_800F036C.c:
+	.text       start:0x800F036C end:0x800F0424
+
+game/gs_thread_candidate_800F0424.c:
+	.text       start:0x800F0424 end:0x800F75FC
 
 game/input/input_exact_800F75FC.c:
 	.text       start:0x800F75FC end:0x800F760C
@@ -2111,7 +2147,13 @@ game/gs_colsys.c:
 	.text       start:0x8010C364 end:0x8010CBD0
 
 game/gs_range_8010CBD0.c:
-	.text       start:0x8010CBD0 end:0x8010F6A0
+	.text       start:0x8010CBD0 end:0x8010F4B8
+
+game/gs_colsys_exact_8010F4B8.c:
+	.text       start:0x8010F4B8 end:0x8010F5A4
+
+game/gs_colsys_candidate_8010F5A4.c:
+	.text       start:0x8010F5A4 end:0x8010F6A0
 
 game/GScolsys2Util.c:
 	.text       start:0x8010F6A0 end:0x8010FAF4
@@ -3046,7 +3088,19 @@ game/gs_range_8017F2C4.c:
 	.text       start:0x8017F2C4 end:0x80180C78
 
 game/people/people.c:
-	.text       start:0x80180C78 end:0x8018FB2C
+	.text       start:0x80180C78 end:0x8018F470
+
+game/people/people_exact_8018F470.c:
+	.text       start:0x8018F470 end:0x8018F4C8
+
+game/people/people_candidate_8018F4C8.c:
+	.text       start:0x8018F4C8 end:0x8018F5B4
+
+game/people/people_exact_8018F5B4.c:
+	.text       start:0x8018F5B4 end:0x8018F730
+
+game/people/people_candidate_8018F730.c:
+	.text       start:0x8018F730 end:0x8018FB2C
 
 game/people/people_exact_8018FB2C.c:
 	.text       start:0x8018FB2C end:0x8018FB94
@@ -3070,7 +3124,13 @@ game/people/people_exact_8018FD88.c:
 	.text       start:0x8018FD88 end:0x8018FE30
 
 game/gs_range_8018FE30.c:
-	.text       start:0x8018FE30 end:0x80190E34
+	.text       start:0x8018FE30 end:0x801908D4
+
+game/gs_flag_exact_801908D4.c:
+	.text       start:0x801908D4 end:0x801909A8
+
+game/gs_flag_candidate_801909A8.c:
+	.text       start:0x801909A8 end:0x80190E34
 
 hsd/hsd_object.c:
 	.text       start:0x80190E34 end:0x801914F4

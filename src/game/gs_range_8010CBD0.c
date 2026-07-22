@@ -583,15 +583,17 @@ void fn_8010F320(void) {
 #pragma pop
 
 /* 0x8010F4B8 | 0xEC */
-s32 GScolsys2UtilGetCpPlaneLine(Vec3f* out, f32* tOut, Vec3f* normal,
-                               Vec3f* planePoint, Vec3f* lineStart,
-                               Vec3f* lineEnd) {
+s32 GScolsys2UtilGetCpPlaneLine(Vec3f* out, f32* tOut,
+                               const Vec3f* normal,
+                               const Vec3f* planePoint,
+                               const Vec3f* lineStart,
+                               const Vec3f* lineEnd) {
     Vec3f direction;
     f32 denominator;
     f32 t;
-    extern void PSVECSubtract(void*, void*, void*);
-    extern void PSVECScale(void*, void*, f32);
-    extern void PSVECAdd(void*, void*, void*);
+    extern void PSVECSubtract(const Vec3f*, const Vec3f*, Vec3f*);
+    extern void PSVECScale(const Vec3f*, Vec3f*, f32);
+    extern void PSVECAdd(const Vec3f*, const Vec3f*, Vec3f*);
     extern const f32 lbl_8047CF10;
 
     PSVECSubtract(lineEnd, lineStart, &direction);

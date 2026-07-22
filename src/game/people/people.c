@@ -1344,9 +1344,9 @@ asm void fn_8018F490(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_8018F490(void* p) {
-    if (p != NULL) {
-        return (*(u8*)p >> 4) & 1;
+u32 fn_8018F490(const PeopleInfoBiosEntry* info) {
+    if (info != NULL) {
+        return (info->flags >> 4) & 1;
     }
     return 0;
 }
@@ -1361,24 +1361,24 @@ asm void fn_8018F4AC(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_8018F4AC(void* p) {
-    if (p != NULL) {
-        return (*(u8*)p >> 5) & 7;
+u32 fn_8018F4AC(const PeopleInfoBiosEntry* info) {
+    if (info != NULL) {
+        return (info->flags >> 5) & 7;
     }
     return 0;
 }
 #endif
 #pragma pop
 extern f32 lbl_8047D8A8;
-f32 fn_8018F5B4(u8* ptr) {
-    if (ptr != NULL) {
-        return *(f32*)(ptr + 0x14);
+f32 fn_8018F5B4(const PeopleInfoBiosEntry* info) {
+    if (info != NULL) {
+        return info->field_14;
     }
     return lbl_8047D8A8;
 }
-f32 fn_8018F5CC(u8* ptr) {
-    if (ptr != NULL) {
-        return *(f32*)(ptr + 0x10);
+f32 fn_8018F5CC(const PeopleInfoBiosEntry* info) {
+    if (info != NULL) {
+        return info->field_10;
     }
     return lbl_8047D8A8;
 }
@@ -1391,9 +1391,9 @@ asm void fn_8018F5FC(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_8018F5FC(void* p) {
-    if (p != NULL) {
-        return (*(u8*)p >> 2) & 3;
+u32 fn_8018F5FC(const PeopleInfoBiosEntry* info) {
+    if (info != NULL) {
+        return (info->flags >> 2) & 3;
     }
     return 0;
 }
@@ -1408,23 +1408,23 @@ asm void fn_8018F6B4(void) {
 }
 #else
 #pragma optimization_level 4
-void* fn_8018F6B4(void* p) {
-    if (p != NULL) {
-        return *(void**)((u8*)p + 0x0C);
+void* fn_8018F6B4(const PeopleInfoBiosEntry* info) {
+    if (info != NULL) {
+        return info->scriptRef;
     }
     return NULL;
 }
 #endif
 #pragma pop
-extern u32 lbl_80478E78;
-extern u32 lbl_80478E7C;
+extern u32* lbl_80478E78;
+extern PeopleInfoBiosEntry* lbl_80478E7C;
 extern s32 lbl_8047B1F8;
 extern PeopleEntry* lbl_8047B200;
-u8* peopleInfoBiosGetPtrFromIndex(u32 index) {
-    if (index >= *(u32*)lbl_80478E78) {
-        return (u8*)0;
+PeopleInfoBiosEntry* peopleInfoBiosGetPtrFromIndex(u32 index) {
+    if (index >= *lbl_80478E78) {
+        return NULL;
     }
-    return (u8*)lbl_80478E7C + index * 0x2C;
+    return &lbl_80478E7C[index];
 }
 #pragma push
 #pragma optimization_level 0
@@ -2511,48 +2511,48 @@ void fn_8018F4C8(void* entry, u8 param, s32* outNode, u8* outResult) {
 }
 
 /* fn_8018F5E4 -- not recovered, gap in archive campaign (size 0x18) */
-f32 fn_8018F5E4(void* ptr) {
+f32 fn_8018F5E4(const PeopleInfoBiosEntry* info) {
     extern f32 lbl_8047D8A8;
-    return (ptr != NULL) ? *(f32*)((u8*)ptr + 0x18) : lbl_8047D8A8;
+    return (info != NULL) ? info->field_18 : lbl_8047D8A8;
 }
 
 /* fn_8018F618 -- not recovered, gap in archive campaign (size 0x20) */
-f32 fn_8018F618(void* ptr) {
+f32 fn_8018F618(const PeopleInfoBiosEntry* info) {
     extern f32 lbl_8047D8A8;
     extern f32 lbl_8047D8AC;
-    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x20) : lbl_8047D8A8;
+    return (info != NULL) ? lbl_8047D8AC * info->field_20 : lbl_8047D8A8;
 }
 
 /* fn_8018F638 -- not recovered, gap in archive campaign (size 0x20) */
-f32 fn_8018F638(void* ptr) {
+f32 fn_8018F638(const PeopleInfoBiosEntry* info) {
     extern f32 lbl_8047D8A8;
     extern f32 lbl_8047D8AC;
-    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x1c) : lbl_8047D8A8;
+    return (info != NULL) ? lbl_8047D8AC * info->field_1C : lbl_8047D8A8;
 }
 
 /* fn_8018F658 -- not recovered, gap in archive campaign (size 0x20) */
-f32 fn_8018F658(void* ptr) {
+f32 fn_8018F658(const PeopleInfoBiosEntry* info) {
     extern f32 lbl_8047D8A8;
     extern f32 lbl_8047D8AC;
-    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x20) : lbl_8047D8A8;
+    return (info != NULL) ? lbl_8047D8AC * info->field_20 : lbl_8047D8A8;
 }
 
 /* fn_8018F678 -- not recovered, gap in archive campaign (size 0x20) */
-f32 fn_8018F678(void* ptr) {
+f32 fn_8018F678(const PeopleInfoBiosEntry* info) {
     extern f32 lbl_8047D8A8;
     extern f32 lbl_8047D8AC;
-    return (ptr != NULL) ? lbl_8047D8AC * *(f32*)((u8*)ptr + 0x1c) : lbl_8047D8A8;
+    return (info != NULL) ? lbl_8047D8AC * info->field_1C : lbl_8047D8A8;
 }
 
 /* fn_8018F698 -- not recovered, gap in archive campaign (size 0x1C) */
-s32 fn_8018F698(void* ptr) {
-    return (ptr != NULL) ? (s32)(s8)((u8*)ptr)[9] : -1;
+s32 fn_8018F698(const PeopleInfoBiosEntry* info) {
+    return (info != NULL) ? (s32)(s8)info->raw_09 : -1;
 }
 
 /* peopleInfoBiosGetPtr = peopleInfoBiosGetPtr (see people.h) -- not recovered, gap in archive campaign */
 void* peopleInfoBiosGetPtr(void* scriptObj) {
-    u32 count = *(u32*)lbl_80478E78;
-    PeopleInfoBiosEntry* entry = (PeopleInfoBiosEntry*)lbl_80478E7C;
+    u32 count = *lbl_80478E78;
+    PeopleInfoBiosEntry* entry = lbl_80478E7C;
     while (count != 0) {
         if (entry->scriptRef == scriptObj) {
             return entry;
