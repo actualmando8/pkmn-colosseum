@@ -8151,17 +8151,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/gs_model_bound_range_800EB464",
+      "name": "main/game/gs_model_bound_exact_800EB464",
       "sections": [
         {
           "name": ".text",
-          "size": 2696,
+          "size": 316,
           "virtual_address": 2148447332
         }
       ],
-      "total_code": 2696,
+      "total_code": 316,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gs_model_bound_candidate_800EB5A0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2380,
+          "virtual_address": 2148447648
+        }
+      ],
+      "total_code": 2380,
+      "total_data": 0,
+      "total_functions": 3
     },
     {
       "name": "main/game/gs_model_anim_candidate_800EBEEC",
@@ -14522,7 +14535,7 @@
       "total_functions": 7
     },
     {
-      "name": "main/hsd/hsd_aobj_candidate_801C01C8",
+      "name": "main/hsd/hsd_aobj_exact_801C01C8",
       "sections": [
         {
           "name": ".text",

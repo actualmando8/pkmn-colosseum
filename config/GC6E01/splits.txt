@@ -1785,8 +1785,11 @@ game/gs_model_bound.c:
 game/gs_model_bound_exact_800EB414.c:
 	.text       start:0x800EB414 end:0x800EB464
 
-game/gs_model_bound_range_800EB464.c:
-	.text       start:0x800EB464 end:0x800EBEEC
+game/gs_model_bound_exact_800EB464.c:
+	.text       start:0x800EB464 end:0x800EB5A0
+
+game/gs_model_bound_candidate_800EB5A0.c:
+	.text       start:0x800EB5A0 end:0x800EBEEC
 
 game/gs_model_anim_candidate_800EBEEC.c:
 	.text       start:0x800EBEEC end:0x800EC0E8
@@ -3204,7 +3207,7 @@ hsd/hsd_util.c:
 hsd/hsd_video.c:
 	.text       start:0x801BF6AC end:0x801C01C8
 
-hsd/hsd_aobj_candidate_801C01C8.c:
+hsd/hsd_aobj_exact_801C01C8.c:
 	.text       start:0x801C01C8 end:0x801C0270
 
 hsd/hsd_aobj_exact_801C0270.c:
