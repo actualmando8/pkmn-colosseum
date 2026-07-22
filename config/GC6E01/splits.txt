@@ -2880,8 +2880,20 @@ hsd/hsd_wobj.c:
 hsd/hsd_range_801920E4.c:
 	.text       start:0x801920E4 end:0x801938FC
 
-hsd/hsd_class.c:
-	.text       start:0x801938FC end:0x80193C24
+hsd/hsd_class_candidate_801938FC.c:
+	.text       start:0x801938FC end:0x80193A58
+
+hsd/hsd_class_exact_80193A58.c:
+	.text       start:0x80193A58 end:0x80193A94
+
+hsd/hsd_class_candidate_80193A94.c:
+	.text       start:0x80193A94 end:0x80193AF0
+
+hsd/hsd_class_exact_80193AF0.c:
+	.text       start:0x80193AF0 end:0x80193B30
+
+hsd/hsd_class_candidate_80193B30.c:
+	.text       start:0x80193B30 end:0x80193C24
 
 hsd/hsd_cobj_candidate_80193C24.c:
 	.text       start:0x80193C24 end:0x80193CD0

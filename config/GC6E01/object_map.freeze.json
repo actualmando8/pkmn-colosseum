@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1402
+    "total_units": 1406
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1334,
-    "source_backed_units": 1318,
+    "named_units": 1338,
+    "source_backed_units": 1322,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -13118,17 +13118,69 @@
       "total_functions": 4
     },
     {
-      "name": "main/hsd/hsd_class",
+      "name": "main/hsd/hsd_class_candidate_801938FC",
       "sections": [
         {
           "name": ".text",
-          "size": 808,
+          "size": 348,
           "virtual_address": 2149136636
         }
       ],
-      "total_code": 808,
+      "total_code": 348,
       "total_data": 0,
-      "total_functions": 9
+      "total_functions": 2
+    },
+    {
+      "name": "main/hsd/hsd_class_exact_80193A58",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 60,
+          "virtual_address": 2149136984
+        }
+      ],
+      "total_code": 60,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/hsd/hsd_class_candidate_80193A94",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 92,
+          "virtual_address": 2149137044
+        }
+      ],
+      "total_code": 92,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_class_exact_80193AF0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 64,
+          "virtual_address": 2149137136
+        }
+      ],
+      "total_code": 64,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/hsd/hsd_class_candidate_80193B30",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 244,
+          "virtual_address": 2149137200
+        }
+      ],
+      "total_code": 244,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_cobj_candidate_80193C24",

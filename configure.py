@@ -5343,7 +5343,31 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
-                "hsd/hsd_class.c",
+                "hsd/hsd_class_candidate_801938FC.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
+                "hsd/hsd_class_exact_80193A58.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_class_candidate_80193A94.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
+                "hsd/hsd_class_exact_80193AF0.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_class_candidate_80193B30.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
