@@ -22,6 +22,14 @@ Each unit is gated locally before being shipped:
   gate 4: isolated <fn> codegen equals the real full-TU build object
   gate 5: permuter Scorer(base.o vs target.o) yields a finite base score > 0
 
+The opt-in ``--full-owner`` lane is local benchmark tooling, not a Windows
+farm format.  It uses Clang only as a directive-preserving sanitizer, splices
+a clean target-only seed into that immutable full translation unit, proves the
+shaped owner still reproduces the live target, applies a reviewed target-only
+pragma-clean context transform, and compiles both owners with exact MWCC.  It
+audits every sibling byte/symbol/relocation across both transitions and
+extracts only the clean-context target for the unchanged scorer interface.
+
 Usage:
   python3 tools/decomp_work/permuter/gen_workunits.py \
       --queue build/permuter_queue_win.tsv \
@@ -33,6 +41,7 @@ Only writes under --outdir (default under build/, which is gitignored).
 """
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -41,6 +50,23 @@ import subprocess
 import sys
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from owner_extract import (  # noqa: E402
+    ExtractError,
+    extract as extract_owner_target,
+    standalone_text_record,
+)
+from owner_source import (  # noqa: E402
+    OwnerSourceError,
+    owner_policy_record,
+    validate_candidate_translation_unit,
+    validate_definition_only,
+    validate_owner_target,
+)
+
 REPO = Path(__file__).resolve().parents[3]
 DEFAULT_PERMUTER = Path(
     os.environ.get("DECOMP_PERMUTER", str(Path.home() / ".cache/pkmn-permuter-tools/decomp-permuter"))
@@ -48,9 +74,12 @@ DEFAULT_PERMUTER = Path(
 DEFAULT_BINUTILS = Path(
     os.environ.get("PPC_BINUTILS", str(Path.home() / ".cache/pkmn-permuter-tools/ppc-binutils"))
 )
+OBJDIFF = REPO / "build" / "tools" / "objdiff-cli"
 
 # Windows-side layout (used inside generated compile.bat / settings.toml).
 WIN_ROOT = "C:/Users/douglaswhittingham/gamecube-decomp/pkmn-permuter"
+OWNER_FIDELITY = "full-owner-clean-context-extracted-v2"
+OWNER_CONTEXT_POLICIES = {"msgctrlWait": "msgctrlWait-pragma-clean-v1"}
 
 # ---------------------------------------------------------------------------
 # build.ninja parsing
@@ -120,6 +149,200 @@ def normalized_disasm(objdump: Path, obj: Path, fn: str):
             continue
         out.append(line)
     return "\n".join(out) or None
+
+
+def objdiff_match_percent(target: Path, candidate: Path, function: str) -> float:
+    result = subprocess.run(
+        [
+            str(OBJDIFF),
+            "diff",
+            "-1",
+            str(target),
+            "-2",
+            str(candidate),
+            "-o",
+            "-",
+            "--format",
+            "json",
+            function,
+        ],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise ValueError((result.stderr or result.stdout).strip()[-1200:])
+    try:
+        report = json.loads(result.stdout)
+        symbols = report["left"]["symbols"]
+        record = next(symbol for symbol in symbols if symbol.get("name") == function)
+        percent = float(record["match_percent"])
+    except (KeyError, StopIteration, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise ValueError("objdiff did not return a target match percentage") from exc
+    if not 0.0 <= percent <= 100.0:
+        raise ValueError("objdiff returned an out-of-range match percentage")
+    return percent
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def repo_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return str(resolved.relative_to(REPO))
+    except ValueError:
+        return str(resolved)
+
+
+def owner_preprocessor_args(cflags: list[str]) -> list[str]:
+    """Translate only MWCC include/define flags into Clang preprocessing flags."""
+    result = ["-I", "."]
+    index = 0
+    while index < len(cflags):
+        value = cflags[index]
+        if value == "-i":
+            if index + 1 >= len(cflags):
+                raise ValueError("MWCC -i flag has no path")
+            result.extend(["-I", cflags[index + 1]])
+            index += 2
+            continue
+        if value in ("-D", "-U"):
+            if index + 1 >= len(cflags):
+                raise ValueError(f"MWCC {value} flag has no value")
+            result.extend([value, cflags[index + 1]])
+            index += 2
+            continue
+        if value.startswith(("-D", "-U")) and len(value) > 2:
+            result.append(value)
+        index += 1
+    return result
+
+
+def parse_depfile(path: Path) -> list[Path]:
+    text = path.read_text(encoding="utf-8")
+    logical = text.replace("\\\n", " ")
+    if ":" not in logical:
+        raise ValueError("sanitizer dependency file has no target")
+    _, dependencies = logical.split(":", 1)
+    paths: list[Path] = []
+    for value in shlex.split(dependencies):
+        candidate = Path(value)
+        resolved = candidate.resolve() if candidate.is_absolute() else (REPO / candidate).resolve()
+        if not resolved.is_file():
+            raise ValueError(f"sanitizer dependency is missing: {value}")
+        if resolved not in paths:
+            paths.append(resolved)
+    if not paths:
+        raise ValueError("sanitizer dependency file is empty")
+    return sorted(paths, key=repo_path)
+
+
+def function_definition_span(source: str, function: str) -> tuple[int, int]:
+    """Return a conservative one-line-signature function span."""
+    matches = [entry for entry in _scan_functions(source) if entry[0] == function]
+    if len(matches) != 1:
+        raise ValueError(f"expected one definition of {function}, got {len(matches)}")
+    _, _header_start, body_open, body_close, _knr = matches[0]
+    header = source[:body_open]
+    names = list(re.finditer(rf"\b{re.escape(function)}\s*\(", header))
+    if not names:
+        raise ValueError(f"could not locate signature for {function}")
+    name_start = names[-1].start()
+    start = source.rfind("\n", 0, name_start) + 1
+    prefix = source[start:name_start].strip()
+    if not prefix or "#" in prefix or ";" in prefix or "{" in prefix or "}" in prefix:
+        raise ValueError(f"{function} must have a one-line signature in owner mode")
+    return start, body_close + 1
+
+
+def splice_owner_target(
+    owner: str,
+    function: str,
+    definition: str,
+    *,
+    parser: Path,
+) -> str:
+    owner_start, owner_end = function_definition_span(owner, function)
+    seed_start, seed_end = function_definition_span(definition, function)
+    validate_definition_only(definition, seed_start, seed_end)
+    clean = definition[seed_start:seed_end].strip()
+    owner_signature = " ".join(owner[owner_start : owner.index("{", owner_start, owner_end)].split())
+    seed_signature = " ".join(clean[: clean.index("{")].split())
+    if owner_signature != seed_signature:
+        raise ValueError(
+            f"clean seed signature drifted: expected {owner_signature!r}, got {seed_signature!r}"
+        )
+    spliced = owner[:owner_start] + clean + owner[owner_end:]
+    validate_owner_target(
+        clean,
+        function,
+        parser=parser,
+        context_source=spliced,
+    )
+    return spliced
+
+
+def clean_owner_target_context(owner: str, function: str) -> tuple[str, dict]:
+    """Put a reviewed mutable target under canonical, pragma-clean flags.
+
+    This is deliberately target-specific.  The source owner has inherited
+    ``peephole off`` before ``msgctrlWait`` and repeats both that pragma and a
+    redundant optimization-level pragma immediately before the definition.
+    We replace exactly that reviewed prefix with ``peephole on`` and retain
+    the existing post-definition ``peephole on`` directive byte-for-byte.
+    """
+    policy = OWNER_CONTEXT_POLICIES.get(function)
+    if policy is None:
+        raise OwnerSourceError(
+            f"full-owner target rejected: no reviewed clean-context policy for {function}"
+        )
+    start, end = function_definition_span(owner, function)
+    prefix = owner[:start]
+    suffix = owner[end:]
+    shaped_prefix = re.compile(
+        r"(?m)(^[ \t]*#pragma[ \t]+optimization_level[ \t]+4[ \t]*\n"
+        r"[ \t]*#pragma[ \t]+peephole[ \t]+off[ \t]*\n)$"
+    )
+    match = shaped_prefix.search(prefix)
+    if match is None or match.end() != len(prefix):
+        raise OwnerSourceError(
+            "full-owner clean-context policy did not find the exact shaped target prefix"
+        )
+    if not re.match(
+        r"^\n[ \t]*#pragma[ \t]+peephole[ \t]+on(?:[ \t]*\n|[ \t]*$)", suffix
+    ):
+        raise OwnerSourceError(
+            "full-owner clean-context policy did not find the target state restore"
+        )
+    replacement = "#pragma peephole on\n"
+    clean = prefix[: match.start()] + replacement + owner[start:]
+    clean_start, clean_end = function_definition_span(clean, function)
+    if clean[clean_start:clean_end] != owner[start:end]:
+        raise OwnerSourceError("clean-context transform changed the mutable definition")
+    clean_suffix = clean[clean_end:]
+    if clean_suffix != suffix:
+        raise OwnerSourceError("clean-context transform changed following owner source")
+    return clean, {
+        "schema": 1,
+        "policy": policy,
+        "function": function,
+        "removed_pragmas": ["optimization_level 4", "peephole off"],
+        "inserted_pragmas": ["peephole on"],
+        "following_state_restore": "peephole on retained",
+        "shaped_source_sha256": hashlib.sha256(owner.encode("utf-8")).hexdigest(),
+        "clean_source_sha256": hashlib.sha256(clean.encode("utf-8")).hexdigest(),
+        "following_source_sha256": hashlib.sha256(suffix.encode("utf-8")).hexdigest(),
+    }
+
+
+def tool_attestation(path: Path) -> dict[str, str]:
+    return {"path": repo_path(path), "sha256": file_sha256(path)}
 
 # ---------------------------------------------------------------------------
 # C pruning: strip all function bodies except the target's
@@ -333,20 +556,73 @@ def main():
             "multiple pragmas (the full-TU fidelity gate still must pass)"
         ),
     )
+    ap.add_argument(
+        "--full-owner",
+        action="store_true",
+        help=(
+            "explicit local-only mode: retain and compile the sanitized full owner, "
+            "then audit/extract only the target"
+        ),
+    )
+    ap.add_argument(
+        "--owner-target-source",
+        help="target-only clean seed required by --full-owner",
+    )
+    ap.add_argument(
+        "--owner-sanitizer",
+        default="/usr/bin/clang",
+        help="Clang executable used only for directive-preserving preprocessing",
+    )
     ap.add_argument("--force", action="store_true", help="regenerate existing units")
     args = ap.parse_args()
+
+    if args.full_owner:
+        if not args.owner_target_source:
+            ap.error("--full-owner requires --owner-target-source")
+        if not args.only or len(args.only) != 1:
+            ap.error("--full-owner requires exactly one --only target")
+        if args.mwcc_pragma:
+            ap.error("--full-owner preserves source pragmas; --mwcc-pragma is forbidden")
+    elif args.owner_target_source:
+        ap.error("--owner-target-source requires --full-owner")
 
     permuter = Path(args.permuter)
     binutils = Path(args.binutils)
     ppc_as = binutils / "powerpc-eabi-as"
     ppc_objdump = binutils / "powerpc-eabi-objdump"
-    for p in (permuter / "strip_other_fns.py", ppc_as, ppc_objdump):
+    ppc_objcopy = binutils / "powerpc-eabi-objcopy"
+    ppc_readelf = binutils / "powerpc-eabi-readelf"
+    owner_extractor = SCRIPT_DIR / "owner_extract.py"
+    sanitizer = Path(args.owner_sanitizer).expanduser().resolve()
+    prerequisites = [permuter / "strip_other_fns.py", ppc_as, ppc_objdump]
+    if args.full_owner:
+        prerequisites.extend(
+            [ppc_objcopy, ppc_readelf, owner_extractor, sanitizer, OBJDIFF]
+        )
+    for p in prerequisites:
         if not p.exists():
             sys.exit(f"missing prerequisite: {p}")
     sys.path.insert(0, str(permuter))
 
     wibo = REPO / "build/tools/wibo"
     sjiswrap = REPO / "build/tools/sjiswrap.exe"
+
+    owner_seed_path: Path | None = None
+    owner_seed = ""
+    sanitizer_version = ""
+    if args.full_owner:
+        owner_seed_path = Path(args.owner_target_source).expanduser()
+        if not owner_seed_path.is_absolute():
+            owner_seed_path = (REPO / owner_seed_path).resolve()
+        if not owner_seed_path.is_file():
+            sys.exit(f"missing owner target seed: {owner_seed_path}")
+        owner_seed = owner_seed_path.read_text(encoding="utf-8")
+        version = subprocess.run(
+            [str(sanitizer), "--version"], capture_output=True, text=True
+        )
+        if version.returncode != 0 or not version.stdout.strip():
+            sys.exit(f"could not identify owner sanitizer: {sanitizer}")
+        sanitizer_version = version.stdout.strip()
 
     ninja_units = parse_ninja(REPO / "build.ninja")
 
@@ -418,36 +694,120 @@ def main():
 
         udir.mkdir(parents=True, exist_ok=True)
 
-        # 1. preprocess with the unit's own mwcc
+        # 1. Preprocess.  Normal work units deliberately retain the historical
+        # exact-MWCC path.  Full-owner mode uses Clang only to resolve
+        # directives while retaining active MWCC pragmas; exact MWCC remains
+        # the sole code generator.
         pp = udir / "_pp.c"
-        r = subprocess.run(
-            [str(wibo), str(mwcc), *cflags, "-E", str(paths["src"]), "-o", str(pp)],
-            cwd=REPO, capture_output=True, text=True)
+        owner_dependencies: list[Path] = []
+        sanitizer_argv: list[str] = []
+        shaped_owner_source = ""
+        context_transform: dict | None = None
+        if args.full_owner:
+            depfile = udir / "_owner.d"
+            try:
+                sanitizer_argv = [
+                    str(sanitizer),
+                    "-E",
+                    "-P",
+                    "-nostdinc",
+                    "-Wno-unknown-pragmas",
+                    *owner_preprocessor_args(cflags),
+                    "-MMD",
+                    "-MF",
+                    str(depfile),
+                    str(paths["src"]),
+                    "-o",
+                    str(pp),
+                ]
+            except ValueError as exc:
+                fail("could not derive owner sanitizer flags", str(exc))
+                continue
+            r = subprocess.run(
+                sanitizer_argv, cwd=REPO, capture_output=True, text=True
+            )
+        else:
+            r = subprocess.run(
+                [str(wibo), str(mwcc), *cflags, "-E", str(paths["src"]), "-o", str(pp)],
+                cwd=REPO, capture_output=True, text=True)
         if r.returncode != 0 or not pp.exists():
-            fail("mwcc -E failed", r.stderr or r.stdout)
+            fail(
+                "owner sanitizer failed" if args.full_owner else "mwcc -E failed",
+                r.stderr or r.stdout,
+            )
             continue
         src_pp = pp.read_text(encoding="utf-8", errors="replace")
-        src_pp = re.sub(r"^/\* #line .*\n?", "", src_pp, flags=re.M)
+        if args.full_owner:
+            try:
+                owner_dependencies = parse_depfile(depfile)
+            except (OSError, ValueError) as exc:
+                fail("invalid owner sanitizer dependency record", str(exc))
+                continue
+            forbidden_context = []
+            if re.search(r"(?m)^\s*#\s*include\b", src_pp):
+                forbidden_context.append("#include")
+            if re.search(r"\b(?:__asm__|__asm|asm)\b", src_pp):
+                forbidden_context.append("assembly")
+            if re.search(r"\.inc\b", src_pp, flags=re.IGNORECASE):
+                forbidden_context.append(".inc")
+            if forbidden_context:
+                fail(
+                    "sanitized owner retained forbidden source constructs",
+                    ", ".join(forbidden_context),
+                )
+                continue
+        else:
+            src_pp = re.sub(r"^/\* #line .*\n?", "", src_pp, flags=re.M)
 
-        # 2. prune to the single target function
-        pruned, funcs = prune_source(src_pp, fn)
-        if pruned is None:
-            fail("target fn not found in preprocessed TU (asm-only or name mismatch)")
-            continue
+        # 2. Keep either an isolated target or an immutable full-owner context.
+        funcs = _scan_functions(src_pp)
+        if args.full_owner:
+            try:
+                shaped_owner_source = splice_owner_target(
+                    src_pp,
+                    fn,
+                    owner_seed,
+                    parser=sanitizer,
+                )
+                pruned, context_transform = clean_owner_target_context(
+                    shaped_owner_source, fn
+                )
+            except (ValueError, OwnerSourceError) as exc:
+                fail("invalid clean owner seed", str(exc))
+                continue
+        else:
+            pruned, funcs = prune_source(src_pp, fn)
+            if pruned is None:
+                fail("target fn not found in preprocessed TU (asm-only or name mismatch)")
+                continue
         base_c = udir / "base.c"
         base_c.write_text(pruned, encoding="utf-8")
+        shaped_c = udir / "_shaped_owner.c"
+        if args.full_owner:
+            shaped_c.write_text(shaped_owner_source, encoding="utf-8")
+            try:
+                validate_candidate_translation_unit(
+                    pruned,
+                    pruned,
+                    fn,
+                    parser=sanitizer,
+                )
+            except OwnerSourceError as exc:
+                fail("clean owner candidate policy failed", str(exc))
+                continue
 
         # gate 1: pycparser parse (what the permuter itself will do)
-        gate = subprocess.run(
-            [sys.executable, "-c",
-             "import sys; sys.path.insert(0, sys.argv[1]);"
-             "from perm_pycparser.c_parser import CParser;"
-             "CParser().parse(open(sys.argv[2]).read(), 'base.c')",
-             str(permuter), str(base_c)],
-            capture_output=True, text=True)
-        if gate.returncode != 0:
-            fail("pycparser parse failed", gate.stderr)
-            continue
+        if not args.full_owner:
+            gate = subprocess.run(
+                [sys.executable, "-c",
+                 "import sys; sys.path.insert(0, sys.argv[1]);"
+                 "from perm_pycparser.c_parser import CParser;"
+                 "CParser().parse(open(sys.argv[2]).read(), 'base.c')",
+                 str(permuter), str(base_c)],
+                capture_output=True, text=True)
+            if gate.returncode != 0:
+                fail("pycparser parse failed", gate.stderr)
+                continue
 
         # 3. target.o from dtk asm
         fn_asm = extract_fn_asm(paths["asm"], fn)
@@ -463,6 +823,13 @@ def main():
         if r.returncode != 0:
             fail("powerpc-eabi-as failed", r.stderr)
             continue
+        retail_target_record: dict | None = None
+        if args.full_owner:
+            try:
+                retail_target_record = standalone_text_record(udir / "target.o")
+            except ExtractError as exc:
+                fail("could not fingerprint retail target", str(exc))
+                continue
 
         # 4. compile gate with exact flags (drop -i/include & -MMD-ish flags:
         # base.c is fully preprocessed).  Keep everything else identical.
@@ -485,30 +852,88 @@ def main():
             fail("base.c does not compile", r.stderr or r.stdout)
             continue
 
-        # gate 3: candidate object contains exactly one function: fn
-        r = subprocess.run([str(ppc_objdump), "-d", str(base_o)],
-                           capture_output=True, text=True)
-        symbols = re.findall(r"^[0-9a-f]+ <([^>]+)>:$", r.stdout, flags=re.M)
-        if symbols != [fn]:
-            fail("stripped object has wrong functions", ",".join(symbols))
-            continue
-
-        # gate 4: pruning siblings must not alter the target's codegen. Without
-        # this, a farm can reach score zero against a synthetic isolated
-        # baseline that does not reproduce the live source object.
+        # gate 3/4: establish the single-function scorer object and prove that
+        # it reproduces the live full-TU target.  Owner mode additionally
+        # audits every sibling before extracting the target.
         full_o = REPO / paths["obj"]
         if not full_o.is_file():
             fail("missing full-TU object for fidelity gate", str(full_o))
             continue
-        isolated_disasm = normalized_disasm(ppc_objdump, base_o, fn)
-        full_disasm = normalized_disasm(ppc_objdump, full_o, fn)
-        if not isolated_disasm or not full_disasm:
-            fail("could not disassemble function for fidelity gate")
-            continue
-        if isolated_disasm != full_disasm:
-            fail("isolated baseline differs from full-TU object")
-            continue
-        meta["fidelity"] = "isolated-equals-full-tu"
+        score_o = base_o
+        owner_report: dict | None = None
+        shaped_report: dict | None = None
+        shaped_o = udir / "_shaped_owner.o"
+        shaped_extracted = udir / "_shaped_extracted.o"
+        if args.full_owner:
+            score_o = udir / "_base_extracted.o"
+            r = subprocess.run(
+                [
+                    str(wibo),
+                    str(sjiswrap),
+                    str(mwcc),
+                    *cf,
+                    "-c",
+                    str(shaped_c),
+                    "-o",
+                    str(shaped_o),
+                ],
+                cwd=REPO,
+                capture_output=True,
+                text=True,
+            )
+            if r.returncode != 0 or not shaped_o.exists():
+                fail("shaped owner does not compile", r.stderr or r.stdout)
+                continue
+            try:
+                shaped_report = extract_owner_target(
+                    baseline_path=full_o,
+                    candidate_path=shaped_o,
+                    function=fn,
+                    output_path=shaped_extracted,
+                    objcopy=ppc_objcopy,
+                    readelf=ppc_readelf,
+                )
+                owner_report = extract_owner_target(
+                    baseline_path=shaped_o,
+                    candidate_path=base_o,
+                    function=fn,
+                    output_path=score_o,
+                    objcopy=ppc_objcopy,
+                    readelf=ppc_readelf,
+                )
+            except ExtractError as exc:
+                fail("full-owner sibling audit/extraction failed", str(exc))
+                continue
+            if (
+                shaped_report["baseline"]["fingerprint_sha256"]
+                != shaped_report["candidate"]["fingerprint_sha256"]
+            ):
+                fail("shaped owner target differs from live full-TU target")
+                continue
+            if (
+                owner_report["baseline"]["fingerprint_sha256"]
+                == owner_report["candidate"]["fingerprint_sha256"]
+            ):
+                fail("pragma-clean target did not differ from shaped target")
+                continue
+            meta["mode"] = "full-owner"
+            meta["fidelity"] = OWNER_FIDELITY
+        else:
+            r = subprocess.run([str(ppc_objdump), "-d", str(base_o)],
+                               capture_output=True, text=True)
+            symbols = re.findall(r"^[0-9a-f]+ <([^>]+)>:$", r.stdout, flags=re.M)
+            if symbols != [fn]:
+                fail("stripped object has wrong functions", ",".join(symbols))
+                continue
+            isolated_disasm = normalized_disasm(ppc_objdump, base_o, fn)
+            full_disasm = normalized_disasm(ppc_objdump, full_o, fn)
+            if not isolated_disasm or not full_disasm:
+                fail("could not disassemble function for fidelity gate")
+                continue
+            if isolated_disasm != full_disasm:
+                fail("isolated baseline differs from full-TU object")
+                continue
+            meta["fidelity"] = "isolated-equals-full-tu"
 
         # gate 5: finite base score
         try:
@@ -516,7 +941,7 @@ def main():
                             algorithm="difflib", debug_mode=False,
                             ign_branch_targets=False,
                             objdump_command=f"{ppc_objdump} -dr -EB -mpowerpc -M broadway")
-            score, _ = scorer.score(str(base_o))
+            score, _ = scorer.score(str(score_o))
         except Exception as e:  # noqa
             fail("scorer failed", str(e))
             continue
@@ -524,6 +949,14 @@ def main():
             fail("base score infinite")
             continue
         meta["base_score"] = score
+        if args.full_owner:
+            try:
+                meta["pct"] = objdiff_match_percent(
+                    udir / "target.o", score_o, fn
+                )
+            except ValueError as exc:
+                fail("objdiff baseline score failed", str(exc))
+                continue
         if score == 0:
             fail("base score already 0 (function already matches?)")
             continue
@@ -531,30 +964,164 @@ def main():
         # 5. Windows-side files
         mwver = nu["mw_version"]
         flags_str = subprocess.list2cmdline(cf)
-        compile_bat = (
-            "@echo off\r\n"
-            f"\"{WIN_ROOT}/tools/sjiswrap.exe\" \"{WIN_ROOT}/tools/mwcc/{mwver}/mwcceppc.exe\" "
-            f"{flags_str} -c %1 -o %3\r\n"
-        )
+        if args.full_owner:
+            assert owner_report is not None
+            compile_bat = (
+                "@echo off\r\n"
+                "echo full-owner work units are local benchmark-only 1^>^&2\r\n"
+                "exit /b 2\r\n"
+            )
+        else:
+            compile_bat = (
+                "@echo off\r\n"
+                f"\"{WIN_ROOT}/tools/sjiswrap.exe\" \"{WIN_ROOT}/tools/mwcc/{mwver}/mwcceppc.exe\" "
+                f"{flags_str} -c %1 -o %3\r\n"
+            )
         (udir / "compile.bat").write_text(compile_bat)
         # POSIX wrapper kept for local (mac) permuter runs / debugging:
-        compile_sh = (
-            "#!/bin/bash\n"
-            f"exec \"{REPO}/build/tools/wibo\" \"{REPO}/build/tools/sjiswrap.exe\" "
-            f"\"{REPO}/build/compilers/{mwver}/mwcceppc.exe\" {flags_str} -c \"$1\" -o \"$3\"\n"
-        )
+        if args.full_owner:
+            baseline_fingerprint = owner_report["candidate"]["fingerprint_sha256"]
+            python_path = Path(sys.executable).resolve()
+            wrapper_paths = {
+                "source_guard": "tools/decomp_work/permuter/owner_source.py",
+                "extractor": "tools/decomp_work/permuter/owner_extract.py",
+                "wibo": "build/tools/wibo",
+                "sjiswrap": "build/tools/sjiswrap.exe",
+                "compiler": f"build/compilers/{mwver}/mwcceppc.exe",
+            }
+            wrapper_external = {
+                "python": str(python_path),
+                "sanitizer": str(sanitizer),
+                "objcopy": str(ppc_objcopy),
+                "readelf": str(ppc_readelf),
+            }
+            wrapper_hashes = {
+                "source_guard": file_sha256(SCRIPT_DIR / "owner_source.py"),
+                "extractor": file_sha256(owner_extractor),
+                "wibo": file_sha256(wibo),
+                "sjiswrap": file_sha256(sjiswrap),
+                "compiler": file_sha256(mwcc),
+                "python": file_sha256(python_path),
+                "sanitizer": file_sha256(sanitizer),
+                "objcopy": file_sha256(ppc_objcopy),
+                "readelf": file_sha256(ppc_readelf),
+            }
+            compile_sh = f"""#!{python_path} -I
+import hashlib
+import os
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+FUNCTION = {fn!r}
+FLAGS = {cf!r}
+REPO_PATHS = {wrapper_paths!r}
+EXTERNAL_PATHS = {wrapper_external!r}
+EXPECTED_HASHES = {wrapper_hashes!r}
+EXPECTED_BASE_SHA256 = {file_sha256(base_c)!r}
+EXPECTED_BASELINE_FINGERPRINT = {baseline_fingerprint!r}
+CLEAN_ENV = {{"LANG": "C", "LC_ALL": "C", "PATH": "/usr/bin:/bin"}}
+
+def digest(path):
+    value = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            value.update(chunk)
+    return value.hexdigest()
+
+def fail(message):
+    print("full-owner compile error: " + message, file=sys.stderr)
+    raise SystemExit(2)
+
+if len(sys.argv) != 4 or sys.argv[2] != "-o":
+    fail("expected candidate, -o, output arguments")
+script_dir = Path(__file__).resolve().parent
+roots = [
+    parent for parent in script_dir.parents
+    if (parent / "configure.py").is_file()
+    and (parent / "tools/decomp_work/permuter/owner_source.py").is_file()
+]
+if len(roots) != 1:
+    fail("could not identify one repository root")
+repo_root = roots[0]
+paths = {{name: repo_root / value for name, value in REPO_PATHS.items()}}
+paths.update({{name: Path(value) for name, value in EXTERNAL_PATHS.items()}})
+for name, path in paths.items():
+    if not path.is_file() or digest(path) != EXPECTED_HASHES[name]:
+        fail("attested tool drifted: " + name)
+base = script_dir / "base.c"
+base_bytes = base.read_bytes()
+if hashlib.sha256(base_bytes).hexdigest() != EXPECTED_BASE_SHA256:
+    fail("attested clean base drifted")
+candidate = Path(sys.argv[1]).resolve()
+candidate_bytes = candidate.read_bytes()
+output = Path(sys.argv[3]).resolve()
+output.unlink(missing_ok=True)
+
+def run(argv):
+    result = subprocess.run(
+        [str(value) for value in argv],
+        cwd=repo_root,
+        env=CLEAN_ENV,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        sys.stdout.write(result.stdout)
+        sys.stderr.write(result.stderr)
+        raise SystemExit(result.returncode)
+
+with tempfile.TemporaryDirectory(prefix="owner-build-", dir=script_dir) as temporary:
+    scratch = Path(temporary)
+    base_snapshot = scratch / "base.c"
+    candidate_snapshot = scratch / "candidate.c"
+    base_snapshot.write_bytes(base_bytes)
+    candidate_snapshot.write_bytes(candidate_bytes)
+    baseline_owner = scratch / "baseline-owner.o"
+    candidate_owner = scratch / "candidate-owner.o"
+    run([
+        paths["python"], "-I", paths["source_guard"],
+        "--base-tu", base_snapshot, "--candidate-tu", candidate_snapshot,
+        "--function", FUNCTION, "--parser", paths["sanitizer"],
+    ])
+    prefix = [paths["wibo"], paths["sjiswrap"], paths["compiler"], *FLAGS]
+    run([*prefix, "-c", base_snapshot, "-o", baseline_owner])
+    run([*prefix, "-c", candidate_snapshot, "-o", candidate_owner])
+    run([
+        paths["python"], "-I", paths["extractor"],
+        "--baseline", baseline_owner, "--candidate", candidate_owner,
+        "--function", FUNCTION, "--output", output,
+        "--objcopy", paths["objcopy"], "--readelf", paths["readelf"],
+        "--expected-baseline-fingerprint", EXPECTED_BASELINE_FINGERPRINT,
+    ])
+"""
+        else:
+            compile_sh = (
+                "#!/bin/bash\n"
+                f"exec \"{REPO}/build/tools/wibo\" \"{REPO}/build/tools/sjiswrap.exe\" "
+                f"\"{REPO}/build/compilers/{mwver}/mwcceppc.exe\" {flags_str} -c \"$1\" -o \"$3\"\n"
+            )
         (udir / "compile.sh").write_text(compile_sh)
         os.chmod(udir / "compile.sh", 0o755)
 
         # Direct-argv compile command (avoids cmd.exe per candidate; sjiswrap
         # only when the preprocessed source actually contains non-ASCII).
-        needs_sjis = any(b > 0x7F for b in base_c.read_bytes())
-        argv = []
-        if needs_sjis:
-            argv.append(f"{WIN_ROOT}/tools/sjiswrap.exe")
-        argv.append(f"{WIN_ROOT}/tools/mwcc/{mwver}/mwcceppc.exe")
-        argv += cf
-        (udir / "compile_cmd.json").write_text(json.dumps({"argv": argv}, indent=1))
+        if args.full_owner:
+            compile_command = {
+                "mode": "full-owner",
+                "supported": False,
+                "reason": "local compile.sh audit/extract pipeline required",
+            }
+        else:
+            needs_sjis = any(b > 0x7F for b in base_c.read_bytes())
+            argv = []
+            if needs_sjis:
+                argv.append(f"{WIN_ROOT}/tools/sjiswrap.exe")
+            argv.append(f"{WIN_ROOT}/tools/mwcc/{mwver}/mwcceppc.exe")
+            argv += cf
+            compile_command = {"argv": argv}
+        (udir / "compile_cmd.json").write_text(json.dumps(compile_command, indent=1))
 
         settings = (
             f'func_name = "{fn}"\n'
@@ -579,13 +1146,85 @@ def main():
         meta["cflags"] = flags_str
         meta["mwcc_pragmas"] = args.mwcc_pragma
         meta["n_fns_in_tu"] = len(funcs)
+        if args.full_owner:
+            assert owner_report is not None
+            assert shaped_report is not None
+            assert owner_seed_path is not None
+            assert context_transform is not None
+            assert retail_target_record is not None
+            dependency_records = [
+                {"path": repo_path(path), "sha256": file_sha256(path)}
+                for path in owner_dependencies
+            ]
+            meta["owner"] = {
+                "schema": 2,
+                "source": repo_path(paths["src"]),
+                "seed": {
+                    "path": repo_path(owner_seed_path),
+                    "sha256": file_sha256(owner_seed_path),
+                },
+                "clean_base_sha256": file_sha256(base_c),
+                "candidate_policy": owner_policy_record(fn, sanitizer),
+                "context_transform": context_transform,
+                "sanitizer": {
+                    **tool_attestation(sanitizer),
+                    "version": sanitizer_version,
+                    "version_sha256": hashlib.sha256(
+                        sanitizer_version.encode("utf-8")
+                    ).hexdigest(),
+                    "argv": [repo_path(Path(value)) if value.startswith(str(REPO)) else value
+                             for value in sanitizer_argv],
+                    "inputs": dependency_records,
+                },
+                "generator": tool_attestation(Path(__file__).resolve()),
+                "source_guard": tool_attestation(SCRIPT_DIR / "owner_source.py"),
+                "extractor": tool_attestation(owner_extractor),
+                "objcopy": tool_attestation(ppc_objcopy),
+                "readelf": tool_attestation(ppc_readelf),
+                "python": tool_attestation(Path(sys.executable)),
+                "compiler": tool_attestation(mwcc),
+                "wibo": tool_attestation(wibo),
+                "sjiswrap": tool_attestation(sjiswrap),
+                "live_owner": {
+                    "path": repo_path(full_o),
+                    "sha256": file_sha256(full_o),
+                    "target": shaped_report["baseline"],
+                },
+                "shaped_owner": {
+                    "source_sha256": hashlib.sha256(
+                        shaped_owner_source.encode("utf-8")
+                    ).hexdigest(),
+                    "sha256": shaped_report["candidate_owner_sha256"],
+                    "target": shaped_report["candidate"],
+                    "sibling_audit": shaped_report["sibling_audit"],
+                },
+                "clean_owner": {
+                    "source_sha256": file_sha256(base_c),
+                    "sha256": owner_report["candidate_owner_sha256"],
+                    "target": owner_report["candidate"],
+                },
+                "retail_target": retail_target_record,
+                "extracted_baseline": owner_report["output"],
+                "sibling_audit": owner_report["sibling_audit"],
+            }
         (udir / "meta.json").write_text(json.dumps(meta, indent=1))
         manifest.append(meta)
         n_ok += 1
         print(f"OK   {fn} ({unit}) base_score={score}")
 
         # tidy intermediates
-        for tmp in (pp, tgt_s, base_o):
+        temporary_paths = [pp, tgt_s, base_o]
+        if args.full_owner:
+            temporary_paths.extend(
+                [
+                    udir / "_owner.d",
+                    udir / "_base_extracted.o",
+                    shaped_c,
+                    shaped_o,
+                    shaped_extracted,
+                ]
+            )
+        for tmp in temporary_paths:
             try:
                 tmp.unlink()
             except OSError:

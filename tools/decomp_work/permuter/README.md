@@ -36,6 +36,71 @@ python worker — zombie workers silently eating cores are another way a farm
 | `farm.py` | Windows | supervisor: keeps N permuter processes running through the queue with per-unit time budgets, writes wins to `outbox/<fn>/`, holds the machine awake while grinding, persists state across reboots |
 | `poll_win.sh` | Mac | pulls `outbox/` into `build/permuter_results/win/<fn>/` (`<fn>.c` + `summary.json`); `--loop` polls every 5 min; never commits anything |
 
+## Full-owner extraction mode (local benchmark only)
+
+Some functions do not reproduce when their owner is reduced to one function.
+For those cases, `gen_workunits.py --full-owner` provides an explicit,
+fail-closed local mode. It is not a Windows farm format and `compile.bat` exits
+with an error deliberately.
+
+The mode uses an explicitly attested Clang only to resolve preprocessing
+directives while retaining active MWCC pragmas. It replaces exactly one target
+definition with a target-only clean seed. For `msgctrlWait`, the reviewed
+`msgctrlWait-pragma-clean-v1` transform then removes the redundant
+`optimization_level 4` and target-shaping `peephole off`, explicitly restores
+canonical `peephole on` before the mutable definition, and retains the existing
+post-target restore. The shaped owner must still reproduce the live owner
+target; the clean-context target must differ from it. The honest clean baseline
+is 92.5%, not the refused 99.5% shaped lane.
+
+Both transitions run through `owner_extract.py`. The extractor rejects changes
+to sibling text, named/static/data symbols, allocatable non-text sections, or
+sibling relocations. Compiler-generated local ASCII `@[0-9]+` names alone may
+renumber; they are compared by stable section/value/type identity. It emits one
+PowerPC ELF function and preserves only target-owned relocations; a relocation
+to a sibling or data definition is rejected.
+
+The seed itself must retain the incumbent signature. A real Clang AST over the
+authentic, sibling-pruned owner first binds `msgctrlWait` to its reviewed
+statement/effect topology: exactly the incumbent two scalar locals, nested
+if/else and return layout, assignment destinations, conditions, and observable
+values. The only mutable search space is local naming, signed-short versus
+signed-int counter storage, optional nonredundant signed-short casts, and the
+same canonical direct/one-step nonzero affine leaves. Extra/empty branches,
+aggregate locals, unary or nested algebra, neutral operations, reordered
+comparisons, conditional expressions, cast round trips, and any changed
+effect slot fail closed. A second definite-assignment/provenance/liveness pass
+then rejects directives/`_Pragma`, assembly, `.inc`, `goto`/labels, every
+unreviewed `__*` compiler intrinsic (the default allowlist is empty), layout
+qualifiers, pointer alias tricks, save/write/restore sequences, compound
+assignment, function calls, dead locals/stores, and reads before definition.
+Unsupported AST/control-flow shapes never fall back to lexical acceptance.
+
+Example (all named queue/seed/output files are ignored build artifacts):
+
+```sh
+python3 tools/decomp_work/permuter/gen_workunits.py \
+  --queue build/k3_msgctrlWait_owner_queue.tsv \
+  --outdir build/permuter_workunits/k3-full-owner-msgctrl-clean-20260722 \
+  --only msgctrlWait \
+  --full-owner \
+  --owner-target-source build/k3_msgctrlWait_clean_seed.c \
+  --force
+```
+
+Schema-2 admission separately binds the retail scorer target, live/shaped
+target, and pragma-clean/extracted target fingerprints. `meta.json` also binds
+the sanitizer/version and transitive inputs, clean seed, context transform,
+candidate policy, generator/source guard, extractor, exact compiler/wrappers,
+and both sibling audits. The executable `compile.sh` is an isolated Python
+wrapper: it verifies every tool hash, snapshots base and candidate bytes once,
+guards exact context equality, and compiles only those immutable snapshots
+under a clean environment. Benchmark hashing remains the same six-file
+contract: `base.c`, `compile.sh`, `compile_cmd.json`, `meta.json`,
+`settings.toml`, and `target.o`. The fidelity label is
+`full-owner-clean-context-extracted-v2`; it never claims equality with the
+live/shaped target.
+
 Windows layout: `C:\Users\douglaswhittingham\gamecube-decomp\pkmn-permuter\`
 (`decomp-permuter/` patched checkout, `tools/` mwcc + sjiswrap + ppc objdump,
 `units/`, `state/`, `outbox/`, `logs/`).
