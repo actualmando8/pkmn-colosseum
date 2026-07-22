@@ -2318,7 +2318,34 @@ game/effect/effect_visual_candidate_801402AC.c:
 	.text       start:0x801402AC end:0x80140588
 
 game/people/people_data.c:
-	.text       start:0x80140588 end:0x80143C50
+	.text       start:0x80140588 end:0x80143718
+
+game/people/people_item_effort_exact_80143718.c:
+	.text       start:0x80143718 end:0x80143778
+
+game/people/people_data_candidate_80143778.c:
+	.text       start:0x80143778 end:0x801437A0
+
+game/people/people_item_ppup_exact_801437A0.c:
+	.text       start:0x801437A0 end:0x801437B8
+
+game/people/people_data_candidate_801437B8.c:
+	.text       start:0x801437B8 end:0x801437E0
+
+game/people/people_item_hpup_exact_801437E0.c:
+	.text       start:0x801437E0 end:0x801437F8
+
+game/people/people_data_candidate_801437F8.c:
+	.text       start:0x801437F8 end:0x801439B8
+
+game/people/people_item_battle_boost_exact_801439B8.c:
+	.text       start:0x801439B8 end:0x80143A44
+
+game/people/people_data_candidate_80143A44.c:
+	.text       start:0x80143A44 end:0x80143A94
+
+game/people/people_item_tables_setters_exact_80143A94.c:
+	.text       start:0x80143A94 end:0x80143C50
 
 game/people/people_item_getters_exact_80143C50.c:
 	.text       start:0x80143C50 end:0x8014402C
