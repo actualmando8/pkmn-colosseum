@@ -5629,6 +5629,13 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                Matching,
+                "hsd/hsd_lobj_tail_exact_801A68D0.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O1"],
+                progress_category="hsd",
+            ),
+            Object(
                 CodeCandidate,
                 "game/gs_dvd.c",
                 mw_version="GC/1.3",
