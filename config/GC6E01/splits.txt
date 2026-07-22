@@ -180,7 +180,16 @@ game/gs_range_80011EA4.c:
 	.text       start:0x80011EA4 end:0x80012D20
 
 game/gs_event_exec.c:
-	.text       start:0x80012D20 end:0x80014110
+	.text       start:0x80012D20 end:0x80013744
+
+game/gs_event_exec_exact_80013744.c:
+	.text       start:0x80013744 end:0x8001374C
+
+game/gs_event_exec_candidate_8001374C.c:
+	.text       start:0x8001374C end:0x800140FC
+
+game/gs_event_exec_exact_800140FC.c:
+	.text       start:0x800140FC end:0x80014110
 
 game/gs_event_exec_exact_80014110.c:
 	.text       start:0x80014110 end:0x80014118
@@ -195,7 +204,13 @@ game/gs_event_exec_candidate_800141BC.c:
 	.text       start:0x800141BC end:0x8001501C
 
 game/gs_pokemon_summary.c:
-	.text       start:0x8001501C end:0x800181C4
+	.text       start:0x8001501C end:0x800178EC
+
+game/gs_pokemon_summary_exact_800178EC.c:
+	.text       start:0x800178EC end:0x8001793C
+
+game/gs_pokemon_summary_candidate_8001793C.c:
+	.text       start:0x8001793C end:0x800181C4
 
 game/menuPokemon.c:
 	.text       start:0x800181C4 end:0x8001D7E4
@@ -2370,7 +2385,13 @@ game/win_msg_candidate_80105C68.c:
 	.text       start:0x80105C68 end:0x80106F98
 
 game/win_sequence.c:
-	.text       start:0x80106F98 end:0x80108580
+	.text       start:0x80106F98 end:0x801070F4
+
+game/win_sequence_exact_801070F4.c:
+	.text       start:0x801070F4 end:0x80107170
+
+game/win_sequence_candidate_80107170.c:
+	.text       start:0x80107170 end:0x80108580
 
 game/win_sprite.c:
 	.text       start:0x80108580 end:0x80108C14
@@ -3602,7 +3623,13 @@ game/gs_range_8017A5FC.c:
 	.text       start:0x8017A5FC end:0x8017B07C
 
 game/fsys/fsys_file.c:
-	.text       start:0x8017B07C end:0x8017BFE8
+	.text       start:0x8017B07C end:0x8017B1AC
+
+game/fsys/fsys_file_exact_8017B1AC.c:
+	.text       start:0x8017B1AC end:0x8017B1CC
+
+game/fsys/fsys_file_candidate_8017B1CC.c:
+	.text       start:0x8017B1CC end:0x8017BFE8
 
 game/fsys/fsys_file_exact_8017BFE8.c:
 	.text       start:0x8017BFE8 end:0x8017C008
@@ -4013,7 +4040,13 @@ hsd/hsd_texp_exact_801B1854.c:
 	.text       start:0x801B1854 end:0x801B18D8
 
 hsd/hsd_texp_candidate_801B18D8.c:
-	.text       start:0x801B18D8 end:0x801B28B8
+	.text       start:0x801B18D8 end:0x801B26F8
+
+hsd/hsd_texp_exact_801B26F8.c:
+	.text       start:0x801B26F8 end:0x801B2718
+
+hsd/hsd_texp_candidate_801B2718.c:
+	.text       start:0x801B2718 end:0x801B28B8
 
 hsd/hsd_texp_exact_801B28B8.c:
 	.text       start:0x801B28B8 end:0x801B28C8

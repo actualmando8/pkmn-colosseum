@@ -1865,13 +1865,20 @@ config.libs = [
                     (CodeCandidate, "game/win_msg_candidate_80105C68.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/win_sequence.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/win_sequence.c"),
+                    (Matching, "game/win_sequence_exact_801070F4.c"),
+                    (CodeCandidate, "game/win_sequence_candidate_80107170.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/win_sprite.c",
@@ -5414,6 +5421,9 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/gs_event_exec.c"),
+                    (Matching, "game/gs_event_exec_exact_80013744.c"),
+                    (CodeCandidate, "game/gs_event_exec_candidate_8001374C.c"),
+                    (Matching, "game/gs_event_exec_exact_800140FC.c"),
                     (Matching, "game/gs_event_exec_exact_80014110.c"),
                     (CodeCandidate, "game/gs_event_exec_candidate_80014118.c"),
                     (Matching, "game/gs_event_exec_exact_80014198.c"),
@@ -5897,13 +5907,20 @@ config.libs = [
                     (CodeCandidate, "game/gs_npc_event_candidate_8003037C.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/gs_pokemon_summary.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_pokemon_summary.c"),
+                    (Matching, "game/gs_pokemon_summary_exact_800178EC.c"),
+                    (CodeCandidate, "game/gs_pokemon_summary_candidate_8001793C.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/main.c",
@@ -6525,6 +6542,8 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "game/fsys/fsys_file.c"),
+                    (Matching, "game/fsys/fsys_file_exact_8017B1AC.c"),
+                    (CodeCandidate, "game/fsys/fsys_file_candidate_8017B1CC.c"),
                     (Matching, "game/fsys/fsys_file_exact_8017BFE8.c"),
                     (CodeCandidate, "game/fsys/fsys_file_candidate_8017C008.c"),
                     (Matching, "game/fsys/fsys_file_exact_8017C394.c"),
@@ -6889,6 +6908,18 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "hsd/hsd_texp_candidate_801B18D8.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                Matching,
+                "hsd/hsd_texp_exact_801B26F8.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_texp_candidate_801B2718.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
