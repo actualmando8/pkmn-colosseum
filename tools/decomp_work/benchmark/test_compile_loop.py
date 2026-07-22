@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -18,6 +19,40 @@ assert SPEC and SPEC.loader
 compile_loop = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = compile_loop
 SPEC.loader.exec_module(compile_loop)
+
+
+OWNER_TARGET_DEFINITION = """int msgctrlWait(EffectUtilCommandObj* obj) {
+    u8* stream;
+    short counter;
+    if (obj->activeFlag == 0) {
+        if (obj->waitCounter == 0) {
+            stream = obj->stream;
+            obj->waitCounter = (short)((short)stream[0] + 1);
+        }
+        counter = obj->waitCounter;
+        counter = (short)(counter - 1);
+        obj->waitCounter = counter;
+        if (counter <= 0) {
+            obj->waitCounter = 0;
+        } else {
+            stream = obj->stream;
+            obj->stream = stream - 3;
+            return 1;
+        }
+    }
+    stream = obj->stream;
+    obj->stream = stream + 1;
+    return 0;
+}"""
+
+OWNER_TEST_BASE = """typedef unsigned char u8;
+typedef struct EffectUtilCommandObj {
+    u8 activeFlag;
+    short waitCounter;
+    u8* stream;
+} EffectUtilCommandObj;
+int sibling(void) { return 7; }
+""" + OWNER_TARGET_DEFINITION + "\n"
 
 
 class CompileLoopTests(unittest.TestCase):
@@ -52,6 +87,181 @@ class CompileLoopTests(unittest.TestCase):
         (unit / "settings.toml").write_text("# test\n", encoding="utf-8")
         (unit / "target.o").write_bytes(b"target-object")
         return unit
+
+    def make_owner_workunit(self, root: Path) -> tuple[Path, str]:
+        function = "msgctrlWait"
+        unit = self.make_workunit(
+            root, function=function, fidelity=compile_loop.OWNER_FIDELITY
+        )
+        (unit / "base.c").write_text(OWNER_TEST_BASE, encoding="utf-8")
+        files = unit / "attested"
+        files.mkdir()
+        paths = {
+            name: files / name
+            for name in (
+                "generator",
+                "objcopy",
+                "readelf",
+                "seed",
+                "owner-source",
+                "live-owner",
+            )
+        }
+        for name, path in paths.items():
+            path.write_bytes(name.encode("ascii"))
+        # The production schema requires the owner source itself to be one of
+        # the preprocessing inputs and to resolve inside the repository.
+        paths["owner-source"] = compile_loop.REPO / "src/game/msgctrl.c"
+        clang = shutil.which("clang")
+        if not clang:
+            raise unittest.SkipTest("Clang is unavailable")
+        paths.update(
+            {
+                "sanitizer": Path(clang).resolve(),
+                "source_guard": compile_loop.PERMUTER_TOOLS / "owner_source.py",
+                "extractor": compile_loop.PERMUTER_TOOLS / "owner_extract.py",
+                "python": Path(sys.executable).resolve(),
+                "compiler": compile_loop.REPO
+                / "build/compilers/GC/1.3/mwcceppc.exe",
+                "wibo": compile_loop.REPO / "build/tools/wibo",
+                "sjiswrap": compile_loop.REPO / "build/tools/sjiswrap.exe",
+            }
+        )
+        version_result = subprocess.run(
+            [str(paths["sanitizer"]), "--version"],
+            capture_output=True,
+            text=True,
+            env={"LANG": "C", "LC_ALL": "C", "PATH": "/usr/bin:/bin"},
+        )
+        self.assertEqual(version_result.returncode, 0)
+        version = version_result.stdout.strip()
+
+        def attest(name: str) -> dict[str, str]:
+            path = paths[name]
+            digest = compile_loop.file_sha256(path)
+            assert digest is not None
+            return {"path": str(path), "sha256": digest}
+
+        shaped = {
+            "start": 4,
+            "size": 4,
+            "bytes_sha256": "b" * 64,
+            "relocations_sha256": "c" * 64,
+            "fingerprint_sha256": "a" * 64,
+        }
+        clean = {
+            "start": 4,
+            "size": 4,
+            "bytes_sha256": "e" * 64,
+            "relocations_sha256": "f" * 64,
+            "fingerprint_sha256": "d" * 64,
+        }
+        audit = {
+            "state": "passed",
+            "sibling_functions": 89,
+            "sibling_relocations": 386,
+            "allocatable_non_text_sections": 2,
+            "sibling_relocations_sha256": "7" * 64,
+        }
+        base_sha = compile_loop.file_sha256(unit / "base.c")
+        assert base_sha is not None
+        meta = {
+            "fn": function,
+            "pct": 90.0,
+            "size": 4,
+            "mode": "full-owner",
+            "fidelity": compile_loop.OWNER_FIDELITY,
+            "mw_version": "GC/1.3",
+            "owner": {
+                "schema": 2,
+                "source": "src/game/msgctrl.c",
+                "seed": attest("seed"),
+                "clean_base_sha256": base_sha,
+                "candidate_policy": {
+                    "schema": 1,
+                    "function": function,
+                    "parser": str(paths["sanitizer"]),
+                    "parser_mode": compile_loop.OWNER_PARSER_MODE,
+                    "intrinsic_allowlist": [],
+                },
+                "context_transform": {
+                    "schema": 1,
+                    "policy": "msgctrlWait-pragma-clean-v1",
+                    "function": function,
+                    "removed_pragmas": ["optimization_level 4", "peephole off"],
+                    "inserted_pragmas": ["peephole on"],
+                    "following_state_restore": "peephole on retained",
+                    "shaped_source_sha256": "4" * 64,
+                    "clean_source_sha256": base_sha,
+                    "following_source_sha256": "5" * 64,
+                },
+                "sanitizer": {
+                    **attest("sanitizer"),
+                    "version": version,
+                    "version_sha256": hashlib.sha256(version.encode()).hexdigest(),
+                    "argv": ["-E", "-P"],
+                    "inputs": [attest("owner-source")],
+                },
+                "generator": attest("generator"),
+                "source_guard": attest("source_guard"),
+                "extractor": attest("extractor"),
+                "objcopy": attest("objcopy"),
+                "readelf": attest("readelf"),
+                "python": attest("python"),
+                "compiler": attest("compiler"),
+                "wibo": attest("wibo"),
+                "sjiswrap": attest("sjiswrap"),
+                "live_owner": {**attest("live-owner"), "target": dict(shaped)},
+                "shaped_owner": {
+                    "source_sha256": "4" * 64,
+                    "sha256": "8" * 64,
+                    "target": dict(shaped),
+                    "sibling_audit": dict(audit),
+                },
+                "clean_owner": {
+                    "source_sha256": base_sha,
+                    "sha256": "9" * 64,
+                    "target": dict(clean),
+                },
+                "retail_target": {
+                    "size": 4,
+                    "bytes_sha256": "1" * 64,
+                    "relocations_sha256": "2" * 64,
+                    "fingerprint_sha256": "3" * 64,
+                    "elf_sha256": compile_loop.file_sha256(unit / "target.o"),
+                },
+                "extracted_baseline": {
+                    **clean,
+                    "elf_sha256": "6" * 64,
+                    "functions": [function],
+                },
+                "sibling_audit": dict(audit),
+            },
+        }
+        bound_values = [
+            str(paths[name].resolve())
+            for name in ("objcopy", "readelf", "python", "sanitizer")
+        ]
+        repo_bindings = (
+            "tools/decomp_work/permuter/owner_source.py",
+            "tools/decomp_work/permuter/owner_extract.py",
+            "build/tools/wibo",
+            "build/tools/sjiswrap.exe",
+            "build/compilers/GC/1.3/mwcceppc.exe",
+        )
+        (unit / "compile.sh").write_text(
+            "#!/bin/sh\n# "
+            + " ".join(bound_values)
+            + " "
+            + " ".join(repo_bindings)
+            + " --parser "
+            + "d" * 64
+            + "\nexit 0\n",
+            encoding="utf-8",
+        )
+        (unit / "compile.sh").chmod(0o700)
+        (unit / "meta.json").write_text(json.dumps(meta) + "\n", encoding="utf-8")
+        return unit, version
 
     def make_semantic_config(
         self,
@@ -272,6 +482,144 @@ class CompileLoopTests(unittest.TestCase):
             }
             with self.assertRaisesRegex(compile_loop.BenchError, "source guardrails"):
                 compile_loop.resolve_workunit({"workunit_root": str(root)}, target)
+
+    def test_full_owner_candidate_guard_rejects_shapers(self) -> None:
+        accepted = "int target(int x) { return x ? x : 0; }"
+        clang = shutil.which("clang")
+        if not clang:
+            self.skipTest("Clang is unavailable")
+        self.assertEqual(
+            compile_loop.extract_candidate(
+                accepted,
+                "target",
+                full_owner=True,
+                owner_parser=Path(clang),
+                owner_context=accepted,
+            ),
+            accepted + "\n",
+        )
+        rejected = {
+            "goto": "int target(int x) { goto done; done: return x; }",
+            "pragma": "int target(int x) {\n#pragma peephole off\nreturn x; }",
+            "self-assignment": "int target(int x) { x = x; return x; }",
+            "register": "int target(int x) { register int y = x; return y; }",
+        }
+        for label, source in rejected.items():
+            with self.subTest(label=label):
+                with self.assertRaisesRegex(
+                    compile_loop.BenchError, "full-owner target rejected"
+                ):
+                    compile_loop.extract_candidate(
+                        source,
+                        "target",
+                        full_owner=True,
+                        owner_parser=Path(clang),
+                        owner_context=source,
+                    )
+        with self.assertRaisesRegex(compile_loop.BenchError, "signature drifted"):
+            compile_loop.validate_owner_signature(
+                "int target(int x) { return x; }",
+                "long target(int x) { return x; }",
+                "target",
+            )
+
+    def test_full_owner_workunit_attestation_and_six_file_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            unit, version = self.make_owner_workunit(root)
+            initial_hash = compile_loop.workunit_sha256(unit)
+            (unit / "not-admitted.txt").write_text("ignored by fingerprint\n")
+            self.assertEqual(compile_loop.workunit_sha256(unit), initial_hash)
+            target = {
+                "function": "msgctrlWait",
+                "baseline_match_percent": 90.0,
+                "workunit_sha256": initial_hash,
+            }
+            completed = subprocess.CompletedProcess(
+                ["sanitizer", "--version"], 0, version + "\n", ""
+            )
+            with mock.patch.object(
+                compile_loop, "run_command", return_value=completed
+            ):
+                self.assertEqual(
+                    compile_loop.resolve_workunit(
+                        {"workunit_root": str(root)}, target
+                    ),
+                    unit,
+                )
+                hashes = compile_loop.execution_tool_fingerprints([unit])
+            self.assertEqual(
+                hashes["full-owner:msgctrlWait:sanitizer-version"],
+                hashlib.sha256(version.encode()).hexdigest(),
+            )
+            self.assertEqual(
+                hashes["full-owner:msgctrlWait:extractor"],
+                compile_loop.file_sha256(compile_loop.PERMUTER_TOOLS / "owner_extract.py"),
+            )
+
+            meta = json.loads((unit / "meta.json").read_text())
+            meta["owner"]["sibling_audit"]["state"] = "failed"
+            (unit / "meta.json").write_text(json.dumps(meta) + "\n")
+            target["workunit_sha256"] = compile_loop.workunit_sha256(unit)
+            with mock.patch.object(
+                compile_loop, "run_command", return_value=completed
+            ):
+                with self.assertRaisesRegex(
+                    compile_loop.BenchError, "sibling audit did not pass"
+                ):
+                    compile_loop.resolve_workunit(
+                        {"workunit_root": str(root)}, target
+                    )
+
+    def test_full_owner_score_source_rejects_context_before_compiler(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            unit, version = self.make_owner_workunit(root)
+            injected = unit / "injected.c"
+            injected.write_text(
+                (unit / "base.c").read_text().replace("return 7", "return 8"),
+                encoding="utf-8",
+            )
+            completed = subprocess.CompletedProcess(
+                ["sanitizer", "--version"], 0, version + "\n", ""
+            )
+            with mock.patch.object(
+                compile_loop, "run_command", return_value=completed
+            ) as runner:
+                with self.assertRaisesRegex(
+                    compile_loop.BenchError, "changed context before the target"
+                ):
+                    compile_loop.compile_and_score(
+                        unit, injected, "msgctrlWait", "injected"
+                    )
+            # The only subprocess was the attested Clang version check.  The
+            # compile wrapper/MWCC was never reached.
+            self.assertEqual(runner.call_count, 1)
+
+    def test_full_owner_source_must_be_an_attested_sanitizer_input(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            unit, version = self.make_owner_workunit(root)
+            meta = json.loads((unit / "meta.json").read_text())
+            meta["owner"]["sanitizer"]["inputs"] = [meta["owner"]["generator"]]
+            (unit / "meta.json").write_text(json.dumps(meta) + "\n")
+            target = {
+                "function": "msgctrlWait",
+                "baseline_match_percent": 90.0,
+                "workunit_sha256": compile_loop.workunit_sha256(unit),
+            }
+            completed = subprocess.CompletedProcess(
+                ["sanitizer", "--version"], 0, version + "\n", ""
+            )
+            with mock.patch.object(
+                compile_loop, "run_command", return_value=completed
+            ):
+                with self.assertRaisesRegex(
+                    compile_loop.BenchError, "not an attested sanitizer input"
+                ):
+                    compile_loop.resolve_workunit(
+                        {"workunit_root": str(root)}, target
+                    )
 
     def test_source_baseline_rejects_committed_source_change(self) -> None:
         commit = "a" * 40
@@ -749,6 +1097,20 @@ class CompileLoopTests(unittest.TestCase):
             },
         )
 
+    def test_msgctrl_wait_semantic_profile_is_bound_to_owner_target(self) -> None:
+        self.assertEqual(
+            compile_loop.SEMANTIC_PROFILE_FUNCTIONS["msgctrlWait-v1"],
+            "msgctrlWait",
+        )
+        self.assertEqual(
+            compile_loop.SEMANTIC_PROFILE_AUTHORITIES["msgctrlWait-v1"],
+            {
+                "virtual_address": "0x80132454",
+                "size": 0x78,
+                "dol_sha1": "870e8b9693ca780782d80f22a6a4572d8ba9458f",
+            },
+        )
+
     def test_semantic_feedback_does_not_replace_objdiff_ranking_or_termination(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_value:
             root = Path(temporary_value)
@@ -910,6 +1272,60 @@ class CompileLoopTests(unittest.TestCase):
             self.assertFalse(result["full_dol_validation"]["performed"])
             self.assertIsNone(result["full_dol_validation"]["passed"])
             api.assert_called_once()
+
+    def test_full_owner_exactness_is_reported_separately(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_value:
+            root = Path(temporary_value)
+            unit, _version = self.make_owner_workunit(root / "source")
+            reply = compile_loop.ApiReply(
+                assistant={
+                    "role": "assistant",
+                    "content": f"```c\n{OWNER_TARGET_DEFINITION}\n```",
+                },
+                served_model="test-model",
+                usage={},
+                elapsed_seconds=0.1,
+                finish_reason="stop",
+            )
+            scores = [
+                compile_loop.CompileScore(True, 90.0, 4, "baseline"),
+                compile_loop.CompileScore(True, 100.0, 4, "exact"),
+            ]
+            with (
+                mock.patch.object(compile_loop, "target_assembly", return_value="blr"),
+                mock.patch.object(
+                    compile_loop, "call_openai_compatible", return_value=reply
+                ),
+                mock.patch.object(
+                    compile_loop, "compile_and_score", side_effect=scores
+                ),
+            ):
+                result = compile_loop.run_target(
+                    source_workunit=unit,
+                    run_directory=root / "run",
+                    function="msgctrlWait",
+                    provider="moonshot",
+                    model="kimi-k3",
+                    rounds=1,
+                    max_tokens=100,
+                    timeout=10,
+                    key_file=root / "unused-key",
+                    key_label=None,
+                    source_commit="a" * 40,
+                    runner_commit="b" * 40,
+                    expected_baseline=90.0,
+                    expected_workunit_sha256=compile_loop.workunit_sha256(unit),
+                    allow_reasoning_salvage=False,
+                )
+            self.assertEqual(
+                result["comparison_mode"], "full-owner-clean-context-extracted"
+            )
+            self.assertTrue(result["workunit_objdiff_exact"])
+            self.assertFalse(result["isolated_objdiff_exact"])
+            self.assertTrue(result["full_owner_clean_context_objdiff_exact"])
+            self.assertTrue(result["full_owner_extracted_objdiff_exact"])
+            self.assertTrue(result["exact"])
+            self.assertFalse(result["campaign_bankable"])
 
     def test_semantic_infrastructure_failure_aborts_target(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_value:

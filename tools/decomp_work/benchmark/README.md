@@ -7,15 +7,25 @@ accepted into `src/` until it passes the normal full-tree validation.
 
 ## Inputs and isolation
 
-- Work units come from `tools/decomp_work/permuter/gen_workunits.py`. Its
-  fidelity gate proves that isolated `base.c` emits the same target function as
-  the full translation unit before the unit is admitted.
+- Work units come from `tools/decomp_work/permuter/gen_workunits.py`. Normal
+  units prove that isolated `base.c` emits the same target as the full
+  translation unit. Explicit `--full-owner` units instead retain a sanitized
+  owner, establish separate live/shaped and pragma-clean target fingerprints,
+  compile the clean context on every attempt, audit all siblings across both
+  transitions, and expose only a relocation-preserving target ELF to the
+  scorer. The shaped target is expressly not an admissible benchmark lane.
 - Each model run copies only six allowlisted, hashed work-unit inputs below the
   gitignored `build/model_benchmark/` tree. Run directories are mode `0700` and
   files are mode `0600` (`compile.sh` remains executable).
 - The runner rejects `.inc`, `#include`, and inline assembly in both incumbents
-  and model responses. The Dolphin SDK paired-single exception is deliberately
-  outside this benchmark until it has explicit allowlist metadata.
+  and model responses. Full-owner targets additionally reject pragmas,
+  `goto`/labels, all unreviewed `__*` intrinsics, layout/alias qualifiers,
+  local typedef/aggregate declarations, comma/bit-mask/self-assignment shapers,
+  pointer alias tricks, reads before definition, and signature drift. The
+  guard is a target-specific canonical Clang AST normal form followed by a
+  conservative dataflow policy over authentic owner context. The Dolphin SDK paired-single
+  exception is deliberately outside this benchmark until it has explicit
+  allowlist metadata.
 - Credentials are read in-process from an owner-only `name: value` file. Never
   put an API key on the command line or in an environment variable.
 
@@ -28,12 +38,32 @@ function/fidelity/baseline metadata, recompiles the expected baseline, and
 records hashes for the suite, runner, compiler, wrappers, objdump, and objdiff.
 Regenerate a suite deliberately after an active source/config change.
 
+Full-owner admission is intentionally stricter. The runner verifies the
+generation-time sanitizer/version and transitive inputs, seed, live owner,
+reviewed pragma transform, generator/source guard, extractor,
+compiler/wrappers, objcopy/readelf, retail target, live/shaped target, and
+clean/extracted target fingerprints before a model run. `compile.sh` must be
+bound to the clean fingerprint and refuse the shaped fingerprint. It hashes
+its tools, sanitizes its environment, validates exact context equality, and
+compiles an immutable candidate snapshot. The fidelity value is
+`full-owner-clean-context-extracted-v2`; the six admitted work-unit files and
+their SHA-256 algorithm are unchanged.
+
 ## Local validation
 
 ```sh
 python3 -m unittest tools/decomp_work/benchmark/test_compile_loop.py
 python3 tools/decomp_work/benchmark/compile_loop.py score \
   build/permuter_workunits/win-fifty-20260716-next/fn_80034708
+```
+
+An ignored `msgctrlWait` full-owner unit can be generated with the command in
+[`../permuter/README.md`](../permuter/README.md), then checked without an API
+request:
+
+```sh
+python3 tools/decomp_work/benchmark/compile_loop.py score \
+  build/permuter_workunits/k3-full-owner-msgctrl-clean-20260722/msgctrlWait
 ```
 
 Render the initial user prompt without making an API call. The system prompt
@@ -104,9 +134,9 @@ The benchmark condition uses 64 balanced deterministic fixtures per round for
 latency. The standalone oracle defaults to 1,000 fixtures for the behavioral
 gate. Behavioral pass/fail is persisted and included in prompts as a separate,
 bounded diagnostic channel. It never changes the objdiff percentage, incumbent
-ranking, isolated-exact flag, or normal termination; an
+ranking, work-unit exactness flag, or normal termination; an
 objdiff-exact/semantic-fail combination is treated as a harness invariant
-failure. Any exact isolated lead still requires the normal full-DOL validation
+failure. Any exact work-unit lead still requires the normal full-DOL validation
 below.
 
 The run configuration fingerprints both binaries, both build attestations, and
@@ -117,13 +147,18 @@ report, and authoritative DOL slice. The driver snapshots both binaries per
 comparison and refuses candidate feedback unless native-original equals the
 Dolphin original.
 
-The current result schema calls this `isolated_objdiff_exact`; `exact` remains
-only as a compatibility alias. Every model result records
+The result schema separates `isolated_objdiff_exact` from
+`full_owner_clean_context_objdiff_exact`; the older
+`full_owner_extracted_objdiff_exact` name remains a compatibility alias for
+that pragma-clean result. `workunit_objdiff_exact` is their common counter and
+`exact` remains only as a compatibility alias. Every model result
+records
 `campaign_bankable: false`, a pending/not-eligible acceptance status, and an
 unperformed full-DOL validation record pointing at
 `build/GC6E01/main.dol` and `config/GC6E01/build.sha1`. The runner never edits
 the source tree, so it cannot turn a scratch candidate into campaign progress.
-The summary retains isolated exact matches, compile-at-1, best match lift,
+The summary retains isolated and full-owner-clean-context exact matches,
+compile-at-1, best match lift,
 tokens, API latency, rounds, served model ID, and failure status. A failed
 target aborts the fixed-policy run without retry and is recorded atomically in
 `run_status.json`.
@@ -143,7 +178,7 @@ Pilot measurements and limitations are recorded in
 
 ## Accepting a candidate
 
-An exact isolated result is only a lead. Reapply the C function in a disposable
+An exact work-unit result is only a lead. Reapply the C function in a disposable
 worktree, then run:
 
 ```sh

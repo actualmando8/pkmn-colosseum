@@ -154,6 +154,17 @@ The default `--dol` is `orig/GC6E01/sys/main.dol`. The default PowerPC tools
 are read from the campaign tool cache; override them with `--objcopy` and
 `--readelf` when needed.
 
+`msgctrlWait` is context-sensitive under isolated compilation. Generate its
+ignored benchmark unit with the explicit full-owner command documented in
+[`../permuter/README.md`](../permuter/README.md). Its `compile.sh` exact-MWCC
+compiles the complete pragma-clean owner from an immutable guarded snapshot,
+rejects sibling drift, and emits the single relocation-free candidate ELF
+expected by `msgctrlWait-v1`. The semantic reference remains the retail target
+and authoritative original-DOL slice; the refused 99.5% shaped target is never
+used as the candidate baseline. The benchmark runner binds that semantic
+profile directly to `msgctrlWait`; this remains a scratch feedback gate, not
+campaign acceptance.
+
 Requests, results, extracted text, reports, the original DOL, objects, generated
 native C, and both executable/attestation sets are local-only artifacts. Keep
 them under the ignored `build/` tree or outside the repository and never commit

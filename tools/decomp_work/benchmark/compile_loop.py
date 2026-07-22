@@ -34,6 +34,17 @@ from typing import Any, Iterable
 
 
 REPO = Path(__file__).resolve().parents[3]
+PERMUTER_TOOLS = REPO / "tools" / "decomp_work" / "permuter"
+if str(PERMUTER_TOOLS) not in sys.path:
+    sys.path.insert(0, str(PERMUTER_TOOLS))
+
+from owner_source import (  # noqa: E402
+    OWNER_PARSER_MODE,
+    OwnerSourceError,
+    validate_candidate_translation_unit,
+    validate_owner_target,
+)
+
 DEFAULT_SUITE = Path(__file__).with_name("suite_pilot.json")
 DEFAULT_KEY_FILE = Path.home() / ".config" / "decomp-keys" / "openrouter.txt"
 OBJDIFF = REPO / "build" / "tools" / "objdiff-cli"
@@ -44,12 +55,18 @@ SEMANTIC_PINS = (
 )
 SEMANTIC_DOL = REPO / "orig" / "GC6E01" / "sys" / "main.dol"
 SEMANTIC_PROFILE_FUNCTIONS = {
+    "msgctrlWait-v1": "msgctrlWait",
     "GStextureLockImage-v2": "GStextureLockImage",
     "fn_801A6DA0-v1": "fn_801A6DA0",
 }
 SEMANTIC_ENGINE = "dolphin-interpreter-from-moderngekko-tree"
 SEMANTIC_NATIVE_ENGINE = "moderngekko-dolrecomp-native-original"
 SEMANTIC_PROFILE_AUTHORITIES = {
+    "msgctrlWait-v1": {
+        "virtual_address": "0x80132454",
+        "size": 0x78,
+        "dol_sha1": "870e8b9693ca780782d80f22a6a4572d8ba9458f",
+    },
     "GStextureLockImage-v2": {
         "virtual_address": "0x800ef548",
         "size": 0x30,
@@ -74,6 +91,7 @@ WORKUNIT_FINGERPRINT_FILES = (
     "settings.toml",
     "target.o",
 )
+OWNER_FIDELITY = "full-owner-clean-context-extracted-v2"
 
 PROVIDERS: dict[str, dict[str, str]] = {
     "moonshot": {
@@ -101,7 +119,7 @@ changes outside the named function. Preserve the supplied ABI and declarations.
 Use compiler/objdiff feedback literally. A higher match percentage is better;
 100.0% is exact. Do not claim success unless the reported score is 100.0%.
 Behavioral fixture feedback is diagnostic: it never replaces objdiff, and an
-isolated exact result still requires full-DOL validation before it can be banked.
+scorer-exact result still requires full-DOL validation before it can be banked.
 Reserve at least 512 output tokens for the C function; stop private reasoning
 before the output limit so that every round produces a compilable proposal."""
 
@@ -208,7 +226,12 @@ def failure_category(error: BenchError) -> str:
 
 
 def run_command(
-    argv: list[str], *, cwd: Path, timeout: int, max_output: int = 12_000
+    argv: list[str],
+    *,
+    cwd: Path,
+    timeout: int,
+    max_output: int = 12_000,
+    env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     try:
         result = subprocess.run(
@@ -218,6 +241,7 @@ def run_command(
             capture_output=True,
             timeout=timeout,
             check=False,
+            env=env,
         )
     except subprocess.TimeoutExpired as exc:
         raise BenchError(f"command timed out after {timeout}s: {Path(argv[0]).name}") from exc
@@ -307,7 +331,14 @@ FORBIDDEN_CANDIDATE = [
 ]
 
 
-def extract_candidate(response: str, function: str) -> str:
+def extract_candidate(
+    response: str,
+    function: str,
+    *,
+    full_owner: bool = False,
+    owner_parser: Path | None = None,
+    owner_context: str | None = None,
+) -> str:
     blocks = re.findall(r"```(?:c|C)?\s*\n(.*?)```", response, flags=re.DOTALL)
     search = blocks if blocks else [response]
     last_error: Exception | None = None
@@ -318,6 +349,16 @@ def extract_candidate(response: str, function: str) -> str:
             for pattern, label in FORBIDDEN_CANDIDATE:
                 if pattern.search(candidate):
                     raise BenchError(f"candidate rejected: {label} is forbidden")
+            if full_owner:
+                try:
+                    validate_owner_target(
+                        candidate,
+                        function,
+                        parser=owner_parser,
+                        context_source=owner_context,
+                    )
+                except OwnerSourceError as exc:
+                    raise BenchError(str(exc)) from exc
             return candidate
         except BenchError as exc:
             last_error = exc
@@ -329,6 +370,20 @@ def splice_function(base: str, function: str, candidate: str) -> str:
     clean_candidate = candidate[candidate_start:candidate_end].strip()
     base_start, base_end = find_function_span(base, function)
     return base[:base_start] + clean_candidate + base[base_end:]
+
+
+def validate_owner_signature(base: str, candidate: str, function: str) -> None:
+    base_start, base_end = find_function_span(base, function)
+    candidate_start, candidate_end = find_function_span(candidate, function)
+    base_open = base.index("{", base_start, base_end)
+    candidate_open = candidate.index("{", candidate_start, candidate_end)
+    base_signature = " ".join(base[base_start:base_open].split())
+    candidate_signature = " ".join(candidate[candidate_start:candidate_open].split())
+    if candidate_signature != base_signature:
+        raise BenchError(
+            "full-owner target signature drifted: expected "
+            f"{base_signature!r}, got {candidate_signature!r}"
+        )
 
 
 def find_symbol(diff_side: dict[str, Any], function: str) -> dict[str, Any] | None:
@@ -785,6 +840,26 @@ def compile_and_score(
     semantic: SemanticOracleConfig | None = None,
     semantic_strict: bool = False,
 ) -> CompileScore:
+    full_owner = False
+    meta_path = workunit / "meta.json"
+    if meta_path.is_file():
+        try:
+            meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise BenchError(f"invalid work-unit metadata: {meta_path}") from exc
+        if meta.get("fidelity") == OWNER_FIDELITY:
+            full_owner = True
+            owner = validate_owner_attestation(workunit, meta)
+            sanitizer_path, _ = _attested_path(owner.get("sanitizer"), "sanitizer")
+            try:
+                validate_candidate_translation_unit(
+                    (workunit / "base.c").read_text(encoding="utf-8"),
+                    source.read_text(encoding="utf-8"),
+                    function,
+                    parser=sanitizer_path,
+                )
+            except (OSError, OwnerSourceError) as exc:
+                raise BenchError(f"full-owner candidate policy failed: {exc}") from exc
     output = workunit / f"{safe_slug(round_name)}.o"
     output.unlink(missing_ok=True)
     compiler = workunit / "compile.sh"
@@ -795,6 +870,11 @@ def compile_and_score(
         [str(compiler), source_argument, "-o", output.name],
         cwd=workunit,
         timeout=90,
+        env=(
+            {"LANG": "C", "LC_ALL": "C", "PATH": "/usr/bin:/bin"}
+            if full_owner
+            else None
+        ),
     )
     if result.returncode != 0 or not output.is_file():
         detail = (result.stderr or result.stdout).strip()
@@ -1266,6 +1346,315 @@ def file_sha256(path: Path) -> str | None:
     return digest.hexdigest()
 
 
+def _require_sha256(value: Any, label: str) -> str:
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value):
+        raise BenchError(f"full-owner attestation has invalid {label} SHA-256")
+    return value
+
+
+def _attested_path(record: Any, label: str) -> tuple[Path, str]:
+    if not isinstance(record, dict):
+        raise BenchError(f"full-owner attestation is missing {label}")
+    value = record.get("path")
+    if not isinstance(value, str) or not value:
+        raise BenchError(f"full-owner attestation has no {label} path")
+    path = Path(value).expanduser()
+    if not path.is_absolute():
+        path = REPO / path
+    path = path.resolve()
+    expected = _require_sha256(record.get("sha256"), label)
+    return path, expected
+
+
+def _verify_attested_file(record: Any, label: str) -> Path:
+    path, expected = _attested_path(record, label)
+    actual = file_sha256(path)
+    if actual is None:
+        raise BenchError(f"full-owner attested {label} is missing: {path}")
+    if actual != expected:
+        raise BenchError(
+            f"full-owner attested {label} drifted: expected {expected}, got {actual}"
+        )
+    return path
+
+
+def validate_owner_attestation(workunit: Path, meta: dict[str, Any]) -> dict[str, Any]:
+    owner = meta.get("owner")
+    if meta.get("mode") != "full-owner" or not isinstance(owner, dict):
+        raise BenchError("full-owner fidelity requires explicit owner metadata")
+    if owner.get("schema") != 2:
+        raise BenchError("full-owner attestation schema is unsupported")
+    function = str(meta.get("fn") or "")
+    if not function:
+        raise BenchError("full-owner attestation has no function")
+
+    base_sha256 = _require_sha256(owner.get("clean_base_sha256"), "clean base")
+    actual_base = file_sha256(workunit / "base.c")
+    if actual_base != base_sha256:
+        raise BenchError(
+            f"full-owner clean base drifted: expected {base_sha256}, got {actual_base}"
+        )
+    base_text = (workunit / "base.c").read_text(encoding="utf-8")
+    context_forbidden = [
+        label
+        for pattern, label in FORBIDDEN_CANDIDATE
+        if pattern.search(base_text)
+    ]
+    if context_forbidden:
+        raise BenchError(
+            "full-owner clean context retained forbidden construct(s): "
+            + ", ".join(context_forbidden)
+        )
+
+    attested_tools: dict[str, Path] = {}
+    for label in (
+        "generator",
+        "source_guard",
+        "extractor",
+        "objcopy",
+        "readelf",
+        "python",
+        "compiler",
+        "wibo",
+        "sjiswrap",
+        "seed",
+    ):
+        attested_tools[label] = _verify_attested_file(owner.get(label), label)
+    sanitizer = owner.get("sanitizer")
+    sanitizer_path = _verify_attested_file(sanitizer, "sanitizer")
+    if not isinstance(sanitizer, dict):
+        raise BenchError("full-owner sanitizer attestation is invalid")
+    expected_version = sanitizer.get("version")
+    expected_version_sha256 = _require_sha256(
+        sanitizer.get("version_sha256"), "sanitizer version"
+    )
+    if (
+        not isinstance(expected_version, str)
+        or hashlib.sha256(expected_version.encode("utf-8")).hexdigest()
+        != expected_version_sha256
+    ):
+        raise BenchError("full-owner sanitizer version attestation is inconsistent")
+    version = run_command(
+        [str(sanitizer_path), "--version"],
+        cwd=REPO,
+        timeout=15,
+        max_output=20_000,
+        env={"LANG": "C", "LC_ALL": "C", "PATH": "/usr/bin:/bin"},
+    )
+    actual_version = version.stdout.strip()
+    if version.returncode != 0 or actual_version != expected_version:
+        raise BenchError("full-owner sanitizer version drifted")
+    inputs = sanitizer.get("inputs")
+    if not isinstance(inputs, list) or not inputs:
+        raise BenchError("full-owner sanitizer has no attested inputs")
+    seen_inputs: set[str] = set()
+    for index, record in enumerate(inputs):
+        path = _verify_attested_file(record, f"sanitizer input {index}")
+        canonical = str(path)
+        if canonical in seen_inputs:
+            raise BenchError("full-owner sanitizer input list contains duplicates")
+        seen_inputs.add(canonical)
+    source_value = owner.get("source")
+    if not isinstance(source_value, str) or not source_value:
+        raise BenchError("full-owner source attestation is invalid")
+    try:
+        source_path = Path(source_value).expanduser()
+        if not source_path.is_absolute():
+            source_path = REPO / source_path
+        source_path = source_path.resolve()
+        source_path.relative_to(REPO.resolve())
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise BenchError("full-owner source is outside the repository") from exc
+    if str(source_path) not in seen_inputs:
+        raise BenchError("full-owner source is not an attested sanitizer input")
+
+    policy = owner.get("candidate_policy")
+    if not isinstance(policy, dict) or policy.get("schema") != 1:
+        raise BenchError("full-owner candidate policy attestation is invalid")
+    if policy.get("function") != function:
+        raise BenchError("full-owner candidate policy function drifted")
+    if policy.get("parser_mode") != OWNER_PARSER_MODE:
+        raise BenchError("full-owner candidate parser mode is unsupported")
+    try:
+        policy_parser = Path(str(policy.get("parser"))).expanduser().resolve()
+    except (OSError, RuntimeError) as exc:
+        raise BenchError("full-owner candidate parser path is invalid") from exc
+    if policy_parser != sanitizer_path:
+        raise BenchError("full-owner candidate parser is not the attested sanitizer")
+    allowlist = policy.get("intrinsic_allowlist")
+    if not isinstance(allowlist, list) or any(
+        not isinstance(value, str) for value in allowlist
+    ):
+        raise BenchError("full-owner intrinsic allowlist is invalid")
+    if function == "msgctrlWait" and allowlist:
+        raise BenchError("msgctrlWait full-owner intrinsic allowlist must be empty")
+
+    transform = owner.get("context_transform")
+    if not isinstance(transform, dict) or transform.get("schema") != 1:
+        raise BenchError("full-owner clean-context transform is missing")
+    if (
+        transform.get("function") != function
+        or transform.get("policy") != "msgctrlWait-pragma-clean-v1"
+        or transform.get("removed_pragmas")
+        != ["optimization_level 4", "peephole off"]
+        or transform.get("inserted_pragmas") != ["peephole on"]
+        or transform.get("following_state_restore") != "peephole on retained"
+    ):
+        raise BenchError("full-owner clean-context transform is not reviewed")
+    if _require_sha256(
+        transform.get("clean_source_sha256"), "clean-context source"
+    ) != base_sha256:
+        raise BenchError("full-owner clean-context source does not bind base.c")
+    _require_sha256(
+        transform.get("following_source_sha256"), "following owner source"
+    )
+
+    live_owner = owner.get("live_owner")
+    _verify_attested_file(live_owner, "live owner")
+    if not isinstance(live_owner, dict):
+        raise BenchError("full-owner live owner attestation is invalid")
+    live_target = live_owner.get("target")
+    shaped_owner = owner.get("shaped_owner")
+    clean_owner = owner.get("clean_owner")
+    retail_target = owner.get("retail_target")
+    extracted = owner.get("extracted_baseline")
+    if not all(
+        isinstance(value, dict)
+        for value in (
+            live_target,
+            shaped_owner,
+            clean_owner,
+            retail_target,
+            extracted,
+        )
+    ):
+        raise BenchError("full-owner target fidelity records are missing")
+    shaped_target = shaped_owner.get("target")
+    clean_target = clean_owner.get("target")
+    if not isinstance(shaped_target, dict) or not isinstance(clean_target, dict):
+        raise BenchError("full-owner shaped/clean target records are missing")
+
+    records = {
+        "live target": live_target,
+        "shaped target": shaped_target,
+        "clean target": clean_target,
+        "extracted baseline": extracted,
+        "retail target": retail_target,
+    }
+    for label, record in records.items():
+        _require_sha256(record.get("fingerprint_sha256"), label)
+        _require_sha256(record.get("bytes_sha256"), f"{label} bytes")
+        _require_sha256(record.get("relocations_sha256"), f"{label} relocations")
+
+    def target_tuple(record: dict[str, Any]) -> tuple[str, str, str]:
+        return (
+            str(record["fingerprint_sha256"]),
+            str(record["bytes_sha256"]),
+            str(record["relocations_sha256"]),
+        )
+
+    if target_tuple(live_target) != target_tuple(shaped_target):
+        raise BenchError("full-owner shaped target does not reproduce live owner target")
+    if target_tuple(clean_target) != target_tuple(extracted):
+        raise BenchError("full-owner extracted baseline does not reproduce clean target")
+    if target_tuple(shaped_target) == target_tuple(clean_target):
+        raise BenchError("full-owner shaped lane is not separated from clean context")
+
+    shaped_source_sha = _require_sha256(
+        shaped_owner.get("source_sha256"), "shaped owner source"
+    )
+    if shaped_source_sha != _require_sha256(
+        transform.get("shaped_source_sha256"), "shaped-context source"
+    ):
+        raise BenchError("full-owner shaped source attestation is inconsistent")
+    if _require_sha256(
+        clean_owner.get("source_sha256"), "clean owner source"
+    ) != base_sha256:
+        raise BenchError("full-owner clean owner source does not bind base.c")
+    _require_sha256(shaped_owner.get("sha256"), "shaped owner")
+    _require_sha256(clean_owner.get("sha256"), "clean owner")
+    _require_sha256(extracted.get("elf_sha256"), "extracted baseline ELF")
+    retail_elf = _require_sha256(retail_target.get("elf_sha256"), "retail target ELF")
+    if file_sha256(workunit / "target.o") != retail_elf:
+        raise BenchError("full-owner retail target does not bind target.o")
+    if extracted.get("functions") != [function]:
+        raise BenchError("full-owner extracted baseline is not single-target")
+    if not isinstance(extracted.get("size"), int) or extracted["size"] <= 0:
+        raise BenchError("full-owner extracted baseline has invalid size")
+    try:
+        metadata_size = int(meta.get("size"))
+    except (TypeError, ValueError) as exc:
+        raise BenchError("full-owner metadata has invalid target size") from exc
+    if retail_target.get("size") != metadata_size:
+        raise BenchError("full-owner retail target size disagrees with queue metadata")
+    for label, audit in (
+        ("live/shaped", shaped_owner.get("sibling_audit")),
+        ("shaped/clean", owner.get("sibling_audit")),
+    ):
+        if not isinstance(audit, dict) or audit.get("state") != "passed":
+            raise BenchError(f"full-owner {label} sibling audit did not pass")
+        _require_sha256(
+            audit.get("sibling_relocations_sha256"), f"{label} sibling relocations"
+        )
+        if function == "msgctrlWait" and (
+            audit.get("sibling_functions") != 89
+            or audit.get("sibling_relocations") != 386
+            or audit.get("allocatable_non_text_sections") != 2
+        ):
+            raise BenchError(f"full-owner {label} sibling audit coverage drifted")
+
+    try:
+        validate_candidate_translation_unit(
+            base_text,
+            base_text,
+            function,
+            parser=sanitizer_path,
+        )
+    except OwnerSourceError as exc:
+        raise BenchError(f"full-owner clean base violates candidate policy: {exc}") from exc
+
+    compile_script = (workunit / "compile.sh").read_text(encoding="utf-8")
+    for label in ("objcopy", "readelf", "python"):
+        if str(attested_tools[label]) not in compile_script:
+            raise BenchError(f"full-owner compile wrapper is not bound to attested {label}")
+    for relative in (
+        "tools/decomp_work/permuter/owner_source.py",
+        "tools/decomp_work/permuter/owner_extract.py",
+        "build/tools/wibo",
+        "build/tools/sjiswrap.exe",
+        f"build/compilers/{meta.get('mw_version')}/mwcceppc.exe",
+    ):
+        if relative not in compile_script:
+            raise BenchError(f"full-owner compile wrapper is not repo-relative: {relative}")
+    repo_tool_bindings = {
+        "source_guard": PERMUTER_TOOLS / "owner_source.py",
+        "extractor": PERMUTER_TOOLS / "owner_extract.py",
+        "wibo": REPO / "build" / "tools" / "wibo",
+        "sjiswrap": REPO / "build" / "tools" / "sjiswrap.exe",
+        "compiler": REPO
+        / "build"
+        / "compilers"
+        / str(meta.get("mw_version"))
+        / "mwcceppc.exe",
+    }
+    for label, invoked_path in repo_tool_bindings.items():
+        if invoked_path.resolve() != attested_tools[label]:
+            raise BenchError(
+                f"full-owner repo-relative {label} does not resolve to attested tool"
+            )
+    if str(sanitizer_path) not in compile_script or "--parser" not in compile_script:
+        raise BenchError("full-owner compile wrapper is not bound to the candidate parser")
+    clean_fingerprint = str(clean_target["fingerprint_sha256"])
+    shaped_fingerprint = str(shaped_target["fingerprint_sha256"])
+    if clean_fingerprint not in compile_script:
+        raise BenchError("full-owner compile wrapper is not bound to clean target fingerprint")
+    if shaped_fingerprint in compile_script:
+        raise BenchError("full-owner compile wrapper still admits the shaped target lane")
+    if "/private/tmp/" in compile_script or "/tmp/pkmn-" in compile_script:
+        raise BenchError("full-owner compile wrapper hardcodes a temporary worktree")
+    return owner
+
+
 def execution_tool_fingerprints(
     workunits: list[Path],
     semantic_configs: Iterable[SemanticOracleConfig] = (),
@@ -1276,12 +1665,44 @@ def execution_tool_fingerprints(
         "wibo": REPO / "build" / "tools" / "wibo",
         "sjiswrap.exe": REPO / "build" / "tools" / "sjiswrap.exe",
     }
+    owner_expected: dict[str, str] = {}
+    owner_versions: dict[str, tuple[Path, str]] = {}
     for workunit in workunits:
         meta = json.loads((workunit / "meta.json").read_text(encoding="utf-8"))
         version = str(meta.get("mw_version") or "")
         if version:
             tools[f"mwcceppc:{version}"] = (
                 REPO / "build" / "compilers" / version / "mwcceppc.exe"
+            )
+        if meta.get("mode") == "full-owner":
+            owner = meta.get("owner")
+            if not isinstance(owner, dict):
+                raise BenchError("full-owner work unit has no owner attestation")
+            function = safe_slug(str(meta.get("fn") or "unknown"))
+            for label in (
+                "sanitizer",
+                "generator",
+                "source_guard",
+                "extractor",
+                "objcopy",
+                "readelf",
+                "python",
+                "compiler",
+                "wibo",
+                "sjiswrap",
+            ):
+                path, expected = _attested_path(owner.get(label), label)
+                key = f"full-owner:{function}:{label}"
+                tools[key] = path
+                owner_expected[key] = expected
+            sanitizer = owner.get("sanitizer")
+            assert isinstance(sanitizer, dict)
+            expected_version = _require_sha256(
+                sanitizer.get("version_sha256"), "sanitizer version"
+            )
+            owner_versions[f"full-owner:{function}:sanitizer-version"] = (
+                tools[f"full-owner:{function}:sanitizer"],
+                expected_version,
             )
     for config in semantic_configs:
         tools.update(
@@ -1298,7 +1719,32 @@ def execution_tool_fingerprints(
                 "semantic-powerpc-eabi-readelf": config.readelf,
             }
         )
-    return {name: file_sha256(path) for name, path in sorted(tools.items())}
+    fingerprints = {name: file_sha256(path) for name, path in sorted(tools.items())}
+    for key, expected in owner_expected.items():
+        actual = fingerprints.get(key)
+        if actual != expected:
+            raise BenchError(
+                f"full-owner execution tool drifted: {key}; expected {expected}, got {actual}"
+            )
+    for key, (path, expected) in owner_versions.items():
+        version = run_command(
+            [str(path), "--version"],
+            cwd=REPO,
+            timeout=15,
+            max_output=20_000,
+            env={"LANG": "C", "LC_ALL": "C", "PATH": "/usr/bin:/bin"},
+        )
+        actual = (
+            hashlib.sha256(version.stdout.strip().encode("utf-8")).hexdigest()
+            if version.returncode == 0
+            else None
+        )
+        if actual != expected:
+            raise BenchError(
+                f"full-owner sanitizer version drifted: expected {expected}, got {actual}"
+            )
+        fingerprints[key] = actual
+    return fingerprints
 
 
 def load_suite(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -1573,10 +2019,25 @@ def resolve_workunit(suite: dict[str, Any], target: dict[str, Any]) -> Path:
         raise BenchError(f"invalid work-unit metadata: {meta_path}") from exc
     if meta.get("fn") != function:
         raise BenchError(f"work-unit function mismatch for {function}")
-    if meta.get("fidelity") != "isolated-equals-full-tu":
+    fidelity = meta.get("fidelity")
+    full_owner = fidelity == OWNER_FIDELITY
+    if fidelity not in ("isolated-equals-full-tu", OWNER_FIDELITY):
         raise BenchError(f"work unit is not fidelity-gated: {function}")
+    owner_parser: Path | None = None
+    if full_owner:
+        owner = validate_owner_attestation(workunit, meta)
+        owner_parser, _ = _attested_path(owner.get("sanitizer"), "sanitizer")
+    elif meta.get("mode") == "full-owner" or meta.get("owner") is not None:
+        raise BenchError(f"work unit has inconsistent owner-mode metadata: {function}")
     try:
-        extract_candidate((workunit / "base.c").read_text(encoding="utf-8"), function)
+        base_text = (workunit / "base.c").read_text(encoding="utf-8")
+        extract_candidate(
+            base_text,
+            function,
+            full_owner=full_owner,
+            owner_parser=owner_parser,
+            owner_context=base_text if full_owner else None,
+        )
     except (OSError, BenchError) as exc:
         raise BenchError(f"work-unit incumbent violates source guardrails: {function}") from exc
     try:
@@ -1659,6 +2120,11 @@ def run_target(
     meta_path = run_directory / "meta.json"
     base = base_path.read_text(encoding="utf-8")
     meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.is_file() else {}
+    full_owner = meta.get("fidelity") == OWNER_FIDELITY
+    owner_parser: Path | None = None
+    if full_owner:
+        owner = validate_owner_attestation(run_directory, meta)
+        owner_parser, _ = _attested_path(owner.get("sanitizer"), "sanitizer")
     base_start, base_end = find_function_span(base, function)
     baseline_candidate = base[base_start:base_end].strip() + "\n"
     baseline = compile_and_score(
@@ -1727,14 +2193,26 @@ def run_target(
         candidate_channel = "content"
         try:
             try:
-                candidate = extract_candidate(reply.content, function)
+                candidate = extract_candidate(
+                    reply.content,
+                    function,
+                    full_owner=full_owner,
+                    owner_parser=owner_parser,
+                    owner_context=base,
+                )
             except BenchError:
                 if not allow_reasoning_salvage:
                     raise
                 candidate = extract_candidate(
-                    str(reply.assistant.get("reasoning_content") or ""), function
+                    str(reply.assistant.get("reasoning_content") or ""),
+                    function,
+                    full_owner=full_owner,
+                    owner_parser=owner_parser,
+                    owner_context=base,
                 )
                 candidate_channel = "reasoning_salvage"
+            if full_owner:
+                validate_owner_signature(base, candidate, function)
             candidate_source = splice_function(base, function, candidate)
             candidate_path = run_directory / f"round_{round_index:02d}.c"
             write_private_text(candidate_path, candidate_source)
@@ -1839,7 +2317,9 @@ def run_target(
 
     if not (run_directory / "best_function.c").exists():
         write_private_text(run_directory / "best_function.c", best_candidate)
-    isolated_objdiff_exact = best_percent >= 100.0
+    workunit_objdiff_exact = best_percent >= 100.0
+    isolated_objdiff_exact = workunit_objdiff_exact and not full_owner
+    full_owner_clean_context_objdiff_exact = workunit_objdiff_exact and full_owner
     return {
         "function": function,
         "provider": provider,
@@ -1885,15 +2365,31 @@ def run_target(
         ),
         "best_match_percent": round(best_percent, 6),
         "improvement_points": round(best_percent - baseline.match_percent, 6),
+        "comparison_mode": (
+            "full-owner-clean-context-extracted" if full_owner else "isolated"
+        ),
+        "workunit_objdiff_exact": workunit_objdiff_exact,
         "isolated_objdiff_exact": isolated_objdiff_exact,
-        # Compatibility alias for benchmark consumers written before campaign
-        # acceptance was made explicit. This is never a full-DOL claim.
-        "exact": isolated_objdiff_exact,
+        "full_owner_clean_context_objdiff_exact": (
+            full_owner_clean_context_objdiff_exact
+        ),
+        # Compatibility alias for pre-v2 consumers. Full-owner v2 resolution
+        # guarantees this can only describe the pragma-clean lane.
+        "full_owner_extracted_objdiff_exact": (
+            full_owner_clean_context_objdiff_exact
+        ),
+        # Compatibility alias. This is work-unit exactness, never a full-DOL
+        # or campaign-acceptance claim.
+        "exact": workunit_objdiff_exact,
         "campaign_bankable": False,
         "campaign_acceptance_status": (
             "requires-source-integration-and-full-dol-validation"
-            if isolated_objdiff_exact
-            else "not-isolated-objdiff-exact"
+            if workunit_objdiff_exact
+            else (
+                "not-full-owner-clean-context-objdiff-exact"
+                if full_owner
+                else "not-isolated-objdiff-exact"
+            )
         ),
         "full_dol_validation": {
             "performed": False,
@@ -2164,8 +2660,17 @@ def command_run(args: argparse.Namespace) -> int:
         "isolated_objdiff_exact": sum(
             result["isolated_objdiff_exact"] for result in results
         ),
+        "full_owner_clean_context_objdiff_exact": sum(
+            result["full_owner_clean_context_objdiff_exact"] for result in results
+        ),
+        "full_owner_extracted_objdiff_exact": sum(
+            result["full_owner_extracted_objdiff_exact"] for result in results
+        ),
+        "workunit_objdiff_exact": sum(
+            result["workunit_objdiff_exact"] for result in results
+        ),
         # Compatibility alias; see the per-target acceptance fields.
-        "exact": sum(result["isolated_objdiff_exact"] for result in results),
+        "exact": sum(result["exact"] for result in results),
         "campaign_bankable": sum(result["campaign_bankable"] for result in results),
         "mean_baseline_match_percent": round(
             sum(result["baseline_match_percent"] for result in results) / len(results), 6
