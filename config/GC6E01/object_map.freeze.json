@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1790
+    "total_units": 1801
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1722,
-    "source_backed_units": 1706,
+    "named_units": 1733,
+    "source_backed_units": 1717,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -824,13 +824,52 @@
       "sections": [
         {
           "name": ".text",
-          "size": 5104,
+          "size": 2596,
           "virtual_address": 2147560736
         }
       ],
-      "total_code": 5104,
+      "total_code": 2596,
       "total_data": 0,
-      "total_functions": 12
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/gs_event_exec_exact_80013744",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2147563332
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_event_exec_candidate_8001374C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2480,
+          "virtual_address": 2147563340
+        }
+      ],
+      "total_code": 2480,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/gs_event_exec_exact_800140FC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 20,
+          "virtual_address": 2147565820
+        }
+      ],
+      "total_code": 20,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_event_exec_exact_80014110",
@@ -889,13 +928,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 12712,
+          "size": 10448,
           "virtual_address": 2147569692
         }
       ],
-      "total_code": 12712,
+      "total_code": 10448,
       "total_data": 0,
-      "total_functions": 26
+      "total_functions": 19
+    },
+    {
+      "name": "main/game/gs_pokemon_summary_exact_800178EC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 80,
+          "virtual_address": 2147580140
+        }
+      ],
+      "total_code": 80,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_pokemon_summary_candidate_8001793C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2184,
+          "virtual_address": 2147580220
+        }
+      ],
+      "total_code": 2184,
+      "total_data": 0,
+      "total_functions": 5
     },
     {
       "name": "main/game/menuPokemon",
@@ -10817,13 +10882,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 5608,
+          "size": 348,
           "virtual_address": 2148560792
         }
       ],
-      "total_code": 5608,
+      "total_code": 348,
       "total_data": 0,
-      "total_functions": 11
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/win_sequence_exact_801070F4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 124,
+          "virtual_address": 2148561140
+        }
+      ],
+      "total_code": 124,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/win_sequence_candidate_80107170",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 5136,
+          "virtual_address": 2148561264
+        }
+      ],
+      "total_code": 5136,
+      "total_data": 0,
+      "total_functions": 9
     },
     {
       "name": "main/game/win_sprite",
@@ -16247,13 +16338,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 3948,
+          "size": 304,
           "virtual_address": 2149036156
         }
       ],
-      "total_code": 3948,
+      "total_code": 304,
       "total_data": 0,
-      "total_functions": 15
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017B1AC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2149036460
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017B1CC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3612,
+          "virtual_address": 2149036492
+        }
+      ],
+      "total_code": 3612,
+      "total_data": 0,
+      "total_functions": 12
     },
     {
       "name": "main/game/fsys/fsys_file_exact_8017BFE8",
@@ -18028,13 +18145,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 4064,
+          "size": 3616,
           "virtual_address": 2149259480
         }
       ],
-      "total_code": 4064,
+      "total_code": 3616,
       "total_data": 0,
-      "total_functions": 12
+      "total_functions": 6
+    },
+    {
+      "name": "main/hsd/hsd_texp_exact_801B26F8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2149263096
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_texp_candidate_801B2718",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 416,
+          "virtual_address": 2149263128
+        }
+      ],
+      "total_code": 416,
+      "total_data": 0,
+      "total_functions": 5
     },
     {
       "name": "main/hsd/hsd_texp_exact_801B28B8",
