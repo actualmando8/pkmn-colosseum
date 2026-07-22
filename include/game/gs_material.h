@@ -561,16 +561,15 @@ void GSmaterialLerpDiffuse(GSmaterialEntry* entry, void* param);
  */
 
 /**
- * GSmaterialSetCallback -- Store callback/state for material rendering.
+ * GSmodelSetShadowBoundExpansion -- Store shadow-bound extent state.
  *
- * @param callback  Function pointer for pre-render callback.
- * @param state     State value passed to callback.
+ * Call sites pass numeric extent/state pairs, including (0, 0) and (11, 7).
  *
  * Stores into lbl_8047AB84 and lbl_8047AB80 respectively.
  *
- * Corresponds to GSmaterialSetCallback. Size: 0xC.
+ * Corresponds to GSmodelSetShadowBoundExpansion. Size: 0xC.
  */
-void GSmaterialSetCallback(void* callback, void* state);
+void GSmodelSetShadowBoundExpansion(u32 extent, u32 state);
 
 /**
  * GSmaterialSetDistanceThreshold -- Set the squared distance threshold.

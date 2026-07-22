@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1482
+    "total_units": 1490
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1414,
-    "source_backed_units": 1398,
+    "named_units": 1422,
+    "source_backed_units": 1406,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -7301,17 +7301,43 @@
       "total_functions": 3
     },
     {
-      "name": "main/game/gs_light",
+      "name": "main/game/gs_light_candidate_800DC560",
       "sections": [
         {
           "name": ".text",
-          "size": 3344,
+          "size": 1200,
           "virtual_address": 2148386144
         }
       ],
-      "total_code": 3344,
+      "total_code": 1200,
       "total_data": 0,
-      "total_functions": 24
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/gs_light_exact_800DCA10",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 556,
+          "virtual_address": 2148387344
+        }
+      ],
+      "total_code": 556,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/gs_light_candidate_800DCC3C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1588,
+          "virtual_address": 2148387900
+        }
+      ],
+      "total_code": 1588,
+      "total_data": 0,
+      "total_functions": 10
     },
     {
       "name": "main/game/gs_log",
@@ -8164,17 +8190,69 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/gs_model_shadow",
+      "name": "main/game/gs_model_shadow_candidate_800E8684",
       "sections": [
         {
           "name": ".text",
-          "size": 5288,
+          "size": 2168,
           "virtual_address": 2148435588
         }
       ],
-      "total_code": 5288,
+      "total_code": 2168,
       "total_data": 0,
-      "total_functions": 16
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_model_shadow_exact_800E8EFC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 132,
+          "virtual_address": 2148437756
+        }
+      ],
+      "total_code": 132,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gs_model_shadow_candidate_800E8F80",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 104,
+          "virtual_address": 2148437888
+        }
+      ],
+      "total_code": 104,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_model_shadow_exact_800E8FE8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 224,
+          "virtual_address": 2148437992
+        }
+      ],
+      "total_code": 224,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_model_shadow_candidate_800E90C8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2660,
+          "virtual_address": 2148438216
+        }
+      ],
+      "total_code": 2660,
+      "total_data": 0,
+      "total_functions": 8
     },
     {
       "name": "main/game/gs_model_state",
@@ -13222,17 +13300,43 @@
       "total_functions": 55
     },
     {
-      "name": "main/game/ps_range_80168C64",
+      "name": "main/game/ps_candidate_80168C64",
       "sections": [
         {
           "name": ".text",
-          "size": 51912,
+          "size": 1756,
           "virtual_address": 2148961380
         }
       ],
-      "total_code": 51912,
+      "total_code": 1756,
       "total_data": 0,
-      "total_functions": 74
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/ps_exact_80169340",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1464,
+          "virtual_address": 2148963136
+        }
+      ],
+      "total_code": 1464,
+      "total_data": 0,
+      "total_functions": 15
+    },
+    {
+      "name": "main/game/ps_candidate_801698F8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48692,
+          "virtual_address": 2148964600
+        }
+      ],
+      "total_code": 48692,
+      "total_data": 0,
+      "total_functions": 52
     },
     {
       "name": "main/game/ps_generator_range_8017572C",
