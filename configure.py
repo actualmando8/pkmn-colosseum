@@ -1114,13 +1114,27 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
             ),
-            Object(
-                CodeCandidate,
-                "game/people/people_data.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/people/people_data.c"),
+                    (Matching, "game/people/people_item_effort_exact_80143718.c"),
+                    (CodeCandidate, "game/people/people_data_candidate_80143778.c"),
+                    (Matching, "game/people/people_item_ppup_exact_801437A0.c"),
+                    (CodeCandidate, "game/people/people_data_candidate_801437B8.c"),
+                    (Matching, "game/people/people_item_hpup_exact_801437E0.c"),
+                    (CodeCandidate, "game/people/people_data_candidate_801437F8.c"),
+                    (Matching, "game/people/people_item_battle_boost_exact_801439B8.c"),
+                    (CodeCandidate, "game/people/people_data_candidate_80143A44.c"),
+                    (Matching, "game/people/people_item_tables_setters_exact_80143A94.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/people/people_item_getters_exact_80143C50.c",
