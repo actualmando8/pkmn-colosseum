@@ -610,7 +610,19 @@ game/menu/cardesavedata.c:
 	.text       start:0x8007FD64 end:0x80088428
 
 game/gba/gba_conv.c:
-	.text       start:0x80088428 end:0x80089048
+	.text       start:0x80088428 end:0x80088EA8
+
+game/gba/gba_conv_exact_80088EA8.c:
+	.text       start:0x80088EA8 end:0x80088F58
+
+game/gba/gba_conv_candidate_80088F58.c:
+	.text       start:0x80088F58 end:0x80089028
+
+game/gba/gba_conv_exact_80089028.c:
+	.text       start:0x80089028 end:0x80089030
+
+game/gba/gba_conv_candidate_80089030.c:
+	.text       start:0x80089030 end:0x80089048
 
 game/pokeconv.c:
 	.text       start:0x80089048 end:0x800896B8
@@ -2328,7 +2340,13 @@ game/window_candidate_80105634.c:
 	.text       start:0x80105634 end:0x801058CC
 
 game/win_msg.c:
-	.text       start:0x801058CC end:0x80106F98
+	.text       start:0x801058CC end:0x80105C30
+
+game/win_msg_exact_80105C30.c:
+	.text       start:0x80105C30 end:0x80105C68
+
+game/win_msg_candidate_80105C68.c:
+	.text       start:0x80105C68 end:0x80106F98
 
 game/win_sequence.c:
 	.text       start:0x80106F98 end:0x80108580
@@ -3488,7 +3506,13 @@ game/camera_exact_801778B4.c:
 	.text       start:0x801778B4 end:0x801779B0
 
 game/camera_candidate_801779B0.c:
-	.text       start:0x801779B0 end:0x80179DFC
+	.text       start:0x801779B0 end:0x8017865C
+
+game/camera_exact_8017865C.c:
+	.text       start:0x8017865C end:0x801786F4
+
+game/camera_candidate_801786F4.c:
+	.text       start:0x801786F4 end:0x80179DFC
 
 game/camera_exact_80179DFC.c:
 	.text       start:0x80179DFC end:0x80179E04
@@ -4121,7 +4145,13 @@ game/wazaViewer_exact_801D53D4.c:
 	.text       start:0x801D53D4 end:0x801D53D8
 
 game/wazaViewer_candidate_801D53D8.c:
-	.text       start:0x801D53D8 end:0x801D7E58
+	.text       start:0x801D53D8 end:0x801D744C
+
+game/wazaViewer_exact_801D744C.c:
+	.text       start:0x801D744C end:0x801D7464
+
+game/wazaViewer_candidate_801D7464.c:
+	.text       start:0x801D7464 end:0x801D7E58
 
 game/wazaSequenceEntry.c:
 	.text       start:0x801D7E58 end:0x801D9E1C

@@ -1707,6 +1707,8 @@ config.libs = [
                     (CodeCandidate, "game/wazaViewer_candidate_801D5328.c"),
                     (Matching, "game/wazaViewer_exact_801D53D4.c"),
                     (CodeCandidate, "game/wazaViewer_candidate_801D53D8.c"),
+                    (Matching, "game/wazaViewer_exact_801D744C.c"),
+                    (CodeCandidate, "game/wazaViewer_candidate_801D7464.c"),
                 ]
             ],
             Object(
@@ -1823,13 +1825,20 @@ config.libs = [
                     (CodeCandidate, "game/window_candidate_80105634.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/win_msg.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/win_msg.c"),
+                    (Matching, "game/win_msg_exact_80105C30.c"),
+                    (CodeCandidate, "game/win_msg_candidate_80105C68.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/win_sequence.c",
@@ -5187,13 +5196,22 @@ config.libs = [
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008A9E4.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/gba/gba_conv.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gba/gba_conv.c"),
+                    (Matching, "game/gba/gba_conv_exact_80088EA8.c"),
+                    (CodeCandidate, "game/gba/gba_conv_candidate_80088F58.c"),
+                    (Matching, "game/gba/gba_conv_exact_80089028.c"),
+                    (CodeCandidate, "game/gba/gba_conv_candidate_80089030.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/GScolsys2Util.c",
@@ -6431,6 +6449,8 @@ config.libs = [
                     (Matching, "game/camera_exact_80177478.c"),
                     (Matching, "game/camera_exact_801778B4.c"),
                     (CodeCandidate, "game/camera_candidate_801779B0.c"),
+                    (Matching, "game/camera_exact_8017865C.c"),
+                    (CodeCandidate, "game/camera_candidate_801786F4.c"),
                     (Matching, "game/camera_exact_80179DFC.c"),
                     (CodeCandidate, "game/camera_candidate_80179E04.c"),
                 ]

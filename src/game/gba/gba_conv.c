@@ -133,6 +133,7 @@ void fn_80089030(u8 x);
 
 /* ===== Function implementations ===== */
 
+#if !defined(PR424_GBA_CONV_TAIL_ONLY)
 
 /* 0x80083AF4 | size: 0x104 */
 void fn_80083AF4(void) {
@@ -4972,6 +4973,8 @@ void fn_80087C64(void) {
     return;
 }
 
+#endif
+
 /* 0x80088428 | size: 0x94 */
 void fn_80088428(void) {
     #pragma peephole off
@@ -5735,4 +5738,3 @@ void fn_80089030(u8 x) {
     lbl_80478958 = (x == 0);
 }
 #pragma pop
-
