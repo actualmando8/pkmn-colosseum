@@ -3457,7 +3457,25 @@ game/fight_seq.c:
 	.text       start:0x80211170 end:0x80211A00
 
 game/fight_range_80211A00.c:
-	.text       start:0x80211A00 end:0x80214450
+	.text       start:0x80211A00 end:0x80212840
+
+game/fight_range_exact_80212840.c:
+	.text       start:0x80212840 end:0x802128D0
+
+game/fight_range_802128D0.c:
+	.text       start:0x802128D0 end:0x802134D4
+
+game/fight_range_exact_802134D4.c:
+	.text       start:0x802134D4 end:0x80213558
+
+game/fight_range_80213558.c:
+	.text       start:0x80213558 end:0x802136A4
+
+game/fight_range_exact_802136A4.c:
+	.text       start:0x802136A4 end:0x80213A78
+
+game/fight_range_80213A78.c:
+	.text       start:0x80213A78 end:0x80214450
 
 game/fight_range_80211A00_exact_80214450.c:
 	.text       start:0x80214450 end:0x80216A58
