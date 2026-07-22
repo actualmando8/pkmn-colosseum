@@ -384,6 +384,10 @@ After merge:
   differ. Inspect every emitted section.
 - **Function exact, linked delta zero:** its `CodeCandidate` object still has
   residual functions or data. Do not report it as linked.
+- **Residual range becomes an auto object:** every split range must keep an
+  explicit `configure.py` object, including candidate-only prefixes/suffixes.
+  Otherwise totals may stay constant while source-backed/category topology
+  silently loses the residual functions.
 - **Windows pull appears to find many new wins:** cumulative outbox contains
   history. Deduplicate against current master and timestamps.
 - **3090 relaunch exits immediately:** queue entries are terminal. Add new
@@ -567,7 +571,7 @@ Newly linked unit/code/data delta from goal baseline: +55 units / +36,476 code /
 Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
 Head linked: 740 / 1,341 units; 602,636 complete code bytes;
   752,773 complete data bytes
-README/report: synced on PR #398; decomp.dev pending PR report
+README/report/decomp.dev: synced on PR #398 at merge `5445b846`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#397 queue; 538 entries, 21 workers, zero new wins;
   one stale terminal WIN? retained
