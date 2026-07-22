@@ -1030,6 +1030,9 @@ config.libs = [
                     progress_category="musyx",
                 )
                 for status, path in [
+                    (Matching, "musyx/musyx_midi_exact_801609C8.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80161134.c"),
+                    (Matching, "musyx/musyx_input_getters_exact_801615D4.c"),
                     (Matching, "musyx/musyx_input_aux_exact_80161934.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80161D20.c"),
                 ]
