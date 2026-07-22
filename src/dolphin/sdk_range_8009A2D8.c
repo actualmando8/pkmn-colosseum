@@ -14,17 +14,23 @@
 #include "dolphin/os/OSThread.h"
 #include "dolphin/os/PPCArch.h"
 
-typedef struct {
-    s32 unk0;
-    u32 unk4;
-    u32 unk8;
-} AlarmCallback;
+typedef struct OSAllocCell {
+    struct OSAllocCell* prev;
+    struct OSAllocCell* next;
+    s32 size;
+} OSAllocCell;
 
-extern u32 lbl_80478980;
-extern AlarmCallback* lbl_8047A6E8;
+typedef struct OSHeapDesc {
+    s32 size;
+    OSAllocCell* free;
+    OSAllocCell* allocated;
+} OSHeapDesc;
+
+extern volatile s32 lbl_80478980;
+extern OSHeapDesc* lbl_8047A6E8;
 extern s32 lbl_8047A6EC;
-extern u32 lbl_8047A6F0;
-extern u32 lbl_8047A6F4;
+extern void* lbl_8047A6F0;
+extern void* lbl_8047A6F4;
 
 typedef struct OSAlarmQueue {
     OSAlarm* head;
@@ -189,84 +195,77 @@ static void DecrementerExceptionCallback(u8 exception, OSContext* context) {
 }
 #endif
 
-extern AlarmCallback* fn_8009A92C(AlarmCallback* head, AlarmCallback* blk,
-                                   void* unused);
+extern OSAllocCell* fn_8009A92C(OSAllocCell* head, OSAllocCell* cell);
 
 #if defined(SDK_8009A9D8_PREFIX_ACTIVE)
-void* fn_8009A9D8(u32 idx, u32 size) {
-    AlarmCallback* rec = &lbl_8047A6E8[idx];
-    AlarmCallback* node = (AlarmCallback*)rec->unk4;
-    u32 reqSize = (size + 0x3F) & ~0x1F;
+static OSAllocCell* DLAddFront(OSAllocCell* list, OSAllocCell* cell) {
+    cell->next = list;
+    cell->prev = 0;
+    if (list) {
+        list->prev = cell;
+    }
+    return cell;
+}
 
-    while (node != 0) {
-        if (reqSize <= node->unk8) {
+static OSAllocCell* DLExtract(OSAllocCell* list, OSAllocCell* cell) {
+    if (cell->next) {
+        cell->next->prev = cell->prev;
+    }
+    if (cell->prev == 0) {
+        return cell->next;
+    }
+    cell->prev->next = cell->next;
+    return list;
+}
+
+void* fn_8009A9D8(s32 heap, u32 size) {
+    OSHeapDesc* hd;
+    OSAllocCell* cell;
+    OSAllocCell* newCell;
+    s32 leftoverSize;
+
+    hd = &lbl_8047A6E8[heap];
+    size += 0x20;
+    size = (size + 0x1F) & ~0x1F;
+
+    for (cell = hd->free; cell != 0; cell = cell->next) {
+        if ((s32)size <= cell->size) {
             break;
         }
-        node = (AlarmCallback*)node->unk4;
     }
-    if (node == 0) {
+    if (cell == 0) {
         return 0;
     }
 
-    if (node->unk8 - reqSize < 0x40) {
-        AlarmCallback* next = (AlarmCallback*)node->unk4;
-        u32 newHead = rec->unk4;
-
-        if (next != 0) {
-            next->unk0 = node->unk0;
-        }
-        if ((u32)node->unk0 == 0) {
-            newHead = node->unk4;
-        } else {
-            ((AlarmCallback*)node->unk0)->unk4 = node->unk4;
-        }
-        rec->unk4 = newHead;
+    leftoverSize = cell->size - size;
+    if ((u32)leftoverSize < 0x40) {
+        hd->free = DLExtract(hd->free, cell);
     } else {
-        AlarmCallback* newblk;
-        u32 remainder = node->unk8 - reqSize;
-
-        node->unk8 = reqSize;
-        newblk = (AlarmCallback*)((u8*)node + reqSize);
-        newblk->unk8 = remainder;
-        newblk->unk0 = node->unk0;
-        newblk->unk4 = node->unk4;
-        if (newblk->unk4 != 0) {
-            ((AlarmCallback*)newblk->unk4)->unk0 = (s32)newblk;
+        cell->size = size;
+        newCell = (OSAllocCell*)((u8*)cell + size);
+        newCell->size = leftoverSize;
+        newCell->prev = cell->prev;
+        newCell->next = cell->next;
+        if (newCell->next != 0) {
+            newCell->next->prev = newCell;
         }
-        if ((u32)newblk->unk0 != 0) {
-            ((AlarmCallback*)newblk->unk0)->unk4 = (u32)newblk;
+        if (newCell->prev != 0) {
+            newCell->prev->next = newCell;
         } else {
-            rec->unk4 = (u32)newblk;
+            hd->free = newCell;
         }
     }
 
-    node->unk4 = rec->unk8;
-    node->unk0 = 0;
-    if (rec->unk8 != 0) {
-        ((AlarmCallback*)rec->unk8)->unk0 = (s32)node;
-    }
-    rec->unk8 = (u32)node;
-
-    return (u8*)node + 0x20;
+    hd->allocated = DLAddFront(hd->allocated, cell);
+    return (u8*)cell + 0x20;
 }
 
 void fn_8009AAD4(u32 idx, void* ptr) {
-    AlarmCallback* rec = &lbl_8047A6E8[idx];
-    AlarmCallback* header = (AlarmCallback*)((u8*)ptr - 0x20);
-    AlarmCallback* next = (AlarmCallback*)header->unk4;
-    u32 newHead = rec->unk8;
+    OSHeapDesc* hd = &lbl_8047A6E8[idx];
+    OSAllocCell* cell = (OSAllocCell*)((u8*)ptr - 0x20);
 
-    if (next != 0) {
-        next->unk0 = header->unk0;
-    }
-    if ((u32)header->unk0 == 0) {
-        newHead = header->unk4;
-    } else {
-        ((AlarmCallback*)header->unk0)->unk4 = header->unk4;
-    }
-    rec->unk8 = newHead;
-
-    rec->unk4 = (u32)fn_8009A92C((AlarmCallback*)rec->unk4, header, (void*)newHead);
+    hd->allocated = DLExtract(hd->allocated, cell);
+    hd->free = fn_8009A92C(hd->free, cell);
 }
 
 u32 fn_8009AB50(u32 xfb) {
@@ -276,47 +275,48 @@ u32 fn_8009AB50(u32 xfb) {
     return previous;
 }
 
-#pragma optimize_for_size on
-void fn_8009AB60(AlarmCallback* arr, void* end, s32 count) {
+void* fn_8009AB60(void* start, void* end, s32 count) {
+    u32 arraySize;
     s32 i;
-    u32 size;
+    OSHeapDesc* hd;
 
-    lbl_8047A6E8 = arr;
+    arraySize = count * sizeof(OSHeapDesc);
+    lbl_8047A6E8 = start;
     lbl_8047A6EC = count;
-    size = count * 0xC;
     for (i = 0; i < lbl_8047A6EC; i++) {
-        AlarmCallback* p = &lbl_8047A6E8[i];
-        p->unk0 = -1;
-        p->unk8 = 0;
-        p->unk4 = 0;
+        hd = &lbl_8047A6E8[i];
+        hd->size = -1;
+        hd->free = hd->allocated = 0;
     }
 
-    lbl_8047A6F4 = (u32)end & ~0x1F;
     lbl_80478980 = -1;
-    lbl_8047A6F0 = ((u32)lbl_8047A6E8 + size + 0x1F) & ~0x1F;
+    start = (void*)((u32)lbl_8047A6E8 + arraySize);
+    start = (void*)(((u32)start + 0x1F) & ~0x1F);
+    lbl_8047A6F0 = start;
+    lbl_8047A6F4 = (void*)((u32)end & ~0x1F);
+    return start;
 }
-#pragma optimize_for_size reset
 #endif
 
 #if defined(SDK_EXACT_8009ABD0)
 s32 fn_8009ABD0(u32 start, u32 end) {
     s32 i;
-    AlarmCallback* arr = lbl_8047A6E8;
+    OSHeapDesc* arr = lbl_8047A6E8;
     s32 count;
     u32 alignedStart = (start + 0x1F) & ~0x1F;
     u32 alignedEnd = end & ~0x1F;
 
     count = lbl_8047A6EC;
     for (i = 0; i < count; arr++, i++) {
-        if (arr->unk0 < 0) {
-            AlarmCallback* blk = (AlarmCallback*)alignedStart;
+        if (arr->size < 0) {
+            OSAllocCell* blk = (OSAllocCell*)alignedStart;
 
-            arr->unk0 = alignedEnd - alignedStart;
-            blk->unk0 = 0;
-            blk->unk4 = 0;
-            blk->unk8 = arr->unk0;
-            arr->unk4 = alignedStart;
-            arr->unk8 = 0;
+            arr->size = alignedEnd - alignedStart;
+            blk->prev = 0;
+            blk->next = 0;
+            blk->size = arr->size;
+            arr->free = blk;
+            arr->allocated = 0;
             return i;
         }
     }
@@ -326,6 +326,6 @@ s32 fn_8009ABD0(u32 start, u32 end) {
 
 #if defined(SDK_8009AC3C_SUFFIX_ACTIVE)
 void fn_8009AC3C(u32 xfb) {
-    lbl_8047A6E8[xfb].unk0 = -1;
+    lbl_8047A6E8[xfb].size = -1;
 }
 #endif

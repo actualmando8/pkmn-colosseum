@@ -539,14 +539,44 @@ Newly linked unit/code/data delta from goal baseline: +51 units / +34,308 code /
 Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
 Head linked: 736 / 1,337 units; 600,468 complete code bytes;
   752,761 complete data bytes
-README/report: synced locally; decomp.dev pending merge ingestion
+README/report/decomp.dev: synced on PR #397 at merge `34442c32`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: healthy post-#395 queue; 535 entries, 21 workers, zero new wins
-Windows: healthy post-#395 manifest; 58 units, 12 workers, zero new wins
+3090: healthy post-#397 queue; 538 entries, 21 workers, zero new wins;
+  one stale terminal WIN? retained
+Windows: healthy post-#397 manifest; 72 fidelity-valid units, 12 workers,
+  zero new wins
 Integrated bank: 16 strict fight-sequence/status functions and 21 strict
   MusyX MIDI/input-getter functions
-Active campaign worktrees: post-396 integration plus isolated game, HSD,
-  and SDK/MusyX closer scouts
-Next unit closers: strict survivors from the three parallel closer scouts,
-  then non-overlapping post-merge farm queues
+Active campaign worktrees: item-data integration plus isolated game and HSD
+  closer scouts; Dolphin survivor banked for the next integration
+Next unit closers: 37 strict item-data accessors plus 6 strict Dolphin
+  allocator/DVD functions, then survivors from the game and HSD scouts
+```
+
+### Batch snapshot — 2026-07-21 (PR #398)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 34442c32 (PR #397 merged)
+Batch PR: #398, `campaign/people-item-post397-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +3 exact functions / +512 matched code / +12 matched data;
+  +43 linked functions / +4 units / +2,168 linked code / +12 linked data
+Newly linked function delta from goal baseline: +251
+Newly linked unit/code/data delta from goal baseline: +55 units / +36,476 code / +189 data
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+Head linked: 740 / 1,341 units; 602,636 complete code bytes;
+  752,773 complete data bytes
+README/report: synced on PR #398; decomp.dev pending PR report
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#397 queue; 538 entries, 21 workers, zero new wins;
+  one stale terminal WIN? retained
+Windows: healthy post-#397 manifest; 72 fidelity-valid units, 12 workers,
+  zero new wins
+Integrated: 37 item-data accessors plus 6 canonical Dolphin OS allocator/DVD
+  functions; the suspicious exportable check and residual suffix remain candidates
+Rejected: game closer probes requiring codegen shaping (width-copy relocation,
+  scheduling/peephole controls, cast-hoist suppression, or artificial iterators)
+Next unit closers: strict HSD scout survivor if any, then current-report object
+  closers and non-overlapping farm results after PR #398 reconciliation
 ```
