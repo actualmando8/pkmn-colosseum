@@ -3921,13 +3921,28 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/field_range_801CB180.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/field_range_801CB180.c"),
+                    (Matching, "game/field_exact_801CB59C.c"),
+                    (CodeCandidate, "game/field_candidate_801CB61C.c"),
+                    (Matching, "game/field_exact_801CB7C4.c"),
+                    (CodeCandidate, "game/field_candidate_801CB834.c"),
+                    (Matching, "game/field_exact_801CB9D8.c"),
+                    (CodeCandidate, "game/field_candidate_801CBA0C.c"),
+                    (Matching, "game/field_exact_801CBA84.c"),
+                    (CodeCandidate, "game/field_candidate_801CBA90.c"),
+                    (Matching, "game/field_exact_801D0080.c"),
+                    (CodeCandidate, "game/field_candidate_801D0090.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/field_exact_801D0314.c",
@@ -4301,13 +4316,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/fight_range_8021B910.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/fight_range_8021B910.c"),
+                    (Matching, "game/fight_range_exact_8021C034.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/fight_range_exact_8021C0F4.c",
@@ -4462,13 +4483,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/fight_range_80229704.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/fight_range_80229704.c"),
+                    (Matching, "game/fight_range_exact_80229B70.c"),
+                    (CodeCandidate, "game/fight_range_80229C28.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/fight_range_8022A504.c",
@@ -5194,6 +5222,8 @@ config.libs = [
                     (Matching, "game/gba/gba_misc_exact_8008A99C.c"),
                     (Matching, "game/gba/gba_misc_exact_8008A9AC.c"),
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008A9E4.c"),
+                    (Matching, "game/gba/gba_misc_exact_8008AB4C.c"),
+                    (CodeCandidate, "game/gba/gba_misc_candidate_8008ABE4.c"),
                 ]
             ],
             *[
@@ -7922,7 +7952,12 @@ config.libs = [
             ),
             Object(
                 Matching,
-                "game/data/data_8039A048.c",
+                "game/data/data_8039A048_prefix.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/data_8039A088.c",
                 progress_category="game",
             ),
             Object(
