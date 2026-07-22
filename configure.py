@@ -2369,8 +2369,35 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
+                Matching,
+                "dolphin/sdk_exact_800CEB64.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
                 CodeCandidate,
-                "dolphin/sdk_range_800CEB64.c",
+                "dolphin/sdk_candidate_800CED58.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800CEF10.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800CF254.c",
+                mw_version="GC/1.2.5n",
+                # This original EXIBios island alone was built without
+                # instruction scheduling; adjacent Odemu/EXIUart code was not.
+                extra_cflags=["-schedule off"],
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800CF47C.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
