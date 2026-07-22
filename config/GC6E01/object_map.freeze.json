@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1412
+    "total_units": 1418
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1344,
-    "source_backed_units": 1328,
+    "named_units": 1350,
+    "source_backed_units": 1334,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -23,7 +23,7 @@
     "matched_data_percent": 97.28669,
     "matched_functions": 6307,
     "matched_functions_percent": 73.31163,
-    "fuzzy_match_percent": 57.79945
+    "fuzzy_match_percent": 57.799606
   },
   "unit_topology": [
     {
@@ -7357,13 +7357,65 @@
       "sections": [
         {
           "name": ".text",
-          "size": 828,
+          "size": 440,
           "virtual_address": 2148403688
         }
       ],
-      "total_code": 828,
+      "total_code": 440,
       "total_data": 0,
-      "total_functions": 7
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_math_random_exact_800E0BA0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 100,
+          "virtual_address": 2148404128
+        }
+      ],
+      "total_code": 100,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_math_random_candidate_800E0C04",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 80,
+          "virtual_address": 2148404228
+        }
+      ],
+      "total_code": 80,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_math_random_exact_800E0C54",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2148404308
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_math_random_candidate_800E0CA0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 132,
+          "virtual_address": 2148404384
+        }
+      ],
+      "total_code": 132,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_math_util",
@@ -8537,13 +8589,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 1132,
+          "size": 840,
           "virtual_address": 2148462744
         }
       ],
-      "total_code": 1132,
+      "total_code": 840,
       "total_data": 0,
-      "total_functions": 8
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_texture_getters_exact_800EF3E0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 292,
+          "virtual_address": 2148463584
+        }
+      ],
+      "total_code": 292,
+      "total_data": 0,
+      "total_functions": 6
     },
     {
       "name": "main/game/gs_texture_exact_800EF504",
@@ -15068,17 +15133,30 @@
       "total_functions": 9
     },
     {
-      "name": "main/game/battle/battle_range_801ED640_prefix",
+      "name": "main/game/battle/battle_range_exact_801ED640",
       "sections": [
         {
           "name": ".text",
-          "size": 2548,
+          "size": 320,
           "virtual_address": 2149504576
         }
       ],
-      "total_code": 2548,
+      "total_code": 320,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/battle/battle_range_candidate_801ED780",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2228,
+          "virtual_address": 2149504896
+        }
+      ],
+      "total_code": 2228,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/battle/battle_range_exact_801EE034",

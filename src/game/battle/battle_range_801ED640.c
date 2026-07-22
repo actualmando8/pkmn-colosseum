@@ -92,60 +92,6 @@ extern u8 fn_801902E0(u16 flag);
 extern u8 fn_801906A0(u16 flag);
 extern void _flagSet(u16 flag, s32 value);
 
-void fn_801ED780(void);
-
-#if defined(BATTLE_RANGE_PREFIX)
-
-void fn_801ED640(u8 value)
-{
-    lbl_8047B5C1 = value;
-}
-
-void fn_801ED648(BattleRangeVec* value)
-{
-    GSvecCopy(&lbl_80375230, value);
-}
-
-void fn_801ED674(void)
-{
-    lbl_8047B5C0 = 0;
-}
-
-void fn_801ED680(BattleRangeResource* resource)
-{
-    s32 i;
-    BattleRangeTextureEntry* entry;
-    void* texture;
-    u8* data;
-
-    lbl_8047B5C4 = resource;
-    if (resource->magic == 0x7B1EE3F0) {
-        data = resource->data;
-        lbl_8047B5C8 = data;
-        entry = (BattleRangeTextureEntry*)(data + resource->textureOffset * 12);
-
-        for (i = 0; i < lbl_8047B5C4->textureCount; i++) {
-            entry->data = (void*)((u32)entry->data + (u32)resource);
-            texture = GStextureLoad(entry->data);
-            if (texture == NULL) {
-                break;
-            }
-            lbl_8046D630[entry->id] = texture;
-            entry++;
-        }
-    }
-    lbl_8047B5C0 = 1;
-}
-
-void fn_801ED740(void)
-{
-    lbl_8047B5C0 = 0;
-    lbl_8047B5C1 = 0;
-    GSgappCreate(1, 0xF0, 0xA, fn_801ED780);
-}
-
-#endif
-
 #if defined(BATTLE_RANGE_EXACT_801EE034)
 
 u32 fn_801EE034(BattleRangeIndexedEntry* entry)
