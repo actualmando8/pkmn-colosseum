@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1550
+    "total_units": 1580
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1482,
-    "source_backed_units": 1466,
+    "named_units": 1512,
+    "source_backed_units": 1496,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -1409,13 +1409,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 12552,
+          "size": 512,
           "virtual_address": 2147680624
         }
       ],
-      "total_code": 12552,
+      "total_code": 512,
       "total_data": 0,
-      "total_functions": 33
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/gs_npc_event_exact_80030370",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2147681136
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_npc_event_candidate_8003037C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12028,
+          "virtual_address": 2147681148
+        }
+      ],
+      "total_code": 12028,
+      "total_data": 0,
+      "total_functions": 27
     },
     {
       "name": "main/game/gs_range_80033278",
@@ -2701,13 +2727,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 12536,
+          "size": 4852,
           "virtual_address": 2148046520
         }
       ],
-      "total_code": 12536,
+      "total_code": 4852,
       "total_data": 0,
-      "total_functions": 37
+      "total_functions": 23
+    },
+    {
+      "name": "main/game/gba/gba_misc_exact_8008A9AC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 56,
+          "virtual_address": 2148051372
+        }
+      ],
+      "total_code": 56,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gba/gba_misc_candidate_8008A9E4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7628,
+          "virtual_address": 2148051428
+        }
+      ],
+      "total_code": 7628,
+      "total_data": 0,
+      "total_functions": 13
     },
     {
       "name": "main/game/gbaCommunication_prefix",
@@ -7851,13 +7903,117 @@
       "sections": [
         {
           "name": ".text",
-          "size": 3780,
+          "size": 244,
           "virtual_address": 2148397096
         }
       ],
-      "total_code": 3780,
+      "total_code": 244,
       "total_data": 0,
-      "total_functions": 24
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_material_exact_800DF11C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148397340
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_material_candidate_800DF140",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 120,
+          "virtual_address": 2148397376
+        }
+      ],
+      "total_code": 120,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_material_exact_800DF1B8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 100,
+          "virtual_address": 2148397496
+        }
+      ],
+      "total_code": 100,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/gs_material_candidate_800DF21C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148397596
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_material_exact_800DF240",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2148397632
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_material_candidate_800DF248",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 552,
+          "virtual_address": 2148397640
+        }
+      ],
+      "total_code": 552,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/gs_material_exact_800DF470",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 40,
+          "virtual_address": 2148398192
+        }
+      ],
+      "total_code": 40,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_material_candidate_800DF498",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 2644,
+          "virtual_address": 2148398232
+        }
+      ],
+      "total_code": 2644,
+      "total_data": 0,
+      "total_functions": 10
     },
     {
       "name": "main/game/gs_math_vec",
@@ -13993,13 +14149,247 @@
       "sections": [
         {
           "name": ".text",
-          "size": 16968,
+          "size": 3948,
           "virtual_address": 2149036156
         }
       ],
-      "total_code": 16968,
+      "total_code": 3948,
       "total_data": 0,
-      "total_functions": 68
+      "total_functions": 15
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017BFE8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2149040104
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017C008",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 908,
+          "virtual_address": 2149040136
+        }
+      ],
+      "total_code": 908,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017C394",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149041044
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017C39C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 460,
+          "virtual_address": 2149041052
+        }
+      ],
+      "total_code": 460,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017C568",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 80,
+          "virtual_address": 2149041512
+        }
+      ],
+      "total_code": 80,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017C5B8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 724,
+          "virtual_address": 2149041592
+        }
+      ],
+      "total_code": 724,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017C88C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149042316
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017C894",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 44,
+          "virtual_address": 2149042324
+        }
+      ],
+      "total_code": 44,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017C8C0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149042368
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017C8C8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 44,
+          "virtual_address": 2149042376
+        }
+      ],
+      "total_code": 44,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017C8F4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149042420
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017C8FC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1484,
+          "virtual_address": 2149042428
+        }
+      ],
+      "total_code": 1484,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017CEC8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2149043912
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017CED8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1224,
+          "virtual_address": 2149043928
+        }
+      ],
+      "total_code": 1224,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017D3A0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 52,
+          "virtual_address": 2149045152
+        }
+      ],
+      "total_code": 52,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017D3D4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 44,
+          "virtual_address": 2149045204
+        }
+      ],
+      "total_code": 44,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fsys/fsys_file_exact_8017D400",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2149045248
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fsys/fsys_file_candidate_8017D410",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7860,
+          "virtual_address": 2149045264
+        }
+      ],
+      "total_code": 7860,
+      "total_data": 0,
+      "total_functions": 19
     },
     {
       "name": "main/game/gs_range_8017F2C4",
