@@ -19,9 +19,10 @@ accepted into `src/` until it passes the normal full-tree validation.
 - Credentials are read in-process from an owner-only `name: value` file. Never
   put an API key on the command line or in an environment variable.
 
-The checked-in suites are pinned to source commit `d9b908ee`. The general pilot
-uses eight work units; `suite_semantic_pilot.json` adds the fidelity-gated,
-relocation-free `GStextureLockImage` behavioral pilot. Each target has a
+`suite_pilot.json` and `suite_semantic_pilot.json` are pinned to source commit
+`d9b908ee`; `suite_kimi3_fn801a6da0.json` is pinned to `76ecf7c4`. The general
+pilot uses eight work units; the semantic pilot adds the fidelity-gated,
+relocation-free `GStextureLockImage` behavioral target. Each target has a
 SHA-256 over its six admitted files. The runner also verifies
 function/fidelity/baseline metadata, recompiles the expected baseline, and
 records hashes for the suite, runner, compiler, wrappers, objdump, and objdiff.
