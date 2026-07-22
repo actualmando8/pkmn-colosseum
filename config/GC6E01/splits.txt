@@ -1820,8 +1820,17 @@ game/gs_texture_range_800EF548.c:
 game/gs_thread.c:
 	.text       start:0x800F0030 end:0x800F75FC
 
+game/input/input_exact_800F75FC.c:
+	.text       start:0x800F75FC end:0x800F760C
+
+game/input/input_candidate_800F760C.c:
+	.text       start:0x800F760C end:0x800F76E4
+
+game/input/input_exact_800F76E4.c:
+	.text       start:0x800F76E4 end:0x800F7758
+
 game/input/input.c:
-	.text       start:0x800F75FC end:0x800F8268
+	.text       start:0x800F7758 end:0x800F8268
 
 game/gs_thread_hi_range_800F8268.c:
 	.text       start:0x800F8268 end:0x800F9318
@@ -2061,7 +2070,10 @@ game/data/data_8035E4B0.c:
 	.data       start:0x8035E4B0 end:0x803634A8
 
 game/pokemon_range_8012640C.c:
-	.text       start:0x8012640C end:0x80128E38
+	.text       start:0x8012640C end:0x80128CC0
+
+game/pokemon_range_exact_80128CC0.c:
+	.text       start:0x80128CC0 end:0x80128E38
 
 game/hero.c:
 	.text       start:0x80128E38 end:0x80129280
@@ -2614,7 +2626,13 @@ musyx/runtime/synthmacros_exact_80157218.c:
 	.text       start:0x80157218 end:0x80157280
 
 musyx/musyx_candidate_80157280.c:
-	.text       start:0x80157280 end:0x80162858
+	.text       start:0x80157280 end:0x80161934
+
+musyx/musyx_input_aux_exact_80161934.c:
+	.text       start:0x80161934 end:0x80161D20
+
+musyx/musyx_candidate_80161D20.c:
+	.text       start:0x80161D20 end:0x80162858
 
 musyx/musyx_hw_exact_80162858.c:
 	.text       start:0x80162858 end:0x80162FB0
@@ -3755,8 +3773,20 @@ game/fight_trainer_ai_waza_hit_exact_802570D0.c:
 game/fight_trainer_ai_waza_hit.c:
 	.text       start:0x8025C264 end:0x8025C5A4
 
+game/fight_trainer_ai2_exact_8025C5A4.c:
+	.text       start:0x8025C5A4 end:0x8025C6BC
+
 game/fight_trainer_ai2.c:
-	.text       start:0x8025C5A4 end:0x8025CD64
+	.text       start:0x8025C6BC end:0x8025C770
+
+game/fight_trainer_ai2_exact_8025C770.c:
+	.text       start:0x8025C770 end:0x8025C808
+
+game/fight_trainer_ai2_candidate_8025C808.c:
+	.text       start:0x8025C808 end:0x8025CAA8
+
+game/fight_trainer_ai2_exact_8025CAA8.c:
+	.text       start:0x8025CAA8 end:0x8025CD64
 
 game/toolentry.c:
 	.text       start:0x8025CD64 end:0x8025DBD4

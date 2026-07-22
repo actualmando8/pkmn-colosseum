@@ -475,7 +475,7 @@ Newly linked unit/code/data delta from goal baseline: +39 units / +27,644 code /
 Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
 Head linked: 724 / 1,318 units; 593,804 complete code bytes;
   752,761 complete data bytes
-README/report: synced on PR #395; decomp.dev pending merged PR report
+README/report: synced on PR #395; decomp.dev confirmed at merge 53492f21
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: 535-entry current queue; 21 workers/permuters/timeouts/claims;
   zero new recoverable wins; one stale terminal WIN? retained
@@ -491,4 +491,36 @@ Rejected: DVDCheckDisk (unaligned jump-table padding); DVDCancelAsync
   three fight-timer conversion functions (private unowned sdata2 constants)
 Next unit closers: banked fight_trainer_ai2 (+9), then fresh strict islands
   from current-master reports while both farms continue their refreshed queues
+```
+
+### Batch snapshot — 2026-07-21 (PR #396)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 53492f21 (PR #395 merged)
+Batch PR: #396, `campaign/post395-batch-20260721`
+Exact-source delta from goal baseline: +36 functions / +14,412 code bytes
+This batch: +0 exact functions / +0 matched code;
+  +30 linked functions / +7 units / +2,644 linked code / +0 linked data
+Newly linked function delta from goal baseline: +171
+Newly linked unit/code/data delta from goal baseline: +46 units / +30,288 code / +177 data
+Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
+Head linked: 731 / 1,328 units; 596,448 complete code bytes;
+  752,761 complete data bytes
+README/report: synced on PR #396; decomp.dev pending PR #396 ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: 535-entry current queue; 21 workers/permuters/timeouts/claims;
+  zero new recoverable wins; one stale terminal WIN? retained
+Windows: 58 active-valid post-#395 units; 12 workers; zero live wins;
+  one bad unit retained; manifest and supervisor restarted atomically
+Integrated: 9 fight_trainer_ai2 functions, 2 input functions, 16 Pokemon
+  accessors, and 3 MusyX input helpers
+Banked not merged: b7e47fee (+16 fight-range links) and 6c7ffef0
+  (+21 MusyX links on top of the integrated 99cd073b prerequisite)
+Rejected: SDK 80098108 exacts (local pragmas/asm/shaping); remaining input
+  exacts (gotos or local pragmas); pokemonEvolutionAll (dont_inline pragma);
+  MusyX _GetInputValue (goto-dependent); inpTranslateExCtrl and inpGetExCtrl
+  (private duplicate jump tables break the retail SHA)
+Next unit closers: banked fight-range 16, banked MusyX 21, then fresh farm
+  wins or a strict small-residual object closer
 ```

@@ -1021,6 +1021,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
             ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3.2",
+                    extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                    progress_category="musyx",
+                )
+                for status, path in [
+                    (Matching, "musyx/musyx_input_aux_exact_80161934.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80161D20.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "musyx/musyx_hw_exact_80162858.c",
@@ -1769,6 +1782,13 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/pokemon_range_8012640C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/pokemon_range_exact_80128CC0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -4062,8 +4082,36 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/fight_trainer_ai2_exact_8025C5A4.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
                 "game/fight_trainer_ai2.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_trainer_ai2_exact_8025C770.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_trainer_ai2_candidate_8025C808.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_trainer_ai2_exact_8025CAA8.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -4915,6 +4963,27 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/gs_texture_range_800EF548.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/input/input_exact_800F75FC.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/input/input_candidate_800F760C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/input/input_exact_800F76E4.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
