@@ -1681,3 +1681,69 @@ Next action: publish and merge PR #425, reconcile and rotate Windows from the
   merged head, then link the final seven functions in the current +1,000
   campaign
 ```
+
+### Batch snapshot — 2026-07-22 (PR #426)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 67c5c73f (PR #425 merged)
+Batch branch: `integration/pr426-exact7`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +7 linked functions / +6 complete units / +11 total-unit topology /
+  +296 linked code / +0 linked data
+Goal cumulative from PR #381: +1,000 linked functions / +341 complete units /
+  +78,596 linked code / +193 linked data; the campaign milestone is complete
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes; fuzzy progress 57.809658%
+Head linked: 4,768 functions; 1,026 / 1,801 units;
+  644,756 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.84% linked / 644.76 kB
+  complete code; PR #425's decomp.dev publication was confirmed at exact
+  merge 67c5c73f before this batch
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole authorized permutation farm
+Windows: post-#425 reconciliation found the same 39 cumulative artifacts:
+  32 already exact plus seven strict rejects and zero recoverable/new source.
+  The prior supervisor and all 12 workers were stopped without orphans, and
+  transient outputs were preserved in the post-#425 archive. A private build
+  generated 69 fidelity-valid functions across 46 owners; all 69 passed native
+  smoke. The final queue chose the best base-score function from each owner,
+  then 14 next-best residuals for 60 functions across 46 owners; all 60 passed
+  a second native smoke. Atomic manifest-last deployment verified 420 / 420
+  contract files. Queue SHA-256 is
+  `7a8fa3aa16b7f9c275967a58aa77aed1e5d1f97ad266aad5dd2c162044898471`,
+  manifest SHA-256 is
+  `a3b1dc530628cf77ccc208804b8301531375d4091ebc6486ec71cc96d062789c`,
+  and final smoke-results SHA-256 is
+  `8d0301a41b3ada14677f8138c4f8dfc05467fa8bf84723ad99c8320e0eae1652`.
+  Supervisor PID 60548 and 12 / 12 parented workers were live with zero
+  orphans, wins, or bad units at the restart checkpoint. All exact/raw-100,
+  historical, Kimi, PR #425, and PR #426 function and owner overlaps are zero.
+Kimi K3: the audited full-owner guard remains available through the owner-only
+  Moonshot key path. No additional request was made while closing the exact
+  +1,000 milestone; the next fuzzy campaign will use a fresh compile-loop
+  target rather than repeat the zero-lift `GSmaterialCreate` trial.
+Integrated: a constant event callback and event-state output copier; two typed
+  summary alpha callbacks; the window sequence movement check; one FSYS state
+  wrapper; and the canonical HSD vertex-descriptor clear wrapper
+Type recovery: the summary callbacks use the evidenced page context and draw
+  item color field. The window checker uses tagged window/sprite layouts, a
+  typed `WinSeqCommand` pointer, and the existing `enabled` state name rather
+  than raw offsets or a guessed flag meaning.
+Residual/data policy: six Matching text islands and explicit CodeCandidate
+  neighbors preserve gapless, disjoint ownership; no data range moves.
+Validation: all seven functions / 296 bytes are raw 100%; all six Matching
+  units emit target-identical text and all seven normalized relocations pair.
+  Every selected symbol survives in main.elf at its retail VA and size, with
+  13 genuine incoming active-input relocations in aggregate and none at zero;
+  `FORCEACTIVE` remains empty.
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, typed semantics and ABI, direct
+  text and 7 / 7 relocation parity, linker liveness, residual topology, strict
+  source policy, Windows owner exclusion, zero regression, and the retail link
+Next action: publish and merge PR #426, confirm decomp.dev at the exact merge,
+  then start the 100% fuzzy campaign with a fresh model-assisted compile-loop
+  target while the Windows-only farm continues its non-overlapping queue
+```

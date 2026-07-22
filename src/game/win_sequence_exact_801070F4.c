@@ -1,7 +1,9 @@
 #include "dolphin/types.h"
 
+typedef struct WinSeqCommand WinSeqCommand;
+
 typedef struct WinSequenceState {
-    void* commands;
+    WinSeqCommand* commands;
     s16 commandIndex;
     s16 delay;
     u8 positionMode;
@@ -25,7 +27,7 @@ typedef struct WinSequenceState {
     s16 scaleFrame;
     s16 scaleDuration;
     s16 loopCount;
-    u8 doneFlag;
+    u8 enabled;
     u8 pad_3B;
 } WinSequenceState;
 
@@ -73,7 +75,7 @@ s32 winSeqCheckMove(s32 id)
     sprite = window->sprites;
     while (sprite != NULL) {
         if (sprite->sequence.commands != NULL) {
-            if (sprite->sequence.doneFlag == 0) {
+            if (sprite->sequence.enabled == 0) {
                 return 1;
             }
         }
