@@ -2112,7 +2112,31 @@ game/sex.c:
 	.text       start:0x80131574 end:0x80131588
 
 game/msgctrl.c:
-	.text       start:0x80131588 end:0x80132C6C
+	.text       start:0x80131588 end:0x80131690
+
+game/msgctrl_exact_80131690.c:
+	.text       start:0x80131690 end:0x80131714
+
+game/msgctrl_candidate_80131714.c:
+	.text       start:0x80131714 end:0x801317FC
+
+game/msgctrl_exact_801317FC.c:
+	.text       start:0x801317FC end:0x8013182C
+
+game/msgctrl_candidate_8013182C.c:
+	.text       start:0x8013182C end:0x80131BA0
+
+game/msgctrl_exact_80131BA0.c:
+	.text       start:0x80131BA0 end:0x80131BF8
+
+game/msgctrl_candidate_80131BF8.c:
+	.text       start:0x80131BF8 end:0x80131F9C
+
+game/msgctrl_exact_80131F9C.c:
+	.text       start:0x80131F9C end:0x80131FF4
+
+game/msgctrl_candidate_80131FF4.c:
+	.text       start:0x80131FF4 end:0x80132C6C
 
 game/dbgMenu.c:
 	.text       start:0x80132C6C end:0x8013433C
