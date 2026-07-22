@@ -539,14 +539,16 @@ Newly linked unit/code/data delta from goal baseline: +51 units / +34,308 code /
 Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
 Head linked: 736 / 1,337 units; 600,468 complete code bytes;
   752,761 complete data bytes
-README/report: synced locally; decomp.dev pending merge ingestion
+README/report/decomp.dev: synced on PR #397 at merge `34442c32`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
-3090: healthy post-#395 queue; 535 entries, 21 workers, zero new wins
-Windows: healthy post-#395 manifest; 58 units, 12 workers, zero new wins
+3090: healthy post-#397 queue; 538 entries, 21 workers, zero new wins;
+  one stale terminal WIN? retained
+Windows: healthy post-#397 manifest; 72 fidelity-valid units, 12 workers,
+  zero new wins
 Integrated bank: 16 strict fight-sequence/status functions and 21 strict
   MusyX MIDI/input-getter functions
-Active campaign worktrees: post-396 integration plus isolated game, HSD,
-  and SDK/MusyX closer scouts
-Next unit closers: strict survivors from the three parallel closer scouts,
-  then non-overlapping post-merge farm queues
+Active campaign worktrees: item-data integration plus isolated game and HSD
+  closer scouts; Dolphin survivor banked for the next integration
+Next unit closers: 37 strict item-data accessors plus 6 strict Dolphin
+  allocator/DVD functions, then survivors from the game and HSD scouts
 ```
