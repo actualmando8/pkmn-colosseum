@@ -540,7 +540,7 @@ Head report: 6,304 / 8,603 matched functions; 900,908 matched code bytes
 Head linked: 736 / 1,337 units; 600,468 complete code bytes;
   752,761 complete data bytes
 README/report: synced locally; decomp.dev pending merge ingestion
-Retail SHA: pending final batch gate
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#395 queue; 535 entries, 21 workers, zero new wins
 Windows: healthy post-#395 manifest; 58 units, 12 workers, zero new wins
 Integrated bank: 16 strict fight-sequence/status functions and 21 strict
