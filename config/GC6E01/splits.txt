@@ -3559,8 +3559,29 @@ game/fight_action.c:
 game/fight_action_exact_8020D868.c:
 	.text       start:0x8020D868 end:0x8020D968
 
-game/fight.c:
-	.text       start:0x8020D968 end:0x8020E1A4
+game/fight_kouka_exact_8020D968.c:
+	.text       start:0x8020D968 end:0x8020DA14
+
+game/fight_candidate_8020DA14.c:
+	.text       start:0x8020DA14 end:0x8020DD44
+
+game/fight_encount_exact_8020DD44.c:
+	.text       start:0x8020DD44 end:0x8020DF10
+
+game/fight_encount_candidate_8020DF10.c:
+	.text       start:0x8020DF10 end:0x8020DF90
+
+game/fight_encount_exact_8020DF90.c:
+	.text       start:0x8020DF90 end:0x8020E020
+
+game/fight_encount_candidate_8020E020.c:
+	.text       start:0x8020E020 end:0x8020E0B0
+
+game/fight_encount_exact_8020E0B0.c:
+	.text       start:0x8020E0B0 end:0x8020E124
+
+game/fight_candidate_8020E124.c:
+	.text       start:0x8020E124 end:0x8020E1A4
 
 game/fight_exact_8020E1A4.c:
 	.text       start:0x8020E1A4 end:0x8020E4E8

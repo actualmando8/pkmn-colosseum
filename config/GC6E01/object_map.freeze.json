@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1373
+    "total_units": 1380
   },
   "topology_status": {
     "auto_units": 66,
-    "named_units": 1307,
-    "source_backed_units": 1291,
+    "named_units": 1314,
+    "source_backed_units": 1298,
     "auto_code": 0,
     "auto_data": 57691,
     "auto_functions": 0
@@ -16269,17 +16269,108 @@
       "total_functions": 13
     },
     {
-      "name": "main/game/fight",
+      "name": "main/game/fight_kouka_exact_8020D968",
       "sections": [
         {
           "name": ".text",
-          "size": 2108,
+          "size": 172,
           "virtual_address": 2149636456
         }
       ],
-      "total_code": 2108,
+      "total_code": 172,
       "total_data": 0,
-      "total_functions": 33
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/fight_candidate_8020DA14",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 816,
+          "virtual_address": 2149636628
+        }
+      ],
+      "total_code": 816,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_encount_exact_8020DD44",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 460,
+          "virtual_address": 2149637444
+        }
+      ],
+      "total_code": 460,
+      "total_data": 0,
+      "total_functions": 10
+    },
+    {
+      "name": "main/game/fight_encount_candidate_8020DF10",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 128,
+          "virtual_address": 2149637904
+        }
+      ],
+      "total_code": 128,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_encount_exact_8020DF90",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 144,
+          "virtual_address": 2149638032
+        }
+      ],
+      "total_code": 144,
+      "total_data": 0,
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/fight_encount_candidate_8020E020",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 144,
+          "virtual_address": 2149638176
+        }
+      ],
+      "total_code": 144,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_encount_exact_8020E0B0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 116,
+          "virtual_address": 2149638320
+        }
+      ],
+      "total_code": 116,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/fight_candidate_8020E124",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 128,
+          "virtual_address": 2149638436
+        }
+      ],
+      "total_code": 128,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/fight_exact_8020E1A4",
