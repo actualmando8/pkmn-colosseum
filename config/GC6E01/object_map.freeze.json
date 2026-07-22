@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1766
+    "total_units": 1790
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1698,
-    "source_backed_units": 1682,
+    "named_units": 1722,
+    "source_backed_units": 1706,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -10540,30 +10540,95 @@
       "total_functions": 3
     },
     {
-      "name": "main/game/gapp_range_80101B34",
+      "name": "main/game/gapp_exact_80101B34",
       "sections": [
         {
           "name": ".text",
-          "size": 1232,
+          "size": 92,
           "virtual_address": 2148539188
         }
       ],
-      "total_code": 1232,
+      "total_code": 92,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 2
     },
     {
-      "name": "main/game/menu",
+      "name": "main/game/gapp_candidate_80101B90",
       "sections": [
         {
           "name": ".text",
-          "size": 7780,
+          "size": 460,
+          "virtual_address": 2148539280
+        }
+      ],
+      "total_code": 460,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gapp_exact_80101D5C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2148539740
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gapp_candidate_80101D8C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 556,
+          "virtual_address": 2148539788
+        }
+      ],
+      "total_code": 556,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gapp_exact_80101FB8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2148540344
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/menu_get_last_error_exact_80102004",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
           "virtual_address": 2148540420
         }
       ],
-      "total_code": 7780,
+      "total_code": 16,
       "total_data": 0,
-      "total_functions": 31
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/menu_candidate_80102014",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7764,
+          "virtual_address": 2148540436
+        }
+      ],
+      "total_code": 7764,
+      "total_data": 0,
+      "total_functions": 30
     },
     {
       "name": "main/game/cursor_bios",
@@ -14851,13 +14916,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 200,
+          "size": 132,
           "virtual_address": 2148937988
         }
       ],
-      "total_code": 200,
+      "total_code": 132,
       "total_data": 0,
-      "total_functions": 5
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_exact_80163188",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 56,
+          "virtual_address": 2148938120
+        }
+      ],
+      "total_code": 56,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/musyx/musyx_candidate_801631C0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148938176
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/musyx/musyx_exact_801631CC",
@@ -14877,13 +14968,91 @@
       "sections": [
         {
           "name": ".text",
-          "size": 2520,
+          "size": 32,
           "virtual_address": 2148938228
         }
       ],
-      "total_code": 2520,
+      "total_code": 32,
       "total_data": 0,
-      "total_functions": 9
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_aram_callback_exact_80163214",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 160,
+          "virtual_address": 2148938260
+        }
+      ],
+      "total_code": 160,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_candidate_801632B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 476,
+          "virtual_address": 2148938420
+        }
+      ],
+      "total_code": 476,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_aram_wait_exact_80163490",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2148938896
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_candidate_801634A8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 784,
+          "virtual_address": 2148938920
+        }
+      ],
+      "total_code": 784,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/musyx/musyx_aram_upload_exact_801637B8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 88,
+          "virtual_address": 2148939704
+        }
+      ],
+      "total_code": 88,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_candidate_80163810",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 956,
+          "virtual_address": 2148939792
+        }
+      ],
+      "total_code": 956,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/musyx/musyx_exact_80163BCC",
@@ -14929,13 +15098,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 332,
+          "size": 300,
           "virtual_address": 2148941720
         }
       ],
-      "total_code": 332,
+      "total_code": 300,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 2
+    },
+    {
+      "name": "main/musyx/musyx_ai_start_exact_801640C4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148942020
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/musyx/musyx_exact_801640E4",
@@ -15007,13 +15189,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 296,
+          "size": 56,
           "virtual_address": 2148942688
         }
       ],
-      "total_code": 296,
+      "total_code": 56,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_irq_disable_exact_80164398",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148942744
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_candidate_801643B8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 208,
+          "virtual_address": 2148942776
+        }
+      ],
+      "total_code": 208,
+      "total_data": 0,
+      "total_functions": 4
     },
     {
       "name": "main/musyx/musyx_exact_80164488",
@@ -15411,17 +15619,69 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/gs_dvd",
+      "name": "main/game/gs_dvd_candidate_80167040",
       "sections": [
         {
           "name": ".text",
-          "size": 7204,
+          "size": 3604,
           "virtual_address": 2148954176
         }
       ],
-      "total_code": 7204,
+      "total_code": 3604,
       "total_data": 0,
-      "total_functions": 55
+      "total_functions": 34
+    },
+    {
+      "name": "main/game/gs_dvd_exact_80167E54",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148957780
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gs_dvd_candidate_80167E64",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 320,
+          "virtual_address": 2148957796
+        }
+      ],
+      "total_code": 320,
+      "total_data": 0,
+      "total_functions": 5
+    },
+    {
+      "name": "main/game/gs_dvd_exact_80167FA4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4,
+          "virtual_address": 2148958116
+        }
+      ],
+      "total_code": 4,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_dvd_candidate_80167FA8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3260,
+          "virtual_address": 2148958120
+        }
+      ],
+      "total_code": 3260,
+      "total_data": 0,
+      "total_functions": 13
     },
     {
       "name": "main/game/ps_candidate_80168C64",
@@ -15857,13 +16117,65 @@
       "sections": [
         {
           "name": ".text",
-          "size": 3244,
+          "size": 60,
           "virtual_address": 2149022128
         }
       ],
-      "total_code": 3244,
+      "total_code": 60,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/camera_get_active_exact_801779EC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 76,
+          "virtual_address": 2149022188
+        }
+      ],
+      "total_code": 76,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_80177A38",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2149022264
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_scene_set_mode_exact_80177A44",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2149022276
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_80177A64",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3064,
+          "virtual_address": 2149022308
+        }
+      ],
+      "total_code": 3064,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/camera_exact_8017865C",
