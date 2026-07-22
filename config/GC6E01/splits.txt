@@ -1820,8 +1820,17 @@ game/gs_texture_range_800EF548.c:
 game/gs_thread.c:
 	.text       start:0x800F0030 end:0x800F75FC
 
+game/input/input_exact_800F75FC.c:
+	.text       start:0x800F75FC end:0x800F760C
+
+game/input/input_candidate_800F760C.c:
+	.text       start:0x800F760C end:0x800F76E4
+
+game/input/input_exact_800F76E4.c:
+	.text       start:0x800F76E4 end:0x800F7758
+
 game/input/input.c:
-	.text       start:0x800F75FC end:0x800F8268
+	.text       start:0x800F7758 end:0x800F8268
 
 game/gs_thread_hi_range_800F8268.c:
 	.text       start:0x800F8268 end:0x800F9318
@@ -2061,7 +2070,10 @@ game/data/data_8035E4B0.c:
 	.data       start:0x8035E4B0 end:0x803634A8
 
 game/pokemon_range_8012640C.c:
-	.text       start:0x8012640C end:0x80128E38
+	.text       start:0x8012640C end:0x80128CC0
+
+game/pokemon_range_exact_80128CC0.c:
+	.text       start:0x80128CC0 end:0x80128E38
 
 game/hero.c:
 	.text       start:0x80128E38 end:0x80129280
