@@ -120,7 +120,11 @@ BOOL OnReset_800AF628(BOOL final) {
     return TRUE;
 }
 
-/* Address suffix preserves the local symbol identity across the source split. */
+/*
+ * The split tail still refers to this formerly TU-local handler. dtk
+ * address-qualifies that cross-object relocation as
+ * MEMIntrruptHandler_8009F41C, so the definition must use the same name.
+ */
 void MEMIntrruptHandler_8009F41C(s16 interrupt, OSContext* context) {
     u32 cause;
     u32 addr;
