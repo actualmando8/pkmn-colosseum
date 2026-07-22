@@ -3797,8 +3797,23 @@ game/fight_menu.c:
 game/fight_menu_exact_8026503C.c:
 	.text       start:0x8026503C end:0x802658C8
 
-game/fight_timer.c:
-	.text       start:0x802658C8 end:0x80265E34
+game/fight_timer_exact_802658C8.c:
+	.text       start:0x802658C8 end:0x80265A6C
+
+game/fight_timer_candidate_80265A6C.c:
+	.text       start:0x80265A6C end:0x80265B3C
+
+game/fight_timer_exact_80265B3C.c:
+	.text       start:0x80265B3C end:0x80265C84
+
+game/fight_timer_candidate_80265C84.c:
+	.text       start:0x80265C84 end:0x80265D54
+
+game/fight_timer_exact_80265D54.c:
+	.text       start:0x80265D54 end:0x80265DB0
+
+game/fight_timer_candidate_80265DB0.c:
+	.text       start:0x80265DB0 end:0x80265E34
 
 game/d2present.c:
 	.text       start:0x80265E34 end:0x80265EC4
