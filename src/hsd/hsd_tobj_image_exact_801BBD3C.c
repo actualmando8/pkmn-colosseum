@@ -6,7 +6,7 @@ extern void fn_80193AF0(void* mem, s32 size);
 extern void* fn_80193B10(s32 size);
 extern void* memset(void* dst, int value, u32 size);
 extern const char lbl_8047DEB0[7];
-extern const char lbl_8047DEB8[8];
+extern const char lbl_8047DEB8[6];
 
 void HSD_ImageDescFree(HSD_ImageDesc* idesc)
 {
