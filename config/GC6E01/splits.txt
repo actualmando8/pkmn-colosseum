@@ -2281,7 +2281,19 @@ game/effect/effect_visual_candidate_801402AC.c:
 	.text       start:0x801402AC end:0x80140588
 
 game/people/people_data.c:
-	.text       start:0x80140588 end:0x80144574
+	.text       start:0x80140588 end:0x80143C50
+
+game/people/people_item_getters_exact_80143C50.c:
+	.text       start:0x80143C50 end:0x8014402C
+
+game/people/people_data_candidate_8014402C.c:
+	.text       start:0x8014402C end:0x80144064
+
+game/people/people_item_tail_exact_80144064.c:
+	.text       start:0x80144064 end:0x801441A8
+
+game/people/people_data_suffix_801441A8.c:
+	.text       start:0x801441A8 end:0x80144574
 
 game/item_range_80144574.c:
 	.text       start:0x80144574 end:0x8014635C
