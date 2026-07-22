@@ -1191,13 +1191,13 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "game/people/people_data.c"),
                     (Matching, "game/people/people_item_effort_exact_80143718.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_80143778.c"),
+                    (Matching, "game/people/people_data_candidate_80143778.c"),
                     (Matching, "game/people/people_item_ppup_exact_801437A0.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_801437B8.c"),
+                    (Matching, "game/people/people_data_candidate_801437B8.c"),
                     (Matching, "game/people/people_item_hpup_exact_801437E0.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_801437F8.c"),
+                    (Matching, "game/people/people_data_candidate_801437F8.c"),
                     (Matching, "game/people/people_item_battle_boost_exact_801439B8.c"),
-                    (CodeCandidate, "game/people/people_data_candidate_80143A44.c"),
+                    (Matching, "game/people/people_data_candidate_80143A44.c"),
                     (Matching, "game/people/people_item_tables_setters_exact_80143A94.c"),
                 ]
             ],

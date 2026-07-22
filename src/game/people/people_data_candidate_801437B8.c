@@ -1,2 +1,13 @@
-/** Candidate-only owner for the item-parameter residual at 0x801437B8. */
-#include "src/game/people/people_data.c"
+/**
+ * @file people_data_candidate_801437B8.c
+ * @brief Item PP-selection flag accessor.
+ */
+#include "game/people/people_data.h"
+
+s32 itemParamGetPPSelectFlag(const ItemParamData* item)
+{
+    if (item == NULL) {
+        return 0;
+    }
+    return item->ppSelectFlag != 0;
+}
