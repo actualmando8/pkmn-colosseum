@@ -24,7 +24,6 @@
 s32 GScolsys2Sun(void* origin, void* dir) {
 #pragma optimization_level 4
     extern f32 PSVECDistance(void* a, void* b);
-    extern s32 GScolsys2UtilGetCpPlaneLine(void* a, void* b, void* c, void* d, void* e, void* f);
     extern s32 GScolsy2UtilChkInTri(void* a, void* b, void* c);
     extern f32 lbl_8047CF68;
     extern f32 lbl_8047CF6C;
@@ -78,7 +77,11 @@ s32 GScolsys2Sun(void* origin, void* dir) {
                         vsrc++;
                         vdst++;
                     } while (k < 3);
-                    if (GScolsys2UtilGetCpPlaneLine(&out, &resultT, &pt, verts, origin, dir) == 0) {
+                    if (GScolsys2UtilGetCpPlaneLine((Vec3f*)&out, &resultT,
+                                                   (const Vec3f*)&pt,
+                                                   (const Vec3f*)verts,
+                                                   (const Vec3f*)origin,
+                                                   (const Vec3f*)dir) == 0) {
                         hit = 0;
                     } else if (resultT < lbl_8047CF68 || resultT > lbl_8047CF6C) {
                         hit = 0;

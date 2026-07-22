@@ -327,7 +327,6 @@ void GScolsys2ThruGetEventID(void) {
 s32 fn_80111864(void* a, void* b, void* c) {
 #pragma optimization_level 4
     extern f32 PSVECDotProduct(void* a, void* b);
-    extern s32 GScolsys2UtilGetCpPlaneLine(void* a, void* b, void* c, void* d, void* e, void* f);
     extern s32 GScolsy2UtilChkInTri(void* a, void* b, void* c);
     extern f32 lbl_8047CF60;
     extern f32 lbl_8047CF64;
@@ -400,7 +399,11 @@ s32 fn_80111864(void* a, void* b, void* c) {
                         vertIdx++;
                         scan += 0xC;
                     } while (vertIdx < 3);
-                    if (GScolsys2UtilGetCpPlaneLine(hitPoint, &resultT, planePoint, verts, a, b) == 0) {
+                    if (GScolsys2UtilGetCpPlaneLine((Vec3f*)hitPoint, &resultT,
+                                                   (const Vec3f*)planePoint,
+                                                   (const Vec3f*)verts,
+                                                   (const Vec3f*)a,
+                                                   (const Vec3f*)b) == 0) {
                         hit = 0;
                     } else if ((resultT < lbl_8047CF60) || (resultT > lbl_8047CF64)) {
                         hit = 0;

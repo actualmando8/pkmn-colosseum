@@ -15,7 +15,7 @@
 #ifndef GAME_GS_FIELD_COLQUERY_TYPES_H
 #define GAME_GS_FIELD_COLQUERY_TYPES_H
 
-#include "dolphin/types.h"
+#include "game/gs_colsys.h"
 
 /* ===== Collision triangle/query record layouts ===== */
 typedef struct GScolsys2Vec3 {
@@ -148,7 +148,6 @@ f32   GScolsy2UtilGetSidePlanePoint(void* normal, void* p1, void* p2);
 void  GScolsy2UtilGetCpPlanePoint(void* out, void* normal, void* verts, void* point);
 f32   GScolsys2UtilGetCpLinePoint(void* out, void* start, void* end, void* point);
 s32   GScolsy2UtilChkInTri(void* point, void* verts, void* normal);
-s32   GScolsys2UtilGetCpPlaneLine(void* a, void* b, void* c, void* d, void* e, void* f);
 
 /* ===== Cross-TU forward declarations (this split) ===== */
 s32 fn_80111864(void* a, void* b, void* c); /* GScolsys2Thru, called from GScolsys2Check */

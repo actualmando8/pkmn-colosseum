@@ -206,9 +206,17 @@ typedef struct PeopleEntry {
  *   0x10-0x2B: (unknown)
  */
 typedef struct PeopleInfoBiosEntry {
-    u8    field_00[0x0C];   /* 0x00 - 0x0B */
+    u8 flags;               /* 0x00 */
+    u8 field_01[0x08];      /* 0x01 - 0x08 */
+    u8 raw_09;              /* 0x09: serialized byte; signed when queried */
+    u8 field_0A[0x02];      /* 0x0A - 0x0B */
     void* scriptRef;        /* 0x0C */
-    u8    field_10[0x1C];   /* 0x10 - 0x2B */
+    f32 field_10;           /* 0x10 */
+    f32 field_14;           /* 0x14 */
+    f32 field_18;           /* 0x18 */
+    f32 field_1C;           /* 0x1C */
+    f32 field_20;           /* 0x20 */
+    u8 field_24[0x08];      /* 0x24 - 0x2B */
 } PeopleInfoBiosEntry;
 
 /**
@@ -295,6 +303,21 @@ void peopleSetTransform(PeopleEntry* entry, void* mtx);
 
 /** Get the world transform pointer for a people entry. fn_8018FC00 */
 void* peopleGetTransform(PeopleEntry* entry);
+
+u32 fn_8018F470(u32 index);
+u32 fn_8018F490(const PeopleInfoBiosEntry* info);
+u32 fn_8018F4AC(const PeopleInfoBiosEntry* info);
+f32 fn_8018F5B4(const PeopleInfoBiosEntry* info);
+f32 fn_8018F5CC(const PeopleInfoBiosEntry* info);
+f32 fn_8018F5E4(const PeopleInfoBiosEntry* info);
+u32 fn_8018F5FC(const PeopleInfoBiosEntry* info);
+f32 fn_8018F618(const PeopleInfoBiosEntry* info);
+f32 fn_8018F638(const PeopleInfoBiosEntry* info);
+f32 fn_8018F658(const PeopleInfoBiosEntry* info);
+f32 fn_8018F678(const PeopleInfoBiosEntry* info);
+s32 fn_8018F698(const PeopleInfoBiosEntry* info);
+void* fn_8018F6B4(const PeopleInfoBiosEntry* info);
+PeopleInfoBiosEntry* peopleInfoBiosGetPtrFromIndex(u32 index);
 
 /* =========================================================================
  * Function declarations -- Movement subsystem

@@ -1039,3 +1039,76 @@ Independent audit: PASS from two independent reviews; exact composition,
 Next action: merge this tracked-tooling cleanup, rotate the Windows-only farm
   to `c7701bef`, and integrate the next exact-30 batch
 ```
+
+### Farm cleanup snapshot — 2026-07-21 (PR #413)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before cleanup: c7701bef (PR #412 merged)
+Merged cleanup: PR #413, source `5503da7f`, merge `ec451007`
+Decompilation delta: none; report and linked metrics remain the PR #412 values
+Tracked cleanup: removed all 28 files under the retired 3090 farm directory
+  plus its queue generator, unit-flag extractor, and poll script; retained only
+  historical ledgers, benchmark evidence, and archived results
+Local cleanup: removed the active ignored 3090 queue, manifest, metadata, and
+  bytecode caches after reconciliation; no recoverable source was discarded
+Remote 3090: campaign checkout, processes, cron entries, and services remain
+  absent; do not contact, restart, or redeploy this machine
+Windows: sole active farm; current-report refill contains 138 records, 69
+  fidelity-valid runnable units across 42 objects, and 69 documented skips;
+  manifest SHA-256
+  `59c84e331b7ce4a00b742e97314affd002bda096ea258d10ee92e6f7bd8150b4`;
+  one supervisor and 12 / 12 workers are live with zero wins or bad units at
+  the handoff boundary
+Quality: generator tests now exercise only the live Windows generator; source,
+  config, object topology, progress counters, and retail output are unchanged
+Next action: integrate the independently preflighted PR #414 exact-30 batch,
+  then reconcile and rotate the Windows queue from the merged head
+```
+
+### Batch snapshot — 2026-07-21 (PR #414)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: ec451007 (PR #413 merged)
+Batch PR: #414, `integration/pr414-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +12 complete units / +20 total-unit topology /
+  +1,916 linked code / +0 linked data
+Goal cumulative from PR #381: +723 linked functions / +175 complete units /
+  +62,140 linked code / +193 linked data
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,491 functions; 860 / 1,550 units;
+  628,300 complete code bytes; 752,777 complete data bytes
+README/report: synced at the PR head at 25.18% linked / 628.30 kB complete
+  code; decomp.dev publication is checked again after merge
+Retired 3090 farm: no tooling, processes, checkout, cron, or services were
+  recreated or contacted; all model and permutation work remains Windows/local
+Windows: sole active farm; the post-#413 138-record manifest remains isolated
+  from this batch, with 69 runnable units and 12 / 12 live workers
+Integrated: one Dolphin OSLink wrapper, four MetroTRK dispatch/init helpers,
+  two MetroTRK communication/circle-buffer helpers, the canonical MSL string
+  writer, five GS thread access/block helpers, one collision plane-line query,
+  one flag clear routine, and 15 typed People info-table helpers
+Reconciliation rejects: `GSscratchFree` required a one-use artificial inline
+  helper; three printf-family callers depended on a TU-local `__pformatter`;
+  `fn_8000D290` and `OSLinkFixed` were report-exact but dead-stripped from the
+  linked image. None is linked or counted. Live natural replacements were
+  selected and the retail-link gate now passes.
+Residual policy: all nine affected original ranges remain contiguous explicit
+  CodeCandidate partitions; no missing range became an auto object
+Validation: all 30 functions / 1,916 bytes are raw 100%; twelve Matching units
+  emit target-identical text and all 57 normalized relocations with correct
+  symbol ownership; every selected symbol survives in main.elf at retail VA
+Type recovery: `PeopleInfoBiosEntry` is an evidenced 0x2C serialized record;
+  byte 0x09 is stored raw and explicitly sign-extended by its getter. Collision
+  vector, TRK result/buffer/callback, OS module, and GS thread types are explicit
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, liveness, text, relocation
+  ownership, residual coverage, semantic/type fidelity, policy, and full link
+Next action: publish and merge PR #414, reconcile/rotate Windows, then replay
+  the linker-live PR #415 exact-30 batch from the merged head
+```
