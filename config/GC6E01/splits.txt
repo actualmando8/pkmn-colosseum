@@ -2626,7 +2626,16 @@ musyx/runtime/synthmacros_exact_80157218.c:
 	.text       start:0x80157218 end:0x80157280
 
 musyx/musyx_candidate_80157280.c:
-	.text       start:0x80157280 end:0x80161934
+	.text       start:0x80157280 end:0x801609C8
+
+musyx/musyx_midi_exact_801609C8.c:
+	.text       start:0x801609C8 end:0x80161134
+
+musyx/musyx_candidate_80161134.c:
+	.text       start:0x80161134 end:0x801615D4
+
+musyx/musyx_input_getters_exact_801615D4.c:
+	.text       start:0x801615D4 end:0x80161934
 
 musyx/musyx_input_aux_exact_80161934.c:
 	.text       start:0x80161934 end:0x80161D20
@@ -3457,7 +3466,25 @@ game/fight_seq.c:
 	.text       start:0x80211170 end:0x80211A00
 
 game/fight_range_80211A00.c:
-	.text       start:0x80211A00 end:0x80214450
+	.text       start:0x80211A00 end:0x80212840
+
+game/fight_range_exact_80212840.c:
+	.text       start:0x80212840 end:0x802128D0
+
+game/fight_range_802128D0.c:
+	.text       start:0x802128D0 end:0x802134D4
+
+game/fight_range_exact_802134D4.c:
+	.text       start:0x802134D4 end:0x80213558
+
+game/fight_range_80213558.c:
+	.text       start:0x80213558 end:0x802136A4
+
+game/fight_range_exact_802136A4.c:
+	.text       start:0x802136A4 end:0x80213A78
+
+game/fight_range_80213A78.c:
+	.text       start:0x80213A78 end:0x80214450
 
 game/fight_range_80211A00_exact_80214450.c:
 	.text       start:0x80214450 end:0x80216A58

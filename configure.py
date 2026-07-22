@@ -1030,6 +1030,9 @@ config.libs = [
                     progress_category="musyx",
                 )
                 for status, path in [
+                    (Matching, "musyx/musyx_midi_exact_801609C8.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80161134.c"),
+                    (Matching, "musyx/musyx_input_getters_exact_801615D4.c"),
                     (Matching, "musyx/musyx_input_aux_exact_80161934.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80161D20.c"),
                 ]
@@ -3391,6 +3394,48 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/fight_range_80211A00.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_range_exact_80212840.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_range_802128D0.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_range_exact_802134D4.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_range_80213558.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/fight_range_exact_802136A4.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/fight_range_80213A78.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
