@@ -58,7 +58,7 @@ extern void GSmodelGetPosition(void* a, void* b);
 
 /* ===== String constants (rodata) ===== */
 extern const char lbl_80273A00[]; /* "gs%04d.xfb" */
-extern u32 lbl_80273DC8[];       /* 3-word animation param table */
+extern const struct GSSceneVec3 lbl_80273DC8; /* vector prefix of rodata blob */
 
 /* ===== BSS / global state (sda21) ===== */
 extern void* lbl_8047B188;  /* active object list head */

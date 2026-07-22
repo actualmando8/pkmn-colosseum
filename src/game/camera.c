@@ -1081,11 +1081,9 @@ asm void cameraMoveTarget(void) {
 #pragma push
 #pragma optimization_level 4
 void cameraMoveTarget(void* unused, u32 a, u32 b, f32 param) {
-    u32 local[3];
+    GSSceneVec3 local;
     void* handle;
-    local[0] = lbl_80273DC8[0];
-    local[1] = lbl_80273DC8[1];
-    local[2] = lbl_80273DC8[2];
+    local = lbl_80273DC8;
     {
         void* p = lbl_80478C40;
         *(u32*)((u8*)p + 0x34) = a;
@@ -1096,13 +1094,13 @@ void cameraMoveTarget(void* unused, u32 a, u32 b, f32 param) {
     }
     handle = GSresGetResource(a, b);
     if (handle != 0) {
-        GSmodelGetPosition(handle, local);
+        GSmodelGetPosition(handle, &local);
     }
     {
         void* p = lbl_80478C40;
         *((u8*)p + 0x01) = 1;
         p = lbl_80478C40;
-        GSvecCopy((u8*)p + 0x50, local);
+        GSvecCopy((u8*)p + 0x50, &local);
     }
     {
         void* q = lbl_80478C40;
