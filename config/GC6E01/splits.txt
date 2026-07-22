@@ -3755,8 +3755,20 @@ game/fight_trainer_ai_waza_hit_exact_802570D0.c:
 game/fight_trainer_ai_waza_hit.c:
 	.text       start:0x8025C264 end:0x8025C5A4
 
+game/fight_trainer_ai2_exact_8025C5A4.c:
+	.text       start:0x8025C5A4 end:0x8025C6BC
+
 game/fight_trainer_ai2.c:
-	.text       start:0x8025C5A4 end:0x8025CD64
+	.text       start:0x8025C6BC end:0x8025C770
+
+game/fight_trainer_ai2_exact_8025C770.c:
+	.text       start:0x8025C770 end:0x8025C808
+
+game/fight_trainer_ai2_candidate_8025C808.c:
+	.text       start:0x8025C808 end:0x8025CAA8
+
+game/fight_trainer_ai2_exact_8025CAA8.c:
+	.text       start:0x8025CAA8 end:0x8025CD64
 
 game/toolentry.c:
 	.text       start:0x8025CD64 end:0x8025DBD4
