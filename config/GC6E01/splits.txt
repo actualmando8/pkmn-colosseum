@@ -639,14 +639,20 @@ dolphin/sdk_range_8009A9D8.c:
 dolphin/sdk_exact_8009ABD0.c:
 	.text       start:0x8009ABD0 end:0x8009AC3C
 
-dolphin/sdk_range_8009AC3C.c:
-	.text       start:0x8009AC3C end:0x8009AFB0
+dolphin/sdk_exact_8009AC3C.c:
+	.text       start:0x8009AC3C end:0x8009AC50
+
+dolphin/sdk_candidate_8009AC50.c:
+	.text       start:0x8009AC50 end:0x8009AFB0
 
 dolphin/os/OSArena.c:
 	.text       start:0x8009AFB0 end:0x8009AFD0
 
-dolphin/sdk_range_8009AFD0.c:
-	.text       start:0x8009AFD0 end:0x8009B290
+dolphin/sdk_exact_8009AFD0.c:
+	.text       start:0x8009AFD0 end:0x8009AFFC
+
+dolphin/sdk_candidate_8009AFFC.c:
+	.text       start:0x8009AFFC end:0x8009B290
 
 dolphin/os/OSCache_privileged_prefix.c:
 	.text       start:0x8009B290 end:0x8009B4D8
@@ -700,8 +706,11 @@ dolphin/sdk_range_8009F77C_prefix.c:
 dolphin/sdk_exact_8009F958.c:
 	.text       start:0x8009F958 end:0x8009F9C8
 
-dolphin/sdk_range_8009F9C8.c:
-	.text       start:0x8009F9C8 end:0x8009FAEC
+dolphin/sdk_exact_8009F9C8.c:
+	.text       start:0x8009F9C8 end:0x8009FADC
+
+dolphin/sdk_candidate_8009FADC.c:
+	.text       start:0x8009FADC end:0x8009FAEC
 
 dolphin/os/OSState_fn_8009FAEC.c:
 	.text       start:0x8009FAEC end:0x8009FAF8
@@ -771,7 +780,13 @@ dolphin/sdk_exact_800A3744.c:
 	.text       start:0x800A3744 end:0x800A37CC
 
 dolphin/sdk_range_800A37CC.c:
-	.text       start:0x800A37CC end:0x800A3EB0
+	.text       start:0x800A37CC end:0x800A3874
+
+dolphin/sdk_exact_800A3874.c:
+	.text       start:0x800A3874 end:0x800A3A78
+
+dolphin/sdk_candidate_800A3A78.c:
+	.text       start:0x800A3A78 end:0x800A3EB0
 
 dolphin/dvd/DVDLowInitWA.c:
 	.text       start:0x800A3EB0 end:0x800A3EF0
@@ -861,8 +876,11 @@ dolphin/dvd/DVD_exact_800A76E4.c:
 dolphin/dvd/DVD_range_800A7728.c:
 	.text       start:0x800A7728 end:0x800A7820
 
-dolphin/sdk_range_800A7820.c:
-	.text       start:0x800A7820 end:0x800A7AFC
+dolphin/sdk_exact_800A7820.c:
+	.text       start:0x800A7820 end:0x800A7880
+
+dolphin/sdk_candidate_800A7880.c:
+	.text       start:0x800A7880 end:0x800A7AFC
 
 dolphin/sdk_exact_800A7AFC.c:
 	.text       start:0x800A7AFC end:0x800A7BD4
@@ -1292,8 +1310,12 @@ crt/mwtrace_helpers.c:
 game/gs_range_800C45A0.c:
 	.text       start:0x800C45A0 end:0x800C4668
 
-crt/global_destructor_chain.c:
-	.text       start:0x800C4668 end:0x800C470C
+crt/global_destructor_chain_exact_800C4668.c:
+	.text       start:0x800C4668 end:0x800C46B0
+	.sbss       start:0x8047A9F0 end:0x8047A9F4
+
+crt/global_destructor_chain_candidate_800C46B0.c:
+	.text       start:0x800C46B0 end:0x800C470C
 
 dolphin/sdk_range_800C470C.c:
 	.text       start:0x800C470C end:0x800C4E44

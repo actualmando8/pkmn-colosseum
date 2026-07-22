@@ -6,21 +6,21 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1393
+    "total_units": 1402
   },
   "topology_status": {
-    "auto_units": 66,
-    "named_units": 1327,
-    "source_backed_units": 1311,
+    "auto_units": 68,
+    "named_units": 1334,
+    "source_backed_units": 1318,
     "auto_code": 0,
-    "auto_data": 57691,
+    "auto_data": 57687,
     "auto_functions": 0
   },
   "baseline_progress": {
     "matched_code": "901420",
     "matched_code_percent": 36.127495,
-    "matched_data": "2136509",
-    "matched_data_percent": 97.286514,
+    "matched_data": "2136513",
+    "matched_data_percent": 97.28669,
     "matched_functions": 6307,
     "matched_functions_percent": 73.31163,
     "fuzzy_match_percent": 57.79945
@@ -2892,17 +2892,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/dolphin/sdk_range_8009AC3C",
+      "name": "main/dolphin/sdk_exact_8009AC3C",
       "sections": [
         {
           "name": ".text",
-          "size": 884,
+          "size": 20,
           "virtual_address": 2148117564
         }
       ],
-      "total_code": 884,
+      "total_code": 20,
       "total_data": 0,
-      "total_functions": 2
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_8009AC50",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 864,
+          "virtual_address": 2148117584
+        }
+      ],
+      "total_code": 864,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/dolphin/os/OSArena",
@@ -2918,17 +2931,30 @@
       "total_functions": 4
     },
     {
-      "name": "main/dolphin/sdk_range_8009AFD0",
+      "name": "main/dolphin/sdk_exact_8009AFD0",
       "sections": [
         {
           "name": ".text",
-          "size": 704,
+          "size": 44,
           "virtual_address": 2148118480
         }
       ],
-      "total_code": 704,
+      "total_code": 44,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_8009AFFC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 660,
+          "virtual_address": 2148118524
+        }
+      ],
+      "total_code": 660,
+      "total_data": 0,
+      "total_functions": 2
     },
     {
       "name": "main/dolphin/os/OSCache_privileged_prefix",
@@ -3170,17 +3196,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/dolphin/sdk_range_8009F9C8",
+      "name": "main/dolphin/sdk_exact_8009F9C8",
       "sections": [
         {
           "name": ".text",
-          "size": 292,
+          "size": 276,
           "virtual_address": 2148137416
         }
       ],
-      "total_code": 292,
+      "total_code": 276,
       "total_data": 0,
-      "total_functions": 4
+      "total_functions": 3
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_8009FADC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 16,
+          "virtual_address": 2148137692
+        }
+      ],
+      "total_code": 16,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/dolphin/os/OSState_fn_8009FAEC",
@@ -3491,13 +3530,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 1764,
+          "size": 168,
           "virtual_address": 2148153292
         }
       ],
-      "total_code": 1764,
+      "total_code": 168,
       "total_data": 0,
-      "total_functions": 18
+      "total_functions": 2
+    },
+    {
+      "name": "main/dolphin/sdk_exact_800A3874",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 516,
+          "virtual_address": 2148153460
+        }
+      ],
+      "total_code": 516,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_800A3A78",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1080,
+          "virtual_address": 2148153976
+        }
+      ],
+      "total_code": 1080,
+      "total_data": 0,
+      "total_functions": 13
     },
     {
       "name": "main/dolphin/dvd/DVDLowInitWA",
@@ -3597,12 +3662,12 @@
       "sections": [
         {
           "name": ".sbss",
-          "size": 2008,
+          "size": 536,
           "virtual_address": 2152179672
         }
       ],
       "total_code": 0,
-      "total_data": 2008,
+      "total_data": 536,
       "total_functions": 0
     },
     {
@@ -3923,17 +3988,30 @@
       "total_functions": 2
     },
     {
-      "name": "main/dolphin/sdk_range_800A7820",
+      "name": "main/dolphin/sdk_exact_800A7820",
       "sections": [
         {
           "name": ".text",
-          "size": 732,
+          "size": 96,
           "virtual_address": 2148169760
         }
       ],
-      "total_code": 732,
+      "total_code": 96,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 2
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_800A7880",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 636,
+          "virtual_address": 2148169856
+        }
+      ],
+      "total_code": 636,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/dolphin/sdk_exact_800A7AFC",
@@ -5969,17 +6047,61 @@
       "total_functions": 1
     },
     {
-      "name": "main/crt/global_destructor_chain",
+      "name": "main/crt/global_destructor_chain_exact_800C4668",
       "sections": [
         {
+          "name": ".sbss",
+          "size": 4,
+          "virtual_address": 2152180208
+        },
+        {
           "name": ".text",
-          "size": 164,
+          "size": 72,
           "virtual_address": 2148288104
         }
       ],
-      "total_code": 164,
+      "total_code": 72,
+      "total_data": 4,
+      "total_functions": 1
+    },
+    {
+      "name": "main/auto_08_8047A9F4_sbss",
+      "sections": [
+        {
+          "name": ".sbss",
+          "size": 44,
+          "virtual_address": 2152180212
+        }
+      ],
+      "total_code": 0,
+      "total_data": 44,
+      "total_functions": 0
+    },
+    {
+      "name": "main/auto_08_8047AA20_sbss",
+      "sections": [
+        {
+          "name": ".sbss",
+          "size": 1424,
+          "virtual_address": 2152180256
+        }
+      ],
+      "total_code": 0,
+      "total_data": 1424,
+      "total_functions": 0
+    },
+    {
+      "name": "main/crt/global_destructor_chain_candidate_800C46B0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 92,
+          "virtual_address": 2148288176
+        }
+      ],
+      "total_code": 92,
       "total_data": 0,
-      "total_functions": 2
+      "total_functions": 1
     },
     {
       "name": "main/dolphin/sdk_range_800C470C",
