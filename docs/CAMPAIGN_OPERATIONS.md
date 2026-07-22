@@ -1608,3 +1608,76 @@ Next action: publish and merge PR #424, reconcile and rotate Windows from the
   merged head, then integrate the next exact-30 batch toward the remaining 37
   functions
 ```
+
+### Batch snapshot — 2026-07-22 (PR #425)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: b57f183f (PR #424 merged)
+Batch branch: `integration/pr425-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +23 complete units / +40 total-unit topology /
+  +1,600 linked code / +0 linked data
+Goal cumulative from PR #381: +993 linked functions / +335 complete units /
+  +78,300 linked code / +193 linked data; seven linked functions remain in
+  the current +1,000 campaign
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes; fuzzy progress 57.809658%
+Head linked: 4,761 functions; 1,020 / 1,790 units;
+  644,460 complete code bytes; 752,777 complete data bytes
+README/report: synced at the branch head at 25.83% linked / 644.46 kB
+  complete code; PR #424's decomp.dev publication was confirmed at exact
+  merge b57f183f before this batch
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole authorized permutation farm
+Windows: post-#424 reconciliation found the same 39 cumulative artifacts:
+  32 already exact plus seven strict rejects and zero recoverable/new source.
+  The stale supervisor and 12 orphan workers were stopped before rotation.
+  Of 113 native-smoked fresh candidates, 102 passed and 11 were rejected; the
+  final 60 functions across 60 owners then passed a second 60 / 60 native
+  smoke. Atomic manifest-last deployment verified all 420 contract files.
+  Queue SHA-256 is
+  `b7f9409798d02b8282fac2ebb383e5380f449cd3edc22cc492ab776bec400333`
+  and manifest SHA-256 is
+  `51fd5da9ff74aa78b782fae9be117d5671347727ef3195ae32cdfcee9d0b47f7`.
+  Supervisor PID 54284 and 12 / 12 parented workers were live with zero
+  orphans, wins, or bad units at the restart checkpoint. The queue has no
+  function or owner overlap with this batch, PR #424, the exact/raw-100 pool,
+  historical Windows deployments, or the Kimi reservation.
+Kimi K3: the audited full-owner guard remains available through the owner-only
+  Moonshot key path. No additional request was made in this batch after the
+  prior `GSmaterialCreate` zero-lift round; no model output enters source.
+Integrated: three GBA command/table helpers; four fight condition/weather
+  helpers; five field resource/memcard helpers; four Gapp breakpoint/state
+  helpers; one menu error accessor; two camera state helpers; three DVD
+  wrappers; and eight MusyX allocator, ARAM, AI, and interrupt helpers
+Type recovery: GBA tables use evidenced typed arrays; fight helpers use typed
+  weather/move-query prototypes and a compiler-owned jump table; menu, camera,
+  field, and memcard accessors name corroborated fields; Gapp stores its
+  breakpoint callback as a function pointer; and the MusyX ARAM queue and
+  allocator-pair layouts preserve the observed ABI. The sole volatile access
+  is the authentic ARAM completion-count wait: an asynchronous callback
+  decrements the byte while the foreground thread spins.
+Residual/data policy: 22 Matching text units and explicit CodeCandidate
+  neighbors preserve gapless, disjoint ownership. The fight switch's 32-byte
+  jump table remains paired with its authentic text owner; adjacent prefix and
+  suffix data remain target-identical. The canonical GX distance-attenuation
+  candidate was rejected because its text-only match required private
+  `.sdata2` ownership; linker-live `menuGetLastError` replaced it naturally.
+Validation: all 30 functions / 1,600 bytes are raw 100%; all 22 Matching text
+  units emit target-identical code. All 58 text and eight fight jump-table
+  data relocations pair after address normalization, for 66 / 66 total.
+  Every selected symbol survives in main.elf at its retail VA and size, with
+  255 genuine incoming active-input relocations in aggregate and none at zero;
+  `FORCEACTIVE` remains empty.
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, 58 text plus eight data
+  relocation pairs, typed semantics and ABI, authentic asynchronous volatile
+  use, linker liveness, residual/data topology, strict source policy, Windows
+  owner exclusion, zero regression, and the full retail link
+Next action: publish and merge PR #425, reconcile and rotate Windows from the
+  merged head, then link the final seven functions in the current +1,000
+  campaign
+```
