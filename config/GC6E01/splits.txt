@@ -2306,11 +2306,26 @@ game/gs_range_80101910.c:
 game/kaisuu.c:
 	.text       start:0x80101A70 end:0x80101B34
 
-game/gapp_range_80101B34.c:
-	.text       start:0x80101B34 end:0x80102004
+game/gapp_exact_80101B34.c:
+	.text       start:0x80101B34 end:0x80101B90
 
-game/menu.c:
-	.text       start:0x80102004 end:0x80103E68
+game/gapp_candidate_80101B90.c:
+	.text       start:0x80101B90 end:0x80101D5C
+
+game/gapp_exact_80101D5C.c:
+	.text       start:0x80101D5C end:0x80101D8C
+
+game/gapp_candidate_80101D8C.c:
+	.text       start:0x80101D8C end:0x80101FB8
+
+game/gapp_exact_80101FB8.c:
+	.text       start:0x80101FB8 end:0x80102004
+
+game/menu_get_last_error_exact_80102004.c:
+	.text       start:0x80102004 end:0x80102014
+
+game/menu_candidate_80102014.c:
+	.text       start:0x80102014 end:0x80103E68
 
 game/cursor_bios.c:
 	.text       start:0x80103E68 end:0x80103FE4
@@ -3280,13 +3295,37 @@ musyx/musyx_exact_801630E4.c:
 	.text       start:0x801630E4 end:0x80163104
 
 musyx/musyx_candidate_80163104.c:
-	.text       start:0x80163104 end:0x801631CC
+	.text       start:0x80163104 end:0x80163188
+
+musyx/musyx_exact_80163188.c:
+	.text       start:0x80163188 end:0x801631C0
+
+musyx/musyx_candidate_801631C0.c:
+	.text       start:0x801631C0 end:0x801631CC
 
 musyx/musyx_exact_801631CC.c:
 	.text       start:0x801631CC end:0x801631F4
 
 musyx/musyx_candidate_801631F4.c:
-	.text       start:0x801631F4 end:0x80163BCC
+	.text       start:0x801631F4 end:0x80163214
+
+musyx/musyx_aram_callback_exact_80163214.c:
+	.text       start:0x80163214 end:0x801632B4
+
+musyx/musyx_candidate_801632B4.c:
+	.text       start:0x801632B4 end:0x80163490
+
+musyx/musyx_aram_wait_exact_80163490.c:
+	.text       start:0x80163490 end:0x801634A8
+
+musyx/musyx_candidate_801634A8.c:
+	.text       start:0x801634A8 end:0x801637B8
+
+musyx/musyx_aram_upload_exact_801637B8.c:
+	.text       start:0x801637B8 end:0x80163810
+
+musyx/musyx_candidate_80163810.c:
+	.text       start:0x80163810 end:0x80163BCC
 
 musyx/musyx_exact_80163BCC.c:
 	.text       start:0x80163BCC end:0x80163BE4
@@ -3298,7 +3337,10 @@ musyx/musyx_exact_80163F88.c:
 	.text       start:0x80163F88 end:0x80163F98
 
 musyx/musyx_candidate_80163F98.c:
-	.text       start:0x80163F98 end:0x801640E4
+	.text       start:0x80163F98 end:0x801640C4
+
+musyx/musyx_ai_start_exact_801640C4.c:
+	.text       start:0x801640C4 end:0x801640E4
 
 musyx/musyx_exact_801640E4.c:
 	.text       start:0x801640E4 end:0x80164118
@@ -3316,7 +3358,13 @@ musyx/musyx_exact_80164328.c:
 	.text       start:0x80164328 end:0x80164360
 
 musyx/musyx_candidate_80164360.c:
-	.text       start:0x80164360 end:0x80164488
+	.text       start:0x80164360 end:0x80164398
+
+musyx/musyx_irq_disable_exact_80164398.c:
+	.text       start:0x80164398 end:0x801643B8
+
+musyx/musyx_candidate_801643B8.c:
+	.text       start:0x801643B8 end:0x80164488
 
 musyx/musyx_exact_80164488.c:
 	.text       start:0x80164488 end:0x801644E0
@@ -3409,8 +3457,20 @@ game/gs_range_801653CC_exact_80166E44.c:
 game/gs_range_801653CC.c:
 	.text       start:0x80166E88 end:0x80167040
 
-game/gs_dvd.c:
-	.text       start:0x80167040 end:0x80168C64
+game/gs_dvd_candidate_80167040.c:
+	.text       start:0x80167040 end:0x80167E54
+
+game/gs_dvd_exact_80167E54.c:
+	.text       start:0x80167E54 end:0x80167E64
+
+game/gs_dvd_candidate_80167E64.c:
+	.text       start:0x80167E64 end:0x80167FA4
+
+game/gs_dvd_exact_80167FA4.c:
+	.text       start:0x80167FA4 end:0x80167FA8
+
+game/gs_dvd_candidate_80167FA8.c:
+	.text       start:0x80167FA8 end:0x80168C64
 
 game/ps_candidate_80168C64.c:
 	.text       start:0x80168C64 end:0x80169340
@@ -3512,7 +3572,19 @@ game/camera_exact_801778B4.c:
 	.text       start:0x801778B4 end:0x801779B0
 
 game/camera_candidate_801779B0.c:
-	.text       start:0x801779B0 end:0x8017865C
+	.text       start:0x801779B0 end:0x801779EC
+
+game/camera_get_active_exact_801779EC.c:
+	.text       start:0x801779EC end:0x80177A38
+
+game/camera_candidate_80177A38.c:
+	.text       start:0x80177A38 end:0x80177A44
+
+game/camera_scene_set_mode_exact_80177A44.c:
+	.text       start:0x80177A44 end:0x80177A64
+
+game/camera_candidate_80177A64.c:
+	.text       start:0x80177A64 end:0x8017865C
 
 game/camera_exact_8017865C.c:
 	.text       start:0x8017865C end:0x801786F4

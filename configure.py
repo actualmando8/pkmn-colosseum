@@ -1176,18 +1176,29 @@ config.libs = [
                     (CodeCandidate, "musyx/musyx_candidate_80163050.c"),
                     (Matching, "musyx/musyx_exact_801630E4.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80163104.c"),
+                    (Matching, "musyx/musyx_exact_80163188.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_801631C0.c"),
                     (Matching, "musyx/musyx_exact_801631CC.c"),
                     (CodeCandidate, "musyx/musyx_candidate_801631F4.c"),
+                    (Matching, "musyx/musyx_aram_callback_exact_80163214.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_801632B4.c"),
+                    (Matching, "musyx/musyx_aram_wait_exact_80163490.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_801634A8.c"),
+                    (Matching, "musyx/musyx_aram_upload_exact_801637B8.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163810.c"),
                     (Matching, "musyx/musyx_exact_80163BCC.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80163BE4.c"),
                     (Matching, "musyx/musyx_exact_80163F88.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80163F98.c"),
+                    (Matching, "musyx/musyx_ai_start_exact_801640C4.c"),
                     (Matching, "musyx/musyx_exact_801640E4.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80164118.c"),
                     (Matching, "musyx/musyx_exact_80164204.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80164238.c"),
                     (Matching, "musyx/musyx_exact_80164328.c"),
                     (CodeCandidate, "musyx/musyx_candidate_80164360.c"),
+                    (Matching, "musyx/musyx_irq_disable_exact_80164398.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_801643B8.c"),
                     (Matching, "musyx/musyx_exact_80164488.c"),
                     (CodeCandidate, "musyx/musyx_candidate_801644E0.c"),
                 ]
@@ -1783,20 +1794,35 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gapp_range_80101B34.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
-            Object(
-                CodeCandidate,
-                "game/menu.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/gapp_exact_80101B34.c"),
+                    (CodeCandidate, "game/gapp_candidate_80101B90.c"),
+                    (Matching, "game/gapp_exact_80101D5C.c"),
+                    (CodeCandidate, "game/gapp_candidate_80101D8C.c"),
+                    (Matching, "game/gapp_exact_80101FB8.c"),
+                ]
+            ],
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/menu_get_last_error_exact_80102004.c"),
+                    (CodeCandidate, "game/menu_candidate_80102014.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/cursor_bios.c",
@@ -6479,6 +6505,10 @@ config.libs = [
                     (Matching, "game/camera_exact_80177478.c"),
                     (Matching, "game/camera_exact_801778B4.c"),
                     (CodeCandidate, "game/camera_candidate_801779B0.c"),
+                    (Matching, "game/camera_get_active_exact_801779EC.c"),
+                    (CodeCandidate, "game/camera_candidate_80177A38.c"),
+                    (Matching, "game/camera_scene_set_mode_exact_80177A44.c"),
+                    (CodeCandidate, "game/camera_candidate_80177A64.c"),
                     (Matching, "game/camera_exact_8017865C.c"),
                     (CodeCandidate, "game/camera_candidate_801786F4.c"),
                     (Matching, "game/camera_exact_80179DFC.c"),
@@ -6705,13 +6735,22 @@ config.libs = [
                 extra_cflags=["-O1"],
                 progress_category="hsd",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_dvd.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_dvd_candidate_80167040.c"),
+                    (Matching, "game/gs_dvd_exact_80167E54.c"),
+                    (CodeCandidate, "game/gs_dvd_candidate_80167E64.c"),
+                    (Matching, "game/gs_dvd_exact_80167FA4.c"),
+                    (CodeCandidate, "game/gs_dvd_candidate_80167FA8.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gs_floor_data_exact_800FF0A0.c",
