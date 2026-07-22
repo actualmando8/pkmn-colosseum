@@ -59,6 +59,8 @@ typedef struct {
     GSdobjNode* child; /* 0x18 */
 } GSjobjNode;
 
+#if !defined(PR410_GS_MODEL_SHADOW_SPLIT) || defined(PR410_GS_MODEL_SHADOW_EXACT_8EFC)
+
 void GSmodelFreeAllShadowTextures(void)
 {
     extern void fn_801B06DC(void* obj);
@@ -72,9 +74,9 @@ void GSmodelFreeAllShadowTextures(void)
     }
 }
 
-void GSmodelSetShadowBoundExpansion(u32 callback, u32 state)
+void GSmodelSetShadowBoundExpansion(u32 extent, u32 state)
 {
-    lbl_8047AB84 = callback;
+    lbl_8047AB84 = extent;
     lbl_8047AB80 = state;
 }
 
@@ -82,6 +84,10 @@ void GSmaterialSetDistanceThreshold(f32 dist)
 {
     lbl_8047AB88 = dist * dist;
 }
+
+#endif
+
+#if !defined(PR410_GS_MODEL_SHADOW_SPLIT) || defined(PR410_GS_MODEL_SHADOW_MIDDLE)
 
 void GSmodelSetShadowDebug(u32 val)
 {
@@ -114,6 +120,10 @@ void GSmodelSetShadowTextureSize(s32 width, s32 height)
         lbl_8047AB8C = height;
     }
 }
+
+#endif
+
+#if !defined(PR410_GS_MODEL_SHADOW_SPLIT) || defined(PR410_GS_MODEL_SHADOW_EXACT_8FE8)
 
 void GSmodelSetShadowLight(GSmodel* model, GSlight* light)
 {
@@ -148,6 +158,10 @@ void GSmodelSetShadowSurface(GSmodel* model, s32 count, void* data)
     }
     memcpy(model->shadowVtxBuffer, data, model->shadowVtxCount * 4);
 }
+
+#endif
+
+#if !defined(PR410_GS_MODEL_SHADOW_SPLIT) || defined(PR410_GS_MODEL_SHADOW_SUFFIX)
 
 void GSmodelClearShadowFlags(GSmodel* model, u32 flags)
 {
@@ -240,3 +254,5 @@ void _modelShadowSetShadowFlag__FP9_HSD_JObjPPvi(GSjobjNode* jobj, void* arg, in
     }
 }
 #pragma peephole reset
+
+#endif

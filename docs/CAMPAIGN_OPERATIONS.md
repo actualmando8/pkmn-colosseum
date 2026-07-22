@@ -902,24 +902,24 @@ Next action: continue post-merge farm reconciliation while the PR #409
   exact-30 batch proceeds in an isolated current-master integration tree
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #409)
+### Batch snapshot — 2026-07-21 (PR #409)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: 08f50d3a (PR #408 merged)
-Pending batch: PR #409, `integration/pr409-exact30`
+Batch PR: #409, `integration/pr409-exact30`
 Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +10 complete units / +20 total-unit topology /
   +1,992 linked code / +0 linked data
 Goal cumulative from PR #381: +603 linked functions / +136 complete units /
   +52,804 linked code / +193 linked data
-Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,371 functions; 821 / 1,482 units;
+Head linked: 4,371 functions; 821 / 1,482 units;
   618,964 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #409; decomp.dev base is synced through
-  PR #408 at 24.73% linked / 616.97 kB complete code
+README/report/decomp.dev: synced at merge `f9f06071`; decomp.dev reports
+  24.81% linked / 618.96 kB complete code
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: reconciled post-#408 snapshots
   `post408-pre-08f50d3a-20260722T053816Z` and
@@ -930,7 +930,7 @@ Windows: reconciled 143-record manifest with 74 fidelity-valid units;
   manifest SHA-256
   `670a7bc1f1709521fd9593424f48fed64f12ae54e395c2d2e34bfb79f7e331ca`;
   zero overlap with this batch
-Integrated pending: four HSD MObj helpers, 13 mail helpers, one waza-viewer
+Integrated: four HSD MObj helpers, 13 mail helpers, one waza-viewer
   updater, four waza-sequence helpers, and eight fight-action accessors
 Residual policy: all 15 prefix/interstitial/suffix ranges remain explicit
   CodeCandidate units; no farm artifact is claimed by this source-linking batch
@@ -942,6 +942,46 @@ Type recovery: synchronized the mail/waza/fight cross-TU structures and
   pointer-valued model/particle fields without changing retail code
 Independent audit: PASS for exact composition, relocation parity, residual
   coverage, semantic/type integrity, zero regression, and retail SHA
-Next action: commit the isolated branch, then hand it to the publisher for PR
-  checks and merge
+Next action: continue the Windows-only farm reconciliation while the PR #410
+  exact-30 batch proceeds in an isolated current-master integration tree
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #410)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: f9f06071 (PR #409 merged)
+Pending batch: PR #410, `integration/pr410-exact30`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +4 complete units / +8 total-unit topology /
+  +2,376 linked code / +0 linked data
+Goal cumulative from PR #381: +633 linked functions / +140 complete units /
+  +55,180 linked code / +193 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,401 functions; 825 / 1,490 units;
+  621,340 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #410; decomp.dev base is synced through
+  PR #409 (`f9f06071`) at 24.81% linked / 618.96 kB complete code
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: disabled and removed from active operation; remote campaign checkout,
+  processes, cron entries, and services are absent; no PR #410 work used it
+Windows: sole active farm; current 143-record manifest has 74 fidelity-valid
+  units and 12 / 12 live workers; the fresh post-#409 audit produced two strict
+  recoveries reserved for the next batch, with no overlap in this batch
+Integrated pending: 15 particle-generator state helpers, ten light animation
+  state helpers, and five model/material shadow-state helpers
+Residual policy: all prefix/interstitial/suffix ranges remain explicit
+  CodeCandidate units; no farm artifact is claimed by this source-linking batch
+Validation: all 30 selected functions / 2,376 bytes are raw 100%; four
+  text-only Matching units emit retail text and all 69 normalized relocations
+  under the canonical compilers and flags; full retail SHA passes
+Context fidelity: the never-linked GSlight suffix candidate retains the exact
+  island as compile-only same-TU context so MWCC preserves the pre-split natural
+  inline decision in `GSlightLoad`; only the standalone exact island is linked
+Independent audit: PASS for exact composition, relocation parity, residual
+  coverage, semantic/type integrity, zero regression, and retail SHA
+Next action: commit and publish PR #410, wait for all required checks, merge,
+  reconcile the Windows queue, and remove the integration worktree
 ```

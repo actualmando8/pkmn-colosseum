@@ -2817,13 +2817,22 @@ config.libs = [
                     (Matching, "game/gs_model_main_suffix_exact_800E85E8.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/gs_model_shadow.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_model_shadow_candidate_800E8684.c"),
+                    (Matching, "game/gs_model_shadow_exact_800E8EFC.c"),
+                    (CodeCandidate, "game/gs_model_shadow_candidate_800E8F80.c"),
+                    (Matching, "game/gs_model_shadow_exact_800E8FE8.c"),
+                    (CodeCandidate, "game/gs_model_shadow_candidate_800E90C8.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/gs_model_state.c",
@@ -3050,13 +3059,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/ps_range_80168C64.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/ps_candidate_80168C64.c"),
+                    (Matching, "game/ps_exact_80169340.c"),
+                    (CodeCandidate, "game/ps_candidate_801698F8.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/gs_range_8017A5FC.c",
@@ -5689,13 +5705,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_light.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_light_candidate_800DC560.c"),
+                    (Matching, "game/gs_light_exact_800DCA10.c"),
+                    (CodeCandidate, "game/gs_light_candidate_800DCC3C.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/gs_log.c",

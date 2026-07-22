@@ -214,6 +214,8 @@ extern void* fn_801A6928(s32 size);
 extern void __assert(const char* file, u32 line, const char* msg);
 extern void* memset(void* dst, s32 value, u32 size);
 
+#if !defined(PR410_PS_SPLIT) || defined(PR410_PS_PREFIX)
+
 #pragma dont_inline on
 PSParticle* _psListGetFirst(s32 linkNo) {
     s32 valid = FALSE;
@@ -342,6 +344,10 @@ void psSetParticleVisibility(PSGeneratorState* gen, u8 visible) {
         child = child->next;
     }
 }
+
+#endif
+
+#if !defined(PR410_PS_SPLIT) || defined(PR410_PS_EXACT)
 
 void psSetRandomVelocityScaling(PSGeneratorState* gen, u8 enabled) {
     if (enabled) {
@@ -510,6 +516,10 @@ void psKillFamily(s32 familyId, s32 linkNo) {
 
     psKillGeneratorID(familyId);
 }
+
+#endif
+
+#if !defined(PR410_PS_SPLIT) || defined(PR410_PS_SUFFIX)
 
 s32 psAttachGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* appSRT) {
     u16 refCount;
@@ -736,6 +746,10 @@ s32 psInitAppSRT(s32 count, s32 size) {
     return i;
 }
 
+#endif
+
+#if !defined(PR410_PS_SPLIT) || defined(PR410_PS_EXACT)
+
 void psDeletePntJObjwithParticle(PSParticle* pp) {
     if (pp->flags & PS_FLAG_ATTACH_CAMERA) {
         u32 slotIdx = (pp->flags >> 12) & 0x7;
@@ -830,6 +844,10 @@ void psSetPointJObj(s32 index, void* renderObj) {
         }
     }
 }
+
+#endif
+
+#if !defined(PR410_PS_SPLIT) || defined(PR410_PS_SUFFIX)
 
 #pragma dont_inline on
 void psKillAllParticle(void) {
@@ -1749,3 +1767,5 @@ void HSD_JObjAddTx(PSJObjTransform* jobj, f32 dx) {
         }
     }
 }
+
+#endif

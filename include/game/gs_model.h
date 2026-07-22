@@ -5,6 +5,7 @@
 
 struct GSbound;
 struct GSjobjDesc;
+struct GSlight;
 struct GSmodel;
 struct GSmodelResource;
 struct GSvec;
@@ -22,6 +23,13 @@ void GSmodelSetTexAnimRate(struct GSmodel* model, f32 rate);
 void GSmodelSetTexAnimType(struct GSmodel* model, u32 type);
 void GSmodelRecalculateBound(struct GSmodel* model);
 void fn_800E3928(void* unused);
+
+/* Shadow state API. Partial model/light layouts remain private to the owner. */
+void GSmodelFreeAllShadowTextures(void);
+void GSmodelSetShadowBoundExpansion(u32 extent, u32 state);
+void GSmodelSetShadowLight(struct GSmodel* model, struct GSlight* light);
+void GSmodelSetShadowSurface(struct GSmodel* model, s32 count,
+                             const void* vertices);
 
 /* HSD services used while constructing a GS model. */
 struct HSDJObj* HSD_JObjLoadJoint(struct GSjobjDesc* joint);

@@ -11,16 +11,13 @@
  * evidence (anchor-name monotonicity checks) used to place this boundary.
  */
 #include "dolphin/types.h"
+#include "game/ps.h"
 #include "game/world/gs_field.h"
 
-typedef struct PSGeneratorState PSGeneratorState;
 typedef struct GSpart GSpart;
 struct GSmodel;
 
-extern void psSetParticleVisibility();
-extern void psSetRandomVelocityScaling(PSGeneratorState* generator, u8 enabled);
-extern void psSetParticleTexScaling(PSGeneratorState* generator, u8 enabled);
-extern void psLinkChildGensToJObj(PSGeneratorState* generator, void* jobj);
+extern void psSetParticleVisibility(PSGeneratorState* generator, u32 visible);
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -270,7 +267,6 @@ extern void heroMoveInitEvent(void);
 extern void fn_8012CA84();
 extern void heroPokemonGetEifie(u32 arg1);
 extern void heroPokemonGetBlacky(u32 arg1);
-u32 psGetGeneratorChildMaxLife(FieldParticleGenerator* generator);
 extern void* wazaDataBiosGetPtr(u16 idx);
 extern u32 pokemonGetStatus();
 extern void pokemonSetStatus();
@@ -414,10 +410,7 @@ extern void fn_800FF4D4(void);
 extern u32 lbl_802727C8[];
 extern void psSetBillboardCamera();
 extern void fn_8016AB94();
-u32 psGetParticleChildCount(FieldParticleGenerator* generator);
-extern void psKillFamily();
 extern void GSmodelSet60fpsAnimFlag();
-extern void psUnlinkChildGensFromJObj();
 extern void psKillGenerator();
 extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
@@ -449,7 +442,6 @@ extern void psInitGenerator(void);
 extern void fn_8016AAF4(void);
 extern void fn_8019733C(void);
 extern void fn_8019D618(void);
-extern void psSetPointJObjNodup(void);
 extern void fn_8019D610(void);
 extern u16 lbl_8047AD98;
 extern u16 lbl_8047ADA4;
@@ -1185,12 +1177,12 @@ extern void fn_80118A68(u8* obj, u32 notify);
 extern void fn_80118C20(void* bank, u32 visible);
 extern void fn_80118C88(void* obj, u32 visible);
 extern void fn_80118CAC(void* obj, u8 enabled);
-extern void fn_80118CD0(void* obj);
-extern void fn_80118CF4(void* obj);
+extern void fn_80118CD0(void* obj, u8 enabled);
+extern void fn_80118CF4(void* obj, u8 enabledA, u8 enabledB);
 extern void fn_80118D18(void* obj, u8 enabled);
-extern void fn_80118D3C(void* obj);
-extern void fn_80118D60(void* obj);
-extern void fn_80118D84(void* obj);
+extern void fn_80118D3C(void* obj, u8 enabledA, u8 enabledB);
+extern void fn_80118D60(void* obj, u8 enabled);
+extern u32 fn_80118D84(void* obj);
 extern s32 fn_80118DA8(u8* ptr);
 extern void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4);
 extern void fn_80118E8C(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5);
@@ -1548,7 +1540,8 @@ static inline void destroyFieldParticleInstance(u8* obj, u32 notify) {
         *(u32*)(obj + 0x4C) = 0;
         obj[6] = 0;
         obj[5] = 0;
-        psUnlinkChildGensFromJObj(*(u32*)(obj + 0x10));
+        psUnlinkChildGensFromJObj(
+            *(PSGeneratorState**)(obj + 0x10));
         *active = 0;
 
         if (*active == 0) {
@@ -1761,10 +1754,7 @@ void fn_80118104(u32 a, u8 b) {
     }
 }
 /* 0x801181B0 | 0x23C */
-u32 psGetParticleChildCount(FieldParticleGenerator* generator);
-extern void psKillFamily();
 extern void GSmodelSet60fpsAnimFlag();
-extern void psUnlinkChildGensFromJObj();
 extern void psKillGenerator();
 extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
@@ -1788,9 +1778,11 @@ void fn_801181B0(void) {
                     if (node->field_01 == 1) {
                         max_life = -1;
                     } else {
-                        max_life = psGetGeneratorChildMaxLife(node->generator);
+                        max_life = psGetGeneratorChildMaxLife(
+                            (PSGeneratorState*)node->generator);
                     }
-                    if (max_life == 0 && psGetParticleChildCount(node->generator) == 0) {
+                    if (max_life == 0 &&
+                        psGetParticleChildCount((PSGeneratorState*)node->generator) == 0) {
                         u32 i;
                         FieldParticleBankCursor owner_bank;
                         FieldParticleNode** base_slot;
@@ -1803,7 +1795,8 @@ void fn_801181B0(void) {
                             node->field_4C = 0;
                             node->field_06 = 0;
                             node->field_05 = 0;
-                            psUnlinkChildGensFromJObj(node->generator);
+                            psUnlinkChildGensFromJObj(
+                                (PSGeneratorState*)node->generator);
                             node->transform_state = 0;
 
                             if (node->transform_state == 0) {
@@ -2075,37 +2068,39 @@ void fn_80118CAC(void* obj, u8 enabled) {
     psSetRandomVelocityScaling(*(PSGeneratorState**)((u8*)obj + 0x10), enabled);
 }
 /* 0x80118CD0 | 36 bytes | load_then_call */
-void fn_80118CD0(void* obj) {
-    psSetNodeScaling(*(void**)((u8*)obj + 0x10));
+void fn_80118CD0(void* obj, u8 enabled) {
+    psSetNodeScaling(*(PSGeneratorState**)((u8*)obj + 0x10), enabled);
 }
 /* 0x80118CF4 | 36 bytes | load_then_call */
-void fn_80118CF4(void* obj) {
-    psSetTornadoScaling(*(void**)((u8*)obj + 0x10));
+void fn_80118CF4(void* obj, u8 enabledA, u8 enabledB) {
+    psSetTornadoScaling(*(PSGeneratorState**)((u8*)obj + 0x10), enabledA,
+                        enabledB);
 }
 /* 0x80118D18 | 36 bytes | load_then_call */
 void fn_80118D18(void* obj, u8 enabled) {
     psSetParticleTexScaling(*(PSGeneratorState**)((u8*)obj + 0x10), enabled);
 }
 /* 0x80118D3C | 36 bytes | load_then_call */
-void fn_80118D3C(void* obj) {
-    psSetOffsetRotationInLocal(*(void**)((u8*)obj + 0x10));
+void fn_80118D3C(void* obj, u8 enabledA, u8 enabledB) {
+    psSetOffsetRotationInLocal(*(PSGeneratorState**)((u8*)obj + 0x10),
+                               enabledA, enabledB);
 }
 /* 0x80118D60 | 36 bytes | load_then_call */
-void fn_80118D60(void* obj) {
-    psSetVelocityRotationInLocal(*(void**)((u8*)obj + 0x10));
+void fn_80118D60(void* obj, u8 enabled) {
+    psSetVelocityRotationInLocal(*(PSGeneratorState**)((u8*)obj + 0x10),
+                                 enabled);
 }
 /* 0x80118D84 | 36 bytes | load_then_call */
-void fn_80118D84(void* obj) {
-    psGetParticleChildCount(*(void**)((u8*)obj + 0x10));
+u32 fn_80118D84(void* obj) {
+    return psGetParticleChildCount(*(PSGeneratorState**)((u8*)obj + 0x10));
 }
 /* 0x80118DA8 | 0x38 */
-u32 psGetGeneratorChildMaxLife(FieldParticleGenerator* generator);
 s32 fn_80118DA8(u8* ptr) {
     FieldParticleNodePtr node;
 
     node.raw = ptr;
     if (node.typed->field_01 == 1) { return -1; }
-    return psGetGeneratorChildMaxLife(node.typed->generator);
+    return psGetGeneratorChildMaxLife((PSGeneratorState*)node.typed->generator);
 }
 /* 0x80118DE0 | 0xAC */
 extern void psSetGeneratorAngleRadiusScale(void);
@@ -2303,7 +2298,8 @@ void fn_801193BC(FieldParticleBank* bank) {
                 node->field_4C = 0;
                 node->field_06 = 0;
                 node->field_05 = 0;
-                psUnlinkChildGensFromJObj(node->generator);
+                psUnlinkChildGensFromJObj(
+                    (PSGeneratorState*)node->generator);
                 node->transform_state = 0;
 
                 if (node->transform_state == 0) {
@@ -2371,7 +2367,6 @@ extern void psInitGenerator(void);
 extern void fn_8016AAF4(void);
 extern void fn_8019733C(void);
 extern void fn_8019D618(void);
-extern void psSetPointJObjNodup(void);
 extern void fn_8019D610(void);
 extern u32 lbl_8047ADA0;
 extern u16 lbl_8047AD98;
@@ -2395,7 +2390,6 @@ void fn_80119824(u32 count1, u32 count2) {
     extern void fn_8019D618(void* fp);
     extern void fn_8019D610(void* fp);
     extern void fn_80119BD0(void);
-    extern void psSetPointJObjNodup(void);
     u32 h;
     u32 i;
     lbl_8047ADA0 = count1;

@@ -475,6 +475,8 @@ extern u32 lbl_8047CB50;
 extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
+#if !defined(PR410_GS_LIGHT_SPLIT) || defined(PR410_GS_LIGHT_PREFIX)
+
 #if 0
 asm void fn_800DC874(void) {
 #include "src/game/gs_render_fn_800DC874.inc"
@@ -605,6 +607,10 @@ void GSlightPopState(u8* obj, u8* snapshot) {
 }
 #endif
 
+#endif
+
+#if !defined(PR410_GS_LIGHT_SPLIT) || defined(PR410_GS_LIGHT_EXACT)
+
 extern void HSD_LObjGetPosition(void*, void*);
 extern void HSD_LObjGetInterest(void*, void*);
 #if 0
@@ -722,6 +728,10 @@ asm void GSlightSetActive(void) {
 #else
 void GSlightSetActive(u8* obj, u8 val) { obj[0x1] = val; }
 #endif
+
+#endif
+
+#if !defined(PR410_GS_LIGHT_SPLIT) || defined(PR410_GS_LIGHT_SUFFIX)
 
 #if 0
 asm void GSlightSetTarget(void) {
@@ -1021,5 +1031,7 @@ void GSlightSetupLights(void* arg) {
     }
     HSD_LObjSetup(arg);
 }
+
+#endif
 #pragma pop
 #endif
