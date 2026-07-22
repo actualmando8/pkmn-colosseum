@@ -525,12 +525,12 @@ Next unit closers: banked fight-range 16, banked MusyX 21, then fresh farm
   wins or a strict small-residual object closer
 ```
 
-### Batch snapshot — 2026-07-21 (post-396 bank)
+### Batch snapshot — 2026-07-21 (PR #397)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: d856c1a5 (PR #396 merged)
-Batch branch: `campaign/post396-batch-20260721`; PR pending
+Batch PR: #397, `campaign/post396-batch-20260721`
 Exact-source delta from goal baseline: +36 functions / +14,412 code bytes
 This batch: +0 exact functions / +0 matched code;
   +37 linked functions / +5 units / +4,020 linked code / +0 linked data
