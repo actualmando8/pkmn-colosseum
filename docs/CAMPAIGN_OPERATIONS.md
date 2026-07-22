@@ -584,3 +584,32 @@ Rejected: game closer probes requiring codegen shaping (width-copy relocation,
 Next unit closers: strict HSD scout survivor if any, then current-report object
   closers and non-overlapping farm results after PR #398 reconciliation
 ```
+
+### Batch snapshot — 2026-07-21 (PR #399)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 5445b846 (PR #398 merged)
+Batch PR: #399, `campaign/post398-next-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 exact functions / +0 matched code/data;
+  +42 linked functions / +6 units / +768 linked code / +0 linked data
+Newly linked function delta from goal baseline: +293
+Newly linked unit/code/data delta from goal baseline: +61 units / +37,244 code / +189 data
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+Head linked: 746 / 1,351 units; 603,404 complete code bytes;
+  752,773 complete data bytes
+README/report: synced on PR #399; decomp.dev pending PR report
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#398 queue; 537 entries, 21 workers, zero new wins;
+  one stale terminal WIN? retained
+Windows: healthy post-#398 manifest; 72 fidelity-valid units, 12 workers,
+  zero new wins
+Integrated: 31 strict msgctrl helpers, 10 strict HSD light-state helpers,
+  and the strict HSD RObj value loader
+Rejected: 7-function debug callback island was text-exact but dead-stripped at
+  link, shrinking .text by 812 bytes and failing the retail SHA
+Banked not merged: four-function MusyX voice-start island still in final gates
+Next unit closers: banked MusyX island, then fresh strict current-report islands
+  and non-overlapping farm results after PR #399 reconciliation
+```
