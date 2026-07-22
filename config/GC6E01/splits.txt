@@ -2304,7 +2304,25 @@ game/window_exact_801040A0.c:
 	.text       start:0x801040A0 end:0x801040F0
 
 game/window_candidate_801040F0.c:
-	.text       start:0x801040F0 end:0x801058CC
+	.text       start:0x801040F0 end:0x801046B8
+
+game/window_exact_801046B8.c:
+	.text       start:0x801046B8 end:0x801046C8
+
+game/window_candidate_801046C8.c:
+	.text       start:0x801046C8 end:0x80104704
+
+game/window_exact_80104704.c:
+	.text       start:0x80104704 end:0x8010474C
+
+game/window_candidate_8010474C.c:
+	.text       start:0x8010474C end:0x80105624
+
+game/window_exact_80105624.c:
+	.text       start:0x80105624 end:0x80105634
+
+game/window_candidate_80105634.c:
+	.text       start:0x80105634 end:0x801058CC
 
 game/win_msg.c:
 	.text       start:0x801058CC end:0x80106F98
@@ -2770,7 +2788,19 @@ game/effect/effect_visual_candidate_801402AC.c:
 	.text       start:0x801402AC end:0x80140588
 
 game/people/people_data.c:
-	.text       start:0x80140588 end:0x80143718
+	.text       start:0x80140588 end:0x80142984
+
+game/people/people_field_lookup_exact_80142984.c:
+	.text       start:0x80142984 end:0x80142A88
+
+game/people/people_data_candidate_80142A88.c:
+	.text       start:0x80142A88 end:0x8014369C
+
+game/people/people_item_friend_exact_8014369C.c:
+	.text       start:0x8014369C end:0x801436F0
+
+game/people/people_data_candidate_801436F0.c:
+	.text       start:0x801436F0 end:0x80143718
 
 game/people/people_item_effort_exact_80143718.c:
 	.text       start:0x80143718 end:0x80143778
@@ -3968,10 +3998,25 @@ game/battle/battle_grid_exact_801C3F10.c:
 	.text       start:0x801C3F10 end:0x801C4078
 
 game/effect/fade.c:
-	.text       start:0x801C4078 end:0x801C4814
+	.text       start:0x801C4078 end:0x801C431C
 
-game/effect/fade_effect.c:
-	.text       start:0x801C4814 end:0x801C4CB8
+game/effect/fade_exact_801C431C.c:
+	.text       start:0x801C431C end:0x801C432C
+
+game/effect/fade_candidate_801C432C.c:
+	.text       start:0x801C432C end:0x801C43E4
+
+game/effect/fade_exact_801C43E4.c:
+	.text       start:0x801C43E4 end:0x801C43F4
+
+game/effect/fade_candidate_801C43F4.c:
+	.text       start:0x801C43F4 end:0x801C4814
+
+game/effect/fade_effect_candidate_801C4814.c:
+	.text       start:0x801C4814 end:0x801C4C98
+
+game/effect/fade_effect_exact_801C4C98.c:
+	.text       start:0x801C4C98 end:0x801C4CB8
 
 game/effect/fade_range_801C4CB8.c:
 	.text       start:0x801C4CB8 end:0x801C766C
