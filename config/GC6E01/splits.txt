@@ -911,8 +911,26 @@ dolphin/dvd/DVDError_ErrorCode2Num.c:
 dolphin/dvd/DVDError.c:
 	.text       start:0x800A80FC end:0x800A8178
 
-dolphin/vi/VI_range_800A8178.c:
-	.text       start:0x800A8178 end:0x800AA280
+dolphin/vi/VI_exact_800A8178.c:
+	.text       start:0x800A8178 end:0x800A839C
+
+dolphin/vi/VI_candidate_800A839C.c:
+	.text       start:0x800A839C end:0x800A880C
+
+dolphin/vi/VI_exact_800A880C.c:
+	.text       start:0x800A880C end:0x800A8894
+
+dolphin/vi/VI_candidate_800A8894.c:
+	.text       start:0x800A8894 end:0x800A8FE4
+
+dolphin/vi/VI_exact_800A8FE4.c:
+	.text       start:0x800A8FE4 end:0x800A9038
+
+dolphin/vi/VI_candidate_800A9038.c:
+	.text       start:0x800A9038 end:0x800AA198
+
+dolphin/vi/VI_candidate_800AA198.c:
+	.text       start:0x800AA198 end:0x800AA280
 
 dolphin/vi/VI_fn_800AA280.c:
 	.text       start:0x800AA280 end:0x800AA288
@@ -1776,8 +1794,23 @@ game/gs_model_shadow.c:
 game/gs_model_state.c:
 	.text       start:0x800E9B2C end:0x800E9E34
 
-game/gs_model_parse.c:
-	.text       start:0x800E9E34 end:0x800EB268
+game/gs_model_parse_exact_800E9E34.c:
+	.text       start:0x800E9E34 end:0x800E9E90
+
+game/gs_model_parse_candidate_800E9E90.c:
+	.text       start:0x800E9E90 end:0x800EA60C
+
+game/gs_model_parse_exact_800EA60C.c:
+	.text       start:0x800EA60C end:0x800EA6D4
+
+game/gs_model_parse_candidate_800EA6D4.c:
+	.text       start:0x800EA6D4 end:0x800EA7E4
+
+game/gs_model_parse_exact_800EA7E4.c:
+	.text       start:0x800EA7E4 end:0x800EA820
+
+game/gs_model_parse_candidate_800EA820.c:
+	.text       start:0x800EA820 end:0x800EB268
 
 game/gs_model_bound.c:
 	.text       start:0x800EB268 end:0x800EB414
@@ -3279,8 +3312,11 @@ game/field_range_801CB180.c:
 game/field_exact_801D0314.c:
 	.text       start:0x801D0314 end:0x801D0AA0
 
-game/battle/battle_range_801D0AA0.c:
-	.text       start:0x801D0AA0 end:0x801D1338
+game/battle/battle_exact_801D0AA0.c:
+	.text       start:0x801D0AA0 end:0x801D0C30
+
+game/battle/battle_candidate_801D0C30.c:
+	.text       start:0x801D0C30 end:0x801D1338
 
 game/mail.c:
 	.text       start:0x801D1338 end:0x801D2080
@@ -3348,8 +3384,26 @@ game/gs_range_801DE698.c:
 game/field_range_801DF790.c:
 	.text       start:0x801DF790 end:0x801E09E0
 
-game/gs_range_801E09E0.c:
-	.text       start:0x801E09E0 end:0x801E1B54
+game/gs_candidate_801E09E0.c:
+	.text       start:0x801E09E0 end:0x801E1170
+
+game/gs_exact_801E1170.c:
+	.text       start:0x801E1170 end:0x801E11F0
+
+game/gs_candidate_801E11F0.c:
+	.text       start:0x801E11F0 end:0x801E1258
+
+game/gs_exact_801E1258.c:
+	.text       start:0x801E1258 end:0x801E1300
+
+game/gs_candidate_801E1300.c:
+	.text       start:0x801E1300 end:0x801E16D0
+
+game/gs_exact_801E16D0.c:
+	.text       start:0x801E16D0 end:0x801E189C
+
+game/gs_candidate_801E189C.c:
+	.text       start:0x801E189C end:0x801E1B54
 
 dolphin/thp/THP_range_801E1B54.c:
 	.text       start:0x801E1B54 end:0x801E5548

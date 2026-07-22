@@ -49,8 +49,8 @@ extern u8 fn_80175FFC(void);
 extern void GSgfxCaptureMovieStop(void);
 extern void GSgfxCaptureMovieStart(u32 mode);
 
-extern u32 fn_801E11CC(void);
-extern void fn_801E11D4(u32 index, u8 active);
+extern u8 fn_801E11CC(void);
+extern void fn_801E11D4(u8 index, u8 active);
 extern void fn_801E1170(void);
 extern void fn_801E118C(void);
 extern void fn_801E11B0(void);

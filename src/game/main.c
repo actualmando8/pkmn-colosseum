@@ -10,6 +10,7 @@
  */
 
 #include "dolphin/types.h"
+#include "dolphin/vi/VI.h"
 
 /* =========================================================================
  * Forward declarations of SDK / engine functions called by this module.
@@ -122,14 +123,14 @@ extern void menuInit(u32 param);                      /* Effect system init */
 extern void fn_80101FB8(u32 param);                      /* Particle system init */
 extern void fn_800D3074(u32 flag);                       /* GSgfx enable rendering */
 
-extern void GSgappCreate(u32 active, u32 taskId, u32 param, /* GSthread create task */
-                         void* func);
+extern u32 GSgappCreate(s32 state, u8 priority, void* param, /* GSthread create task */
+                       void* func);
 extern void GSgappUpdate(void);                           /* GSthread yield / run scheduler */
 extern void GSthreadCreate(u32 affinity, u32 priority,      /* GSthread create main thread */
                          u32 stackSize, u32 usesFPU,
                          u32 autoStart, void* entry);
 
-extern void GSvtrRegisterGSgapp(void);                           /* Save system post-init */
+extern s32 GSvtrRegisterGSgapp(u32 taskId);              /* Save task registration */
 extern void fadeInit(void);                           /* Script engine init */
 extern void fn_80168638(u32 numSlots);                   /* Floor/scene loader init */
 extern void fn_80130CE0(u32 maxEffects);                 /* 3D model/effect loader */
@@ -210,8 +211,6 @@ extern void fn_80166E44(void);    /* Screen fade to black */
 extern void fn_800AAE34(u32 mask);/* VISetBlack / video blank */
 extern void VISetBlack(u32 flag);/* VIFlush */
 extern void fn_800AA068(void);    /* VIWaitForRetrace */
-extern void fn_800A880C(u32 a);   /* AISetDSPSampleRate */
-extern void fn_800A8850(u32 a);   /* AIStopDMA */
 extern void OSSetIdleFunction(u32 a, u32 b, u32 c, u32 d); /* OSClearStack or thread cleanup */
 extern void VIWaitForRetrace(void);    /* AIReset */
 
@@ -683,10 +682,8 @@ void fn_800057B0(void) {
     GSgappCreate(1, 0x01, 0, (void*)fn_80005FFC);
 
     /* Task 0x0A: Audio retrace callback (fn_80005FA8) */
-    GSgappCreate(1, 0x0A, 0, (void*)fn_80005FA8);
-
-    /* Post-init for save system */
-    GSvtrRegisterGSgapp();
+    GSvtrRegisterGSgapp(
+        GSgappCreate(1, 0x0A, 0, (void*)fn_80005FA8));
 
     /* Task 0xFD: Reset button countdown (fn_80005CE4) */
     GSgappCreate(1, 0xFD, 0, (void*)fn_80005CE4);
@@ -851,8 +848,8 @@ void fn_80005C3C(void) {
                 fn_800AAE34(0xF0000000); /* VISetBlack */
                 VISetBlack(1);          /* VIFlush */
                 VIFlush();               /* real symtab: VIFlush (was fn_800AA068) */
-                fn_800A880C(0);          /* Stop DSP sample rate */
-                fn_800A8850(0);          /* Stop DMA */
+                fn_800A880C(NULL);        /* Clear pre-retrace callback */
+                fn_800A8850(NULL);        /* Clear post-retrace callback */
                 OSSetIdleFunction(0, 0, 0, 0); /* Clean up threads */
                 VIWaitForRetrace();           /* Reset audio */
                 OSResetSystem(0, 0, 1);  /* Reset to system menu */

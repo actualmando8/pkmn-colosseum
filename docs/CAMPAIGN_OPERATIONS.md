@@ -825,30 +825,31 @@ Next unit closers: the strict Toolentry/field/battle exact-30 island prepared
   for PR #407 after post-#406 farm reconciliation
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #407)
+### Batch snapshot — 2026-07-21 (PR #407)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: ce1c97e5 (PR #406 merged)
-Pending batch: PR #407, `integration/pr407-exact30`
+Batch PR: #407, `integration/pr407-exact30`
 Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +10 complete units / +18 total-unit topology /
   +1,944 linked code / +0 linked data
 Goal cumulative from PR #381: +543 linked functions / +116 complete units /
   +48,536 linked code / +193 linked data
-Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,311 functions; 801 / 1,444 units;
+Head linked: 4,311 functions; 801 / 1,444 units;
   614,696 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #407; decomp.dev awaits merge ingestion
+README/report: synced at merge `7e9f6187`; decomp.dev closeout verification
+  remains part of the post-merge reconciliation
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#406 queue on `ce1c97e5`; 537 entries, 21 workers and
   21 active claims; queue/metadata SHA-256 snapshots preserved; zero overlap
   with this batch and zero new recoverable wins
 Windows: healthy post-#406 manifest on `ce1c97e5`; 74 fidelity-valid units,
   12 workers and 12 active units; zero overlap and zero new recoverable wins
-Integrated pending: 23 strict Toolentry helpers, five strict field/nursery
+Integrated: 23 strict Toolentry helpers, five strict field/nursery
   helpers, and two strict battle-camera helpers; all eight residual ranges remain
   explicit CodeCandidate units
 Rejected farm artifacts: dataInsertLayer used artificial pointer aliases and
@@ -860,6 +861,42 @@ Independent audit: PASS for exactly 30 functions / 1,944 bytes, ten text-only
 Semantic corrections: replaced implicit return-register chaining with typed
   value flow, corrected callback and state/accessor types, and preserved the
   12-byte visibility array with target-evidenced extern small-data placement
-Next action: publish PR #407, wait for all required checks, merge, verify
-  decomp.dev, then remirror both farms before the ranked PR #408 exact-30 batch
+Next action: complete post-merge farm reconciliation while the ranked PR #408
+  exact-30 batch proceeds in an isolated current-master integration tree
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #408)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 7e9f6187 (PR #407 merged)
+Pending batch: PR #408, `integration/pr408-exact30`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +10 complete units / +18 total-unit topology /
+  +2,276 linked code / +0 linked data
+Goal cumulative from PR #381: +573 linked functions / +126 complete units /
+  +50,812 linked code / +193 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,341 functions; 811 / 1,462 units;
+  616,972 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #408; decomp.dev awaits merge ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+Farm status: post-#407 reconciliation/remirror is tracked independently; no
+  farm result is claimed by this source-linking batch
+Integrated pending: seven canonical Dolphin DVD/VI functions, 16 GS VTR/save
+  state functions, three battle party/status functions, and four model/HSD JObj
+  traversal/matrix helpers
+Residual policy: callback `cb`, `fn_800A8894`, `fn_801E1300`, and every other
+  prefix/interstitial/suffix range remain explicit CodeCandidate units;
+  `VISetNextFrameBuffer`, `VISetBlack`, and `fn_801B06DC` stay outside this
+  batch and are not counted as linked progress
+Validation: all 30 selected functions / 2,276 bytes are raw 100%; ten
+  text-only Matching units emit retail text and all 120 normalized relocations
+  under the canonical compilers and flags; full retail SHA passes
+Independent audit: PASS for exact composition, semantic/type integrity,
+  residual coverage, canonical flags, report/freeze deltas, and retail SHA
+Next action: commit the isolated branch, then hand it to the publisher for PR
+  checks and merge
 ```

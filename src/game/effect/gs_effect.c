@@ -56,7 +56,7 @@ extern void  GSlogWrite(const char* fmt, ...);          /* OSReport / GSlog */
 extern void  fn_800E24B0(u16 handle);                    /* GSmemLock (raw) */
 extern void  fn_800E209C(u16 handle);                    /* GSmemFree (raw) */
 extern u32   fn_800D3088(void);                          /* GSgfxGetTickCount */
-extern void  GSvtrRegisterGSgapp(void);                          /* battle VFX init */
+extern s32   GSvtrRegisterGSgapp(u32 taskId);            /* battle VFX registration */
 extern void  memset(void* dst, u32 val, u32 size);
 extern void  memcpy(void* dst, void* src, u32 size);
 
@@ -97,12 +97,13 @@ extern u32 lbl_8047ADC0;
  * ======================================================================= */
 void fn_80130CE0(u16 maxEffects) {
     u32 memHandle;
+    u32 taskId;
     GSEffectInstance* table;
     GSEffectInstance* entry;
     u16 cnt;
     extern u16 _toolentryAlloc__FUl(u32);
     extern void* fn_800E27B0(u16);
-    extern u32 GSgappCreate(u32, u32, u32, void*);
+    extern u32 GSgappCreate(s32 state, u8 priority, void* param, void* func);
 
     memHandle = _toolentryAlloc__FUl(maxEffects * sizeof(GSEffectInstance));
     gsEffectGlobals.memHandle = memHandle;
@@ -133,8 +134,9 @@ void fn_80130CE0(u16 maxEffects) {
         gsEffectGlobals.maxEffects = 0;
     }
     gsEffectGlobals.activeListHead = NULL;
-    lbl_8047ADC0 = GSgappCreate(1, 0x7F, 0, (void*)fn_80130F68);
-    GSvtrRegisterGSgapp();
+    taskId = GSgappCreate(1, 0x7F, 0, (void*)fn_80130F68);
+    lbl_8047ADC0 = taskId;
+    GSvtrRegisterGSgapp(taskId);
     GSgappCreate(1, 0x80, 0, (void*)fn_80130F04);
 }
 
