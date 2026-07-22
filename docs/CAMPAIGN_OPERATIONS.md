@@ -628,7 +628,7 @@ Newly linked unit/code/data delta from goal baseline: +63 units / +38,720 code /
 Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
 Head linked: 748 / 1,354 units; 604,880 complete code bytes;
   752,773 complete data bytes
-README/report: synced on PR #400; decomp.dev pending merge ingestion
+README/report/decomp.dev: synced on PR #400 at merge `3f0d86b6`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#399 queue; 537 entries, 21 workers, zero new wins;
   one stale terminal WIN? retained
@@ -640,4 +640,30 @@ Rejected: the apparent 31-function msgctrl tail batch was pragma-dependent;
   only strict natural-C islands may be promoted
 Next unit closers: fresh current-report exact islands and preserved nonexact farm
   artifacts after PR #400 reconciliation
+```
+
+### Batch snapshot — 2026-07-21 (PR #401)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 3f0d86b6 (PR #400 merged)
+Batch PR: #401, `campaign/post400-batch33-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 exact functions / +0 matched code/data;
+  +33 linked functions / +2 units / +416 linked code / +0 linked data
+Newly linked function delta from goal baseline: +363
+Newly linked unit/code/data delta from goal baseline: +65 units / +39,136 code / +189 data
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+Head linked: 750 / 1,356 units; 605,296 complete code bytes;
+  752,773 complete data bytes
+README/report: synced on PR #401; decomp.dev pending merge ingestion
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#400 queue; 537 entries, 21 workers, zero new wins;
+  one stale terminal WIN? retained
+Windows: healthy post-#400 manifest; 72 fidelity-valid units, 12 workers,
+  zero new wins
+Integrated: 20 strict fight-action dispatchers plus 13 strict fight-action
+  BIOS setters/getters; the middle range remains an explicit candidate
+Next unit closers: separately banked strict HSD islands plus fresh current-report
+  closers and non-overlapping farm results after PR #401 reconciliation
 ```
