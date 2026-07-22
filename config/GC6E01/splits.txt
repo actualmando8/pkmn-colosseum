@@ -991,25 +991,94 @@ dolphin/ar_dsp_exact_800AE3F0.c:
 	.text       start:0x800AE3F0 end:0x800AE9FC
 
 dolphin/sdk_range_800AE9FC.c:
-	.text       start:0x800AE9FC end:0x800AF474
+	.text       start:0x800AE9FC end:0x800AF14C
+
+dolphin/sdk_exact_800AF14C.c:
+	.text       start:0x800AF14C end:0x800AF35C
+
+dolphin/sdk_candidate_800AF35C.c:
+	.text       start:0x800AF35C end:0x800AF474
 
 dolphin/card_exact_800AF474.c:
 	.text       start:0x800AF474 end:0x800AF8A0
 
 dolphin/sdk_range_800AF8A0.c:
-	.text       start:0x800AF8A0 end:0x800B1788
+	.text       start:0x800AF8A0 end:0x800B016C
+
+dolphin/sdk_exact_800B016C.c:
+	.text       start:0x800B016C end:0x800B0174
+
+dolphin/sdk_candidate_800B0174.c:
+	.text       start:0x800B0174 end:0x800B01AC
+
+dolphin/sdk_exact_800B01AC.c:
+	.text       start:0x800B01AC end:0x800B0694
+
+dolphin/sdk_candidate_800B0694.c:
+	.text       start:0x800B0694 end:0x800B1788
 
 dolphin/card_exact_800B1788.c:
 	.text       start:0x800B1788 end:0x800B2070
 
 dolphin/sdk_range_800B2070.c:
-	.text       start:0x800B2070 end:0x800B3B68
+	.text       start:0x800B2070 end:0x800B2968
+
+dolphin/sdk_exact_800B2968.c:
+	.text       start:0x800B2968 end:0x800B29F4
+
+dolphin/sdk_candidate_800B29F4.c:
+	.text       start:0x800B29F4 end:0x800B2F84
+
+dolphin/sdk_exact_800B2F84.c:
+	.text       start:0x800B2F84 end:0x800B3078
+
+dolphin/sdk_candidate_800B3078.c:
+	.text       start:0x800B3078 end:0x800B38DC
+
+dolphin/sdk_exact_800B38DC.c:
+	.text       start:0x800B38DC end:0x800B3978
+
+dolphin/sdk_candidate_800B3978.c:
+	.text       start:0x800B3978 end:0x800B3B68
 
 dolphin/card_exact_800B3B68.c:
 	.text       start:0x800B3B68 end:0x800B4488
 
 dolphin/sdk_range_800B4488.c:
-	.text       start:0x800B4488 end:0x800B71F0
+	.text       start:0x800B4488 end:0x800B45E8
+
+dolphin/sdk_exact_800B45E8.c:
+	.text       start:0x800B45E8 end:0x800B4644
+
+dolphin/sdk_candidate_800B4644.c:
+	.text       start:0x800B4644 end:0x800B4DC4
+
+dolphin/sdk_exact_800B4DC4.c:
+	.text       start:0x800B4DC4 end:0x800B4E50
+
+dolphin/sdk_candidate_800B4E50.c:
+	.text       start:0x800B4E50 end:0x800B4FC0
+
+dolphin/sdk_exact_800B4FC0.c:
+	.text       start:0x800B4FC0 end:0x800B5070
+
+dolphin/sdk_candidate_800B5070.c:
+	.text       start:0x800B5070 end:0x800B5184
+
+dolphin/sdk_exact_800B5184.c:
+	.text       start:0x800B5184 end:0x800B5228
+
+dolphin/sdk_candidate_800B5228.c:
+	.text       start:0x800B5228 end:0x800B5AE0
+
+dolphin/sdk_candidate_800B5AE0.c:
+	.text       start:0x800B5AE0 end:0x800B5BA4
+
+dolphin/sdk_exact_800B5BA4.c:
+	.text       start:0x800B5BA4 end:0x800B5C5C
+
+dolphin/sdk_candidate_800B5C5C.c:
+	.text       start:0x800B5C5C end:0x800B71F0
 
 dolphin/gx/GX_fn_800B71F0.c:
 	.text       start:0x800B71F0 end:0x800B71FC
@@ -1502,7 +1571,13 @@ game/gs_render_util_exact_800D13C4.c:
 	.text       start:0x800D13C4 end:0x800D1B3C
 
 game/gs_render_util.c:
-	.text       start:0x800D1B3C end:0x800D3074
+	.text       start:0x800D1B3C end:0x800D1EB8
+
+game/gs_render_util_exact_800D1EB8.c:
+	.text       start:0x800D1EB8 end:0x800D1F58
+
+game/gs_render_util_candidate_800D1F58.c:
+	.text       start:0x800D1F58 end:0x800D3074
 
 game/gs_gfx.c:
 	.text       start:0x800D3074 end:0x800D3E4C
@@ -1544,7 +1619,10 @@ game/gs_gfx_layer_exact_800D7820.c:
 	.text       start:0x800D7820 end:0x800D7894
 
 game/gs_gfx_layer_candidate_800D7894.c:
-	.text       start:0x800D7894 end:0x800D7A70
+	.text       start:0x800D7894 end:0x800D7940
+
+game/gs_gfx_layer_exact_800D7940.c:
+	.text       start:0x800D7940 end:0x800D7A70
 
 game/gs_gfx_layer_exact_800D7A70.c:
 	.text       start:0x800D7A70 end:0x800D7D90
@@ -1595,8 +1673,11 @@ game/gs_light_candidate_800DC560.c:
 game/gs_light_exact_800DCA10.c:
 	.text       start:0x800DCA10 end:0x800DCC3C
 
-game/gs_light_candidate_800DCC3C.c:
-	.text       start:0x800DCC3C end:0x800DD270
+game/gs_light_exact_800DCC3C.c:
+	.text       start:0x800DCC3C end:0x800DCC84
+
+game/gs_light_candidate_800DCC84.c:
+	.text       start:0x800DCC84 end:0x800DD270
 
 game/gs_log.c:
 	.text       start:0x800DD270 end:0x800DF028
