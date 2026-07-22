@@ -384,6 +384,10 @@ After merge:
   differ. Inspect every emitted section.
 - **Function exact, linked delta zero:** its `CodeCandidate` object still has
   residual functions or data. Do not report it as linked.
+- **Residual range becomes an auto object:** every split range must keep an
+  explicit `configure.py` object, including candidate-only prefixes/suffixes.
+  Otherwise totals may stay constant while source-backed/category topology
+  silently loses the residual functions.
 - **Windows pull appears to find many new wins:** cumulative outbox contains
   history. Deduplicate against current master and timestamps.
 - **3090 relaunch exits immediately:** queue entries are terminal. Add new
@@ -567,7 +571,7 @@ Newly linked unit/code/data delta from goal baseline: +55 units / +36,476 code /
 Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
 Head linked: 740 / 1,341 units; 602,636 complete code bytes;
   752,773 complete data bytes
-README/report: synced on PR #398; decomp.dev pending PR report
+README/report/decomp.dev: synced on PR #398 at merge `5445b846`
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 3090: healthy post-#397 queue; 538 entries, 21 workers, zero new wins;
   one stale terminal WIN? retained
@@ -579,4 +583,33 @@ Rejected: game closer probes requiring codegen shaping (width-copy relocation,
   scheduling/peephole controls, cast-hoist suppression, or artificial iterators)
 Next unit closers: strict HSD scout survivor if any, then current-report object
   closers and non-overlapping farm results after PR #398 reconciliation
+```
+
+### Batch snapshot — 2026-07-21 (PR #399)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 5445b846 (PR #398 merged)
+Batch PR: #399, `campaign/post398-next-20260721`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 exact functions / +0 matched code/data;
+  +42 linked functions / +6 units / +768 linked code / +0 linked data
+Newly linked function delta from goal baseline: +293
+Newly linked unit/code/data delta from goal baseline: +61 units / +37,244 code / +189 data
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes
+Head linked: 746 / 1,351 units; 603,404 complete code bytes;
+  752,773 complete data bytes
+README/report: synced on PR #399; decomp.dev pending PR report
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: healthy post-#398 queue; 537 entries, 21 workers, zero new wins;
+  one stale terminal WIN? retained
+Windows: healthy post-#398 manifest; 72 fidelity-valid units, 12 workers,
+  zero new wins
+Integrated: 31 strict msgctrl helpers, 10 strict HSD light-state helpers,
+  and the strict HSD RObj value loader
+Rejected: 7-function debug callback island was text-exact but dead-stripped at
+  link, shrinking .text by 812 bytes and failing the retail SHA
+Banked not merged: four-function MusyX voice-start island still in final gates
+Next unit closers: banked MusyX island, then fresh strict current-report islands
+  and non-overlapping farm results after PR #399 reconciliation
 ```
