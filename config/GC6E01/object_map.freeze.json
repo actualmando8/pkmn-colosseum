@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1517
+    "total_units": 1530
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1449,
-    "source_backed_units": 1433,
+    "named_units": 1462,
+    "source_backed_units": 1446,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -7244,17 +7244,30 @@
       "total_functions": 2
     },
     {
-      "name": "main/game/gs_render_util_candidate_800D1F58",
+      "name": "main/game/gs_render_util_exact_800D1F58",
       "sections": [
         {
           "name": ".text",
-          "size": 4380,
+          "size": 292,
           "virtual_address": 2148343640
         }
       ],
-      "total_code": 4380,
+      "total_code": 292,
       "total_data": 0,
-      "total_functions": 21
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/gs_render_util_candidate_800D207C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 4088,
+          "virtual_address": 2148343932
+        }
+      ],
+      "total_code": 4088,
+      "total_data": 0,
+      "total_functions": 17
     },
     {
       "name": "main/game/gs_gfx",
@@ -9525,13 +9538,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 6376,
+          "size": 188,
           "virtual_address": 2148548580
         }
       ],
-      "total_code": 6376,
+      "total_code": 188,
       "total_data": 0,
-      "total_functions": 25
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/window_exact_801040A0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 80,
+          "virtual_address": 2148548768
+        }
+      ],
+      "total_code": 80,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/window_candidate_801040F0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 6108,
+          "virtual_address": 2148548848
+        }
+      ],
+      "total_code": 6108,
+      "total_data": 0,
+      "total_functions": 20
     },
     {
       "name": "main/game/win_msg",
@@ -9885,17 +9924,30 @@
       "total_functions": 2
     },
     {
+      "name": "main/game/field_camera_exact_8011711C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 172,
+          "virtual_address": 2148626716
+        }
+      ],
+      "total_code": 172,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
       "name": "main/game/field_camera",
       "sections": [
         {
           "name": ".text",
-          "size": 3388,
-          "virtual_address": 2148626716
+          "size": 3216,
+          "virtual_address": 2148626888
         }
       ],
-      "total_code": 3388,
+      "total_code": 3216,
       "total_data": 0,
-      "total_functions": 16
+      "total_functions": 13
     },
     {
       "name": "main/game/field_exact_80117E58",
@@ -13785,13 +13837,104 @@
       "sections": [
         {
           "name": ".text",
-          "size": 61880,
+          "size": 61108,
           "virtual_address": 2149059704
         }
       ],
-      "total_code": 61880,
+      "total_code": 61108,
       "total_data": 0,
-      "total_functions": 136
+      "total_functions": 116
+    },
+    {
+      "name": "main/game/people/people_exact_8018FB2C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 104,
+          "virtual_address": 2149120812
+        }
+      ],
+      "total_code": 104,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/people/people_candidate_8018FB94",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 24,
+          "virtual_address": 2149120916
+        }
+      ],
+      "total_code": 24,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/people/people_exact_8018FBAC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 164,
+          "virtual_address": 2149120940
+        }
+      ],
+      "total_code": 164,
+      "total_data": 0,
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/people/people_candidate_8018FC50",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2149121104
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/people/people_exact_8018FC74",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 108,
+          "virtual_address": 2149121140
+        }
+      ],
+      "total_code": 108,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/people/people_candidate_8018FCE0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 168,
+          "virtual_address": 2149121248
+        }
+      ],
+      "total_code": 168,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/people/people_exact_8018FD88",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 168,
+          "virtual_address": 2149121416
+        }
+      ],
+      "total_code": 168,
+      "total_data": 0,
+      "total_functions": 4
     },
     {
       "name": "main/game/gs_range_8018FE30",
@@ -17838,13 +17981,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 10420,
+          "size": 96,
           "virtual_address": 2149625552
         }
       ],
-      "total_code": 10420,
+      "total_code": 96,
       "total_data": 0,
-      "total_functions": 27
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_action_exact_8020AF30",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 296,
+          "virtual_address": 2149625648
+        }
+      ],
+      "total_code": 296,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/fight_action_candidate_8020B058",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 10028,
+          "virtual_address": 2149625944
+        }
+      ],
+      "total_code": 10028,
+      "total_data": 0,
+      "total_functions": 23
     },
     {
       "name": "main/game/fight_action_exact_8020D784",

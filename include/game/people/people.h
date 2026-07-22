@@ -179,7 +179,7 @@ typedef struct PeopleEntry {
     f32  animBlendFactor;   /* 0x84 */
     u8   field_88[0x08];    /* 0x88 - 0x8F */
     u32  motionIndex;       /* 0x90 */
-    u32  field_94;          /* 0x94 */
+    u8   field_94;          /* 0x94 */
     u8   isTalkable;        /* 0x95 (stored from talk check) */
     u8   moveType;          /* 0x96 */
     u8   pad97;             /* 0x97 */

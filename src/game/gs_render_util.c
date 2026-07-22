@@ -629,7 +629,7 @@ void GScameraLookAt(GSRenderCamera* camera, const GSRenderVec3* src1,
  * GScameraGetRotation - GS render: set object rotation data (field_0x88)
  * Address: 0x800D1F58, Size: 0x2C
  * ================================================================== */
-void GScameraGetRotation(GSRenderCamera* camera, void* dest) {
+void GScameraGetRotation(GSRenderCamera* camera, GSRenderVec3* dest) {
     GSvecCopy(dest, &camera->rotation);
 }
 
@@ -637,7 +637,7 @@ void GScameraGetRotation(GSRenderCamera* camera, void* dest) {
  * GScameraGetPosition - GS render: get position data, optionally update JObj
  * Address: 0x800D1F84, Size: 0x58
  * ================================================================== */
-void GScameraGetPosition(GSRenderCamera* camera, void* dest) {
+void GScameraGetPosition(GSRenderCamera* camera, GSRenderVec3* dest) {
     if (camera->isAnimating != 0) {
         HSD_CObjGetEyePosition(camera->cobj, &camera->eye);
     }
@@ -659,7 +659,7 @@ void GScameraGetPerspective(GSRenderCamera* camera, f32* fov, f32* aspect,
  * GScameraSetRotation - GS render: set rotation data, mark dirty
  * Address: 0x800D203C, Size: 0x40
  * ================================================================== */
-void GScameraSetRotation(GSRenderCamera* camera, void* src) {
+void GScameraSetRotation(GSRenderCamera* camera, const GSRenderVec3* src) {
     GSvecCopy(&camera->rotation, src);
     camera->dirty = 1;
     camera->useLookAt = 0;

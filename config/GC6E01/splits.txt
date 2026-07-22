@@ -1576,8 +1576,11 @@ game/gs_render_util.c:
 game/gs_render_util_exact_800D1EB8.c:
 	.text       start:0x800D1EB8 end:0x800D1F58
 
-game/gs_render_util_candidate_800D1F58.c:
-	.text       start:0x800D1F58 end:0x800D3074
+game/gs_render_util_exact_800D1F58.c:
+	.text       start:0x800D1F58 end:0x800D207C
+
+game/gs_render_util_candidate_800D207C.c:
+	.text       start:0x800D207C end:0x800D3074
 
 game/gs_gfx.c:
 	.text       start:0x800D3074 end:0x800D3E4C
@@ -2072,7 +2075,13 @@ game/cursor_bios.c:
 	.text       start:0x80103E68 end:0x80103FE4
 
 game/window.c:
-	.text       start:0x80103FE4 end:0x801058CC
+	.text       start:0x80103FE4 end:0x801040A0
+
+game/window_exact_801040A0.c:
+	.text       start:0x801040A0 end:0x801040F0
+
+game/window_candidate_801040F0.c:
+	.text       start:0x801040F0 end:0x801058CC
 
 game/win_msg.c:
 	.text       start:0x801058CC end:0x80106F98
@@ -2155,8 +2164,11 @@ game/floor_character_exact_80117038.c:
 game/floor_character_candidate_80117070.c:
 	.text       start:0x80117070 end:0x8011711C
 
+game/field_camera_exact_8011711C.c:
+	.text       start:0x8011711C end:0x801171C8
+
 game/field_camera.c:
-	.text       start:0x8011711C end:0x80117E58
+	.text       start:0x801171C8 end:0x80117E58
 
 game/field_exact_80117E58.c:
 	.text       start:0x80117E58 end:0x801183EC
@@ -3034,7 +3046,28 @@ game/gs_range_8017F2C4.c:
 	.text       start:0x8017F2C4 end:0x80180C78
 
 game/people/people.c:
-	.text       start:0x80180C78 end:0x8018FE30
+	.text       start:0x80180C78 end:0x8018FB2C
+
+game/people/people_exact_8018FB2C.c:
+	.text       start:0x8018FB2C end:0x8018FB94
+
+game/people/people_candidate_8018FB94.c:
+	.text       start:0x8018FB94 end:0x8018FBAC
+
+game/people/people_exact_8018FBAC.c:
+	.text       start:0x8018FBAC end:0x8018FC50
+
+game/people/people_candidate_8018FC50.c:
+	.text       start:0x8018FC50 end:0x8018FC74
+
+game/people/people_exact_8018FC74.c:
+	.text       start:0x8018FC74 end:0x8018FCE0
+
+game/people/people_candidate_8018FCE0.c:
+	.text       start:0x8018FCE0 end:0x8018FD88
+
+game/people/people_exact_8018FD88.c:
+	.text       start:0x8018FD88 end:0x8018FE30
 
 game/gs_range_8018FE30.c:
 	.text       start:0x8018FE30 end:0x80190E34
@@ -3915,7 +3948,13 @@ game/fight_action_exact_8020AE30.c:
 	.text       start:0x8020AE30 end:0x8020AED0
 
 game/fight_action_candidate_8020AED0.c:
-	.text       start:0x8020AED0 end:0x8020D784
+	.text       start:0x8020AED0 end:0x8020AF30
+
+game/fight_action_exact_8020AF30.c:
+	.text       start:0x8020AF30 end:0x8020B058
+
+game/fight_action_candidate_8020B058.c:
+	.text       start:0x8020B058 end:0x8020D784
 
 game/fight_action_exact_8020D784.c:
 	.text       start:0x8020D784 end:0x8020D844

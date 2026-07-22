@@ -98,6 +98,9 @@ void GScameraGetLookAt(GSRenderCamera* camera, GSRenderVec3* up,
                        GSRenderVec3* interest);
 void GScameraLookAt(GSRenderCamera* camera, const GSRenderVec3* up,
                     const GSRenderVec3* interest);
-void GScameraGetPosition(GSRenderCamera* camera, void* position);
+void GScameraGetRotation(GSRenderCamera* camera, GSRenderVec3* rotation);
+void GScameraGetPosition(GSRenderCamera* camera, GSRenderVec3* position);
+void GScameraSetRotation(GSRenderCamera* camera,
+                         const GSRenderVec3* rotation);
 
 #endif /* GAME_GS_RENDER_UTIL_H */

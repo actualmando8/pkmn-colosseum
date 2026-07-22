@@ -476,7 +476,9 @@ void _cameraPadMoveUpdate__FP9_GScamera(void* camera) {
     ((CameraPadState*)lbl_80478C40)->rotation.y -=
         rotateX / (lbl_8047D788.value * movementDivisor);
     GScameraSetPosition(camera, &((CameraPadState*)lbl_80478C40)->direction);
-    GScameraSetRotation(camera, &((CameraPadState*)lbl_80478C40)->rotation);
+    GScameraSetRotation(
+        camera,
+        (const GSRenderVec3*)&((CameraPadState*)lbl_80478C40)->rotation);
     GScameraGetPerspective(camera, &aspect, &fov, &near, &far);
     GScameraSetPerspective(camera, ((CameraPadState*)lbl_80478C40)->fov,
                            fov, near, far);
@@ -534,7 +536,7 @@ void cameraSetRotation(f32 x, f32 y, f32 z) {
     set__5GSvecFfff(&rotation, x, y, z);
     camera = GSresGetResource(0, 0);
     GSvecCopy(&((CameraPadState*)lbl_80478C40)->rotation, &rotation);
-    GScameraSetRotation(camera, &rotation);
+    GScameraSetRotation(camera, (const GSRenderVec3*)&rotation);
 }
 #pragma pop
 #pragma push
