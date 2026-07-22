@@ -3181,7 +3181,37 @@ game/ps_exact_80169340.c:
 	.text       start:0x80169340 end:0x801698F8
 
 game/ps_candidate_801698F8.c:
-	.text       start:0x801698F8 end:0x8017572C
+	.text       start:0x801698F8 end:0x8016A644
+
+game/ps_app_srt_exact_8016A644.c:
+	.text       start:0x8016A644 end:0x8016A79C
+
+game/ps_candidate_8016A79C.c:
+	.text       start:0x8016A79C end:0x8016A93C
+
+game/ps_app_srt_exact_8016A93C.c:
+	.text       start:0x8016A93C end:0x8016A9B4
+
+game/ps_candidate_8016A9B4.c:
+	.text       start:0x8016A9B4 end:0x8016AAAC
+
+game/ps_app_srt_exact_8016AAAC.c:
+	.text       start:0x8016AAAC end:0x8016AB94
+
+game/ps_candidate_8016AB94.c:
+	.text       start:0x8016AB94 end:0x8016F2F4
+
+game/ps_exact_8016F2F4.c:
+	.text       start:0x8016F2F4 end:0x8016F300
+
+game/ps_candidate_8016F300.c:
+	.text       start:0x8016F300 end:0x80172928
+
+game/ps_exact_80172928.c:
+	.text       start:0x80172928 end:0x80172930
+
+game/ps_candidate_80172930.c:
+	.text       start:0x80172930 end:0x8017572C
 
 game/ps_generator_range_8017572C.c:
 	.text       start:0x8017572C end:0x80175F6C
@@ -3192,8 +3222,53 @@ game/gs_xfb_capture.c:
 game/gs_spline.c:
 	.text       start:0x80176068 end:0x801765F4
 
-game/camera.c:
-	.text       start:0x801765F4 end:0x80179DFC
+game/camera_exact_801765F4.c:
+	.text       start:0x801765F4 end:0x801766A8
+
+game/camera_candidate_801766A8.c:
+	.text       start:0x801766A8 end:0x801768F0
+
+game/camera_exact_801768F0.c:
+	.text       start:0x801768F0 end:0x80176948
+
+game/camera_candidate_80176948.c:
+	.text       start:0x80176948 end:0x801769E4
+
+game/camera_exact_801769E4.c:
+	.text       start:0x801769E4 end:0x80176B48
+
+game/camera_candidate_80176B48.c:
+	.text       start:0x80176B48 end:0x80176C04
+
+game/camera_exact_80176C04.c:
+	.text       start:0x80176C04 end:0x80176C78
+
+game/camera_candidate_80176C78.c:
+	.text       start:0x80176C78 end:0x80176F68
+
+game/camera_exact_80176F68.c:
+	.text       start:0x80176F68 end:0x80176F98
+
+game/camera_candidate_80176F98.c:
+	.text       start:0x80176F98 end:0x80177004
+
+game/camera_exact_80177004.c:
+	.text       start:0x80177004 end:0x8017707C
+
+game/camera_candidate_8017707C.c:
+	.text       start:0x8017707C end:0x801773F4
+
+game/camera_exact_801773F4.c:
+	.text       start:0x801773F4 end:0x80177478
+
+game/camera_candidate_80177478.c:
+	.text       start:0x80177478 end:0x801778B4
+
+game/camera_exact_801778B4.c:
+	.text       start:0x801778B4 end:0x801779B0
+
+game/camera_candidate_801779B0.c:
+	.text       start:0x801779B0 end:0x80179DFC
 
 game/camera_exact_80179DFC.c:
 	.text       start:0x80179DFC end:0x80179E04

@@ -2,8 +2,8 @@
 #define GAME_PS_H
 
 #include "dolphin/types.h"
+#include "game/ps_types.h"
 
-typedef struct PSGeneratorState PSGeneratorState;
 struct PSParticle;
 
 void psSetRandomVelocityScaling(PSGeneratorState* generator, u8 enabled);

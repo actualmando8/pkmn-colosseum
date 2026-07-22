@@ -1209,3 +1209,59 @@ Independent audit: PASS for exact composition, text and relocation parity,
 Next action: publish and merge PR #416 after final review, rotate Windows from
   the merged head, then integrate the next vetted exact-30 batch
 ```
+
+### Batch snapshot — 2026-07-22 (PR #418)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: e6987c21 (PR #417 merged; no decomp delta)
+Batch branch: `integration/pr418-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +13 complete units / +25 total-unit topology /
+  +2,008 linked code / +0 linked data
+Goal cumulative from PR #381: +813 linked functions / +222 complete units /
+  +65,896 linked code / +193 linked data
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,581 functions; 907 / 1,639 units;
+  632,056 complete code bytes; 752,777 complete data bytes
+README/report: synced at the PR head at 25.33% linked / 632.06 kB complete
+  code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole active permutation farm
+Windows: post-#416 reconciliation found 32 already-exact artifacts, the same
+  seven strict rejects, and zero recoverable survivors; four topology rechecks
+  remain full-TU-fidelity invalid. The fresh queue has 138 records across 70
+  objects, 69 runnable units across 42 objects, and 69 documented skips (67
+  full-TU-fidelity, two parser), with manifest SHA-256
+  `49c4713b83038612ae368f2d400d87f523acca54d70ff8cb65352593af563cf5`;
+  one supervisor (PID 57200) and 12 / 12 workers are live at round three with
+  zero wins or bad units
+Integrated: 22 typed camera state, animation, movement, and public-vector
+  helpers; seven typed particle AppSRT lifetime/attachment helpers; and the
+  linker-live `_psListGetNext` accessor
+Relocation rejection gate: `psAddGeneratorAppSRT` emitted target-identical text
+  but failed strict parity for two of 14 private-versus-owned relocations; the
+  replacement `_psListGetNext` has zero relocations and three genuine incoming
+  references. The rejected function remains unlinked and is not counted.
+Type recovery: the 0xFC saved camera-state prefix, 0xB4 generator state, and
+  0x74 AppSRT layouts are canonical shared definitions; local duplicates were
+  removed from camera and particle units, and public camera-vector APIs use
+  explicit `GSSceneVec3*` arguments
+Residual policy: the two affected original ranges become 13 Matching units
+  plus 14 explicit non-auto CodeCandidate ranges; coverage is gapless and
+  disjoint
+Validation: all 30 functions / 2,008 bytes are raw 100%; all 13 Matching units
+  emit target-identical text and exactly 85 normalized target/source
+  relocations; every selected symbol survives in main.elf at its retail VA and
+  size and has a genuine incoming relocation from an active linker input;
+  `FORCEACTIVE` is empty
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, text and relocation parity,
+  liveness, caller ABI/type fidelity, residual topology, strict-policy
+  compliance, zero regression, and the full retail link
+Next action: publish and merge PR #418 after final review, rotate Windows from
+  the merged head, then integrate the next vetted exact-30 batch
+```

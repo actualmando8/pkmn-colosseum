@@ -2,27 +2,6 @@
 #include "game/ps.h"
 #include "game/script/script.h"
 
-struct PSGeneratorState {
-    /* 0x00 */ struct PSGeneratorState* next;
-    /* 0x04 */ u32 flags;
-    /* 0x08 */ u8 pad08[0x08];
-    /* 0x10 */ u16 maxLife;
-    /* 0x12 */ u16 angleFlags;
-    /* 0x14 */ u8 bankIndex;
-    /* 0x15 */ u8 linkNo;
-    /* 0x16 */ u8 pad16[0x02];
-    /* 0x18 */ u16 familyId;
-    /* 0x1A */ u8 pad1A[0x32];
-    /* 0x4C */ u32 childCount;
-    /* 0x50 */ void* appSRT;
-    /* 0x54 */ u8 pad54[0x34];
-    /* 0x88 */ u16 generatorFlags;
-    /* 0x8A */ u8 pad8A[0x02];
-    /* 0x8C */ f32 generatorData[6];
-    /* 0xA4 */ void* linkedJObj;
-    /* 0xA8 */ f32 angleRadiusScale[3];
-};
-
 extern PSGeneratorState* lbl_8047B188;
 extern void* lbl_80452DC8[];
 extern const char lbl_80273820[];

@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1614
+    "total_units": 1639
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1546,
-    "source_backed_units": 1530,
+    "named_units": 1571,
+    "source_backed_units": 1555,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -14422,13 +14422,143 @@
       "sections": [
         {
           "name": ".text",
-          "size": 48692,
+          "size": 3404,
           "virtual_address": 2148964600
         }
       ],
-      "total_code": 48692,
+      "total_code": 3404,
       "total_data": 0,
-      "total_functions": 52
+      "total_functions": 8
+    },
+    {
+      "name": "main/game/ps_app_srt_exact_8016A644",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 344,
+          "virtual_address": 2148968004
+        }
+      ],
+      "total_code": 344,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/ps_candidate_8016A79C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 416,
+          "virtual_address": 2148968348
+        }
+      ],
+      "total_code": 416,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/ps_app_srt_exact_8016A93C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 120,
+          "virtual_address": 2148968764
+        }
+      ],
+      "total_code": 120,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/ps_candidate_8016A9B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 248,
+          "virtual_address": 2148968884
+        }
+      ],
+      "total_code": 248,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/ps_app_srt_exact_8016AAAC",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 232,
+          "virtual_address": 2148969132
+        }
+      ],
+      "total_code": 232,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/ps_candidate_8016AB94",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 18272,
+          "virtual_address": 2148969364
+        }
+      ],
+      "total_code": 18272,
+      "total_data": 0,
+      "total_functions": 11
+    },
+    {
+      "name": "main/game/ps_exact_8016F2F4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 12,
+          "virtual_address": 2148987636
+        }
+      ],
+      "total_code": 12,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/ps_candidate_8016F300",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 13864,
+          "virtual_address": 2148987648
+        }
+      ],
+      "total_code": 13864,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/ps_exact_80172928",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 8,
+          "virtual_address": 2149001512
+        }
+      ],
+      "total_code": 8,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/ps_candidate_80172930",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 11772,
+          "virtual_address": 2149001520
+        }
+      ],
+      "total_code": 11772,
+      "total_data": 0,
+      "total_functions": 13
     },
     {
       "name": "main/game/ps_generator_range_8017572C",
@@ -14470,17 +14600,212 @@
       "total_functions": 3
     },
     {
-      "name": "main/game/camera",
+      "name": "main/game/camera_exact_801765F4",
       "sections": [
         {
           "name": ".text",
-          "size": 14344,
+          "size": 180,
           "virtual_address": 2149017076
         }
       ],
-      "total_code": 14344,
+      "total_code": 180,
       "total_data": 0,
-      "total_functions": 58
+      "total_functions": 7
+    },
+    {
+      "name": "main/game/camera_candidate_801766A8",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 584,
+          "virtual_address": 2149017256
+        }
+      ],
+      "total_code": 584,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/camera_exact_801768F0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 88,
+          "virtual_address": 2149017840
+        }
+      ],
+      "total_code": 88,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_80176948",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 156,
+          "virtual_address": 2149017928
+        }
+      ],
+      "total_code": 156,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/camera_exact_801769E4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 356,
+          "virtual_address": 2149018084
+        }
+      ],
+      "total_code": 356,
+      "total_data": 0,
+      "total_functions": 4
+    },
+    {
+      "name": "main/game/camera_candidate_80176B48",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 188,
+          "virtual_address": 2149018440
+        }
+      ],
+      "total_code": 188,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_exact_80176C04",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 116,
+          "virtual_address": 2149018628
+        }
+      ],
+      "total_code": 116,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_80176C78",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 752,
+          "virtual_address": 2149018744
+        }
+      ],
+      "total_code": 752,
+      "total_data": 0,
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/camera_exact_80176F68",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 48,
+          "virtual_address": 2149019496
+        }
+      ],
+      "total_code": 48,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_80176F98",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 108,
+          "virtual_address": 2149019544
+        }
+      ],
+      "total_code": 108,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_exact_80177004",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 120,
+          "virtual_address": 2149019652
+        }
+      ],
+      "total_code": 120,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_8017707C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 888,
+          "virtual_address": 2149019772
+        }
+      ],
+      "total_code": 888,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_exact_801773F4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 132,
+          "virtual_address": 2149020660
+        }
+      ],
+      "total_code": 132,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/camera_candidate_80177478",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1084,
+          "virtual_address": 2149020792
+        }
+      ],
+      "total_code": 1084,
+      "total_data": 0,
+      "total_functions": 9
+    },
+    {
+      "name": "main/game/camera_exact_801778B4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 252,
+          "virtual_address": 2149021876
+        }
+      ],
+      "total_code": 252,
+      "total_data": 0,
+      "total_functions": 6
+    },
+    {
+      "name": "main/game/camera_candidate_801779B0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 9292,
+          "virtual_address": 2149022128
+        }
+      ],
+      "total_code": 9292,
+      "total_data": 0,
+      "total_functions": 15
     },
     {
       "name": "main/game/camera_exact_80179DFC",
