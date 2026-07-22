@@ -185,9 +185,9 @@ void _cameraOffsetAnimeUpdate__FP9_GScamera(GSRenderCamera* camera) {
     f32 aspect;
     f32 near;
     f32 far;
-    GSSceneVec3 eye;
-    GSSceneVec3 interest;
-    GSSceneVec3 up;
+    GSRenderVec3 eye;
+    GSRenderVec3 interest;
+    GSRenderVec3 up;
     GSRenderMtx rotation;
     GSRenderCamera* animation;
     CameraPadState* state;

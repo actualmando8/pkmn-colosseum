@@ -44,7 +44,7 @@ extern void* fn_80362D0C(void* jobj);  /* HSD_JObjAnimAll */
 extern void fn_80363CF4(void* jobj);   /* HSD_JObjRemoveAll */
 
 /* GS render util internal functions */
-extern void GSvecCopy(void* dst, void* src);
+extern void GSvecCopy(void* dst, const void* src);
 extern void fn_800E0168(void* dst, void* src1, void* src2);
 extern void fn_800E0628(void* dst, void* src);
 extern void fn_800E0218(void* a, void* b, void* c, void* d);
@@ -604,19 +604,21 @@ void fn_800D1D00(void* obj) {
 }
 
 /* ==================================================================
- * GScameraGetLookAt - GS render: get translation and scale data
+ * GScameraGetLookAt - GS render: get up and interest vectors
  * Address: 0x800D1EB8, Size: 0x4C
  * ================================================================== */
-void GScameraGetLookAt(GSRenderCamera* camera, void* dest1, void* dest2) {
+void GScameraGetLookAt(GSRenderCamera* camera, GSRenderVec3* dest1,
+                       GSRenderVec3* dest2) {
     GSvecCopy(dest1, &camera->upVector);
     GSvecCopy(dest2, &camera->interest);
 }
 
 /* ==================================================================
- * GScameraLookAt - GS render: set translation and scale data
+ * GScameraLookAt - GS render: set up and interest vectors
  * Address: 0x800D1F04, Size: 0x54
  * ================================================================== */
-void GScameraLookAt(GSRenderCamera* camera, void* src1, void* src2) {
+void GScameraLookAt(GSRenderCamera* camera, const GSRenderVec3* src1,
+                    const GSRenderVec3* src2) {
     GSvecCopy(&camera->upVector, src1);
     GSvecCopy(&camera->interest, src2);
     camera->dirty = 1;

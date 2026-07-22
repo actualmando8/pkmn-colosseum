@@ -37,7 +37,6 @@ extern void  fn_800E032C(void* matrix, f32 angle);
 extern void  GSvecAdd(void* out, void* a, void* b);  /* cross product */
 extern void  GSvecTransform(void* out, void* a, void* b);  /* vector subtract */
 extern void  GScameraSetPosition(void* obj, void* mtx);         /* set model matrix */
-extern void  GScameraLookAt(void* obj, void* tbl, void* pos); /* set joint pos */
 extern void* fn_800FF56C(void);                         /* GSfloor get active */
 
 /* Script/generator */

@@ -89,7 +89,7 @@ extern void fn_800D7588(void);
 extern void fn_800D75AC(void);
 extern void fn_800D7650(u8*);
 extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
-extern void fn_800D7940(u32, u16);
+extern void fn_800D7940(u8*, u16);
 extern void fn_800D7A70(u32);
 extern void fn_800D923C(void);
 extern void fn_800D963C(u32, s32);
@@ -161,7 +161,7 @@ extern void fn_800D7588(void);
 extern void fn_800D75AC(void);
 extern void fn_800D7650(u8*);
 extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
-extern void fn_800D7940(u32, u16);
+extern void fn_800D7940(u8*, u16);
 extern void fn_800D7A70(u32);
 extern void fn_800DB098(void);
 extern void fn_800DB758(u16);
@@ -1262,7 +1262,7 @@ void fn_800D76A8(u32 obj, u16 vertCount) {
     if (*(u8*)(state + 0x47e) == 1) {
         oldObj = *(u32*)(state + 0x24);
         *(u32*)(state + 0x24) = obj;
-        fn_800D7940(obj, vertCount);
+        fn_800D7940((u8*)obj, vertCount);
         *(u32*)(state + 0x24) = oldObj;
         return;
     }
@@ -1274,7 +1274,7 @@ void fn_800D76A8(u32 obj, u16 vertCount) {
 
     fn_800D7A70(obj);
     fn_800D892C(obj);
-    fn_800D7940(obj, vertCount);
+    fn_800D7940((u8*)obj, vertCount);
 }
 #endif
 #endif
@@ -1309,7 +1309,7 @@ void fn_800D7868(u8* arr, u32 idx, u32 a, u32 b, u32 c, u8 d, u32 e, u8 f) {
 #endif
 #endif
 
-#if defined(GS_GFX_LAYER_800D7894_800D7A70)
+#if defined(GS_GFX_LAYER_800D7894_800D7940)
 extern u32 lbl_8047AAB0;
 extern u32 lbl_8047AAAC;
 extern u8 lbl_803144D0[];
@@ -1356,50 +1356,66 @@ u8* fn_800D7894(void) {
 #pragma pop
 #endif
 
+#endif
+
+#if defined(GS_GFX_LAYER_800D7940_800D7A70)
 #if 0
 asm void fn_800D7940(void) {
 #include "src/game/gs_render_fn_800D7940.inc"
 }
 #else
-void fn_800D7940(u32 obj, u16 vertCount) {
-    u32 vertex;
-    u32 i;
+extern void fn_800D6028(u16);
+extern void fn_800D5FA4(u8);
+extern void fn_800D5DD0(u16);
+extern void fn_800D5D6C(u8);
+extern void fn_800D5AB0(u32, u16);
+extern void fn_800D5A38(u32, u8);
+extern void fn_800D579C(u32, u16);
+extern void fn_800D5724(u32, u8);
+extern void fn_800D6728(void);
+
+void fn_800D7940(u8* obj, u16 vertCount) {
+    u16 vertex;
+    s32 i;
+    u32 layer;
     u8* entry;
 
     fn_800D67BC(vertCount);
     for (vertex = 0; vertex < vertCount; vertex++) {
         if (*(s32*)(obj + 0x28) == 2) {
-            fn_800D6028((u16)vertex);
+            fn_800D6028(vertex);
         } else {
-            fn_800D5FA4((u8)vertex);
+            fn_800D5FA4(vertex);
         }
 
         if (*(u8*)(obj + 0x40) == 1) {
             if (*(s32*)(obj + 0x44) == 2) {
-                fn_800D5DD0((u16)vertex);
+                fn_800D5DD0(vertex);
             } else {
-                fn_800D5D6C((u8)vertex);
+                fn_800D5D6C(vertex);
             }
         }
 
-        for (i = 4; i < 6; i++) {
+        for (i = 4; i <= 5; i++) {
             entry = (u8*)(obj + i * 0x1c);
             if (entry[0x8] == 1) {
+                layer = i - 4;
                 if (*(s32*)(entry + 0xc) == 2) {
-                    fn_800D5AB0(i - 4, (u16)vertex);
+                    fn_800D5AB0(layer, vertex);
                 } else {
-                    fn_800D5A38(i - 4, (u8)vertex);
+                    fn_800D5A38(layer, vertex);
                 }
             }
         }
 
-        for (i = 6; i < 14; i++) {
+        for (i = 6; i <= 13; i++) {
             entry = (u8*)(obj + i * 0x1c);
             if (entry[0x8] == 1) {
+                layer = i - 6;
                 if (*(s32*)(entry + 0xc) == 2) {
-                    fn_800D579C(i - 6, (u16)vertex);
+                    fn_800D579C(layer, vertex);
                 } else {
-                    fn_800D5724(i - 6, (u8)vertex);
+                    fn_800D5724(layer, vertex);
                 }
             }
         }

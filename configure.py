@@ -2454,6 +2454,18 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "dolphin/sdk_exact_800AF14C.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800AF35C.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
                 "dolphin/card_exact_800AF474.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2461,6 +2473,30 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/sdk_range_800AF8A0.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B016C.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B0174.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B01AC.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B0694.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -2478,6 +2514,42 @@ config.libs = [
             ),
             Object(
                 Matching,
+                "dolphin/sdk_exact_800B2968.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B29F4.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B2F84.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B3078.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B38DC.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B3978.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
                 "dolphin/card_exact_800B3B68.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -2485,6 +2557,72 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/sdk_range_800B4488.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B45E8.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B4644.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B4DC4.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B4E50.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B4FC0.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B5070.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B5184.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B5228.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B5AE0.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                Matching,
+                "dolphin/sdk_exact_800B5BA4.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800B5C5C.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -2525,7 +2663,7 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "dolphin/sdk_range_800B8E74.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
@@ -4913,6 +5051,29 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
+                Matching,
+                "game/gs_render_util_exact_800D1EB8.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                ],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_render_util_candidate_800D1F58.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-DGS_RENDER_UTIL_SUFFIX_800D1B3C",
+                ],
+                progress_category="game",
+            ),
+            Object(
                 CodeCandidate,
                 "game/gs_event_exec.c",
                 mw_version="GC/1.3",
@@ -5655,6 +5816,7 @@ config.libs = [
                     (CodeCandidate, "game/gs_gfx_layer_candidate_800D76A8.c"),
                     (Matching, "game/gs_gfx_layer_exact_800D7820.c"),
                     (CodeCandidate, "game/gs_gfx_layer_candidate_800D7894.c"),
+                    (Matching, "game/gs_gfx_layer_exact_800D7940.c"),
                     (Matching, "game/gs_gfx_layer_exact_800D7A70.c"),
                     (CodeCandidate, "game/gs_gfx_layer_candidate_800D7D90.c"),
                     (Matching, "game/gs_gfx_layer_exact_800D7E5C.c"),
@@ -5716,7 +5878,8 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "game/gs_light_candidate_800DC560.c"),
                     (Matching, "game/gs_light_exact_800DCA10.c"),
-                    (CodeCandidate, "game/gs_light_candidate_800DCC3C.c"),
+                    (Matching, "game/gs_light_exact_800DCC3C.c"),
+                    (CodeCandidate, "game/gs_light_candidate_800DCC84.c"),
                 ]
             ],
             Object(
