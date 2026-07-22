@@ -1,0 +1,23 @@
+/** Exact tool-entry resource cleanup, 0x8025CD64 - 0x8025CDB8. */
+#include "dolphin/types.h"
+
+extern u32 lbl_8047B650;
+extern u32 fn_800E202C();
+extern void fn_800E209C();
+extern void fn_800E24B0();
+
+void toolentryTaisenFreePokemonData(void* ctx, u32 slot, u32 param)
+{
+    u32 handle;
+    u32 result;
+
+    handle = lbl_8047B650;
+    if (handle != 0) {
+        result = fn_800E202C(handle);
+        if ((result & 0xFFFF) != 0) {
+            fn_800E24B0(result);
+            fn_800E209C(result);
+        }
+        lbl_8047B650 = 0;
+    }
+}
