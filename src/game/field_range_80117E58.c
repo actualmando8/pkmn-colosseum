@@ -12,6 +12,15 @@
  */
 #include "dolphin/types.h"
 #include "game/world/gs_field.h"
+
+typedef struct PSGeneratorState PSGeneratorState;
+typedef struct GSpart GSpart;
+struct GSmodel;
+
+extern void psSetParticleVisibility();
+extern void psSetRandomVelocityScaling(PSGeneratorState* generator, u8 enabled);
+extern void psSetParticleTexScaling(PSGeneratorState* generator, u8 enabled);
+extern void psLinkChildGensToJObj(PSGeneratorState* generator, void* jobj);
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 extern void* memcpy(void* dst, const void* src, u32 n);
@@ -48,7 +57,6 @@ extern void OSGetTick();
 extern void psInitAppSRT();
 extern void psInitParticle();
 extern void psSetGeneratorAngleRadiusScale();
-extern void psSetParticleVisibility();
 extern void sin();
 extern void statusGetStatus();
 /* GSfloor / GScolsys */
@@ -307,9 +315,9 @@ extern void GSmodelSetAnimType(void);
 extern void GSmodelStartAnimation(void);
 extern void _threadSwitch(void);
 extern void GSmodelIsAnimating(void);
-extern void GSmodelGetPart(void);
+extern GSpart* GSmodelGetPart(struct GSmodel* model, s32 index);
 extern void GSpartGetTransform(void);
-extern void GSpartFree();
+extern void GSpartFree(GSpart* part);
 extern void fn_8018AACC(void);
 extern void peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag);
 extern void fn_8018805C(void);
@@ -361,7 +369,7 @@ extern void GSscene_GetCameraViewVector(void*);
 extern f32 cameraGetHeight(void);
 extern f32 cameraGetDistance(void);
 extern f32 cameraGetRotY(void);
-extern void set__5GSvecFfff(void* obj, f32 f1, f32 f2, f32 f3);
+extern void set__5GSvecFfff(f32* vec, f32 x, f32 y, f32 z);
 extern void GSmtxMakeYRotation(void*, f32);
 extern void GSvecTransform(void*, void*, void*);
 extern void GSvecAdd(void*, void*, void*);
@@ -424,9 +432,7 @@ extern void jumptable_8035BB88();
 extern u8 lbl_8047ADB0;
 void fn_801183EC(u32 particleCount);
 void fn_80118874(u8* list, u32 notify);
-extern void psSetParticleVisibility(); /* K&R: called with 0 or 1 args */
 extern void psSetGeneratorAngleRadiusScale(void);
-extern void psLinkChildGensToJObj(void);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
 void* psCreateGeneratorID(u32 use_alt, u8 texture_type, u32 selector);
@@ -447,13 +453,13 @@ extern void psSetPointJObjNodup(void);
 extern void fn_8019D610(void);
 extern u16 lbl_8047AD98;
 extern u16 lbl_8047ADA4;
-extern void GSmodelSearchModelList(void);
-extern void GSmodelGetLinkedGSparticleBank(void);
-extern void GSmodelIsRootNullAdded(void);
-extern void GSpartGetJObjIndex(void);
-extern void fn_800E3CBC(void);
-extern void GSmodelGetGSparticleLinkAttachMode(void);
-extern void GSmodelGetVisibility(void);
+extern struct GSmodel* GSmodelSearchModelList(void* jobj);
+extern void* GSmodelGetLinkedGSparticleBank(struct GSmodel* model);
+extern u32 GSmodelIsRootNullAdded(struct GSmodel* model);
+extern u32 GSpartGetJObjIndex(void* jobj, void* root);
+extern u32 fn_800E3CBC(struct GSmodel* model);
+extern u32 GSmodelGetGSparticleLinkAttachMode(struct GSmodel* model);
+extern u32 GSmodelGetVisibility(struct GSmodel* model);
 extern void fn_80135E44(void);
 void fn_8011A0A8(void);
 extern s32 kaisuuGetKaisuu(u32);
@@ -1176,12 +1182,12 @@ extern void fn_80118070(void);
 extern void fn_80118100(void);
 extern void fn_80118104(u32 a, u8 b);
 extern void fn_80118A68(u8* obj, u32 notify);
-extern void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5);
-extern void fn_80118C88(void* obj);
-extern void fn_80118CAC(void* obj);
+extern void fn_80118C20(void* bank, u32 visible);
+extern void fn_80118C88(void* obj, u32 visible);
+extern void fn_80118CAC(void* obj, u8 enabled);
 extern void fn_80118CD0(void* obj);
 extern void fn_80118CF4(void* obj);
-extern void fn_80118D18(void* obj);
+extern void fn_80118D18(void* obj, u8 enabled);
 extern void fn_80118D3C(void* obj);
 extern void fn_80118D60(void* obj);
 extern void fn_80118D84(void* obj);
@@ -1189,8 +1195,9 @@ extern s32 fn_80118DA8(u8* ptr);
 extern void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4);
 extern void fn_80118E8C(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5);
 extern void fn_80118F04(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5);
-extern void fn_80118F7C(u8* obj, void* arg);
-extern void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u32 attach_model);
+extern void fn_80118F7C(u8* obj, f32* arg);
+extern void fn_80118FB0(u8* obj, GSpart* part, u32 state, u32 byte5,
+                        u32 init_from_zero, u32 attach_model);
 extern void fn_80119824(u32 count1, u32 count2);
 extern void fn_8011A280(u8* arg1, u16 arg2, u32 arg3);
 extern s32 fn_8011A3E4(void* obj, u16 val);
@@ -2048,25 +2055,24 @@ void fn_80118A68(u8* obj, u32 notify) {
     destroyFieldParticleInstance(obj, notify);
 }
 /* 0x68 | fn_80118C20 | guarded_call */
-extern void psSetParticleVisibility();  /* K&R: called with 0 or 1 args */
-void fn_80118C20(u8* arg1, void* arg2, u32 arg3, u32 arg4, u32 arg5) {
-    u8* scan = arg1;
+void fn_80118C20(void* bank, u32 visible) {
+    u8* scan = bank;
     u32 i = 0;
     for (i = 0; i < 0x40; i++, scan += 4) {
         void* entry = *(void**)(scan + 8);
         if (entry) {
-            psSetParticleVisibility(*(void**)((u8*)entry + 0x10), arg2);
+            psSetParticleVisibility(
+                *(PSGeneratorState**)((u8*)entry + 0x10), visible);
         }
     }
 }
 /* 0x80118C88 | 36 bytes | load_then_call */
-void fn_80118C88(void* obj) {
-    extern void psSetParticleVisibility();
-    psSetParticleVisibility(*(void**)((u8*)obj + 0x10));
+void fn_80118C88(void* obj, u32 visible) {
+    psSetParticleVisibility(*(PSGeneratorState**)((u8*)obj + 0x10), visible);
 }
 /* 0x80118CAC | 36 bytes | load_then_call */
-void fn_80118CAC(void* obj) {
-    psSetRandomVelocityScaling(*(void**)((u8*)obj + 0x10));
+void fn_80118CAC(void* obj, u8 enabled) {
+    psSetRandomVelocityScaling(*(PSGeneratorState**)((u8*)obj + 0x10), enabled);
 }
 /* 0x80118CD0 | 36 bytes | load_then_call */
 void fn_80118CD0(void* obj) {
@@ -2077,8 +2083,8 @@ void fn_80118CF4(void* obj) {
     psSetTornadoScaling(*(void**)((u8*)obj + 0x10));
 }
 /* 0x80118D18 | 36 bytes | load_then_call */
-void fn_80118D18(void* obj) {
-    psSetParticleTexScaling(*(void**)((u8*)obj + 0x10));
+void fn_80118D18(void* obj, u8 enabled) {
+    psSetParticleTexScaling(*(PSGeneratorState**)((u8*)obj + 0x10), enabled);
 }
 /* 0x80118D3C | 36 bytes | load_then_call */
 void fn_80118D3C(void* obj) {
@@ -2141,20 +2147,19 @@ void fn_80118F04(u8* arg1, f32* arg2, u32 arg3, u32 arg4, u32 arg5) {
     }
 }
 /* 0x80118F7C | 0x34 */
-void fn_80118F7C(u8* obj, void* arg) {
+void fn_80118F7C(u8* obj, f32* arg) {
     f32 f1 = *(f32*)(&obj[0x38]);
     f32 f2 = *(f32*)(&obj[0x3C]);
     f32 f3 = *(f32*)(&obj[0x40]);
     set__5GSvecFfff(arg, f1, f2, f3);
 }
 /* 0x80118FB0 | 0x12C */
-extern void psLinkChildGensToJObj(void);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
-void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u32 attach_model) {
+void fn_80118FB0(u8* obj, GSpart* part, u32 state, u32 byte5,
+                 u32 init_from_zero, u32 attach_model) {
     extern void GSvecCopy(void* dst, void* src);
-    extern void set__5GSvecFfff(void* dst, f32 x, f32 y, f32 z);
-    extern void psLinkChildGensToJObj(u32 model, u32 value);
+    u8* desc = (u8*)part;
     f32 zero;
     f32 one;
 
@@ -2163,24 +2168,25 @@ void fn_80118FB0(u8* obj, u8* desc, u32 state, u32 byte5, u32 init_from_zero, u3
         *(u32*)(obj + 0x4C) = *(u16*)(desc + 0x2);
         if ((u8)init_from_zero == 1) {
             zero = lbl_8047CFE8;
-            set__5GSvecFfff(obj + 0x50, zero, zero, zero);
+            set__5GSvecFfff((f32*)(obj + 0x50), zero, zero, zero);
             zero = lbl_8047CFE8;
-            set__5GSvecFfff(obj + 0x5C, zero, zero, zero);
+            set__5GSvecFfff((f32*)(obj + 0x5C), zero, zero, zero);
             one = lbl_8047CFEC;
-            set__5GSvecFfff(obj + 0x68, one, one, one);
+            set__5GSvecFfff((f32*)(obj + 0x68), one, one, one);
         } else {
             GSvecCopy(obj + 0x50, obj + 0x14);
             GSvecCopy(obj + 0x5C, obj + 0x20);
             GSvecCopy(obj + 0x68, obj + 0x2C);
         }
         zero = lbl_8047CFE8;
-        set__5GSvecFfff(obj + 0x14, zero, zero, zero);
+        set__5GSvecFfff((f32*)(obj + 0x14), zero, zero, zero);
         zero = lbl_8047CFE8;
-        set__5GSvecFfff(obj + 0x20, zero, zero, zero);
+        set__5GSvecFfff((f32*)(obj + 0x20), zero, zero, zero);
         one = lbl_8047CFEC;
-        set__5GSvecFfff(obj + 0x2C, one, one, one);
+        set__5GSvecFfff((f32*)(obj + 0x2C), one, one, one);
         if ((u8)attach_model != 0) {
-            psLinkChildGensToJObj(*(u32*)(obj + 0x10), *(u32*)(desc + 0x8));
+            psLinkChildGensToJObj(
+                *(PSGeneratorState**)(obj + 0x10), *(void**)(desc + 0x8));
         }
         *(u32*)(obj + 0x44) = state;
         obj[5] = (u8)byte5;
@@ -2257,7 +2263,7 @@ u8* fn_801190DC(u8* texture, u32 selector, u32 subid) {
     node[5] = 0;
     node[6] = 0;
 
-    set__5GSvecFfff(node + 0x38,
+    set__5GSvecFfff((f32*)(node + 0x38),
                     ((FieldParticleNode*)node)->generator->position[0],
                     ((FieldParticleNode*)node)->generator->position[1],
                     ((FieldParticleNode*)node)->generator->position[2]);
@@ -2441,30 +2447,21 @@ void fn_80119930(FieldParticleInstanceList* list) {
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_80119BD0_80119D90)
 /* 0x80119BD0 | 0x1C0 */
-extern void GSmodelSearchModelList(void);
-extern void GSmodelGetLinkedGSparticleBank(void);
-extern void GSmodelIsRootNullAdded(void);
-extern void GSpartGetJObjIndex(void);
-extern void fn_800E3CBC(void);
-extern void GSmodelGetGSparticleLinkAttachMode(void);
-extern void GSmodelGetVisibility(void);
-extern void psSetParticleVisibility();
+extern struct GSmodel* GSmodelSearchModelList(void* jobj);
+extern void* GSmodelGetLinkedGSparticleBank(struct GSmodel* model);
+extern u32 GSmodelIsRootNullAdded(struct GSmodel* model);
+extern u32 GSpartGetJObjIndex(void* jobj, void* root);
+extern u32 fn_800E3CBC(struct GSmodel* model);
+extern u32 GSmodelGetGSparticleLinkAttachMode(struct GSmodel* model);
+extern u32 GSmodelGetVisibility(struct GSmodel* model);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
 void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
-    extern u8* GSmodelSearchModelList();
-    extern u8* GSmodelGetLinkedGSparticleBank();
-    extern u32 GSmodelIsRootNullAdded();
-    extern u32 GSpartGetJObjIndex();
-    extern u8* GSmodelGetPart();
-    extern u32 fn_800E3CBC();
-    extern u8* fn_801190DC();
-    extern u32 GSmodelGetGSparticleLinkAttachMode();
-    extern u32 GSmodelGetVisibility();
     u8* node = arg6;
-    u8* resource;
+    struct GSmodel* resource;
     u8* texture;
-    u8* entry;
+    GSpart* entry;
+    u8* entryBytes;
     u32 index;
     s32 handle;
 
@@ -2499,19 +2496,20 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
     if (entry == NULL) {
         return;
     }
+    entryBytes = (u8*)entry;
 
     node = fn_801190DC(texture, arg5, fn_800E3CBC(resource));
     if (node != NULL) {
         handle = GSmodelGetGSparticleLinkAttachMode(resource);
         if (*(s32*)(node + 0x44) == 0 && handle != 0) {
-            *(u32*)(node + 0x48) = *(u32*)(entry + 0x04);
-            *(u32*)(node + 0x4C) = *(u16*)(entry + 0x02);
-            set__5GSvecFfff(node + 0x50, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            set__5GSvecFfff(node + 0x5C, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            set__5GSvecFfff(node + 0x68, lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
-            set__5GSvecFfff(node + 0x14, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            set__5GSvecFfff(node + 0x20, lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
-            set__5GSvecFfff(node + 0x2C, lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
+            *(u32*)(node + 0x48) = *(u32*)(entryBytes + 0x04);
+            *(u32*)(node + 0x4C) = *(u16*)(entryBytes + 0x02);
+            set__5GSvecFfff((f32*)(node + 0x50), lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff((f32*)(node + 0x5C), lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff((f32*)(node + 0x68), lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
+            set__5GSvecFfff((f32*)(node + 0x14), lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff((f32*)(node + 0x20), lbl_8047CFE8, lbl_8047CFE8, lbl_8047CFE8);
+            set__5GSvecFfff((f32*)(node + 0x2C), lbl_8047CFEC, lbl_8047CFEC, lbl_8047CFEC);
             *(u32*)(node + 0x44) = handle;
             *(u8*)(node + 0x05) = 0;
             *(u8*)(node + 0x06) = 1;
@@ -2520,7 +2518,7 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
 
     GSpartFree(entry);
     if ((GSmodelGetVisibility(resource) & 0xFF) == 0) {
-        psSetParticleVisibility(*(void**)(node + 0x10), 0);
+        psSetParticleVisibility(*(PSGeneratorState**)(node + 0x10), 0);
     }
 }
 #endif

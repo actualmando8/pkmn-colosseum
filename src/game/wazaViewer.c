@@ -10,6 +10,7 @@
 
 #include "game/battle/battle_waza_types.h"
 
+#if !defined(PR409_WAZA_VIEWER_SPLIT) || defined(PR409_WAZA_VIEWER_5328_53D4)
 
 /**
  * _wazaViewerFinalize - Move animation helper: screen flash.
@@ -19,6 +20,10 @@ void _wazaViewerFinalize(u8 r, u8 g, u8 b, f32 duration) {
     /* TODO: Screen flash helper (0xAC bytes) */
 }
 
+#endif
+
+#if !defined(PR409_WAZA_VIEWER_SPLIT) || defined(PR409_WAZA_VIEWER_53D4_53D8)
+
 /**
  * _wazaViewerUpdate - Move animation no-op.
  * Address: 0x801D53D4 | Size: 0x4
@@ -27,6 +32,11 @@ void _wazaViewerUpdate(void) {
     /* No-op */
 }
 
+
+#endif
+
+#if !defined(PR409_WAZA_VIEWER_SPLIT) || defined(PR409_WAZA_VIEWER_53D8_7E58)
+
 /**
  * _wazaViewerInitialize - Move animation helper: camera zoom.
  * Address: 0x801D53D8 | Size: 0x8C
@@ -34,13 +44,11 @@ void _wazaViewerUpdate(void) {
 void _wazaViewerInitialize(s32 slot, f32 zoom, f32 speed) {
     extern u8 lbl_804673F8[];
     extern void wazaViewerThread(s32 slot, s32 motionType);
-    extern void fn_801D58E4();
-    extern u32 GSresGetResource(s32, s32);
-    extern void GSmodelSetVisibility(s32, s32);
+    extern struct GSmodel* GSresGetResource(u32 group, u32 handle);
     extern s32 GSthreadCreate(s32, s32, s32, s32, s32, void*);
     extern s32 fn_800057A8(void);
 
-    u32 result;
+    struct GSmodel* result;
     s32 value;
 
     fn_801DAEF8(8);
@@ -74,7 +82,7 @@ void fn_801D56B0(s32 slot, s32 reactionType) {
  * fn_801D58E4 - Move animation helper: environment effect.
  * Address: 0x801D58E4 | Size: 0x1B0
  */
-void fn_801D58E4(s32 effectType) {
+void fn_801D58E4(void) {
     /* TODO: Environment effect helper (0x1B0 bytes) */
 }
 
@@ -186,3 +194,5 @@ void fn_801D7B94(void) {
      * 5. Returns when all entries are complete
      */
 }
+
+#endif

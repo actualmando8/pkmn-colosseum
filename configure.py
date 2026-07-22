@@ -1462,13 +1462,20 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/fight_action.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/fight_action_candidate_8020AED0.c"),
+                    (Matching, "game/fight_action_exact_8020D784.c"),
+                    (CodeCandidate, "game/fight_action_candidate_8020D844.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/fight_action_exact_8020D868.c",
@@ -1560,13 +1567,22 @@ config.libs = [
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/mail.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/mail_candidate_801D1338.c"),
+                    (Matching, "game/mail_exact_801D1470.c"),
+                    (CodeCandidate, "game/mail_candidate_801D167C.c"),
+                    (Matching, "game/mail_exact_801D1A44.c"),
+                    (CodeCandidate, "game/mail_candidate_801D1B10.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/mailMain.c",
@@ -1581,13 +1597,20 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/wazaViewer.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/wazaViewer_candidate_801D5328.c"),
+                    (Matching, "game/wazaViewer_exact_801D53D4.c"),
+                    (CodeCandidate, "game/wazaViewer_candidate_801D53D8.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/wazaSequenceEntry.c",
@@ -1617,13 +1640,22 @@ config.libs = [
                     (Matching, "game/wazaSequenceSys_tail_exact_801DB848.c"),
                 ]
             ],
-            Object(
-                CodeCandidate,
-                "game/wazaSequence.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/wazaSequence_candidate_801DB988.c"),
+                    (Matching, "game/wazaSequence_exact_801DBB10.c"),
+                    (CodeCandidate, "game/wazaSequence_candidate_801DBDDC.c"),
+                    (Matching, "game/wazaSequence_exact_801DBFB0.c"),
+                    (CodeCandidate, "game/wazaSequence_candidate_801DC014.c"),
+                ]
+            ],
             *[
                 Object(
                     status,
@@ -6154,12 +6186,25 @@ config.libs = [
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
-            Object(
-                CodeCandidate,
-                "hsd/hsd_mobj.c",
-                mw_version="GC/1.3",
-                progress_category="hsd",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    progress_category="hsd",
+                )
+                for status, path in [
+                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6CA4.c"),
+                    (Matching, "hsd/hsd_mobj_exact_801A6DC4.c"),
+                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6DDC.c"),
+                    (Matching, "hsd/hsd_mobj_exact_801A6E00.c"),
+                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6E24.c"),
+                    (Matching, "hsd/hsd_mobj_exact_801A6F78.c"),
+                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6FF0.c"),
+                    (Matching, "hsd/hsd_mobj_exact_801A7E3C.c"),
+                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A7E84.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_range_801ADD48.c",

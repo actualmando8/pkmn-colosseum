@@ -37,6 +37,8 @@ typedef struct MailPartyScratchExt {
     u16 sortMode; /* offset 0x444 */
 } MailPartyScratchExt;
 
+#if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_1338_1470)
+
 /**
  * fn_801D1364 - Set u16 handle in battle party scratch at offset 0x444.
  * Address: 0x801D1364 | Size: 0x38
@@ -64,19 +66,17 @@ s32 fn_801D139C(void* entry) {
  * fn_801D13E4 - Waza get entry field at +0x04 (u16), by index.
  * Address: 0x801D13E4 | Size: 0x48
  */
-u32 fn_801D13E4(void* entry) {
-    s32 idx;
+u32 fn_801D13E4(s32 idx) {
     WazaEntry* sequenceEntry;
 
-    idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        sequenceEntry = &lbl_80478E9C[idx];
     }
 
     if (sequenceEntry == NULL) return 0xFFFF;
-    return *(u16*)&sequenceEntry->startFrame;
+    return sequenceEntry->field_04;
 }
 
 /**
@@ -88,13 +88,15 @@ f32 fn_801D142C(void* entry) {
     return *(f32*)((u8*)entry + 0x08);
 }
 
+#endif
+
+#if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_1470_167C)
+
 /**
  * mailGetNbMailData - Waza get entry flags.
  * Address: 0x801D1470 | Size: 0xC
  */
-extern u32* lbl_80478E98; /* waza context pointer */
-extern u32 lbl_80478E9C; /* waza entry array pointer */
-u32 mailGetNbMailData(void* entry) {
+u32 mailGetNbMailData(void) {
     return *lbl_80478E98;
 }
 
@@ -102,15 +104,13 @@ u32 mailGetNbMailData(void* entry) {
  * fn_801D147C - Waza get entry resource ID.
  * Address: 0x801D147C | Size: 0x44
  */
-s32 fn_801D147C(void* entry) {
-    s32 idx;
+s32 fn_801D147C(s32 idx) {
     WazaEntry* sequenceEntry;
 
-    idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        sequenceEntry = &lbl_80478E9C[idx];
     }
 
     if (sequenceEntry == NULL) return -1;
@@ -128,7 +128,7 @@ s32 fn_801D14C0(s32 idx) {
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        entry = &lbl_80478E9C[idx];
     }
 
     if (entry == NULL) return -1;
@@ -139,76 +139,68 @@ s32 fn_801D14C0(s32 idx) {
  * fn_801D1504 - Waza get entry field at +0x20 (s32), by index.
  * Address: 0x801D1504 | Size: 0x44
  */
-s32 fn_801D1504(void* entry) {
-    s32 idx;
-    void* sequenceEntry;
+s32 fn_801D1504(s32 idx) {
+    WazaEntry* sequenceEntry;
 
-    idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        sequenceEntry = &lbl_80478E9C[idx];
     }
 
     if (sequenceEntry == NULL) return -1;
-    return *(s32*)((u8*)sequenceEntry + 0x20);
+    return sequenceEntry->field_20;
 }
 
 /**
  * mailGetSendCondition - Waza get entry field at +0x1C (s32), by index.
  * Address: 0x801D1548 | Size: 0x44
  */
-s32 mailGetSendCondition(void* entry) {
-    s32 idx;
-    void* sequenceEntry;
+s32 mailGetSendCondition(s32 idx) {
+    WazaEntry* sequenceEntry;
 
-    idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        sequenceEntry = &lbl_80478E9C[idx];
     }
 
     if (sequenceEntry == NULL) return -1;
-    return *(s32*)((u8*)sequenceEntry + 0x1C);
+    return sequenceEntry->sendCondition;
 }
 
 /**
  * mailGetSendCondType - Waza get entry field at +0x00 (u8), by index.
  * Address: 0x801D158C | Size: 0x44
  */
-u32 mailGetSendCondType(void* entry) {
-    s32 idx;
-    void* sequenceEntry;
+u32 mailGetSendCondType(s32 idx) {
+    WazaEntry* sequenceEntry;
 
-    idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        sequenceEntry = &lbl_80478E9C[idx];
     }
 
     if (sequenceEntry == NULL) return 0xFF;
-    return *(u8*)((u8*)sequenceEntry + 0x00);
+    return sequenceEntry->sendCondType;
 }
 
 /**
  * mailGetSendRate - Waza get entry field at +0x06 (u16), by index.
  * Address: 0x801D15D0 | Size: 0x48
  */
-u32 mailGetSendRate(void* entry) {
-    s32 idx;
-    void* sequenceEntry;
+u32 mailGetSendRate(s32 idx) {
+    WazaEntry* sequenceEntry;
 
-    idx = (s32)entry;
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         sequenceEntry = NULL;
     } else {
-        sequenceEntry = (void*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        sequenceEntry = &lbl_80478E9C[idx];
     }
 
     if (sequenceEntry == NULL) return 0xFFFF;
-    return *(u16*)((u8*)sequenceEntry + 0x06);
+    return sequenceEntry->sendRate;
 }
 
 /**
@@ -224,7 +216,6 @@ u32 fn_801D1618(void) {
  * fn_801D1620 - Waza handle table lookup (second word of pair).
  * Address: 0x801D1620 | Size: 0x30
  */
-extern u32 lbl_8036E0E0[];
 u32 fn_801D1620(u32 idx) {
     s32 slot = idx & 0xFF;
     if (slot >= lbl_80478CB8) {
@@ -237,7 +228,6 @@ u32 fn_801D1620(u32 idx) {
  * fn_801D1650 - Waza handle table lookup.
  * Address: 0x801D1650 | Size: 0x2C
  */
-extern u32 lbl_8036E0E0[];
 u32 fn_801D1650(u32 idx) {
     s32 slot = idx & 0xFF;
     if (slot >= lbl_80478CB8) {
@@ -245,6 +235,10 @@ u32 fn_801D1650(u32 idx) {
     }
     return lbl_8036E0E0[slot * 2];
 }
+
+#endif
+
+#if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_167C_1A44)
 
 /**
  * fn_801D167C - Waza set current handle.
@@ -281,10 +275,10 @@ u32 mailGetAttachFileGroup(s32 idx) {
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        entry = &lbl_80478E9C[idx];
     }
     if (entry == NULL) return 0;
-    return *(u32*)&entry->posZ;
+    return entry->field_18;
 }
 
 /* =========================================================================
@@ -317,6 +311,10 @@ void fn_801D19A4(s32 seqHandle, f32 speed) {
     /* TODO: Waza animation speed control (0xA0 bytes) */
 }
 
+#endif
+
+#if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_1A44_1B10)
+
 /**
  * mailGetContents - Waza entry get field 0x14 by index.
  * Address: 0x801D1A44 | Size: 0x44
@@ -328,10 +326,10 @@ u32 mailGetContents(s32 idx) {
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        entry = &lbl_80478E9C[idx];
     }
     if (entry == NULL) return 0;
-    return *(u32*)&entry->posY;
+    return entry->field_14;
 }
 
 /**
@@ -343,7 +341,7 @@ u32 mailGetSenderName(s32 idx) {
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        entry = &lbl_80478E9C[idx];
     }
     if (entry == NULL) return 0;
     return entry->field_0C;
@@ -358,11 +356,16 @@ u32 mailGetSubject(s32 idx) {
     if (idx < 0 || (u32)idx >= *lbl_80478E98) {
         entry = NULL;
     } else {
-        entry = (WazaEntry*)(lbl_80478E9C + (u32)idx * sizeof(WazaEntry));
+        entry = &lbl_80478E9C[idx];
     }
     if (entry == NULL) return 0;
     return entry->field_10;
 }
+
+
+#endif
+
+#if !defined(PR409_MAIL_SPLIT) || defined(PR409_MAIL_1B10_2080)
 
 /**
  * fn_801D1B10 - Waza set byte in battle party by handle.
@@ -522,3 +525,5 @@ u16 mailGetNbMailInMailbox(void) {
 void mailInitMailbox(s32 seqHandle, u32 color) {
     /* TODO: Effect color modulation (0xD8 bytes) */
 }
+
+#endif

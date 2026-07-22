@@ -24,19 +24,60 @@
  * ========================================================================= */
 
 typedef struct WazaEntry {
-    /* 0x00 */ s32 type;           /* WAZA_ENTRY_* type */
-    /* 0x04 */ f32 startFrame;     /* Frame when entry should start */
+    /* 0x00 */ u8  sendCondType;
+    /* 0x01 */ u8  pad_01[3];
+    /* 0x04 */ u16 field_04;
+    /* 0x06 */ u16 sendRate;
     /* 0x08 */ f32 duration;       /* Duration of the entry */
     /* 0x0C */ u32 field_0C;       /* Unknown field */
     /* 0x10 */ u32 field_10;       /* Unknown field */
-    /* 0x14 */ f32 posY;          /* Position Y */
-    /* 0x18 */ f32 posZ;          /* Position Z */
-    /* 0x1C */ f32 scale;         /* Scale */
-    /* 0x20 */ f32 rotation;      /* Rotation */
+    /* 0x14 */ u32 field_14;
+    /* 0x18 */ u32 field_18;
+    /* 0x1C */ s32 sendCondition;
+    /* 0x20 */ s32 field_20;
     /* 0x24 */ s32 field_24;      /* Field being accessed by fn_801D14C0 */
     /* 0x28 */ s32 resourceID;    /* Resource ID */
     /* 0x2C */ /* end of struct */
 } WazaEntry;
+
+typedef struct WazaSequenceNode WazaSequenceNode;
+typedef struct WazaSequence WazaSequence;
+typedef struct WazaEffect WazaEffect;
+typedef WazaEffect WazaSequenceOwner;
+typedef struct GSpart GSpart;
+typedef struct GSvec GSvec;
+
+struct WazaSequenceNode {
+    /* 0x00 */ u8 pad_00[4];
+    /* 0x04 */ s32 kind;
+    /* 0x08 */ u8 pad_08[0x10];
+    /* 0x18 */ s32 state;
+    /* 0x1C */ u8 pad_1C[0x50];
+    /* 0x6C */ u32 runtimeState;
+    /* 0x70 */ u8 pad_70[0x18];
+    /* 0x88 */ void* resource;
+    /* 0x8C */ u8 pad_8C[0x1C];
+    /* 0xA8 */ WazaSequenceNode* next;
+};
+
+struct WazaSequence {
+    /* 0x00 */ u32 state;
+    /* 0x04 */ u8 pad_04[4];
+    /* 0x08 */ u32 flags;
+    /* 0x0C */ s32 kind;
+    /* 0x10 */ s32 field_10;
+    /* 0x14 */ u8 active;
+    /* 0x15 */ u8 stopping;
+    /* 0x16 */ u8 cameraActive;
+    /* 0x17 */ u8 pad_17[0x0D];
+    /* 0x24 */ WazaSequenceNode* firstNode;
+    /* 0x28 */ u8 pad_28[2];
+    /* 0x2A */ u16 handle;
+    /* 0x2C */ u8 pad_2C[2];
+    /* 0x2E */ u16 animationMode;
+    /* 0x30 */ u8 pad_30[0x0C];
+    /* 0x3C */ WazaSequenceOwner* owner;
+};
 
 typedef struct WazaPartyScratch {
     u16 seqIds[0x200];
@@ -54,38 +95,28 @@ typedef struct WazaEffectTblEntry {
 } WazaEffectTblEntry;
 
 /* Waza battle effect object (size 0x8C) */
-typedef struct WazaEffect {
+struct WazaEffect {
     /* 0x00 */ u8 pad_00[0x10];
     /* 0x10 */ s32 scale_selector;          /* selects scale value */
     /* 0x14 */ u8 pad_14[0x04];
     /* 0x18 */ u8 flags;                     /* trajectory/flags byte */
     /* 0x19 */ u8 pad_19[0x0B];
-    /* 0x24 */ s32 handle;                   /* owner handle */
-    /* 0x28 */ u8 pad_28[0x04];
-    /* 0x2C */ union {
-        WazaEffectTblEntry* table;           /* effect data table */
-        char* table_bytes;
-    };
+    /* 0x24 */ struct GSmodel* model;
+    /* 0x28 */ void* particleBank;
+    /* 0x2C */ WazaEffectTblEntry* table;    /* effect data table */
     /* 0x30 */ u8 pad_30[0x02];
     /* 0x32 */ u16 index;                    /* table index */
     /* 0x34 */ u16 field_34;                 /* set by fn_801DD100 */
-    /* 0x36 */ u8 pad_36[0x3E];
+    /* 0x36 */ u8 pad_36[0x36];
+    /* 0x6C */ WazaSequence* currentSequence;
+    /* 0x70 */ u8 pad_70[0x04];
     /* 0x74 */ u8 active;
-    /* 0x75 */ u8 pad_75[0x0B];
-    /* 0x80 */ u32 field_80;                 /* secondary motion/effect handle */
-    /* 0x84 */ u32 effect_handle;            /* effect handle */
+    /* 0x75 */ u8 animationActive;
+    /* 0x76 */ u8 pad_76[0x0A];
+    /* 0x80 */ u8* field_80;                 /* secondary particle node */
+    /* 0x84 */ u8* effect_handle;            /* particle node */
     /* 0x88 */ u8 pad_88[0x04];
-} WazaEffect;
-
-/* Sequence-entry ("obj") fields read by fn_801DD100 when linking a waza
- * blend effect to its owner; see wazaSequence.c's wazaSequenceStart for
- * the many other offsets accessed on this same pointer (obj/blendType,
- * not yet consolidated into a full struct). */
-typedef struct WazaBlendEntry {
-    /* 0x00 */ u8  pad_00[0x0C];
-    /* 0x0C */ u32 field_0C;                 /* WazaEffect::table index */
-    /* 0x10 */ s32 field_10;                 /* value stored into WazaEffect::table[index].field_90 */
-} WazaBlendEntry;
+};
 
 typedef struct WazaFxNode {
     u8 pad_00[0x2C];
@@ -147,17 +178,19 @@ extern f32   fadeEffectHookFunction_fadein_Init(s32 slot);                      
 extern f32   fadeEffectHookFunction_trainer_Init(s32 slot);                        /* get slot Z */
 
 /* Waza effect functions (engine callbacks) */
-extern s32   fn_801190DC(s32, s32, s32);
-extern void  fn_80118C88(s32, s32);
-extern void* GSmodelGetPart(s32, s32);
-void  set__5GSvecFfff(void*, f32, f32, f32);
-extern void  fn_80118FB0(s32, s32, s32, s32, s32, s32);
-extern void  fn_80118D18(s32, s32);
-extern void  fn_80118DE0(s32, void*, s32, s32);
-extern void  GSpartFree(s32);
-extern u8    GSmodelCenterNull(s32);
-extern s32   fn_800EE0E8(s32);
-extern void  fn_80118CAC(s32, s32);
+extern u8*   fn_801190DC(u8* texture, u32 selector, u32 subid);
+extern void  fn_80118C88(void* particleNode, u32 visible);
+extern GSpart* GSmodelGetPart(struct GSmodel* model, s32 partIndex);
+void  set__5GSvecFfff(f32* vec, f32 x, f32 y, f32 z);
+extern void  fn_80118FB0(u8* particleNode, GSpart* part, u32 state,
+                         u32 byte5, u32 initFromZero, u32 attachModel);
+extern void  fn_80118D18(void* particleNode, u8 enabled);
+extern void  fn_80118DE0(u8* particleNode, f32* scale, u32 applyToGenerator,
+                         u32 angleRadiusScale);
+extern void  GSpartFree(GSpart* part);
+extern u8    GSmodelCenterNull(struct GSmodel* model);
+extern s32   fn_800EE0E8(struct GSmodel* model);
+extern void  fn_80118CAC(void* particleNode, u8 enabled);
 
 /* Additional externs (other TUs) referenced from scattered file-scope
  * declarations in the original battle_waza.c; consolidated here so every
@@ -171,18 +204,29 @@ extern void  _threadSwitch(void);
 extern s32   fn_8017B2CC(s32 id);
 extern void  fn_800F915C(s32 id);
 extern void  fn_8017B1CC(s32 id);
-extern void  GSmodelRemoveNull(void* obj);
-extern void  GSmodelStopAnimation(void* obj);
+extern u32   GSmodelIsRootNullAdded(struct GSmodel* model);
+extern void  GSmodelGetRootPosition(struct GSmodel* model, GSvec* position);
+extern void  GSmodelAddNull(struct GSmodel* model, const GSvec* position,
+                            const GSvec* rotation, const GSvec* scale);
+extern void  GSmodelRemoveNull(struct GSmodel* model);
+extern void  GSmodelStopAnimation(struct GSmodel* model);
+extern void  GSmodelSetVisibility(struct GSmodel* model, u8 visible);
+extern void  GSmodelForceAnimTransformUpdate(struct GSmodel* model);
+extern u32   fn_800E3CBC(struct GSmodel* model);
+extern void  GSmodelDrawModel(struct GSmodel* model, u32 flags);
+extern void  GSmodelLinkToGSparticleBank(struct GSmodel* model, void* bank);
+extern void  fn_800E3CC8(struct GSmodel* model, u8 enable);
+extern void  fn_80118874(u8* resource, u32 notify);
 
 /* Data symbols (lbl_*, in .sdata/.sdata2/.bss of neighboring TUs) referenced
  * from scattered file-scope declarations in the original battle_waza.c. */
 extern u32*  lbl_80478E98;              /* waza context pointer */
-extern u32   lbl_80478E9C;              /* waza entry array pointer */
+extern WazaEntry* lbl_80478E9C;          /* waza entry array pointer */
 extern s32   lbl_80478CB8;
-extern u32   lbl_8036E0E0[];
+extern u32   lbl_8036E0E0[20];
 extern s32   lbl_80467390[];
-extern u32   lbl_8047B3EC;
-extern u32   lbl_8047B3F0;
+extern void* lbl_8047B3EC;
+extern void* lbl_8047B3F0;
 extern s32   lbl_8047B410;
 extern u8    lbl_80467CC0[];
 extern u8    lbl_8047B3F4;
@@ -206,15 +250,15 @@ extern u8    lbl_80467C80[];
 extern s32 fn_801D1338(void* wazaCtx);
 extern void* fn_801D1364(u16 handle, s32 idx);
 extern s32 fn_801D139C(void* entry);
-extern u32 fn_801D13E4(void* entry);
+extern u32 fn_801D13E4(s32 idx);
 extern f32 fn_801D142C(void* entry);
-extern u32 mailGetNbMailData(void* entry);
-extern s32 fn_801D147C(void* entry);
+extern u32 mailGetNbMailData(void);
+extern s32 fn_801D147C(s32 idx);
 extern s32 fn_801D14C0(s32 idx);
-extern s32 fn_801D1504(void* entry);
-extern s32 mailGetSendCondition(void* entry);
-extern u32 mailGetSendCondType(void* entry);
-extern u32 mailGetSendRate(void* entry);
+extern s32 fn_801D1504(s32 idx);
+extern s32 mailGetSendCondition(s32 idx);
+extern u32 mailGetSendCondType(s32 idx);
+extern u32 mailGetSendRate(s32 idx);
 extern u32 fn_801D1618(void);
 extern u32 fn_801D1620(u32 idx);
 extern u32 fn_801D1650(u32 idx);
@@ -247,13 +291,13 @@ extern void chkMailSend(s32 seqHandle, f32 velX, f32 velY, f32 velZ);
 extern void cbStep(s32 moveID, s32 hitCount);
 extern void mailMainInit(void);
 extern void wazaSequenceCameraGetPattern__Fbi(void);
-extern u32 fn_801D2C6C(void);
-extern void fn_801D2C74(s32 moveID);
-extern void fn_801D2D28();
+extern void* fn_801D2C6C(void);
+extern void fn_801D2C74(void* owner);
+extern void fn_801D2D28(void);
 extern void fn_801D2F94(void);
 extern void fn_801D301C(void);
-extern void fn_801D3034(u32 state);
-extern void battleCameraStartWaza(void);
+extern void fn_801D3034(void* state);
+extern void battleCameraStartWaza(void* owner, void* sequence);
 extern void _wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb(void);
 extern void _wazaSequenceCameraDoDollyPosition__FP21TemplateExpFileHeaderP24wazaSequenceCameraParamsfb(void);
 extern void _wazaSequenceCameraDoFOV__FP13ModelSequenceP24wazaSequenceCameraParamsif(void);
@@ -265,7 +309,7 @@ extern void _wazaViewerUpdate(void);
 extern void _wazaViewerInitialize(s32 slot, f32 zoom, f32 speed);
 extern void wazaViewerThread(s32 slot, s32 motionType);
 extern void fn_801D56B0(s32 slot, s32 reactionType);
-extern void fn_801D58E4(s32 effectType);
+extern void fn_801D58E4(void);
 extern void fn_801D5A94(s32 moveID);
 extern void fn_801D5DA0(s32 elementType);
 extern void fn_801D603C(s32 slot, s32 hitEffectType);
@@ -276,7 +320,7 @@ extern void fn_801D7230(void);
 extern void fn_801D744C(u32 bits);
 extern void fn_801D7464(void);
 extern void fn_801D7B94(void);
-extern void wazaSequenceEntryStop(void* entry);
+extern void wazaSequenceEntryStop(void* entry, BOOL immediate);
 extern void wazaSequenceEntryUpdate(void* entry);
 extern void wazaSequenceEntryStart(void);
 extern void _wazaSequenceEffectEntryStart(void* entry, s32 type);
@@ -284,33 +328,33 @@ extern void _wazaSequenceParticleEntryStart(void* entry);
 extern void _wazaSequenceModelEntryStart(void* entry);
 extern void fn_801D97F0(void* entry);
 extern void fn_801D9950(s32 slot, s32 motionType);
-extern void wazaSequencePokemonMotionStart(s32 slot);
+extern void wazaSequencePokemonMotionStart(void* owner, BOOL enabled);
 extern u8 fn_801D9E1C(void* obj);
 extern void fn_801D9E34(void* obj);
 extern void fn_801D9E8C(void* effect);
 extern void fn_801DA014(void* effect);
 extern void fn_801DA070(void* effect);
-extern void fn_801DA224(void* effect, f32 height, f32 t);
+extern void fn_801DA224(void* effect, s32 flags);
 extern void fn_801DA2C4(void* effect, f32 radius, f32 t);
 extern u8 fn_801DA354(void* effect);
 extern void fn_801DA36C(void* effect, s32 trajType);
 extern void fn_801DA3CC(void* effect, s32 trajType);
 extern u32 fn_801DA42C(void* effect);
-extern void fn_801DA448(void* effect, f32 gravity);
-extern void fn_801DA4E8(void* effect, f32 drag);
+extern void fn_801DA448(void* effect, u32 visible);
+extern void fn_801DA4E8(void* effect, u32 visible);
 extern void fn_801DA5AC(void* effect, u8 val);
-extern void fn_801DA5C4(void* effect, f32 lifetime);
-extern BOOL fn_801DA698(void* effect);
-extern void fn_801DA74C(void* effect, f32 fadeSpeed);
-extern void* fn_801DA7AC(s32 effectType);
+extern u8 fn_801DA5C4(s32 timeType);
+extern u8 fn_801DA698(void* sequence, s32 moveID, s32 variant, s32 timeType);
+extern s32 fn_801DA74C(void* sequence, s32 moveID, s32 variant, s32 timeType);
+extern void fn_801DA7AC(void);
 extern void fn_801DA83C(void* effect);
-extern void fn_801DA8C4(void* obj);
-extern void fn_801DA914(void* obj);
-extern s32 fn_801DA94C(void* obj);
-extern void fn_801DA9B4(void* obj);
-extern void fn_801DA9E8(s32 sndID, s32 slot);
-extern void fn_801DAAAC(s32 sndID, f32 x, f32 y, f32 z);
-extern void fn_801DABAC(s32 sndHandle);
+extern void fn_801DA8C4(void* obj, s32 search_key1, s32 search_key2);
+extern void fn_801DA914(void* obj, s32 search_key1, s32 search_key2);
+extern s32 fn_801DA94C(void* obj, s32 search_key1, s32 search_key2);
+extern void fn_801DA9B4(void* obj, s32 search_key1, s32 search_key2);
+extern void fn_801DA9E8(void* sequence, s32 moveID, s32 variant);
+extern void fn_801DAAAC(void* effect);
+extern f32 fn_801DABAC(void* obj);
 extern u32 fn_801DAC24(void* obj);
 extern u32 fn_801DAC3C(void* obj);
 extern u32 fn_801DAC54(void* obj);
@@ -324,18 +368,18 @@ extern void fn_801DB100(void* obj);
 extern void* fn_801DB154(void);
 extern void wazaSequenceSysFreeSequenceResource(void* obj);
 extern void wazaSequenceSysFreeWazaResource(void* seqData, s32 moveID);
-extern void wazaSequenceSysGetWazaTime(void* seqData);
+extern s32 wazaSequenceSysGetWazaTime(void* owner, void* sequence, s32 timeType);
 extern s32 wazaSequenceSysGetModelShadowLight__Fv(void);
 extern s32 wazaSequenceSysGetModelShadowCount__Fv(void);
 extern void* wazaSequenceSysGetModelShadowList__Fv(void);
-extern void wazaSequenceSysResetAnimationExcept(WazaEffect* except);
+extern void wazaSequenceSysResetAnimationExcept(void* except);
 extern void fn_801DB8FC(void* entry, u32 drawFlags, u8 modelID);
-extern void wazaSequenceUpdate(void);
+extern void wazaSequenceUpdate(void* sequence);
 extern void wazaSequenceApplyStop(void* obj);
 extern void fn_801DBC30(void* obj);
-extern void wazaSequenceStart(s32 blendType);
+extern void wazaSequenceStart(void* sequence);
 extern void wazaSequenceFree(void* obj);
-extern s32 fn_801DBFB0(void);
+extern WazaSequence* fn_801DBFB0(void);
 extern void wazaSequenceLoadData(s32 distortType, f32 intensity);
 extern void wazaSequenceEntryLink(void);
 extern void fn_801DC46C(s32 overlayType, u32 color);
@@ -353,7 +397,7 @@ extern void fn_801DCFD8(void* obj);
 extern void fn_801DD028(void* obj);
 extern void fn_801DD078(void* obj);
 extern void* GetWaza__12NullSequenceCFUsUs(void* obj, s32 search_key1, s32 search_key2);
-extern void fn_801DD100(u8* p, u8* q);
+extern void fn_801DD100(WazaSequenceOwner* owner, WazaSequence* sequence);
 extern void fn_801DD158(void* obj);
 extern void fn_801DD23C(void* obj);
 extern void fn_801DD3E4(void* obj);
@@ -368,8 +412,8 @@ extern void fn_801DE190(void);
 extern void fn_801DE418(s32 attackerSlot, s32 targetSlot);
 extern void fn_801DE598(void);
 extern void sequenceAnimEndCallback(s32 arg0, s32 arg1);
-extern void fn_801DE698(s32 slot, s32 statID, s32 direction);
-extern void _eyeTexAnimEnded(void);
+extern void fn_801DE698(s32 arg0, s32 arg1);
+extern void _eyeTexAnimEnded(s32 arg0, s32 arg1);
 extern void fn_801DEE14(s32 slot, u32 status);
 extern void fn_801DEF0C(void* obj, s32 arg1, s32 arg2);
 extern void fn_801DF070(s32 weatherType);

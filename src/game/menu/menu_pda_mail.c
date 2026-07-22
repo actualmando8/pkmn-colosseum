@@ -1407,9 +1407,7 @@ s32 fn_8004D9C0(s32 a)
 /* PdaMailOutC: widget/out-record variant used by fn_8004DCC0 -- a
  * halfword "current message id" field at 0x6 (compared against the
  * lookup table below) plus the shared field_0x4c out-slot seen on
- * PdaMailOutA. fn_801D1620 (battle_waza.c): despite its current void
- * mutator shape there (unverified, 22.9% match), this call site treats
- * it as returning a value -- only the calling convention matters here. */
+ * PdaMailOutA. */
 typedef struct PdaMailOutC {
     u8 pad00[6];
     s16 msgId;
@@ -1417,7 +1415,7 @@ typedef struct PdaMailOutC {
     u32 field_0x4c;
 } PdaMailOutC;
 
-extern u32 fn_801D1620(u8 idx);
+extern u32 fn_801D1620(u32 idx);
 
 /* lbl_802672F0 (rodata_80267250.c): shared message-id table; this call
  * site takes a mutable stack COPY of the first 11 (of 12) entries. */

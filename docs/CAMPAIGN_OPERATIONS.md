@@ -865,27 +865,28 @@ Next action: complete post-merge farm reconciliation while the ranked PR #408
   exact-30 batch proceeds in an isolated current-master integration tree
 ```
 
-### Pending batch snapshot — 2026-07-21 (PR #408)
+### Batch snapshot — 2026-07-21 (PR #408)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: 7e9f6187 (PR #407 merged)
-Pending batch: PR #408, `integration/pr408-exact30`
+Batch PR: #408, `integration/pr408-exact30`
 Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +10 complete units / +18 total-unit topology /
   +2,276 linked code / +0 linked data
 Goal cumulative from PR #381: +573 linked functions / +126 complete units /
   +50,812 linked code / +193 linked data
-Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+Head report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
   2,136,513 matched data bytes
-Pending linked: 4,341 functions; 811 / 1,462 units;
+Head linked: 4,341 functions; 811 / 1,462 units;
   616,972 complete code bytes; 752,777 complete data bytes
-README/report: prepared on pending PR #408; decomp.dev awaits merge ingestion
+README/report/decomp.dev: synced at merge `08f50d3a`; decomp.dev reports
+  24.73% linked / 616.97 kB complete code
 Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
 Farm status: post-#407 reconciliation/remirror is tracked independently; no
   farm result is claimed by this source-linking batch
-Integrated pending: seven canonical Dolphin DVD/VI functions, 16 GS VTR/save
+Integrated: seven canonical Dolphin DVD/VI functions, 16 GS VTR/save
   state functions, three battle party/status functions, and four model/HSD JObj
   traversal/matrix helpers
 Residual policy: callback `cb`, `fn_800A8894`, `fn_801E1300`, and every other
@@ -897,6 +898,50 @@ Validation: all 30 selected functions / 2,276 bytes are raw 100%; ten
   under the canonical compilers and flags; full retail SHA passes
 Independent audit: PASS for exact composition, semantic/type integrity,
   residual coverage, canonical flags, report/freeze deltas, and retail SHA
+Next action: continue post-merge farm reconciliation while the PR #409
+  exact-30 batch proceeds in an isolated current-master integration tree
+```
+
+### Pending batch snapshot — 2026-07-21 (PR #409)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 08f50d3a (PR #408 merged)
+Pending batch: PR #409, `integration/pr409-exact30`
+Exact-source delta from goal baseline: +39 functions / +14,924 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +10 complete units / +20 total-unit topology /
+  +1,992 linked code / +0 linked data
+Goal cumulative from PR #381: +603 linked functions / +136 complete units /
+  +52,804 linked code / +193 linked data
+Pending report: 6,307 / 8,603 matched functions; 901,420 matched code bytes;
+  2,136,513 matched data bytes
+Pending linked: 4,371 functions; 821 / 1,482 units;
+  618,964 complete code bytes; 752,777 complete data bytes
+README/report: prepared on pending PR #409; decomp.dev base is synced through
+  PR #408 at 24.73% linked / 616.97 kB complete code
+Retail SHA: 870e8b9693ca780782d80f22a6a4572d8ba9458f
+3090: reconciled post-#408 snapshots
+  `post408-pre-08f50d3a-20260722T053816Z` and
+  `post408-live-08f50d3a-20260722T054610Z`; 537 queue records; queue SHA-256
+  `07aea0db351b74a7d9c99748f53b0528ef79ff0d2dca577c49276b36cec9bdc3`;
+  zero overlap with this batch
+Windows: reconciled 143-record manifest with 74 fidelity-valid units;
+  manifest SHA-256
+  `670a7bc1f1709521fd9593424f48fed64f12ae54e395c2d2e34bfb79f7e331ca`;
+  zero overlap with this batch
+Integrated pending: four HSD MObj helpers, 13 mail helpers, one waza-viewer
+  updater, four waza-sequence helpers, and eight fight-action accessors
+Residual policy: all 15 prefix/interstitial/suffix ranges remain explicit
+  CodeCandidate units; no farm artifact is claimed by this source-linking batch
+Validation: all 30 selected functions / 1,992 bytes are raw 100%; ten
+  text-only Matching units emit retail text and all 59 normalized relocations
+  under the canonical compilers and flags; full retail SHA passes
+Type recovery: synchronized the mail/waza/fight cross-TU structures and
+  callbacks; recovered explicit particle visibility/scaling parameters and
+  pointer-valued model/particle fields without changing retail code
+Independent audit: PASS for exact composition, relocation parity, residual
+  coverage, semantic/type integrity, zero regression, and retail SHA
 Next action: commit the isolated branch, then hand it to the publisher for PR
   checks and merge
 ```

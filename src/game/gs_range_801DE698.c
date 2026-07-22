@@ -17,7 +17,7 @@
  * fn_801DE698 - Waza stat change effect.
  * Address: 0x801DE698 | Size: 0x5CC
  */
-void fn_801DE698(s32 slot, s32 statID, s32 direction) {
+void fn_801DE698(s32 arg0, s32 arg1) {
     /* TODO: Stat change visual effect (0x5CC bytes)
      * Displays the up/down arrow and color flash for stat changes.
      */
@@ -27,7 +27,7 @@ void fn_801DE698(s32 slot, s32 statID, s32 direction) {
  * _eyeTexAnimEnded - Waza stat change update.
  * Address: 0x801DEC64 | Size: 0x1B0
  */
-void _eyeTexAnimEnded(void) {
+void _eyeTexAnimEnded(s32 arg0, s32 arg1) {
     /* TODO: Stat change effect update (0x1B0 bytes) */
 }
 

@@ -78,15 +78,15 @@ void fn_801DCE0C(void* obj) {
  * fn_801DCEA8 - Waza field effect clear.
  * Address: 0x801DCEA8 | Size: 0x58
  */
-extern void GSmodelRemoveNull(void* obj);
 extern void fn_801DEF0C(void* obj, s32 arg1, s32 arg2);
 void fn_801DCEA8(void* obj) {
-    u8 flags = *(u8*)((u8*)obj + 0x18);
+    WazaEffect* effect = obj;
+    u8 flags = effect->flags;
 
     if ((flags & 2) == 2) {
-        *(u8*)((u8*)obj + 0x18) = flags ^ 2;
-        GSmodelRemoveNull(*(void**)((u8*)obj + 0x24));
-        fn_801DEF0C(obj, 1, 0);
+        effect->flags = flags ^ 2;
+        GSmodelRemoveNull(effect->model);
+        fn_801DEF0C(effect, 1, 0);
     }
 }
 
@@ -142,14 +142,14 @@ void fn_801DCF84(void* obj) {
  * fn_801DCFD8 - Waza lighting override get active.
  * Address: 0x801DCFD8 | Size: 0x50
  */
-extern void GSmodelStopAnimation(void* obj);
 void fn_801DCFD8(void* obj) {
-    u8 flags = *(u8*)((u8*)obj + 0x18);
+    WazaEffect* effect = obj;
+    u8 flags = effect->flags;
 
     if ((flags & 8) != 8) {
-        *(u8*)((u8*)obj + 0x18) = flags | 8;
-        GSmodelStopAnimation(*(void**)((u8*)obj + 0x24));
-        fn_801DA070(obj);
+        effect->flags = flags | 8;
+        GSmodelStopAnimation(effect->model);
+        fn_801DA070(effect);
     }
 }
 
@@ -207,18 +207,18 @@ void* GetWaza__12NullSequenceCFUsUs(void* obj, s32 search_key1, s32 search_key2)
  * Two-arg (owner, obj) per the caller in wazaSequence.c; the prior
  * (u32 filterColor) signature was a placeholder.
  */
-void fn_801DD100(u8* p, u8* q) {
-    if (p == NULL) return;
-    if (q == NULL) {
-        ((WazaEffect*)p)->index = 0;
-        ((WazaEffect*)p)->field_34 = 0;
-        ((WazaEffect*)p)->table[0].field_90 = 0;
+void fn_801DD100(WazaSequenceOwner* owner, WazaSequence* sequence) {
+    if (owner == NULL) return;
+    if (sequence == NULL) {
+        owner->index = 0;
+        owner->field_34 = 0;
+        owner->table[0].field_90 = 0;
     } else {
         WazaEffectTblEntry* tblEntry;
-        ((WazaEffect*)p)->index = (u8)((WazaBlendEntry*)q)->field_0C;
-        ((WazaEffect*)p)->field_34 = 0;
-        tblEntry = &((WazaEffect*)p)->table[((WazaBlendEntry*)q)->field_0C];
-        tblEntry->field_90 = ((WazaBlendEntry*)q)->field_10;
+        owner->index = (u8)sequence->kind;
+        owner->field_34 = 0;
+        tblEntry = &owner->table[sequence->kind];
+        tblEntry->field_90 = sequence->field_10;
     }
 }
 
@@ -461,10 +461,7 @@ void fn_801DE598(void) {
  * Address: 0x801DE654 | Size: 0x44
  */
 void sequenceAnimEndCallback(s32 arg0, s32 arg1) {
-    extern void fn_801DE698();
-    extern void _eyeTexAnimEnded();
-
-    fn_801DE698();
+    fn_801DE698(arg0, arg1);
     _eyeTexAnimEnded(arg0, arg1);
 }
 

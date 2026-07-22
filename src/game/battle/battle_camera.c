@@ -89,7 +89,7 @@ void battleGridResetModelVisibilityFlags(void) {
  * updated to the new name.
  * Address: 0x801C2BE0 | Size: 0x174
  */
-void battleGridHideModelsExcept(void* ctx, s32 arg1) {
+void battleGridHideModelsExcept(void* ctx) {
     u8* state = (u8*)ctx;
     if (state == NULL) {
         return;

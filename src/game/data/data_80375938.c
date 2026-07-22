@@ -1,4 +1,5 @@
 #include "dolphin/types.h"
+#include "game/fight_action.h"
 
 #pragma section ".data"
 
@@ -8,8 +9,7 @@ extern u8 lbl_80375970[];
 extern void* fight_encount_wipe_data[];
 extern u8 lbl_80375A08[];
 extern u8 lbl_80375AC8[];
-extern void* lbl_80375BB8[];
-extern u8 lbl_80375CA8[];
+extern FightActionData lbl_80375CA8[];
 extern u8 lbl_80375CB8[];
 extern u8 lbl_80375CC8[];
 extern u8 lbl_80375D10[];
@@ -34,46 +34,6 @@ extern u8 fadeEffectHookFunction_trainer_Init[];
 extern u8 fadeEffectHookFunction_yoko_Init[];
 extern u8 fadeEffectHookFunction_yoko_or_tate_Init[];
 extern u8 fadeEffectHookFunction_yoko_or_tate_or_ball_Init[];
-extern u8 fightActionDispAllFightOutPokemonDoFightAction[];
-extern u8 fightActionDispAllFightTrainerSelectFightAction[];
-extern u8 fightActionDispFightNigeru[];
-extern u8 fightActionDispFightOutPokemonIrekae[];
-extern u8 fightActionDispFightOutPokemonOutWaza[];
-extern u8 fightActionDispFightTrainerCall[];
-extern u8 fightActionDispFightTrainerUseItem[];
-extern u8 fightActionDispHeijou[];
-extern u8 fightActionDispKaijou[];
-extern u8 fightActionDispKaisiNyuujouPokemon[];
-extern u8 fightActionDispKaisiNyuujouTrainer[];
-extern u8 fightActionDispKaisiPost[];
-extern u8 fightActionDispKaisiPre[];
-extern u8 fightActionDispNullFunc[];
-extern u8 fightActionDispOneTurnPost[];
-extern u8 fightActionDispSyuuryou[];
-extern u8 fightActionDispSyuuryouPost[];
-extern u8 fightActionDispSyuuryouPre[];
-extern u8 fightActionDispTenkouInit[];
-extern u8 fightActionDispWazaKiaipantiPre[];
-extern u8 fightActionFlowAllFightOutPokemonDoFightAction[];
-extern u8 fightActionFlowAllFightTrainerSelectFightAction[];
-extern u8 fightActionFlowFightNigeru[];
-extern u8 fightActionFlowFightOutPokemonIrekae[];
-extern u8 fightActionFlowFightOutPokemonOutWaza[];
-extern u8 fightActionFlowFightTrainerCall[];
-extern u8 fightActionFlowFightTrainerUseItem[];
-extern u8 fightActionFlowHeijou[];
-extern u8 fightActionFlowKaijou[];
-extern u8 fightActionFlowKaisiNyuujouPokemon[];
-extern u8 fightActionFlowKaisiNyuujouTrainer[];
-extern u8 fightActionFlowKaisiPost[];
-extern u8 fightActionFlowKaisiPre[];
-extern u8 fightActionFlowNullFunc[];
-extern u8 fightActionFlowOneTurnPost[];
-extern u8 fightActionFlowSyuuryou[];
-extern u8 fightActionFlowSyuuryouPost[];
-extern u8 fightActionFlowSyuuryouPre[];
-extern u8 fightActionFlowTenkouInit[];
-extern u8 fightActionFlowWazaKiaipantiPre[];
 extern u8 fn_8020A8E0[];
 extern u8 lbl_80375E60[];
 extern u8 lbl_80375E6A[];
@@ -189,72 +149,32 @@ u8 lbl_80375AC8[240] = {
     0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-void* lbl_80375BB8[60] = {
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowNullFunc),
-    (void*)((u8*)fightActionDispNullFunc),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowKaijou),
-    (void*)((u8*)fightActionDispKaijou),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowKaisiPre),
-    (void*)((u8*)fightActionDispKaisiPre),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowKaisiNyuujouTrainer),
-    (void*)((u8*)fightActionDispKaisiNyuujouTrainer),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowKaisiNyuujouPokemon),
-    (void*)((u8*)fightActionDispKaisiNyuujouPokemon),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowKaisiPost),
-    (void*)((u8*)fightActionDispKaisiPost),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowTenkouInit),
-    (void*)((u8*)fightActionDispTenkouInit),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowAllFightTrainerSelectFightAction),
-    (void*)((u8*)fightActionDispAllFightTrainerSelectFightAction),
-    (void*)0x00000000,
-    (void*)((u8*)fightActionFlowFightNigeru),
-    (void*)((u8*)fightActionDispFightNigeru),
-    (void*)0x03000000,
-    (void*)((u8*)fightActionFlowFightOutPokemonIrekae),
-    (void*)((u8*)fightActionDispFightOutPokemonIrekae),
-    (void*)0x02000000,
-    (void*)((u8*)fightActionFlowFightTrainerCall),
-    (void*)((u8*)fightActionDispFightTrainerCall),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowAllFightOutPokemonDoFightAction),
-    (void*)((u8*)fightActionDispAllFightOutPokemonDoFightAction),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowWazaKiaipantiPre),
-    (void*)((u8*)fightActionDispWazaKiaipantiPre),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowOneTurnPost),
-    (void*)((u8*)fightActionDispOneTurnPost),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowSyuuryouPre),
-    (void*)((u8*)fightActionDispSyuuryouPre),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowSyuuryou),
-    (void*)((u8*)fightActionDispSyuuryou),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowSyuuryouPost),
-    (void*)((u8*)fightActionDispSyuuryouPost),
-    (void*)0xFF000000,
-    (void*)((u8*)fightActionFlowHeijou),
-    (void*)((u8*)fightActionDispHeijou),
-    (void*)0x01000000,
-    (void*)((u8*)fightActionFlowFightTrainerUseItem),
-    (void*)((u8*)fightActionDispFightTrainerUseItem),
-    (void*)0x04000000,
-    (void*)((u8*)fightActionFlowFightOutPokemonOutWaza),
-    (void*)((u8*)fightActionDispFightOutPokemonOutWaza),
+FightActionKindData lbl_80375BB8[20] = {
+    { 0xFF, { 0, 0, 0 }, fightActionFlowNullFunc, fightActionDispNullFunc },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowKaijou, fightActionDispKaijou },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowKaisiPre, fightActionDispKaisiPre },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowKaisiNyuujouTrainer, fightActionDispKaisiNyuujouTrainer },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowKaisiNyuujouPokemon, fightActionDispKaisiNyuujouPokemon },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowKaisiPost, fightActionDispKaisiPost },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowTenkouInit, fightActionDispTenkouInit },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowAllFightTrainerSelectFightAction, fightActionDispAllFightTrainerSelectFightAction },
+    {  0, { 0, 0, 0 }, fightActionFlowFightNigeru, fightActionDispFightNigeru },
+    {  3, { 0, 0, 0 }, fightActionFlowFightOutPokemonIrekae, fightActionDispFightOutPokemonIrekae },
+    {  2, { 0, 0, 0 }, fightActionFlowFightTrainerCall, fightActionDispFightTrainerCall },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowAllFightOutPokemonDoFightAction, fightActionDispAllFightOutPokemonDoFightAction },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowWazaKiaipantiPre, fightActionDispWazaKiaipantiPre },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowOneTurnPost, fightActionDispOneTurnPost },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowSyuuryouPre, fightActionDispSyuuryouPre },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowSyuuryou, fightActionDispSyuuryou },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowSyuuryouPost, fightActionDispSyuuryouPost },
+    { 0xFF, { 0, 0, 0 }, fightActionFlowHeijou, fightActionDispHeijou },
+    {  1, { 0, 0, 0 }, fightActionFlowFightTrainerUseItem, fightActionDispFightTrainerUseItem },
+    {  4, { 0, 0, 0 }, fightActionFlowFightOutPokemonOutWaza, fightActionDispFightOutPokemonOutWaza },
 };
 
-u8 lbl_80375CA8[16] = {
-    0x00, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00,
+FightActionData lbl_80375CA8[2] = {
+    { 0x13, { 0, 0 }, 0 },
+    { 0, { 0, 0 }, 0 },
 };
 
 u8 lbl_80375CB8[16] = {
@@ -350,4 +270,3 @@ u8 lbl_80375E51[14] = {
 u8 lbl_80375E5F[1] = {
     0xF6,
 };
-

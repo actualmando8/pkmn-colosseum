@@ -59,7 +59,6 @@ extern void fn_801B5F08(HSD_TExp* exp, u32 sel_a, HSD_TExp* a, u32 sel_b,
 /* HSD_TExpFreeList */
 extern void fn_801B7178(HSD_TExp* texp, u32 type, int flag);
 /* HSD_TExpSetupTev */
-extern void fn_801B45A4(HSD_TExpTevDesc* tevdesc, HSD_TExp* texp);
 
 extern HSD_TExp* HSD_TExpCnst(void* ptr, u32 comp, u32 type, HSD_TExp** list);
 extern u32 HSD_TExpGetType(HSD_TExp* texp);
@@ -170,6 +169,8 @@ extern HSD_TObj* lbl_8047B2DC;
 /*  Texture list                                                             */
 /* ========================================================================= */
 
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6CA4_6DC4)
+
 /* 0x801A6CA4 | 0x64 */
 void HSD_MObjAddShadowTexture(HSD_TObj* tobj)
 {
@@ -230,6 +231,10 @@ void fn_801A6DA0(HSD_MObj* mobj, HSD_TObj* tobj)
     mobj->tobj = tobj;
 }
 
+#endif
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6DC4_6DDC)
+
 /* 0x801A6DC4 | 0x18 */
 HSD_TObj* HSD_MObjGetTObj(HSD_MObj* mobj)
 {
@@ -238,6 +243,10 @@ HSD_TObj* HSD_MObjGetTObj(HSD_MObj* mobj)
     }
     return mobj->tobj;
 }
+
+#endif
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6DDC_6E00)
 
 /* 0x801A6DDC | 0x24 */
 void HSD_MObjSetAlpha(HSD_MObj* mobj, f32 alpha)
@@ -251,15 +260,24 @@ void HSD_MObjSetAlpha(HSD_MObj* mobj, f32 alpha)
     mobj->mat->alpha = alpha;
 }
 
+#endif
+
 /* ========================================================================= */
 /*  Setup                                                                    */
 /* ========================================================================= */
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6E00_6E24)
 
 /* 0x801A6E00 | 0x24 */
 void HSD_MObjUnset(HSD_MObj* mobj, u32 rendermode)
 {
     HSD_TObjSetup(NULL);
 }
+
+
+#endif
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6E24_6F78)
 
 /* 0x801A6E24 | 0x154 */
 void HSD_MObjSetup(HSD_MObj* mobj, u32 rendermode)
@@ -300,6 +318,10 @@ void HSD_MObjSetup(HSD_MObj* mobj, u32 rendermode)
     }
 }
 
+#endif
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6F78_6FF0)
+
 /* 0x801A6F78 | 0x78 */
 void MObjSetupTev(HSD_MObj* mobj, HSD_TObj* tobj, u32 rendermode)
 {
@@ -308,9 +330,13 @@ void MObjSetupTev(HSD_MObj* mobj, HSD_TObj* tobj, u32 rendermode)
     HSD_TObjSetupVolatileTev(tobj, rendermode);
 }
 
+#endif
+
 /* ========================================================================= */
 /*  TEV compilation                                                          */
 /* ========================================================================= */
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_6FF0_7E3C)
 
 /* 0x801A6FF0 | 0x138 */
 void HSD_MObjCompileTev(HSD_MObj* mobj)
@@ -679,9 +705,13 @@ int MObjLoad(HSD_MObj* mobj, HSD_MObjDesc* desc)
     return 0;
 }
 
+#endif
+
 /* ========================================================================= */
 /*  Animation                                                                */
 /* ========================================================================= */
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_7E3C_7E84)
 
 /* 0x801A7E3C | 0x48 */
 void HSD_MObjAnim(HSD_MObj* mobj)
@@ -691,6 +721,10 @@ void HSD_MObjAnim(HSD_MObj* mobj)
         HSD_TObjAnimAll(mobj->tobj);
     }
 }
+
+#endif
+
+#if !defined(PR409_HSD_MOBJ_SPLIT) || defined(PR409_HSD_MOBJ_7E84_8428)
 
 static f32 MObjClampAnim(f32 value)
 {
@@ -808,3 +842,5 @@ void HSD_MObjAddAnim(HSD_MObj* mobj, HSD_MatAnim* matanim)
     mobj->aobj = HSD_AObjLoadDesc(matanim->aobjdesc);
     HSD_TObjAddAnimAll(mobj->tobj, matanim->texanim);
 }
+
+#endif
