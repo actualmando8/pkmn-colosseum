@@ -11,7 +11,11 @@
 #define VI_DEBUG_PAL 4
 #define VI_EUR60  5
 
+typedef void (*VIRetraceCallback)(u32 retraceCount);
+
 u32 VIGetTvFormat(void);
 u32 VIGetCurrentLine(void);
+VIRetraceCallback fn_800A880C(VIRetraceCallback callback);
+VIRetraceCallback fn_800A8850(VIRetraceCallback callback);
 
 #endif /* DOLPHIN_VI_VI_H */

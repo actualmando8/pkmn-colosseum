@@ -2337,12 +2337,23 @@ config.libs = [
                 "game/data/data_80311C00.c",
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "dolphin/vi/VI_range_800A8178.c",
-                mw_version="GC/1.2.5n",
-                progress_category="sdk",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.2.5n",
+                    progress_category="sdk",
+                )
+                for status, path in [
+                    (Matching, "dolphin/vi/VI_exact_800A8178.c"),
+                    (CodeCandidate, "dolphin/vi/VI_candidate_800A839C.c"),
+                    (Matching, "dolphin/vi/VI_exact_800A880C.c"),
+                    (CodeCandidate, "dolphin/vi/VI_candidate_800A8894.c"),
+                    (Matching, "dolphin/vi/VI_exact_800A8FE4.c"),
+                    (CodeCandidate, "dolphin/vi/VI_candidate_800A9038.c"),
+                    (CodeCandidate, "dolphin/vi/VI_candidate_800AA198.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "dolphin/sdk_range_800AA288.c",
@@ -2788,13 +2799,23 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_model_parse.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/gs_model_parse_exact_800E9E34.c"),
+                    (CodeCandidate, "game/gs_model_parse_candidate_800E9E90.c"),
+                    (Matching, "game/gs_model_parse_exact_800EA60C.c"),
+                    (CodeCandidate, "game/gs_model_parse_candidate_800EA6D4.c"),
+                    (Matching, "game/gs_model_parse_exact_800EA7E4.c"),
+                    (CodeCandidate, "game/gs_model_parse_candidate_800EA820.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "game/gs_model_bound.c",
@@ -3537,13 +3558,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/battle/battle_range_801D0AA0.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (Matching, "game/battle/battle_exact_801D0AA0.c"),
+                    (CodeCandidate, "game/battle/battle_candidate_801D0C30.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "game/gs_range_801DE698.c",
@@ -3558,13 +3585,24 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
-            Object(
-                CodeCandidate,
-                "game/gs_range_801E09E0.c",
-                mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
-                progress_category="game",
-            ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3",
+                    extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                    progress_category="game",
+                )
+                for status, path in [
+                    (CodeCandidate, "game/gs_candidate_801E09E0.c"),
+                    (Matching, "game/gs_exact_801E1170.c"),
+                    (CodeCandidate, "game/gs_candidate_801E11F0.c"),
+                    (Matching, "game/gs_exact_801E1258.c"),
+                    (CodeCandidate, "game/gs_candidate_801E1300.c"),
+                    (Matching, "game/gs_exact_801E16D0.c"),
+                    (CodeCandidate, "game/gs_candidate_801E189C.c"),
+                ]
+            ],
             Object(
                 CodeCandidate,
                 "dolphin/thp/THP_range_801E1B54.c",
