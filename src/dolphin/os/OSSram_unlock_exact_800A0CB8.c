@@ -3,7 +3,7 @@
 
 void __OSUnlockSram(BOOL commit)
 {
-    extern void fn_800A09B0(BOOL commit, u32 arg);
+    extern BOOL fn_800A09B0(BOOL commit, u32 arg);
 
     fn_800A09B0(commit, 0);
 }
