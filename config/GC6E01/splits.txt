@@ -315,7 +315,13 @@ game/menuPokemonChange.c:
 	.text       start:0x8002DD24 end:0x80030170
 
 game/gs_npc_event.c:
-	.text       start:0x80030170 end:0x80033278
+	.text       start:0x80030170 end:0x80030370
+
+game/gs_npc_event_exact_80030370.c:
+	.text       start:0x80030370 end:0x8003037C
+
+game/gs_npc_event_candidate_8003037C.c:
+	.text       start:0x8003037C end:0x80033278
 
 game/gs_range_80033278.c:
 	.text       start:0x80033278 end:0x80035E04
@@ -595,7 +601,13 @@ game/pokeconv.c:
 	.text       start:0x80089048 end:0x800896B8
 
 game/gba/gba_misc.c:
-	.text       start:0x800896B8 end:0x8008C7B0
+	.text       start:0x800896B8 end:0x8008A9AC
+
+game/gba/gba_misc_exact_8008A9AC.c:
+	.text       start:0x8008A9AC end:0x8008A9E4
+
+game/gba/gba_misc_candidate_8008A9E4.c:
+	.text       start:0x8008A9E4 end:0x8008C7B0
 
 game/gbaCommunication_prefix.c:
 	.text       start:0x8008C7B0 end:0x80090720
@@ -1716,7 +1728,31 @@ game/gs_log.c:
 	.text       start:0x800DD270 end:0x800DF028
 
 game/gs_material.c:
-	.text       start:0x800DF028 end:0x800DFEEC
+	.text       start:0x800DF028 end:0x800DF11C
+
+game/gs_material_exact_800DF11C.c:
+	.text       start:0x800DF11C end:0x800DF140
+
+game/gs_material_candidate_800DF140.c:
+	.text       start:0x800DF140 end:0x800DF1B8
+
+game/gs_material_exact_800DF1B8.c:
+	.text       start:0x800DF1B8 end:0x800DF21C
+
+game/gs_material_candidate_800DF21C.c:
+	.text       start:0x800DF21C end:0x800DF240
+
+game/gs_material_exact_800DF240.c:
+	.text       start:0x800DF240 end:0x800DF248
+
+game/gs_material_candidate_800DF248.c:
+	.text       start:0x800DF248 end:0x800DF470
+
+game/gs_material_exact_800DF470.c:
+	.text       start:0x800DF470 end:0x800DF498
+
+game/gs_material_candidate_800DF498.c:
+	.text       start:0x800DF498 end:0x800DFEEC
 
 game/gs_math_vec.c:
 	.text       start:0x800DFEEC end:0x800E0218
@@ -3082,7 +3118,61 @@ game/gs_range_8017A5FC.c:
 	.text       start:0x8017A5FC end:0x8017B07C
 
 game/fsys/fsys_file.c:
-	.text       start:0x8017B07C end:0x8017F2C4
+	.text       start:0x8017B07C end:0x8017BFE8
+
+game/fsys/fsys_file_exact_8017BFE8.c:
+	.text       start:0x8017BFE8 end:0x8017C008
+
+game/fsys/fsys_file_candidate_8017C008.c:
+	.text       start:0x8017C008 end:0x8017C394
+
+game/fsys/fsys_file_exact_8017C394.c:
+	.text       start:0x8017C394 end:0x8017C39C
+
+game/fsys/fsys_file_candidate_8017C39C.c:
+	.text       start:0x8017C39C end:0x8017C568
+
+game/fsys/fsys_file_exact_8017C568.c:
+	.text       start:0x8017C568 end:0x8017C5B8
+
+game/fsys/fsys_file_candidate_8017C5B8.c:
+	.text       start:0x8017C5B8 end:0x8017C88C
+
+game/fsys/fsys_file_exact_8017C88C.c:
+	.text       start:0x8017C88C end:0x8017C894
+
+game/fsys/fsys_file_candidate_8017C894.c:
+	.text       start:0x8017C894 end:0x8017C8C0
+
+game/fsys/fsys_file_exact_8017C8C0.c:
+	.text       start:0x8017C8C0 end:0x8017C8C8
+
+game/fsys/fsys_file_candidate_8017C8C8.c:
+	.text       start:0x8017C8C8 end:0x8017C8F4
+
+game/fsys/fsys_file_exact_8017C8F4.c:
+	.text       start:0x8017C8F4 end:0x8017C8FC
+
+game/fsys/fsys_file_candidate_8017C8FC.c:
+	.text       start:0x8017C8FC end:0x8017CEC8
+
+game/fsys/fsys_file_exact_8017CEC8.c:
+	.text       start:0x8017CEC8 end:0x8017CED8
+
+game/fsys/fsys_file_candidate_8017CED8.c:
+	.text       start:0x8017CED8 end:0x8017D3A0
+
+game/fsys/fsys_file_exact_8017D3A0.c:
+	.text       start:0x8017D3A0 end:0x8017D3D4
+
+game/fsys/fsys_file_candidate_8017D3D4.c:
+	.text       start:0x8017D3D4 end:0x8017D400
+
+game/fsys/fsys_file_exact_8017D400.c:
+	.text       start:0x8017D400 end:0x8017D410
+
+game/fsys/fsys_file_candidate_8017D410.c:
+	.text       start:0x8017D410 end:0x8017F2C4
 
 game/gs_range_8017F2C4.c:
 	.text       start:0x8017F2C4 end:0x80180C78

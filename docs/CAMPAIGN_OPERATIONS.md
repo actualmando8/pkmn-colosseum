@@ -1066,12 +1066,12 @@ Next action: integrate the independently preflighted PR #414 exact-30 batch,
   then reconcile and rotate the Windows queue from the merged head
 ```
 
-### Batch snapshot — 2026-07-21 (PR #414)
+### Merged batch snapshot — 2026-07-21 (PR #414)
 
 ```text
 Goal baseline: 6f25dc2c (PR #381)
 Current master before batch: ec451007 (PR #413 merged)
-Batch PR: #414, `integration/pr414-exact30`
+Merged batch: PR #414, source `96fca6dd`, merge `99ab9e5b`
 Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
 This batch: +0 matched functions / +0 matched code/data;
   +30 linked functions / +12 complete units / +20 total-unit topology /
@@ -1082,8 +1082,8 @@ Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
   2,136,513 matched data bytes
 Head linked: 4,491 functions; 860 / 1,550 units;
   628,300 complete code bytes; 752,777 complete data bytes
-README/report: synced at the PR head at 25.18% linked / 628.30 kB complete
-  code; decomp.dev publication is checked again after merge
+README/report/decomp.dev: synced at merge `99ab9e5b`; decomp.dev reports
+  25.18% linked / 628.30 kB complete code
 Retired 3090 farm: no tooling, processes, checkout, cron, or services were
   recreated or contacted; all model and permutation work remains Windows/local
 Windows: sole active farm; the post-#413 138-record manifest remains isolated
@@ -1109,6 +1109,49 @@ Regression/link: all 8,603 function scores have zero regressions; full retail
   SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
 Independent audit: PASS for exact composition, liveness, text, relocation
   ownership, residual coverage, semantic/type fidelity, policy, and full link
-Next action: publish and merge PR #414, reconcile/rotate Windows, then replay
-  the linker-live PR #415 exact-30 batch from the merged head
+Next action: reconcile/rotate Windows, then replay the linker-live PR #415
+  exact-30 batch from the merged head
+```
+
+### Batch snapshot — 2026-07-21 (PR #415)
+
+```text
+Goal baseline: 6f25dc2c (PR #381)
+Current master before batch: 99ab9e5b (PR #414 merged)
+Batch PR: #415, `integration/pr415-exact30`
+Exact-source delta from goal baseline: +41 functions / +15,264 code bytes
+This batch: +0 matched functions / +0 matched code/data;
+  +30 linked functions / +15 complete units / +30 total-unit topology /
+  +480 linked code / +0 linked data
+Goal cumulative from PR #381: +753 linked functions / +190 complete units /
+  +62,620 linked code / +193 linked data
+Head report: 6,309 / 8,603 matched functions; 901,760 matched code bytes;
+  2,136,513 matched data bytes
+Head linked: 4,521 functions; 875 / 1,580 units;
+  628,780 complete code bytes; 752,777 complete data bytes
+README/report: synced at the PR head at 25.20% linked / 628.78 kB complete
+  code; decomp.dev publication is checked again after merge
+Retired 3090 farm: remains absent and was neither contacted nor recreated;
+  Windows remains the sole active permutation farm
+Windows: post-#414 reconciliation found no recoverable survivors among seven
+  strict rejects; the fresh queue has 138 records, 69 runnable units across 42
+  objects, and 69 documented skips, with manifest SHA-256
+  `dcaa80696c3cf87ee4368c4f9fb34f11d27a3bb5ba56a7888139c75de9160e52`;
+  one supervisor and 12 / 12 workers are live with zero wins or bad units
+Integrated: 21 typed FSYS slot/state helpers, seven typed material helpers,
+  the six-nibble GBA entry-Pokemon decoder, and one NPC model-ID setter
+Dead-strip gate: `fn_80097FCC` and `fn_80097FF8` were report-exact but absent
+  from the final linked image, so live replacements were selected instead
+Residual policy: four affected source ranges remain gapless and overlap-free as
+  15 Matching units plus 19 explicit non-auto CodeCandidate units
+Validation: all 30 functions / 480 bytes are raw 100%; all 15 Matching units
+  emit target-identical text with target/source relocation totals of zero; each
+  selected symbol survives in main.elf at its retail VA and has a genuine
+  incoming relocation from an active linker input; `FORCEACTIVE` remains empty
+Regression/link: all 8,603 function scores have zero regressions; full retail
+  SHA-1 passes at `870e8b9693ca780782d80f22a6a4572d8ba9458f`
+Independent audit: PASS for exact composition, source/target text, liveness,
+  semantic and ABI fidelity, residual coverage, policy, and full retail link
+Next action: publish and merge PR #415, rotate the Windows-only queue from the
+  merged head, then integrate the next vetted exact-30 batch
 ```
