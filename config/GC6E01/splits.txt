@@ -2626,7 +2626,13 @@ musyx/runtime/synthmacros_exact_80157218.c:
 	.text       start:0x80157218 end:0x80157280
 
 musyx/musyx_candidate_80157280.c:
-	.text       start:0x80157280 end:0x80162858
+	.text       start:0x80157280 end:0x80161934
+
+musyx/musyx_input_aux_exact_80161934.c:
+	.text       start:0x80161934 end:0x80161D20
+
+musyx/musyx_candidate_80161D20.c:
+	.text       start:0x80161D20 end:0x80162858
 
 musyx/musyx_hw_exact_80162858.c:
 	.text       start:0x80162858 end:0x80162FB0

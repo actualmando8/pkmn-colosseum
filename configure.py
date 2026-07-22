@@ -1021,6 +1021,19 @@ config.libs = [
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
             ),
+            *[
+                Object(
+                    status,
+                    path,
+                    mw_version="GC/1.3.2",
+                    extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
+                    progress_category="musyx",
+                )
+                for status, path in [
+                    (Matching, "musyx/musyx_input_aux_exact_80161934.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80161D20.c"),
+                ]
+            ],
             Object(
                 Matching,
                 "musyx/musyx_hw_exact_80162858.c",
