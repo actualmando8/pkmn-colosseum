@@ -1164,6 +1164,11 @@ config.libs = [
                 )
                 for status, path in [
                     (CodeCandidate, "musyx/musyx_candidate_80162FB0.c"),
+                    (Matching, "musyx/musyx_exact_8016300C.c"),
+                    (Matching, "musyx/musyx_exact_80163030.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163050.c"),
+                    (Matching, "musyx/musyx_exact_801630E4.c"),
+                    (CodeCandidate, "musyx/musyx_candidate_80163104.c"),
                     (Matching, "musyx/musyx_exact_801631CC.c"),
                     (CodeCandidate, "musyx/musyx_candidate_801631F4.c"),
                     (Matching, "musyx/musyx_exact_80163BCC.c"),

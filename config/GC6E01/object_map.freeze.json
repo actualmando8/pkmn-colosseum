@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1698
+    "total_units": 1703
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1630,
-    "source_backed_units": 1614,
+    "named_units": 1635,
+    "source_backed_units": 1619,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -14469,13 +14469,78 @@
       "sections": [
         {
           "name": ".text",
-          "size": 540,
+          "size": 92,
           "virtual_address": 2148937648
         }
       ],
-      "total_code": 540,
+      "total_code": 92,
       "total_data": 0,
-      "total_functions": 10
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_exact_8016300C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 36,
+          "virtual_address": 2148937740
+        }
+      ],
+      "total_code": 36,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_exact_80163030",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148937776
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_candidate_80163050",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 148,
+          "virtual_address": 2148937808
+        }
+      ],
+      "total_code": 148,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_exact_801630E4",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 32,
+          "virtual_address": 2148937956
+        }
+      ],
+      "total_code": 32,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/musyx/musyx_candidate_80163104",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 200,
+          "virtual_address": 2148937988
+        }
+      ],
+      "total_code": 200,
+      "total_data": 0,
+      "total_functions": 5
     },
     {
       "name": "main/musyx/musyx_exact_801631CC",

@@ -3199,7 +3199,22 @@ musyx/musyx_hw_exact_80162858.c:
 	.text       start:0x80162858 end:0x80162FB0
 
 musyx/musyx_candidate_80162FB0.c:
-	.text       start:0x80162FB0 end:0x801631CC
+	.text       start:0x80162FB0 end:0x8016300C
+
+musyx/musyx_exact_8016300C.c:
+	.text       start:0x8016300C end:0x80163030
+
+musyx/musyx_exact_80163030.c:
+	.text       start:0x80163030 end:0x80163050
+
+musyx/musyx_candidate_80163050.c:
+	.text       start:0x80163050 end:0x801630E4
+
+musyx/musyx_exact_801630E4.c:
+	.text       start:0x801630E4 end:0x80163104
+
+musyx/musyx_candidate_80163104.c:
+	.text       start:0x80163104 end:0x801631CC
 
 musyx/musyx_exact_801631CC.c:
 	.text       start:0x801631CC end:0x801631F4
