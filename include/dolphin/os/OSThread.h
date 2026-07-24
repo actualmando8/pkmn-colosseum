@@ -49,7 +49,23 @@ struct OSThread {
     /* 0x2FC */ OSThreadLink linkActive;
     /* 0x304 */ u32* stackBase;
     /* 0x308 */ u32* stackEnd;
+    /* 0x30C */ s32 error;
+    /* 0x310 */ void* specific[2];
 };
+
+#define OS_THREAD_STATE_EXITED   0
+#define OS_THREAD_STATE_READY    1
+#define OS_THREAD_STATE_RUNNING  2
+#define OS_THREAD_STATE_WAITING  4
+#define OS_THREAD_STATE_MORIBUND 8
+
+#define OS_THREAD_ATTR_DETACH 0x0001
+
+#define OS_PRIORITY_MIN  0
+#define OS_PRIORITY_MAX 31
+#define OS_PRIORITY_IDLE OS_PRIORITY_MAX
+
+#define OS_THREAD_STACK_MAGIC 0xDEADBABE
 
 /* OSMutex - defined here for thread/mutex linkage */
 struct OSMutex {

@@ -603,6 +603,11 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
+                CodeCandidate,
+                "dolphin/os/OSThread.c",
+                progress_category="sdk",
+            ),
+            Object(
                 Matching,
                 "dolphin/os/OSTime.c",
                 source="dolphin/os/calendar/OSTime.c",
