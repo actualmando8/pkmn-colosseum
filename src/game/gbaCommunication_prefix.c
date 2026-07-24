@@ -123,8 +123,10 @@ void fn_8008D348(u32 ctx) {
     extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void cameraWaitSyncAnime(s32 sync);
 
-    u32 waitFrames;
-    u32 elapsed;
+    u32 elapsed1;
+    u32 waitFrames1;
+    u32 elapsed2;
+    u32 waitFrames2;
     u32 model;
     u32 base;
     f32 frame;
@@ -148,16 +150,16 @@ void fn_8008D348(u32 ctx) {
     GSmodelSetShadowTextureSize(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
-    waitFrames = 1;
+    waitFrames1 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames1 = (u32)lbl_8047C1D0;
+        if (waitFrames1 < 1) {
+            waitFrames1 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed1 = 0; elapsed1 < waitFrames1; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed1 += fn_800D3088();
     }
 
     fn_801CB7C4(0x0CE61000);
@@ -166,7 +168,7 @@ void fn_8008D348(u32 ctx) {
     fn_80118874(*(u32*)(base + 0x144), 1);
     *(u32*)(base + 0x144) = 0;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     model = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(model, 0);
     GSmodelGetFrameCount(model, &frame, 0);
@@ -221,16 +223,16 @@ void fn_8008D348(u32 ctx) {
 
     cameraPlayAnime(ctx, 0x0CFF1800, 0, 0);
 
-    waitFrames = 1;
+    waitFrames2 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames2 = (u32)lbl_8047C1D0;
+        if (waitFrames2 < 1) {
+            waitFrames2 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed2 = 0; elapsed2 < waitFrames2; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed2 += fn_800D3088();
     }
 
     h0d091000 = fn_801CBA0C(0x0D091000);
@@ -285,8 +287,12 @@ void fn_80090100(u32 ctx) {
     extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
     extern void cameraWaitSyncAnime(s32 sync);
 
-    u32 waitFrames;
-    u32 elapsed;
+    u32 elapsed1;
+    u32 waitFrames1;
+    u32 elapsed2;
+    u32 waitFrames2;
+    u32 elapsed3;
+    u32 waitFrames3;
     u32 model;
     u32 base;
     f32 frame;
@@ -312,37 +318,37 @@ void fn_80090100(u32 ctx) {
     GSmodelSetShadowTextureSize(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
-    waitFrames = 1;
+    waitFrames1 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames1 = (u32)lbl_8047C1D0;
+        if (waitFrames1 < 1) {
+            waitFrames1 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed1 = 0; elapsed1 < waitFrames1; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed1 += fn_800D3088();
     }
 
     fn_801CB7C4(0x0CE61000);
 
-    waitFrames = 1;
+    waitFrames2 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames2 = (u32)lbl_8047C1D0;
+        if (waitFrames2 < 1) {
+            waitFrames2 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed2 = 0; elapsed2 < waitFrames2; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed2 += fn_800D3088();
     }
 
     base = GSresGetResource(ctx, 0x0CE61000);
     fn_80118874(*(u32*)(base + 0x144), 1);
     *(u32*)(base + 0x144) = 0;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     model = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(model, 0);
     GSmodelGetFrameCount(model, &frame, 0);
@@ -399,16 +405,16 @@ void fn_80090100(u32 ctx) {
 
     cameraPlayAnime(ctx, 0x0CF31800, 0, 0);
 
-    waitFrames = 1;
+    waitFrames3 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames3 = (u32)lbl_8047C1D0;
+        if (waitFrames3 < 1) {
+            waitFrames3 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed3 = 0; elapsed3 < waitFrames3; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed3 += fn_800D3088();
     }
 
     h0cea1006 = fn_801CBA0C(0x0CEA1006);
@@ -502,7 +508,7 @@ void fn_8008CACC(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -614,7 +620,7 @@ void fn_8008FE94(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -713,7 +719,7 @@ void fn_8008CDD8(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -816,7 +822,7 @@ void fn_8008D0A0(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -878,8 +884,12 @@ void fn_8008E320(u32 ctx) {
     extern void fn_800FF58C(u32 id);
     extern void floorSetFadeScript(u32 a, u32 b);
 
-    u32 waitFrames;
-    u32 elapsed;
+    u32 elapsed1;
+    u32 waitFrames1;
+    u32 elapsed2;
+    u32 waitFrames2;
+    u32 elapsed3;
+    u32 waitFrames3;
     GSmaterialEntry* material;
     f32 frame;
     u32 model;
@@ -898,16 +908,16 @@ void fn_8008E320(u32 ctx) {
     GSmodelSetShadowTextureSize(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
-    waitFrames = 1;
+    waitFrames1 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames1 = (u32)lbl_8047C1D0;
+        if (waitFrames1 < 1) {
+            waitFrames1 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed1 = 0; elapsed1 < waitFrames1; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed1 += fn_800D3088();
     }
 
     fn_801CB7C4(0x0CE61000);
@@ -916,7 +926,7 @@ void fn_8008E320(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -931,16 +941,16 @@ void fn_8008E320(u32 ctx) {
 
     fn_801CB834(0x0CE61000, 3, 0, 0);
 
-    waitFrames = 0x32;
+    waitFrames2 = 0x32;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1E0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames2 = (u32)lbl_8047C1E0;
+        if (waitFrames2 < 1) {
+            waitFrames2 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed2 = 0; elapsed2 < waitFrames2; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed2 += fn_800D3088();
     }
 
     h06af0400 = fn_801CBA0C(0x06AF0400);
@@ -970,16 +980,16 @@ void fn_8008E320(u32 ctx) {
 
     cameraPlayAnime(ctx, 0x0CFD1800, 0, 0);
 
-    waitFrames = 1;
+    waitFrames3 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames3 = (u32)lbl_8047C1D0;
+        if (waitFrames3 < 1) {
+            waitFrames3 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed3 = 0; elapsed3 < waitFrames3; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed3 += fn_800D3088();
     }
 
     h0d071000 = fn_801CBA0C(0x0D071000);
@@ -1023,8 +1033,12 @@ void fn_8008E7D4(u32 ctx) {
     extern void fn_800FF58C(u32 id);
     extern void floorSetFadeScript(u32 a, u32 b);
 
-    u32 waitFrames;
-    u32 elapsed;
+    u32 elapsed1;
+    u32 waitFrames1;
+    u32 elapsed2;
+    u32 waitFrames2;
+    u32 elapsed3;
+    u32 waitFrames3;
     GSmaterialEntry* material;
     f32 frame;
     u32 model;
@@ -1041,16 +1055,16 @@ void fn_8008E7D4(u32 ctx) {
     GSmodelSetShadowTextureSize(0x280, 0x1E0);
     fn_801CB834(0x0CE61000, 0, 0, 0);
 
-    waitFrames = 1;
+    waitFrames1 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames1 = (u32)lbl_8047C1D0;
+        if (waitFrames1 < 1) {
+            waitFrames1 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed1 = 0; elapsed1 < waitFrames1; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed1 += fn_800D3088();
     }
 
     fn_801CB7C4(0x0CE61000);
@@ -1059,7 +1073,7 @@ void fn_8008E7D4(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -1074,16 +1088,16 @@ void fn_8008E7D4(u32 ctx) {
 
     fn_801CB834(0x0CE61000, 3, 0, 0);
 
-    waitFrames = 0x32;
+    waitFrames2 = 0x32;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1E0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames2 = (u32)lbl_8047C1E0;
+        if (waitFrames2 < 1) {
+            waitFrames2 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed2 = 0; elapsed2 < waitFrames2; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed2 += fn_800D3088();
     }
 
     h06af0400 = fn_801CBA0C(0x06AF0400);
@@ -1108,16 +1122,16 @@ void fn_8008E7D4(u32 ctx) {
 
     cameraPlayAnime(ctx, 0x0CFC1800, 0, 0);
 
-    waitFrames = 1;
+    waitFrames3 = 1;
     if (fn_800D37CC() == 0x32) {
-        waitFrames = (u32)lbl_8047C1D0;
-        if (waitFrames < 1) {
-            waitFrames = 1;
+        waitFrames3 = (u32)lbl_8047C1D0;
+        if (waitFrames3 < 1) {
+            waitFrames3 = 1;
         }
     }
-    for (elapsed = 0; elapsed < waitFrames; ) {
+    for (elapsed3 = 0; elapsed3 < waitFrames3; ) {
         _threadSwitch();
-        elapsed += fn_800D3088();
+        elapsed3 += fn_800D3088();
     }
 
     h0d061000 = fn_801CBA0C(0x0D061000);
@@ -1219,7 +1233,7 @@ void fn_8008D938(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     resource = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(resource, 0);
     GSmodelGetFrameCount(resource, &frame, 0);
@@ -1433,7 +1447,7 @@ void fn_8008EC28(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -1535,7 +1549,7 @@ void fn_8008EED0(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -1639,7 +1653,7 @@ void fn_8008F190(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -1761,7 +1775,7 @@ void fn_8008FBF4(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
@@ -1864,7 +1878,7 @@ void fn_8008C7B0(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    frame = lbl_8047C1D4;
+    frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
     GSmodelSetAnimIndex(handle2, 0);
     GSmodelGetFrameCount(handle2, &frame, 0);
