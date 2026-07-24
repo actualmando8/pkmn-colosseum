@@ -145,298 +145,59 @@ u32 fightTrainerAiWazaValueSiroikiri(void* ctx, u32 param1, u32 param2, u32 para
     return setup;
 }
 /* Address: 0x80240788 | Size: 0x448 (1096 bytes) */
-void fightTrainerAiWazaValueJikoanji(void* ctx, u32 param1, u32 param2, u32 param3) {
-    extern void fightOutPokemonGetPokemonPtr();
-    extern void fn_802357CC();
-    extern void fn_802358AC();
-    extern void fn_80235910();
-    extern void fn_80235974();
-    extern void fn_802359D8();
-    extern void fn_80235A3C();
-    extern void fn_80235AA0();
-    extern void fn_80239984();
-    extern void fn_80239EE8();
-    u8 sp[0x40];
-    u32 r0 = 0;
-    u32 r3 = (u32)ctx;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r9 = 0;
-    u32 r10 = 0;
-    u32 r27 = 0;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    u32 r1 = (u32)sp;
-    u32 r4 = param1;
-    u32 r5 = param2;
-    u32 r6 = param3;
+static u8 jikoanjiStatusInRange(void* ctx, u32 target, u8 low, u8 high) {
+    u8 fn_802357CC(void*, u32);
+    u8 fn_802358AC(void*, u32);
+    u8 fn_80235910(void*, u32);
+    u8 fn_80235974(void*, u32);
+    u8 fn_802359D8(void*, u32);
+    u8 fn_80235A3C(void*, u32);
+    u8 fn_80235AA0(void*, u32);
+    u8 status[7];
+    u8 i;
 
-    r30 = r6;
-    r28 = r4;
-    r27 = r3;
-    r29 = r5;
-    r4 = r30;
-    r31 = 0x0;
-    fn_80235AA0();
-    *(u8*)(sp + 0x20) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235A3C();
-    *(u8*)(sp + 0x21) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802359D8();
-    *(u8*)(sp + 0x22) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235974();
-    *(u8*)(sp + 0x23) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235910();
-    *(u8*)(sp + 0x24) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    *(u8*)(sp + 0x25) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802357CC();
-    *(u8*)(sp + 0x26) = r3;
-    r3 = (u32)sp + 0x20;
-    r4 = 0x0;
-    while (1) {
-        r0 = r4 & 0xFF;
-        if (r0 >= (u32)0x7) break;
-        r0 = r4 & 0xFF;
-        r0 = *(u8*)(r3 + r0);
-        if (r0 >= (u32)0x8 || r0 > (u32)0x9) {
+    status[0] = fn_80235AA0(ctx, target);
+    status[1] = fn_80235A3C(ctx, target);
+    status[2] = fn_802359D8(ctx, target);
+    status[3] = fn_80235974(ctx, target);
+    status[4] = fn_80235910(ctx, target);
+    status[5] = fn_802358AC(ctx, target);
+    status[6] = fn_802357CC(ctx, target);
 
-            r0 = 0x1;
-            break;
+    for (i = 0; i < 7; i++) {
+        if (status[i] >= low && status[i] <= high) {
+            return 1;
         }
-        r4 = r4 + 0x1;
-
     }
-    r0 = 0x0;
+    return 0;
+}
 
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r4 = r27;
-        r3 = 0x0;
-        r5 = 0x1be;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fightOutPokemonGetPokemonPtr();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1be;
-        fn_80239EE8();
+u32 fightTrainerAiWazaValueJikoanji(void* ctx, u32 param1, u32 param2, u32 param3) {
+    u32 fightOutPokemonGetPokemonPtr(u32);
+    u32 fn_80239984(u32, void*, u32);
+    void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
+    u32 handle;
+
+    handle = 0;
+
+    if (jikoanjiStatusInRange(ctx, param3, 8, 9) == 1) {
+        handle = fn_80239984(0, ctx, 0x1be);
+        fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x1be);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235AA0();
-    *(u8*)(sp + 0x18) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235A3C();
-    *(u8*)(sp + 0x19) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802359D8();
-    *(u8*)(sp + 0x1A) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235974();
-    *(u8*)(sp + 0x1B) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235910();
-    *(u8*)(sp + 0x1C) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    *(u8*)(sp + 0x1D) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802357CC();
-    *(u8*)(sp + 0x1E) = r3;
-    r3 = (u32)sp + 0x18;
-    r4 = 0x0;
-    while (1) {
-        r0 = r4 & 0xFF;
-        if (r0 >= (u32)0x7) break;
-        r0 = r4 & 0xFF;
-        r0 = *(u8*)(r3 + r0);
-        if (r0 >= (u32)0xa || r0 > (u32)0xc) {
 
-            r0 = 0x1;
-            break;
-        }
-        r4 = r4 + 0x1;
-
+    if (jikoanjiStatusInRange(ctx, param3, 0xa, 0xc) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1bf);
+        fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x1bf);
     }
-    r0 = 0x0;
 
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1bf;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fightOutPokemonGetPokemonPtr();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1bf;
-        fn_80239EE8();
+    if (jikoanjiStatusInRange(ctx, param3, 3, 4) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1c0);
+        fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x1c0);
     }
-    r3 = r27;
-    r4 = r30;
-    fn_80235AA0();
-    *(u8*)(sp + 0x10) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235A3C();
-    *(u8*)(sp + 0x11) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802359D8();
-    *(u8*)(sp + 0x12) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235974();
-    *(u8*)(sp + 0x13) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235910();
-    *(u8*)(sp + 0x14) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    *(u8*)(sp + 0x15) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802357CC();
-    *(u8*)(sp + 0x16) = r3;
-    r3 = (u32)sp + 0x10;
-    r4 = 0x0;
-    while (1) {
-        r0 = r4 & 0xFF;
-        if (r0 >= (u32)0x7) break;
-        r0 = r4 & 0xFF;
-        r0 = *(u8*)(r3 + r0);
-        if (r0 >= (u32)0x3 || r0 > (u32)0x4) {
 
-            r0 = 0x1;
-            break;
-        }
-        r4 = r4 + 0x1;
-
+    if (jikoanjiStatusInRange(ctx, param3, 0, 2) == 1) {
+        handle = fn_80239984(handle, ctx, 0x1c1);
+        fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0x1c1);
     }
-    r0 = 0x0;
-
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1c0;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fightOutPokemonGetPokemonPtr();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1c0;
-        fn_80239EE8();
-    }
-    r3 = r27;
-    r4 = r30;
-    fn_80235AA0();
-    *(u8*)(sp + 0x8) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235A3C();
-    *(u8*)(sp + 0x9) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802359D8();
-    *(u8*)(sp + 0xA) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235974();
-    *(u8*)(sp + 0xB) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_80235910();
-    *(u8*)(sp + 0xC) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802358AC();
-    *(u8*)(sp + 0xD) = r3;
-    r3 = r27;
-    r4 = r30;
-    fn_802357CC();
-    *(u8*)(sp + 0xE) = r3;
-    r3 = (u32)sp + 0x8;
-    r4 = 0x0;
-    while (1) {
-        r0 = r4 & 0xFF;
-        if (r0 >= (u32)0x7) break;
-        r0 = r4 & 0xFF;
-        r0 = *(u8*)(r3 + r0);
-        if (r0 >= (u32)0x0 || r0 > (u32)0x2) {
-
-            r0 = 0x1;
-            break;
-        }
-        r4 = r4 + 0x1;
-
-    }
-    r0 = 0x0;
-
-    r0 = r0 & 0xFF;
-    if (r0 == (u32)0x1) {
-        r3 = r31;
-        r4 = r27;
-        r5 = 0x1c1;
-        fn_80239984();
-        r0 = r3;
-        r3 = r28;
-        r31 = r0;
-        fightOutPokemonGetPokemonPtr();
-        r6 = (0x1 << 16);
-        r5 = r3;
-        r4 = r27;
-        r8 = r29;
-        r6 = 0x0;
-        r7 = 0x0;
-        r9 = 0x0;
-        r10 = 0x1c1;
-        fn_80239EE8();
-    }
-    r3 = r31;
-    return;
+    return handle;
 }
