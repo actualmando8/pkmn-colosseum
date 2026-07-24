@@ -233,3 +233,83 @@ s32 fn_80167E54(void) { return -1; }
 u32 fn_80167E5C(u8* obj) {
     return *(u32*)((u8*)obj + 0x38);
 }
+
+/* 2026-07-24: decompiled directly from the current disassembly (not the
+ * unreliable archive bodies noted above). */
+extern BOOL OSDisableInterrupts(void);
+extern BOOL OSRestoreInterrupts(BOOL level);
+extern void *fn_80167720(void);
+extern void fn_80167070(void *entry, u32 flag);
+extern u8 *lbl_8047B0C4;
+extern u32 lbl_8047B0C8;
+extern u8 *lbl_8047B0CC;
+extern u32 lbl_8047B0D0;
+
+void fn_80167040(void)
+{
+    void *entry;
+
+    entry = fn_80167720();
+    if (entry != NULL) {
+        fn_80167070(entry, 0);
+    }
+}
+
+void fn_801677BC(u8 *flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_801677F4(u8 *flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_8016782C(u8 *flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_801679E4(void)
+{
+    u32 offset;
+    u32 i;
+    u8 value;
+
+    offset = 0;
+    i = 0;
+    value = 0;
+    while (i < lbl_8047B0C8) {
+        lbl_8047B0C4[offset] = value;
+        i++;
+        offset += 0x78;
+    }
+}
+
+void fn_80167A14(void)
+{
+    u32 offset;
+    u32 i;
+    u8 value;
+
+    offset = 0;
+    i = 0;
+    value = 0;
+    while (i < lbl_8047B0D0) {
+        lbl_8047B0CC[offset] = value;
+        i++;
+        offset += 0xD0;
+    }
+}

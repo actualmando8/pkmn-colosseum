@@ -32,6 +32,11 @@ static inline GSscratchAllocation *GSscratchFindAllocation(u8 firstBlock)
     return NULL;
 }
 
+u8 GSscratchIsPtr(void *ptr)
+{
+    return ((u32)ptr & 0xF0000000) == ((u32)lbl_8047ABE0 & 0xF0000000);
+}
+
 void GSscratchFree(void *ptr)
 {
     GSscratchAllocation *allocation;
@@ -60,4 +65,13 @@ void GSscratchFree(void *ptr)
     }
     lbl_8047ABEC = usedBlocks;
     allocation->firstBlock = 0xFF;
+}
+
+extern void LCQueueWait(u32 len);
+extern u32 lbl_8047ABDC;
+
+void GSscratchWaitForCompletion(void)
+{
+    LCQueueWait(lbl_8047ABDC);
+    lbl_8047ABDC = 0;
 }
