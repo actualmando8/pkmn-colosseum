@@ -451,9 +451,9 @@ typedef struct GStexture GStexture;
 /* Waza data access */
 /* fn_801D1338 */ s32  fn_801D1338(void* wazaCtx);
 /* fn_801D1364 */ void* fn_801D1364(u16 handle, s32 idx);
-/* fn_801D139C */ s32  fn_801D139C(void* entry);
+/* fn_801D139C */ u32  fn_801D139C(s32 idx);
 /* fn_801D13E4 */ u32  fn_801D13E4(s32 idx);
-/* fn_801D142C */ f32  fn_801D142C(void* entry);
+/* fn_801D142C */ u32  fn_801D142C(s32 idx);
 
 /* Waza animation controllers */
 /* fn_801D1734 */ void fn_801D1734(s32 attackerSlot, s32 targetSlot, s32 moveID);

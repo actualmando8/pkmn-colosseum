@@ -424,6 +424,20 @@ void __GXAbort(void) {
 #undef GX_ABORT_STATIC
 
 #if !defined(GX_EXACT_800B884C_800B8AE8)
+/* 0x800B8AE8 | size: 0x170 -- second GP abort entry point; identical to
+   __GXAbort but also resets the GP FIFO afterwards. */
+void fn_800B8AE8(void) {
+    if (gx->field_4F2 && fn_800B7714() != 0) {
+        __GXAbortWaitPECopyDone();
+    }
+
+    __PIRegs[0x18 / 4] = 1;
+    __GXAbortWait(200);
+    __PIRegs[0x18 / 4] = 0;
+    __GXAbortWait(20);
+    __GXCleanGPFifo();
+}
+
 void fn_800B8C58(u16 token) {
     BOOL enabled;
     u32 reg;

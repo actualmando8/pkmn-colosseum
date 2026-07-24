@@ -314,11 +314,27 @@ void fn_80167A14(void)
     }
 }
 
+
 extern u32 fn_800E2C04(u32 size, u32 align);
 extern void* fn_800E27B0(u32 handle);
+extern u32 fn_800E202C(void);
+extern void fn_800E24B0(u32 handle);
+extern void fn_800E209C(u32 handle);
 extern s32 DVDConvertPathToEntrynum(const char* path);
 extern s32 DVDGetCommandBlockStatus(const void* block);
 extern s32 DVDGetDriveStatus(void);
+extern void DVDClose(void* fileInfo);
+void fn_80168164(u8* flag);
+
+void fn_80167B70(void)
+{
+    u32 handle = fn_800E202C();
+
+    if ((u16)handle != 0) {
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+}
 
 void* fn_80167BB0(u32 size)
 {
@@ -330,14 +346,25 @@ void* fn_80167BB0(u32 size)
     return 0;
 }
 
-void* fn_8016824C(u32 size)
+s32 fn_80167E10(u8* handle)
 {
-    u32 handle = fn_800E2C04(size, 0x20);
+    return DVDGetCommandBlockStatus(handle + 4);
+}
 
-    if ((u16)handle != 0) {
-        return fn_800E27B0(handle);
-    }
-    return 0;
+s32 fn_80167E34(void)
+{
+    return DVDGetDriveStatus();
+}
+
+void fn_80167E64(u8* file)
+{
+    fn_80168164(file);
+    DVDClose(file + 4);
+}
+
+u32 fn_80167EF8(const char* path)
+{
+    return DVDConvertPathToEntrynum(path) != -1;
 }
 
 void fn_80168164(u8* flag)
@@ -349,17 +376,12 @@ void fn_80168164(u8* flag)
     OSRestoreInterrupts(enabled);
 }
 
-u32 fn_80167EF8(const char* path)
+void* fn_8016824C(u32 size)
 {
-    return DVDConvertPathToEntrynum(path) != -1;
-}
+    u32 handle = fn_800E2C04(size, 0x20);
 
-s32 fn_80167E10(u8* handle)
-{
-    return DVDGetCommandBlockStatus(handle + 4);
-}
-
-s32 fn_80167E34(void)
-{
-    return DVDGetDriveStatus();
+    if ((u16)handle != 0) {
+        return fn_800E27B0(handle);
+    }
+    return 0;
 }
