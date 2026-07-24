@@ -3294,3 +3294,80 @@ asm void PPCMtwpar(register u32 val) {
 }
 
 #endif
+
+#if !defined(GBA_COMMUNICATION_EXACT_80092FC8_ONLY)
+
+/* 0x80092E38 | size: 0x190 */
+s32 fn_80092E38(s32 channel, void* requestValue)
+{
+    extern u32 fn_800E2C04(u32 size, u32 align);
+    extern void* fn_800E27B0(u32 handle);
+    extern void fn_8009F77C(void* work);
+    extern void fn_8009F9C8(void* callback);
+    extern s32 fn_800937F4(void* arg);
+    extern void fn_80093B04(u32 a, u32 b);
+    extern void OSCreateThread(void* thread, void* entry, void* arg,
+                               void* stack, u32 stackSize, s32 priority,
+                               u16 attributes);
+    extern void OSResumeThread(void* thread);
+    extern void* memset(void* dst, int value, u32 size);
+
+    u32 slot;
+    u32 handle;
+    u8* allocated;
+    u8* work;
+    s32 started;
+    s32 requestStarted;
+    u8* requestWork;
+
+    if (channel < 0 || channel > 3) {
+        started = 0;
+    } else {
+        slot = (u32)channel << 2;
+        if (*(u8**)(lbl_803FB328 + slot) != NULL) {
+            started = 1;
+        } else {
+            handle = fn_800E2C04(0x44A0, 0x20);
+            if ((handle & 0xFFFF) == 0) {
+                __assert(lbl_8026F5A8, 0x1DD, &lbl_8047C1E8);
+            }
+            allocated = fn_800E27B0(handle);
+            memset(allocated, 0, 0x4490);
+            *(u8**)(lbl_803FB328 + slot) = allocated;
+
+            work = *(u8**)(lbl_803FB328 + slot);
+            *(u32*)(work + GBA_STATE_PHASE) = 0;
+            *(s32*)(work + GBA_STATE_PORT) = channel;
+            fn_800716C8(channel, work + GBA_DATA_OFFSET, fn_80093B04);
+            fn_8009F77C(work);
+            fn_8009F9C8(work + 0x18);
+            OSCreateThread(work + GBA_DATA_OFFSET, fn_800937F4, work,
+                           work + GBA_STATE_PORT, 0x4000,
+                           GBA_THREAD_PRIORITY, 0);
+            OSResumeThread(work + GBA_DATA_OFFSET);
+            started = 1;
+        }
+    }
+
+    if (started == 0) {
+        return 0;
+    }
+
+    requestWork = *(u8**)(lbl_803FB328 + ((u32)channel << 2));
+    requestStarted = 0;
+    fn_8009F7B4(requestWork);
+    if (*(s32*)(requestWork + GBA_STATE_PHASE) == 0) {
+        *(s32*)(requestWork + GBA_STATE_PHASE) = 11;
+        *(u32*)(requestWork + GBA_STATE_TIMEOUT) = 0x3000B;
+        requestStarted = 1;
+        *(void**)(requestWork + 0x4344) = requestValue;
+    }
+    fn_8009F890(requestWork);
+    fn_800A257C(requestWork + GBA_DATA_OFFSET, GBA_THREAD_PRIORITY);
+    if (requestStarted != 0) {
+        fn_8009FABC(requestWork + 0x18);
+    }
+    return requestStarted;
+}
+
+#endif

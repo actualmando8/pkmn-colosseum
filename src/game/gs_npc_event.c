@@ -2302,3 +2302,32 @@ void fn_80034DC0(u8* arg0, u8* arg1) {
 }
 #pragma pop
 #endif
+
+/* fn_800301B0 - 0x800301B0 | size: 0x120 */
+void fn_800301B0(void* r3, u8* r4) {
+    void* model = NULL;
+    s32 evtype = *(s16*)(r4 + 0x6);
+    switch (evtype) {
+    case 0x10CE:
+        model = menuModelRender(lbl_803A3230);
+        break;
+    case 0x10CF:
+        model = menuModelRender(lbl_803A31E8);
+        break;
+    }
+    if (model != NULL) {
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, model);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047B9D4, lbl_8047B9D4);
+        fn_800D61E4(*(s16*)(r4 + 0x54), *(s16*)(r4 + 0x56));
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047B9F0, lbl_8047B9F0);
+        fn_800D6728();
+    }
+}

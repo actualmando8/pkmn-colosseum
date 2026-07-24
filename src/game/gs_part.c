@@ -58,3 +58,23 @@ GSpart *GSpartCreate(void)
     part->inUse = 1;
     return part;
 }
+
+extern u16 lbl_8047ABB8;
+extern u32 _toolentryAlloc__FUl(u32 size);
+extern void* fn_800E27B0(u16 handle);
+
+void GSpartInit(u32 count)
+{
+    u32 handle;
+    u32 i;
+
+    lbl_8047ABC0 = count;
+    handle = _toolentryAlloc__FUl(count * sizeof(GSpart));
+    lbl_8047ABB8 = handle;
+    if ((u16)handle != 0) {
+        lbl_8047ABBC = fn_800E27B0((u16)handle);
+        for (i = 0; i < lbl_8047ABC0; i++) {
+            ((u8*)lbl_8047ABBC)[i * sizeof(GSpart)] = 0;
+        }
+    }
+}

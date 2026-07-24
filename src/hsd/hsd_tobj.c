@@ -394,3 +394,87 @@ void fn_801BE85C(void* obj, u32 type, HSD_ObjData* val)
     (void) type;
     (void) val;
 }
+
+/* ========================================================================= */
+/*  0x801BE4E4 | 0xCC  HSD_TObjLoadDesc                                      */
+/* ========================================================================= */
+HSD_TObj* HSD_TObjLoadDesc(HSD_TObjDesc* desc)
+{
+    HSD_TObj* tobj;
+    HSD_ClassInfo* info;
+
+    if (desc == NULL) {
+        goto return_null;
+    }
+
+    if (desc->class_name != NULL) {
+        info = fn_80193748(desc->class_name);
+        if (info != NULL) {
+            goto do_alloc_from_info;
+        }
+    }
+
+    if (default_class != NULL) {
+        info = default_class;
+    } else {
+        info = hsdTObjClass;
+    }
+    tobj = fn_80193828(info);
+    if (tobj == NULL) {
+        __assert(HSD_TOBJ_FILE, 0x884, lbl_8047DECC);
+    }
+    goto setup;
+
+do_alloc_from_info:
+    tobj = fn_80193828(info);
+    if (tobj == NULL) {
+        __assert(HSD_TOBJ_FILE, 0x1ed, lbl_8047DF10);
+    }
+setup:
+    HSD_TOBJ_METHOD(tobj)->load(tobj, desc);
+    return tobj;
+return_null:
+    return NULL;
+}
+
+/* ========================================================================= */
+/*  0x801BE800 | 0x5C  HSD_TObjAnimAll                                       */
+/* ========================================================================= */
+void fn_801BE800(HSD_TObj* tobj)
+{
+    HSD_TObj* cur;
+
+    if (tobj == NULL) {
+        return;
+    }
+
+    cur = tobj;
+    while (cur != NULL) {
+        if (cur != NULL) {
+            HSD_AObjInterpretAnim(cur->aobj, cur, HSD_TOBJ_METHOD(cur)->update);
+        }
+        cur = cur->next;
+    }
+}
+
+/* ========================================================================= */
+/*  0x801BEE68 | 0x74  HSD_TObjReqAnimAllByFlags                             */
+/* ========================================================================= */
+void fn_801BEE68(HSD_TObj* tobj, f32 val, u32 flags)
+{
+    HSD_TObj* cur;
+
+    if (tobj == NULL) {
+        return;
+    }
+
+    cur = tobj;
+    while (cur != NULL) {
+        if (cur != NULL) {
+            if (flags & 0x10) {
+                HSD_AObjReqAnim(cur->aobj, val);
+            }
+        }
+        cur = cur->next;
+    }
+}
