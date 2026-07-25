@@ -33,7 +33,7 @@ void fn_800EE20C(void *jobj)
     }
 }
 
-GSpart *GSpartCreate(void)
+static inline GSpart *GSpartFindFree(void)
 {
     GSpart *part;
     u32 i;
@@ -41,11 +41,22 @@ GSpart *GSpartCreate(void)
     part = lbl_8047ABBC;
     for (i = 0; i < lbl_8047ABC0; i++, part++) {
         if (part->inUse == 0) {
-            part->inUse = 1;
             return part;
         }
     }
     return NULL;
+}
+
+GSpart *GSpartCreate(void)
+{
+    GSpart *part;
+
+    part = GSpartFindFree();
+    if (part == NULL) {
+        return NULL;
+    }
+    part->inUse = 1;
+    return part;
 }
 
 extern u16 lbl_8047ABB8;
