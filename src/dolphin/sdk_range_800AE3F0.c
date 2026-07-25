@@ -378,7 +378,7 @@ extern void* __OSLockSram(void);
 extern void __OSUnlockSram(BOOL commit);
 extern void* __OSLockSramEx(void);
 extern void __OSUnlockSramEx(BOOL commit);
-extern void __CARDCheckSum(void* ptr, u32 length, u16* checksum,
+extern void __CARDCheckSum(void* ptr, s32 length, u16* checksum,
                            u16* checksumInv);
 extern void FormatCallback(s32 chan, s32 result);
 extern void DCStoreRange(void* addr, u32 length);
@@ -398,9 +398,174 @@ extern u32 DummyLen(void);
 extern s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen,
                            s32 mode);
 
+#if defined(SDK_EXACT_800B2070_800B2968)
+void __CARDCheckSum(void* ptr, s32 length, u16* checksum, u16* checksumInv)
+{
+    u16* p;
+    s32 i;
+
+    length /= sizeof(u16);
+    *checksum = *checksumInv = 0;
+    for (i = 0, p = ptr; i < length; i++, p++) {
+        *checksum += *p;
+        *checksumInv += ~*p;
+    }
+
+    if (*checksum == 0xFFFF) {
+        *checksum = 0;
+    }
+    if (*checksumInv == 0xFFFF) {
+        *checksumInv = 0;
+    }
+}
+
+s32 VerifyID(CARDControl* card)
+{
+    CARDID* id;
+    u16 checksum;
+    u16 checksumInv;
+    OSSramEx* sramEx;
+    s64 rand;
+    s32 i;
+
+    id = card->workArea;
+
+    if (id->deviceID != 0 || id->size != card->size) {
+        return -6;
+    }
+
+    __CARDCheckSum(id, sizeof(CARDID) - sizeof(u32), &checksum, &checksumInv);
+    if (id->checkSum != checksum || id->checkSumInv != checksumInv) {
+        return -6;
+    }
+
+    rand = *(s64*)&id->serial[12];
+    sramEx = __OSLockSramEx();
+    for (i = 0; i < 12; i++) {
+        rand = (rand * 1103515245 + 12345) >> 16;
+        if (id->serial[i] !=
+            (u8)(sramEx->flashID[card - lbl_803FC620][i] + rand)) {
+            __OSUnlockSramEx(FALSE);
+            return -6;
+        }
+        rand = ((rand * 1103515245 + 12345) >> 16) & 0x7FFF;
+    }
+
+    __OSUnlockSramEx(FALSE);
+
+    if (id->encode != __CARDGetFontEncode()) {
+        return -13;
+    }
+    return 0;
+}
+
+s32 VerifyDir(CARDControl* card, s32* currentOut)
+{
+    CARDDirEntry* dir[2];
+    CARDDirCheck* check[2];
+    u16 checksum;
+    u16 checksumInv;
+    s32 i;
+    s32 errors;
+    s32 current;
+
+    current = errors = 0;
+    for (i = 0; i < 2; i++) {
+        dir[i] =
+            (CARDDirEntry*)((u8*)card->workArea + (1 + i) * 0x2000);
+        check[i] = (CARDDirCheck*)((u8*)dir[i] + 0x1FC0);
+        __CARDCheckSum(dir[i], 0x1FFC, &checksum, &checksumInv);
+        if (check[i]->checkSum != checksum ||
+            check[i]->checkSumInv != checksumInv) {
+            ++errors;
+            current = i;
+            card->dirBlock = NULL;
+        }
+    }
+
+    if (errors == 0) {
+        if (card->dirBlock == NULL) {
+            if (check[0]->checkCode - check[1]->checkCode < 0) {
+                current = 0;
+            } else {
+                current = 1;
+            }
+            card->dirBlock = dir[current];
+            memcpy(dir[current], dir[current ^ 1], 0x2000);
+        } else {
+            current = card->dirBlock == dir[0] ? 0 : 1;
+        }
+    }
+
+    if (currentOut != NULL) {
+        *currentOut = current;
+    }
+    return errors;
+}
+
+s32 VerifyFAT(CARDControl* card, s32* currentOut)
+{
+    u16* fat[2];
+    u16* fatp;
+    u16 block;
+    u16 freeBlocks;
+    s32 i;
+    u16 checksum;
+    u16 checksumInv;
+    s32 errors;
+    s32 current;
+
+    current = errors = 0;
+    for (i = 0; i < 2; i++) {
+        fatp = fat[i] =
+            (u16*)((u8*)card->workArea + (3 + i) * 0x2000);
+        __CARDCheckSum(&fatp[2], 0x1FFC, &checksum, &checksumInv);
+        if (fatp[0] != checksum || fatp[1] != checksumInv) {
+            ++errors;
+            current = i;
+            card->fatBlock = NULL;
+            continue;
+        }
+
+        freeBlocks = 0;
+        for (block = 5; block < card->cBlock; block++) {
+            if (fatp[block] == 0) {
+                freeBlocks++;
+            }
+        }
+        if (freeBlocks != fatp[3]) {
+            ++errors;
+            current = i;
+            card->fatBlock = NULL;
+            continue;
+        }
+    }
+
+    if (errors == 0) {
+        if (card->fatBlock == NULL) {
+            if ((s16)fat[0][2] - (s16)fat[1][2] < 0) {
+                current = 0;
+            } else {
+                current = 1;
+            }
+            card->fatBlock = fat[current];
+            memcpy(fat[current], fat[current ^ 1], 0x2000);
+        } else {
+            current = card->fatBlock == fat[0] ? 0 : 1;
+        }
+    }
+
+    if (currentOut != NULL) {
+        *currentOut = current;
+    }
+    return errors;
+}
+#endif
+
 #if defined(SDK_EXACT_800AE3F0_800AE9FC) || \
     defined(SDK_EXACT_800AF474_800AF8A0) || \
-    defined(SDK_EXACT_800B1788_800B2070)
+    defined(SDK_EXACT_800B1788_800B2070) || \
+    defined(SDK_EXACT_800B2070_800B2968)
 #define SDK_RANGE_EXACT_ACTIVE
 #endif
 
