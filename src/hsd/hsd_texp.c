@@ -3377,6 +3377,21 @@ void fn_801B278C(s32 enable) {
 }
 #pragma pop
 
+/* 0x801B27DC | 0x9C */
+void fn_801B27DC(u32 enable, s32 func, u32 update) {
+    u32 enable_state = enable != 0;
+    u32 update_state = update != 0;
+
+    if ((u8)lbl_8047B338 != (u8)enable_state ||
+        lbl_8047B334 != func ||
+        (u8)lbl_8047B330 != (u8)update_state) {
+        GXSetZMode(enable_state, func, update_state);
+        lbl_8047B338 = enable_state;
+        lbl_8047B334 = func;
+        lbl_8047B330 = update_state;
+    }
+}
+
 /* 0x801B2878 | 0x40 */
 #pragma push
 #pragma optimization_level 1

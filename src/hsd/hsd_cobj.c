@@ -2658,11 +2658,193 @@ void fn_80197400(void)
 }
 #pragma pop
 
+/* 0x801974A8 | 0x154 */
+void fn_801974A8(void)
+{
+    extern HSD_ZListNode* lbl_8047B24C;
+    extern HSD_ZListNode* lbl_8047B250;
+    extern HSD_ZListNode* lbl_8047B258;
+    extern s32 lbl_8047B254;
+    extern s32 lbl_8047B25C;
+    extern HSD_ZListNode** lbl_80478C64;
+    extern HSD_ZListNode** lbl_80478C68;
+    extern HSD_ZListNode** lbl_80478C6C;
+    HSD_ZListNode* list;
+    f32 (*vmtx)[4];
+
+    vmtx = (f32 (*)[4])((u8*)HSD_CObjGetCurrent() + 0x54);
+
+    for (list = lbl_8047B250; list != NULL; list = list->sort.texedge) {
+        HSD_JOBJ_METHOD((HSD_JObj*)list->jobj)
+            ->disp((HSD_JObj*)list->jobj,
+                   list->vmtx != NULL ? list->vmtx : vmtx,
+                   list->projection_mtx, 4, list->rendermode);
+    }
+
+    for (list = lbl_8047B258; list != NULL;
+         list = list->sort.translucent) {
+        HSD_JOBJ_METHOD((HSD_JObj*)list->jobj)
+            ->disp((HSD_JObj*)list->jobj,
+                   list->vmtx != NULL ? list->vmtx : vmtx,
+                   list->projection_mtx, 2, list->rendermode);
+    }
+
+    for (list = lbl_8047B24C; list != NULL; ) {
+        HSD_ZListNode* next = list->next;
+        if (list->vmtx != NULL) {
+            HSD_MtxFree(list->vmtx);
+        }
+        HSD_ObjFree(lbl_80465348, list);
+        list = next;
+    }
+
+    lbl_8047B24C = NULL;
+    lbl_80478C64 = &lbl_8047B24C;
+    lbl_8047B250 = NULL;
+    lbl_80478C68 = &lbl_8047B250;
+    lbl_8047B254 = 0;
+    lbl_8047B258 = NULL;
+    lbl_80478C6C = &lbl_8047B258;
+    lbl_8047B25C = 0;
+}
+
+#define ZLIST_NEXT(list, offset) \
+    (*(HSD_ZListNode**)((u8*)(list) + (offset)))
+
+/* 0x80197650 | 0x134 */
+HSD_ZListNode* fn_80197650(HSD_ZListNode* list, s32 count, u32 offset)
+{
+    HSD_ZListNode* fore;
+    HSD_ZListNode* hind;
+    HSD_ZListNode** current;
+    s32 fore_count;
+    s32 hind_count;
+    s32 i;
+
+    if (count <= 1) {
+        if (list != NULL) {
+            ZLIST_NEXT(list, offset) = NULL;
+        }
+        return list;
+    }
+
+    fore_count = count / 2;
+    hind_count = count - fore_count;
+
+    hind = list;
+    for (i = 0; i < fore_count; i++) {
+        hind = ZLIST_NEXT(hind, offset);
+    }
+
+    fore = fn_80197650(list, fore_count, offset);
+    hind = fn_80197650(hind, hind_count, offset);
+
+    list = NULL;
+    current = &list;
+    while (fore != NULL && hind != NULL) {
+        if (fore->projection_mtx[2][3] <= hind->projection_mtx[2][3]) {
+            *current = fore;
+            fore = ZLIST_NEXT(fore, offset);
+        } else {
+            *current = hind;
+            hind = ZLIST_NEXT(hind, offset);
+        }
+        current = &ZLIST_NEXT(*current, offset);
+    }
+
+    if (fore != NULL) {
+        *current = fore;
+    } else if (hind != NULL) {
+        *current = hind;
+    }
+
+    return list;
+}
+
+#undef ZLIST_NEXT
+
+/* 0x80197784 | 0x214 */
+void fn_80197784(HSD_JObj* jobj, f32 vmtx[3][4], u32 trsp_mask,
+                 u32 rendermode)
+{
+    extern void* HSD_ObjAlloc(void* allocator);
+    extern s32 lbl_8047B244;
+    extern HSD_ZListNode** lbl_80478C64;
+    extern HSD_ZListNode** lbl_80478C68;
+    extern HSD_ZListNode** lbl_80478C6C;
+    extern s32 lbl_8047B254;
+    extern s32 lbl_8047B25C;
+    HSD_ZListNode* list;
+    f32 pmtx[3][4];
+    u32 trsp_bits;
+
+    if ((jobj->flags & JOBJ_HIDDEN) != 0) {
+        return;
+    }
+
+    trsp_bits = jobj->flags & (trsp_mask << 18);
+    if (trsp_bits == 0) {
+        return;
+    }
+
+    HSD_JObjSetupMatrix(jobj);
+
+    if (vmtx == NULL) {
+        vmtx = (f32 (*)[4])((u8*)HSD_CObjGetCurrent() + 0x54);
+    }
+
+    HSD_JOBJ_METHOD(jobj)->make_pmtx(jobj, vmtx, pmtx);
+
+    if ((trsp_bits & JOBJ_ROOT_OPA) != 0) {
+        HSD_JOBJ_METHOD(jobj)->disp(jobj, vmtx, pmtx, HSD_TRSP_OPA,
+                                    rendermode);
+    }
+
+    if (lbl_8047B244 == 0) {
+        if ((trsp_bits & JOBJ_ROOT_TEXEDGE) != 0) {
+            HSD_JOBJ_METHOD(jobj)->disp(jobj, vmtx, pmtx,
+                                        HSD_TRSP_TEXEDGE, rendermode);
+        }
+        if ((trsp_bits & JOBJ_ROOT_XLU) != 0) {
+            HSD_JOBJ_METHOD(jobj)->disp(jobj, vmtx, pmtx, HSD_TRSP_XLU,
+                                        rendermode);
+        }
+        return;
+    }
+
+    if ((trsp_bits & (JOBJ_ROOT_TEXEDGE | JOBJ_ROOT_XLU)) == 0) {
+        return;
+    }
+
+    list = HSD_ObjAlloc(lbl_80465348);
+    memset(&list->vmtx, 0, 0x18);
+    PSMTXCopy(&pmtx[0][0], &list->projection_mtx[0][0]);
+    if (vmtx != NULL) {
+        list->vmtx = HSD_MtxAlloc();
+        PSMTXCopy(&vmtx[0][0], list->vmtx);
+    }
+    list->jobj = jobj;
+    list->rendermode = rendermode;
+    *lbl_80478C64 = list;
+    lbl_80478C64 = &list->next;
+
+    if ((trsp_bits & JOBJ_ROOT_TEXEDGE) != 0) {
+        *lbl_80478C68 = list;
+        lbl_80478C68 = &list->sort.texedge;
+        lbl_8047B254 += 1;
+    }
+    if ((trsp_bits & JOBJ_ROOT_XLU) != 0) {
+        *lbl_80478C6C = list;
+        lbl_80478C6C = &list->sort.translucent;
+        lbl_8047B25C += 1;
+    }
+}
+
 /* 0x801975FC | 0x54 */
 #pragma push
 #pragma optimization_level 1
 #pragma optimizewithasm off
-extern u32 fn_80197650(u32, u32, u32);
+extern HSD_ZListNode* fn_80197650(HSD_ZListNode*, s32, u32);
 #if 0
 asm void fn_801975FC(void) {
 #include "src/hsd/hsd_cobj_fn_801975FC.inc"
@@ -2670,9 +2852,9 @@ asm void fn_801975FC(void) {
 #else
 void fn_801975FC(void) {
     extern s32 lbl_8047B248;
-    extern u32 lbl_8047B250;
+    extern HSD_ZListNode* lbl_8047B250;
     extern u32 lbl_8047B254;
-    extern u32 lbl_8047B258;
+    extern HSD_ZListNode* lbl_8047B258;
     extern u32 lbl_8047B25C;
     if (lbl_8047B248 == 0) return;
     lbl_8047B250 = fn_80197650(lbl_8047B250, lbl_8047B254, 0x3c);

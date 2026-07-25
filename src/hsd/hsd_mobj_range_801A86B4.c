@@ -12,6 +12,8 @@
 /* Object / class helpers (DTK names). */
 extern void  fn_801A6960(void* ptr);   /* HSD_MemFree  */
 extern void* fn_801A6928(s32 size);    /* HSD_MemAlloc */
+extern s32   HSD_GetNbBits(u32 value);
+extern void* memset(void* dst, int value, u32 size);
 extern void  __assert(const char* file, u32 line, const char* expression);
 extern void  hsdInitClassInfo(void* info, void* parent, const char* library,
                               const char* name, u32 size, u32 flags);
@@ -23,6 +25,8 @@ extern u8    hsdObj[];               /* data class info                  */
 extern u8    lbl_8036C638[];         /* data parent class info           */
 extern u32   lbl_8036CC40[];         /* performance counters             */
 extern const char lbl_80274EC8[];    /* rodata string                    */
+extern const char lbl_80274E90[];    /* objalloc.c strings               */
+extern const char lbl_8047DC98;      /* non-null allocation data         */
 extern const char lbl_8047DCA0;      /* sdata2 string                    */
 extern const char lbl_8047DCA8;      /* sdata2 string                    */
 extern const char lbl_8047DCB0;      /* sdata2 string                    */
@@ -145,6 +149,46 @@ void HSD_MtxGetTranslate(f32 mtx[3][4], f32* vec) {
 /* Address: 0x801AA350 | Size: 0xC  -- already-banked (GC/1.3, calibration) */
 void _HSD_ObjAllocForgetMemory(void) {
     lbl_8047B2E0 = 0;
+}
+
+/* Address: 0x801AA35C | Size: 0x13C */
+void HSD_ObjAllocInit(void* data, u32 size, u32 align)
+{
+    void** current;
+
+    if (data == NULL) {
+        __assert(lbl_80274E90, 0x1AE, &lbl_8047DC98);
+    }
+
+    if (data != NULL) {
+        current = &lbl_8047B2E0;
+        while (*current != NULL) {
+            if (*current == data) {
+                *current = *(void**)((u8*)*current + 0x28);
+                break;
+            }
+            current = (void**)((u8*)*current + 0x28);
+        }
+    } else {
+        lbl_8047B2E0 = NULL;
+    }
+
+    memset(data, 0, 0x2C);
+    *(s32*)((u8*)data + 0x14) = -1;
+    *(u32*)((u8*)data + 0x18) = 0;
+    *(s32*)((u8*)data + 0x1C) = -1;
+
+    if (align > 0x20) {
+        __assert(lbl_80274E90, 0x1B9, lbl_80274E90 + 0xC);
+    }
+    if (HSD_GetNbBits(align) != 1) {
+        __assert(lbl_80274E90, 0x1BA, lbl_80274E90 + 0x18);
+    }
+
+    *(u32*)((u8*)data + 0x24) = align;
+    *(u32*)((u8*)data + 0x20) = (size + align - 1) & ~(align - 1);
+    *(void**)((u8*)data + 0x28) = lbl_8047B2E0;
+    lbl_8047B2E0 = data;
 }
 
 /* Address: 0x801AA498 | Size: 0x34  -- HSD_ObjFree (from backup hsd_pobj_disp.c) */
