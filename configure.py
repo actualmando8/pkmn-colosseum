@@ -3479,6 +3479,18 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                CodeCandidate,
+                "hsd/hsd_robj_range_801AE008.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_range_801AEBE4.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
                 Matching,
                 "hsd/hsd_range_801B0158.c",
                 mw_version="GC/1.3",
