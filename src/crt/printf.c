@@ -19,7 +19,9 @@ extern u8 __files[];
 extern void __begin_critical_region(s32 region);
 extern void __end_critical_region(s32 region);
 extern s32 fwide(__FILE* file, s32 mode);
-extern s32 __pformatter(WriteFunc writefunc, __FILE* file, const char* fmt, va_list args);
+typedef void* (*WriteProcT)(void*, const char*, u32);
+int __pformatter_800C88BC(WriteProcT WriteProc, void* WriteProcArg,
+                          const char* format_str, va_list arg);
 void* __FileWrite(void* pFile, const char* pBuffer, u32 char_num);
 
 /* vsprintf - 0x800C8600 | size: 0x78 */
@@ -31,7 +33,7 @@ s32 vsprintf(char* buf, const char* fmt, va_list args) {
     sf.p = buf;
     sf.a = -1;
     sf.b = 0;
-    n = __pformatter((WriteFunc)__StringWrite, (__FILE*)&sf, fmt, args);
+    n = __pformatter_800C88BC((WriteProcT)__StringWrite, &sf, fmt, args);
     if (buf != NULL) {
         s32 idx = -2;
         if ((u32)n < 0xFFFFFFFFU)
@@ -51,7 +53,7 @@ s32 vprintf(const char* fmt, va_list args) {
     }
 
     __begin_critical_region(2);
-    result = __pformatter((WriteFunc)__FileWrite, stdout_file, fmt, args);
+    result = __pformatter_800C88BC((WriteProcT)__FileWrite, stdout_file, fmt, args);
     __end_critical_region(2);
 
     return result;
@@ -69,7 +71,7 @@ s32 printf(const char* fmt, ...) {
 
     __begin_critical_region(2);
     __builtin_va_info(&args);
-    result = __pformatter((WriteFunc)__FileWrite, stdout_file, fmt, args);
+    result = __pformatter_800C88BC((WriteProcT)__FileWrite, stdout_file, fmt, args);
     __end_critical_region(2);
 
     return result;
@@ -120,6 +122,283 @@ void* __FileWrite(void* pFile, const char* pBuffer, u32 char_num) {
     extern u32 fwrite(const void* ptr, u32 size, u32 count, void* file);
 
     return (fwrite(pBuffer, 1, char_num, pFile) == char_num ? pFile : 0);
+}
+
+extern void* __va_arg(void* ap, u32 kind);
+extern char* strchr(const char* s, int c);
+extern u32 strlen(const char* s);
+extern void* memchr(const void* s, int c, u32 n);
+extern s32 wcstombs(char* dst, const u16* src, u32 n);
+
+const char* parse_format_800CA11C(const char* format_string, va_list* arg,
+                                  print_format* format);
+char* longlong2str_800C9BB0(signed long long num, char* pBuf, print_format fmt);
+char* long2str_800C9EC4(signed long num, char* buff, print_format format);
+char* float2str(f64 num, char* buff, print_format format);
+char* double2hex(f64 num, char* buff, print_format format);
+
+/* __pformatter - 0x800C88BC */
+int __pformatter_800C88BC(WriteProcT WriteProc, void* WriteProcArg,
+                          const char* format_str, va_list arg) {
+    int num_chars, chars_written, field_width;
+    const char* format_ptr;
+    const char* curr_format;
+    print_format format;
+    signed long long_num;
+    signed long long long_long_num;
+    f64 long_double_num;
+    char buff[512];
+    char* buff_ptr;
+    char* string_end;
+    char fill_char = ' ';
+
+    format_ptr = format_str;
+    chars_written = 0;
+
+    while (*format_ptr) {
+        if (!(curr_format = strchr(format_ptr, '%'))) {
+            num_chars = strlen(format_ptr);
+            chars_written += num_chars;
+
+            if (num_chars && !(*WriteProc)(WriteProcArg, format_ptr, num_chars)) {
+                return -1;
+            }
+            break;
+        }
+
+        num_chars = curr_format - format_ptr;
+        chars_written += num_chars;
+
+        if (num_chars && !(*WriteProc)(WriteProcArg, format_ptr, num_chars)) {
+            return -1;
+        }
+
+        format_ptr = curr_format;
+        format_ptr = parse_format_800CA11C(format_ptr, (va_list*)arg, &format);
+
+        switch (format.conversion_char) {
+        case 'd':
+        case 'i':
+            if (format.argument_options == long_argument) {
+                long_num = *(signed long*)__va_arg(arg, 1);
+            } else if (format.argument_options == long_long_argument) {
+                long_long_num = *(signed long long*)__va_arg(arg, 2);
+            } else {
+                long_num = *(int*)__va_arg(arg, 1);
+            }
+
+            if (format.argument_options == short_argument) {
+                long_num = (signed short)long_num;
+            }
+            if (format.argument_options == char_argument) {
+                long_num = (signed char)long_num;
+            }
+
+            if ((format.argument_options == long_long_argument)) {
+                if (!(buff_ptr = longlong2str_800C9BB0(long_long_num, buff + 512,
+                                                       format))) {
+                    goto conversion_error;
+                }
+            } else {
+                if (!(buff_ptr = long2str_800C9EC4(long_num, buff + 512, format))) {
+                    goto conversion_error;
+                }
+            }
+
+            num_chars = buff + 512 - 1 - buff_ptr;
+            break;
+
+        case 'o':
+        case 'u':
+        case 'x':
+        case 'X':
+            if (format.argument_options == long_argument) {
+                long_num = *(unsigned long*)__va_arg(arg, 1);
+            } else if (format.argument_options == long_long_argument) {
+                long_long_num = *(signed long long*)__va_arg(arg, 2);
+            } else {
+                long_num = *(unsigned int*)__va_arg(arg, 1);
+            }
+
+            if (format.argument_options == short_argument) {
+                long_num = (unsigned short)long_num;
+            }
+            if (format.argument_options == char_argument) {
+                long_num = (unsigned char)long_num;
+            }
+
+            if ((format.argument_options == long_long_argument)) {
+                if (!(buff_ptr = longlong2str_800C9BB0(long_long_num, buff + 512,
+                                                       format))) {
+                    goto conversion_error;
+                }
+            } else {
+                if (!(buff_ptr = long2str_800C9EC4(long_num, buff + 512, format))) {
+                    goto conversion_error;
+                }
+            }
+
+            num_chars = buff + 512 - 1 - buff_ptr;
+            break;
+
+        case 'f':
+        case 'F':
+        case 'e':
+        case 'E':
+        case 'g':
+        case 'G':
+            if (format.argument_options == long_double_argument) {
+                long_double_num = *(f64*)__va_arg(arg, 3);
+            } else {
+                long_double_num = *(f64*)__va_arg(arg, 3);
+            }
+
+            if (!(buff_ptr = float2str(long_double_num, buff + 512, format))) {
+                goto conversion_error;
+            }
+
+            num_chars = buff + 512 - 1 - buff_ptr;
+            break;
+
+        case 'a':
+        case 'A':
+            if (format.argument_options == long_double_argument) {
+                long_double_num = *(f64*)__va_arg(arg, 3);
+            } else {
+                long_double_num = *(f64*)__va_arg(arg, 3);
+            }
+
+            if (!(buff_ptr = double2hex(long_double_num, buff + 512, format))) {
+                goto conversion_error;
+            }
+
+            num_chars = buff + 512 - 1 - buff_ptr;
+            break;
+
+        case 's':
+            if (format.argument_options == wchar_argument) {
+                u16* wcs_ptr = *(u16**)__va_arg(arg, 1);
+
+                if (wcs_ptr == NULL) {
+                    wcs_ptr = (u16*)L"";
+                }
+
+                if ((num_chars = wcstombs(buff, wcs_ptr, sizeof(buff))) < 0) {
+                    goto conversion_error;
+                }
+
+                buff_ptr = &buff[0];
+            } else {
+                buff_ptr = *(char**)__va_arg(arg, 1);
+            }
+
+            if (buff_ptr == NULL) {
+                buff_ptr = "";
+            }
+
+            if (format.alternate_form) {
+                num_chars = (unsigned char)*buff_ptr++;
+
+                if (format.precision_specified && num_chars > format.precision) {
+                    num_chars = format.precision;
+                }
+            } else if (format.precision_specified) {
+                num_chars = format.precision;
+
+                if ((string_end = (char*)memchr((unsigned char*)buff_ptr, 0,
+                                                num_chars)) != 0) {
+                    num_chars = string_end - buff_ptr;
+                }
+            } else {
+                num_chars = strlen(buff_ptr);
+            }
+            break;
+
+        case 'n':
+            buff_ptr = *(char**)__va_arg(arg, 1);
+
+            switch (format.argument_options) {
+            case normal_argument:
+                *(int*)buff_ptr = chars_written;
+                break;
+            case short_argument:
+                *(signed short*)buff_ptr = chars_written;
+                break;
+            case long_argument:
+                *(signed long*)buff_ptr = chars_written;
+                break;
+            case long_long_argument:
+                *(signed long long*)buff_ptr = chars_written;
+                break;
+            }
+            continue;
+
+        case 'c':
+            buff_ptr = buff;
+            *buff_ptr = *(int*)__va_arg(arg, 1);
+            num_chars = 1;
+            break;
+
+        case '%':
+            buff_ptr = buff;
+            *buff_ptr = '%';
+            num_chars = 1;
+            break;
+
+        case 0xFF:
+        default:
+        conversion_error:
+            num_chars = strlen(curr_format);
+            chars_written += num_chars;
+
+            if (num_chars && !(*WriteProc)(WriteProcArg, curr_format, num_chars)) {
+                return -1;
+            }
+            return chars_written;
+            break;
+        }
+
+        field_width = num_chars;
+
+        if (format.justification_options != left_justification) {
+            fill_char = (format.justification_options == zero_fill) ? '0' : ' ';
+
+            if (((*buff_ptr == '+') || (*buff_ptr == '-') || (*buff_ptr == ' ')) &&
+                (fill_char == '0')) {
+                if ((*WriteProc)(WriteProcArg, buff_ptr, 1) == 0) {
+                    return -1;
+                }
+                ++buff_ptr;
+                num_chars--;
+            }
+
+            while (field_width < format.field_width) {
+                if ((*WriteProc)(WriteProcArg, &fill_char, 1) == 0) {
+                    return -1;
+                }
+                ++field_width;
+            }
+        }
+
+        if (num_chars && !(*WriteProc)(WriteProcArg, buff_ptr, num_chars)) {
+            return -1;
+        }
+
+        if (format.justification_options == left_justification) {
+            while (field_width < format.field_width) {
+                char blank = ' ';
+
+                if ((*WriteProc)(WriteProcArg, &blank, 1) == 0) {
+                    return -1;
+                }
+                ++field_width;
+            }
+        }
+
+        chars_written += field_width;
+    }
+
+    return chars_written;
 }
 
 /* round_decimal - 0x800C974C */
