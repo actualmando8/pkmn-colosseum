@@ -327,6 +327,144 @@ void fn_801AB63C(u32 first, u32 second)
 }
 #pragma pop
 
+/* Shape-anim source decoders. The retail range keeps the sysdolphin
+ * pobj.c bodies (assert/panic lines 1145/1188 and 1082/1125), so the
+ * component fetch below mirrors that source one-for-one. */
+
+/* Address: 0x801AC4BC | Size: 0x460  -- fetch one shape-anim normal */
+void get_shape_normal_xyz(HSD_ShapeSet* shape_set, s32 shape_id, s32 arrayidx,
+                          f32 dst[3])
+{
+    extern void __assert(const char*, s32, const char*);
+    extern void HSD_Panic(const char*, s32, const char*);
+    extern void* memcpy(void* dst, const void* src, u32 size);
+    extern char lbl_8047DCB8;
+
+    u8* index_array = shape_set->normal_idx_list[shape_id];
+    s32 idx;
+    void* src_base;
+
+    if ((s32) shape_set->normal_desc->attr_type == 3) {
+        idx = index_array[arrayidx * 2];
+        idx = (idx << 8) + index_array[arrayidx * 2 + 1];
+    } else {
+        idx = index_array[arrayidx];
+    }
+
+    if ((s32) shape_set->normal_desc->comp_cnt != 0) {
+        __assert(&lbl_8047DCB8, 1145,
+                 "shape_set->normal_desc->comp_cnt == GX_NRM_XYZ");
+    }
+
+    src_base = ((u8*) shape_set->normal_desc->vertex) +
+               idx * shape_set->normal_desc->stride;
+
+    if ((s32) shape_set->normal_desc->comp_type == 4) {
+        memcpy(dst, src_base, sizeof(f32[3]));
+    } else {
+        s32 decimal_point = 1 << shape_set->normal_desc->frac;
+        switch ((s32) shape_set->normal_desc->comp_type) {
+        case 0: {
+            u8* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        case 1: {
+            s8* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        case 2: {
+            u16* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        case 3: {
+            s16* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        default:
+            HSD_Panic(&lbl_8047DCB8, 1188, "unexpected normal type.");
+        }
+    }
+}
+
+/* Address: 0x801AC91C | Size: 0x460  -- fetch one shape-anim vertex */
+void get_shape_vertex_xyz(HSD_ShapeSet* shape_set, s32 shape_id, s32 arrayidx,
+                          f32 dst[3])
+{
+    extern void __assert(const char*, s32, const char*);
+    extern void HSD_Panic(const char*, s32, const char*);
+    extern void* memcpy(void* dst, const void* src, u32 size);
+    extern char lbl_8047DCB8;
+
+    u8* index_array = shape_set->vertex_idx_list[shape_id];
+    s32 idx;
+    void* src_base;
+
+    if ((s32) shape_set->vertex_desc->attr_type == 3) {
+        idx = index_array[arrayidx * 2];
+        idx = (idx << 8) + index_array[arrayidx * 2 + 1];
+    } else {
+        idx = index_array[arrayidx];
+    }
+
+    if ((s32) shape_set->vertex_desc->comp_cnt != 1) {
+        __assert(&lbl_8047DCB8, 1082,
+                 "shape_set->vertex_desc->comp_cnt == GX_POS_XYZ");
+    }
+
+    src_base = ((u8*) shape_set->vertex_desc->vertex) +
+               idx * shape_set->vertex_desc->stride;
+
+    if ((s32) shape_set->vertex_desc->comp_type == 4) {
+        memcpy(dst, src_base, sizeof(f32[3]));
+    } else {
+        s32 decimal_point = 1 << shape_set->vertex_desc->frac;
+        switch ((s32) shape_set->vertex_desc->comp_type) {
+        case 0: {
+            u8* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        case 1: {
+            s8* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        case 2: {
+            u16* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        case 3: {
+            s16* src = src_base;
+            dst[0] = (f32) src[0] / decimal_point;
+            dst[1] = (f32) src[1] / decimal_point;
+            dst[2] = (f32) src[2] / decimal_point;
+            break;
+        }
+        default:
+            HSD_Panic(&lbl_8047DCB8, 1125, "unexpected vertex type.\n");
+        }
+    }
+}
+
 /* Address: 0x801ADC08 | Size: 0x34  -- Forget RNG memory state */
 void _HSD_RandForgetMemory(void)
 {
