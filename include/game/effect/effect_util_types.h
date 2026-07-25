@@ -700,7 +700,7 @@ extern u8 lbl_8047D0E8[4];
 
 extern void mailChkReceiveMail(void);
 
-extern void mailAddMailbox(void);
+extern BOOL mailAddMailbox(s32 mailId);
 
 extern void mailMainReceiveStart(void);
 

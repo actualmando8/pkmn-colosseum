@@ -1028,6 +1028,53 @@ s32 HSD_Index2TevStage(u32 index)
 }
 #pragma pop
 
+static inline s32 HSD_TevStage2Num(s32 stage)
+{
+    switch (stage) {
+    case 0:  return 1;
+    case 1:  return 2;
+    case 2:  return 3;
+    case 3:  return 4;
+    case 4:  return 5;
+    case 5:  return 6;
+    case 6:  return 7;
+    case 7:  return 8;
+    case 8:  return 9;
+    case 9:  return 10;
+    case 10: return 11;
+    case 11: return 12;
+    case 12: return 13;
+    case 13: return 14;
+    case 14: return 15;
+    case 15: return 16;
+    default:
+        __assert((const char*)&lbl_8047DE60, 0x37A,
+                 (const char*)&lbl_8047DE68);
+        return 0;
+    }
+}
+
+/*
+ * HSD_SetupTevStageAll - 0x801B3408 | Size: 0x230
+ * Configure every descriptor and publish the highest active TEV stage count.
+ */
+void fn_801B3408(HSD_TevDesc* desc)
+{
+    s32 num = 0;
+    HSD_TevDesc* td;
+
+    for (td = desc; td != NULL; td = td->next) {
+        s32 stageCount = HSD_TevStage2Num(td->stage);
+        if (stageCount > num) {
+            num = stageCount;
+        }
+        fn_801B3638(td);
+    }
+    lbl_8047B370 = num;
+    fn_800BC8C8((u8)lbl_8047B370);
+    lbl_8047B370 = 0;
+}
+
 /* Address: 0x801B3770 | Size: 0x30 */
 
 
@@ -3329,6 +3376,21 @@ void fn_801B278C(s32 enable) {
     }
 }
 #pragma pop
+
+/* 0x801B27DC | 0x9C */
+void fn_801B27DC(u32 enable, s32 func, u32 update) {
+    u32 enable_state = enable != 0;
+    u32 update_state = update != 0;
+
+    if ((u8)lbl_8047B338 != (u8)enable_state ||
+        lbl_8047B334 != func ||
+        (u8)lbl_8047B330 != (u8)update_state) {
+        GXSetZMode(enable_state, func, update_state);
+        lbl_8047B338 = enable_state;
+        lbl_8047B334 = func;
+        lbl_8047B330 = update_state;
+    }
+}
 
 /* 0x801B2878 | 0x40 */
 #pragma push

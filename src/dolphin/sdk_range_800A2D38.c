@@ -238,6 +238,42 @@ void PSMTXScaleApply(const Mtx src, Mtx dst, f32 xS, f32 yS, f32 zS)
 }
 #pragma optimize_for_size reset
 
+void C_MTXLookAt(Mtx m, const Vec* cameraPosition, const Vec* cameraUp,
+                 const Vec* target)
+{
+    extern void PSVECNormalize(const Vec* source, Vec* destination);
+    extern void PSVECCrossProduct(const Vec* first, const Vec* second, Vec* destination);
+    Vec look;
+    Vec right;
+    Vec up;
+
+    look.x = cameraPosition->x - target->x;
+    look.y = cameraPosition->y - target->y;
+    look.z = cameraPosition->z - target->z;
+    PSVECNormalize(&look, &look);
+    PSVECCrossProduct(cameraUp, &look, &right);
+    PSVECNormalize(&right, &right);
+    PSVECCrossProduct(&look, &right, &up);
+
+    m[0][0] = right.x;
+    m[0][1] = right.y;
+    m[0][2] = right.z;
+    m[0][3] = -(cameraPosition->x * right.x + cameraPosition->y * right.y +
+                  cameraPosition->z * right.z);
+
+    m[1][0] = up.x;
+    m[1][1] = up.y;
+    m[1][2] = up.z;
+    m[1][3] = -(cameraPosition->x * up.x + cameraPosition->y * up.y +
+                  cameraPosition->z * up.z);
+
+    m[2][0] = look.x;
+    m[2][1] = look.y;
+    m[2][2] = look.z;
+    m[2][3] = -(cameraPosition->x * look.x + cameraPosition->y * look.y +
+                  cameraPosition->z * look.z);
+}
+
 #pragma peephole off
 void C_MTXLightFrustum(Mtx m, f32 top, f32 bottom, f32 left, f32 right, f32 near,
                        f32 scaleS, f32 scaleT, f32 transS, f32 transT)
@@ -613,4 +649,41 @@ void C_QUATRotAxisRad(Quaternion* quat, const Vec* axis, f32 rad)
     quat->w = cosHalf;
 }
 #pragma dont_inline reset
+
+void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t)
+{
+    extern f32 acosf(f32 x);
+    extern f32 sinf(f32 x);
+    extern const f32 lbl_8047C2C8;
+    extern const f32 lbl_8047C2CC;
+    extern const f32 lbl_8047C2D4;
+    f32 theta;
+    f32 sinTheta;
+    f32 cosTheta;
+    f32 pScale;
+    f32 qScale;
+
+    cosTheta = p->x * q->x + p->y * q->y + p->z * q->z + p->w * q->w;
+    qScale = lbl_8047C2CC;
+
+    if (cosTheta < lbl_8047C2C8) {
+        cosTheta = -cosTheta;
+        qScale = -qScale;
+    }
+
+    if (cosTheta <= lbl_8047C2D4) {
+        theta = acosf(cosTheta);
+        sinTheta = sinf(theta);
+        pScale = sinf((lbl_8047C2CC - t) * theta) / sinTheta;
+        qScale *= sinf(t * theta) / sinTheta;
+    } else {
+        pScale = lbl_8047C2CC - t;
+        qScale *= t;
+    }
+
+    r->x = pScale * p->x + qScale * q->x;
+    r->y = pScale * p->y + qScale * q->y;
+    r->z = pScale * p->z + qScale * q->z;
+    r->w = pScale * p->w + qScale * q->w;
+}
 #endif

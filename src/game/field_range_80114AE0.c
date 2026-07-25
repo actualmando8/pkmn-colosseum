@@ -1600,6 +1600,96 @@ void pokemonSetLevelBasisStatus(void);
 void heroItemGetItemKindToItemAryPtr(void);
 void heroSetStatus();
 void heroGetStatus(void);
+
+typedef struct FloorMapPublic {
+    void** models;
+    void* camera;
+    void** lights;
+    void** extra;
+} FloorMapPublic;
+
+extern void HSD_ArchiveParse(void* archive, void* buffer, u32 size);
+extern void* HSD_ArchiveGetPublicAddress(void* archive, const char* name);
+extern void* GSresRegisterResource(void* resource, u32 owner, u32 id,
+                                   void* unload);
+extern void* GSlightLoad(void* light);
+extern void* fn_800D27FC(void* camera);
+extern void floorInitMap(u32 owner, u32 param);
+extern u8 lbl_80272200[];
+
+/*
+ * floorReadMapPostFunc - 0x80114AE0 | Size: 0x1C8
+ * Parse a map archive and register its models, lights, camera, and auxiliary
+ * resource with the floor resource manager.
+ */
+void* floorReadMapPostFunc(u32 owner, u32 param, u32 size)
+{
+    FloorMapPublic* public;
+    void* archive;
+    void* resource;
+    u32 index;
+    u32 offset;
+    u32 group;
+    const char* strings = (const char*) lbl_80272200;
+
+    index = 0;
+    archive = GSresGetResource(owner, param);
+    HSD_ArchiveParse(archive, (u8*) archive + 0x60, size);
+    public = HSD_ArchiveGetPublicAddress(archive, strings + 0xAC);
+    if (public == NULL) {
+        return NULL;
+    }
+
+    floorDataBiosSetMapResID(floorDataBiosGetCurrentPtr(), param);
+    if (public->models != NULL) {
+        offset = 0;
+        group = (param & 0x7FFF0000) | 0x1000;
+        while ((resource = public->models[offset]) != NULL) {
+            GSresRegisterResource(resource, owner, group | index, NULL);
+            offset++;
+            index++;
+        }
+    }
+
+    if (public->lights != NULL) {
+        index = 0;
+        offset = 0;
+        group = (param & 0x7FFF0000) | 0x1600;
+        while ((resource = public->lights[offset]) != NULL) {
+            resource = GSlightLoad(resource);
+            if (resource == NULL) {
+                GSlogWrite(strings + 0x298, index);
+                GSlogWrite(strings + 0x2D0);
+            } else {
+                GSresRegisterResource(resource, owner, group | index,
+                                      (void*) _unloadLight__FPvUlUl);
+            }
+            offset++;
+            index++;
+        }
+    }
+
+    group = (param & 0x7FFF0000) | 0x1800;
+    if (public == NULL) {
+        GSlogWrite(strings + 0x1CC);
+    } else {
+        resource = fn_800D27FC(public->camera);
+        if (resource == NULL) {
+            GSlogWrite(strings + 0x200);
+        } else {
+            GSresRegisterResource(resource, owner, group,
+                                  (void*) _unloadCamera__FPvUlUl);
+        }
+    }
+
+    if (public->extra != NULL && *public->extra != NULL) {
+        GSresRegisterResource(*public->extra, owner,
+                              (param & 0x7FFF0000) | 0x1A00, NULL);
+    }
+    floorInitMap(owner, param);
+    return public;
+}
+
 /* 0x70 | floorReadMapPreFunc | alloc_wrapper */
 extern void* GSresAllocResourceAlign();  /* K&R: called with 5 args, returns void* */
 #pragma push
