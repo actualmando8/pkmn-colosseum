@@ -1548,22 +1548,6 @@ void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id) {
     }
 }
 
-/*
- * HSD_TObjMakeTExp - 0x801B750C | Size: 0x6C8
- * Build a texture expression tree from a TObj chain.
- * This is the main entry point for building the TExp tree
- * that will be compiled into TEV stages.
- */
-void fn_801B750C(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
-                  void** c_expr, void** a_expr, void** list) {
-    /* Walk the TObj chain and create TExp nodes for each layer.
-     * Handles all colormap/alphamap modes and light map interactions.
-     */
-    if (tobj == NULL) {
-        return;
-    }
-}
-
 typedef struct ColTExpNode ColTExpNode;
 
 typedef struct ColTEArg {
@@ -1624,6 +1608,41 @@ static inline s32 ColTExpGetType(ColTExpNode* exp)
         return COL_TE_RAS;
     }
     return exp->type;
+}
+
+/*
+ * HSD_TExpUnref - 0x801B750C | Size: 0x6C8
+ * Drop one reference on a TExp node.  Once both the colour and the alpha
+ * reference counts have reached zero the node's own inputs are released as
+ * well, so a dead sub-graph unwinds in a single sweep.
+ */
+void fn_801B750C(ColTExpNode* texp, u8 sel) {
+    s32 i;
+
+    switch (ColTExpGetType(texp)) {
+    case COL_TE_TEV:
+        if (sel == COL_TE_RGB) {
+            if (texp->c_ref != 0) {
+                texp->c_ref -= 1;
+            }
+        } else {
+            if (texp->a_ref != 0) {
+                texp->a_ref -= 1;
+            }
+        }
+        if (texp->c_ref == 0 && texp->a_ref == 0) {
+            for (i = 0; i < 4; i++) {
+                fn_801B750C(texp->c_in[i].exp, texp->c_in[i].sel);
+                fn_801B750C(texp->a_in[i].exp, texp->a_in[i].sel);
+            }
+        }
+        break;
+    case COL_TE_CNST:
+        if (texp->c_scale != 0) {
+            texp->c_scale -= 1;
+        }
+        break;
+    }
 }
 
 /* ========================================================================= */
@@ -2140,21 +2159,42 @@ void fn_801B8D5C(HSD_GObj* gobj) {
 }
 
 /*
- * GObj_SetHSDObj - 0x801B8FB8 | Size: 0x90
- * Set the HSD object (JObj/CObj/LObj) for a GObj.
+ * The neutral TEV argument used whenever an input slot is cleared:
+ * { type = HSD_TE_ZERO, sel = HSD_TE_0, arg = 0xFF, exp = NULL }.
  */
-void HSD_TExpSimplify(HSD_GObj* gobj, u32 obj_kind, void* hsd_obj) {
-    if (gobj == NULL) {
-        return;
-    }
+extern ColTEArg lbl_80478CA0;
 
-    gobj->obj_kind = (u8)obj_kind;
-    gobj->hsd_obj = hsd_obj;
+s32 fn_801B9320(ColTExpNode* tev);
+void fn_801B9048(u32 pass);
+s32 fn_801BAC8C(ColTExpNode* tev);
+s32 fn_801BB4C4(ColTExpNode* tev);
+
+/*
+ * HSD_TExpSimplify - 0x801B8FB8 | Size: 0x90
+ * Run the three peephole passes over one TEV node until they report no
+ * further change, then fold the clamp/range flags.
+ */
+s32 HSD_TExpSimplify(ColTExpNode* texp) {
+    s32 res = 0;
+
+    if (((s32 (*)(ColTExpNode*)) HSD_TExpGetType)(texp) != COL_TE_TEV) {
+        return 0;
+    }
+    if (fn_801BB4C4(texp) != 0) {
+        res = 1;
+    }
+    if (fn_801BAC8C(texp) != 0) {
+        res = 1;
+    }
+    if (fn_801B9320(texp) != 0) {
+        res = 1;
+    }
+    return res;
 }
 
 /*
- * GObj_RenderDispatch - 0x801B9048 | Size: 0x2D8
- * Walk the render list and call render callbacks for each GObj.
+ * 0x801B9048 | Size: 0x2D8
+ * Propagate the clamp/range flags of the source expressions onto this node.
  */
 void fn_801B9048(u32 pass) {
     u32 i;
@@ -2605,41 +2645,398 @@ s32 fn_801B9320(ColTExpNode* tev)
 }
 #pragma pop
 
+/*
+ * SimplifyThis - 0x801BAC8C | Size: 0x838
+ * Local peephole over a single TEV stage: drop unreferenced halves, collapse
+ * multiply/compare forms whose operands became constant, and re-run until the
+ * node stops changing.
+ */
+s32 fn_801BAC8C(ColTExpNode* tev)
+{
+    s32 color_tex;
+    s32 alpha_tex;
+    s32 color_ras;
+    s32 alpha_ras;
+    s32 result;
+    s32 changed;
+    s32 i;
+
+    result = 0;
+    do {
+        color_tex = -1;
+        alpha_tex = -1;
+        color_ras = -1;
+        alpha_ras = -1;
+
+        for (i = 0; i < 4; i++) {
+            switch (tev->c_in[i].type) {
+            case COL_TE_TEX:
+                color_tex = i;
+                break;
+            case COL_TE_RAS:
+                color_ras = i;
+                break;
+            }
+            switch (tev->a_in[i].type) {
+            case COL_TE_TEX:
+                alpha_tex = i;
+                break;
+            case COL_TE_RAS:
+                alpha_ras = i;
+                break;
+            }
+        }
+
+        if (color_tex == -1 && alpha_tex == -1) {
+            tev->tex = NULL;
+            tev->tex_swap = 0xFF;
+        }
+        if (color_ras == -1 && alpha_ras == -1) {
+            tev->chan = 0xFF;
+            tev->ras_swap = 0xFF;
+        }
+
+        changed = 0;
+        if (tev->a_op == 0xFF || tev->a_op == 0xE || tev->a_op == 0xF ||
+            tev->a_op == 0 || tev->a_op == 1)
+        {
+            if (tev->c_op != 0xFF && tev->c_ref == 0) {
+                tev->c_op = 0xFF;
+                for (i = 0; i < 4; i++) {
+                    TEXP_UNREF(tev->c_in[i].exp, tev->c_in[i].sel);
+                    tev->c_in[i] = lbl_80478CA0;
+                }
+                changed = 1;
+            }
+
+            switch (tev->c_op) {
+            case 0:
+            case 1:
+                if (tev->c_in[2].sel == COL_TE_0) {
+                    if (tev->c_in[1].sel != COL_TE_0) {
+                        TEXP_UNREF(tev->c_in[1].exp, tev->c_in[1].sel);
+                        changed = 1;
+                        tev->c_in[1] = lbl_80478CA0;
+                    }
+                    if (tev->c_op == 0 && tev->c_in[3].sel == COL_TE_0) {
+                        changed = 1;
+                        tev->c_in[3] = tev->c_in[0];
+                        tev->c_in[0] = lbl_80478CA0;
+                        tev->c_clamp = 1;
+                    }
+                }
+                if (tev->c_in[2].sel == 8) {
+                    if (tev->c_in[0].sel != COL_TE_0) {
+                        TEXP_UNREF(tev->c_in[0].exp, tev->c_in[0].sel);
+                        changed = 1;
+                        tev->c_in[0] = lbl_80478CA0;
+                    }
+                    if (tev->c_op == 0 && tev->c_in[3].sel == COL_TE_0) {
+                        changed = 1;
+                        tev->c_in[3] = tev->c_in[1];
+                        tev->c_in[1] = lbl_80478CA0;
+                        tev->c_in[2] = lbl_80478CA0;
+                    }
+                }
+                if (tev->c_in[0].sel == COL_TE_0 &&
+                    tev->c_in[1].sel == COL_TE_0 &&
+                    tev->c_in[3].sel == COL_TE_0 && tev->c_bias == 0)
+                {
+                    tev->c_op = 0xFF;
+                    TEXP_UNREF(tev->c_in[2].exp, tev->c_in[2].sel);
+                    changed = 1;
+                    tev->c_in[2] = lbl_80478CA0;
+                }
+                break;
+            case 8:
+            case 10:
+            case 12:
+            case 14:
+                if (tev->c_in[2].sel == COL_TE_0) {
+                    tev->c_op = 0;
+                    TEXP_UNREF(tev->c_in[0].exp, tev->c_in[0].sel);
+                    tev->c_in[0] = lbl_80478CA0;
+                    TEXP_UNREF(tev->c_in[1].exp, tev->c_in[1].sel);
+                    changed = 1;
+                    tev->c_in[1] = lbl_80478CA0;
+                } else if (tev->c_in[0].sel == COL_TE_0) {
+                    tev->c_op = 0;
+                    TEXP_UNREF(tev->c_in[1].exp, tev->c_in[1].sel);
+                    tev->c_in[1] = lbl_80478CA0;
+                    TEXP_UNREF(tev->c_in[2].exp, tev->c_in[2].sel);
+                    changed = 1;
+                    tev->c_in[2] = lbl_80478CA0;
+                }
+                break;
+            case 9:
+            case 11:
+            case 13:
+            case 15:
+                if (tev->c_in[2].sel == COL_TE_0) {
+                    tev->c_op = 0;
+                    TEXP_UNREF(tev->c_in[0].exp, tev->c_in[0].sel);
+                    tev->c_in[0] = lbl_80478CA0;
+                    TEXP_UNREF(tev->c_in[1].exp, tev->c_in[1].sel);
+                    changed = 1;
+                    tev->c_in[1] = lbl_80478CA0;
+                } else if (tev->c_in[0].sel == COL_TE_0 &&
+                           tev->c_in[1].sel == COL_TE_0)
+                {
+                    tev->c_op = 0;
+                    changed = 1;
+                    tev->c_in[0] = tev->c_in[2];
+                    tev->c_in[2] = lbl_80478CA0;
+                }
+                break;
+            }
+        }
+
+        if (tev->a_op != 0xFF && tev->a_ref == 0) {
+            tev->a_op = 0xFF;
+            for (i = 0; i < 4; i++) {
+                TEXP_UNREF(tev->a_in[i].exp, tev->a_in[i].sel);
+                tev->a_in[i] = lbl_80478CA0;
+            }
+            changed = 1;
+        }
+
+        switch (tev->a_op) {
+        case 0:
+        case 1:
+            if (tev->a_in[2].sel == COL_TE_0) {
+                if (tev->a_in[1].sel != COL_TE_0) {
+                    TEXP_UNREF(tev->a_in[1].exp, tev->a_in[1].sel);
+                    changed = 1;
+                    tev->a_in[1] = lbl_80478CA0;
+                }
+                if (tev->a_op == 0 && tev->a_in[3].sel == COL_TE_0) {
+                    changed = 1;
+                    tev->a_in[3] = tev->a_in[0];
+                    tev->a_in[0] = lbl_80478CA0;
+                }
+            }
+            if (tev->a_in[2].sel == 8) {
+                if (tev->a_in[0].sel != COL_TE_0) {
+                    TEXP_UNREF(tev->a_in[0].exp, tev->a_in[0].sel);
+                    changed = 1;
+                    tev->a_in[0] = lbl_80478CA0;
+                }
+                if (tev->a_op == 0 && tev->a_in[3].sel == COL_TE_0) {
+                    changed = 1;
+                    tev->a_in[3] = tev->a_in[1];
+                    tev->a_in[1] = lbl_80478CA0;
+                    tev->a_in[2] = lbl_80478CA0;
+                }
+            }
+            if (tev->a_in[0].sel == COL_TE_0 &&
+                tev->a_in[1].sel == COL_TE_0 && tev->a_in[3].sel == COL_TE_0)
+            {
+                tev->a_op = 0xFF;
+                changed = 1;
+            }
+            break;
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+            if (tev->a_in[2].sel == COL_TE_0) {
+                tev->a_op = 0;
+                TEXP_UNREF(tev->a_in[0].exp, tev->a_in[0].sel);
+                tev->a_in[0] = lbl_80478CA0;
+                TEXP_UNREF(tev->a_in[1].exp, tev->a_in[1].sel);
+                changed = 1;
+                tev->a_in[1] = lbl_80478CA0;
+            }
+            break;
+        case 14:
+            if (tev->a_in[2].sel == COL_TE_0) {
+                tev->a_op = 0;
+                TEXP_UNREF(tev->a_in[0].exp, tev->a_in[0].sel);
+                tev->a_in[0] = lbl_80478CA0;
+                TEXP_UNREF(tev->a_in[1].exp, tev->a_in[1].sel);
+                changed = 1;
+                tev->a_in[1] = lbl_80478CA0;
+            } else if (tev->a_in[0].sel == COL_TE_0) {
+                tev->a_op = 0;
+                TEXP_UNREF(tev->a_in[1].exp, tev->a_in[1].sel);
+                tev->a_in[1] = lbl_80478CA0;
+                TEXP_UNREF(tev->a_in[2].exp, tev->a_in[2].sel);
+                changed = 1;
+                tev->a_in[2] = lbl_80478CA0;
+            }
+            break;
+        case 15:
+            if (tev->a_in[2].sel == COL_TE_0) {
+                tev->a_op = 0;
+                TEXP_UNREF(tev->a_in[0].exp, tev->a_in[0].sel);
+                tev->a_in[0] = lbl_80478CA0;
+                TEXP_UNREF(tev->a_in[1].exp, tev->a_in[1].sel);
+                changed = 1;
+                tev->a_in[1] = lbl_80478CA0;
+            } else if (tev->a_in[0].sel == COL_TE_0 &&
+                       tev->a_in[1].sel == COL_TE_0)
+            {
+                tev->a_op = 0;
+                changed = 1;
+                tev->a_in[0] = tev->a_in[2];
+                tev->a_in[2] = lbl_80478CA0;
+            }
+            break;
+        }
+
+        if (changed != 0) {
+            result = 1;
+        }
+    } while (changed != 0);
+
+    return result;
+}
+
+/*
+ * SimplifySrc - 0x801BB4C4 | Size: 0x604
+ * Simplify every TEV-typed input of this node, then splice a pass-through
+ * source directly into this node's input slot.
+ */
+s32 fn_801BB4C4(ColTExpNode* tev)
+{
+    ColTExpNode* src;
+    u8 sel;
+    s32 result;
+    s32 i;
+
+    result = 0;
+
+    for (i = 0; i < 4; i++) {
+        if (tev->c_in[i].type == COL_TE_TEV) {
+            src = tev->c_in[i].exp;
+            sel = tev->c_in[i].sel;
+            if (HSD_TExpSimplify(src) != 0) {
+                result = 1;
+            }
+            if (sel == COL_TE_RGB) {
+                switch (src->c_op) {
+                case 0xFF:
+                    TEXP_UNREF(src, sel);
+                    result = 1;
+                    tev->c_in[i] = lbl_80478CA0;
+                    break;
+                case 0:
+                    if (src->c_in[0].sel == COL_TE_0 &&
+                        src->c_in[1].sel == COL_TE_0 && src->c_bias == 0 &&
+                        src->c_scale == 0)
+                    {
+                        switch (src->c_in[3].type) {
+                        case COL_TE_TEV:
+                            if (src->c_in[3].exp->c_clamp != 0 ||
+                                src->c_clamp == 0)
+                            {
+                                tev->c_in[i] = src->c_in[3];
+                                TEXP_REF(tev->c_in[i].exp, tev->c_in[i].sel);
+                                TEXP_UNREF(src, sel);
+                                result = 1;
+                            }
+                            break;
+                        case COL_TE_TEX:
+                            if ((tev->tex == NULL || tev->tex == src->tex) &&
+                                (tev->tex_swap == 0xFF ||
+                                 src->tex_swap == 0xFF ||
+                                 tev->tex_swap == src->tex_swap))
+                            {
+                                tev->c_in[i] = src->c_in[3];
+                                tev->tex = src->tex;
+                                if (tev->tex_swap == 0xFF) {
+                                    tev->tex_swap = src->tex_swap;
+                                }
+                                TEXP_UNREF(src, sel);
+                                result = 1;
+                            }
+                            break;
+                        case COL_TE_RAS:
+                            if ((tev->chan == 0xFF ||
+                                 tev->chan == src->chan) &&
+                                (tev->ras_swap == 0xFF ||
+                                 src->ras_swap == 0xFF ||
+                                 tev->ras_swap == src->ras_swap))
+                            {
+                                tev->c_in[i] = src->c_in[3];
+                                tev->chan = src->chan;
+                                if (tev->ras_swap == 0xFF) {
+                                    tev->ras_swap = src->ras_swap;
+                                }
+                                TEXP_UNREF(src, sel);
+                                result = 1;
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            } else {
+                switch (src->a_op) {
+                case 0xFF:
+                    TEXP_UNREF(src, sel);
+                    result = 1;
+                    tev->c_in[i] = lbl_80478CA0;
+                    break;
+                }
+            }
+        }
+    }
+
+    for (i = 0; i < 4; i++) {
+        if (tev->a_in[i].type == COL_TE_TEV) {
+            src = tev->a_in[i].exp;
+            sel = tev->a_in[i].sel;
+            if (HSD_TExpSimplify(src) != 0) {
+                result = 1;
+            }
+            switch (src->a_op) {
+            case 0xFF:
+                TEXP_UNREF(src, sel);
+                result = 1;
+                tev->a_in[i] = lbl_80478CA0;
+                break;
+            case 0:
+                if (src->a_in[0].sel == COL_TE_0 &&
+                    src->a_in[1].sel == COL_TE_0 && src->a_bias == 0 &&
+                    src->a_scale == 0)
+                {
+                    switch (src->a_in[3].type) {
+                    case COL_TE_TEV:
+                        tev->a_in[i] = src->a_in[3];
+                        TEXP_REF(tev->a_in[i].exp, tev->a_in[i].sel);
+                        TEXP_UNREF(src, sel);
+                        result = 1;
+                        break;
+                    case COL_TE_TEX:
+                        if (tev->tex == NULL || tev->tex == src->tex) {
+                            tev->a_in[i] = src->a_in[3];
+                            tev->tex = src->tex;
+                            TEXP_UNREF(src, sel);
+                            result = 1;
+                        }
+                        break;
+                    case COL_TE_RAS:
+                        if (tev->chan == 0xFF || tev->chan == src->chan) {
+                            tev->a_in[i] = src->a_in[3];
+                            tev->chan = src->chan;
+                            TEXP_UNREF(src, sel);
+                            result = 1;
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 #undef TEXP_UNREF
 #undef TEXP_REF
-
-/*
- * GObj_SceneSetup - 0x801BAC8C | Size: 0x838
- * Set up a scene with camera, lights, and render passes.
- */
-void fn_801BAC8C(void) {
-    /* Scene setup:
-     * 1. Create camera GObj
-     * 2. Create light GObjs
-     * 3. Configure render passes
-     * 4. Set up GX viewport and projection
-     * 5. Initialize scene-specific state
-     */
-}
-
-/*
- * GObj_SceneRender - 0x801BB4C4 | Size: 0x604
- * Execute all render passes for the current scene.
- */
-void fn_801BB4C4(void) {
-    /* Render passes:
-     * 1. Opaque geometry pass
-     * 2. Transparent geometry pass (sorted)
-     * 3. Shadow pass
-     * 4. Post-processing effects
-     * 5. HUD / overlay pass
-     */
-    u32 pass;
-
-    for (pass = 0; pass < 5; pass++) {
-        fn_801B9048(pass);
-    }
-}
 
 /* 0x801B1854 | 0x30 */
 extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
