@@ -12,6 +12,7 @@
 #include "dolphin/gx/GX.h"
 #include "dolphin/os/OS.h"
 #include "dolphin/os/OSContext.h"
+#include "dolphin/si/SI.h"
 #include "dolphin/vi/VI.h"
 
 #define OS_FPUCONTEXT (*(OSContext* volatile*)0x800000D8)
@@ -353,6 +354,59 @@ void __OSUnhandledException(u8 exception, OSContext* context, u32 dsisr,
     PPCHalt();
 }
 
+typedef struct OSFontHeader {
+    u16 fontType;
+    u16 firstChar;
+    u16 lastChar;
+    u16 invalChar;
+    u16 ascent;
+    u16 descent;
+    u16 width;
+    u16 leading;
+    u16 cellWidth;
+    u16 cellHeight;
+    u32 sheetSize;
+    u16 sheetFormat;
+    u16 sheetColumn;
+    u16 sheetRow;
+    u16 sheetWidth;
+    u16 sheetHeight;
+    u16 widthTable;
+    u32 sheetImage;
+    u32 sheetFullSize;
+    u8 c0;
+    u8 c1;
+    u8 c2;
+    u8 c3;
+} OSFontHeader;
+
+/**
+ * OSFatal's parameter block, at the head of the 0x2E8-byte lbl_803FB538
+ * object: FatalParam (0xC, padded to 0x10) followed by FatalContext (0x2D8).
+ */
+typedef struct OSFatalParam {
+    /* 0x00 */ GXColor fg;
+    /* 0x04 */ GXColor bg;
+    /* 0x08 */ const char* msg;
+} OSFatalParam;
+
+/* Inlined into fn_8009CE8C (Halt); emits no standalone code. */
+static void ScreenClear(void* xfb, u16 xfbW, u16 xfbH, GXColor yuv) {
+    int i;
+    int j;
+    u8* ptr;
+
+    ptr = xfb;
+    for (i = 0; i < xfbH; i++) {
+        for (j = 0; j < xfbW; j += 2) {
+            *ptr++ = yuv.r;
+            *ptr++ = yuv.g;
+            *ptr++ = yuv.r;
+            *ptr++ = yuv.b;
+        }
+    }
+}
+
 void ScreenReport(void* xfb, u16 xfbW, u16 xfbH, GXColor yuv, s32 x, s32 y,
                   s32 leading, const char* string) {
     extern char* fn_8009DC38(const char* string, void* image, s32 pos,
@@ -462,6 +516,173 @@ void ConfigureVideo(u16 fbWidth, u16 xfbHeight) {
 
     VIConfigure(&mode);
     VIConfigurePan(0, 0, 640, 480);
+}
+
+/* Inlined into fn_8009CE8C (Halt); emits no standalone code. */
+static GXColor RGB2YUV(GXColor rgb) {
+    f32 Y;
+    f32 Cb;
+    f32 Cr;
+    GXColor yuv;
+
+    Y = 0.5f + (16.0f + ((0.098f * (f32)rgb.b) +
+                         ((0.257f * (f32)rgb.r) + (0.504f * (f32)rgb.g))));
+    Cb = 0.5f + (128.0f + ((0.439f * (f32)rgb.b) +
+                           ((-0.148f * (f32)rgb.r) - (0.291f * (f32)rgb.g))));
+    Cr = 0.5f + (128.0f + (((0.439f * (f32)rgb.r) - (0.368f * (f32)rgb.g)) -
+                           (0.071f * (f32)rgb.b)));
+
+    yuv.r = (Y > 235.0f) ? 235.0f : (Y < 16.0f) ? 16.0f : Y;
+    yuv.g = (Cb > 240.0f) ? 240.0f : (Cb < 16.0f) ? 16.0f : Cb;
+    yuv.b = (Cr > 240.0f) ? 240.0f : (Cr < 16.0f) ? 16.0f : Cr;
+    yuv.a = 0;
+
+    return yuv;
+}
+
+/**
+ * OSFatal. Halts the machine, then hands off to fn_8009CE8C (Halt) on a fresh
+ * fiber stack at the top of the arena to draw the message to the screen.
+ */
+void fn_8009CD38(GXColor fg, GXColor bg, const char* msg) {
+    extern void __OSStopAudioSystem(void);
+    extern void AISetStreamVolLeft(u8 vol);
+    extern void AISetStreamVolRight(u8 vol);
+    extern BOOL fn_8009FEBC(BOOL final); /* __OSCallResetFunctions */
+    extern u32 fn_800AA280(void);        /* VIGetRetraceCount */
+    extern void fn_800B8AE8(void);       /* GXAbortFrame */
+    extern void VIInit(void);
+    extern void VISetBlack(BOOL black);
+    extern void VIFlush(void);
+    extern u8 lbl_803FB538[];            /* FatalParam + FatalContext */
+    extern void fn_8009CE8C(void);       /* Halt */
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSEnableInterrupts(void);
+
+    OSFatalParam* fp = (OSFatalParam*)lbl_803FB538;
+    OSBootInfo* bootInfo = (OSBootInfo*)0x80000000;
+    u32 count;
+    OSTime t;
+
+    OSDisableInterrupts();
+    OSDisableScheduler();
+    OSClearContext((OSContext*)(lbl_803FB538 + 0x10));
+    OSSetCurrentContext((OSContext*)(lbl_803FB538 + 0x10));
+    __OSStopAudioSystem();
+    AISetStreamVolLeft(0);
+    AISetStreamVolRight(0);
+    VIInit();
+    VISetBlack(TRUE);
+    VIFlush();
+    OSEnableInterrupts();
+
+    count = fn_800AA280();
+    do {
+    } while ((s32)(fn_800AA280() - count) < 1);
+
+    t = OSGetTime();
+    while (!fn_8009FEBC(FALSE) && OSGetTime() - t < OSMillisecondsToTicks(1000)) {
+    }
+
+    OSDisableInterrupts();
+    fn_8009FEBC(TRUE);
+    __OSSetExceptionHandler(8, OSDefaultExceptionHandler);
+    fn_800B8AE8();
+    OSSetArenaLo((void*)0x81200000);
+    OSSetArenaHi((void*)bootInfo->FSTLocation);
+
+    fp->fg = fg;
+    fp->bg = bg;
+    fp->msg = msg;
+    OSSwitchFiber((u32)fn_8009CE8C, (u32)OSGetArenaHi());
+}
+
+/** EXI channel register file; [3] is the channel-0 control register. */
+#define __EXIRegs ((volatile u32*)0xCC006800)
+
+/**
+ * Halt: OSFatal's fiber entry point. Copies the message into the fresh arena,
+ * quiesces EXI, loads the SDK font, clears the XFB to the background colour
+ * and prints the message, then stops the CPU.
+ *
+ * ScreenClear and RGB2YUV above are both inlined here.
+ */
+void fn_8009CE8C(void) {
+    extern void fn_8009870C(s32 chan, void* callback); /* EXISetExiCallback */
+    extern BOOL EXILock(s32 chan, u32 dev, void* callback);
+    extern BOOL EXIDeselect(s32 chan);
+    extern BOOL EXIUnlock(s32 chan);
+    extern u16 fn_8009D820(void);                        /* OSGetFontEncode */
+    extern u32 fn_8009D904(OSFontHeader* fontData, void* tmp); /* OSLoadFont */
+    extern u32 fn_800AA280(void);                        /* VIGetRetraceCount */
+    extern void* OSAllocFromArenaLo(u32 size, u32 align);
+    extern void* memmove(void* dst, const void* src, u32 size);
+    extern u32 strlen(const char* s);
+    extern void VISetNextFrameBuffer(void* fb);
+    extern void VISetBlack(BOOL black);
+    extern void VIFlush(void);
+    extern void DCFlushRange(void* addr, u32 nBytes);
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSEnableInterrupts(void);
+    extern void OSReport(const char* format, ...);
+    extern u8 lbl_803FB538[]; /* FatalParam + FatalContext */
+    extern char lbl_80478998[]; /* "%s\n" */
+
+    OSFatalParam* fp;
+    u32 count;
+    OSFontHeader* fontData;
+    void* xfb;
+    u32 len;
+
+    OSEnableInterrupts();
+    fp = (OSFatalParam*)lbl_803FB538;
+    len = strlen(fp->msg) + 1;
+    fp->msg = memmove(OSAllocFromArenaLo(len, 32), fp->msg, len);
+
+    fn_8009870C(0, NULL);
+    fn_8009870C(2, NULL);
+
+    while (!EXILock(0, 1, NULL)) {
+        while ((__EXIRegs[3] & 1) == 1) {
+        }
+        EXIDeselect(0);
+        EXIUnlock(0);
+    }
+    EXIUnlock(0);
+
+    while ((__EXIRegs[3] & 1) == 1) {
+    }
+
+    if (fn_8009D820() == 1) {
+        fontData = OSAllocFromArenaLo(0x90EE4, 32);
+    } else {
+        fontData = OSAllocFromArenaLo(0x10120, 32);
+    }
+    fn_8009D904(fontData, OSGetArenaLo());
+
+    xfb = OSAllocFromArenaLo(0x96000, 32);
+    ScreenClear(xfb, 640, 480, RGB2YUV(fp->bg));
+    VISetNextFrameBuffer(xfb);
+    ConfigureVideo(640, 480);
+    VIFlush();
+
+    count = fn_800AA280();
+    do {
+    } while ((s32)(fn_800AA280() - count) < 2);
+
+    ScreenReport(xfb, 640, 480, RGB2YUV(fp->fg), 48, 100, fontData->leading,
+                 fp->msg);
+    DCFlushRange(xfb, 0x96000);
+    VISetBlack(FALSE);
+    VIFlush();
+
+    count = fn_800AA280();
+    do {
+    } while ((s32)(fn_800AA280() - count) < 1);
+
+    OSDisableInterrupts();
+    OSReport(lbl_80478998, fp->msg);
+    PPCHalt();
 }
 
 
@@ -608,32 +829,6 @@ void fn_8009D878(void* dest, s32 size, s32 offset) {
         dest = (u8*)dest + chunkSize;
     }
 }
-
-typedef struct OSFontHeader {
-    u16 fontType;
-    u16 firstChar;
-    u16 lastChar;
-    u16 invalChar;
-    u16 ascent;
-    u16 descent;
-    u16 width;
-    u16 leading;
-    u16 cellWidth;
-    u16 cellHeight;
-    u32 sheetSize;
-    u16 sheetFormat;
-    u16 sheetColumn;
-    u16 sheetRow;
-    u16 sheetWidth;
-    u16 sheetHeight;
-    u16 widthTable;
-    u32 sheetImage;
-    u32 sheetFullSize;
-    u8 c0;
-    u8 c1;
-    u8 c2;
-    u8 c3;
-} OSFontHeader;
 
 /* Font state: header, width table, and the cached sheetColumn*sheetRow. */
 #define FontData lbl_8047A700
