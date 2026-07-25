@@ -692,6 +692,137 @@ void round_decimal(decimal* dec, int new_length) {
     dec->sig.length = new_length;
 }
 
+/* double2hex - 0x800C9530 */
+char* double2hex(f64 num, char* buff, print_format format) {
+    int offset, what_nibble = 0;
+    char* wrk_byte_ptr;
+    char *p, *q;
+    char working_byte;
+    f64 ld;
+    signed short* sptr;
+    signed short snum;
+    signed long exp;
+    print_format exp_format;
+    int hex_precision;
+    decform form;
+    decimal dec;
+
+    p = buff;
+    ld = num;
+    sptr = (signed short*)&ld;
+
+    if (format.precision > 509) {
+        return 0;
+    }
+
+    form.style = (char)0;
+    form.digits = 0x20;
+    __num2dec(&form, num, &dec);
+
+    if (*dec.sig.text == 'I') {
+        if (*sptr & 0x8000) {
+            p = buff - 5;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "-INF");
+            } else {
+                strcpy(p, "-inf");
+            }
+        } else {
+            p = buff - 4;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "INF");
+            } else {
+                strcpy(p, "inf");
+            }
+        }
+        return p;
+    } else if (*dec.sig.text == 'N') {
+        if (*(char*)&num & 0x80) {
+            p = buff - 5;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "-NAN");
+            } else {
+                strcpy(p, "-nan");
+            }
+        } else {
+            p = buff - 4;
+            if (format.conversion_char == 'A') {
+                strcpy(p, "NAN");
+            } else {
+                strcpy(p, "nan");
+            }
+        }
+        return p;
+    }
+
+    exp_format.justification_options = right_justification;
+    exp_format.sign_options = sign_always;
+    exp_format.precision_specified = 0;
+    exp_format.alternate_form = 0;
+    exp_format.argument_options = normal_argument;
+    exp_format.field_width = 0;
+    exp_format.precision = 1;
+    exp_format.conversion_char = 'd';
+
+    snum = (*sptr & 0x7ff0) >> 4;
+    exp = snum - 0x3FF;
+
+    p = long2str_800C9EC4(exp, buff, exp_format);
+    if (format.conversion_char == 'a') {
+        *--p = 'p';
+    } else {
+        *--p = 'P';
+    }
+
+    q = (char*)&num;
+
+    for (hex_precision = format.precision; hex_precision >= 1; hex_precision--) {
+        working_byte = *(q + (hex_precision / 2) + 1);
+        if (hex_precision % 2) {
+            working_byte = working_byte & 0x0f;
+        } else {
+            working_byte = (working_byte >> 4) & 0x0f;
+        }
+
+        if (working_byte < 10) {
+            working_byte += '0';
+        } else {
+            working_byte -= 10;
+            if (format.conversion_char == 'a') {
+                working_byte += 'a';
+            } else {
+                working_byte += 'A';
+            }
+        }
+
+        *--p = working_byte;
+    }
+
+    if (format.precision || format.alternate_form) {
+        *--p = '.';
+    }
+
+    *--p = '1';
+
+    if (format.conversion_char == 'a') {
+        *--p = 'x';
+    } else {
+        *--p = 'X';
+    }
+
+    *--p = '0';
+
+    if (*sptr & 0x8000) {
+        *--p = '-';
+    } else if (format.sign_options == sign_always) {
+        *--p = '+';
+    } else if (format.sign_options == space_holder) {
+        *--p = ' ';
+    }
+
+    return p;
+}
+
 /* longlong2str - 0x800C9BB0 */
 char* longlong2str_800C9BB0(signed long long num, char* pBuf, print_format fmt) {
     unsigned long long unsigned_num, base;
