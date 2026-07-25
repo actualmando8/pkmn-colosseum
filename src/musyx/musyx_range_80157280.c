@@ -2096,17 +2096,10 @@ void fn_80162494(u32 index, u32 val) {
 #pragma dont_inline reset
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_801624A8(void) {
-#include "src/game/people/people_field_fn_801624A8.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-void fn_801624A8(u32 index, u16 value70, void* words74, u32 resetState, u32 value1C, u32 value18, u32 initFlags, u32 setupFlag, u32 unused) {
+void hwInitSamplePlayback(u32 index, u16 value70, void* words74, u32 resetState, u32 value1C, u32 value18, u32 initFlags, u8 setupFlag) {
+    typedef struct HardwareSampleInfo {
+        u32 words[8];
+    } HardwareSampleInfo;
     typedef struct {
         u8 pad_00[0x18];      /* 0x00 */
         u32 field_18;         /* 0x18 */
@@ -2115,7 +2108,7 @@ void fn_801624A8(u32 index, u16 value70, void* words74, u32 resetState, u32 valu
         u32 flags_24[0x13];   /* 0x24 */
         u16 field_70;         /* 0x70 */
         u8 pad_72[0x2];       /* 0x72 */
-        u32 words_74[0x8];    /* 0x74 */
+        HardwareSampleInfo sample; /* 0x74 */
         u32 field_94;         /* 0x94 */
         u32 field_98;         /* 0x98 */
         u8 field_9C;          /* 0x9C */
@@ -2134,46 +2127,36 @@ void fn_801624A8(u32 index, u16 value70, void* words74, u32 resetState, u32 valu
         u8 pad_E8[0x8];       /* 0xE8 */
         u32 field_F0;         /* 0xF0 */
     } PeopleFieldState;
-    extern u32 lbl_8047B024;
     extern u8 lbl_8047B050;
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
-    PeopleFieldState* entry = &entries[index];
-    u32 i;
+    u8 i;
     u32 flags = 0;
-    u32* src = (u32*)words74;
 
-    for (i = 0; i < lbl_8047B050; i++) {
-        flags |= entries[0].flags_24[i] & 0x20;
-        entries[0].flags_24[i] = 0;
+#define HW_PLAYBACK_VOICES (*(PeopleFieldState**)&lbl_8047B024)
+    for (i = 0; i <= lbl_8047B050; i++) {
+        flags |= HW_PLAYBACK_VOICES[index].flags_24[i] & 0x20;
+        HW_PLAYBACK_VOICES[index].flags_24[i] = 0;
     }
 
-    entry->flags_24[0] = flags;
-    entry->field_1C = value1C;
-    entry->field_18 = value18;
-    entry->field_F0 = 0;
-    entry->field_70 = value70;
+    HW_PLAYBACK_VOICES[index].flags_24[0] = flags;
+    HW_PLAYBACK_VOICES[index].field_1C = value1C;
+    HW_PLAYBACK_VOICES[index].field_18 = value18;
+    HW_PLAYBACK_VOICES[index].field_F0 = 0;
+    HW_PLAYBACK_VOICES[index].field_70 = value70;
 
-    entry->words_74[0] = src[0];
-    entry->words_74[1] = src[1];
-    entry->words_74[2] = src[2];
-    entry->words_74[3] = src[3];
-    entry->words_74[4] = src[4];
-    entry->words_74[5] = src[5];
-    entry->words_74[6] = src[6];
-    entry->words_74[7] = src[7];
+    HW_PLAYBACK_VOICES[index].sample = *(HardwareSampleInfo*)words74;
 
-    if (resetState == 0) {
-        entry->field_A4 = 0;
-        entry->field_B8 = 0;
-        entry->field_BC = 0;
-        entry->field_C0 = 0x7FFF;
-        entry->field_C4 = 0;
+    if (resetState != 0) {
+        HW_PLAYBACK_VOICES[index].field_A4 = 0;
+        HW_PLAYBACK_VOICES[index].field_B8 = 0;
+        HW_PLAYBACK_VOICES[index].field_BC = 0;
+        HW_PLAYBACK_VOICES[index].field_C0 = 0x7FFF;
+        HW_PLAYBACK_VOICES[index].field_C4 = 0;
     }
 
-    entry->bytes_E4[0] = 0xFF;
-    entry->bytes_E4[1] = 0xFF;
-    entry->bytes_E4[2] = 0xFF;
-    entry->bytes_E4[3] = 0xFF;
+    HW_PLAYBACK_VOICES[index].bytes_E4[0] = 0xFF;
+    HW_PLAYBACK_VOICES[index].bytes_E4[1] = 0xFF;
+    HW_PLAYBACK_VOICES[index].bytes_E4[2] = 0xFF;
+    HW_PLAYBACK_VOICES[index].bytes_E4[3] = 0xFF;
 
     if (initFlags != 0) {
         fn_801629A4(index, 0);
@@ -2181,10 +2164,8 @@ void fn_801624A8(u32 index, u16 value70, void* words74, u32 resetState, u32 valu
     }
 
     hwSetITDMode(index, setupFlag);
+#undef HW_PLAYBACK_VOICES
 }
-#pragma pop
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
@@ -2214,17 +2195,7 @@ void hwBreak(u32 index) {
 #pragma dont_inline reset
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_801626AC(void) {
-#include "src/game/people/people_field_fn_801626AC.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-void fn_801626AC(u32 index, void* ptr, u32 mode) {
+void hwSetADSR(u32 index, void* ptr, u8 mode) {
     typedef struct {
         u8 pad_00[0x18];      /* 0x00 */
         u32 field_18;         /* 0x18 */
@@ -2266,57 +2237,52 @@ void fn_801626AC(u32 index, void* ptr, u32 mode) {
         u16 field_08;         /* 0x08 */
         u16 field_0A;         /* 0x0A */
     } PeopleFieldMode12Args;
-    extern u32 lbl_8047B024;
     extern u8 lbl_8036944C[];
-    PeopleFieldState* entries = (*(PeopleFieldState* volatile*)&lbl_8047B024);
-    PeopleFieldState* entry = &entries[index];
-    u8 m = (u8)mode;
 
-    switch (m) {
+#define HW_ADSR_VOICES (*(PeopleFieldState**)&lbl_8047B024)
+    switch (mode) {
     case 0: {
         PeopleFieldMode0Args* args = ptr;
         u32 v;
-        entry->field_A4 = 0;
-        entry->field_B8 = args->field_00;
-        entry->field_BC = args->field_02;
+        HW_ADSR_VOICES[index].field_A4 = 0;
+        HW_ADSR_VOICES[index].field_B8 = args->field_00;
+        HW_ADSR_VOICES[index].field_BC = args->field_02;
         v = args->field_04 << 3;
         if (v > 0x7FFF) {
             v = 0x7FFF;
         }
-        entry->field_C0 = (u16)v;
-        entry->field_C4 = args->field_06;
+        HW_ADSR_VOICES[index].field_C0 = (u16)v;
+        HW_ADSR_VOICES[index].field_C4 = args->field_06;
         break;
     }
     case 1:
     case 2:
         {
         PeopleFieldMode12Args* args = ptr;
-        entry->field_A4 = 1;
-        entry->field_CA = 0;
-        if (m == 1) {
-            entry->field_B8 = (u16)adsrConvertTimeCents(args->field_00);
-            entry->field_BC = (u16)adsrConvertTimeCents(args->field_04);
+        HW_ADSR_VOICES[index].field_A4 = 1;
+        HW_ADSR_VOICES[index].field_CA = 0;
+        if (mode == 1) {
+            HW_ADSR_VOICES[index].field_B8 = (u16)adsrConvertTimeCents(args->field_00);
+            HW_ADSR_VOICES[index].field_BC = (u16)adsrConvertTimeCents(args->field_04);
             {
                 s32 idx = args->field_08 >> 2;
                 if ((u32)idx > 0x3FF) {
                     idx = 0x3FF;
                 }
-                entry->field_C0 = (u16)(0xC1 - lbl_8036944C[idx]);
+                HW_ADSR_VOICES[index].field_C0 = (u16)(0xC1 - lbl_8036944C[idx]);
             }
         } else {
-            entry->field_B8 = (u16)args->field_00;
-            entry->field_BC = (u16)args->field_04;
-            entry->field_C0 = args->field_08;
+            HW_ADSR_VOICES[index].field_B8 = (u16)args->field_00;
+            HW_ADSR_VOICES[index].field_BC = (u16)args->field_04;
+            HW_ADSR_VOICES[index].field_C0 = args->field_08;
         }
-        entry->field_C4 = args->field_0A;
+        HW_ADSR_VOICES[index].field_C4 = args->field_0A;
         }
     }
 
-    entry->flags_24[0] |= 0x10;
+    HW_ADSR_VOICES[index].flags_24[0] |= 0x10;
+#undef HW_ADSR_VOICES
 }
-#pragma pop
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 2
 #if 0
