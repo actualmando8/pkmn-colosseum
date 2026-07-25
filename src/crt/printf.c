@@ -24,6 +24,34 @@ int __pformatter_800C88BC(WriteProcT WriteProc, void* WriteProcArg,
                           const char* format_str, va_list arg);
 void* __FileWrite(void* pFile, const char* pBuffer, u32 char_num);
 
+s32 vsprintf(char* buf, const char* fmt, va_list args);
+
+/*
+ * sprintf - 0x800C8520 | size: 0xE0
+ *
+ * vsprintf is inlined here in the target, so its body is repeated rather
+ * than called; vsprintf is defined after this point and does not inline.
+ */
+s32 sprintf(char* buf, const char* fmt, ...) {
+    extern s32 __StringWrite(void* data, s32 count, __FILE* file);
+    struct { char* p; s32 a; s32 b; } sf;
+    va_list args;
+    s32 n;
+
+    __builtin_va_info(&args);
+    sf.p = buf;
+    sf.a = -1;
+    sf.b = 0;
+    n = __pformatter_800C88BC((WriteProcT)__StringWrite, &sf, fmt, args);
+    if (buf != NULL) {
+        s32 idx = -2;
+        if ((u32)n < 0xFFFFFFFFU)
+            idx = n;
+        buf[idx] = 0;
+    }
+    return n;
+}
+
 /* vsprintf - 0x800C8600 | size: 0x78 */
 s32 vsprintf(char* buf, const char* fmt, va_list args) {
     extern s32 __StringWrite(void* data, s32 count, __FILE* file);
