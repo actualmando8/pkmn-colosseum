@@ -213,6 +213,32 @@ void VIWaitForRetrace(void) {
     OSRestoreInterrupts(enabled);
 }
 
+typedef struct VITiming {
+    u8 equ;
+    u16 acv;
+    u16 prbOdd;
+    u16 prbEven;
+    u16 psbOdd;
+    u16 psbEven;
+    u8 bs1;
+    u8 bs2;
+    u8 bs3;
+    u8 bs4;
+    u16 be1;
+    u16 be2;
+    u16 be3;
+    u16 be4;
+    u16 nhlines;
+    u16 hlw;
+    u8 hsy;
+    u8 hcs;
+    u8 hce;
+    u8 hbe640;
+    u16 hbs640;
+    u8 hbeCCIR656;
+    u16 hbsCCIR656;
+} VITiming;
+
 typedef struct SomeVIStruct {
     u16 DispPosX;
     u16 DispPosY;
@@ -386,6 +412,106 @@ void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 prbOdd,
     MARK_CHANGED(9);
     regs[8] = (u16)(u32)actualPsbEven;
     MARK_CHANGED(8);
+}
+
+#define VI_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define VI_MAX(a, b) ((a) > (b) ? (a) : (b))
+#define VI_CLAMP(val, min, max)                                                \
+    ((val) > (max) ? (max) : (val) < (min) ? (min) : (val))
+
+static void AdjustPosition(u16 acv) {
+    VI_CONTEXT_DECL;
+    extern s16 lbl_8047A868; /* displayOffsetH */
+    extern s16 lbl_8047A86A; /* displayOffsetV */
+    SomeVIStruct* HorVer = &lbl_803FC488.HorVer;
+    s32 coeff;
+    s32 frac;
+
+    HorVer->AdjustedDispPosX = VI_CLAMP((s16)HorVer->DispPosX + lbl_8047A868, 0,
+                                        0x2D0 - HorVer->DispSizeX);
+    coeff = (HorVer->FBMode == 0) ? 2 : 1;
+    frac = HorVer->DispPosY & 1;
+    HorVer->AdjustedDispPosY =
+        VI_MAX((s16)HorVer->DispPosY + lbl_8047A86A, frac);
+    HorVer->AdjustedDispSizeY =
+        HorVer->DispSizeY +
+        VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) -
+        VI_MAX((s16)HorVer->DispPosY + (s16)HorVer->DispSizeY + lbl_8047A86A -
+                   (((s16)acv * 2) - frac),
+               0);
+    HorVer->AdjustedPanPosY =
+        HorVer->PanPosY -
+        (VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) / coeff);
+    HorVer->AdjustedPanSizeY =
+        HorVer->PanSizeY +
+        (VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) / coeff) -
+        (VI_MAX((s16)HorVer->DispPosY + (s16)HorVer->DispSizeY + lbl_8047A86A -
+                    (((s16)acv * 2) - frac),
+                0) /
+         coeff);
+}
+
+static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
+    VI_CONTEXT_DECL;
+    u32 scale;
+
+    panSizeX = threeD ? (panSizeX << 1) : panSizeX;
+    if (panSizeX < dispSizeX) {
+        scale = (u32)(dispSizeX + (panSizeX << 8) - 1) / dispSizeX;
+        regs[37] = scale | 0x1000;
+        changed |= 0x04000000;
+        regs[56] = (u32)panSizeX;
+        changed |= 0x80;
+    } else {
+        regs[37] = 0x100;
+        changed |= 0x04000000;
+    }
+}
+
+static void setPicConfig(u16 fbSizeX, u32 xfbMode, u16 panPosX, u16 panSizeX,
+                         u8* wordPerLine, u8* std, u8* wpl, u8* xof) {
+    VI_CONTEXT_DECL;
+
+    *wordPerLine = (fbSizeX + 15) / 16;
+    *std = (xfbMode == 0) ? *wordPerLine : (u8)(*wordPerLine * 2);
+    *xof = panPosX % 16;
+    *wpl = (*xof + panSizeX + 15) / 16;
+    regs[0x24] = *std | (*wpl << 8);
+    changed |= 0x8000000;
+}
+
+void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height) {
+    VI_CONTEXT_DECL;
+    extern u32 lbl_8047A898; /* FBSet */
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSRestoreInterrupts(BOOL level);
+    SomeVIStruct* HorVer = &lbl_803FC488.HorVer;
+    BOOL enabled;
+    VITiming* tm;
+
+    enabled = OSDisableInterrupts();
+    HorVer->PanPosX = xOrg;
+    HorVer->PanPosY = yOrg;
+    HorVer->PanSizeX = width;
+    HorVer->PanSizeY = height;
+    HorVer->DispSizeY = (HorVer->nonInter == 2)   ? HorVer->PanSizeY
+                        : (HorVer->nonInter == 3) ? HorVer->PanSizeY
+                        : (HorVer->FBMode == 0)   ? (u16)(HorVer->PanSizeY * 2)
+                                                  : HorVer->PanSizeY;
+    tm = HorVer->timing;
+    AdjustPosition(tm->acv);
+    setScalingRegs(HorVer->PanSizeX, HorVer->DispSizeX, HorVer->threeD);
+    setPicConfig(HorVer->FBSizeX, HorVer->FBMode, HorVer->PanPosX,
+                 HorVer->PanSizeX, &HorVer->wordPerLine, &HorVer->std,
+                 &HorVer->wpl, &HorVer->xof);
+    if (lbl_8047A898 != 0) {
+        setFbbRegs(HorVer, &HorVer->tfbb, &HorVer->bfbb, &HorVer->rtfbb,
+                   &HorVer->rbfbb);
+    }
+    setVerticalRegs(HorVer->AdjustedDispPosY, HorVer->DispSizeY, tm->equ,
+                    tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven,
+                    HorVer->black);
+    OSRestoreInterrupts(enabled);
 }
 
 static s32 cntlzd(u64 bit) {
