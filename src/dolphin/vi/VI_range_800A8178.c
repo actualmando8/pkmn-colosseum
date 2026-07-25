@@ -414,6 +414,90 @@ void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 prbOdd,
     MARK_CHANGED(8);
 }
 
+#define VI_SET_REG_FIELD(reg, size, shift, val)                                \
+    ((reg) = ((u32)(reg) & ~(((1 << (size)) - 1) << (shift))) |                \
+             ((u32)(val) << (shift)))
+
+static void PrintDebugPalCaution(void) {
+    extern u8 lbl_803120E8[];
+    extern u32 lbl_8047A89C;
+    extern void OSReport(const char* msg, ...);
+
+    if (lbl_8047A89C == 0) {
+        lbl_8047A89C = 1;
+        OSReport((const char*)&lbl_803120E8[0x260]);
+        OSReport((const char*)&lbl_803120E8[0x28C]);
+        OSReport((const char*)&lbl_803120E8[0x2B8]);
+        OSReport((const char*)&lbl_803120E8[0x2E4]);
+        OSReport((const char*)&lbl_803120E8[0x310]);
+        OSReport((const char*)&lbl_803120E8[0x33C]);
+        OSReport((const char*)&lbl_803120E8[0x260]);
+    }
+}
+
+static void setInterruptRegs(VITiming* tm) {
+    VI_CONTEXT_DECL;
+    u16 hct;
+    u16 vct;
+    u16 borrow;
+
+    vct = tm->nhlines / 2;
+    borrow = tm->nhlines % 2;
+    if (borrow != 0) {
+        hct = tm->hlw;
+    } else {
+        hct = 0;
+    }
+    vct++;
+    hct++;
+    regs[25] = (u16)(u32)hct;
+    MARK_CHANGED(25);
+    regs[24] = vct | 0x1000;
+    MARK_CHANGED(24);
+}
+
+static void setHorizontalRegs(VITiming* tm, u16 dispPosX, u16 dispSizeX) {
+    VI_CONTEXT_DECL;
+    u32 hbe;
+    u32 hbs;
+    u32 hbeLo;
+    u32 hbeHi;
+
+    regs[3] = (u16)(u32)tm->hlw;
+    MARK_CHANGED(3);
+    regs[2] = tm->hce | (tm->hcs << 8);
+    MARK_CHANGED(2);
+    hbe = tm->hbe640 - 40 + dispPosX;
+    hbs = tm->hbs640 + 40 + dispPosX - (720 - dispSizeX);
+    hbeLo = hbe & 0x1FF;
+    hbeHi = hbe >> 9;
+    regs[5] = tm->hsy | (hbeLo << 7);
+    MARK_CHANGED(5);
+    regs[4] = hbeHi | (hbs * 2);
+    MARK_CHANGED(4);
+}
+
+static void setBBIntervalRegs(VITiming* tm) {
+    VI_CONTEXT_DECL;
+    u16 val;
+
+    val = tm->bs1 | (tm->be1 << 5);
+    regs[11] = val;
+    changed |= 0x10000000000000;
+
+    val = tm->bs3 | (tm->be3 << 5);
+    regs[10] = val;
+    changed |= 0x20000000000000;
+
+    val = tm->bs2 | (tm->be2 << 5);
+    regs[13] = val;
+    changed |= 0x4000000000000;
+
+    val = tm->bs4 | (tm->be4 << 5);
+    regs[12] = val;
+    changed |= 0x8000000000000;
+}
+
 #define VI_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define VI_MAX(a, b) ((a) > (b) ? (a) : (b))
 #define VI_CLAMP(val, min, max)                                                \
@@ -478,6 +562,153 @@ static void setPicConfig(u16 fbSizeX, u32 xfbMode, u16 panPosX, u16 panSizeX,
     *wpl = (*xof + panSizeX + 15) / 16;
     regs[0x24] = *std | (*wpl << 8);
     changed |= 0x8000000;
+}
+
+typedef struct GXRenderModeObj {
+    u32 viTVmode;
+    u16 fbWidth;
+    u16 efbHeight;
+    u16 xfbHeight;
+    u16 viXOrigin;
+    u16 viYOrigin;
+    u16 viWidth;
+    u16 viHeight;
+    u32 xfbMode;
+    u8 field_rendering;
+    u8 aa;
+    u8 sample_pattern[12][2];
+    u8 vfilter[7];
+} GXRenderModeObj;
+
+void VIConfigure(const GXRenderModeObj* rm) {
+    VI_CONTEXT_DECL;
+    extern u32 lbl_8047A864;          /* encoderType */
+    extern volatile u32 lbl_8047A86C; /* changeMode */
+    extern u32 lbl_8047A898;          /* FBSet */
+    extern char lbl_804789FC[];       /* __FILE__ */
+    extern u8 lbl_803120E8[];
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSRestoreInterrupts(BOOL level);
+    extern void fn_800060F0(const char* file, s32 line, const char* msg, ...);
+    extern void* fn_800A8894(u32 mode);
+    SomeVIStruct* HorVer = &lbl_803FC488.HorVer;
+    VITiming* tm;
+    u32 regDspCfg;
+    u32 regClksel;
+    BOOL enabled;
+    u32 newNonInter;
+    u32 tvInBootrom;
+    u32 tvInGame;
+
+    enabled = OSDisableInterrupts();
+    newNonInter = rm->viTVmode & 3;
+
+    if (HorVer->nonInter != newNonInter) {
+        lbl_8047A86C = 1;
+        HorVer->nonInter = newNonInter;
+    }
+
+    tvInGame = rm->viTVmode >> 2;
+    tvInBootrom = *(u32*)0x800000CC;
+
+    if (tvInGame == 4) {
+        PrintDebugPalCaution();
+    }
+
+    switch (tvInBootrom) {
+    case 0:
+    case 2:
+    case 6:
+        if (tvInGame == 0 || tvInGame == 2 || tvInGame == 6) {
+            break;
+        }
+        goto panic;
+    case 1:
+    case 5:
+        if (tvInGame == 1 || tvInGame == 5) {
+            break;
+        }
+    default:
+    panic:
+        fn_800060F0(lbl_804789FC, 1884, (const char*)&lbl_803120E8[0x368],
+                    tvInBootrom, tvInGame);
+    }
+
+    if (tvInGame == 0 || tvInGame == 2) {
+        HorVer->tv = tvInBootrom;
+    } else {
+        HorVer->tv = tvInGame;
+    }
+
+    HorVer->DispPosX = rm->viXOrigin;
+    HorVer->DispPosY = (HorVer->nonInter == 1) ? (u16)(rm->viYOrigin * 2)
+                                               : rm->viYOrigin;
+    HorVer->DispSizeX = rm->viWidth;
+    HorVer->FBSizeX = rm->fbWidth;
+    HorVer->FBSizeY = rm->xfbHeight;
+    HorVer->FBMode = rm->xfbMode;
+    HorVer->PanSizeX = HorVer->FBSizeX;
+    HorVer->PanSizeY = HorVer->FBSizeY;
+    HorVer->PanPosX = 0;
+    HorVer->PanPosY = 0;
+    HorVer->DispSizeY = (HorVer->nonInter == 2)   ? HorVer->PanSizeY
+                        : (HorVer->nonInter == 3) ? HorVer->PanSizeY
+                        : (HorVer->FBMode == 0)   ? (u16)(HorVer->PanSizeY * 2)
+                                                  : HorVer->PanSizeY;
+    HorVer->threeD = (HorVer->nonInter == 3) ? TRUE : FALSE;
+
+    tm = fn_800A8894((HorVer->tv << 2) + HorVer->nonInter);
+    HorVer->timing = tm;
+
+    AdjustPosition(tm->acv);
+
+    if (lbl_8047A864 == 0) {
+        HorVer->tv = 3;
+    }
+    setInterruptRegs(tm);
+
+    regDspCfg = regs[1];
+    if (HorVer->nonInter == 2 || HorVer->nonInter == 3) {
+        regDspCfg = ((u32)regDspCfg & ~0x00000004) | ((u32)1 << 2);
+    } else {
+        VI_SET_REG_FIELD(regDspCfg, 1, 2, HorVer->nonInter & 1);
+    }
+
+    VI_SET_REG_FIELD(regDspCfg, 1, 3, HorVer->threeD);
+
+    if (HorVer->tv == 4 || HorVer->tv == 5 || HorVer->tv == 6) {
+        regDspCfg = (u32)regDspCfg & ~0x00000300;
+    } else {
+        VI_SET_REG_FIELD(regDspCfg, 2, 8, HorVer->tv);
+    }
+
+    regs[1] = regDspCfg;
+    MARK_CHANGED(1);
+
+    regClksel = regs[54];
+    if ((s32)rm->viTVmode == 2 || (s32)rm->viTVmode == 3 ||
+        (s32)rm->viTVmode == 26) {
+        regClksel = ((u32)regClksel & ~0x00000001) | ((u32)1 << 0);
+    } else {
+        regClksel = (u32)regClksel & ~0x00000001;
+    }
+    regs[54] = (u16)regClksel;
+    MARK_CHANGED(54);
+
+    setScalingRegs(HorVer->PanSizeX, HorVer->DispSizeX, HorVer->threeD);
+    setHorizontalRegs(tm, HorVer->AdjustedDispPosX, HorVer->DispSizeX);
+    setBBIntervalRegs(tm);
+    setPicConfig(HorVer->FBSizeX, HorVer->FBMode, HorVer->PanPosX,
+                 HorVer->PanSizeX, &HorVer->wordPerLine, &HorVer->std,
+                 &HorVer->wpl, &HorVer->xof);
+    if (lbl_8047A898 != 0) {
+        setFbbRegs(HorVer, &HorVer->tfbb, &HorVer->bfbb, &HorVer->rtfbb,
+                   &HorVer->rbfbb);
+    }
+    setVerticalRegs(HorVer->AdjustedDispPosY, HorVer->AdjustedDispSizeY,
+                    tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd,
+                    tm->psbEven, HorVer->black);
+    OSRestoreInterrupts(enabled);
 }
 
 void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height) {
