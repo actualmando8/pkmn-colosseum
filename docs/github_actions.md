@@ -18,12 +18,9 @@ This repository will be used to build and store the CI build container.
 2. Once the repository is created, add your game's assets to the `orig/GAMEID` directory. (Replace `GAMEID` with your game's ID, matching the `orig` layout in your main repository.)  
     **Only include game files necessary for the build**, such as `sys/main.dol` and any `.rel` or `.sel` files.
 
-3. Once the build container action completes, visit the package settings:  
-    ![GitHub repository packages](images/github_build_repo_packages.png)  
-    ![GitHub package settings](images/github_package_settings.png)
+3. Once the build container action completes, visit the package settings.
 
-4. Under "Manage Actions access", add your project's main repository with the "Read" role:  
-    ![GitHub package Actions access](images/github_package_settings_access.png)
+4. Under "Manage Actions access", add your project's main repository with the "Read" role.
 
 ## Workflow
 
