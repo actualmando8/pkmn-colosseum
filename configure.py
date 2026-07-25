@@ -5260,7 +5260,6 @@ config.libs = [
                     (Matching, "game/gba/gba_misc_exact_80089D98.c"),
                     (CodeCandidate, "game/gba/gba_misc_candidate_80089E20.c"),
                     (Matching, "game/gba/gba_misc_exact_80089F58.c"),
-                    (CodeCandidate, "game/gba/gba_misc_candidate_80089F78.c"),
                     (Matching, "game/gba/gba_misc_exact_8008A99C.c"),
                     (Matching, "game/gba/gba_misc_exact_8008A9AC.c"),
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008A9E4.c"),
@@ -5268,6 +5267,13 @@ config.libs = [
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008ABE4.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "game/gba/gba_misc_candidate_80089F78.c",
+                mw_version="GC/1.2.5",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
             *[
                 Object(
                     status,
@@ -6468,7 +6474,6 @@ config.libs = [
                     (Matching, "game/gs_title_exact_80021A9C.c"),
                     (CodeCandidate, "game/gs_title_candidate_80021B14.c"),
                     (Matching, "game/gs_title_exact_80022050.c"),
-                    (CodeCandidate, "game/gs_title_candidate_8002217C.c"),
                     (Matching, "game/gs_title_exact_80022E54.c"),
                     (CodeCandidate, "game/gs_title_candidate_80023068.c"),
                     (Matching, "game/gs_title_exact_80023274.c"),
@@ -6485,6 +6490,13 @@ config.libs = [
                     (CodeCandidate, "game/gs_title_candidate_80025F84.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "game/gs_title_candidate_8002217C.c",
+                mw_version="GC/2.0",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8", "-opt nopeephole"],
+                progress_category="game",
+            ),
             Object(
                 CodeCandidate,
                 "game/ps_generator_range_8017572C.c",
@@ -6566,13 +6578,19 @@ config.libs = [
                     (Matching, "game/fsys/fsys_file_exact_8017C8F4.c"),
                     (CodeCandidate, "game/fsys/fsys_file_candidate_8017C8FC.c"),
                     (Matching, "game/fsys/fsys_file_exact_8017CEC8.c"),
-                    (CodeCandidate, "game/fsys/fsys_file_candidate_8017CED8.c"),
                     (Matching, "game/fsys/fsys_file_exact_8017D3A0.c"),
                     (CodeCandidate, "game/fsys/fsys_file_candidate_8017D3D4.c"),
                     (Matching, "game/fsys/fsys_file_exact_8017D400.c"),
                     (CodeCandidate, "game/fsys/fsys_file_candidate_8017D410.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "game/fsys/fsys_file_candidate_8017CED8.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
             *[
                 Object(
                     status,
@@ -6884,11 +6902,16 @@ config.libs = [
                     (Matching, "hsd/hsd_mobj_exact_801A6E00.c"),
                     (CodeCandidate, "hsd/hsd_mobj_candidate_801A6E24.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A6F78.c"),
-                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6FF0.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A7E3C.c"),
                     (CodeCandidate, "hsd/hsd_mobj_candidate_801A7E84.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj_candidate_801A6FF0.c",
+                mw_version="GC/1.3.2",
+                progress_category="hsd",
+            ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_robj_range_801ADD48.c",
