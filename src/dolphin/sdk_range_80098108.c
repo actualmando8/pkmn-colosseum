@@ -841,49 +841,13 @@ s32 fn_80099400(s32 chan, u32 dev, u32* id) {
             err |= !EXIDeselect(chan);
         }
 
-        /* EXIUnlock(chan) */
-        {
-            EXIControl* uexi = &lbl_803FB3C8[chan];
-            BOOL uenabled = OSDisableInterrupts();
-
-            if (!(uexi->state & 0x10)) {
-                OSRestoreInterrupts(uenabled);
-            } else {
-                uexi->state &= ~0x10;
-                fn_80098110(chan, uexi);
-
-                if (uexi->items > 0) {
-                    EXICallback callback = uexi->queue[0].callback;
-
-                    if (--uexi->items > 0) {
-                        memmove(&uexi->queue[0], &uexi->queue[1],
-                                uexi->items * sizeof(EXIQueueEntry));
-                    }
-                    callback(chan, NULL);
-                }
-                OSRestoreInterrupts(uenabled);
-            }
-        }
+        EXIUnlock(chan);
     }
 
     OSRestoreInterrupts(enabled);
 
     if ((chan < 2) && (dev == 0)) {
-        /* EXIDetach(chan) */
-        {
-            EXIControl* dexi = &lbl_803FB3C8[chan];
-            BOOL denabled = OSDisableInterrupts();
-
-            if (!(dexi->state & 8)) {
-                OSRestoreInterrupts(denabled);
-            } else if ((dexi->state & 0x10) && dexi->device == 0) {
-                OSRestoreInterrupts(denabled);
-            } else {
-                dexi->state &= ~8;
-                __OSMaskInterrupts(0x700000u >> (chan * 3));
-                OSRestoreInterrupts(denabled);
-            }
-        }
+        fn_80098AE8(chan);
 
         enabled = OSDisableInterrupts();
         err |= __EXIProbeStartTime[chan] != startTime;
