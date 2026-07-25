@@ -355,8 +355,8 @@ void __OSUnhandledException(u8 exception, OSContext* context, u32 dsisr,
 
 void ScreenReport(void* xfb, u16 xfbW, u16 xfbH, GXColor yuv, s32 x, s32 y,
                   s32 leading, const char* string) {
-    extern const char* fn_8009DC38(const char* string, void* image, s32 pos,
-                                   s32 stride, s32* width);
+    extern char* fn_8009DC38(const char* string, void* image, s32 pos,
+                             s32 stride, s32* width);
     u8* ptr;
     s32 width;
     u32 i;
@@ -466,6 +466,59 @@ void ConfigureVideo(u16 fbWidth, u16 xfbHeight) {
 
 
 /* 0x8009D820 | 0x58 */
+/* Yay0 decompressor for the IPL font sheet. */
+void Decode(u8* s, u8* d) {
+    int i;
+    int j;
+    int k;
+    int p;
+    int q;
+    int linkTable;
+    int chunkSrc;
+    int cnt;
+    int os;
+    unsigned int flag;
+    unsigned int code;
+
+    os = *(int*)(s + 0x4);
+    linkTable = *(int*)(s + 0x8);
+    chunkSrc = *(int*)(s + 0xC);
+
+    q = 0;
+    flag = 0;
+    p = 16;
+
+    do {
+        if (flag == 0) {
+            code = *(u32*)(s + p);
+            p += sizeof(u32);
+            flag = sizeof(u32) * 8;
+        }
+
+        if (code & 0x80000000) {
+            d[q++] = s[chunkSrc++];
+        } else {
+            j = s[linkTable] << 8 | s[linkTable + 1];
+            linkTable += sizeof(u16);
+
+            k = q - (j & 0x0FFF);
+            cnt = j >> 12;
+            if (cnt == 0) {
+                cnt = s[chunkSrc++] + 0x12;
+            } else {
+                cnt += 2;
+            }
+
+            for (i = 0; i < cnt; i++, q++, k++) {
+                d[q] = d[k - 1];
+            }
+        }
+
+        code <<= 1;
+        flag--;
+    } while (q < os);
+}
+
 u16 fn_8009D820(void) {
     extern u16 lbl_804789A0;
 
