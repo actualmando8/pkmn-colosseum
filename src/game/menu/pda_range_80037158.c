@@ -16,7 +16,11 @@ extern void* lbl_8047A480;
 extern s8 lbl_8047A490;
 extern f32 lbl_8047A478;
 extern f32 lbl_8047A484;
+extern f32 lbl_8047A488;
+extern f32 lbl_8047A48C;
 extern f32 lbl_8047A494;
+extern s8 lbl_8047A47C;
+extern s8 lbl_8047A47D;
 extern s32 lbl_8047A4A8;
 extern s32 lbl_8047A4B8;
 extern s32 lbl_8047A4B4;
@@ -24,6 +28,10 @@ extern s32 lbl_8047A4B0;
 
 extern f32 lbl_8047BA58;
 extern f32 lbl_8047BA60;
+extern f32 lbl_8047BA64;
+extern f32 lbl_8047BA68;
+extern f32 lbl_8047BA6C;
+extern f32 lbl_8047BA70;
 extern f32 lbl_8047BA74;
 extern f32 lbl_8047BA78;
 extern f32 lbl_8047BAC0;
@@ -39,12 +47,16 @@ typedef struct PdaModelWindow {
     f32 field_28;
     u8 pad2C[0x18];
     f32 alphaScale;
+    u8 pad48[0x4C];
+    s8 variant;
 } PdaModelWindow;
 
 typedef struct PdaSprite {
     u8 pad00[0x4];
     s8 flags;
-    u8 pad05[0x47];
+    u8 pad05;
+    s16 eventId;
+    u8 pad08[0x44];
     s32 messageId;
     s16 field_50;
     s16 field_52;
@@ -64,10 +76,15 @@ typedef struct PdaSprite {
 } PdaSprite;
 
 typedef struct PdaSceneWork {
-    u8 pad00[0x10];
+    s32 currentIndex;
+    u8 pad04[0xC];
     s32 field_10;
     u8 pad14[0x14];
     s32 field_28;
+    u8 pad2C[0x14];
+    f32 angle;
+    u8 pad44[8];
+    f32 alphaScale;
 } PdaSceneWork;
 
 typedef struct PdaEvent {
@@ -98,6 +115,20 @@ typedef struct PdaListEntry {
     u16 battleId;
 } PdaListEntry;
 
+typedef struct PdaOrbitPoint {
+    f32 angle;
+    f32 pad04[6];
+    f32 alpha;
+    f32 pad20;
+} PdaOrbitPoint;
+
+typedef struct PdaDrawWork {
+    u8 pad00[0x88];
+    void* drawData;
+    u8 pad8C[9];
+    s8 selectedPage;
+} PdaDrawWork;
+
 extern PdaModelWindow lbl_803A6748;
 extern u8 lbl_803A67FC[];
 extern PdaSceneWork lbl_803A6818;
@@ -118,11 +149,11 @@ void fn_80037158(void)
 
 s32 fn_8003715C(void)
 {
-    u8 flag;
+    s32 flag;
 
     flag = lbl_8047A470;
     lbl_8047A470 = 1;
-    return 1 - (u8)flag;
+    return 1 - flag;
 }
 
 void fn_80037174(void)
@@ -448,6 +479,101 @@ void fn_8003792C(void* window, volatile PdaSprite* sprite)
     }
 }
 #pragma peephole reset
+
+static inline void pdaUpdateOrbitSprite(PdaSprite* sprite, f32 baseAngle,
+                                        s32 updateTarget)
+{
+    extern f32 lbl_802E52A8[4];
+    extern PdaKeyInfo* windowGetKeyInfo(void);
+    extern f64 cos(f64 angle);
+    extern f64 sin(f64 angle);
+    f32 angle;
+    f32 step;
+    f32 distance;
+    f32 magnitude;
+    s8 direction;
+
+    angle = lbl_8047A484 - baseAngle;
+    if (updateTarget) {
+        lbl_8047A488 = lbl_802E52A8[lbl_8047A47C];
+    }
+    if (angle < lbl_8047BA58) {
+        angle += lbl_8047BA60;
+    }
+    if (angle >= lbl_8047BA60) {
+        angle -= lbl_8047BA60;
+    }
+
+    windowGetKeyInfo();
+    step = lbl_8047BA64 * lbl_8047A494;
+    if (lbl_8047A484 != lbl_8047A488) {
+        if (lbl_8047A488 - lbl_8047A484 < lbl_8047BA58) {
+            step = -step;
+        }
+        lbl_8047A48C = step;
+        lbl_8047A484 += step;
+        if (lbl_8047A484 >= lbl_8047BA60) {
+            lbl_8047A484 -= lbl_8047BA60;
+        }
+        if (lbl_8047A484 < lbl_8047BA58) {
+            lbl_8047A484 += lbl_8047BA60;
+        }
+
+        distance = lbl_8047A484 - lbl_8047A488;
+        if (distance <= lbl_8047BA58) {
+            distance = -distance;
+        }
+        magnitude = step;
+        if (magnitude <= lbl_8047BA58) {
+            magnitude = -magnitude;
+        }
+        if (distance < magnitude) {
+            lbl_8047A484 = lbl_8047A488;
+            lbl_8047A48C = lbl_8047BA58;
+        }
+    } else if (lbl_8047A47D != lbl_8047A47C) {
+        direction = lbl_8047A47D - lbl_8047A47C;
+        if (direction > 0) {
+            lbl_8047A48C = -step;
+        } else if (direction < 0) {
+            lbl_8047A48C = step;
+        }
+        lbl_8047A47D = lbl_8047A47C;
+    }
+
+    sprite->field_50 =
+        (s16)(lbl_8047BA6C * (f32)sin(angle) + lbl_8047BA68);
+    sprite->field_52 =
+        (s16)(lbl_8047BA6C * (f32)cos(angle) + lbl_8047BA70);
+}
+
+void fn_800379E8(void* window, PdaSprite* sprite)
+{
+    extern f32 lbl_802E52B8[4];
+    (void)window;
+    pdaUpdateOrbitSprite(sprite, lbl_802E52B8[3], 0);
+}
+
+void fn_80037BB0(void* window, PdaSprite* sprite)
+{
+    extern f32 lbl_802E52B8[4];
+    (void)window;
+    pdaUpdateOrbitSprite(sprite, lbl_802E52B8[2], 0);
+}
+
+void fn_80037D78(void* window, PdaSprite* sprite)
+{
+    extern f32 lbl_802E52B8[4];
+    (void)window;
+    pdaUpdateOrbitSprite(sprite, lbl_802E52B8[1], 0);
+}
+
+void fn_80037F40(void* window, PdaSprite* sprite)
+{
+    extern f32 lbl_802E52B8[4];
+    (void)window;
+    pdaUpdateOrbitSprite(sprite, lbl_802E52B8[0], 1);
+}
 
 /* The redundant expressions preserve MWCC's exact register/scheduling shape. */
 void fn_80038138(void* window, PdaSprite* sprite)
@@ -827,6 +953,39 @@ void fn_80039F44(void* button)
     }
 }
 
+s32 fn_8003A6C0(PdaDrawWork* work, PdaSprite* sprite)
+{
+    extern const s32 lbl_80267130[3];
+    extern s32 lbl_8047A4C8;
+    extern void fn_800FB8C8(s32, s32, s16, s16, void*, s32);
+    extern void msgctrlSetValue(s32 id, s32 value);
+    s32 index;
+    s32 divisor;
+    s32 i;
+
+    index = 0;
+    if (sprite->eventId != lbl_80267130[0]) {
+        index = 1;
+        if (sprite->eventId != lbl_80267130[1]) {
+            index = 2;
+            if (sprite->eventId != lbl_80267130[2]) {
+                index = 3;
+            }
+        }
+    }
+    if (index >= 3) {
+        return 0;
+    }
+
+    divisor = 1;
+    for (i = 0; i < index; i++) {
+        divisor *= 10;
+    }
+    msgctrlSetValue(0x34, (lbl_8047A4C8 / divisor) % 10);
+    fn_800FB8C8(0, 0, sprite->x, sprite->y, work->drawData, 0xC9);
+    return 0;
+}
+
 #pragma peephole off
 s32 fn_8003AC50(PdaMenuState* state)
 {
@@ -876,6 +1035,39 @@ s32 fn_8003ACE8(s32 arg0, s32 arg1, s32 arg2)
     return value;
 }
 #pragma peephole reset
+
+s32 fn_8003AD6C(PdaSelectionWork* work, PdaSprite* sprite)
+{
+    extern const s32 lbl_80267140[4];
+    s32 group;
+    s32 found;
+    s32 i;
+
+    found = 0;
+    group = 0;
+    for (i = 0; i < 2 && !found; i++) {
+        if (sprite->eventId == lbl_80267140[i]) {
+            found = 1;
+        }
+    }
+    if (!found) {
+        group = 1;
+        for (i = 0; i < 2 && !found; i++) {
+            if (sprite->eventId == lbl_80267140[i + 2]) {
+                found = 1;
+            }
+        }
+        if (!found) {
+            group = 2;
+        }
+    }
+    if (!found) {
+        return 0;
+    }
+
+    winSpriteSetDisp(sprite, group == work->selectedIndex);
+    return 0;
+}
 
 #pragma peephole off
 s32 fn_8003AE84(void)
@@ -1073,6 +1265,60 @@ void fn_8003C728(PdaSprite* alphaSprite, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+s32 fn_8003CE1C(s32 index)
+{
+    extern u32 lbl_8047A4D0;
+    extern PdaListEntry* lbl_8047A4D4;
+    extern s32 GSmsgGetGSchar(s32 message);
+    extern void* fightTrainerDataBiosGetPtr(u16 id);
+    extern u16 fightTrainerDataBiosGetKindDataId(void* trainer);
+    extern u32 fightTrainerKindDataBiosGetPrefixName(void* kind);
+    extern void* fightTrainerKindDataBiosGetPtr(u16 kind);
+    extern u8 fn_801EE174(u16 id);
+    extern s32 fn_801EE544(u16 id, s8* variant);
+    extern u32 fn_801EEF40(u16 id);
+    extern u16 fn_801EEFAC(u16 id, s32 side);
+    void* kindData;
+    void* trainer;
+    u16 battleId;
+    u16 kind;
+    u16 alternate;
+    s32 message;
+
+    if (lbl_8047A4D0 == 0) {
+        return 0;
+    }
+
+    battleId = lbl_8047A4D4[index].battleId;
+    message = fn_801EE544(battleId, &lbl_803A6748.variant);
+    switch (lbl_803A6748.variant) {
+    case 0:
+    case 1:
+        message = 0x3720;
+        break;
+    case 2:
+        kind = fn_801EEFAC(battleId, 0);
+        if (kind == 9) {
+            kindData = fightTrainerKindDataBiosGetPtr(fn_801EE174(battleId));
+        } else {
+            alternate = fn_801EEFAC(battleId, 1);
+            if (alternate != 0 && fn_801EEF40(battleId) != 3) {
+                kind = alternate;
+            }
+            trainer = fightTrainerDataBiosGetPtr(kind);
+            kindData = fightTrainerKindDataBiosGetPtr(
+                fightTrainerDataBiosGetKindDataId(trainer));
+        }
+        if (battleId == 0x43) {
+            message = 0x12C0;
+        } else {
+            message = fightTrainerKindDataBiosGetPrefixName(kindData);
+        }
+        break;
+    }
+    return GSmsgGetGSchar(message);
+}
+
 #pragma peephole off
 void fn_8003D818(void)
 {
@@ -1176,6 +1422,34 @@ void fn_80043CD8(PdaSprite* alphaSprite, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+void fn_80043DC0(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern u8 lbl_802EF0A8[];
+    extern s32 lbl_804788C0;
+    extern f32 lbl_8047BCA0;
+    extern f32 lbl_8047BCA4;
+    extern f32 lbl_8047BCA8;
+    extern f32 lbl_8047BD0C;
+    extern f64 sin(f64 angle);
+    f32 angle;
+
+    alphaSprite->alphaByte =
+        lbl_8047BCA0 * lbl_803A6818.alphaScale;
+    if (lbl_803A6818.currentIndex != lbl_803A6818.field_10 - 1) {
+        if (lbl_804788C0 != 0) {
+            sprite->flags |= 2;
+            angle = lbl_8047BCA8 *
+                    (lbl_8047BCA8 * lbl_803A6818.angle);
+            sprite->field_52 =
+                (s16)(lbl_8047BD0C *
+                          (f32)sin(lbl_8047BCA4 * angle) +
+                      (f32)*(s16*)(lbl_802EF0A8 + 0x57F4));
+            return;
+        }
+    }
+    sprite->flags &= ~2;
+}
+
 #pragma peephole off
 void fn_80043EC8(PdaSprite* alphaSprite, PdaSprite* sprite)
 {
@@ -1205,3 +1479,32 @@ void fn_80043EC8(PdaSprite* alphaSprite, PdaSprite* sprite)
                               (f32)(s32)*(s16*)(lbl_802EF0A8 + 0x57bc));
 }
 #pragma peephole reset
+
+void fn_800472CC(PdaSprite* alphaSprite)
+{
+    extern PdaOrbitPoint lbl_802E52C8[8];
+    extern u32 lbl_8047A4EC;
+    extern f32 lbl_8047BC94;
+    extern f32 lbl_8047BCA0;
+    extern f32 lbl_8047BCC4;
+    extern void fn_800473E0(PdaOrbitPoint* point);
+    s32 i;
+
+    alphaSprite->alphaByte =
+        lbl_8047BCA0 * lbl_803A6818.alphaScale;
+    for (i = 0; i < 8; i++) {
+        fn_800473E0(&lbl_802E52C8[i]);
+    }
+    for (i = (s32)lbl_8047A4EC - 1; i >= 0; i--) {
+        lbl_802E52C8[i].alpha -= lbl_8047BCC4;
+        if (lbl_802E52C8[i].alpha < lbl_8047BC94) {
+            lbl_802E52C8[i].alpha = lbl_8047BC94;
+        }
+    }
+    for (i = 7; i > (s32)lbl_8047A4EC; i--) {
+        lbl_802E52C8[i].alpha -= lbl_8047BCC4;
+        if (lbl_802E52C8[i].alpha < lbl_8047BC94) {
+            lbl_802E52C8[i].alpha = lbl_8047BC94;
+        }
+    }
+}

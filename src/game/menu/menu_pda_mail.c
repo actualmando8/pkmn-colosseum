@@ -92,6 +92,14 @@ extern void fn_800FF660(void);
 extern void floorSetFadeScript(s32 a, u32 b);
 extern void _threadSwitch(void);
 
+typedef struct PdaMailAttachmentConfig {
+    f32* scroll;
+    s32 mailId;
+    s32* status;
+    s32 y;
+    s32 x;
+} PdaMailAttachmentConfig;
+
 #pragma peephole off
 void fn_8004B7EC(void)
 {
@@ -1564,3 +1572,49 @@ s32 fn_8004C36C(u8* ctx, u8* p)
 }
 #pragma peephole reset
 #endif
+
+void fn_8004E9C0(s32 mailId)
+{
+    extern u8 lbl_802EF0A8[];
+    extern s32 lbl_804788E8;
+    extern s32 lbl_8047A530;
+    extern s32 lbl_8047A534;
+    extern s32 lbl_8047A538;
+    extern f32 lbl_8047A53C;
+    extern f32 lbl_8047BE48;
+    extern void fn_800F915C(u32 group);
+    extern void fn_8017B1CC(u32 group);
+    extern s32 fn_8017B2CC(u32 group);
+    extern void fn_8017B3E4(u32 group);
+    extern u32 mailGetAttachFileGroup(s32 mailId);
+    PdaMailAttachmentConfig config;
+    u32 group;
+
+    if (lbl_804788E8 != 0) {
+        lbl_804788E8 = 0;
+        lbl_8047A534 = *(s16*)(lbl_802EF0A8 + 0x8CC6);
+        lbl_8047A530 = *(s16*)(lbl_802EF0A8 + 0x8CAA);
+    }
+
+    lbl_8047A538 = 0;
+    group = mailGetAttachFileGroup(mailId);
+    if (group == 0) {
+        return;
+    }
+
+    fn_8017B3E4(group);
+    config.scroll = &lbl_8047A53C;
+    config.mailId = mailId;
+    config.status = &lbl_8047A538;
+    config.y = lbl_8047A534;
+    config.x = lbl_8047A530;
+    lbl_8047A53C = lbl_8047BE48;
+    menuOpenCustom(0x77, windowGetActiveID(), 0, 0, 1, 1, &config);
+    while (fn_8017B2CC(group) == 1) {
+        _threadSwitch();
+    }
+    menuClose(0x77);
+    menuCloseSync(0x77, 1);
+    fn_8017B1CC(group);
+    fn_800F915C(group);
+}
