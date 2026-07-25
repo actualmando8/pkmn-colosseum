@@ -2400,6 +2400,9 @@ config.libs = [
                 "dolphin/sdk_range_8009BD84.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
+                # OSFatal.c's RGB2YUV is emitted with separate fmuls/fadds, so
+                # this SDK object predates the project-wide -fp_contract on.
+                extra_cflags=["-fp_contract off"],
             ),
             *[
                 Object(status, path, mw_version="GC/1.2.5n", progress_category="sdk")

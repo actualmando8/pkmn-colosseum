@@ -552,9 +552,11 @@ void fn_8009CD38(GXColor fg, GXColor bg, const char* msg) {
     extern u32 fn_800AA280(void);        /* VIGetRetraceCount */
     extern void fn_800B8AE8(void);       /* GXAbortFrame */
     extern void VIInit(void);
+    extern OSTime OSGetTime(void);
     extern void VISetBlack(BOOL black);
     extern void VIFlush(void);
     extern u8 lbl_803FB538[];            /* FatalParam + FatalContext */
+#define FatalContext (*(OSContext*)(lbl_803FB538 + 0x10))
     extern void fn_8009CE8C(void);       /* Halt */
     extern BOOL OSDisableInterrupts(void);
     extern BOOL OSEnableInterrupts(void);
@@ -562,12 +564,13 @@ void fn_8009CD38(GXColor fg, GXColor bg, const char* msg) {
     OSFatalParam* fp = (OSFatalParam*)lbl_803FB538;
     OSBootInfo* bootInfo = (OSBootInfo*)0x80000000;
     u32 count;
+    u32 timeout;
     OSTime t;
 
     OSDisableInterrupts();
     OSDisableScheduler();
-    OSClearContext((OSContext*)(lbl_803FB538 + 0x10));
-    OSSetCurrentContext((OSContext*)(lbl_803FB538 + 0x10));
+    OSClearContext(&FatalContext);
+    OSSetCurrentContext(&FatalContext);
     __OSStopAudioSystem();
     AISetStreamVolLeft(0);
     AISetStreamVolRight(0);
@@ -581,7 +584,8 @@ void fn_8009CD38(GXColor fg, GXColor bg, const char* msg) {
     } while ((s32)(fn_800AA280() - count) < 1);
 
     t = OSGetTime();
-    while (!fn_8009FEBC(FALSE) && OSGetTime() - t < OSMillisecondsToTicks(1000)) {
+    timeout = OSMillisecondsToTicks(1000);
+    while (!fn_8009FEBC(FALSE) && OSGetTime() - t < timeout) {
     }
 
     OSDisableInterrupts();
