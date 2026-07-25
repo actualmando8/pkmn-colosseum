@@ -196,6 +196,80 @@ void* fn_800A8894(u32 mode) {
     }
 }
 
+typedef struct VIHwTiming {
+    u8 equ;
+    u16 acv;
+    u16 prbOdd;
+    u16 prbEven;
+    u16 psbOdd;
+    u16 psbEven;
+    u8 bs1;
+    u8 bs2;
+    u8 bs3;
+    u8 bs4;
+    u16 be1;
+    u16 be2;
+    u16 be3;
+    u16 be4;
+    u16 nhlines;
+    u16 hlw;
+    u8 hsy;
+    u8 hcs;
+    u8 hce;
+    u8 hbe640;
+    u16 hbs640;
+    u8 hbeCCIR656;
+    u16 hbsCCIR656;
+} VIHwTiming;
+
+#define __VIRegs ((volatile u16*)0xCC002000)
+
+void fn_800A8934(u32 mode) {
+    extern void* fn_800A8894(u32 mode);
+    VIHwTiming* tm;
+    u32 nonInter;
+    u32 tv;
+    volatile u32 a;
+
+    nonInter = mode & 3;
+    tv = mode >> 2;
+    *(u32*)0x800000CC = tv;
+    tm = fn_800A8894(mode);
+    __VIRegs[1] = 2;
+
+    for (a = 0; a < 1000; a += 8) {
+    }
+
+    __VIRegs[1] = 0;
+    __VIRegs[3] = (u32)tm->hlw;
+    __VIRegs[2] = tm->hce | (tm->hcs << 8);
+    __VIRegs[5] = tm->hsy | (tm->hbe640 << 7);
+    __VIRegs[4] = tm->hbs640 << 1;
+    __VIRegs[0] = (u32)tm->equ;
+    __VIRegs[7] = (u32)(tm->prbOdd + (tm->acv * 2) - 2);
+    __VIRegs[6] = (u32)(tm->psbOdd + 2);
+    __VIRegs[9] = (u32)(tm->prbEven + (tm->acv * 2) - 2);
+    __VIRegs[8] = (u32)(tm->psbEven + 2);
+    __VIRegs[11] = tm->bs1 | (tm->be1 << 5);
+    __VIRegs[10] = tm->bs3 | (tm->be3 << 5);
+    __VIRegs[13] = tm->bs2 | (tm->be2 << 5);
+    __VIRegs[12] = tm->bs4 | (tm->be4 << 5);
+    __VIRegs[36] = 0x2828;
+    __VIRegs[27] = 1;
+    __VIRegs[26] = 0x1001;
+    __VIRegs[25] = (u16)(u32)(tm->hlw + 1);
+    __VIRegs[24] = ((tm->nhlines / 2) + 1) | 0x1000;
+
+    if (mode == 2 || mode == 3 || mode == 26) {
+        __VIRegs[1] = (tv << 8) | 5;
+        __VIRegs[54] = 1;
+        return;
+    }
+
+    __VIRegs[1] = ((nonInter & 2) << 2) | 1 | (tv << 8);
+    __VIRegs[54] = 0;
+}
+
 void VIWaitForRetrace(void) {
     extern u32 lbl_8047A84C;
     extern u32 lbl_8047A854;
