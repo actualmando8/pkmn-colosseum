@@ -182,6 +182,76 @@ void OSReport(const char* format, ...) {
 
 /* FPSCR bits left standing when an FP exception is cleared. */
 #define FPSCR_KEEP 0x6005F8FF
+/* FPSCR VE|OE|UE|ZE|XE, and MSR FE0|FE1. */
+#define FPSCR_ENABLE 0xF8
+#define MSR_FE 0x900
+
+OSErrorHandler OSSetErrorHandler(u16 error, OSErrorHandler handler) {
+    typedef struct OSThread {
+        OSContext context; /* 0x000 */
+        u8 _2C8[0x34];
+        struct OSThread* nextActive; /* 0x2FC */
+    } OSThread;
+    extern OSErrorHandler __OSErrorTable[17];
+    extern u32 lbl_80478990; /* OSDefaultFPSCR */
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSRestoreInterrupts(BOOL level);
+    extern u32 PPCMfmsr(void);
+    extern void PPCMtmsr(u32 msr);
+    extern u32 PPCMffpscr(void);
+    extern void PPCMtfpscr(u32 fpscr);
+    OSErrorHandler oldHandler;
+    OSThread* thread;
+    BOOL enabled;
+    u32 msr;
+    u32 fpscr;
+    u32 i;
+
+    enabled = OSDisableInterrupts();
+    oldHandler = __OSErrorTable[error];
+    __OSErrorTable[error] = handler;
+
+    if (error == 16) {
+        msr = PPCMfmsr();
+        PPCMtmsr(msr | 0x2000);
+        fpscr = PPCMffpscr();
+
+        if (handler != 0) {
+            for (thread = *(OSThread**)0x800000DC; thread != NULL;
+                 thread = thread->nextActive) {
+                thread->context.srr1 |= MSR_FE;
+                if (!(thread->context.state & OS_CONTEXT_STATE_FPSAVED)) {
+                    thread->context.state |= OS_CONTEXT_STATE_FPSAVED;
+                    for (i = 0; i < 32; i++) {
+                        *(u64*)&thread->context.fpr[i] = -1;
+                        *(u64*)&thread->context.psf[i] = -1;
+                    }
+                    thread->context.fpscr = 4;
+                }
+                thread->context.fpscr |= (lbl_80478990 & FPSCR_ENABLE);
+                thread->context.fpscr &= FPSCR_KEEP;
+            }
+            msr |= MSR_FE;
+            fpscr |= (lbl_80478990 & FPSCR_ENABLE);
+        } else {
+            for (thread = *(OSThread**)0x800000DC; thread != NULL;
+                 thread = thread->nextActive) {
+                thread->context.srr1 &= ~MSR_FE;
+                thread->context.fpscr &= ~FPSCR_ENABLE;
+                thread->context.fpscr &= FPSCR_KEEP;
+            }
+            fpscr &= ~FPSCR_ENABLE;
+            msr &= ~MSR_FE;
+        }
+
+        fpscr &= FPSCR_KEEP;
+        PPCMtfpscr(fpscr);
+        PPCMtmsr(msr);
+    }
+
+    OSRestoreInterrupts(enabled);
+    return oldHandler;
+}
 
 void __OSUnhandledException(u8 exception, OSContext* context, u32 dsisr,
                             u32 dar) {
