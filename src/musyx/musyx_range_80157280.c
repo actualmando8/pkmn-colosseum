@@ -1867,7 +1867,7 @@ extern u32  ARGetSize(void);
 extern void fn_800AE630(void);
 extern u32  ARQGetChunkSize(void);
 extern u32  adsrConvertTimeCents(s32 tc); /* verified true signature via synth_adsr.c reference + callsite (see below) */
-extern void salActivateStudio(void);
+extern void salActivateStudio();
 extern u8 lbl_8047B033;
 extern u8 lbl_8047B034;
 extern u8 lbl_8047B035;
@@ -3988,6 +3988,10 @@ static inline void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
     delayline->outPoint = 0;
 }
 
+static inline void DLdelete(_SND_REVHI_DELAYLINE* delayline) {
+    fn_80164400((u32)delayline->inputs);
+}
+
 u32 ReverbHICreate(u8* obj, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay,
                    f32 crosstalk) {
     _SND_REVHI_WORK* rev = (_SND_REVHI_WORK*)obj;
@@ -4056,51 +4060,44 @@ asm void ReverbHIModify(void) {
 #include "src/game/people/people_field_fn_80164A2C.inc"
 }
 #else
-u32 ReverbHIModify(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6) {
-    u32 i;
-    u32 ptr;
+u32 ReverbHIModify(u8* obj, f32 coloration, f32 time, f32 mix, f32 damping,
+                   f32 preDelay, f32 crosstalk) {
+    _SND_REVHI_WORK* rev = (_SND_REVHI_WORK*)obj;
+    u8 i;
 
-    if (obj == NULL) {
-        return 0;
-    }
-    if (f1 < lbl_8047D4F0 || f1 > lbl_8047D4F4) {
-        return 0;
-    }
-    if (f2 < lbl_8047D4F8 || f2 > lbl_8047D4FC) {
-        return 0;
-    }
-    if (f3 < lbl_8047D4F0 || f3 > lbl_8047D4F4) {
-        return 0;
-    }
-    if (f4 < lbl_8047D4F0 || f4 > lbl_8047D4F4) {
-        return 0;
-    }
-    if (f5 < lbl_8047D4F0 || f5 > lbl_8047D520) {
-        return 0;
-    }
-    if (f6 < lbl_8047D4F0 || f6 > lbl_8047D4F4) {
+    if (coloration < 0.f || coloration > 1.f || time < 0.01f ||
+        time > 10.f || mix < 0.f || mix > 1.f || crosstalk < 0.f ||
+        crosstalk > 1.f || damping < 0.f || damping > 1.f ||
+        preDelay < 0.f || preDelay > 100.f) {
         return 0;
     }
 
-    for (i = 0; i < 9; i++) {
-        ptr = *(u32*)(obj + 0x0C + i * 0x14);
-        if (ptr != 0) {
-            fn_80164400(ptr);
-        }
-        ptr = *(u32*)(obj + 0xC0 + i * 0x14);
-        if (ptr != 0) {
-            fn_80164400(ptr);
+    rev->allPassCoeff = coloration;
+    rev->level = mix;
+    rev->crosstalk = crosstalk;
+    rev->damping = damping;
+    if (rev->damping < 0.05f) {
+        rev->damping = 0.05f;
+    }
+
+    rev->damping = 1.f - (rev->damping * 0.8f + 0.05f);
+
+    for (i = 0; i < 9; ++i) {
+        DLdelete(&rev->AP[i]);
+    }
+
+    for (i = 0; i < 9; ++i) {
+        DLdelete(&rev->C[i]);
+    }
+
+    if (rev->preDelayTime != 0) {
+        for (i = 0; i < 3; ++i) {
+            fn_80164400((u32)rev->preDelayLine[i]);
         }
     }
-    if (*(u32*)(obj + 0x1A4) != 0) {
-        for (i = 0; i < 3; i++) {
-            ptr = *(u32*)(obj + 0x1AC + i * 4);
-            if (ptr != 0) {
-                fn_80164400(ptr);
-            }
-        }
-    }
-    return ReverbHICreate(obj, f1, f2, f3, f4, f5, f6);
+
+    return ReverbHICreate(obj, coloration, time, mix, damping, preDelay,
+                          crosstalk);
 }
 #endif
 #undef fn_80164520
@@ -4368,6 +4365,7 @@ typedef struct {
     u8 voiceNum;  /* 0x210 */
     u8 maxMusic;  /* 0x211 */
     u8 maxSFX;    /* 0x212 */
+    u8 studioNum; /* 0x213 */
 } SynthInfoMini;
 
 extern VidListFull* lbl_8047AFD0; /* vidFree */
@@ -5409,6 +5407,46 @@ u32 adsrHandleLowPrecision(AdsrVars* adsr, u16* adsr_start, u16* adsr_delta) {
  * 0x950 per symbols.txt): clears count, marks 64 vsID slots as free
  * (0xFF), and zeroes trailing bookkeeping fields. */
 extern u8 lbl_80446F10[0x950]; /* vsSampleInfo BSS block */
+
+typedef struct MusyxVirtualSampleInfo {
+    u16 smpID;
+    u16 instID;
+    union {
+        struct {
+            u32 off1;
+            u32 len1;
+            u32 off2;
+            u32 len2;
+        } update;
+    } data;
+} MusyxVirtualSampleInfo;
+
+typedef struct MusyxVirtualSampleBuffer {
+    u8 state;
+    u8 hwId;
+    u8 smpType;
+    u8 voice;
+    u32 last;
+    u32 finalGoodSamples;
+    u32 finalLast;
+    MusyxVirtualSampleInfo info;
+} MusyxVirtualSampleBuffer;
+
+typedef struct MusyxVirtualSamples {
+    u8 numBuffers;
+    u8 pad_01[3];
+    u32 bufferLength;
+    MusyxVirtualSampleBuffer streamBuffer[64];
+    u8 voices[64];
+    u16 nextInstID;
+    u8 pad_94A[2];
+    u32 (*callback)(u8 reason, const MusyxVirtualSampleInfo* info);
+} MusyxVirtualSamples;
+
+extern void hwSetVirtualSampleLoopBuffer(u8 voice, void* address, u32 length);
+extern u16 hwGetSampleID(u8 voice);
+extern u8 hwGetSampleType(u8 voice);
+
 #pragma push
 #pragma optimization_level 4
 void vsInit(void) {
@@ -5422,6 +5460,115 @@ void vsInit(void) {
     *(u32*)&lbl_80446F10[0x94C] = 0;
 }
 #pragma pop
+
+static u16 vsNewInstanceID(MusyxVirtualSamples* vs) {
+    u8 i;
+    u16 instID;
+
+    do {
+        instID = vs->nextInstID++;
+        for (i = 0; i < vs->numBuffers; ++i) {
+            if (vs->streamBuffer[i].state != 0 &&
+                vs->streamBuffer[i].info.instID == instID) {
+                break;
+            }
+        }
+    } while (i != vs->numBuffers);
+
+    return instID;
+}
+
+static u8 vsAllocateBuffer(MusyxVirtualSamples* vs) {
+    u8 i;
+
+    for (i = 0; i < vs->numBuffers; ++i) {
+        if (vs->streamBuffer[i].state == 0) {
+            vs->streamBuffer[i].state = 1;
+            vs->streamBuffer[i].last = 0;
+            return i;
+        }
+    }
+
+    return 0xFF;
+}
+
+static void vsFreeBuffer(MusyxVirtualSamples* vs, u8 bufferIndex) {
+    vs->streamBuffer[bufferIndex].state = 0;
+    vs->voices[vs->streamBuffer[bufferIndex].voice] = 0xFF;
+}
+
+u32 fn_80159550(u8 voice) {
+    MusyxVirtualSamples* vs = (MusyxVirtualSamples*)lbl_80446F10;
+    u8 sb;
+    u8 i;
+    u32 address;
+
+    for (i = 0; i < vs->numBuffers; ++i) {
+        if (vs->streamBuffer[i].state != 0 &&
+            vs->streamBuffer[i].voice == voice) {
+            vsFreeBuffer(vs, i);
+        }
+    }
+
+    sb = vs->voices[voice] = vsAllocateBuffer(vs);
+    if (sb != 0xFF) {
+        address = aramGetStreamBufferAddress(vs->voices[voice], 0);
+        hwSetVirtualSampleLoopBuffer(voice, (void*)address,
+                                     vs->bufferLength);
+        vs->streamBuffer[sb].info.smpID = hwGetSampleID(voice);
+        vs->streamBuffer[sb].info.instID = vsNewInstanceID(vs);
+        vs->streamBuffer[sb].smpType = hwGetSampleType(voice);
+        vs->streamBuffer[sb].voice = voice;
+        if (vs->callback != NULL) {
+            vs->callback(0, &vs->streamBuffer[sb].info);
+            return (vs->streamBuffer[sb].info.instID << 8) | voice;
+        }
+        hwSetVirtualSampleLoopBuffer(voice, NULL, 0);
+    } else {
+        hwSetVirtualSampleLoopBuffer(voice, NULL, 0);
+    }
+
+    return 0xFFFFFFFF;
+}
+
+void fn_80159840(MusyxVirtualSampleBuffer* sb, u32 cpos) {
+    MusyxVirtualSamples* vs = (MusyxVirtualSamples*)lbl_80446F10;
+    u32 len;
+
+    if (sb->last == cpos) {
+        return;
+    }
+
+    if ((s32)sb->last < cpos) {
+        if (sb->smpType == 5) {
+            sb->info.data.update.off1 = (sb->last / 14) * 8;
+            sb->info.data.update.len1 = cpos - sb->last;
+            sb->info.data.update.off2 = 0;
+            sb->info.data.update.len2 = 0;
+            if ((len = vs->callback(1, &sb->info)) != 0) {
+                sb->last = (sb->last + len) % vs->bufferLength;
+            }
+        }
+    } else if (cpos == 0) {
+        if (sb->smpType == 5) {
+            sb->info.data.update.off1 = (sb->last / 14) * 8;
+            sb->info.data.update.len1 = vs->bufferLength - sb->last;
+            sb->info.data.update.off2 = 0;
+            sb->info.data.update.len2 = 0;
+            if ((len = vs->callback(1, &sb->info)) != 0) {
+                sb->last = (sb->last + len) % vs->bufferLength;
+            }
+        }
+    } else if (sb->smpType == 5) {
+        sb->info.data.update.off1 = (sb->last / 14) * 8;
+        sb->info.data.update.len1 = vs->bufferLength - sb->last;
+        sb->info.data.update.off2 = 0;
+        sb->info.data.update.len2 = cpos;
+        if ((len = vs->callback(1, &sb->info)) != 0) {
+            sb->last = (sb->last + len) % vs->bufferLength;
+        }
+    }
+}
 
 /* ===== hw_dspctrl.c: salBuildCommandList, 0x8015B250 =====
  * identity: simindex ext:metroidprime/marioparty4 hw_dspctrl.c
@@ -5739,6 +5886,46 @@ extern u16 lbl_80369A50[3][6];     /* dspSRCCycles */
 
 extern u32 salSynthSendMessage(DSPvoice* dsp_vptr, u32 mesg);
 
+static inline void AddDpop(s32* sum, s16 delta) {
+    *sum += delta;
+    *sum = (*sum > 0x7FFFFF)
+               ? 0x7FFFFF
+               : (*sum < -0x7FFFFF ? -0x7FFFFF : *sum);
+}
+
+void fn_8015AD1C(DSPstudioinfo* stp, DSPvoice* dsp_vptr) {
+    _PB* pb;
+
+    dsp_vptr->postBreak = 0;
+    dsp_vptr->pb->state = 0;
+    pb = dsp_vptr->pb;
+
+    AddDpop(&stp->hostDPopSum.l, (s16)pb->dpop.aL);
+    AddDpop(&stp->hostDPopSum.r, (s16)pb->dpop.aR);
+
+    if ((pb->mixerCtrl & 0x04) != 0) {
+        AddDpop(&stp->hostDPopSum.s, (s16)pb->dpop.aS);
+    }
+
+    if ((pb->mixerCtrl & 0x01) != 0) {
+        AddDpop(&stp->hostDPopSum.lA, (s16)pb->dpop.aAuxAL);
+        AddDpop(&stp->hostDPopSum.rA, (s16)pb->dpop.aAuxAR);
+
+        if ((pb->mixerCtrl & 0x14) != 0) {
+            AddDpop(&stp->hostDPopSum.sA, (s16)pb->dpop.aAuxAS);
+        }
+    }
+
+    if ((pb->mixerCtrl & 0x12) != 0) {
+        AddDpop(&stp->hostDPopSum.lB, (s16)pb->dpop.aAuxBL);
+        AddDpop(&stp->hostDPopSum.rB, (s16)pb->dpop.aAuxBR);
+
+        if ((pb->mixerCtrl & 0x04) != 0) {
+            AddDpop(&stp->hostDPopSum.sB, (s16)pb->dpop.aAuxBS);
+        }
+    }
+}
+
 void SortVoices(DSPvoice** voices, s32 l, s32 r) {
     s32 i;
     s32 last;
@@ -5805,6 +5992,185 @@ void salInitHRTFBuffer(void) {
 
     memset((void*)lbl_8047B018, 0, 0x100);
     DCFlushRangeNoSync((void*)lbl_8047B018, 0x100);
+}
+
+u32 salInitDspCtrl(u8 numVoices, u8 numStudios, u8 defaultStudioDPL2) {
+    extern u32 fn_80163798(void);
+    extern void DCInvalidateRange(void* addr, u32 nBytes);
+    extern void DCStoreRangeNoSync(void* addr, u32 nBytes);
+    u32 i;
+    u32 j;
+    u32 itdPtr;
+    DSPvoice* dv;
+    DSPstudioinfo* sp;
+
+    lbl_8047B05D = numVoices;
+    salMaxStudioNum = numStudios;
+    dspARAMZeroBuffer = fn_80163798();
+
+    lbl_8047B010 = fn_801643D8(1024 * sizeof(u16));
+    if (lbl_8047B010 != 0) {
+        lbl_8047B01C = (u16*)fn_801643D8(160 * sizeof(s32));
+        if (lbl_8047B01C != NULL) {
+            memset(lbl_8047B01C, 0, 160 * sizeof(s32));
+            DCFlushRange(lbl_8047B01C, 160 * sizeof(s32));
+
+            lbl_8047B024 =
+                fn_801643D8((u32)numVoices * sizeof(DSPvoice));
+            if (lbl_8047B024 != 0) {
+                lbl_8047B020 = fn_801643D8((u32)numVoices * 64);
+                if (lbl_8047B020 != 0) {
+                    DCInvalidateRange((void*)lbl_8047B020,
+                                      (u32)numVoices * 64);
+                    itdPtr = lbl_8047B020;
+                    dv = (DSPvoice*)lbl_8047B024;
+
+                    for (i = 0; i < numVoices; ++i) {
+                        dv[i].state = 0;
+                        dv[i].postBreak = 0;
+                        dv[i].startupBreak = 0;
+                        dv[i].lastUpdate.pitch = 0xFF;
+                        dv[i].lastUpdate.vol = 0xFF;
+                        dv[i].lastUpdate.volA = 0xFF;
+                        dv[i].lastUpdate.volB = 0xFF;
+                        dv[i].pb = (_PB*)fn_801643D8(sizeof(_PB));
+                        memset(dv[i].pb, 0, sizeof(_PB));
+                        dv[i].patchData = (void*)fn_801643D8(0x80);
+                        dv[i].pb->currHi = (u32)dv[i].pb >> 16;
+                        dv[i].pb->currLo = (u16)(u32)dv[i].pb;
+                        dv[i].pb->update.dataHi =
+                            (u32)dv[i].patchData >> 16;
+                        dv[i].pb->update.dataLo =
+                            (u16)(u32)dv[i].patchData;
+                        dv[i].pb->itd.bufferHi = itdPtr >> 16;
+                        dv[i].pb->itd.bufferLo = (u16)itdPtr;
+                        dv[i].itdBuffer = (void*)itdPtr;
+                        itdPtr += 0x40;
+                        dv[i].virtualSampleID = 0xFFFFFFFF;
+                        DCStoreRangeNoSync(dv[i].pb, sizeof(_PB));
+                        for (j = 0; j < 5; ++j) {
+                            dv[i].changed[j] = 0;
+                        }
+                    }
+
+                    sp = dspStudio;
+                    for (i = 0; i < salMaxStudioNum; ++i) {
+                        sp[i].state = 0;
+                        sp[i].spb = (void*)fn_801643D8(sizeof(_SPB));
+                        if (sp[i].spb == NULL) {
+                            return 0;
+                        }
+
+                        sp[i].main[0] = (s32*)fn_801643D8(0x3C00);
+                        if (sp[i].main[0] == NULL) {
+                            return 0;
+                        }
+
+                        memset(sp[i].main[0], 0, 0x3C00);
+                        DCFlushRangeNoSync(sp[i].main[0], 0x3C00);
+                        sp[i].main[1] = sp[i].main[0] + 0x1E0;
+                        sp[i].auxA[0] = sp[i].main[1] + 0x1E0;
+                        sp[i].auxA[1] = sp[i].auxA[0] + 0x1E0;
+                        sp[i].auxA[2] = sp[i].auxA[1] + 0x1E0;
+                        sp[i].auxB[0] = sp[i].auxA[2] + 0x1E0;
+                        sp[i].auxB[1] = sp[i].auxB[0] + 0x1E0;
+                        sp[i].auxB[2] = sp[i].auxB[1] + 0x1E0;
+                        memset(sp[i].spb, 0, sizeof(_SPB));
+                        sp[i].hostDPopSum.l = sp[i].hostDPopSum.r =
+                            sp[i].hostDPopSum.s = 0;
+                        sp[i].hostDPopSum.lA = sp[i].hostDPopSum.rA =
+                            sp[i].hostDPopSum.sA = 0;
+                        sp[i].hostDPopSum.lB = sp[i].hostDPopSum.rB =
+                            sp[i].hostDPopSum.sB = 0;
+                        DCFlushRangeNoSync(sp[i].spb, sizeof(_SPB));
+                    }
+
+                    salActivateStudio(0, 1,
+                                      defaultStudioDPL2 != 0 ? 1 : 0);
+                    lbl_8047B018 = fn_801643D8(0x100);
+                    if (lbl_8047B018 == 0) {
+                        return 0;
+                    }
+
+                    salInitHRTFBuffer();
+                    return 1;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+void salActivateStudio(studio, isMaster, type)
+u8 studio;
+u32 isMaster;
+s32 type;
+{
+    DSPstudioinfo* sp = &dspStudio[studio];
+
+    memset(sp->main[0], 0, 0x3C00);
+    DCFlushRangeNoSync(sp->main[0], 0x3C00);
+    memset(sp->spb, 0, sizeof(_SPB));
+    sp->hostDPopSum.l = sp->hostDPopSum.r = sp->hostDPopSum.s = 0;
+    sp->hostDPopSum.lA = sp->hostDPopSum.rA = sp->hostDPopSum.sA = 0;
+    sp->hostDPopSum.lB = sp->hostDPopSum.rB = sp->hostDPopSum.sB = 0;
+    DCFlushRangeNoSync(sp->spb, sizeof(_SPB));
+    memset(sp->auxA[0], 0, 0x780);
+    DCFlushRangeNoSync(sp->auxA[0], 0x780);
+    memset(sp->auxB[0], 0, 0x780);
+    DCFlushRangeNoSync(sp->auxB[0], 0x780);
+    sp->voiceRoot = NULL;
+    sp->alienVoiceRoot = NULL;
+    sp->state = 1;
+    sp->isMaster = isMaster;
+    sp->numInputs = 0;
+    sp->type = type;
+    sp->auxAHandler = sp->auxBHandler = NULL;
+}
+
+typedef struct MusyxAuxInfo {
+    struct {
+        struct {
+            s32* left;
+            s32* right;
+            s32* surround;
+        } bufferUpdate;
+    } data;
+} MusyxAuxInfo;
+
+typedef void (*MusyxAuxCallback)(u8 reason, MusyxAuxInfo* info, void* user);
+
+void salHandleAuxProcessing(void) {
+    u8 studio;
+    s32* work;
+    DSPstudioinfo* sp;
+    MusyxAuxInfo info;
+
+    for (sp = dspStudio, studio = 0; studio < salMaxStudioNum;
+         ++studio, ++sp) {
+        if (sp->state != 1) {
+            continue;
+        }
+
+        if (sp->auxAHandler != NULL) {
+            work = sp->auxA[(salAuxFrame + 2) % 3];
+            info.data.bufferUpdate.left = work;
+            info.data.bufferUpdate.right = work + 0xA0;
+            info.data.bufferUpdate.surround = work + 0x140;
+            ((MusyxAuxCallback)sp->auxAHandler)(0, &info, sp->auxAUser);
+            DCFlushRangeNoSync(work, 0x780);
+        }
+
+        if (sp->type == 0 && sp->auxBHandler != NULL) {
+            work = sp->auxB[(salAuxFrame + 2) % 3];
+            info.data.bufferUpdate.left = work;
+            info.data.bufferUpdate.right = work + 0xA0;
+            info.data.bufferUpdate.surround = work + 0x140;
+            ((MusyxAuxCallback)sp->auxBHandler)(0, &info, sp->auxBUser);
+            DCFlushRangeNoSync(work, 0x780);
+        }
+    }
 }
 
 void fn_8015AAA0(u32 studio) {
@@ -6968,6 +7334,49 @@ void fn_8015FE4C(u32 arg) {
 }
 
 void fn_8015FE84(void) { }
+
+extern void seqInit(void);
+extern void synthInit(u32 mixFrq, u8 numVoices);
+
+s32 fn_8015FE88(u8 voicesArg, u8 music, u8 sfx, u8 studios, u32 flags,
+                u32 aramSize) {
+    extern u32 hwInit(u32 mixFrq, u16 numVoices, u32 numStudios, u32 flags);
+    extern void fn_80159C48(void);
+    extern void vsInit(void);
+    extern void fn_8015FE4C(u32 flags);
+    s32 ret;
+    u32 mixFrq;
+
+    ret = 0;
+    lbl_8047AF18 = 0;
+    if (voicesArg <= 64) {
+        synthInfo.voiceNum = voicesArg;
+    } else {
+        synthInfo.voiceNum = 64;
+    }
+    if (studios <= 8) {
+        synthInfo.studioNum = studios;
+    } else {
+        synthInfo.studioNum = 8;
+    }
+
+    synthInfo.maxMusic = music;
+    synthInfo.maxSFX = sfx;
+    mixFrq = 32000;
+    ret = hwInit((u32)&mixFrq, synthInfo.voiceNum, synthInfo.studioNum, flags);
+    if (ret == 0) {
+        fn_80159C48();
+        dataInit(0, aramSize);
+        seqInit();
+        synthIdleWaitActive = 0;
+        synthInit(32000, synthInfo.voiceNum);
+        vsInit();
+        fn_8015FE4C(flags);
+        lbl_8047AF18 = 1;
+    }
+
+    return ret;
+}
 
 #pragma dont_inline on
 void sndQuit(void) {
