@@ -6667,7 +6667,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "hsd/hsd_jobj.c",
-                mw_version="GC/1.3",
+                mw_version="GC/1.3.2",
                 extra_cflags=["-DHSD_JOBJ_OMIT_EXACT_8019F718"],
                 progress_category="hsd",
             ),
