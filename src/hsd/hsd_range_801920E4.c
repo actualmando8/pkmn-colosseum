@@ -59,56 +59,7 @@ typedef union ByteCodeVal {
     f32 f;
 } ByteCodeVal;
 
-typedef union ByteCodeFloatShape {
-    f32 value;
-    u32 bits;
-} ByteCodeFloatShape;
-
-/* MSL <math.h> inline sqrtf: frsqrte plus three Newton steps, then the
- * NaN / zero / denormal fallback driven by __fpclassifyf. */
-static inline f32 bcSqrt(f32 value)
-{
-    volatile ByteCodeFloatShape shape;
-    u32 exponent;
-    s32 fpclass;
-
-    if (value > 0.0f) {
-        f64 guess = __frsqrte(value);
-        guess = 0.5 * guess * (3.0 - value * (guess * guess));
-        guess = 0.5 * guess * (3.0 - value * (guess * guess));
-        guess = 0.5 * guess * (3.0 - value * (guess * guess));
-        return (f32) (value * guess);
-    }
-    if ((f64) value < 0.0) {
-        return lbl_80478AC0[0];
-    }
-
-    shape.value = value;
-    exponent = shape.bits & 0x7F800000;
-    switch (exponent) {
-    case 0x7F800000:
-        if ((shape.bits & 0x007FFFFF) != 0) {
-            fpclass = 1;
-        } else {
-            fpclass = 2;
-        }
-        break;
-    case 0:
-        if ((shape.bits & 0x007FFFFF) != 0) {
-            fpclass = 5;
-        } else {
-            fpclass = 3;
-        }
-        break;
-    default:
-        fpclass = 4;
-        break;
-    }
-    if (fpclass == 1) {
-        return lbl_80478AC0[0];
-    }
-    return value;
-}
+extern f32 sqrtf(f32 value);
 
 f32 HSD_ByteCodeEval(u8* bytecode, f32* args, s32 nb_args)
 {
@@ -304,7 +255,7 @@ f32 HSD_ByteCodeEval(u8* bytecode, f32* args, s32 nb_args)
             break;
         case 0x16:
             BC_ASSERT(474, stack);
-            fv = bcSqrt(((ByteCodeVal*) &stack->data)->f);
+            fv = sqrtf(((ByteCodeVal*) &stack->data)->f);
             stack->data = *(void**) &fv;
             break;
         case 0x31:
