@@ -622,7 +622,10 @@ game/menu/menu_carde_matrix.c:
 	.text       start:0x8007C300 end:0x8007FD64
 
 game/menu/cardesavedata.c:
-	.text       start:0x8007FD64 end:0x80088428
+	.text       start:0x8007FD64 end:0x80084038
+
+game/menu/cardesavedata_80084038.c:
+	.text       start:0x80084038 end:0x80088428
 
 game/gba/gba_conv.c:
 	.text       start:0x80088428 end:0x80088EA8

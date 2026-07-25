@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1803
+    "total_units": 1804
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1735,
-    "source_backed_units": 1720,
+    "named_units": 1736,
+    "source_backed_units": 1721,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -23,7 +23,7 @@
     "matched_data_percent": 97.28669,
     "matched_functions": 6378,
     "matched_functions_percent": 74.13693,
-    "fuzzy_match_percent": 60.462955
+    "fuzzy_match_percent": 60.544765
   },
   "unit_topology": [
     {
@@ -2818,13 +2818,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 34500,
+          "size": 17108,
           "virtual_address": 2148007268
         }
       ],
-      "total_code": 34500,
+      "total_code": 17108,
       "total_data": 0,
-      "total_functions": 28
+      "total_functions": 23
+    },
+    {
+      "name": "main/game/menu/cardesavedata_80084038",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 17392,
+          "virtual_address": 2148024376
+        }
+      ],
+      "total_code": 17392,
+      "total_data": 0,
+      "total_functions": 5
     },
     {
       "name": "main/game/gba/gba_conv",
