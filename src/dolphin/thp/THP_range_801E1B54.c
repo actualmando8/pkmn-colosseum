@@ -799,6 +799,12 @@ void fn_801E1FF8(const THPVideoInfo* info)
 }
 #pragma pop
 
+typedef struct THPAudioBuffer {
+    s16 *buffer;
+    s16 *curPtr;
+    u32 validSample;
+} THPAudioBuffer;
+
 typedef struct THPActivePlayer {
     u8 pad00[0x4C];
     f32 frameRate;
@@ -825,7 +831,7 @@ typedef struct THPActivePlayer {
     u32 audioReadFrame;
     u32 audioPlayedFrame;
     u32 decodedFrame;
-    u32 pendingFrame;
+    THPAudioBuffer *playAudioBuffer;
 } THPActivePlayer;
 
 #define THP_ACTIVE_PLAYER (*(THPActivePlayer *)lbl_8046AC60)
@@ -974,7 +980,7 @@ decoded:
     if (player->hasAudio) {
         if (player->audioPlayedFrame + player->frameOffset ==
                 player->frameCount &&
-            player->pendingFrame == 0) {
+            player->playAudioBuffer == NULL) {
             player->internalState = 3;
             player->state = 3;
         }
@@ -1258,6 +1264,57 @@ u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
 #pragma pop
 
 #pragma optimize_for_size on
+u32 fn_801E2B74(s16 *left, s16 *right, u32 requestedSamples, u32 *status)
+{
+    /* Separate THPAudioDecode translation unit in the SDK source. */
+    extern u32 fn_801E4AC4(u32 flags);
+    extern void fn_801E4B08(u32 message);
+    u32 samples;
+    s16 *audio;
+    u32 i;
+
+    if (THP_ACTIVE_PLAYER.playAudioBuffer == NULL) {
+        THP_ACTIVE_PLAYER.playAudioBuffer =
+            (THPAudioBuffer *)fn_801E4AC4(0);
+        if (THP_ACTIVE_PLAYER.playAudioBuffer == NULL) {
+            *status = 2;
+            return 0;
+        }
+    }
+
+    if (THP_ACTIVE_PLAYER.playAudioBuffer->validSample != 0) {
+        samples = THP_ACTIVE_PLAYER.playAudioBuffer->validSample >=
+                          requestedSamples
+                      ? requestedSamples
+                      : THP_ACTIVE_PLAYER.playAudioBuffer->validSample;
+        audio = THP_ACTIVE_PLAYER.playAudioBuffer->curPtr;
+
+        if (right == NULL) {
+            for (i = samples; i != 0; i--) {
+                *left++ = audio[1];
+                audio += 2;
+            }
+        } else {
+            for (i = samples; i != 0; i--) {
+                *right++ = audio[0];
+                *left++ = audio[1];
+                audio += 2;
+            }
+        }
+
+        THP_ACTIVE_PLAYER.playAudioBuffer->validSample -= samples;
+        THP_ACTIVE_PLAYER.playAudioBuffer->curPtr = audio;
+        if (THP_ACTIVE_PLAYER.playAudioBuffer->validSample == 0) {
+            fn_801E4B08((u32)THP_ACTIVE_PLAYER.playAudioBuffer);
+            THP_ACTIVE_PLAYER.playAudioBuffer = NULL;
+            *status = 1;
+        } else {
+            *status = 0;
+        }
+    }
+    return samples;
+}
+
 u32 fn_801E4650(void)
 {
     u32 total;
