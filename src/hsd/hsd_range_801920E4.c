@@ -59,7 +59,51 @@ typedef union ByteCodeVal {
     f32 f;
 } ByteCodeVal;
 
-extern f32 sqrtf(f32 value);
+/*
+ * MSL math.h supplies these as inlines. The target expands both at the
+ * bytecode square-root opcode: three reciprocal-square-root refinements,
+ * followed by the standard float classification fallback.
+ */
+static inline s32 __fpclassifyf(f32 value)
+{
+    switch (*(s32*) &value & 0x7F800000) {
+    case 0x7F800000: {
+        if (*(s32*) &value & 0x007FFFFF) {
+            return 1;
+        } else {
+            return 2;
+        }
+        break;
+    }
+    case 0: {
+        if (*(s32*) &value & 0x007FFFFF) {
+            return 5;
+        } else {
+            return 3;
+        }
+        break;
+    }
+    }
+    return 4;
+}
+
+static inline f32 sqrtf(f32 value)
+{
+    if (value > 0.0F) {
+        f64 guess = __frsqrte(value);
+        guess = 0.5 * guess * (3.0 - value * (guess * guess));
+        guess = 0.5 * guess * (3.0 - value * (guess * guess));
+        guess = 0.5 * guess * (3.0 - value * (guess * guess));
+        return (f32) (value * guess);
+    }
+    if ((f64) value < 0.0) {
+        return lbl_80478AC0[0];
+    }
+    if (__fpclassifyf(value) == 1) {
+        return lbl_80478AC0[0];
+    }
+    return value;
+}
 
 f32 HSD_ByteCodeEval(u8* bytecode, f32* args, s32 nb_args)
 {
