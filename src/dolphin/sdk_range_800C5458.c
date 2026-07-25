@@ -96,6 +96,38 @@ typedef struct decform {
     /* 0x02 */ short digits;
 } decform;
 
+#define FP_NAN 1
+#define FP_INFINITE 2
+#define FP_ZERO 3
+#define FP_NORMAL 4
+#define FP_SUBNORMAL 5
+
+#define __HI(x) (*(u32*)&x)
+#define __LO(x) (*(1 + (u32*)&x))
+
+inline int __fpclassifyd(f64 x) {
+    switch (__HI(x) & 0x7FF00000) {
+    case 0x7FF00000:
+        if ((__HI(x) & 0x000FFFFF) || (__LO(x) & 0xFFFFFFFF)) {
+            return FP_NAN;
+        } else {
+            return FP_INFINITE;
+        }
+        break;
+    case 0:
+        if ((__HI(x) & 0x000FFFFF) || (__LO(x) & 0xFFFFFFFF)) {
+            return FP_SUBNORMAL;
+        } else {
+            return FP_ZERO;
+        }
+        break;
+    }
+    return FP_NORMAL;
+}
+
+#define isnan(x) (__fpclassifyd(x) == FP_NAN)
+#define isfinite(x) (__fpclassifyd(x) > FP_INFINITE)
+
 extern f64 frexp(f64 x, int* exp);
 extern f64 ldexp(f64 x, int exp);
 extern f64 modf(f64 x, f64* ip);
@@ -248,6 +280,13 @@ void __num2dec_internal(decimal* d, f64 x) {
         d->exp = 0;
         d->sig.length = 1;
         d->sig.text[0] = 0;
+        return;
+    }
+    if (!isfinite(x)) {
+        d->sign = sgn;
+        d->exp = 0;
+        d->sig.length = 1;
+        d->sig.text[0] = (unsigned char)(isnan(x) ? 'N' : 'I');
         return;
     }
 
