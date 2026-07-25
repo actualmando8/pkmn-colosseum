@@ -1705,52 +1705,54 @@ u16 inpGetExCtrl(u8* obj, u8 ctrl) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void fn_80161E8C(void) {
-#include "src/game/people/people_field_fn_80161E8C.inc"
-}
-#else
-void fn_80161E8C(u8* obj, u32 ctrl, s32 value) {
-    u32 code;
-    u32 raw;
+void inpSetExCtrl(u8* obj, u8 ctrl, s16 value) {
+    u8 code;
+    u8 raw;
     u32 base;
-    u32 high;
-    u32 low;
+    u8 channel;
+    u8 set;
 
-    if (value < 0) {
-        value = 0;
+    value = value < 0 ? 0 : value > 0x3FFF ? 0x3FFF : value;
+    code = ctrl;
+    raw = ctrl;
+    switch (raw) {
+    case 0x80: code = 0x80; break;
+    case 0x81: code = 0x82; break;
+    case 0x82: code = 0xA0; break;
+    case 0x83: code = 0xA1; break;
+    case 0x84: code = 0x83; break;
+    case 0x85: code = 0x84; break;
+    case 0x86: code = 0xA2; break;
+    case 0x87: code = 0xA3; break;
+    case 0x88: code = 0xA4; break;
     }
-    if (value > 0x3FFF) {
-        value = 0x3FFF;
-    }
-    raw = ctrl & 0xFF;
-    code = inpTranslateExCtrl(ctrl) & 0xFF;
-    if (code == 0xA0 || code == 0xA1) {
-        return;
-    }
-    if (obj[0x121] == 0xFF || obj[0x122] == 0xFF) {
-        return;
-    }
-
-    high = ((u32)value >> 7) & 0xFF;
-    low = (u32)value & 0x7F;
-    if (raw < 0x40) {
-        base = raw & 0x1F;
-        fn_801603C0(base, obj[0x121], obj[0x122], high);
-        fn_801603C0((base + 0x20) & 0xFF, obj[0x121], obj[0x122], low);
-    } else if (raw == 0x80 || raw == 0x81 || raw == 0x84 || raw == 0x85) {
-        base = raw & 0xFE;
-        fn_801603C0(base, obj[0x121], obj[0x122], high);
-        fn_801603C0((base + 1) & 0xFF, obj[0x121], obj[0x122], low);
-    } else {
-        fn_801603C0(raw, obj[0x121], obj[0x122], high);
+    switch (code) {
+    case 0xA0:
+    case 0xA1:
+        break;
+    default:
+        channel = obj[0x121];
+        if (channel != 0xFF) {
+            set = obj[0x122];
+            if (raw < 0x40) {
+                base = raw & 0x1F;
+                fn_801603C0(base, channel, set, (u16)value >> 7);
+                fn_801603C0(base + 0x20, channel, set, value & 0x7F);
+            } else if (raw == 0x80 || raw == 0x81) {
+                base = raw & 0xFE;
+                fn_801603C0(base, channel, set, (u16)value >> 7);
+                fn_801603C0(base + 1, channel, set, value & 0x7F);
+            } else if (raw == 0x84 || raw == 0x85) {
+                base = raw & 0xFE;
+                fn_801603C0(base, channel, set, (u16)value >> 7);
+                fn_801603C0(base + 1, channel, set, value & 0x7F);
+            } else {
+                fn_801603C0(raw, channel, set, (u16)value >> 7);
+            }
+        }
+        break;
     }
 }
-#endif
-#pragma pop
 extern u32 lbl_80478BF0;
 #pragma push
 #pragma optimization_level 4
@@ -1904,7 +1906,7 @@ extern void fn_80163BCC(u8* a, u32 b);
 extern u8   fn_80163CA8();
 extern u32  aramGetStreamBufferAddress(u32 idx, u32 *out);
 extern void aramFreeStreamBuffer();
-extern u32  salInitAi(u32(*fnptr)(void), u32 d, u32 a);
+extern u32  salInitAi(void(*fnptr)(void), u32 d, u32 a);
 extern void fn_801640C4(void);
 extern u32  salExitAi(void);
 extern u32  fn_80164148(u32 d);
@@ -1954,6 +1956,76 @@ asm void fn_80162214(void) {
 u32 fn_80162214(u32 time) { return time / 256; }
 #endif
 #pragma pop
+extern u8 lbl_8047AF18;
+extern u8 lbl_8047B05D;
+extern u8 lbl_8047B05E;
+extern u8 lbl_8047B05F;
+extern u32 lbl_8047B024;
+extern void fn_8014E7CC(void);
+extern u32 fn_80164398(void);
+extern u32 fn_801643B8(void);
+extern u8* salAiGetDest(void);
+extern void salCtrlDsp(u32 arg);
+extern void salHandleAuxProcessing(void);
+extern void fn_8016245C(u8 offset);
+extern void fn_801496A0(u32 ticks);
+extern void synthHandle(u32 ticks);
+extern void fn_8015F620(void);
+extern void fn_8014DF20(void);
+extern void vsSampleUpdates(void);
+
+typedef struct HwIrqVoice {
+    u8 pad_00[0x24];
+    u32 changed[5];
+} HwIrqVoice;
+
+void snd_handle_irq(void) {
+    u8 frame;
+    u8 voice;
+    u8 i;
+
+    if (lbl_8047AF18 == 0) {
+        return;
+    }
+
+    fn_8014E7CC();
+    fn_80164398();
+    salCtrlDsp((u32)salAiGetDest());
+    fn_801643B8();
+    fn_80164398();
+    salHandleAuxProcessing();
+    fn_801643B8();
+    fn_80164398();
+
+    lbl_8047B05F ^= 1;
+    lbl_8047B05E = (lbl_8047B05E + 1) % 3;
+    for (voice = 0; voice < lbl_8047B05D; voice++) {
+        for (i = 0; i < 5; i++) {
+            ((HwIrqVoice*)((u8*)lbl_8047B024 + voice * 0xF4))->changed[i] = 0;
+        }
+    }
+    fn_801643B8();
+
+    for (frame = 0; frame < 5; frame++) {
+        fn_80164398();
+        fn_8016245C(frame);
+        fn_801496A0(0x100);
+        synthHandle(0x100);
+        fn_801643B8();
+    }
+
+    fn_80164398();
+    fn_8016245C(0);
+    fn_8015F620();
+    fn_801643B8();
+    fn_80164398();
+    fn_8014DF20();
+    fn_801643B8();
+    fn_80164398();
+    vsSampleUpdates();
+    fn_801643B8();
+}
+
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
@@ -1964,7 +2036,7 @@ asm void hwInit(void) {
 #else
 extern u8  lbl_8047B05E;
 extern u8  lbl_8047B05F;
-extern u32 snd_handle_irq(void);
+extern void snd_handle_irq(void);
 u32 hwInit(u32 a, u16 b, u32 c, u32 d) {
     extern u32 lbl_8047B028;
     hwInitIrq();
@@ -3538,7 +3610,7 @@ asm u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
 /* The guard-clause layout preserves the target branch polarity. Keep the
  * adjacent stores direct: swapping or chaining them changes the constant-
  * register pairing. */
-u32 salInitAi(u32(*fnptr)(void), u32 d, u32 a) {
+u32 salInitAi(void(*fnptr)(void), u32 d, u32 a) {
     lbl_8047B09C = fn_801643D8(0xA00);
     if (lbl_8047B09C != 0) {
         memset((void*)lbl_8047B09C, 0, 0xA00);
