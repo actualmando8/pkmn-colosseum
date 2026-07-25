@@ -401,6 +401,242 @@ int __pformatter_800C88BC(WriteProcT WriteProc, void* WriteProcArg,
     return chars_written;
 }
 
+/* MSL ctype table; bit 0x10 marks a digit, bit 0x80 an uppercase letter. */
+extern u8 lbl_80313B18[];
+
+typedef struct decform {
+    /* 0x00 */ char style;
+    /* 0x01 */ char unk1;
+    /* 0x02 */ short digits;
+} decform;
+
+extern void __num2dec(const decform* f, f64 x, decimal* d);
+extern char* strcpy(char* dst, const char* src);
+void round_decimal(decimal* dec, int new_length);
+
+/* MSL ctype table; bit 0x80 marks an uppercase letter. */
+#define isupper(c) (lbl_80313B18[(u8)(c)] & 0x80)
+
+/* float2str - 0x800C8FF4 */
+char* float2str(f64 num, char* buff, print_format format) {
+    decimal dec;
+    decform form;
+    char* p;
+    char* q;
+    int n, digits, sign;
+    int int_digits, frac_digits;
+    int radix_marker;
+
+    radix_marker = '.';
+
+    if (format.precision > 509) {
+        return 0;
+    }
+
+    form.style = 0;
+    form.digits = 0x20;
+    __num2dec(&form, num, &dec);
+    p = (char*)dec.sig.text + dec.sig.length;
+
+    while (dec.sig.length > 1 && *--p == '0') {
+        --dec.sig.length;
+        ++dec.exp;
+    }
+
+    switch (*dec.sig.text) {
+    case '0':
+        dec.exp = 0;
+        break;
+
+    case 'I':
+        if (num < 0) {
+            p = buff - 5;
+            if (isupper(format.conversion_char)) {
+                strcpy(p, "-INF");
+            } else {
+                strcpy(p, "-inf");
+            }
+        } else {
+            p = buff - 4;
+            if (isupper(format.conversion_char)) {
+                strcpy(p, "INF");
+            } else {
+                strcpy(p, "inf");
+            }
+        }
+        return p;
+
+    case 'N':
+        if (dec.sign) {
+            p = buff - 5;
+            if (isupper(format.conversion_char)) {
+                strcpy(p, "-NAN");
+            } else {
+                strcpy(p, "-nan");
+            }
+        } else {
+            p = buff - 4;
+            if (isupper(format.conversion_char)) {
+                strcpy(p, "NAN");
+            } else {
+                strcpy(p, "nan");
+            }
+        }
+        return p;
+    }
+
+    dec.exp += dec.sig.length - 1;
+    p = buff;
+    *--p = 0;
+
+    switch (format.conversion_char) {
+    case 'g':
+    case 'G':
+        if (dec.sig.length > format.precision) {
+            round_decimal(&dec, format.precision);
+        }
+
+        if (dec.exp < -4 || dec.exp >= format.precision) {
+            if (format.alternate_form) {
+                --format.precision;
+            } else {
+                format.precision = dec.sig.length - 1;
+            }
+
+            if (format.conversion_char == 'g') {
+                format.conversion_char = 'e';
+            } else {
+                format.conversion_char = 'E';
+            }
+            goto e_format;
+        }
+
+        if (format.alternate_form) {
+            format.precision -= dec.exp + 1;
+        } else {
+            if ((format.precision = dec.sig.length - (dec.exp + 1)) < 0) {
+                format.precision = 0;
+            }
+        }
+        goto f_format;
+
+    case 'e':
+    case 'E':
+    e_format:
+        if (dec.sig.length > format.precision + 1) {
+            round_decimal(&dec, format.precision + 1);
+        }
+
+        n = dec.exp;
+        sign = '+';
+
+        if (n < 0) {
+            n = -n;
+            sign = '-';
+        }
+
+        for (digits = 0; n || digits < 2; ++digits) {
+            *--p = n % 10 + '0';
+            n /= 10;
+        }
+
+        *--p = sign;
+        *--p = format.conversion_char;
+
+        if (buff - p + format.precision > 509) {
+            return 0;
+        }
+
+        if (dec.sig.length < format.precision + 1) {
+            for (n = format.precision + 1 - dec.sig.length + 1; --n;) {
+                *--p = '0';
+            }
+        }
+
+        for (n = dec.sig.length, q = (char*)dec.sig.text + dec.sig.length; --n;) {
+            *--p = *--q;
+        }
+
+        if (format.precision || format.alternate_form) {
+            *--p = radix_marker;
+        }
+
+        *--p = *dec.sig.text;
+
+        if (dec.sign) {
+            *--p = '-';
+        } else if (format.sign_options == sign_always) {
+            *--p = '+';
+        } else if (format.sign_options == space_holder) {
+            *--p = ' ';
+        }
+        break;
+
+    case 'f':
+    case 'F':
+    f_format:
+        if ((frac_digits = -dec.exp + dec.sig.length - 1) < 0) {
+            frac_digits = 0;
+        }
+
+        if (frac_digits > format.precision) {
+            round_decimal(&dec, dec.sig.length - (frac_digits - format.precision));
+
+            if ((frac_digits = -dec.exp + dec.sig.length - 1) < 0) {
+                frac_digits = 0;
+            }
+        }
+
+        if ((int_digits = dec.exp + 1) < 0) {
+            int_digits = 0;
+        }
+
+        if (int_digits + frac_digits > 509) {
+            return 0;
+        }
+
+        q = (char*)dec.sig.text + dec.sig.length;
+
+        for (digits = 0; digits < (format.precision - frac_digits); ++digits) {
+            *--p = '0';
+        }
+
+        for (digits = 0; digits < frac_digits && digits < dec.sig.length; ++digits) {
+            *--p = *--q;
+        }
+
+        for (; digits < frac_digits; ++digits) {
+            *--p = '0';
+        }
+
+        if (format.precision || format.alternate_form) {
+            *--p = radix_marker;
+        }
+
+        if (int_digits) {
+            for (digits = 0; digits < int_digits - dec.sig.length; ++digits) {
+                *--p = '0';
+            }
+            for (; digits < int_digits; ++digits) {
+                *--p = *--q;
+            }
+        } else {
+            *--p = '0';
+        }
+
+        if (dec.sign) {
+            *--p = '-';
+        } else if (format.sign_options == sign_always) {
+            *--p = '+';
+        } else if (format.sign_options == space_holder) {
+            *--p = ' ';
+        }
+        break;
+    }
+
+    return p;
+}
+
 /* round_decimal - 0x800C974C */
 void round_decimal(decimal* dec, int new_length) {
     char c;
@@ -656,11 +892,7 @@ char* long2str_800C9EC4(signed long num, char* buff, print_format format) {
     return p;
 }
 
-/* MSL ctype table; bit 0x10 marks a decimal digit. */
-extern u8 lbl_80313B18[];
 #define isdigit(c) (lbl_80313B18[(u8)(c)] & 0x10)
-
-extern void* __va_arg(void* ap, u32 kind);
 
 /* parse_format - 0x800CA11C */
 const char* parse_format_800CA11C(const char* format_string, va_list* arg,
