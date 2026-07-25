@@ -213,6 +213,223 @@ void VIWaitForRetrace(void) {
     OSRestoreInterrupts(enabled);
 }
 
+typedef struct SomeVIStruct {
+    u16 DispPosX;
+    u16 DispPosY;
+    u16 DispSizeX;
+    u16 DispSizeY;
+    u16 AdjustedDispPosX;
+    u16 AdjustedDispPosY;
+    u16 AdjustedDispSizeY;
+    u16 AdjustedPanPosY;
+    u16 AdjustedPanSizeY;
+    u16 FBSizeX;
+    u16 FBSizeY;
+    u16 PanPosX;
+    u16 PanPosY;
+    u16 PanSizeX;
+    u16 PanSizeY;
+    u32 FBMode;
+    u32 nonInter;
+    u32 tv;
+    u8 wordPerLine;
+    u8 std;
+    u8 wpl;
+    u32 bufAddr;
+    u32 tfbb;
+    u32 bfbb;
+    u8 xof;
+    BOOL black;
+    BOOL threeD;
+    u32 rbufAddr;
+    u32 rtfbb;
+    u32 rbfbb;
+    void* timing;
+} SomeVIStruct;
+
+/*
+ * VI shadow state: regs[59] at 0x803FC488, shdwRegs[59] at +0x78,
+ * HorVer at +0xF0.  Declared per-function to match this file's convention.
+ */
+#define VI_CONTEXT_DECL                                                        \
+    typedef struct VIContext {                                                 \
+        volatile u16 viRegs[59];                                                 \
+        u8 _76[2];                                                             \
+        volatile u16 viShdwRegs[59];                                             \
+        u8 _EE[2];                                                             \
+        SomeVIStruct HorVer;                                                   \
+    } VIContext;                                                               \
+    extern VIContext lbl_803FC488;                                             \
+    extern volatile u64 lbl_8047A870
+
+#define regs lbl_803FC488.viRegs
+#define shdwRegs lbl_803FC488.viShdwRegs
+#define changed lbl_8047A870
+#define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
+
+static void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine,
+                     u32 xfbMode, u16 dispPosY, u32* tfbb, u32* bfbb) {
+    u32 bytesPerLine;
+    u32 xoffInWords;
+    u32 tmp;
+
+    xoffInWords = (panPosX & ~0xF) >> 4;
+    bytesPerLine = (wordPerLine & 0xFF) << 5;
+    *tfbb = bufAddr + (xoffInWords << 5) + (bytesPerLine * panPosY);
+    *bfbb = (xfbMode == 0) ? *tfbb : *tfbb + bytesPerLine;
+    if (dispPosY % 2 == 1) {
+        tmp = *tfbb;
+        *tfbb = *bfbb;
+        *bfbb = tmp;
+    }
+    *tfbb &= 0x3FFFFFFF;
+    *bfbb &= 0x3FFFFFFF;
+}
+
+void setFbbRegs(void* horVer, u32* tfbb, u32* bfbb, u32* rtfbb, u32* rbfbb) {
+    VI_CONTEXT_DECL;
+    SomeVIStruct* HorVer = horVer;
+    u32 shifted;
+
+    calcFbbs(HorVer->bufAddr, HorVer->PanPosX, HorVer->AdjustedPanPosY,
+             HorVer->wordPerLine, HorVer->FBMode, HorVer->AdjustedDispPosY, tfbb,
+             bfbb);
+    if (HorVer->threeD) {
+        calcFbbs(HorVer->rbufAddr, HorVer->PanPosX, HorVer->AdjustedPanPosY,
+                 HorVer->wordPerLine, HorVer->FBMode, HorVer->AdjustedDispPosY,
+                 rtfbb, rbfbb);
+    }
+
+    if (*tfbb < 0x01000000U && *bfbb < 0x01000000U && *rtfbb < 0x01000000U &&
+        *rbfbb < 0x01000000U) {
+        shifted = 0;
+    } else {
+        shifted = 1;
+    }
+
+    if (shifted) {
+        *tfbb >>= 5;
+        *bfbb >>= 5;
+        *rtfbb >>= 5;
+        *rbfbb >>= 5;
+    }
+
+    regs[15] = (u16)*tfbb & 0xFFFF;
+    MARK_CHANGED(15);
+    regs[14] = (shifted << 12) | ((*tfbb >> 16) | (HorVer->xof << 8));
+    MARK_CHANGED(14);
+    regs[19] = (u16)*bfbb & 0xFFFF;
+    MARK_CHANGED(19);
+    regs[18] = (*bfbb >> 16);
+    MARK_CHANGED(18);
+
+    if (HorVer->threeD) {
+        regs[17] = (u16)*rtfbb & 0xFFFF;
+        MARK_CHANGED(17);
+        regs[16] = *rtfbb >> 16;
+        MARK_CHANGED(16);
+        regs[21] = (u16)*rbfbb & 0xFFFF;
+        MARK_CHANGED(21);
+        regs[20] = *rbfbb >> 16;
+        MARK_CHANGED(20);
+    }
+}
+
+void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 prbOdd,
+                     u16 prbEven, u16 psbOdd, u16 psbEven, BOOL black) {
+    VI_CONTEXT_DECL;
+    u16 actualPrbOdd;
+    u16 actualPrbEven;
+    u16 actualPsbOdd;
+    u16 actualPsbEven;
+    u16 actualAcv;
+    u16 c;
+    u16 d;
+
+    if (regs[54] & 1) {
+        c = 1;
+        d = 2;
+    } else {
+        c = 2;
+        d = 1;
+    }
+
+    if ((dispPosY % 2) == 0) {
+        actualPrbOdd = prbOdd + (d * dispPosY);
+        actualPsbOdd = psbOdd + (d * (((c * acv) - dispSizeY) - dispPosY));
+        actualPrbEven = prbEven + (d * dispPosY);
+        actualPsbEven = psbEven + (d * (((c * acv) - dispSizeY) - dispPosY));
+    } else {
+        actualPrbOdd = prbEven + (d * dispPosY);
+        actualPsbOdd = psbEven + (d * (((c * acv) - dispSizeY) - dispPosY));
+        actualPrbEven = prbOdd + (d * dispPosY);
+        actualPsbEven = psbOdd + (d * (((c * acv) - dispSizeY) - dispPosY));
+    }
+
+    actualAcv = dispSizeY / c;
+
+    if (black) {
+        actualPrbOdd += 2 * actualAcv - 2;
+        actualPsbOdd += 2;
+        actualPrbEven += 2 * actualAcv - 2;
+        actualPsbEven += 2;
+        actualAcv = 0;
+    }
+
+    regs[0] = equ | (actualAcv << 4);
+    MARK_CHANGED(0);
+    regs[7] = (u16)(u32)actualPrbOdd;
+    MARK_CHANGED(7);
+    regs[6] = (u16)(u32)actualPsbOdd;
+    MARK_CHANGED(6);
+    regs[9] = (u16)(u32)actualPrbEven;
+    MARK_CHANGED(9);
+    regs[8] = (u16)(u32)actualPsbEven;
+    MARK_CHANGED(8);
+}
+
+static s32 cntlzd(u64 bit) {
+    u32 hi;
+    u32 lo;
+    s32 value;
+
+    hi = bit >> 32;
+    lo = bit & 0xFFFFFFFF;
+    value = __cntlzw(hi);
+    if (value < 32) {
+        return value;
+    }
+    return __cntlzw(lo) + 32;
+}
+
+void VIFlush(void) {
+    VI_CONTEXT_DECL;
+    extern volatile u32 lbl_8047A850;
+    extern volatile u32 lbl_8047A86C;
+    extern volatile u32 lbl_8047A878;
+    extern volatile u64 lbl_8047A880;
+    extern u32 lbl_8047A890;
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSRestoreInterrupts(BOOL level);
+    BOOL enabled;
+    s32 regIndex;
+
+    enabled = OSDisableInterrupts();
+    lbl_8047A878 |= lbl_8047A86C;
+    lbl_8047A86C = 0;
+    lbl_8047A880 |= changed;
+
+    while (changed != 0) {
+        regIndex = cntlzd(changed);
+        shdwRegs[regIndex] = regs[regIndex];
+        changed &= ~((u64)1 << (63 - regIndex));
+    }
+
+    lbl_8047A850 = 1;
+    lbl_8047A890 = lbl_803FC488.HorVer.bufAddr;
+    OSRestoreInterrupts(enabled);
+}
+
 void VISetNextFrameBuffer(void* fb) {
     typedef struct VIContext {
         u8 _00[0xF0];
