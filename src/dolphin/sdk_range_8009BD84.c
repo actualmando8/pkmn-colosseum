@@ -502,3 +502,116 @@ void fn_8009D878(void* dest, s32 size, s32 offset) {
         dest = (u8*)dest + chunkSize;
     }
 }
+
+typedef struct OSFontHeader {
+    u16 fontType;
+    u16 firstChar;
+    u16 lastChar;
+    u16 invalChar;
+    u16 ascent;
+    u16 descent;
+    u16 width;
+    u16 leading;
+    u16 cellWidth;
+    u16 cellHeight;
+    u32 sheetSize;
+    u16 sheetFormat;
+    u16 sheetColumn;
+    u16 sheetRow;
+    u16 sheetWidth;
+    u16 sheetHeight;
+    u16 widthTable;
+    u32 sheetImage;
+    u32 sheetFullSize;
+    u8 c0;
+    u8 c1;
+    u8 c2;
+    u8 c3;
+} OSFontHeader;
+
+/* Font state: header, width table, and the cached sheetColumn*sheetRow. */
+#define FontData lbl_8047A700
+#define FontWidthTable lbl_8047A708
+#define FontCharsPerSheet lbl_8047A70C
+
+static BOOL IsSjisLeadByte(u8 c) {
+    return ((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xFC));
+}
+
+char* fn_8009DC38(const char* string, void* image, s32 pos, s32 stride,
+                  s32* width) {
+    extern OSFontHeader* FontData;
+    extern u8* FontWidthTable;
+    extern s32 FontCharsPerSheet;
+    extern s32 fn_8009D510(u16 code, OSFontHeader* font);
+    u16 encode;
+    u16 code;
+    u8* src;
+    u8* dst;
+    s32 fontCode;
+    s32 sheet;
+    s32 numChars;
+    s32 row;
+    s32 column;
+    s32 x;
+    s32 y;
+    s32 offsetSrc;
+    s32 offsetDst;
+    u8* colorIndex;
+    u8* imageSrc;
+
+    code = (u8)*string;
+    if (code == 0) {
+        return (char*)string;
+    }
+    string++;
+
+    encode = fn_8009D820();
+    if (encode == 1) {
+        if (IsSjisLeadByte((u8)code) && (s8)*string != 0) {
+            code = (code << 8) | (u8)*string;
+            string++;
+        }
+    }
+
+    colorIndex = &FontData->c0;
+    fontCode = fn_8009D510(code, FontData);
+
+    sheet = fontCode / FontCharsPerSheet;
+    numChars = fontCode - (sheet * FontCharsPerSheet);
+    row = numChars / FontData->sheetColumn;
+    column = numChars - (row * FontData->sheetColumn);
+    row *= FontData->cellHeight;
+    column *= FontData->cellWidth;
+
+    imageSrc = (u8*)FontData + FontData->sheetImage;
+    imageSrc += ((sheet * FontData->sheetSize) >> 1);
+
+    for (y = 0; y < FontData->cellHeight; y++) {
+        for (x = 0; x < FontData->cellWidth; x++) {
+            src = imageSrc + (((FontData->sheetWidth / 8) * 32) / 2) *
+                                 ((row + y) / 8);
+            src += ((column + x) / 8) * 16;
+            src += ((row + y) % 8) * 2;
+            src += ((column + x) % 8) / 4;
+
+            offsetSrc = (column + x) % 4;
+
+            dst = (u8*)image + ((y / 8) * (((stride * 4) / 8) * 32));
+            dst += (((pos + x) / 8) * 32);
+            dst += ((y % 8) * 4);
+            dst += ((pos + x) % 8) / 2;
+
+            offsetDst = (pos + x) % 2;
+
+            *dst |= colorIndex[*src >> (6 - (offsetSrc * 2)) & 3] &
+                    ((offsetDst != 0) ? 0x0F : 0xF0);
+        }
+    }
+
+    if (width != 0) {
+        *width = FontWidthTable[fontCode];
+    }
+
+    return (char*)string;
+}
