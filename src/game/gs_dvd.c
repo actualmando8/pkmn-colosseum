@@ -40,6 +40,52 @@
 
 #include "dolphin/types.h"
 
+typedef struct GSsndWork {
+    u8 flags;
+    u8 priority;
+    u8 unk2;
+    u8 unk3;
+    u8 stackDepth;
+    u8 volumeStack[3];
+    u32 handle;
+    u32 unkC;
+    u32 unk10;
+} GSsndWork;
+
+typedef struct GSsndEntry {
+    u8 flags;
+    u8 unk1;
+    u8 reverb;
+    u8 waveIndex;
+    u16 waveId;
+    u16 unk6;
+    GSsndWork* work;
+} GSsndEntry;
+
+typedef struct GSsndFlagBits {
+    u8 isSe : 1;
+    u8 unk6 : 1;
+    u8 active : 1;
+    u8 paused : 1;
+    u8 unk0_3 : 4;
+} GSsndFlagBits;
+
+typedef struct GSsndReverbState {
+    u8 pad0[0x1C4];
+    u8 enabled;
+    u8 pad1[3];
+    f32 coloration;
+    f32 mix;
+    f32 time;
+    f32 damping;
+    f32 preDelay;
+    f32 crosstalk;
+} GSsndReverbState;
+
+#define SND_FLAG_SE 0x80
+#define SND_FLAG_ACTIVE 0x20
+#define SND_FLAG_PAUSED 0x10
+
 /* ===== External SDK / engine functions ===== */
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
 extern void  GSresGetResource(void* ptr, u32 param);        /* resource resolution */
@@ -53,7 +99,7 @@ extern const char lbl_80273764[]; /* "_sndCheckSndWorkALL:End" */
 extern const char lbl_80273780[]; /* "[GSDVD_ERROR_STATE_COVEROPEN_WAIT]..." */
 
 /* ===== BSS / global state ===== */
-extern u8 lbl_80478FAC[];  /* DVD handle table (sda21) */
+extern GSsndEntry* lbl_80478FAC;
 extern u8 lbl_80478FB4[];  /* DVD extended state (sda21) */
 
 /* Forward declarations for converted functions */
@@ -238,19 +284,19 @@ u32 fn_80167E5C(u8* obj) {
  * unreliable archive bodies noted above). */
 extern BOOL OSDisableInterrupts(void);
 extern BOOL OSRestoreInterrupts(BOOL level);
-extern void *fn_80167720(void);
-extern void fn_80167070(void *entry, u32 flag);
+extern u32 fn_80167720(u32 handle);
+extern u8 fn_80167070(u32 entry, u32 flag);
 extern u8 *lbl_8047B0C4;
 extern u32 lbl_8047B0C8;
 extern u8 *lbl_8047B0CC;
 extern u32 lbl_8047B0D0;
 
-void fn_80167040(void)
+void fn_80167040(u32 handle)
 {
-    void *entry;
+    u32 entry;
 
-    entry = fn_80167720();
-    if (entry != NULL) {
+    entry = fn_80167720(handle);
+    if (entry != 0) {
         fn_80167070(entry, 0);
     }
 }
@@ -345,6 +391,28 @@ extern u32 lbl_8047B0F8;
 extern u8 lbl_804526E0[];
 extern void GXDrawDone(void);
 extern void fn_800B856C(void);
+extern u32 sndFXCtrl(u32 voice, u8 control, u8 value);
+extern u32 sndFXKeyOff(u32 voice);
+extern void sndSeqVolume(u8 group, u16 volume, u32 sequence, u8 fade);
+extern u32 sndFXCheck(u32 voice);
+extern u32 fn_80166B3C(u32 id, u32 arg1, u32 arg2);
+extern BOOL DVDSeekAsyncPrio(void* fileInfo, s32 offset,
+                            void (*callback)(s32 result, void* fileInfo),
+                            s32 priority);
+
+extern u8* lbl_8047B0D4;
+extern u32 lbl_8047B0D8;
+extern u8* lbl_8047B0DC;
+extern u32 lbl_8047B0E0;
+extern u32 lbl_8047B0E4;
+extern u32 lbl_8047B0E8;
+extern f32* lbl_80478FA4;
+extern GSsndReverbState lbl_80452500;
+extern u32 lbl_80478C10;
+extern u32 lbl_80478C14;
+extern u32 lbl_80478C18;
+extern u32 lbl_80478C1C;
+extern u32 lbl_80478C20;
 
 GSDVDWork* _info2work(void* fileInfo);
 
@@ -493,4 +561,182 @@ void fn_801684F0(GSDVDWork* work)
         }
         lbl_804526E0[0x19]--;
     }
+}
+
+u32 fn_8016737C(GSsndEntry* entry, u32 volume, u32 limit)
+{
+    GSsndWork* work = entry->work;
+
+    if (work == NULL) {
+        return 0;
+    }
+
+    work->priority = limit & 0x7F;
+    if (work->handle != -1) {
+        if (((GSsndFlagBits*)&entry->flags)->isSe == 1) {
+            sndFXCtrl(work->handle, 7, work->priority);
+        } else {
+            sndSeqVolume(work->priority, (u16)volume, work->handle, 0);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+u8 _sndSetVolumeWork(u32 id, u32 volume)
+{
+    GSsndEntry* entry = &lbl_80478FAC[id];
+    GSsndWork* work;
+
+    if (((GSsndFlagBits*)&entry->flags)->active != 1) {
+        if (((GSsndFlagBits*)&entry->flags)->isSe != 1) {
+            return 0;
+        }
+        fn_80166B3C(id, 0, 0);
+    }
+
+    work = entry->work;
+    if (work != NULL) {
+        work->priority = volume & 0x7F;
+        return 1;
+    }
+    return 0;
+}
+
+u32 _sndStopSE(GSsndEntry* entry, u32 arg1, u32 arg2)
+{
+    GSsndWork* work = entry->work;
+    u32 result;
+
+    if (work == NULL) {
+        return 0;
+    }
+    if (work->handle == -1U) {
+        return 0;
+    }
+    if (sndFXCheck(work->handle) != -1) {
+        result = sndFXKeyOff(work->handle);
+    } else {
+        result = 0;
+    }
+    work->handle = -1;
+    return result;
+}
+
+u32 _sndStopBGM(GSsndEntry* entry, u32 fade, u32 arg2)
+{
+    GSsndWork* work = entry->work;
+
+    if (work == NULL) {
+        return 0;
+    }
+    if (((GSsndFlagBits*)&entry->flags)->active != 1) {
+        return 0;
+    }
+    if (work->handle == -1U) {
+        return 0;
+    }
+    sndSeqVolume(0, (u16)fade, work->handle, 1);
+    work->handle = -1;
+    return 1;
+}
+
+u32 fn_80167720(u32 handle)
+{
+    GSsndEntry* entry;
+    u32 i;
+
+    entry = lbl_80478FAC;
+    for (i = 0; i < lbl_8047B0E8; i++, entry++) {
+        if (entry->work != NULL && entry->work->handle == handle) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+u32 fn_80167768(u32 unkC, u32 unk10)
+{
+    GSsndEntry* entry;
+    u32 i;
+
+    entry = lbl_80478FAC;
+    for (i = 0; i < lbl_8047B0E8; i++, entry++) {
+        if (entry->work != NULL && entry->work->unkC == unkC &&
+            entry->work->unk10 == unk10) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void _sndInitStack(void)
+{
+    u32 i;
+
+    for (i = 0; i < lbl_8047B0D8; i++) {
+        lbl_8047B0D4[i] = 0;
+    }
+}
+
+void fn_80167A6C(void)
+{
+    u32 offset;
+    u32 i;
+    u8 value;
+
+    offset = 0;
+    i = 0;
+    value = 0;
+    while (i < lbl_8047B0E0) {
+        lbl_8047B0DC[offset] = value;
+        i++;
+        offset += 0x14;
+    }
+}
+
+void _sndSetReverbParm(u32 index)
+{
+    f32* source = &lbl_80478FA4[index * 6];
+
+    lbl_80452500.enabled = 0;
+    lbl_80452500.coloration = source[0];
+    lbl_80452500.mix = source[1];
+    lbl_80452500.time = source[2];
+    lbl_80452500.damping = source[3];
+    lbl_80452500.preDelay = source[4];
+    lbl_80452500.crosstalk = source[5];
+    lbl_8047B0E4 = index;
+}
+
+void _sndInitParms(GSsndEntry* entry, GSsndWork* work)
+{
+    BOOL enabled = OSDisableInterrupts();
+    GSsndFlagBits* flags = (GSsndFlagBits*)&entry->flags;
+
+    flags->active = 1;
+    flags->paused = 0;
+    entry->work = work;
+    work->handle = -1;
+    work->stackDepth = 0;
+    work->priority = 0x7F;
+    work->unk2 = 0x40;
+    work->unk3 = 0x40;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_80167DC0(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
+{
+    lbl_80478C10 = arg0;
+    lbl_80478C14 = arg1;
+    lbl_80478C18 = arg2;
+    lbl_80478C1C = arg3;
+    lbl_80478C20 = arg4;
+}
+
+u8 fn_80167DD8(GSDVDWork* work, s32 offset,
+               void (*callback)(s32 result, GSDVDWork* work))
+{
+    work->callback = callback;
+    return DVDSeekAsyncPrio(work->fileInfo, offset, _AsyncCallback, 2);
 }
