@@ -66,6 +66,79 @@ void OSInitContext(OSContext* context, u32 pc, u32 newsp) {
     OSClearContext(context);
 }
 
+#define OS_CURRENTCONTEXT (*(OSContext**)0x800000D4)
+
+/*
+ * Retail's OSClearContext lives at 0x8009BD60, in the split just ahead of
+ * this one but in the same TU, so it inlines into OSDumpContext below.
+ */
+static void ClearContext(OSContext* context) {
+    context->mode = 0;
+    context->state = 0;
+    if (OS_FPUCONTEXT == context) {
+        OS_FPUCONTEXT = NULL;
+    }
+}
+
+void OSDumpContext(OSContext* context) {
+    extern void OSReport(const char* format, ...);
+    extern void OSSetCurrentContext(OSContext* context);
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSRestoreInterrupts(BOOL level);
+    extern u8 lbl_803107E0[];
+    u32 i;
+    u32* p;
+
+    OSReport((const char*)&lbl_803107E0[0x0], context);
+
+    for (i = 0; i < 16; ++i) {
+        OSReport((const char*)&lbl_803107E0[0x44], i, context->gpr[i],
+                 context->gpr[i], i + 16, context->gpr[i + 16],
+                 context->gpr[i + 16]);
+    }
+
+    OSReport((const char*)&lbl_803107E0[0x74], context->lr, context->cr);
+    OSReport((const char*)&lbl_803107E0[0xA4], context->srr0, context->srr1);
+
+    OSReport((const char*)&lbl_803107E0[0xD4]);
+    for (i = 0; i < 4; ++i) {
+        OSReport((const char*)&lbl_803107E0[0xE8], i, context->gqr[i], i + 4,
+                 context->gqr[i + 4]);
+    }
+
+    if (context->state & OS_CONTEXT_STATE_FPSAVED) {
+        OSContext* currentContext;
+        OSContext fpuContext;
+        BOOL enabled;
+
+        enabled = OSDisableInterrupts();
+        currentContext = OS_CURRENTCONTEXT;
+        ClearContext(&fpuContext);
+        OSSetCurrentContext(&fpuContext);
+
+        OSReport((const char*)&lbl_803107E0[0x10C]);
+        for (i = 0; i < 32; i += 2) {
+            OSReport((const char*)&lbl_803107E0[0x120], i, (u32)context->fpr[i],
+                     i + 1, (u32)context->fpr[i + 1]);
+        }
+        OSReport((const char*)&lbl_803107E0[0x13C]);
+        for (i = 0; i < 32; i += 2) {
+            OSReport((const char*)&lbl_803107E0[0x150], i, (u32)context->psf[i],
+                     i + 1, (u32)context->psf[i + 1]);
+        }
+
+        ClearContext(&fpuContext);
+        OSSetCurrentContext(currentContext);
+        OSRestoreInterrupts(enabled);
+    }
+
+    OSReport((const char*)&lbl_803107E0[0x170]);
+    for (i = 0, p = (u32*)context->gpr[1];
+         p && (u32)p != 0xFFFFFFFF && i++ < 16; p = (u32*)*p) {
+        OSReport((const char*)&lbl_803107E0[0x198], p, p[0], p[1]);
+    }
+}
+
 #pragma scheduling off
 void OSSwitchFPUContext(u8 exception, OSContext* context) {
     OSContext** fpuContext = (OSContext**)0x800000D8;
