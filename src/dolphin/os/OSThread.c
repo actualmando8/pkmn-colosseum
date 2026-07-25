@@ -556,16 +556,15 @@ BOOL fn_800A257C(OSThread* thread, s32 priority)
 OSThread* OSSetIdleFunction(void (*idleFunction)(void*), void* param, void* stack,
                             u32 stackSize)
 {
-    if (idleFunction != NULL) {
-        if (IdleThread.state != OS_THREAD_STATE_EXITED) {
-            return NULL;
+    if (idleFunction) {
+        if (IdleThread.state == OS_THREAD_STATE_EXITED) {
+            OSCreateThread(&IdleThread, (void* (*)(void*))idleFunction, param,
+                           stack, stackSize, OS_PRIORITY_IDLE,
+                           OS_THREAD_ATTR_DETACH);
+            OSResumeThread(&IdleThread);
+            return &IdleThread;
         }
-        OSCreateThread(&IdleThread, (void* (*)(void*))idleFunction, param, stack, stackSize,
-                       OS_PRIORITY_IDLE, OS_THREAD_ATTR_DETACH);
-        OSResumeThread(&IdleThread);
-        return &IdleThread;
-    }
-    if (IdleThread.state != OS_THREAD_STATE_EXITED) {
+    } else if (IdleThread.state != OS_THREAD_STATE_EXITED) {
         OSCancelThread(&IdleThread);
     }
     return NULL;

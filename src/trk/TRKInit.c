@@ -3,7 +3,16 @@
 extern void EnableEXI2Interrupts(void); /* EnableEXI2Interrupts */
 
 extern u8 gTRKCPUState[];
+extern u8 gTRKState[];
 extern u8 lbl_803FED58[]; /* exception table base */
+extern u32 __TRK_get_MSR(void);
+
+s32 TRKInitializeTarget(void) {
+    *(s32*)&gTRKState[0x98] = 1;
+    *(u32*)&gTRKState[0x8C] = __TRK_get_MSR();
+    *(u32*)lbl_803FED58 = 0xE0000000;
+    return 0;
+}
 
 /* TRKTargetTranslate - 0x800C3344 | size 0x58 | scope none */
 u32 TRKTargetTranslate(u32 addr) {

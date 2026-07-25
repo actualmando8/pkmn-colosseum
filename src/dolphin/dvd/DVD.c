@@ -474,7 +474,7 @@ s32 DVDGetDriveStatus(void) {
     } else if (executing_8047A7E8 == &DummyCommandBlock_803FC3A0) {
         result = 0;
     } else {
-        result = executing_8047A7E8->state;
+        result = DVDGetCommandBlockStatus(executing_8047A7E8);
     }
 
     OSRestoreInterrupts(enabled);
@@ -1163,10 +1163,17 @@ BOOL DVDCancel(DVDCommandBlock* block) {
  * Get the status of a DVD command block.
  */
 s32 DVDGetCommandBlockStatus(DVDCommandBlock* block) {
-    if (block->state == 0) {
-        return 0;
+    BOOL enabled;
+    s32 result;
+
+    enabled = OSDisableInterrupts();
+    if (block->state == 3) {
+        result = 1;
+    } else {
+        result = block->state;
     }
-    return block->state;
+    OSRestoreInterrupts(enabled);
+    return result;
 }
 
 /*

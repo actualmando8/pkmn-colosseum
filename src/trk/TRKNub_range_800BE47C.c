@@ -7,12 +7,40 @@ extern void fn_800BF080(void);        /* TRKTerminateSerialHandler */
 extern s32  fn_800C3588(void* dst, u32 val);
 
 extern void TRK_board_display(const char* msg);
+extern void usr_put_initialize(void);
+extern s32 TRKInitializeMessageBuffers(void);
+extern s32 TRKInitializeDispatcher(void);
+extern void InitializeProgramEndTrap(void);
+extern s32 TRKInitializeSerialHandler(void);
+extern s32 TRKInitializeTarget(void);
+extern s32 TRKInitializeIntDrivenUART(u32, u32, u32, volatile u8**);
+extern void TRKTargetSetInputPendingPtr(volatile u8*);
+extern volatile u8* gTRKInputPendingPtr;
 
 /* Endianness flag (1=big, 0=little) */
 extern u8 gTRKBigEndian[];
 
 /* "MessageSend : cc_write returned %ld\n" */
 extern char lbl_8026F640[];
+
+static inline s32 TRKInitializeEndian(void) {
+    u8 endian[4];
+    s32 result = 0;
+
+    *(s32*)gTRKBigEndian = 1;
+    endian[0] = 0x12;
+    endian[1] = 0x34;
+    endian[2] = 0x56;
+    endian[3] = 0x78;
+    if (*(u32*)endian == 0x12345678) {
+        *(s32*)gTRKBigEndian = 1;
+    } else if (*(u32*)endian == 0x78563412) {
+        *(s32*)gTRKBigEndian = 0;
+    } else {
+        result = 1;
+    }
+    return result;
+}
 
 typedef struct TRKEvent {
     s32 type;
@@ -112,6 +140,42 @@ void TRKNubWelcome(void) {
 s32 TRKTerminateNub(void) {
     fn_800BF080();
     return 0;
+}
+
+s32 TRKInitializeNub(void) {
+    s32 result;
+    s32 uartResult;
+
+    result = TRKInitializeEndian();
+    MWTRACE(1, "Initialize NUB\n");
+    if (result == 0) {
+        usr_put_initialize();
+    }
+    if (result == 0) {
+        result = TRKInitializeEventQueue();
+    }
+    if (result == 0) {
+        result = TRKInitializeMessageBuffers();
+    }
+    if (result == 0) {
+        result = TRKInitializeDispatcher();
+    }
+    InitializeProgramEndTrap();
+    if (result == 0) {
+        result = TRKInitializeSerialHandler();
+    }
+    if (result == 0) {
+        result = TRKInitializeTarget();
+    }
+    if (result == 0) {
+        uartResult =
+            TRKInitializeIntDrivenUART(0xE100, 1, 0, &gTRKInputPendingPtr);
+        TRKTargetSetInputPendingPtr(gTRKInputPendingPtr);
+        if (uartResult != 0) {
+            result = uartResult;
+        }
+    }
+    return result;
 }
 
 /* MessageSend - 0x800BE800 | size 0x44 | scope none */

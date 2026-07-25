@@ -19,6 +19,9 @@ extern u8 *lbl_8047ABE0;
 extern u8 lbl_8047ABE8;
 extern u32 lbl_8047ABEC;
 extern u32 lbl_8047ABDC;
+extern u32 lbl_8047ABD8;
+
+extern void LCEnable(void);
 
 void GSscratchSetValid(void)
 {
@@ -111,6 +114,86 @@ void GSscratchFree(void *ptr)
     }
     lbl_8047ABEC = usedBlocks;
     allocation->firstBlock = 0xFF;
+}
+
+void *GSscratchAlloc(u8 blockCount,
+                     void (*callback)(BOOL valid, void *ptr, u8 blockCount))
+{
+    GSscratchAllocation *allocation;
+    u32 usedMask;
+    u32 scanMask;
+    u32 occupied;
+    u8 firstBlock;
+    u8 remaining;
+    u32 i;
+
+    if (lbl_8047ABE8 == 1 || blockCount == 0 || blockCount > 32) {
+        return NULL;
+    }
+
+    for (firstBlock = 0; firstBlock < 32; firstBlock++) {
+        scanMask = 0x80000000 >> firstBlock;
+        occupied = 0;
+        remaining = blockCount;
+        while (remaining-- != 0) {
+            occupied <<= 1;
+            if (scanMask == 0 || (lbl_8047ABEC & scanMask) != 0) {
+                occupied |= 1;
+            }
+            scanMask >>= 1;
+        }
+        if (occupied != 0) {
+            continue;
+        }
+
+        allocation = lbl_804018F0;
+        for (i = 0; i < 32; allocation++, i++) {
+            if (allocation->firstBlock == 0xFF) {
+                break;
+            }
+        }
+        if (i == 32) {
+            return NULL;
+        }
+
+        allocation->firstBlock = firstBlock;
+        allocation->blockCount = blockCount;
+        allocation->callback = callback;
+        usedMask = lbl_8047ABEC;
+        scanMask = 0x80000000 >> firstBlock;
+        remaining = blockCount;
+        while (remaining-- != 0) {
+            usedMask |= scanMask;
+            scanMask >>= 1;
+        }
+        lbl_8047ABEC = usedMask;
+        return lbl_8047ABE0 + firstBlock * 0x200;
+    }
+    return NULL;
+}
+
+void GSscratchInit(u8 reservedBlocks)
+{
+    GSscratchAllocation *allocation;
+    u32 reservedMask;
+    u8 i;
+
+    lbl_8047ABEC = 0;
+    allocation = lbl_804018F0;
+    for (i = 0; i < 32; allocation++, i++) {
+        allocation->firstBlock = 0xFF;
+    }
+
+    LCEnable();
+    lbl_8047ABD8 = reservedBlocks << 9;
+    lbl_8047ABE0 = (u8*)0xE0000000;
+    if (reservedBlocks != 0) {
+        reservedMask = 0xFFFFFFFF << (32 - reservedBlocks);
+        lbl_8047ABEC = reservedMask;
+        lbl_804018F0[0].firstBlock = 0;
+        lbl_804018F0[0].blockCount = reservedBlocks;
+    }
+    lbl_8047ABE8 = 0;
 }
 
 extern void LCQueueWait(u32 len);
