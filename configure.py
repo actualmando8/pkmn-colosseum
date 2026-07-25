@@ -2943,7 +2943,7 @@ config.libs = [
             Object(Matching, "dolphin/gx/GX_exact_800BD744.c", mw_version="GC/1.2.5n", progress_category="sdk"),
             Object(CodeCandidate, "dolphin/sdk_candidate_800BD7A0.c", mw_version="GC/1.2.5n", progress_category="sdk"),
             Object(Matching, "dolphin/gx/GX_exact_800BE30C.c", mw_version="GC/1.2.5n", progress_category="sdk"),
-            Object(CodeCandidate, "dolphin/sdk_candidate_800BE348.c", mw_version="GC/1.2.5n", progress_category="sdk"),
+            Object(CodeCandidate, "dolphin/sdk_candidate_800BE348.c", mw_version="GC/1.3", progress_category="sdk"),
             Object(
                 CodeCandidate,
                 "dolphin/sdk_range_800BF33C.c",

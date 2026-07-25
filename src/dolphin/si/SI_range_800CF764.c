@@ -446,7 +446,8 @@ u32 SISetXY(u32 x, u32 y) {
     u32 poll;
     BOOL enabled;
 
-    poll = (x << 16) | (y << 8);
+    poll = x << 16;
+    poll |= y << 8;
     enabled = OSDisableInterrupts();
     Si_80313F8C.poll &= 0xFC0000FF;
     Si_80313F8C.poll |= poll;
@@ -460,7 +461,6 @@ u32 SISetXY(u32 x, u32 y) {
 #pragma peephole off
 u32 SIEnablePolling(u32 poll) {
     BOOL enabled;
-    u32 top;
     u32 en;
 
     if (poll == 0) {
@@ -468,16 +468,18 @@ u32 SIEnablePolling(u32 poll) {
     }
 
     enabled = OSDisableInterrupts();
-    top = poll >> 24;
-    en = top >> 4;
-    Si_80313F8C.poll &= ~en;
-    Si_80313F8C.poll |= top & (0xF0 | en);
+    poll >>= 24;
+    en = poll & 0xF0;
+    poll &= (en >> 4) | 0x03FFFFF0;
+    poll &= 0xFC0000FF;
+    Si_80313F8C.poll &= ~(en >> 4);
     Si_80313F8C.poll |= poll;
+    poll = Si_80313F8C.poll;
 
     __SIRegs[SI_STATUS_IDX] = 0x80000000u;
-    __SIRegs[SI_POLL_IDX] = Si_80313F8C.poll;
+    __SIRegs[SI_POLL_IDX] = poll;
     OSRestoreInterrupts(enabled);
-    return Si_80313F8C.poll;
+    return poll;
 }
 #pragma pop
 

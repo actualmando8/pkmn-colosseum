@@ -34,6 +34,9 @@ extern s32 TRKTargetContinue(void);
 extern void __TRK_copy_vectors(void);
 extern void fn_800BE464(TRKEvent* event, s32 type);
 extern s32 TRKPostEvent(TRKEvent* event);
+extern s32 usr_puts_serial(char* text);
+extern void fn_800C39B0(u8 enabled);
+extern char lbl_8026F858[];
 
 static inline s32 TRKStandardACK(TRKBuffer* buffer, u8 error)
 {
@@ -44,6 +47,23 @@ static inline s32 TRKStandardACK(TRKBuffer* buffer, u8 error)
     reply.length = sizeof(reply);
     reply.error = error;
     fn_800C3588(&reply, sizeof(reply));
+    return 0;
+}
+
+s32 TRKDoSetOption(TRKBuffer* buffer)
+{
+    u8 enabled = buffer->data[12];
+
+    if (buffer->data[8] == 1) {
+        usr_puts_serial(lbl_8026F858);
+        if (enabled != 0) {
+            usr_puts_serial(lbl_8026F858 + 0x20);
+        } else {
+            usr_puts_serial(lbl_8026F858 + 0x28);
+        }
+        fn_800C39B0(enabled);
+    }
+    TRKStandardACK(buffer, 0);
     return 0;
 }
 
