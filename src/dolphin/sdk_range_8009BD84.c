@@ -466,6 +466,59 @@ void ConfigureVideo(u16 fbWidth, u16 xfbHeight) {
 
 
 /* 0x8009D820 | 0x58 */
+static BOOL IsSjisTrailByte(u8 c) {
+    return (0x40 <= c && c <= 0xFC) && (c != 0x7F);
+}
+
+/* Maps a character code to its index in the IPL font sheet. */
+int fn_8009D510(u16 code) {
+    extern u16 lbl_80310CD8[]; /* HankakuToCode */
+    extern u16 lbl_80310E58[]; /* Zenkaku2Code */
+    extern u16 fn_8009D820(void);
+
+    if (fn_8009D820() == 1) {
+        if (code >= 0x20 && code <= 0xDF) {
+            return lbl_80310CD8[code - 0x20];
+        }
+
+        if (code > 0x889E && code <= 0x9872) {
+            int i = ((code >> 8) - 0x88) * 188;
+            int j = (code & 0xFF);
+
+            if (!IsSjisTrailByte(j)) {
+                return 0;
+            }
+
+            j -= 0x40;
+            if (j >= 0x40) {
+                j--;
+            }
+
+            return (i + j + 0x2BE);
+        }
+
+        if (code >= 0x8140 && code < 0x879E) {
+            int i = ((code >> 8) - 0x81) * 188;
+            int j = (code & 0xFF);
+
+            if (!IsSjisTrailByte(j)) {
+                return 0;
+            }
+
+            j -= 0x40;
+            if (j >= 0x40) {
+                j--;
+            }
+
+            return lbl_80310E58[i + j];
+        }
+    } else if (code > 0x20 && code <= 0xFF) {
+        return code - 0x20;
+    }
+
+    return 0;
+}
+
 /* Yay0 decompressor for the IPL font sheet. */
 void Decode(u8* s, u8* d) {
     int i;
@@ -596,7 +649,7 @@ char* fn_8009DC38(const char* string, void* image, s32 pos, s32 stride,
     extern OSFontHeader* FontData;
     extern u8* FontWidthTable;
     extern s32 FontCharsPerSheet;
-    extern s32 fn_8009D510(u16 code, OSFontHeader* font);
+    extern int fn_8009D510(u16 code);
     u16 encode;
     u16 code;
     u8* src;
@@ -628,7 +681,7 @@ char* fn_8009DC38(const char* string, void* image, s32 pos, s32 stride,
     }
 
     colorIndex = &FontData->c0;
-    fontCode = fn_8009D510(code, FontData);
+    fontCode = fn_8009D510(code);
 
     sheet = fontCode / FontCharsPerSheet;
     numChars = fontCode - (sheet * FontCharsPerSheet);
