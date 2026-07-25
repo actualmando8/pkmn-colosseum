@@ -640,6 +640,92 @@ typedef struct OSFontHeader {
 #define FontWidthTable lbl_8047A708
 #define FontCharsPerSheet lbl_8047A70C
 
+/*
+ * Reads the font sheet out of IPL ROM, decompresses it, and caches the
+ * header, width table and chars-per-sheet that fn_8009DC38 reads back.
+ */
+u32 fn_8009D904(OSFontHeader* fontData, void* tmp) {
+    extern OSFontHeader* FontData;
+    extern u8* FontWidthTable;
+    extern s32 FontCharsPerSheet;
+    extern u32 lbl_8047A704;
+    extern u16 lbl_8047C280[]; /* imageT initialiser */
+    extern void fn_8009D878(void* dest, s32 size, s32 offset);
+    extern void Decode(u8* s, u8* d);
+    u32 size;
+
+    lbl_8047A704 = 0;
+
+    {
+        /* Block-scoped so this call stays a bl; the later one inlines. */
+        extern u16 fn_8009D820(void);
+
+        if (fn_8009D820() == 1) {
+            fn_8009D878(tmp, 0x4D000, 0x1AFF00);
+        } else {
+            fn_8009D878(tmp, 0x3000, 0x1FCF00);
+        }
+    }
+
+    if (((u8*)tmp)[0] == 'Y' && ((u8*)tmp)[1] == 'a' && ((u8*)tmp)[2] == 'y') {
+        size = *(u32*)((u8*)tmp + 0x4);
+    } else {
+        size = 0;
+    }
+    if (size == 0) {
+        return 0;
+    }
+
+    Decode(tmp, (u8*)fontData);
+    FontData = fontData;
+    FontWidthTable = (u8*)fontData + fontData->widthTable;
+    FontCharsPerSheet = fontData->sheetColumn * fontData->sheetRow;
+
+    if (fn_8009D820() == 1) {
+        OSFontHeader* font;
+        s32 fontCode;
+        u8* imageSrc;
+        s32 sheet;
+        s32 numChars;
+        s32 row;
+        s32 column;
+        s32 x;
+        s32 y;
+        u8* src;
+        u16 imageT[4];
+
+        imageT[0] = lbl_8047C280[0];
+        imageT[1] = lbl_8047C280[1];
+        imageT[2] = lbl_8047C280[2];
+        imageT[3] = lbl_8047C280[3];
+
+        fontCode = fn_8009D510(0x54);
+        font = FontData;
+        sheet = fontCode / FontCharsPerSheet;
+        numChars = fontCode - (sheet * FontCharsPerSheet);
+        row = numChars / font->sheetColumn;
+        column = numChars - (row * font->sheetColumn);
+        row *= font->cellHeight;
+        column *= font->cellWidth;
+
+        imageSrc = (u8*)font + font->sheetImage;
+        imageSrc += ((sheet * font->sheetSize) >> 1);
+
+        for (y = 4; y < 8; y++) {
+            x = 0;
+            src = imageSrc +
+                  ((((FontData->sheetWidth / 8) << 5) / 2) * ((row + y) / 8));
+            src += ((column + x) / 8) * 0x10;
+            src += ((row + y) % 8) * 2;
+            src += ((column + x) % 8) / 4;
+
+            *(u16*)src = imageT[y - 4];
+        }
+    }
+
+    return size;
+}
+
 static BOOL IsSjisLeadByte(u8 c) {
     return ((c >= 0x81) && (c <= 0x9F)) || ((c >= 0xE0) && (c <= 0xFC));
 }
