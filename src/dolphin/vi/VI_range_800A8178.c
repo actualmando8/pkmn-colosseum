@@ -196,97 +196,6 @@ void* fn_800A8894(u32 mode) {
     }
 }
 
-typedef struct VIHwTiming {
-    u8 equ;
-    u16 acv;
-    u16 prbOdd;
-    u16 prbEven;
-    u16 psbOdd;
-    u16 psbEven;
-    u8 bs1;
-    u8 bs2;
-    u8 bs3;
-    u8 bs4;
-    u16 be1;
-    u16 be2;
-    u16 be3;
-    u16 be4;
-    u16 nhlines;
-    u16 hlw;
-    u8 hsy;
-    u8 hcs;
-    u8 hce;
-    u8 hbe640;
-    u16 hbs640;
-    u8 hbeCCIR656;
-    u16 hbsCCIR656;
-} VIHwTiming;
-
-#define __VIRegs ((volatile u16*)0xCC002000)
-
-void fn_800A8934(u32 mode) {
-    extern void* fn_800A8894(u32 mode);
-    VIHwTiming* tm;
-    u32 nonInter;
-    u32 tv;
-    volatile u32 a;
-
-    nonInter = mode & 3;
-    tv = mode >> 2;
-    *(u32*)0x800000CC = tv;
-    tm = fn_800A8894(mode);
-    __VIRegs[1] = 2;
-
-    for (a = 0; a < 1000; a += 8) {
-    }
-
-    __VIRegs[1] = 0;
-    __VIRegs[3] = (u32)tm->hlw;
-    __VIRegs[2] = tm->hce | (tm->hcs << 8);
-    __VIRegs[5] = tm->hsy | (tm->hbe640 << 7);
-    __VIRegs[4] = tm->hbs640 << 1;
-    __VIRegs[0] = (u32)tm->equ;
-    __VIRegs[7] = (u32)(tm->prbOdd + (tm->acv * 2) - 2);
-    __VIRegs[6] = (u32)(tm->psbOdd + 2);
-    __VIRegs[9] = (u32)(tm->prbEven + (tm->acv * 2) - 2);
-    __VIRegs[8] = (u32)(tm->psbEven + 2);
-    __VIRegs[11] = tm->bs1 | (tm->be1 << 5);
-    __VIRegs[10] = tm->bs3 | (tm->be3 << 5);
-    __VIRegs[13] = tm->bs2 | (tm->be2 << 5);
-    __VIRegs[12] = tm->bs4 | (tm->be4 << 5);
-    __VIRegs[36] = 0x2828;
-    __VIRegs[27] = 1;
-    __VIRegs[26] = 0x1001;
-    __VIRegs[25] = (u16)(u32)(tm->hlw + 1);
-    __VIRegs[24] = ((tm->nhlines / 2) + 1) | 0x1000;
-
-    if (mode == 2 || mode == 3 || mode == 26) {
-        __VIRegs[1] = (tv << 8) | 5;
-        __VIRegs[54] = 1;
-        return;
-    }
-
-    __VIRegs[1] = ((nonInter & 2) << 2) | 1 | (tv << 8);
-    __VIRegs[54] = 0;
-}
-
-void VIWaitForRetrace(void) {
-    extern u32 lbl_8047A84C;
-    extern u32 lbl_8047A854;
-    extern BOOL OSDisableInterrupts(void);
-    extern BOOL OSRestoreInterrupts(BOOL level);
-    extern void OSSleepThread(void* queue);
-    BOOL enabled;
-    u32 count;
-
-    enabled = OSDisableInterrupts();
-    count = lbl_8047A84C;
-    do {
-        OSSleepThread(&lbl_8047A854);
-    } while (count == lbl_8047A84C);
-    OSRestoreInterrupts(enabled);
-}
-
 typedef struct VITiming {
     u8 equ;
     u16 acv;
@@ -366,6 +275,250 @@ typedef struct SomeVIStruct {
 #define shdwRegs lbl_803FC488.viShdwRegs
 #define changed lbl_8047A870
 #define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
+
+#define VI_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define VI_MAX(a, b) ((a) > (b) ? (a) : (b))
+#define VI_CLAMP(val, min, max)                                                \
+    ((val) > (max) ? (max) : (val) < (min) ? (min) : (val))
+
+static void AdjustPosition(u16 acv) {
+    VI_CONTEXT_DECL;
+    extern s16 lbl_8047A868; /* displayOffsetH */
+    extern s16 lbl_8047A86A; /* displayOffsetV */
+    SomeVIStruct* HorVer = &lbl_803FC488.HorVer;
+    s32 coeff;
+    s32 frac;
+
+    HorVer->AdjustedDispPosX = VI_CLAMP((s16)HorVer->DispPosX + lbl_8047A868, 0,
+                                        0x2D0 - HorVer->DispSizeX);
+    coeff = (HorVer->FBMode == 0) ? 2 : 1;
+    frac = HorVer->DispPosY & 1;
+    HorVer->AdjustedDispPosY =
+        VI_MAX((s16)HorVer->DispPosY + lbl_8047A86A, frac);
+    HorVer->AdjustedDispSizeY =
+        HorVer->DispSizeY +
+        VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) -
+        VI_MAX((s16)HorVer->DispPosY + (s16)HorVer->DispSizeY + lbl_8047A86A -
+                   (((s16)acv * 2) - frac),
+               0);
+    HorVer->AdjustedPanPosY =
+        HorVer->PanPosY -
+        (VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) / coeff);
+    HorVer->AdjustedPanSizeY =
+        HorVer->PanSizeY +
+        (VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) / coeff) -
+        (VI_MAX((s16)HorVer->DispPosY + (s16)HorVer->DispSizeY + lbl_8047A86A -
+                    (((s16)acv * 2) - frac),
+                0) /
+         coeff);
+}
+
+#define __VIRegs ((volatile u16*)0xCC002000)
+
+void fn_800A8934(u32 mode) {
+    extern void* fn_800A8894(u32 mode);
+    VITiming* tm;
+    u32 nonInter;
+    u32 tv;
+    volatile u32 a;
+
+    nonInter = mode & 3;
+    tv = mode >> 2;
+    *(u32*)0x800000CC = tv;
+    tm = fn_800A8894(mode);
+    __VIRegs[1] = 2;
+
+    for (a = 0; a < 1000; a += 8) {
+    }
+
+    __VIRegs[1] = 0;
+    __VIRegs[3] = (u32)tm->hlw;
+    __VIRegs[2] = tm->hce | (tm->hcs << 8);
+    __VIRegs[5] = tm->hsy | (tm->hbe640 << 7);
+    __VIRegs[4] = tm->hbs640 << 1;
+    __VIRegs[0] = (u32)tm->equ;
+    __VIRegs[7] = (u32)(tm->prbOdd + (tm->acv * 2) - 2);
+    __VIRegs[6] = (u32)(tm->psbOdd + 2);
+    __VIRegs[9] = (u32)(tm->prbEven + (tm->acv * 2) - 2);
+    __VIRegs[8] = (u32)(tm->psbEven + 2);
+    __VIRegs[11] = tm->bs1 | (tm->be1 << 5);
+    __VIRegs[10] = tm->bs3 | (tm->be3 << 5);
+    __VIRegs[13] = tm->bs2 | (tm->be2 << 5);
+    __VIRegs[12] = tm->bs4 | (tm->be4 << 5);
+    __VIRegs[36] = 0x2828;
+    __VIRegs[27] = 1;
+    __VIRegs[26] = 0x1001;
+    __VIRegs[25] = (u16)(u32)(tm->hlw + 1);
+    __VIRegs[24] = ((tm->nhlines / 2) + 1) | 0x1000;
+
+    if (mode == 2 || mode == 3 || mode == 26) {
+        __VIRegs[1] = (tv << 8) | 5;
+        __VIRegs[54] = 1;
+        return;
+    }
+
+    __VIRegs[1] = ((nonInter & 2) << 2) | 1 | (tv << 8);
+    __VIRegs[54] = 0;
+}
+
+static u32 getEncoderType(void) {
+    return 1;
+}
+
+void VIInit(void) {
+    typedef struct VIInitContext {
+        volatile u16 viRegs[59];
+        u8 _76[2];
+        volatile u16 viShdwRegs[59];
+        u8 _EE[2];
+        SomeVIStruct HorVer;
+    } VIInitContext;
+    typedef struct OSSram {
+        u8 _00[0x10];
+        s8 displayOffsetH;
+    } OSSram;
+    extern VIInitContext lbl_803FC488;
+    extern volatile u64 lbl_8047A870;  /* changed */
+    extern volatile u64 lbl_8047A880;  /* shdwChanged */
+    extern u8 lbl_803120E8[];
+    extern const char* lbl_804789F8;   /* __VIVersion */
+    extern u32 lbl_8047A848;           /* IsInitialized */
+    extern u32 lbl_8047A864;           /* encoderType */
+    extern volatile u32 lbl_8047A84C;  /* retraceCount */
+    extern volatile u32 lbl_8047A850;  /* flushFlag */
+    extern volatile u32 lbl_8047A86C;  /* changeMode */
+    extern volatile u32 lbl_8047A878;  /* shdwChangeMode */
+    extern s16 lbl_8047A868;           /* displayOffsetH */
+    extern s16 lbl_8047A86A;           /* displayOffsetV */
+    extern u32 lbl_8047A854;           /* retraceQueue */
+    extern VITiming* lbl_8047A888;     /* CurrTiming */
+    extern u32 CurrTvMode_8047A88C;
+    extern void (*lbl_8047A85C)(u32);  /* PreCB */
+    extern void (*lbl_8047A860)(u32);  /* PostCB */
+    extern void OSRegisterVersion(const char* version);
+    extern void OSInitThreadQueue(void* queue);
+    extern OSSram* __OSLockSram(void);
+    extern void __OSUnlockSram(BOOL commit);
+    extern void __OSSetInterruptHandler(s32 interrupt, void* handler);
+    extern void __OSUnmaskInterrupts(u32 mask);
+    extern void* fn_800A8894(u32 mode);
+    extern void fn_800A8934(u32 mode);
+    extern void fn_800A85DC(void);
+    SomeVIStruct* HorVer = &lbl_803FC488.HorVer;
+    u16* taps = (u16*)&lbl_803120E8[0x1C0];
+    OSSram* sram;
+    u16 dspCfg;
+    u32 value;
+    u32 tv;
+    u32 tvInBootrom;
+
+    if (lbl_8047A848) {
+        return;
+    }
+
+    OSRegisterVersion(lbl_804789F8);
+    lbl_8047A848 = TRUE;
+
+    lbl_8047A864 = getEncoderType();
+    if (!(__VIRegs[1] & 1)) {
+        fn_800A8934(0);
+    }
+
+    lbl_8047A84C = 0;
+    lbl_8047A870 = 0;
+    lbl_8047A880 = 0;
+    lbl_8047A86C = 0;
+    lbl_8047A878 = 0;
+    lbl_8047A850 = 0;
+
+    __VIRegs[39] = taps[0] | ((taps[1] & 0x3F) << 10);
+    __VIRegs[38] = (taps[1] >> 6) | (taps[2] << 4);
+    __VIRegs[41] = taps[3] | ((taps[4] & 0x3F) << 10);
+    __VIRegs[40] = (taps[4] >> 6) | (taps[5] << 4);
+    __VIRegs[43] = taps[6] | ((taps[7] & 0x3F) << 10);
+    __VIRegs[42] = (taps[7] >> 6) | (taps[8] << 4);
+    __VIRegs[45] = taps[9] | (taps[10] << 8);
+    __VIRegs[44] = taps[11] | (taps[12] << 8);
+    __VIRegs[47] = taps[13] | (taps[14] << 8);
+    __VIRegs[46] = taps[15] | (taps[16] << 8);
+    __VIRegs[49] = taps[17] | (taps[18] << 8);
+    __VIRegs[48] = taps[19] | (taps[20] << 8);
+    __VIRegs[51] = taps[21] | (taps[22] << 8);
+    __VIRegs[50] = taps[23] | (taps[24] << 8);
+    __VIRegs[56] = 0x280;
+
+    sram = __OSLockSram();
+    lbl_8047A86A = 0;
+    lbl_8047A868 = sram->displayOffsetH;
+    __OSUnlockSram(FALSE);
+
+    tvInBootrom = *(u32*)0x800000CC;
+    dspCfg = __VIRegs[1];
+    HorVer->nonInter = (s32)((dspCfg >> 2U) & 1);
+    HorVer->tv = ((u32)dspCfg & 0x300) >> 8;
+
+    if (tvInBootrom == 1 && HorVer->tv == 0) {
+        HorVer->tv = 5;
+    }
+
+    tv = (HorVer->tv == 3) ? 0 : HorVer->tv;
+    HorVer->timing = fn_800A8894((tv << 2) + HorVer->nonInter);
+    lbl_803FC488.viRegs[1] = dspCfg;
+
+    lbl_8047A888 = HorVer->timing;
+    CurrTvMode_8047A88C = HorVer->tv;
+
+    HorVer->DispSizeX = 640;
+    HorVer->DispSizeY = lbl_8047A888->acv * 2;
+    HorVer->DispPosX = (720 - HorVer->DispSizeX) / 2;
+    HorVer->DispPosY = 0;
+    AdjustPosition(lbl_8047A888->acv);
+    HorVer->FBSizeX = 640;
+    HorVer->FBSizeY = lbl_8047A888->acv * 2;
+    HorVer->PanPosX = 0;
+    HorVer->PanPosY = 0;
+    HorVer->PanSizeX = 640;
+    HorVer->PanSizeY = lbl_8047A888->acv * 2;
+    HorVer->FBMode = 0;
+
+    HorVer->wordPerLine = 40;
+    HorVer->std = 40;
+    HorVer->wpl = 40;
+    HorVer->xof = 0;
+    HorVer->black = 1;
+    HorVer->threeD = 0;
+    OSInitThreadQueue(&lbl_8047A854);
+    value = __VIRegs[24];
+    value &= ~0x8000;
+    value = (u16)value;
+    __VIRegs[24] = value;
+    value = __VIRegs[26];
+    value = value & ~0x8000;
+    value = (u16)value;
+    __VIRegs[26] = value;
+    lbl_8047A85C = NULL;
+    lbl_8047A860 = NULL;
+    __OSSetInterruptHandler(0x18, fn_800A85DC);
+    __OSUnmaskInterrupts(0x80);
+}
+
+void VIWaitForRetrace(void) {
+    extern u32 lbl_8047A84C;
+    extern u32 lbl_8047A854;
+    extern BOOL OSDisableInterrupts(void);
+    extern BOOL OSRestoreInterrupts(BOOL level);
+    extern void OSSleepThread(void* queue);
+    BOOL enabled;
+    u32 count;
+
+    enabled = OSDisableInterrupts();
+    count = lbl_8047A84C;
+    do {
+        OSSleepThread(&lbl_8047A854);
+    } while (count == lbl_8047A84C);
+    OSRestoreInterrupts(enabled);
+}
+
 
 static void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine,
                      u32 xfbMode, u16 dispPosY, u32* tfbb, u32* bfbb) {
@@ -570,43 +723,6 @@ static void setBBIntervalRegs(VITiming* tm) {
     val = tm->bs4 | (tm->be4 << 5);
     regs[12] = val;
     changed |= 0x8000000000000;
-}
-
-#define VI_MIN(a, b) ((a) < (b) ? (a) : (b))
-#define VI_MAX(a, b) ((a) > (b) ? (a) : (b))
-#define VI_CLAMP(val, min, max)                                                \
-    ((val) > (max) ? (max) : (val) < (min) ? (min) : (val))
-
-static void AdjustPosition(u16 acv) {
-    VI_CONTEXT_DECL;
-    extern s16 lbl_8047A868; /* displayOffsetH */
-    extern s16 lbl_8047A86A; /* displayOffsetV */
-    SomeVIStruct* HorVer = &lbl_803FC488.HorVer;
-    s32 coeff;
-    s32 frac;
-
-    HorVer->AdjustedDispPosX = VI_CLAMP((s16)HorVer->DispPosX + lbl_8047A868, 0,
-                                        0x2D0 - HorVer->DispSizeX);
-    coeff = (HorVer->FBMode == 0) ? 2 : 1;
-    frac = HorVer->DispPosY & 1;
-    HorVer->AdjustedDispPosY =
-        VI_MAX((s16)HorVer->DispPosY + lbl_8047A86A, frac);
-    HorVer->AdjustedDispSizeY =
-        HorVer->DispSizeY +
-        VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) -
-        VI_MAX((s16)HorVer->DispPosY + (s16)HorVer->DispSizeY + lbl_8047A86A -
-                   (((s16)acv * 2) - frac),
-               0);
-    HorVer->AdjustedPanPosY =
-        HorVer->PanPosY -
-        (VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) / coeff);
-    HorVer->AdjustedPanSizeY =
-        HorVer->PanSizeY +
-        (VI_MIN((s16)HorVer->DispPosY + lbl_8047A86A - frac, 0) / coeff) -
-        (VI_MAX((s16)HorVer->DispPosY + (s16)HorVer->DispSizeY + lbl_8047A86A -
-                    (((s16)acv * 2) - frac),
-                0) /
-         coeff);
 }
 
 static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
