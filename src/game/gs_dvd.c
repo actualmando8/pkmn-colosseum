@@ -324,7 +324,55 @@ extern s32 DVDConvertPathToEntrynum(const char* path);
 extern s32 DVDGetCommandBlockStatus(const void* block);
 extern s32 DVDGetDriveStatus(void);
 extern void DVDClose(void* fileInfo);
+extern s32 DVDRead(void* fileInfo, void* addr, s32 length, s32 offset,
+                   s32 priority);
+extern BOOL DVDReadAsync(void* fileInfo, void* addr, s32 length, s32 offset,
+                         void (*callback)(s32 result, void* fileInfo),
+                         s32 priority);
 void fn_80168164(u8* flag);
+
+typedef struct GSDVDWork {
+    u8 active;
+    u8 started;
+    u8 drawing;
+    u8 _pad03;
+    u8 fileInfo[0x3C];
+    void (*callback)(s32 result, struct GSDVDWork* work);
+} GSDVDWork;
+
+extern GSDVDWork* lbl_8047B0F4;
+extern u32 lbl_8047B0F8;
+extern u8 lbl_804526E0[];
+extern void GXDrawDone(void);
+extern void fn_800B856C(void);
+
+GSDVDWork* _info2work(void* fileInfo);
+
+void _AsyncCallback(s32 result, void* fileInfo)
+{
+    GSDVDWork* work;
+
+    work = _info2work(fileInfo);
+    if (work != NULL && work->callback != NULL) {
+        work->callback(result, work);
+    }
+}
+
+GSDVDWork* _info2work(void* fileInfo)
+{
+    GSDVDWork* base;
+    GSDVDWork* work;
+    u32 i;
+
+    base = lbl_8047B0F4;
+    work = base;
+    for (i = 0; i < lbl_8047B0F8; i++, work++) {
+        if (work->active != 0 && work->fileInfo == fileInfo) {
+            return &base[i];
+        }
+    }
+    return NULL;
+}
 
 void fn_80167B70(void)
 {
@@ -367,6 +415,19 @@ u32 fn_80167EF8(const char* path)
     return DVDConvertPathToEntrynum(path) != -1;
 }
 
+u8 fn_80167E98(GSDVDWork* work, void* addr, s32 length, s32 offset,
+                void (*callback)(s32 result, GSDVDWork* work))
+{
+    work->callback = callback;
+    return DVDReadAsync(work->fileInfo, addr, length, offset, _AsyncCallback,
+                        2);
+}
+
+s32 fn_80167ED0(GSDVDWork* work, void* addr, s32 length, s32 offset)
+{
+    return DVDRead(work->fileInfo, addr, length, offset, 2);
+}
+
 void fn_80168164(u8* flag)
 {
     BOOL enabled;
@@ -374,6 +435,40 @@ void fn_80168164(u8* flag)
     enabled = OSDisableInterrupts();
     *flag = 0;
     OSRestoreInterrupts(enabled);
+}
+
+GSDVDWork* fn_8016819C(void)
+{
+    GSDVDWork* base;
+    GSDVDWork* work;
+    GSDVDWork* result;
+    BOOL enabled;
+    u32 i;
+
+    enabled = OSDisableInterrupts();
+    result = NULL;
+    base = lbl_8047B0F4;
+    work = base;
+    for (i = 0; i < lbl_8047B0F8; i++, work++) {
+        if (work->active != 1) {
+            base[i].active = 1;
+            result = &lbl_8047B0F4[i];
+            break;
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+void fn_8016821C(void)
+{
+    u32 i;
+
+    i = 0;
+    while (i < lbl_8047B0F8) {
+        lbl_8047B0F4[i].active = 0;
+        i++;
+    }
 }
 
 void* fn_8016824C(u32 size)
@@ -384,4 +479,18 @@ void* fn_8016824C(u32 size)
         return fn_800E27B0(handle);
     }
     return 0;
+}
+
+void fn_801684F0(GSDVDWork* work)
+{
+    if (work->started != 0) {
+        work->started = 0;
+        if (work->drawing != 0) {
+            GXDrawDone();
+            fn_800B856C();
+            work->drawing = 0;
+            lbl_804526E0[0x1A]--;
+        }
+        lbl_804526E0[0x19]--;
+    }
 }

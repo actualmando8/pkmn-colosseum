@@ -8,27 +8,67 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+#include "hsd/hsd_aobj.h"
+#include "hsd/hsd_class.h"
+#include "hsd/hsd_mobj.h"
+#include "hsd/hsd_tobj.h"
 
-typedef struct HSD_AmnesiaClass {
-    u8 _00[0x14];
-    struct HSD_AmnesiaClass* parent; /* 0x14 */
-    u8 _18[0x20];
-    void (*amnesia)(void* info);     /* 0x38 */
-} HSD_AmnesiaClass;
-
-extern u8 lbl_8036CB30[]; /* hsdMObj class info */
+extern HSD_MObjInfo lbl_8036CB30; /* hsdMObj class info */
 extern void* lbl_8047B2D0;
-extern void* lbl_8047B2D8;
-extern void* lbl_8047B2DC;
+extern HSD_TObj* lbl_8047B2D8;
+extern HSD_TObj* lbl_8047B2DC;
+
+extern void HSD_TExpFreeTevDesc(HSD_TExpTevDesc* tevdesc);
+extern void fn_801B7178(HSD_TExp* texp, u32 type, int flag);
+
+void MObjRelease(HSD_Class* obj)
+{
+    HSD_MObj* mobj = HSD_MOBJ(obj);
+
+    HSD_AObjRemove(mobj->aobj);
+    hsdFreeMemPiece(mobj->mat, sizeof(HSD_Material));
+    HSD_TObjRemoveAll(mobj->tobj);
+    if (mobj->tevdesc != NULL) {
+        HSD_TExpFreeTevDesc(mobj->tevdesc);
+    }
+    if (mobj->texp != NULL) {
+        fn_801B7178(mobj->texp, 7, 1);
+    }
+    if (mobj->pe != NULL) {
+        hsdFreeMemPiece(mobj->pe, sizeof(HSD_PEDesc));
+    }
+    lbl_8036CB30.parent.head.parent->release(obj);
+}
+
+void HSD_MObjDeleteShadowTexture(HSD_TObj* tobj)
+{
+    if (tobj != NULL) {
+        HSD_TObj** cur = &lbl_8047B2DC;
+        while (*cur != NULL) {
+            if (*cur == tobj) {
+                *cur = tobj->next;
+                tobj->next = NULL;
+                return;
+            }
+            cur = &(*cur)->next;
+        }
+    } else {
+        HSD_TObj* next;
+        for (next = NULL; lbl_8047B2DC != NULL; lbl_8047B2DC = next) {
+            next = lbl_8047B2DC->next;
+            lbl_8047B2DC->next = NULL;
+        }
+    }
+}
 
 void MObjAmnesia(void* info)
 {
     if (info == lbl_8047B2D0) {
         lbl_8047B2D0 = 0;
     }
-    if (info == (void*)lbl_8036CB30) {
+    if (info == (void*) &lbl_8036CB30) {
         lbl_8047B2D8 = 0;
         lbl_8047B2DC = 0;
     }
-    ((HSD_AmnesiaClass*)lbl_8036CB30)->parent->amnesia(info);
+    lbl_8036CB30.parent.head.parent->amnesia(info);
 }

@@ -311,6 +311,19 @@ config.libs = [
                 ],
                 progress_category="runtime",
             ),
+            Object(
+                CodeCandidate,
+                "trk/TRKBuffer.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="runtime",
+            ),
+            Object(
+                CodeCandidate,
+                "trk/TRKDispatch_range_800BF53C.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
             *[
                 Object(status, path, mw_version="GC/1.3", progress_category="runtime")
                 for status, path in [
