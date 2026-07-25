@@ -257,14 +257,15 @@ typedef struct SomeVIStruct {
 } SomeVIStruct;
 
 /*
- * VI shadow state: regs[59] at 0x803FC488, shdwRegs[59] at +0x78,
+ * VI software shadow state: regs[59] at 0x803FC488, shdwRegs[59] at +0x78,
  * HorVer at +0xF0.  Declared per-function to match this file's convention.
+ * The interrupt-shared change masks are volatile; the shadow arrays are not.
  */
 #define VI_CONTEXT_DECL                                                        \
     typedef struct VIContext {                                                 \
-        volatile u16 viRegs[59];                                                 \
+        u16 viRegs[59];                                                        \
         u8 _76[2];                                                             \
-        volatile u16 viShdwRegs[59];                                             \
+        u16 viShdwRegs[59];                                                    \
         u8 _EE[2];                                                             \
         SomeVIStruct HorVer;                                                   \
     } VIContext;                                                               \
@@ -367,9 +368,9 @@ static u32 getEncoderType(void) {
 
 void VIInit(void) {
     typedef struct VIInitContext {
-        volatile u16 viRegs[59];
+        u16 viRegs[59];
         u8 _76[2];
-        volatile u16 viShdwRegs[59];
+        u16 viShdwRegs[59];
         u8 _EE[2];
         SomeVIStruct HorVer;
     } VIInitContext;
