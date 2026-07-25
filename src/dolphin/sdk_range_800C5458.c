@@ -487,7 +487,6 @@ static void __timesdec(decimal* result, const decimal* x, const decimal* y) {
     }
 }
 
-#pragma peephole off
 int __flush_buffer(MSL_FILE* stream, u32* count) {
     int result;
     u32 written = stream->buffer_ptr - stream->buffer;
@@ -513,7 +512,6 @@ int __flush_buffer(MSL_FILE* stream, u32* count) {
 
     return result;
 }
-#pragma peephole reset
 
 void __prep_buffer(MSL_FILE* stream) {
     stream->buffer_ptr = stream->buffer;
