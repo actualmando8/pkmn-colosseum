@@ -219,15 +219,15 @@ __declspec(section ".init") void* memcpy(void* dst, const void* src, u32 count) 
     u32 n;
 
     if ((const u8*)src >= (u8*)dst) {
-        d = (u8*)dst - 1;
         s = (const u8*)src - 1;
+        d = (u8*)dst - 1;
         n = count + 1;
         while (--n) {
             *++d = *++s;
         }
     } else {
-        d = (u8*)dst + count;
         s = (const u8*)src + count;
+        d = (u8*)dst + count;
         n = count + 1;
         while (--n) {
             *--d = *--s;
