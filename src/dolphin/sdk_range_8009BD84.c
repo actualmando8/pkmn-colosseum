@@ -12,6 +12,7 @@
 #include "dolphin/gx/GX.h"
 #include "dolphin/os/OS.h"
 #include "dolphin/os/OSContext.h"
+#include "dolphin/os/OSThread.h"
 #include "dolphin/si/SI.h"
 #include "dolphin/vi/VI.h"
 
@@ -188,11 +189,6 @@ void OSReport(const char* format, ...) {
 #define MSR_FE 0x900
 
 OSErrorHandler OSSetErrorHandler(u16 error, OSErrorHandler handler) {
-    typedef struct OSThread {
-        OSContext context; /* 0x000 */
-        u8 _2C8[0x34];
-        struct OSThread* nextActive; /* 0x2FC */
-    } OSThread;
     extern OSErrorHandler __OSErrorTable[17];
     extern u32 lbl_80478990; /* OSDefaultFPSCR */
     extern BOOL OSDisableInterrupts(void);
@@ -219,7 +215,7 @@ OSErrorHandler OSSetErrorHandler(u16 error, OSErrorHandler handler) {
 
         if (handler != 0) {
             for (thread = *(OSThread**)0x800000DC; thread != NULL;
-                 thread = thread->nextActive) {
+                 thread = thread->linkActive.next) {
                 thread->context.srr1 |= MSR_FE;
                 if (!(thread->context.state & OS_CONTEXT_STATE_FPSAVED)) {
                     thread->context.state |= OS_CONTEXT_STATE_FPSAVED;
@@ -236,7 +232,7 @@ OSErrorHandler OSSetErrorHandler(u16 error, OSErrorHandler handler) {
             fpscr |= (lbl_80478990 & FPSCR_ENABLE);
         } else {
             for (thread = *(OSThread**)0x800000DC; thread != NULL;
-                 thread = thread->nextActive) {
+                 thread = thread->linkActive.next) {
                 thread->context.srr1 &= ~MSR_FE;
                 thread->context.fpscr &= ~FPSCR_ENABLE;
                 thread->context.fpscr &= FPSCR_KEEP;
