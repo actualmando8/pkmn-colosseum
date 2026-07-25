@@ -1823,3 +1823,33 @@ Next action: continue byte-weighted source work from this head. Prefer
   reference-backed SDK/HSD/MSL ports and large game/menu/people functions;
   leave the documented walls and register-permutation residue alone.
 ```
+
+### CARDCheck exact range — 2026-07-25
+
+```text
+Baseline: 9c641dc2; 60.900250% fuzzy, 931,092 matched code bytes,
+  6,384 / 8,603 exact functions, 1,026 / 1,804 linked units
+Current report: 60.992270% fuzzy, 933,388 matched code bytes,
+  6,388 / 8,603 exact functions, 1,027 / 1,804 linked units
+Delta: +0.092020pp fuzzy, +2,296 matched and linked code bytes,
+  +4 exact functions, +1 linked unit
+
+Integrated: canonical Dolphin SDK CARDCheck implementations for
+  `__CARDCheckSum`, `VerifyID`, `VerifyDir`, and `VerifyFAT`
+Evidence: the GC/1.2.5n retail disassembly agrees with the CARDCheck source in
+  the local Mario Strikers, Mario Party 4, Prime, and Melee corpora. Struct
+  offsets, SRAM flash-ID validation, checksum ranges, directory/FAT selection,
+  and return codes were checked against the target before integration.
+Inlining: `__CARDCheckSum` is ordinary readable C. Its same-TU definition is
+  authentically auto-inlined into the three verification functions; no asm,
+  artificial volatile state, dummy assignment, or optimization pragma is used.
+Compiler detail: the canonical signed `int` checksum length is required for
+  the target's signed divide-by-two sequence. The prior unsigned declaration
+  was corrected to the reference signature.
+Topology: `sdk_range_800B2070` is promoted from CodeCandidate to Matching only
+  after all four functions reached raw 100%; the range is now a complete linked
+  unit with target-identical 2,296-byte text.
+
+Next action: continue byte-weighted reference-backed SDK/HSD work; the adjacent
+  CARDCreate/CARDRead residual at 0x800B4644 is a promising canonical target.
+```
