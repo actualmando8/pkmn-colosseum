@@ -904,9 +904,13 @@ char* longlong2str_800C9BB0(signed long long num, char* pBuf, print_format fmt) 
         return 0;
     }
 
-    while (digits < fmt.precision) {
-        *--p = '0';
-        ++digits;
+    {
+        int pad = fmt.precision;
+
+        while (digits < pad) {
+            *--p = '0';
+            ++digits;
+        }
     }
 
     if (base == 16 && fmt.alternate_form) {
@@ -1002,9 +1006,13 @@ char* long2str_800C9EC4(signed long num, char* buff, print_format format) {
         return 0;
     }
 
-    while (digits < format.precision) {
-        *--p = '0';
-        ++digits;
+    {
+        int pad = format.precision;
+
+        while (digits < pad) {
+            *--p = '0';
+            ++digits;
+        }
     }
 
     if (base == 16 && format.alternate_form) {
