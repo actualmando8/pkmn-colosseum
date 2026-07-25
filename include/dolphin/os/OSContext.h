@@ -14,7 +14,8 @@ typedef struct OSContext {
     /* 0x088 */ u32 ctr;           /* Count register */
     /* 0x08C */ u32 xer;           /* XER register */
     /* 0x090 */ f64 fpr[32];       /* Floating-point registers */
-    /* 0x190 */ u64 fpscr_pad;     /* FPSCR as double */
+    /* 0x190 */ u32 fpscr_pad;     /* Upper half of the FPSCR double slot */
+    /* 0x194 */ u32 fpscr;         /* FPSCR */
     /* 0x198 */ u32 srr0;          /* SRR0 */
     /* 0x19C */ u32 srr1;          /* SRR1 */
     /* 0x1A0 */ u16 mode;          /* context mode */

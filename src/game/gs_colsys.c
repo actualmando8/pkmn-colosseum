@@ -116,22 +116,44 @@ s32 fn_8010C364(void) {
 #pragma pop
 
 /* 0x8010C388 | 0x74 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010C388(void) {
-    /* TODO: match -- 116 bytes at 0x8010C388 */
+extern void* lbl_80478E70; /* -> face-bios entry count */
+extern void* lbl_80478E74; /* -> face-bios entry table */
+extern char lbl_80272000[];
+extern char lbl_8035B4E8[];
+extern void GSlogWrite(char*, char*, ...);
+
+u32 fn_8010C388(u16 idx) {
+    u8* entry;
+    u16 i = idx;
+
+    if (i >= *(u32*)lbl_80478E70) {
+        GSlogWrite(lbl_80272000, lbl_8035B4E8);
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80478E74 + i * 8;
+    }
+    if (entry == NULL) {
+        return 0;
+    }
+    return (*entry >> 7) & 1;
 }
-#pragma pop
 
 /* 0x8010C3FC | 0x70 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void _menuFaceBiosGetPtr__FUs(void) {
-    /* TODO: match -- 112 bytes at 0x8010C3FC */
+void* _menuFaceBiosGetPtr__FUs(u16 idx) {
+    u8* entry;
+    u16 i = idx;
+
+    if (i >= *(u32*)lbl_80478E70) {
+        GSlogWrite(lbl_80272000, lbl_8035B4E8);
+        entry = NULL;
+    } else {
+        entry = (u8*)lbl_80478E74 + i * 8;
+    }
+    if (entry == NULL) {
+        return NULL;
+    }
+    return *(void**)(entry + 4);
 }
-#pragma pop
 
 /* 0x8010C46C | 0x34 */
 #pragma push

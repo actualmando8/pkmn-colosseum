@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 1801
+    "total_units": 1804
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 1733,
-    "source_backed_units": 1717,
+    "named_units": 1736,
+    "source_backed_units": 1721,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "901760",
-    "matched_code_percent": 36.14112,
+    "matched_code": "928372",
+    "matched_code_percent": 37.207687,
     "matched_data": "2136513",
     "matched_data_percent": 97.28669,
-    "matched_functions": 6309,
-    "matched_functions_percent": 73.334885,
-    "fuzzy_match_percent": 57.809658
+    "matched_functions": 6378,
+    "matched_functions_percent": 74.13693,
+    "fuzzy_match_percent": 60.544765
   },
   "unit_topology": [
     {
@@ -2818,13 +2818,26 @@
       "sections": [
         {
           "name": ".text",
-          "size": 34500,
+          "size": 17108,
           "virtual_address": 2148007268
         }
       ],
-      "total_code": 34500,
+      "total_code": 17108,
       "total_data": 0,
-      "total_functions": 28
+      "total_functions": 23
+    },
+    {
+      "name": "main/game/menu/cardesavedata_80084038",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 17392,
+          "virtual_address": 2148024376
+        }
+      ],
+      "total_code": 17392,
+      "total_data": 0,
+      "total_functions": 5
     },
     {
       "name": "main/game/gba/gba_conv",
@@ -8418,13 +8431,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 4548,
+          "size": 2320,
           "virtual_address": 2148370732
         }
       ],
-      "total_code": 4548,
+      "total_code": 2320,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_gfx_layer_candidate_800D923C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1024,
+          "virtual_address": 2148373052
+        }
+      ],
+      "total_code": 1024,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_gfx_layer_candidate_800D963C",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1204,
+          "virtual_address": 2148374076
+        }
+      ],
+      "total_code": 1204,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_gfx_range_800D9AF0",

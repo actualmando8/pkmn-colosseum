@@ -19,6 +19,7 @@
 #include "dolphin/types.h"
 #include "hsd/hsd_class.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_fobj.h"
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_tobj.h"
 
@@ -54,6 +55,13 @@ extern u8 lbl_8036D3F0[]; /* hsdTObj class info */
 extern char lbl_80275638[]; /* "sysdolphin_base_library" */
 extern char lbl_80275650[]; /* "hsd_tobj" */
 extern char lbl_8027565C[]; /* "texmtx index exceed hardware limit (%d).\n" */
+extern char lbl_802756C4[]; /* "tobj->repeat_s && tobj->repeat_t" */
+extern char lbl_802756E8[]; /* "tobj->imagetbl" */
+
+extern void PSMTXTrans(Mtx m, f32 x, f32 y, f32 z);
+extern void PSMTXScale(Mtx m, f32 x, f32 y, f32 z);
+extern void PSMTXConcat(const Mtx a, const Mtx b, Mtx dst);
+extern void HSD_MkRotationMtx(Mtx m, Vec* rot);
 
 /* .sdata2 strings */
 extern const char lbl_8047DEB0[7]; /* __FILE__ */
@@ -108,6 +116,46 @@ static inline void HSD_TObjTevRemove(HSD_TObjTev* tev)
     if (tev != NULL) {
         HSD_TObjTevFree(tev);
     }
+}
+
+static inline HSD_Tlut* HSD_TlutAlloc(void)
+{
+    HSD_Tlut* tlut = fn_80193B10(sizeof(HSD_Tlut));
+    if (tlut == NULL) {
+        __assert(HSD_TOBJ_FILE, 0x8A1, lbl_8047DEC4);
+    }
+    memset(tlut, 0, sizeof(HSD_Tlut));
+    return tlut;
+}
+
+static inline HSD_Tlut* HSD_TlutLoadDesc(HSD_TlutDesc* tlutdesc)
+{
+    if (tlutdesc != NULL) {
+        HSD_Tlut* tlut = HSD_TlutAlloc();
+        memcpy(tlut, tlutdesc, sizeof(HSD_Tlut));
+        return tlut;
+    }
+    return NULL;
+}
+
+static inline HSD_TObjTev* HSD_TObjTevAlloc(void)
+{
+    HSD_TObjTev* tev = fn_80193B10(sizeof(HSD_TObjTev));
+    if (tev == NULL) {
+        __assert(HSD_TOBJ_FILE, 0x8CC, lbl_8047DEC0);
+    }
+    memset(tev, 0, sizeof(HSD_TObjTev));
+    return tev;
+}
+
+static inline HSD_TObjTev* HSD_TObjTevLoadDesc(HSD_TObjTevDesc* tevdesc)
+{
+    if (tevdesc != NULL) {
+        HSD_TObjTev* tev = HSD_TObjTevAlloc();
+        memcpy(tev, tevdesc, sizeof(HSD_TObjTev));
+        return tev;
+    }
+    return NULL;
 }
 
 /* ------------------------------------------------------------------ */
@@ -367,17 +415,142 @@ END:
 }
 #pragma pop
 
+/* ========================================================================= */
+/*  0x801BE4CC | 0xCC  HSD_TObjLoadDesc                                      */
+/* ========================================================================= */
+HSD_TObj* HSD_TObjLoadDesc(HSD_TObjDesc* td)
+{
+    if (td != NULL) {
+        HSD_TObj* tobj;
+        HSD_ClassInfo* info;
+
+        if (td->class_name == NULL ||
+            (info = fn_80193748(td->class_name)) == NULL)
+        {
+            tobj = HSD_TObjAlloc();
+        } else {
+            tobj = fn_80193828(info);
+            if (tobj == NULL) {
+                __assert(HSD_TOBJ_FILE, 0x1ED, lbl_8047DF10);
+            }
+        }
+        HSD_TOBJ_METHOD(tobj)->load(tobj, td);
+        return tobj;
+    } else {
+        return NULL;
+    }
+}
+
+/* ========================================================================= */
+/*  0x801BE598 | 0x268  TObjLoad                                             */
+/* ========================================================================= */
+static int TObjLoad(HSD_TObj* tobj, HSD_TObjDesc* td)
+{
+    tobj->next = HSD_TObjLoadDesc(td->next);
+    tobj->anim_id = (u16) td->id;
+    tobj->src = td->src;
+    tobj->mtxid = GX_IDENTITY;
+    tobj->rotate.x = td->rotate.x;
+    tobj->rotate.y = td->rotate.y;
+    tobj->rotate.z = td->rotate.z;
+    tobj->scale = td->scale;
+    tobj->translate = td->translate;
+    tobj->wrap_s = td->wrap_s;
+    tobj->wrap_t = td->wrap_t;
+    tobj->repeat_s = td->repeat_s;
+    tobj->repeat_t = td->repeat_t;
+    tobj->flags = td->blend_flags;
+    tobj->blending = td->blending;
+    tobj->magFilt = td->magFilt;
+    tobj->imagedesc = td->imagedesc;
+    tobj->tlut = HSD_TlutLoadDesc(td->tlutdesc);
+    tobj->lod = td->lod;
+    tobj->aobj = NULL;
+    tobj->flags |= TEX_MTX_DIRTY;
+    tobj->tlut_no = (u8) -1;
+    tobj->tev = HSD_TObjTevLoadDesc(td->tev);
+
+    fn_8019C6EC(2);
+
+    return 0;
+}
+
+/* ========================================================================= */
+/*  0x801BE800 | 0x5C  fn_801BE800 -- HSD_TObjAnimAll                        */
+/* ========================================================================= */
+
+static inline void HSD_TObjAnim(HSD_TObj* tobj)
+{
+    if (tobj == NULL) {
+        return;
+    }
+    HSD_AObjInterpretAnim(tobj->aobj, tobj, HSD_TOBJ_METHOD(tobj)->update);
+}
+
+void fn_801BE800(HSD_TObj* tobj)
+{
+    HSD_TObj* tp;
+
+    if (tobj != NULL) {
+        for (tp = tobj; tp != NULL; tp = tp->next) {
+            HSD_TObjAnim(tp);
+        }
+    }
+}
+
 /* --- Non-linked CodeCandidate placeholders. These remain intentionally
        incomplete until their target bodies are decompiled. --- */
 
-static int TObjLoad(HSD_TObj* tobj, HSD_TObjDesc* td)
+/* ========================================================================= */
+/*  0x801BE2B4 | 0x1DC  MakeTextureMtx                                       */
+/* ========================================================================= */
+
+/** 1.0e-10f, the .sdata2 constant at 0x8047DF00. */
+#define TOBJ_SCALE_EPSILON 1.0e-10F
+
+static void MakeTextureMtx(HSD_TObj* tobj)
 {
-    (void) tobj;
-    (void) td;
-    return 0;
+    Vec scale;
+    Mtx m;
+    Vec trans;
+    Quaternion rot;
+
+    int no_assert = 0;
+
+    if (tobj->repeat_s && tobj->repeat_t) {
+        no_assert = 1;
+    }
+
+    if (!no_assert) {
+        __assert(HSD_TOBJ_FILE, 0x267, lbl_802756C4);
+    }
+
+    scale.x = (f32) __fabs(tobj->scale.x) < TOBJ_SCALE_EPSILON
+                  ? 0.0F
+                  : (f32) tobj->repeat_s / tobj->scale.x;
+    scale.y = (f32) __fabs(tobj->scale.y) < TOBJ_SCALE_EPSILON
+                  ? 0.0F
+                  : (f32) tobj->repeat_t / tobj->scale.y;
+    scale.z = tobj->scale.z;
+    rot.x = tobj->rotate.x;
+    rot.y = tobj->rotate.y;
+    rot.z = -tobj->rotate.z;
+    trans.x = -tobj->translate.x;
+    trans.y =
+        -(tobj->translate.y + (tobj->wrap_t == GX_MIRROR
+                                   ? 1.0F / (tobj->repeat_t / tobj->scale.y)
+                                   : 0.0F));
+    trans.z = tobj->translate.z;
+
+    PSMTXTrans(tobj->mtx, trans.x, trans.y, trans.z);
+    HSD_MkRotationMtx(m, (Vec*) &rot);
+    PSMTXConcat(m, tobj->mtx, tobj->mtx);
+    PSMTXScale(m, scale.x, scale.y, scale.z);
+    PSMTXConcat(m, tobj->mtx, tobj->mtx);
 }
-static void MakeTextureMtx(HSD_TObj* tobj) { (void) tobj; }
+
 static void TObjSetupMtx(HSD_TObj* tobj) { (void) tobj; }
+
 static void TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
                          HSD_TExp** c, HSD_TExp** a, HSD_TExp** list)
 {
@@ -388,9 +561,236 @@ static void TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
     (void) a;
     (void) list;
 }
+
+/* ========================================================================= */
+/*  0x801BE85C | 0x60C  fn_801BE85C -- TObjUpdateFunc                        */
+/* ========================================================================= */
+
+/**
+ * Colosseum clamps every animated TObj scalar into [0, 1] before it is used.
+ * The two limits and the 255.0f scale are the .sdata2 constants at
+ * 0x8047DEE0, 0x8047DEE4 and 0x8047DF18.
+ */
+static inline f32 tobj_clamp01(f32 x)
+{
+    if (x <= 0.0F) {
+        x = 0.0F;
+    } else if (x >= 1.0F) {
+        x = 1.0F;
+    }
+    return x;
+}
+
+static inline u8 tobj_color8(f32 x)
+{
+    return (u8) (255.0F * tobj_clamp01(x));
+}
+
 void fn_801BE85C(void* obj, u32 type, HSD_ObjData* val)
 {
-    (void) obj;
-    (void) type;
-    (void) val;
+    HSD_TObj* tobj = obj;
+
+    if (tobj == NULL) {
+        return;
+    }
+
+    switch (type) {
+    case HSD_A_T_TIMG: {
+        int n;
+        if (tobj->imagetbl == NULL) {
+            __assert(HSD_TOBJ_FILE, 0x116, lbl_802756E8);
+        }
+        n = (int) val->fv;
+        if (tobj->imagetbl[n] != NULL) {
+            tobj->imagedesc = tobj->imagetbl[n];
+        }
+    } break;
+    case HSD_A_T_TCLT:
+        if (tobj->tluttbl != NULL) {
+            tobj->tlut_no = (u8) val->fv;
+        }
+        break;
+    case HSD_A_T_BLEND:
+        tobj->blending = tobj_clamp01(val->fv);
+        break;
+    case HSD_A_T_ROTX:
+        tobj->rotate.x = val->fv;
+        goto mtxdirty;
+    case HSD_A_T_ROTY:
+        tobj->rotate.y = val->fv;
+        goto mtxdirty;
+    case HSD_A_T_ROTZ:
+        tobj->rotate.z = val->fv;
+        goto mtxdirty;
+    case HSD_A_T_TRAU:
+        tobj->translate.x = val->fv;
+        goto mtxdirty;
+    case HSD_A_T_TRAV:
+        tobj->translate.y = val->fv;
+        goto mtxdirty;
+    case HSD_A_T_SCAU:
+        tobj->scale.x = val->fv;
+        goto mtxdirty;
+    case HSD_A_T_SCAV:
+        tobj->scale.y = val->fv;
+        goto mtxdirty;
+    mtxdirty:
+        tobj->flags |= TEX_MTX_DIRTY;
+        break;
+    case HSD_A_T_LOD_BIAS:
+        if (tobj->lod != NULL) {
+            tobj->lod->LODBias = val->fv;
+        }
+        break;
+    case HSD_A_T_KONST_R:
+        if (tobj->tev != NULL) {
+            tobj->tev->konst.r = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_KONST_G:
+        if (tobj->tev != NULL) {
+            tobj->tev->konst.g = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_KONST_B:
+        if (tobj->tev != NULL) {
+            tobj->tev->konst.b = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_KONST_A:
+        if (tobj->tev != NULL) {
+            tobj->tev->konst.a = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV0_R:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev0.r = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV0_G:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev0.g = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV0_B:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev0.b = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV0_A:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev0.a = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV1_R:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev1.r = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV1_G:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev1.g = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV1_B:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev1.b = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TEV1_A:
+        if (tobj->tev != NULL) {
+            tobj->tev->tev1.a = tobj_color8(val->fv);
+        }
+        break;
+    case HSD_A_T_TS_BLEND:
+        tobj->blending = tobj_clamp01(val->fv);
+        break;
+    }
+}
+
+/* ========================================================================= */
+/*  0x801BEE68 | 0x74  fn_801BEE68 -- HSD_TObjReqAnimAllByFlags              */
+/* ========================================================================= */
+
+static inline void HSD_TObjReqAnimByFlags(HSD_TObj* tobj, f32 startframe,
+                                          u32 flags)
+{
+    if (tobj != NULL) {
+        if (flags & TOBJ_ANIM) {
+            HSD_AObjReqAnim(tobj->aobj, startframe);
+        }
+    }
+}
+
+void fn_801BEE68(HSD_TObj* tobj, f32 startframe, u32 flags)
+{
+    HSD_TObj* tp;
+
+    if (tobj != NULL) {
+        for (tp = tobj; tp != NULL; tp = tp->next) {
+            HSD_TObjReqAnimByFlags(tp, startframe, flags);
+        }
+    }
+}
+
+/* ========================================================================= */
+/*  0x801BEEDC | 0x1BC  fn_801BEEDC -- HSD_TObjAddAnimAll                    */
+/* ========================================================================= */
+
+static inline HSD_TexAnim* lookupTextureAnim(s32 id, HSD_TexAnim* texanim)
+{
+    HSD_TexAnim* ta;
+
+    for (ta = texanim; ta != NULL; ta = ta->next) {
+        if ((s32) ta->id == id) {
+            return ta;
+        }
+    }
+    return NULL;
+}
+
+static inline void HSD_TObjAddAnim(HSD_TObj* tobj, HSD_TexAnim* texanim)
+{
+    s32 i;
+    HSD_TexAnim* ta;
+
+    if (tobj != NULL) {
+        if ((ta = lookupTextureAnim(tobj->anim_id, texanim)) != NULL) {
+            if (tobj->aobj != NULL) {
+                HSD_AObjRemove(tobj->aobj);
+            }
+            tobj->aobj = HSD_AObjLoadDesc(ta->aobjdesc);
+            tobj->imagetbl = ta->imagetbl;
+
+            if (tobj->tluttbl != NULL) {
+                for (i = 0; tobj->tluttbl[i] != NULL; i++) {
+                    HSD_TlutRemove(tobj->tluttbl[i]);
+                }
+                fn_801A6960(tobj->tluttbl);
+            }
+
+            if (ta->n_tluttbl != 0) {
+                tobj->tluttbl = (HSD_Tlut**) fn_801A6928(
+                    (s32) sizeof(HSD_Tlut*) * (ta->n_tluttbl + 1));
+                for (i = 0; i < ta->n_tluttbl; i++) {
+                    tobj->tluttbl[i] = HSD_TlutLoadDesc(ta->tluttbl[i]);
+                }
+                tobj->tluttbl[i] = NULL;
+            } else {
+                tobj->tluttbl = NULL;
+            }
+            tobj->tlut_no = (u8) -1;
+        }
+    }
+}
+
+void fn_801BEEDC(HSD_TObj* tobj, HSD_TexAnim* texanim)
+{
+    HSD_TObj* tp;
+
+    if (tobj != NULL) {
+        for (tp = tobj; tp != NULL; tp = tp->next) {
+            HSD_TObjAddAnim(tp, texanim);
+        }
+    }
 }

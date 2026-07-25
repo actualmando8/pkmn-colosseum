@@ -553,3 +553,10 @@ void GSgfx_FrameEndCallback(void) {
 }
 #pragma pop
 
+
+extern u8 lbl_8047AA91;
+
+void fn_800D3F50(void)
+{
+    lbl_8047AA91 = 1;
+}

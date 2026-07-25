@@ -94,7 +94,7 @@ extern u32 __DBVECTOR[];
 static volatile EXIRegBlock* const ExiHw = (volatile EXIRegBlock*)0xCC006800;
 static volatile OSLowMem* const LowMem = (volatile OSLowMem*)0x80000000;
 
-BOOL fn_80099400(s32 chan, u32 dev, u32* id);
+s32 fn_80099400(s32 chan, u32 dev, u32* id);
 BOOL fn_80098790(s32 chan);
 u32 fn_800986A0(s32 chan, s32 exi, s32 tc, s32 ext);
 u32 fn_8009A23C(void);
@@ -785,6 +785,92 @@ BOOL fn_800993D0(s32 chan) {
 #pragma scheduling reset
 #pragma pop
 
+/*
+ * EXIGetID - 0x80099400 | size: 0x390
+ *
+ * __EXIAttach, EXIDetach and EXIUnlock are all inlined here in the target,
+ * so their bodies are repeated rather than called.
+ */
+s32 fn_80099400(s32 chan, u32 dev, u32* id) {
+    EXIControl* exi = &lbl_803FB3C8[chan];
+    int err;
+    u32 cmd;
+    s32 startTime;
+    BOOL enabled;
+
+    if ((chan < 2) && (dev == 0)) {
+        if (fn_80098790(chan) == 0) {
+            return 0;
+        }
+
+        if (exi->idTime == __EXIProbeStartTime[chan]) {
+            *id = exi->id;
+            return exi->idTime;
+        }
+
+        /* __EXIAttach(chan, NULL) */
+        {
+            EXIControl* aexi = &lbl_803FB3C8[chan];
+
+            enabled = OSDisableInterrupts();
+            if ((aexi->state & 8) || !fn_80098790(chan)) {
+                OSRestoreInterrupts(enabled);
+                return 0;
+            }
+            fn_800986A0(chan, TRUE, FALSE, FALSE);
+            aexi->extCallback = NULL;
+            __OSUnmaskInterrupts(0x100000u >> (chan * 3));
+            aexi->state |= 8;
+            OSRestoreInterrupts(enabled);
+        }
+
+        startTime = __EXIProbeStartTime[chan];
+    }
+
+    enabled = OSDisableInterrupts();
+
+    err = !EXILock(chan, dev, (chan < 2 && dev == 0) ? (EXICallback)fn_800993D0 : NULL);
+    if (err == 0) {
+        err = !EXISelect(chan, dev, 0);
+        if (err == 0) {
+            cmd = 0;
+            err |= !EXIImm(chan, &cmd, 2, 1, 0);
+            err |= !EXISync(chan);
+            err |= !EXIImm(chan, id, 4, 0, 0);
+            err |= !EXISync(chan);
+            err |= !EXIDeselect(chan);
+        }
+
+        EXIUnlock(chan);
+    }
+
+    OSRestoreInterrupts(enabled);
+
+    if ((chan < 2) && (dev == 0)) {
+        fn_80098AE8(chan);
+
+        enabled = OSDisableInterrupts();
+        err |= __EXIProbeStartTime[chan] != startTime;
+
+        if (!err) {
+            exi->id = *id;
+            exi->idTime = startTime;
+        }
+
+        OSRestoreInterrupts(enabled);
+
+        if (err) {
+            return 0;
+        }
+        return exi->idTime;
+    }
+
+    if (err) {
+        return 0;
+    }
+    return 1;
+}
+
 #pragma peephole off
 u32 OSGetConsoleType(void) {
     if (BootInfo_8047A6A0 == NULL || BootInfo_8047A6A0->consoleType == 0) {
@@ -851,6 +937,185 @@ static void InquiryCallback(s32 result, DVDCommandBlock* block) {
     }
 }
 #pragma peephole reset
+
+static void OSExceptionInit(void);
+
+/* 0x80099A44 | size: 0x3D8 */
+void OSInit(void) {
+    extern void OSDisableInterrupts(void);
+    extern void OSEnableInterrupts(void);
+    extern s64 __OSGetSystemTime(void);
+    extern void PPCMtmmcr0(u32);
+    extern void PPCMtmmcr1(u32);
+    extern void PPCMtpmc1(u32);
+    extern void PPCMtpmc2(u32);
+    extern void PPCMtpmc3(u32);
+    extern void PPCMtpmc4(u32);
+    extern void PPCDisableSpeculation(void);
+    extern u32 PPCMfhid2(void);
+    extern void PPCMthid2(u32);
+    extern void OSSetArenaLo(void* addr);
+    extern void OSSetArenaHi(void* addr);
+    extern void __OSInitSystemCall(void);
+    extern void OSInitAlarm(void);
+    extern void __OSModuleInit(void);
+    extern void __OSInterruptInit(void);
+    extern void __OSSetInterruptHandler(u32 interrupt, void* handler);
+    extern void __OSResetSWInterruptHandler(void);
+    extern void __OSContextInit(void);
+    extern void __OSCacheInit(void);
+    extern void SIInit(void);
+    extern void __OSInitSram(void);
+    extern void __OSThreadInit(void);
+    extern void __OSInitAudioSystem(void);
+    extern void __OSInitMemoryProtection(void);
+    extern void OSReport(const char* format, ...);
+    extern void OSRegisterVersion(const char* version);
+    extern void EnableMetroTRKInterrupts(void);
+    extern void DVDInit(void);
+    extern void DCInvalidateRange(void* addr, u32 nBytes);
+    extern void DVDInquiryAsync(DVDCommandBlock* block, DVDDriveInfo* info,
+                                void* callback);
+    extern DVDCommandBlock DriveBlock_803FB4C0;
+    extern s64 __OSStartTime;
+    extern u32 AreWeInitialized_8047A6C0;
+    extern u32 BI2DebugFlagHolder_8047A6A8;
+    extern u32 __PADSpec;
+    extern u32 __DVDLongFileNameFlag;
+    extern u32 __OSInIPL;
+    extern u32 __OSIsGcam;
+    extern const char* __OSVersion;
+    extern u8 __ArenaLo[];
+    extern u8 __ArenaHi[];
+    extern u8 _stack_addr[];
+
+    u32 consoleType;
+    void* bi2StartAddr;
+
+    if (AreWeInitialized_8047A6C0 == FALSE) {
+        AreWeInitialized_8047A6C0 = TRUE;
+
+        __OSStartTime = __OSGetSystemTime();
+        OSDisableInterrupts();
+
+        PPCMtmmcr0(0);
+        PPCMtmmcr1(0);
+        PPCMtpmc1(0);
+        PPCMtpmc2(0);
+        PPCMtpmc3(0);
+        PPCMtpmc4(0);
+        PPCDisableSpeculation();
+        PPCSetFpNonIEEEMode();
+
+        BootInfo_8047A6A0 = (OSBootInfo*)0x80000000;
+        BI2DebugFlag_8047A6A4 = 0;
+        __DVDLongFileNameFlag = 0;
+
+        bi2StartAddr = (void*)(*(u32*)0x800000F4);
+        if (bi2StartAddr) {
+            BI2DebugFlag_8047A6A4 = (u32*)((char*)bi2StartAddr + 0xC);
+            __PADSpec = ((u32*)bi2StartAddr)[9];
+            *(u8*)0x800030E8 = *BI2DebugFlag_8047A6A4;
+            *(u8*)0x800030E9 = __PADSpec;
+        } else if (BootInfo_8047A6A0->arenaHi) {
+            BI2DebugFlagHolder_8047A6A8 = *(u8*)0x800030E8;
+            BI2DebugFlag_8047A6A4 = &BI2DebugFlagHolder_8047A6A8;
+            __PADSpec = *(u8*)0x800030E9;
+        }
+
+        __DVDLongFileNameFlag = 1;
+
+        OSSetArenaLo((!BootInfo_8047A6A0->arenaLo)
+                         ? (void*)__ArenaLo
+                         : (void*)BootInfo_8047A6A0->arenaLo);
+        if ((!BootInfo_8047A6A0->arenaLo) && (BI2DebugFlag_8047A6A4) &&
+            (*BI2DebugFlag_8047A6A4 < 2)) {
+            OSSetArenaLo((void*)(((u32)(char*)_stack_addr + 0x1F) & 0xFFFFFFE0));
+        }
+        OSSetArenaHi((!BootInfo_8047A6A0->arenaHi)
+                         ? (void*)__ArenaHi
+                         : (void*)BootInfo_8047A6A0->arenaHi);
+
+        OSExceptionInit();
+        __OSInitSystemCall();
+        OSInitAlarm();
+        __OSModuleInit();
+        __OSInterruptInit();
+        __OSSetInterruptHandler(0x16, &__OSResetSWInterruptHandler);
+        __OSContextInit();
+        __OSCacheInit();
+        EXIInit();
+        SIInit();
+        __OSInitSram();
+        __OSThreadInit();
+        __OSInitAudioSystem();
+
+        PPCMthid2(PPCMfhid2() & 0xBFFFFFFF);
+
+        if (!__OSInIPL) {
+            __OSInitMemoryProtection();
+        }
+
+        OSReport("\nDolphin OS\n");
+        OSReport("Kernel built : %s %s\n", "Mar 17 2003", "04:20:41");
+        OSReport("Console Type : ");
+
+        consoleType = OSGetConsoleType();
+        switch (consoleType & 0xF0000000) {
+        case 0x00000000:
+            OSReport("Retail %d\n", consoleType);
+            break;
+        case 0x10000000:
+        case 0x20000000:
+            switch (consoleType & 0x0FFFFFFF) {
+            case 0x00000001:
+                OSReport("Mac Emulator\n");
+                break;
+            case 0x00000002:
+                OSReport("PC Emulator\n");
+                break;
+            case 0x00000003:
+                OSReport("EPPC Arthur\n");
+                break;
+            case 0x00000004:
+                OSReport("EPPC Minnow\n");
+                break;
+            default:
+                OSReport("Development HW%d (%08x)\n",
+                         (consoleType & 0xFFFFFFF) - 3, consoleType);
+                break;
+            }
+            break;
+        default:
+            OSReport("%08x\n", consoleType);
+            break;
+        }
+
+        OSReport("Memory %d MB\n", (u32)BootInfo_8047A6A0->memorySize >> 0x14U);
+        OSReport("Arena : 0x%x - 0x%x\n", OSGetArenaLo(), OSGetArenaHi());
+        OSRegisterVersion(__OSVersion);
+
+        if (BI2DebugFlag_8047A6A4 && ((*BI2DebugFlag_8047A6A4) >= 2)) {
+            EnableMetroTRKInterrupts();
+        }
+
+        ClearArena();
+        OSEnableInterrupts();
+
+        if (!__OSInIPL) {
+            DVDInit();
+
+            if (__OSIsGcam) {
+                LowMem->dvdDeviceCode = 0x9000;
+                return;
+            }
+
+            DCInvalidateRange(&DriveInfo_803FB4A0, sizeof(DVDDriveInfo));
+            DVDInquiryAsync(&DriveBlock_803FB4C0, &DriveInfo_803FB4A0,
+                            InquiryCallback);
+        }
+    }
+}
 
 static u32 __OSExceptionLocations[] = {
     0x00000100, 0x00000200, 0x00000300, 0x00000400, 0x00000500,

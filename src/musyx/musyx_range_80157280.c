@@ -3904,97 +3904,110 @@ void sndAuxCallbackPrepareReverbHI(u8* ptr) {
 }
 #endif
 #pragma pop
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-#if 0
-asm void ReverbHICreate(void) {
-#include "src/game/people/people_field_fn_80164520.inc"
-}
-#else
-u32 ReverbHICreate(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6) {
-    u32 i;
-    u32 bytes;
-    u32 ptr;
-    u32 delaySamples;
-    u32* table;
+/* ===== StdReverb/reverb.c, ReverbHI* =====
+ * Layout and code ported from the MusyX reference `_SND_REVHI_WORK` /
+ * `_SND_REVHI_DELAYLINE` (musyx.h) and reverb.c.  Retail's fixed delay-line
+ * length table `static int lens[] = {1789,1999,2333,433,149,47,73,67}` is the
+ * already-transcribed .data blob at lbl_8036BF00 (0x20 bytes) -- referenced by
+ * name so the relocation matches instead of emitting a second copy.
+ * salMalloc/salFree are the indirect thunks fn_801643D8 / fn_80164400. */
+typedef struct _SND_REVHI_DELAYLINE {
+    s32 inPoint;
+    s32 outPoint;
+    s32 length;
+    f32* inputs;
+    f32 lastOutput;
+} _SND_REVHI_DELAYLINE;
+
+typedef struct _SND_REVHI_WORK {
+    _SND_REVHI_DELAYLINE AP[9];
+    _SND_REVHI_DELAYLINE C[9];
+    f32 allPassCoeff;
+    f32 combCoef[9];
+    f32 lpLastout[3];
+    f32 level;
     f32 damping;
+    s32 preDelayTime;
+    f32 crosstalk;
+    f32* preDelayLine[3];
+    f32* preDelayPtr[3];
+} _SND_REVHI_WORK;
 
-    if (obj == NULL) {
-        return 0;
+static inline void DLsetdelay(_SND_REVHI_DELAYLINE* delayline, s32 len) {
+    delayline->outPoint = delayline->inPoint - (len * sizeof(f32));
+    while (delayline->outPoint < 0) {
+        delayline->outPoint += delayline->length;
     }
-    if (f1 < lbl_8047D4F0 || f1 > lbl_8047D4F4) {
-        return 0;
-    }
-    if (f2 < lbl_8047D4F8 || f2 > lbl_8047D4FC) {
-        return 0;
-    }
-    if (f3 < lbl_8047D4F0 || f3 > lbl_8047D4F4) {
-        return 0;
-    }
-    if (f4 < lbl_8047D4F0 || f4 > lbl_8047D4F4) {
-        return 0;
-    }
-    if (f5 < lbl_8047D4F0 || f5 > lbl_8047D500) {
-        return 0;
-    }
-    if (f6 < lbl_8047D4F0 || f6 > lbl_8047D4F4) {
-        return 0;
-    }
+}
 
-    memset(obj, 0, 0x1C4);
-    table = (u32*)lbl_8036BF00;
-    for (i = 0; i < 9; i++) {
-        bytes = table[i & 7] * 4;
-        if (bytes == 0) {
-            bytes = 4;
-        }
-        ptr = fn_801643D8(bytes);
-        if (ptr == 0) {
-            return 0;
-        }
-        memset((void*)ptr, 0, bytes);
-        *(u32*)(obj + 0x0C + i * 0x14) = ptr;
+static inline void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
+    delayline->length = (s32)length * sizeof(f32);
+    delayline->inputs = (f32*)fn_801643D8(length * sizeof(f32));
+    memset(delayline->inputs, 0, length * sizeof(length));
+    delayline->lastOutput = 0.f;
+    DLsetdelay(delayline, length >> 1);
+    delayline->inPoint = 0;
+    delayline->outPoint = 0;
+}
 
-        ptr = fn_801643D8(bytes);
-        if (ptr == 0) {
-            return 0;
-        }
-        memset((void*)ptr, 0, bytes);
-        *(u32*)(obj + 0xC0 + i * 0x14) = ptr;
+u32 ReverbHICreate(u8* obj, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay,
+                   f32 crosstalk) {
+    _SND_REVHI_WORK* rev = (_SND_REVHI_WORK*)obj;
+    const s32* lens;
+    u8 i;
+    u8 k;
+
+    if (coloration < 0.f || coloration > 1.f || time < 0.01f || time > 10.f || mix < 0.f ||
+        mix > 1.f || crosstalk < 0.f || crosstalk > 1.f || damping < 0.f || damping > 1.f ||
+        preDelay < 0.f || preDelay > 0.1f) {
+        return 0;
     }
 
-    *(f32*)(obj + 0x168) = f1;
-    *(f32*)(obj + 0x16C) = f2;
-    *(f32*)(obj + 0x19C) = f3;
-    *(f32*)(obj + 0x1A8) = f6;
-    damping = f4;
-    if (damping < lbl_8047D510) {
-        damping = lbl_8047D510;
-    }
-    *(f32*)(obj + 0x1A0) = lbl_8047D4F4 - (lbl_8047D510 + lbl_8047D514 * damping);
+    memset(rev, 0, sizeof(_SND_REVHI_WORK));
 
-    if (f5 != lbl_8047D4F0) {
-        delaySamples = (u32)(lbl_8047D504 * f5);
-        if (delaySamples == 0) {
-            delaySamples = 1;
+    lens = (const s32*)lbl_8036BF00;
+    for (k = 0; k < 3; ++k) {
+        for (i = 0; i < 3; ++i) {
+            DLcreate(&rev->C[i + k * 3], lens[i] + 2);
+            DLsetdelay(&rev->C[i + k * 3], lens[i]);
+            rev->combCoef[i + k * 3] = (f32)pow(10.0, (lens[i] * -3) / (32000.f * time));
         }
-        *(u32*)(obj + 0x1A4) = delaySamples;
-        bytes = delaySamples * 4;
-        for (i = 0; i < 3; i++) {
-            ptr = fn_801643D8(bytes);
-            if (ptr == 0) {
-                return 0;
-            }
-            memset((void*)ptr, 0, bytes);
-            *(u32*)(obj + 0x1AC + i * 4) = ptr;
-            *(u32*)(obj + 0x1B8 + i * 4) = ptr;
+
+        for (i = 0; i < 2; ++i) {
+            DLcreate(&rev->AP[i + k * 3], lens[i + 3] + 2);
+            DLsetdelay(&rev->AP[i + k * 3], lens[i + 3]);
+        }
+        DLcreate(&rev->AP[k * 3 + 2], lens[k + 5] + 2);
+        DLsetdelay(&rev->AP[k * 3 + 2], lens[k + 5]);
+        rev->lpLastout[k] = 0.f;
+    }
+
+    rev->allPassCoeff = coloration;
+    rev->level = mix;
+    rev->crosstalk = crosstalk;
+    rev->damping = damping;
+    if (rev->damping < 0.05f) {
+        rev->damping = 0.05f;
+    }
+
+    rev->damping = 1.f - (0.05f + 0.8f * rev->damping);
+    if (0.f != preDelay) {
+        rev->preDelayTime = 32000.f * preDelay;
+        for (i = 0; i < 3; ++i) {
+            rev->preDelayLine[i] = (f32*)fn_801643D8(rev->preDelayTime * sizeof(f32));
+            memset(rev->preDelayLine[i], 0, rev->preDelayTime * sizeof(f32));
+            rev->preDelayPtr[i] = rev->preDelayLine[i];
+        }
+    } else {
+        rev->preDelayTime = 0;
+        for (i = 0; i < 3; ++i) {
+            rev->preDelayPtr[i] = NULL;
+            rev->preDelayLine[i] = NULL;
         }
     }
+
     return 1;
 }
-#endif
-#pragma pop
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off

@@ -233,3 +233,155 @@ s32 fn_80167E54(void) { return -1; }
 u32 fn_80167E5C(u8* obj) {
     return *(u32*)((u8*)obj + 0x38);
 }
+
+/* 2026-07-24: decompiled directly from the current disassembly (not the
+ * unreliable archive bodies noted above). */
+extern BOOL OSDisableInterrupts(void);
+extern BOOL OSRestoreInterrupts(BOOL level);
+extern void *fn_80167720(void);
+extern void fn_80167070(void *entry, u32 flag);
+extern u8 *lbl_8047B0C4;
+extern u32 lbl_8047B0C8;
+extern u8 *lbl_8047B0CC;
+extern u32 lbl_8047B0D0;
+
+void fn_80167040(void)
+{
+    void *entry;
+
+    entry = fn_80167720();
+    if (entry != NULL) {
+        fn_80167070(entry, 0);
+    }
+}
+
+void fn_801677BC(u8 *flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_801677F4(u8 *flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_8016782C(u8 *flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void fn_801679E4(void)
+{
+    u32 offset;
+    u32 i;
+    u8 value;
+
+    offset = 0;
+    i = 0;
+    value = 0;
+    while (i < lbl_8047B0C8) {
+        lbl_8047B0C4[offset] = value;
+        i++;
+        offset += 0x78;
+    }
+}
+
+void fn_80167A14(void)
+{
+    u32 offset;
+    u32 i;
+    u8 value;
+
+    offset = 0;
+    i = 0;
+    value = 0;
+    while (i < lbl_8047B0D0) {
+        lbl_8047B0CC[offset] = value;
+        i++;
+        offset += 0xD0;
+    }
+}
+
+
+extern u32 fn_800E2C04(u32 size, u32 align);
+extern void* fn_800E27B0(u32 handle);
+extern u32 fn_800E202C(void);
+extern void fn_800E24B0(u32 handle);
+extern void fn_800E209C(u32 handle);
+extern s32 DVDConvertPathToEntrynum(const char* path);
+extern s32 DVDGetCommandBlockStatus(const void* block);
+extern s32 DVDGetDriveStatus(void);
+extern void DVDClose(void* fileInfo);
+void fn_80168164(u8* flag);
+
+void fn_80167B70(void)
+{
+    u32 handle = fn_800E202C();
+
+    if ((u16)handle != 0) {
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+}
+
+void* fn_80167BB0(u32 size)
+{
+    u32 handle = fn_800E2C04(size, 0x20);
+
+    if ((u16)handle != 0) {
+        return fn_800E27B0(handle);
+    }
+    return 0;
+}
+
+s32 fn_80167E10(u8* handle)
+{
+    return DVDGetCommandBlockStatus(handle + 4);
+}
+
+s32 fn_80167E34(void)
+{
+    return DVDGetDriveStatus();
+}
+
+void fn_80167E64(u8* file)
+{
+    fn_80168164(file);
+    DVDClose(file + 4);
+}
+
+u32 fn_80167EF8(const char* path)
+{
+    return DVDConvertPathToEntrynum(path) != -1;
+}
+
+void fn_80168164(u8* flag)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    *flag = 0;
+    OSRestoreInterrupts(enabled);
+}
+
+void* fn_8016824C(u32 size)
+{
+    u32 handle = fn_800E2C04(size, 0x20);
+
+    if ((u16)handle != 0) {
+        return fn_800E27B0(handle);
+    }
+    return 0;
+}

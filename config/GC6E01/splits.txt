@@ -622,7 +622,10 @@ game/menu/menu_carde_matrix.c:
 	.text       start:0x8007C300 end:0x8007FD64
 
 game/menu/cardesavedata.c:
-	.text       start:0x8007FD64 end:0x80088428
+	.text       start:0x8007FD64 end:0x80084038
+
+game/menu/cardesavedata_80084038.c:
+	.text       start:0x80084038 end:0x80088428
 
 game/gba/gba_conv.c:
 	.text       start:0x80088428 end:0x80088EA8
@@ -1847,7 +1850,13 @@ game/gs_gfx_layer_exact_800D87AC.c:
 	.text       start:0x800D87AC end:0x800D892C
 
 game/gs_gfx_layer_candidate_800D892C.c:
-	.text       start:0x800D892C end:0x800D9AF0
+	.text       start:0x800D892C end:0x800D923C
+
+game/gs_gfx_layer_candidate_800D923C.c:
+	.text       start:0x800D923C end:0x800D963C
+
+game/gs_gfx_layer_candidate_800D963C.c:
+	.text       start:0x800D963C end:0x800D9AF0
 
 game/gs_gfx_range_800D9AF0.c:
 	.text       start:0x800D9AF0 end:0x800D9D68

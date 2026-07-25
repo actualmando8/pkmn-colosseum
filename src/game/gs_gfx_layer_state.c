@@ -518,7 +518,7 @@ void fn_800D7230(void) {
  * Configure the full GX rendering pipeline. At 2320 bytes, this is
  * a major setup function. Called once per render mode change.
  * ================================================================== */
-#if defined(GS_GFX_LAYER_800D892C_800D9AF0)
+#if defined(GS_GFX_LAYER_800D892C_800D9AF0) || defined(GS_GFX_LAYER_800D892C_800D923C)
 void fn_800D892C(u32 objArg) {
     u8* obj;
     u8* state;
@@ -1967,7 +1967,7 @@ void fn_800D88DC(u32 mask) {
 #endif
 #endif
 
-#if defined(GS_GFX_LAYER_800D892C_800D9AF0)
+#if defined(GS_GFX_LAYER_800D892C_800D9AF0) || defined(GS_GFX_LAYER_800D923C_800D963C)
 extern void fn_800BA6B0();
 extern void fn_800BA6F4();
 extern void fn_800B884C();
@@ -2088,7 +2088,7 @@ void fn_800D923C(void) {
 #endif
 #endif
 
-#if defined(GS_GFX_LAYER_800D892C_800D9AF0)
+#if defined(GS_GFX_LAYER_800D892C_800D9AF0) || defined(GS_GFX_LAYER_800D963C_800D9AF0)
 #if 0
 asm void fn_800D963C(void) {
 #include "src/game/gs_render_fn_800D963C.inc"

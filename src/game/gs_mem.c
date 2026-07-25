@@ -6,3 +6,15 @@
  * segment (Fable re-split, 2026-07-07). Functions asm-only until matched.
  */
 #include "dolphin/types.h"
+
+extern u32 lbl_8047AB2C;
+
+s32 fn_800E2AF8(void)
+{
+    return 1;
+}
+
+void fn_800E3560(u32 value)
+{
+    lbl_8047AB2C = value;
+}

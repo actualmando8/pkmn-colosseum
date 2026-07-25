@@ -8,3 +8,27 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+typedef struct HSD_AmnesiaClass {
+    u8 _00[0x14];
+    struct HSD_AmnesiaClass* parent; /* 0x14 */
+    u8 _18[0x20];
+    void (*amnesia)(void* info);     /* 0x38 */
+} HSD_AmnesiaClass;
+
+extern u8 lbl_8036CB30[]; /* hsdMObj class info */
+extern void* lbl_8047B2D0;
+extern void* lbl_8047B2D8;
+extern void* lbl_8047B2DC;
+
+void MObjAmnesia(void* info)
+{
+    if (info == lbl_8047B2D0) {
+        lbl_8047B2D0 = 0;
+    }
+    if (info == (void*)lbl_8036CB30) {
+        lbl_8047B2D8 = 0;
+        lbl_8047B2DC = 0;
+    }
+    ((HSD_AmnesiaClass*)lbl_8036CB30)->parent->amnesia(info);
+}

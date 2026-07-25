@@ -62,9 +62,17 @@ void* fn_801D1364(u16 handle, s32 idx) {
  * fn_801D139C - Waza get entry type.
  * Address: 0x801D139C | Size: 0x48
  */
-s32 fn_801D139C(void* entry) {
-    if (entry == NULL) return -1;
-    return *(s32*)((u8*)entry + 0x00);
+u32 fn_801D139C(s32 idx) {
+    WazaEntry* sequenceEntry;
+
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = &lbl_80478E9C[idx];
+    }
+
+    if (sequenceEntry == NULL) return 0xFFFF;
+    return *(u16*)((u8*)sequenceEntry + 0x08);
 }
 #endif
 
@@ -93,9 +101,17 @@ u32 fn_801D13E4(s32 idx) {
  * fn_801D142C - Waza get entry duration.
  * Address: 0x801D142C | Size: 0x44
  */
-f32 fn_801D142C(void* entry) {
-    if (entry == NULL) return 0.0f;
-    return *(f32*)((u8*)entry + 0x08);
+u32 fn_801D142C(s32 idx) {
+    WazaEntry* sequenceEntry;
+
+    if (idx < 0 || (u32)idx >= *lbl_80478E98) {
+        sequenceEntry = NULL;
+    } else {
+        sequenceEntry = &lbl_80478E9C[idx];
+    }
+
+    if (sequenceEntry == NULL) return 0xFF;
+    return *(u8*)((u8*)sequenceEntry + 0x01);
 }
 #endif
 
