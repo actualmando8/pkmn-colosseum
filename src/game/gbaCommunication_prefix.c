@@ -1715,6 +1715,259 @@ void fn_8008F190(u32 ctx) {
     floorSetFadeScript(0, 0);
 }
 
+
+/* 0x8008F524 | size: 0x3F8 */
+void fn_8008F524(u32 ctx) {
+    extern u32 GSresGetResource(u32 ctx, u32 id);
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void fn_801CB7C4(u32 id);
+    extern void GSmodelLinkToGSparticleBank(u32 handle, u32 val);
+    extern void GSmodelSetGSparticleLinkAttachMode(u32 handle, u32 val);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern s32 fn_800D37CC(void);
+    extern void _threadSwitch(void);
+    extern u32 fn_800D3088(void);
+    extern u32 fn_801CBA0C(u32 id);
+    extern u32 GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32 *param);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void floorSetFadeScript(u32 a, u32 b);
+    extern void fn_80118874(void *texture, u32 flag);
+    extern void GSmodelSetAnimIndex(u32 handle, u32 val);
+    extern void GSmodelGetFrameCount(u32 handle, f32 *out, u32 flag);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 val);
+    extern void GSmodelSetAnimType(u32 handle, u32 val);
+    extern void GSmodelStartAnimation(u32 handle);
+
+    u32 elapsed;
+    u32 waitFrames;
+    u32 cameraElapsed;
+    u32 cameraWaitFrames;
+    GSmaterialEntry *material;
+    f32 frame;
+    u32 handle2;
+    u32 modelA;
+    u32 modelB;
+    u32 modelC;
+    u32 shadowTarget;
+    u32 animA;
+    u32 animB;
+    u32 animC;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    frame = 0.0f;
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame = frame - lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0CE61000), GSresGetResource(ctx, 0x111B1400));
+    GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0CE61000), 4);
+
+    fn_801CB834(0x0CE61000, 3, 0, 0);
+    waitFrames = 0x32;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1E0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    modelA = fn_801CBA0C(0x06BC0400);
+    modelB = fn_801CBA0C(0x06BE0400);
+    modelC = fn_801CBA0C(0x06BE0400);
+
+    shadowTarget = GSresGetResource(ctx, modelA);
+    GSmodelSetShadowFlags(shadowTarget, 2);
+    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
+    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+
+    shadowTarget = GSresGetResource(ctx, modelB);
+    GSmodelSetShadowFlags(shadowTarget, 2);
+    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
+    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+
+    shadowTarget = GSresGetResource(ctx, modelC);
+    GSmodelSetShadowFlags(shadowTarget, 2);
+    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
+    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0CF71800, 0, 0);
+    cameraWaitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        cameraWaitFrames = (u32)lbl_8047C1D0;
+        if (cameraWaitFrames < 1) {
+            cameraWaitFrames = 1;
+        }
+    }
+    for (cameraElapsed = 0; cameraElapsed < cameraWaitFrames; ) {
+        _threadSwitch();
+        cameraElapsed += fn_800D3088();
+    }
+
+    animA = fn_801CBA0C(0x0CEE1000);
+    animB = fn_801CBA0C(0x0CEE1002);
+    animC = fn_801CBA0C(0x0CEE1001);
+
+    fn_801845E4(ctx, modelA, ctx, animA, 0);
+    fn_801845E4(ctx, modelB, ctx, animB, 0);
+    fn_801845E4(ctx, modelC, ctx, animC, 0);
+
+    fn_801CB834(modelA, 3, 0, 1);
+    fn_801CB834(modelB, 4, 0, 1);
+    fn_801CB834(modelC, 4, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
+
+/* 0x8008F91C | size: 0x2D8 */
+void fn_8008F91C(u32 ctx) {
+    extern u32 GSresGetResource(u32 ctx, u32 id);
+    extern void GSmodelSetShadowTextureSize(u32 w, u32 h);
+    extern void fn_801CB7C4(u32 id);
+    extern void fn_801CB834(u32 id, u32 slot, u32 x, u32 y);
+    extern s32 fn_800D37CC(void);
+    extern void _threadSwitch(void);
+    extern u32 fn_800D3088(void);
+    extern u32 fn_801CBA0C(u32 id);
+    extern u32 GSmodelSetShadowFlags(u32 handle, u32 val);
+    extern void GSmodelSetShadowLight(u32 handle, u32 val);
+    extern void GSmodelSetShadowSurface(u32 handle, u32 val, u32 *param);
+    extern void cameraPlayAnime(u32 ctx, u32 id, u32 a, u32 b);
+    extern void fn_801845E4(u32 ctx, u32 modelHandle, u32 ctx2, u32 handle, u32 flags);
+    extern void cameraWaitSyncAnime(s32 sync);
+    extern void fn_800FF58C(u32 id);
+    extern void floorSetFadeScript(u32 a, u32 b);
+    extern void fn_80118874(void *texture, u32 flag);
+    extern void GSmodelSetAnimIndex(u32 handle, u32 val);
+    extern void GSmodelGetFrameCount(u32 handle, f32 *out, u32 flag);
+    extern void GSmodelSetAnimFrame(u32 handle, f32 val);
+    extern void GSmodelSetAnimType(u32 handle, u32 val);
+    extern void GSmodelStartAnimation(u32 handle);
+
+    u32 elapsed;
+    u32 waitFrames;
+    u32 cameraElapsed;
+    u32 cameraWaitFrames;
+    GSmaterialEntry *material;
+    f32 frame;
+    u32 handle2;
+    u32 modelA;
+    u32 modelB;
+    u32 shadowTarget;
+    u32 animA;
+    u32 animB;
+
+    lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
+    lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
+    GSmodelSetShadowTextureSize(0x280, 0x1E0);
+    fn_801CB834(0x0CE61000, 0, 0, 0);
+
+    waitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        waitFrames = (u32)lbl_8047C1D0;
+        if (waitFrames < 1) {
+            waitFrames = 1;
+        }
+    }
+    for (elapsed = 0; elapsed < waitFrames; ) {
+        _threadSwitch();
+        elapsed += fn_800D3088();
+    }
+
+    fn_801CB7C4(0x0CE61000);
+
+    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(material->texture, 1);
+    material->texture = NULL;
+
+    frame = 0.0f;
+    handle2 = GSresGetResource(ctx, 0x0CE61004);
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelGetFrameCount(handle2, &frame, 0);
+    frame = frame - lbl_8047C1D8;
+    GSmodelSetAnimIndex(handle2, 0);
+    GSmodelSetAnimFrame(handle2, frame);
+    GSmodelSetAnimType(handle2, 0);
+    GSmodelStartAnimation(handle2);
+
+    modelA = fn_801CBA0C(0x06BD0400);
+    modelB = fn_801CBA0C(0x06BA0400);
+
+    shadowTarget = GSresGetResource(ctx, modelA);
+    GSmodelSetShadowFlags(shadowTarget, 2);
+    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
+    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+
+    shadowTarget = GSresGetResource(ctx, modelB);
+    GSmodelSetShadowFlags(shadowTarget, 2);
+    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
+    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+
+    cameraPlayAnime(ctx, 0x0CF61800, 0, 0);
+    cameraWaitFrames = 1;
+    if (fn_800D37CC() == 0x32) {
+        cameraWaitFrames = (u32)lbl_8047C1D0;
+        if (cameraWaitFrames < 1) {
+            cameraWaitFrames = 1;
+        }
+    }
+    for (cameraElapsed = 0; cameraElapsed < cameraWaitFrames; ) {
+        _threadSwitch();
+        cameraElapsed += fn_800D3088();
+    }
+
+    animA = fn_801CBA0C(0x0CED1000);
+    animB = fn_801CBA0C(0x0CED1001);
+
+    fn_801845E4(ctx, modelB, ctx, animA, 0);
+    fn_801845E4(ctx, modelA, ctx, animB, 0);
+
+    fn_801CB834(modelB, 2, 0, 1);
+    fn_801CB834(modelA, 2, 0, 1);
+
+    cameraWaitSyncAnime(1);
+    fn_800FF58C(0x89);
+    floorSetFadeScript(0, 0);
+}
+
 /* 0x8008FBF4 | size: 0x2A0 */
 void fn_8008FBF4(u32 ctx) {
     #pragma peephole off
