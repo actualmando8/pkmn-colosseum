@@ -8,11 +8,86 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+#include "dolphin/exi/EXI.h"
+#include "dolphin/os/OSCache.h"
+#include "dolphin/os/OSThread.h"
+
+extern u8 _stack_addr[];
+extern u8 _stack_end[];
+
+static OSThreadQueue RunQueue_803FB898[32];
+static OSThread IdleThread;
+static OSThread DefaultThread;
+static OSContext IdleContext;
+static volatile u32 RunQueueBits_8047A760;
+static volatile int RunQueueHint_8047A764;
+static s32 Reschedule_8047A768;
+
+extern OSSwitchThreadCallback SwitchThreadCallback_804789A8;
+
+#define OS_CURRENT_THREAD (*(OSThread**)0x800000E4)
+#define OS_FPU_CONTEXT (*(OSContext**)0x800000D8)
+
+static OSThreadQueue* const OS_ACTIVE_THREAD_QUEUE = (OSThreadQueue*)0x800000DC;
+
+#define ADD_TAIL(queue, thread, link)              \
+    do {                                            \
+        OSThread* previous = (queue)->tail;         \
+        if (previous == NULL) {                     \
+            (queue)->head = (thread);               \
+        } else {                                    \
+            previous->link.next = (thread);         \
+        }                                           \
+        (thread)->link.prev = previous;             \
+        (thread)->link.next = NULL;                 \
+        (queue)->tail = (thread);                   \
+    } while (0)
+
+typedef struct SramControl {
+    u8 sram[0x40];
+    u32 offset;
+    BOOL enabled;
+    BOOL locked;
+    BOOL sync;
+} SramControl;
+
+extern u32 Scb_803FB840[0x54 / sizeof(u32)];
+
+static inline BOOL ReadSram(void* buffer) {
+    BOOL err;
+    u32 command;
+
+    DCInvalidateRange(buffer, 0x40);
+    if (!EXILock(0, 1, NULL)) {
+        return FALSE;
+    }
+    if (!EXISelect(0, 1, 3)) {
+        EXIUnlock(0);
+        return FALSE;
+    }
+
+    command = 0x20000100;
+    err = FALSE;
+    err |= !EXIImm(0, &command, 4, 1, NULL);
+    err |= !EXISync(0);
+    err |= !EXIDma(0, buffer, 0x40, 0, NULL);
+    err |= !EXISync(0);
+    err |= !EXIDeselect(0);
+    EXIUnlock(0);
+    return !err;
+}
+
+void __OSInitSram(void) {
+    SramControl* control = (SramControl*)Scb_803FB840;
+
+    control->locked = control->enabled = FALSE;
+    control->sync = ReadSram(control->sram);
+    control->offset = 0x40;
+}
 
 void* __OSLockSram(void) {
     extern BOOL OSDisableInterrupts(void);
     extern BOOL OSRestoreInterrupts(BOOL level);
-    extern u32 Scb_803FB840[0x54 / sizeof(u32)];
     BOOL enabled;
     void* result = Scb_803FB840;
 
@@ -31,7 +106,6 @@ void* __OSLockSram(void) {
 void* __OSLockSramEx(void) {
     extern BOOL OSDisableInterrupts(void);
     extern BOOL OSRestoreInterrupts(BOOL level);
-    extern u32 Scb_803FB840[0x54 / sizeof(u32)];
     BOOL enabled;
     u32* sram = Scb_803FB840;
     u32* lock;
@@ -55,9 +129,33 @@ void __OSUnlockSram(BOOL commit) {
 }
 
 BOOL __OSSyncSram(void) {
-    extern u32 Scb_803FB840[0x54 / sizeof(u32)];
-
     return ((u32*)Scb_803FB840)[0x13];
+}
+
+BOOL __OSReadROM(void* buffer, s32 length, s32 offset) {
+    BOOL err;
+    u32 command;
+
+    DCInvalidateRange(buffer, (u32)length);
+
+    if (!EXILock(0, 1, NULL)) {
+        return FALSE;
+    }
+    if (!EXISelect(0, 1, 3)) {
+        EXIUnlock(0);
+        return FALSE;
+    }
+
+    command = (u32)(offset << 6);
+    err = FALSE;
+    err |= !EXIImm(0, &command, 4, 1, NULL);
+    err |= !EXISync(0);
+    err |= !EXIDma(0, buffer, length, 0, NULL);
+    err |= !EXISync(0);
+    err |= !EXIDeselect(0);
+    EXIUnlock(0);
+
+    return !err;
 }
 
 BOOL __OSUnlockSramEx(BOOL commit) {
@@ -183,4 +281,42 @@ void __OSInitSystemCall(void) {
 #pragma peephole reset
 
 void fn_800A128C(void) {
+}
+
+void __OSThreadInit(void) {
+    OSThread* thread = &DefaultThread;
+    s32 priority;
+
+    thread->state = OS_THREAD_STATE_RUNNING;
+    thread->attr = OS_THREAD_ATTR_DETACH;
+    thread->priority = thread->base = 16;
+    thread->suspend = 0;
+    thread->val = (u32)-1;
+    thread->mutex = NULL;
+
+    OSInitThreadQueue(&thread->queueJoin);
+    thread->queueMutex.head = thread->queueMutex.tail = NULL;
+
+    OS_FPU_CONTEXT = &thread->context;
+    OSClearContext(&thread->context);
+    OSSetCurrentContext(&thread->context);
+    thread->stackBase = (u32*)_stack_addr;
+    thread->stackEnd = (u32*)_stack_end;
+    *thread->stackEnd = OS_THREAD_STACK_MAGIC;
+
+    SwitchThreadCallback_804789A8(OS_CURRENT_THREAD, thread);
+    OS_CURRENT_THREAD = thread;
+    OSClearStack(0);
+
+    RunQueueBits_8047A760 = 0;
+    RunQueueHint_8047A764 = FALSE;
+    for (priority = OS_PRIORITY_MIN; priority <= OS_PRIORITY_MAX; priority++) {
+        OSInitThreadQueue(&RunQueue_803FB898[priority]);
+    }
+
+    OSInitThreadQueue(OS_ACTIVE_THREAD_QUEUE);
+    ADD_TAIL(OS_ACTIVE_THREAD_QUEUE, thread, linkActive);
+
+    OSClearContext(&IdleContext);
+    Reschedule_8047A768 = 0;
 }
