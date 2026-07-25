@@ -377,6 +377,243 @@ char* long2str_800C9EC4(signed long num, char* buff, print_format format) {
     return p;
 }
 
+/* MSL ctype table; bit 0x10 marks a decimal digit. */
+extern u8 lbl_80313B18[];
+#define isdigit(c) (lbl_80313B18[(u8)(c)] & 0x10)
+
+extern void* __va_arg(void* ap, u32 kind);
+
+/* parse_format - 0x800CA11C */
+const char* parse_format_800CA11C(const char* format_string, va_list* arg,
+                                  print_format* format) {
+    print_format f;
+    const char* s = format_string;
+    int c;
+    int flag_found;
+
+    f.justification_options = right_justification;
+    f.sign_options = only_minus;
+    f.precision_specified = 0;
+    f.alternate_form = 0;
+    f.argument_options = normal_argument;
+    f.field_width = 0;
+    f.precision = 0;
+
+    if ((c = *++s) == '%') {
+        f.conversion_char = c;
+        *format = f;
+        return ((const char*)s + 1);
+    }
+
+    for (;;) {
+        flag_found = 1;
+
+        switch (c) {
+        case '-':
+            f.justification_options = left_justification;
+            break;
+        case '+':
+            f.sign_options = sign_always;
+            break;
+        case ' ':
+            if (f.sign_options != sign_always) {
+                f.sign_options = space_holder;
+            }
+            break;
+        case '#':
+            f.alternate_form = 1;
+            break;
+        case '0':
+            if (f.justification_options != left_justification) {
+                f.justification_options = zero_fill;
+            }
+            break;
+        default:
+            flag_found = 0;
+            break;
+        }
+
+        if (flag_found) {
+            c = *++s;
+        } else {
+            break;
+        }
+    }
+
+    if (c == '*') {
+        if ((f.field_width = *(int*)__va_arg(*arg, 1)) < 0) {
+            f.justification_options = left_justification;
+            f.field_width = -f.field_width;
+        }
+
+        c = *++s;
+    } else {
+        while (isdigit(c)) {
+            f.field_width = (f.field_width * 10) + (c - '0');
+            c = *++s;
+        }
+    }
+
+    if (f.field_width > 509) {
+        f.conversion_char = 0xFF;
+        *format = f;
+        return ((const char*)s + 1);
+    }
+
+    if (c == '.') {
+        f.precision_specified = 1;
+
+        if ((c = *++s) == '*') {
+            if ((f.precision = *(int*)__va_arg(*arg, 1)) < 0) {
+                f.precision_specified = 0;
+            }
+
+            c = *++s;
+        } else {
+            while (isdigit(c)) {
+                f.precision = (f.precision * 10) + (c - '0');
+                c = *++s;
+            }
+        }
+    }
+
+    flag_found = 1;
+
+    switch (c) {
+    case 'h':
+        f.argument_options = short_argument;
+        if (s[1] == 'h') {
+            f.argument_options = char_argument;
+            c = *++s;
+        }
+        break;
+
+    case 'l':
+        f.argument_options = long_argument;
+        if (s[1] == 'l') {
+            f.argument_options = long_long_argument;
+            c = *++s;
+        }
+        break;
+
+    case 'L':
+        f.argument_options = long_double_argument;
+        break;
+
+    default:
+        flag_found = 0;
+        break;
+    }
+
+    if (flag_found) {
+        c = *++s;
+    }
+
+    f.conversion_char = c;
+
+    switch (c) {
+    case 'd':
+    case 'i':
+    case 'u':
+    case 'o':
+    case 'x':
+    case 'X':
+        if (f.argument_options == long_double_argument) {
+            f.conversion_char = 0xFF;
+            break;
+        }
+        if (!f.precision_specified) {
+            f.precision = 1;
+        } else if (f.justification_options == zero_fill) {
+            f.justification_options = right_justification;
+        }
+        break;
+
+    case 'f':
+    case 'F':
+        if (f.argument_options == short_argument ||
+            f.argument_options == long_long_argument) {
+            f.conversion_char = 0xFF;
+            break;
+        }
+        if (!f.precision_specified) {
+            f.precision = 6;
+        }
+        break;
+
+    case 'a':
+    case 'A':
+        if (!f.precision_specified) {
+            f.precision = 0xD;
+        }
+        if (f.argument_options == short_argument ||
+            f.argument_options == long_long_argument ||
+            f.argument_options == char_argument) {
+            f.conversion_char = 0xFF;
+        }
+        break;
+
+    case 'g':
+    case 'G':
+        if (!f.precision) {
+            f.precision = 1;
+        }
+
+    case 'e':
+    case 'E':
+        if (f.argument_options == short_argument ||
+            f.argument_options == long_long_argument ||
+            f.argument_options == char_argument) {
+            f.conversion_char = 0xFF;
+            break;
+        }
+        if (!f.precision_specified) {
+            f.precision = 6;
+        }
+        break;
+
+    case 'p':
+        f.conversion_char = 'x';
+        f.alternate_form = 1;
+        f.argument_options = long_argument;
+        f.precision = 8;
+        break;
+
+    case 'c':
+        if (f.argument_options == long_argument) {
+            f.argument_options = wchar_argument;
+        } else {
+            if (f.precision_specified || f.argument_options != normal_argument) {
+                f.conversion_char = 0xFF;
+            }
+        }
+        break;
+
+    case 's':
+        if (f.argument_options == long_argument) {
+            f.argument_options = wchar_argument;
+        } else {
+            if (f.argument_options != normal_argument) {
+                f.conversion_char = 0xFF;
+            }
+        }
+        break;
+
+    case 'n':
+        if (f.argument_options == long_double_argument) {
+            f.conversion_char = 0xFF;
+        }
+        break;
+
+    default:
+        f.conversion_char = 0xFF;
+        break;
+    }
+
+    *format = f;
+    return ((const char*)s + 1);
+}
+
 /* __StringWrite - 0x800C87F8 | size: 0x6C */
 s32 __StringWrite(u8* ctx, const void* src, u32 count) {
     extern void* memcpy(void* dst, const void* src, u32 n);
