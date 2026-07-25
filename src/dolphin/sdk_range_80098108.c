@@ -94,7 +94,7 @@ extern u32 __DBVECTOR[];
 static volatile EXIRegBlock* const ExiHw = (volatile EXIRegBlock*)0xCC006800;
 static volatile OSLowMem* const LowMem = (volatile OSLowMem*)0x80000000;
 
-BOOL fn_80099400(s32 chan, u32 dev, u32* id);
+s32 fn_80099400(s32 chan, u32 dev, u32* id);
 BOOL fn_80098790(s32 chan);
 u32 fn_800986A0(s32 chan, s32 exi, s32 tc, s32 ext);
 u32 fn_8009A23C(void);
@@ -784,6 +784,128 @@ BOOL fn_800993D0(s32 chan) {
 }
 #pragma scheduling reset
 #pragma pop
+
+/*
+ * EXIGetID - 0x80099400 | size: 0x390
+ *
+ * __EXIAttach, EXIDetach and EXIUnlock are all inlined here in the target,
+ * so their bodies are repeated rather than called.
+ */
+s32 fn_80099400(s32 chan, u32 dev, u32* id) {
+    EXIControl* exi = &lbl_803FB3C8[chan];
+    int err;
+    u32 cmd;
+    s32 startTime;
+    BOOL enabled;
+
+    if ((chan < 2) && (dev == 0)) {
+        if (fn_80098790(chan) == 0) {
+            return 0;
+        }
+
+        if (exi->idTime == __EXIProbeStartTime[chan]) {
+            *id = exi->id;
+            return exi->idTime;
+        }
+
+        /* __EXIAttach(chan, NULL) */
+        {
+            EXIControl* aexi = &lbl_803FB3C8[chan];
+
+            enabled = OSDisableInterrupts();
+            if ((aexi->state & 8) || !fn_80098790(chan)) {
+                OSRestoreInterrupts(enabled);
+                return 0;
+            }
+            fn_800986A0(chan, TRUE, FALSE, FALSE);
+            aexi->extCallback = NULL;
+            __OSUnmaskInterrupts(0x100000u >> (chan * 3));
+            aexi->state |= 8;
+            OSRestoreInterrupts(enabled);
+        }
+
+        startTime = __EXIProbeStartTime[chan];
+    }
+
+    enabled = OSDisableInterrupts();
+
+    err = !EXILock(chan, dev, (chan < 2 && dev == 0) ? (EXICallback)fn_800993D0 : NULL);
+    if (err == 0) {
+        err = !EXISelect(chan, dev, 0);
+        if (err == 0) {
+            cmd = 0;
+            err |= !EXIImm(chan, &cmd, 2, 1, 0);
+            err |= !EXISync(chan);
+            err |= !EXIImm(chan, id, 4, 0, 0);
+            err |= !EXISync(chan);
+            err |= !EXIDeselect(chan);
+        }
+
+        /* EXIUnlock(chan) */
+        {
+            EXIControl* uexi = &lbl_803FB3C8[chan];
+            BOOL uenabled = OSDisableInterrupts();
+
+            if (!(uexi->state & 0x10)) {
+                OSRestoreInterrupts(uenabled);
+            } else {
+                uexi->state &= ~0x10;
+                fn_80098110(chan, uexi);
+
+                if (uexi->items > 0) {
+                    EXICallback callback = uexi->queue[0].callback;
+
+                    if (--uexi->items > 0) {
+                        memmove(&uexi->queue[0], &uexi->queue[1],
+                                uexi->items * sizeof(EXIQueueEntry));
+                    }
+                    callback(chan, NULL);
+                }
+                OSRestoreInterrupts(uenabled);
+            }
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+
+    if ((chan < 2) && (dev == 0)) {
+        /* EXIDetach(chan) */
+        {
+            EXIControl* dexi = &lbl_803FB3C8[chan];
+            BOOL denabled = OSDisableInterrupts();
+
+            if (!(dexi->state & 8)) {
+                OSRestoreInterrupts(denabled);
+            } else if ((dexi->state & 0x10) && dexi->device == 0) {
+                OSRestoreInterrupts(denabled);
+            } else {
+                dexi->state &= ~8;
+                __OSMaskInterrupts(0x700000u >> (chan * 3));
+                OSRestoreInterrupts(denabled);
+            }
+        }
+
+        enabled = OSDisableInterrupts();
+        err |= __EXIProbeStartTime[chan] != startTime;
+
+        if (!err) {
+            exi->id = *id;
+            exi->idTime = startTime;
+        }
+
+        OSRestoreInterrupts(enabled);
+
+        if (err) {
+            return 0;
+        }
+        return exi->idTime;
+    }
+
+    if (err) {
+        return 0;
+    }
+    return 1;
+}
 
 #pragma peephole off
 u32 OSGetConsoleType(void) {
