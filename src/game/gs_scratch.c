@@ -16,7 +16,53 @@ typedef struct GSscratchAllocation {
 
 extern GSscratchAllocation lbl_804018F0[32];
 extern u8 *lbl_8047ABE0;
+extern u8 lbl_8047ABE8;
 extern u32 lbl_8047ABEC;
+extern u32 lbl_8047ABDC;
+
+void GSscratchSetValid(void)
+{
+    GSscratchAllocation *allocation;
+    s32 count;
+
+    if (lbl_8047ABE8 != 0) {
+        allocation = lbl_804018F0;
+        count = 32;
+        while (count-- != 0) {
+            if (allocation->firstBlock != 0xFF &&
+                allocation->callback != NULL) {
+                allocation->callback(
+                    TRUE,
+                    lbl_8047ABE0 + allocation->firstBlock * 0x200,
+                    allocation->blockCount);
+            }
+            allocation++;
+        }
+        lbl_8047ABE8 = 0;
+    }
+}
+
+void GSscratchSetInvalid(void)
+{
+    GSscratchAllocation *allocation;
+    s32 count;
+
+    if (lbl_8047ABE8 != 1) {
+        allocation = lbl_804018F0;
+        count = 32;
+        while (count-- != 0) {
+            if (allocation->firstBlock != 0xFF &&
+                allocation->callback != NULL) {
+                allocation->callback(
+                    FALSE,
+                    lbl_8047ABE0 + allocation->firstBlock * 0x200,
+                    allocation->blockCount);
+            }
+            allocation++;
+        }
+        lbl_8047ABE8 = 1;
+    }
+}
 
 static inline GSscratchAllocation *GSscratchFindAllocation(u8 firstBlock)
 {
@@ -68,10 +114,28 @@ void GSscratchFree(void *ptr)
 }
 
 extern void LCQueueWait(u32 len);
-extern u32 lbl_8047ABDC;
+extern u32 LCQueueLength(void);
+extern u32 LCStoreData(void *dest, void *src, u32 len);
 
 void GSscratchWaitForCompletion(void)
 {
     LCQueueWait(lbl_8047ABDC);
     lbl_8047ABDC = 0;
+}
+
+u32 GSscratchStore(void *dest, void *src, u32 len)
+{
+    u32 queued;
+
+    if (LCQueueLength() >= 15) {
+        return 1;
+    }
+    if (((u32)dest & 0x1F) != 0 || ((u32)src & 0x1F) != 0 ||
+        (len & 0x1F) != 0) {
+        return 2;
+    }
+
+    queued = LCStoreData(dest, src, len);
+    lbl_8047ABDC += queued;
+    return 0;
 }
