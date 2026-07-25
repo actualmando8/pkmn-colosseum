@@ -29,8 +29,9 @@ s32 vsprintf(char* buf, const char* fmt, va_list args);
 /*
  * sprintf - 0x800C8520 | size: 0xE0
  *
- * vsprintf is inlined here in the target, so its body is repeated rather
- * than called; vsprintf is defined after this point and does not inline.
+ * This MSL revision implements sprintf and vsprintf as separate entry points
+ * with the same output-controller body; the target contains no call between
+ * them.
  */
 s32 sprintf(char* buf, const char* fmt, ...) {
     extern s32 __StringWrite(void* data, s32 count, __FILE* file);
