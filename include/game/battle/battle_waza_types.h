@@ -82,7 +82,7 @@ struct WazaSequence {
 typedef struct WazaPartyScratch {
     u16 seqIds[0x200];
     u16 count;
-    u8 pad_402[0x40];
+    u8 receivedFlags[0x40];
     u8 selectedHandle;
     u8 currentHandle;
 } WazaPartyScratch;
@@ -273,10 +273,10 @@ extern u32 mailGetSenderName(s32 idx);
 extern u32 mailGetSubject(s32 idx);
 extern void fn_801D1B10(s32 handle);
 extern u8 mailGetSortMode(void);
-extern void fn_801D1B78(s32 seqHandle);
-extern void fn_801D1C20(s32 seqHandle);
+extern BOOL fn_801D1B78(s32 mailId);
+extern BOOL fn_801D1C20(s32 mailId);
 extern BOOL mailChkReceiveMail(s32 idx);
-extern void mailAddMailbox(s32 seqHandle);
+extern BOOL mailAddMailbox(s32 mailId);
 extern BOOL fn_801D1E50(s32 seqHandle);
 extern s32 mailGetMailIDInMailbox(s32 idx);
 extern u16 mailGetNbMailInMailbox(void);

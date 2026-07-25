@@ -426,20 +426,50 @@ u8 mailGetSortMode(void) {
 }
 #pragma scheduling on
 
-/**
- * fn_801D1B78 - Waza effect position update (attacker-relative).
- * Address: 0x801D1B78 | Size: 0xA8
- */
-void fn_801D1B78(s32 seqHandle) {
-    /* TODO: Effect position update (0xA8 bytes) */
+static inline s32 mailFlagIndex(s32 mailId)
+{
+    if (mailId < 0 || mailId >= 0x200) {
+        return -1;
+    }
+    return mailId / 8;
+}
+
+static inline u8 mailFlagMask(s32 mailId)
+{
+    return 1 << (7 - mailId % 8);
 }
 
 /**
- * fn_801D1C20 - Waza effect position update (target-relative).
+ * Test whether a mailbox ID has already been received.
+ * Address: 0x801D1B78 | Size: 0xA8
+ */
+BOOL fn_801D1B78(s32 mailId) {
+    WazaPartyScratch* party =
+        (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
+    s32 index = mailFlagIndex(mailId);
+    u8 mask = mailFlagMask(mailId);
+
+    if (index < 0) {
+        return FALSE;
+    }
+    return (party->receivedFlags[index] & mask) != 0;
+}
+
+/**
+ * Mark a mailbox ID as received.
  * Address: 0x801D1C20 | Size: 0xA4
  */
-void fn_801D1C20(s32 seqHandle) {
-    /* TODO: Effect position update target-relative (0xA4 bytes) */
+BOOL fn_801D1C20(s32 mailId) {
+    WazaPartyScratch* party =
+        (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
+    s32 index = mailFlagIndex(mailId);
+    u8 mask = mailFlagMask(mailId);
+
+    if (index < 0) {
+        return FALSE;
+    }
+    party->receivedFlags[index] |= mask;
+    return TRUE;
 }
 
 /**
@@ -475,11 +505,32 @@ BOOL mailChkReceiveMail(s32 idx) {
 #pragma pop
 
 /**
- * mailAddMailbox - Waza projectile update.
+ * Append a mailbox ID and clear its received flag.
  * Address: 0x801D1D58 | Size: 0xF8
  */
-void mailAddMailbox(s32 seqHandle) {
-    /* TODO: Waza projectile update (0xF8 bytes) */
+BOOL mailAddMailbox(s32 mailId) {
+    WazaPartyScratch* party =
+        (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
+    s32 index;
+    u8 mask;
+
+    if (mailId < 0 || (u32)mailId >= *lbl_80478E98) {
+        return FALSE;
+    }
+    if (party->count >= 0x200) {
+        return FALSE;
+    }
+
+    party->seqIds[party->count] = mailId;
+    party->count++;
+
+    party = (WazaPartyScratch*)savedataGetStatus(0, 0x0A);
+    index = mailFlagIndex(mailId);
+    mask = mailFlagMask(mailId);
+    if (index >= 0) {
+        party->receivedFlags[index] &= ~mask;
+    }
+    return TRUE;
 }
 
 /**

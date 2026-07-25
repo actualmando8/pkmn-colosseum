@@ -35,7 +35,10 @@ typedef struct BattleGridCameraWork {
     f32 sequenceTimer;
 } BattleGridCameraWork;
 
-void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b);
+void* fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b);
+void fadeSet(s32 mode, f32 value);
+void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), s32 mode, u32 arg,
+                                  f32 value);
 
 /**
  * fadeEffectDokuStop - Get grid slot model pointer (renamed
@@ -102,7 +105,13 @@ s32 fadeCheck(u8 flag) {
  * fadeSetEX - Schedule grid update callback with arguments.
  * Address: 0x801C4164 | Size: 0x64
  */
-void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
+void* fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
+    void* previous;
+
+    previous = fadeSetFunction__FPFv_vbUsf((void (*)(void))callback, flags,
+                                           mode, b);
+    fadeSet(mode, a);
+    return previous;
 }
 
 /**
@@ -112,8 +121,29 @@ void fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
  * Initializes the battle camera to the default overhead view
  * and configures the camera animation system.
  */
-void fadeSet(s32 mode) {
-    /* Initialize battle camera with specified mode */
+void fadeSet(s32 mode, f32 value) {
+    extern BattleGridTransitionState lbl_80466E30;
+    extern const f32 lbl_8047DFB8;
+    volatile BattleGridTransitionState* state = &lbl_80466E30;
+
+    state->pending = 1;
+    state->arg = mode;
+    state->startValue = value;
+    state->endValue = lbl_8047DFB8;
+
+    if (mode & 8) {
+        if (mode & 1) {
+            state->mode = 4;
+        } else {
+            state->mode = 3;
+        }
+    } else {
+        if (mode & 1) {
+            state->mode = 2;
+        } else {
+            state->mode = 1;
+        }
+    }
 }
 
 /**
@@ -122,7 +152,7 @@ void fadeSet(s32 mode) {
  * Address: 0x801C423C | Size: 0xE0
  */
 #pragma peephole off
-void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), u8 mode, u32 arg, f32 value) {
+void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), s32 mode, u32 arg, f32 value) {
     extern u8 lbl_80466E30[];
     extern volatile const f32 lbl_8047DFB8;
     extern u32 menuOffScreenGetPtr(void);
