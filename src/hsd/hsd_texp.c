@@ -900,17 +900,16 @@ void HSD_TExpCompile(u8* root, u32* tex_count, u32* ras_count) {
         return;
     }
 
-    /* Walk tree and count texture / rasterizer references */
     {
         u8* node = root;
         while (node != NULL) {
             u32 type = *(u32*)(node + 0x0);
-            if (type == 1) { /* TEX */
+            if (type == 1) {
                 t_count++;
-            } else if (type == 2) { /* RAS */
+            } else if (type == 2) {
                 r_count++;
             }
-            node = *(u8**)(node + 0x8); /* next */
+            node = *(u8**)(node + 0x8);
         }
     }
 
@@ -1129,10 +1128,89 @@ void fn_801B3AE8(s32 chan)
 }
 #pragma pop
 
-struct _HSD_TExpTevDesc {
-    /* 0x00 */ HSD_TevDesc desc;
-    /* 0x84 */ HSD_TObj* tobj;
+typedef struct ColTExpNode ColTExpNode;
+
+typedef struct ColTEArg {
+    u8 type;
+    u8 sel;
+    u8 arg;
+    u8 pad_03;
+    ColTExpNode* exp;
+} ColTEArg;
+
+struct ColTExpNode {
+    s32 type;
+    ColTExpNode* next;
+    s32 c_ref;
+    u8 c_dst;
+    u8 c_op;
+    u8 c_clamp;
+    u8 c_bias;
+    u8 c_scale;
+    u8 c_range;
+    u8 pad_12[2];
+    s32 a_ref;
+    u8 a_dst;
+    u8 a_op;
+    u8 a_clamp;
+    u8 a_bias;
+    u8 a_scale;
+    u8 a_range;
+    u8 tex_swap;
+    u8 ras_swap;
+    u8 kcsel;
+    u8 kasel;
+    u8 pad_22[0x12];
+    ColTEArg c_in[4];
+    ColTEArg a_in[4];
+    HSD_TObj* tex;
+    u8 chan;
 };
+
+#define COL_TE_ZERO 0
+#define COL_TE_TEV 1
+#define COL_TE_TEX 2
+#define COL_TE_RAS 3
+#define COL_TE_CNST 4
+#define COL_TE_RGB 1
+#define COL_TE_A 5
+#define COL_TE_0 7
+
+static inline s32 ColTExpGetType(ColTExpNode* exp)
+{
+    if (exp == NULL) {
+        return COL_TE_ZERO;
+    }
+    if ((u32) exp == -1U) {
+        return COL_TE_TEX;
+    }
+    if ((u32) exp == -2U) {
+        return COL_TE_RAS;
+    }
+    return exp->type;
+}
+
+struct _HSD_TExpTevDesc {
+    HSD_TevDesc desc;
+    HSD_TObj* tobj;
+};
+
+typedef struct ColTECnst {
+    s32 type;
+    ColTExpNode* next;
+    void* val;
+    u8 comp;
+    u8 ctype;
+    u8 reg;
+    u8 idx;
+    u8 ref;
+    u8 range;
+} ColTECnst;
+
+extern void fn_800B8E74(void);
+extern void fn_800BC3E0(u32 id, GXColor color);
+extern void fn_800BC2F8(u32 id, GXColor color);
+extern void fn_801B25C4(u32 flags);
 
 void HSD_TExpSetReg(HSD_TExp* texp);
 
@@ -1151,30 +1229,136 @@ void fn_801B45A4(HSD_TExpTevDesc* tevdesc, HSD_TExp* texp) {
 }
 
 /*
- * HSD_TExpGenTEVStages - 0x801B4614 | Size: 0x548
- * Compile pass 2 - generate GX TEV stage configurations
- * from the validated expression tree. Maps expression nodes
- * to TEV stages, assigns texture coordinates and maps.
+ * HSD_TExpSetReg - 0x801B4614 | Size: 0x548
  */
-void HSD_TExpSetReg(HSD_TExp* texp) {
-    u32 stage;
-    u8* node;
+void HSD_TExpSetReg(HSD_TExp* texp)
+{
+    static u32 id1[4] = { 0, 1, 2, 3 };
+    static u32 id2[3] = { 1, 2, 3 };
+    s32 i;
+    GXColor reg[8];
+    u32 changed;
+    ColTECnst* clist;
 
-    if (texp == NULL) {
-        return;
+    clist = (ColTECnst*) texp;
+    changed = 0;
+    while (clist != NULL) {
+        HSD_ASSERT(0x5AD, clist->type == COL_TE_CNST);
+        if (clist->reg < 8) {
+            changed |= 1 << clist->reg;
+            if (clist->comp == COL_TE_RGB) {
+                switch (clist->ctype) {
+                case 0: {
+                    GXColor col = *(GXColor*) clist->val;
+                    col.a = reg[clist->reg].a;
+                    reg[clist->reg] = col;
+                    break;
+                }
+                case 2: {
+                    u32* ptr = clist->val;
+                    reg[clist->reg].r = ptr[0] < 0x100 ? ptr[0] : 0xFF;
+                    reg[clist->reg].g = ptr[1] < 0x100 ? ptr[1] : 0xFF;
+                    reg[clist->reg].b = ptr[2] < 0x100 ? ptr[2] : 0xFF;
+                    break;
+                }
+                default: {
+                    s32 r;
+                    s32 g;
+                    s32 b;
+                    switch (clist->ctype) {
+                    case 1: {
+                        u16* ptr = clist->val;
+                        r = ptr[0];
+                        g = ptr[1];
+                        b = ptr[2];
+                        break;
+                    }
+                    case 3: {
+                        f32* ptr = clist->val;
+                        r = 255.0F * ptr[0];
+                        g = 255.0F * ptr[1];
+                        b = 255.0F * ptr[2];
+                        break;
+                    }
+                    default: {
+                        f64* ptr = clist->val;
+                        r = 255.0 * ptr[0];
+                        g = 255.0 * ptr[1];
+                        b = 255.0 * ptr[2];
+                        break;
+                    }
+                    }
+                    reg[clist->reg].r = r > 0xFF ? 0xFF : r < 0 ? 0 : r;
+                    reg[clist->reg].g = g > 0xFF ? 0xFF : g < 0 ? 0 : g;
+                    reg[clist->reg].b = b > 0xFF ? 0xFF : b < 0 ? 0 : b;
+                    break;
+                }
+                }
+            } else {
+                s32 x;
+                u8 val;
+                switch (clist->ctype) {
+                case 0:
+                    x = *(u8*) clist->val;
+                    val = x;
+                    break;
+                case 1:
+                    x = *(u16*) clist->val;
+                    val = x > 0xFF ? 0xFF : x < 0 ? 0 : x;
+                    break;
+                case 2:
+                    x = *(u32*) clist->val;
+                    val = x > 0xFF ? 0xFF : x < 0 ? 0 : x;
+                    break;
+                case 3:
+                    x = 255.0F * *(f32*) clist->val;
+                    val = x > 0xFF ? 0xFF : x < 0 ? 0 : x;
+                    break;
+                default:
+                    x = 255.0 * *(f64*) clist->val;
+                    val = x > 0xFF ? 0xFF : x < 0 ? 0 : x;
+                    break;
+                }
+                if (clist->reg < 4) {
+                    switch (clist->idx) {
+                    case 0:
+                        reg[clist->reg].r = val;
+                        break;
+                    case 1:
+                        reg[clist->reg].g = val;
+                        break;
+                    case 2:
+                        reg[clist->reg].b = val;
+                        break;
+                    default:
+                        reg[clist->reg].a = val;
+                        break;
+                    }
+                } else if (clist->idx == 3) {
+                    reg[clist->reg].a = val;
+                } else {
+                    reg[clist->reg].r = val;
+                    reg[clist->reg].g = val;
+                    reg[clist->reg].b = val;
+                }
+            }
+        }
+        clist = (ColTECnst*) clist->next;
     }
-
-    stage = 0;
-    node = (u8*)texp;
-
-    while (node != NULL && stage < 16) {
-        u32 type = *(u32*)(node + 0x0);
-
-        /* Configure this TEV stage based on node type */
-        /* Sets GXSetTevOrder, GXSetTevColorIn/Op, GXSetTevAlphaIn/Op */
-
-        stage++;
-        node = *(u8**)(node + 0x8);
+    if (changed != 0) {
+        fn_800B8E74();
+        for (i = 0; i < 4; i++) {
+            if (changed & (1 << i)) {
+                fn_800BC3E0(id1[i], reg[i]);
+            }
+        }
+        for (i = 4; i < 7; i++) {
+            if (changed & (1 << i)) {
+                fn_800BC2F8(id2[i - 4], reg[i]);
+            }
+        }
+        fn_801B25C4(0x10);
+        fn_800B8E74();
     }
 }
 
@@ -1184,22 +1368,105 @@ void HSD_TExpSetReg(HSD_TExp* texp) {
  * Merges stages where possible, removes redundant operations,
  * and minimizes register usage.
  */
-void TExp2TevDesc(u32 num_stages) {
-    u32 i;
+void TExp2TevDesc(ColTExpNode* texp, HSD_TExpTevDesc* desc,
+                  s32* init_cprev, s32* init_aprev)
+{
+    static u32 dst[4] = { 1, 2, 3, 0 };
+    ColTExpNode* tev;
+    HSD_TevDesc* tevdesc;
 
-    if (num_stages <= 1) {
-        return;
+    HSD_ASSERT(0x52C, texp);
+    HSD_ASSERT(0x52D, desc);
+    HSD_ASSERT(0x52E, ColTExpGetType(texp) == COL_TE_TEV);
+
+    tev = texp;
+    tevdesc = &desc->desc;
+    tevdesc->next = NULL;
+    tevdesc->flag = 1;
+    desc->tobj = tev->tex;
+    if (tev->tex == NULL) {
+        tevdesc->coord = 0xFF;
+        tevdesc->map = 0xFF;
+    }
+    tevdesc->color = tev->chan == 0xFF ? 0xFF : tev->chan;
+    tevdesc->swap0 = tev->ras_swap == 0xFF ? 0 : tev->ras_swap;
+    tevdesc->swap1 = tev->tex_swap == 0xFF ? 0 : tev->tex_swap;
+    tevdesc->kcolor0 = tev->kcsel == 0xFF ? 0 : tev->kcsel;
+    tevdesc->kcolor1 = tev->kasel == 0xFF ? 0 : tev->kasel;
+
+    if (tev->c_op == 0xFF ||
+        (tev->c_ref == 0 && tev->a_op != 8 && tev->a_op != 9 &&
+         tev->a_op != 10 && tev->a_op != 11 && tev->a_op != 12 &&
+         tev->a_op != 13)) {
+        tevdesc->color_op = GX_TEV_ADD;
+        tevdesc->color_a = GX_CC_ZERO;
+        tevdesc->color_b = GX_CC_ZERO;
+        tevdesc->color_c = GX_CC_ZERO;
+        if (*init_cprev != 0) {
+            *init_cprev = 0;
+            tevdesc->color_d = GX_CC_ZERO;
+        } else {
+            tevdesc->color_d = GX_CC_CPREV;
+        }
+        tevdesc->color_scale = 0;
+        tevdesc->color_bias = 0;
+        tevdesc->color_clamp = 0;
+        tevdesc->color_tevreg = 0;
+    } else {
+        tevdesc->color_op = tev->c_op;
+        tevdesc->color_a =
+            tev->c_in[0].arg == 0xFF ? GX_CC_ZERO : tev->c_in[0].arg;
+        tevdesc->color_b =
+            tev->c_in[1].arg == 0xFF ? GX_CC_ZERO : tev->c_in[1].arg;
+        tevdesc->color_c =
+            tev->c_in[2].arg == 0xFF ? GX_CC_ZERO : tev->c_in[2].arg;
+        tevdesc->color_d =
+            tev->c_in[3].arg == 0xFF ? GX_CC_ZERO : tev->c_in[3].arg;
+        tevdesc->color_scale = tev->c_scale == 0xFF ? 0 : tev->c_scale;
+        tevdesc->color_bias = tev->c_bias == 0xFF ? 0 : tev->c_bias;
+        tevdesc->color_clamp = tev->c_clamp != 0 ? GX_TRUE : GX_FALSE;
+        HSD_ASSERT(0x56D, tev->c_dst != 0xFF);
+        tevdesc->color_tevreg = dst[tev->c_dst];
+        if (tevdesc->color_tevreg == 0) {
+            *init_cprev = 0;
+        }
     }
 
-    /* Optimization passes:
-     * 1. Merge consecutive add/multiply stages
-     * 2. Remove identity stages (multiply by 1, add 0)
-     * 3. Minimize temporary register allocation
-     * 4. Reorder stages to reduce dependencies
-     */
-    for (i = 0; i < num_stages; i++) {
-        /* Check if stage i can be merged with stage i+1 */
+    if (tev->a_op == 0xFF || tev->a_ref == 0) {
+        tevdesc->alpha_op = GX_TEV_ADD;
+        tevdesc->alpha_a = GX_CA_ZERO;
+        tevdesc->alpha_b = GX_CA_ZERO;
+        tevdesc->alpha_c = GX_CA_ZERO;
+        if (*init_aprev != 0) {
+            *init_aprev = 0;
+            tevdesc->alpha_d = GX_CA_ZERO;
+        } else {
+            tevdesc->alpha_d = GX_CA_APREV;
+        }
+        tevdesc->alpha_scale = 0;
+        tevdesc->alpha_bias = 0;
+        tevdesc->alpha_clamp = 0;
+        tevdesc->alpha_tevreg = 0;
+    } else {
+        tevdesc->alpha_op = tev->a_op;
+        tevdesc->alpha_a =
+            tev->a_in[0].arg == 0xFF ? GX_CA_ZERO : tev->a_in[0].arg;
+        tevdesc->alpha_b =
+            tev->a_in[1].arg == 0xFF ? GX_CA_ZERO : tev->a_in[1].arg;
+        tevdesc->alpha_c =
+            tev->a_in[2].arg == 0xFF ? GX_CA_ZERO : tev->a_in[2].arg;
+        tevdesc->alpha_d =
+            tev->a_in[3].arg == 0xFF ? GX_CA_ZERO : tev->a_in[3].arg;
+        tevdesc->alpha_scale = tev->a_scale == 0xFF ? 0 : tev->a_scale;
+        tevdesc->alpha_bias = tev->a_bias == 0xFF ? 0 : tev->a_bias;
+        tevdesc->alpha_clamp = tev->a_clamp != 0 ? GX_TRUE : GX_FALSE;
+        HSD_ASSERT(0x591, tev->a_dst != 0xFF);
+        tevdesc->alpha_tevreg = dst[tev->a_dst];
+        if (tevdesc->alpha_tevreg == 0) {
+            *init_aprev = 0;
+        }
     }
+    tevdesc->pad60 = 0;
 }
 
 /* ========================================================================= */
@@ -1208,10 +1475,6 @@ void TExp2TevDesc(u32 num_stages) {
 
 /*
  * HSD_MaterialSetupTEV - 0x801B50C0 | Size: 0x790
- * Main material TEV setup. Configures all TEV stages for a material.
- * This is the main entry point called when rendering a material.
- * Walks the TObj chain, builds expression trees, compiles them,
- * and configures all GX state.
  */
 void fn_801B50C0(void* mobj, u32 rendermode) {
     /* Full material TEV setup:
@@ -1529,85 +1792,16 @@ void fn_801B707C(HSD_TObj* tobj, u32 coord_id) {
 /*
  * HSD_TObjFullBind - 0x801B7178 | Size: 0x394
  * Full texture binding with all parameters.
- * Loads image, TLUT, configures filter/wrap/LOD, and generates texcoords.
  */
 void fn_801B7178(HSD_TObj* tobj, u32 map_id, u32 coord_id) {
     if (tobj == NULL) {
         return;
     }
-
-    /* 1. Load image to GX */
     fn_801B600C(tobj, map_id);
-
-    /* 2. Set up texcoord gen */
     fn_801B6E74(tobj, coord_id);
-
-    /* 3. Compute texture matrix if dirty */
     if (tobj->flags & TEX_MTX_DIRTY) {
         HSD_TExpCnst(tobj);
     }
-}
-
-typedef struct ColTExpNode ColTExpNode;
-
-typedef struct ColTEArg {
-    u8 type;
-    u8 sel;
-    u8 arg;
-    u8 pad_03;
-    ColTExpNode* exp;
-} ColTEArg;
-
-struct ColTExpNode {
-    s32 type;
-    ColTExpNode* next;
-    s32 c_ref;
-    u8 c_dst;
-    u8 c_op;
-    u8 c_clamp;
-    u8 c_bias;
-    u8 c_scale;
-    u8 c_range;
-    u8 pad_12[2];
-    s32 a_ref;
-    u8 a_dst;
-    u8 a_op;
-    u8 a_clamp;
-    u8 a_bias;
-    u8 a_scale;
-    u8 a_range;
-    u8 tex_swap;
-    u8 ras_swap;
-    u8 kcsel;
-    u8 kasel;
-    u8 pad_22[0x12];
-    ColTEArg c_in[4];
-    ColTEArg a_in[4];
-    HSD_TObj* tex;
-    u8 chan;
-};
-
-#define COL_TE_ZERO 0
-#define COL_TE_TEV 1
-#define COL_TE_TEX 2
-#define COL_TE_RAS 3
-#define COL_TE_CNST 4
-#define COL_TE_RGB 1
-#define COL_TE_A 5
-#define COL_TE_0 7
-
-static inline s32 ColTExpGetType(ColTExpNode* exp)
-{
-    if (exp == NULL) {
-        return COL_TE_ZERO;
-    }
-    if ((u32) exp == -1U) {
-        return COL_TE_TEX;
-    }
-    if ((u32) exp == -2U) {
-        return COL_TE_RAS;
-    }
-    return exp->type;
 }
 
 /*
@@ -1651,7 +1845,6 @@ void fn_801B750C(ColTExpNode* texp, u8 sel) {
 
 /*
  * HSD_TExpRef - 0x801B7BD4 | Size: 0x8C
- * Increment reference counters for child TExp nodes.
  */
 #pragma push
 #pragma optimization_level 1
@@ -2112,7 +2305,6 @@ void fn_801B8B84(HSD_GObj* gobj, u8 p_link, u8 priority) {
 
 /*
  * GObj_Destroy - 0x801B8D5C | Size: 0x25C
- * Destroy a game object and clean up all resources.
  */
 void fn_801B8D5C(HSD_GObj* gobj) {
     HSD_GObjProc* proc;
@@ -2121,20 +2313,15 @@ void fn_801B8D5C(HSD_GObj* gobj) {
         return;
     }
 
-    /* Free user data */
     if (gobj->user_data != NULL && gobj->user_data_remove_func != NULL) {
         gobj->user_data_remove_func(gobj->user_data);
     }
-
-    /* Free all processes */
     proc = gobj->proc;
     while (proc != NULL) {
         HSD_GObjProc* next = proc->next;
         hsdFreeMemPiece(proc, sizeof(HSD_GObjProc));
         proc = next;
     }
-
-    /* Unlink from process list */
     if (gobj->prev != NULL) {
         gobj->prev->next = gobj->next;
     } else if (gobj->p_link < 64) {
@@ -2143,8 +2330,6 @@ void fn_801B8D5C(HSD_GObj* gobj) {
     if (gobj->next != NULL) {
         gobj->next->prev = gobj->prev;
     }
-
-    /* Unlink from render list */
     if (gobj->prev_gx != NULL) {
         gobj->prev_gx->next_gx = gobj->next_gx;
     } else if (gobj->gx_link < 64) {
@@ -2153,7 +2338,6 @@ void fn_801B8D5C(HSD_GObj* gobj) {
     if (gobj->next_gx != NULL) {
         gobj->next_gx->prev_gx = gobj->prev_gx;
     }
-
     gobj_num_active--;
     hsdFreeMemPiece(gobj, sizeof(HSD_GObj));
 }
