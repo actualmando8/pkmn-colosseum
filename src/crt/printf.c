@@ -20,7 +20,7 @@ extern void __begin_critical_region(s32 region);
 extern void __end_critical_region(s32 region);
 extern s32 fwide(__FILE* file, s32 mode);
 extern s32 __pformatter(WriteFunc writefunc, __FILE* file, const char* fmt, va_list args);
-extern s32 __FileWrite(void* data, s32 count, __FILE* file);
+void* __FileWrite(void* pFile, const char* pBuffer, u32 char_num);
 
 /* vsprintf - 0x800C8600 | size: 0x78 */
 s32 vsprintf(char* buf, const char* fmt, va_list args) {
@@ -73,6 +73,308 @@ s32 printf(const char* fmt, ...) {
     __end_critical_region(2);
 
     return result;
+}
+
+/* ------------------------------------------------------------------ */
+/* MSL printf.c body (0x800C8864 onward, printf_candidate_800C8864).   */
+/* ------------------------------------------------------------------ */
+
+enum justification_options { left_justification, right_justification, zero_fill };
+
+enum sign_options { only_minus, sign_always, space_holder };
+
+enum argument_options {
+    normal_argument,
+    char_argument,
+    short_argument,
+    long_argument,
+    long_long_argument,
+    long_double_argument,
+    wchar_argument
+};
+
+typedef struct {
+    /* 0x00 */ unsigned char justification_options;
+    /* 0x01 */ unsigned char sign_options;
+    /* 0x02 */ unsigned char precision_specified;
+    /* 0x03 */ unsigned char alternate_form;
+    /* 0x04 */ unsigned char argument_options;
+    /* 0x05 */ unsigned char conversion_char;
+    /* 0x08 */ int field_width;
+    /* 0x0C */ int precision;
+} print_format;
+
+typedef struct decimal {
+    /* 0x00 */ char sign;
+    /* 0x01 */ char unk1;
+    /* 0x02 */ short exp;
+    struct {
+        /* 0x04 */ unsigned char length;
+        /* 0x05 */ unsigned char text[36];
+        /* 0x29 */ unsigned char unk41;
+    } sig;
+} decimal;
+
+/* __FileWrite - 0x800C8864 | size: 0x58 */
+void* __FileWrite(void* pFile, const char* pBuffer, u32 char_num) {
+    extern u32 fwrite(const void* ptr, u32 size, u32 count, void* file);
+
+    return (fwrite(pBuffer, 1, char_num, pFile) == char_num ? pFile : 0);
+}
+
+/* round_decimal - 0x800C974C */
+void round_decimal(decimal* dec, int new_length) {
+    char c;
+    char* p;
+    int carry;
+
+    if (new_length < 0) {
+    return_zero:
+        dec->exp = 0;
+        dec->sig.length = 1;
+        *dec->sig.text = '0';
+        return;
+    }
+
+    if (new_length >= dec->sig.length) {
+        return;
+    }
+
+    p = (char*)dec->sig.text + new_length + 1;
+    c = *--p - '0';
+
+    if (c == 5) {
+        char* q = &((char*)dec->sig.text)[dec->sig.length];
+
+        while (--q > p && *q == '0') {
+            ;
+        }
+        carry = (q == p) ? p[-1] & 1 : 1;
+    } else {
+        carry = (c > 5);
+    }
+
+    while (new_length != 0) {
+        c = *--p - '0' + carry;
+
+        if ((carry = (c > 9)) != 0 || c == 0) {
+            --new_length;
+        } else {
+            *p = c + '0';
+            break;
+        }
+    }
+
+    if (carry != 0) {
+        dec->exp += 1;
+        dec->sig.length = 1;
+        *dec->sig.text = '1';
+        return;
+    } else if (new_length == 0) {
+        goto return_zero;
+    }
+
+    dec->sig.length = new_length;
+}
+
+/* longlong2str - 0x800C9BB0 */
+char* longlong2str_800C9BB0(signed long long num, char* pBuf, print_format fmt) {
+    unsigned long long unsigned_num, base;
+    char* p;
+    int n, digits;
+    int minus = 0;
+
+    unsigned_num = num;
+    minus = 0;
+    p = pBuf;
+    *--p = 0;
+    digits = 0;
+
+    if (!num && !fmt.precision &&
+        !(fmt.alternate_form && fmt.conversion_char == 'o')) {
+        return p;
+    }
+
+    switch (fmt.conversion_char) {
+    case 'd':
+    case 'i':
+        base = 10;
+        if (num < 0) {
+            unsigned_num = -unsigned_num;
+            minus = 1;
+        }
+        break;
+    case 'o':
+        base = 8;
+        fmt.sign_options = only_minus;
+        break;
+    case 'u':
+        base = 10;
+        fmt.sign_options = only_minus;
+        break;
+    case 'x':
+    case 'X':
+        base = 16;
+        fmt.sign_options = only_minus;
+        break;
+    }
+
+    do {
+        n = unsigned_num % base;
+        unsigned_num /= base;
+
+        if (n < 10) {
+            n += '0';
+        } else {
+            n -= 10;
+            if (fmt.conversion_char == 'x') {
+                n += 'a';
+            } else {
+                n += 'A';
+            }
+        }
+
+        *--p = n;
+        ++digits;
+    } while (unsigned_num != 0);
+
+    if (base == 8 && fmt.alternate_form && *p != '0') {
+        *--p = '0';
+        ++digits;
+    }
+
+    if (fmt.justification_options == zero_fill) {
+        fmt.precision = fmt.field_width;
+
+        if (minus || fmt.sign_options != only_minus) {
+            --fmt.precision;
+        }
+        if (base == 16 && fmt.alternate_form) {
+            fmt.precision -= 2;
+        }
+    }
+
+    if (pBuf - p + fmt.precision > 509) {
+        return 0;
+    }
+
+    while (digits < fmt.precision) {
+        *--p = '0';
+        ++digits;
+    }
+
+    if (base == 16 && fmt.alternate_form) {
+        *--p = fmt.conversion_char;
+        *--p = '0';
+    }
+
+    if (minus) {
+        *--p = '-';
+    } else if (fmt.sign_options == sign_always) {
+        *--p = '+';
+    } else if (fmt.sign_options == space_holder) {
+        *--p = ' ';
+    }
+
+    return p;
+}
+
+/* long2str - 0x800C9EC4 */
+char* long2str_800C9EC4(signed long num, char* buff, print_format format) {
+    unsigned long unsigned_num, base;
+    char* p;
+    int n, digits;
+    int minus = 0;
+
+    unsigned_num = num;
+    p = buff;
+    *--p = 0;
+    digits = 0;
+
+    if (!num && !format.precision &&
+        !(format.alternate_form && format.conversion_char == 'o')) {
+        return p;
+    }
+
+    switch (format.conversion_char) {
+    case 'd':
+    case 'i':
+        base = 10;
+        if (num < 0) {
+            unsigned_num = -unsigned_num;
+            minus = 1;
+        }
+        break;
+    case 'o':
+        base = 8;
+        format.sign_options = only_minus;
+        break;
+    case 'u':
+        base = 10;
+        format.sign_options = only_minus;
+        break;
+    case 'x':
+    case 'X':
+        base = 16;
+        format.sign_options = only_minus;
+        break;
+    }
+
+    do {
+        n = unsigned_num % base;
+        unsigned_num /= base;
+
+        if (n < 10) {
+            n += '0';
+        } else if (format.conversion_char == 'x') {
+            n += 'W';
+        } else {
+            n += '7';
+        }
+
+        *--p = n;
+        ++digits;
+    } while (unsigned_num != 0);
+
+    if (base == 8 && format.alternate_form && *p != '0') {
+        *--p = '0';
+        ++digits;
+    }
+
+    if (format.justification_options == zero_fill) {
+        format.precision = format.field_width;
+
+        if (minus || format.sign_options != only_minus) {
+            --format.precision;
+        }
+        if (base == 16 && format.alternate_form) {
+            format.precision -= 2;
+        }
+    }
+
+    if (buff - p + format.precision > 509) {
+        return 0;
+    }
+
+    while (digits < format.precision) {
+        *--p = '0';
+        ++digits;
+    }
+
+    if (base == 16 && format.alternate_form) {
+        *--p = format.conversion_char;
+        *--p = '0';
+    }
+
+    if (minus) {
+        *--p = '-';
+    } else if (format.sign_options == sign_always) {
+        *--p = '+';
+    } else if (format.sign_options == space_holder) {
+        *--p = ' ';
+    }
+
+    return p;
 }
 
 /* __StringWrite - 0x800C87F8 | size: 0x6C */
