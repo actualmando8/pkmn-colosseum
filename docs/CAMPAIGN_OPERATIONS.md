@@ -1747,3 +1747,79 @@ Next action: publish and merge PR #426, confirm decomp.dev at the exact merge,
   then start the 100% fuzzy campaign with a fresh model-assisted compile-loop
   target while the Windows-only farm continues its non-overlapping queue
 ```
+
+### Fuzzy campaign restart snapshot — 2026-07-25
+
+```text
+Master baseline: dae9b326; 57.809658% fuzzy, 901,760 matched code bytes,
+  6,309 / 8,603 exact functions, 1,026 / 1,801 linked units
+Recovered Claude worktree:
+  `.claude/worktrees/decompilation-linking-fuzzy-match-274746`
+Recovered handoff head: ac0125b6; 60.544765% fuzzy, 928,372 matched code
+  bytes, 6,378 exact functions, 1,026 / 1,804 linked units
+Reconciled source head: 697dd7b3 on
+  `claude/decompilation-linking-fuzzy-match-274746`
+Current report: 60.900250% fuzzy, 931,092 matched code bytes,
+  6,384 / 8,603 exact functions, 1,026 / 1,804 linked units
+Delta from handoff: +0.355485pp fuzzy, +2,720 matched code bytes,
+  +6 exact functions; linked code/data and complete-unit counts unchanged
+Delta from master: +3.090592pp fuzzy, +29,332 matched code bytes,
+  +75 exact functions; linked code/data and complete-unit counts unchanged
+
+Reconciliation: all Claude scratch lanes, five abandoned agent worktrees, six
+  older frontier worktrees, and the dirty fuzzy-batch tree were inspected.
+  Existing frontier commits were already ancestors of the recovered head.
+  Accepted abandoned survivors were the canonical SI BIOS range, HSD TObj
+  reference bodies, fdlibm `__ieee754_sqrt`, and the typed THP audio-buffer
+  consumer. Rejected work included the unfinished fdlibm exp body, raw-offset
+  THP scratch and its pragma variant, a regressing pointer-walk experiment,
+  and a particle candidate with an inverted condition and uninitialized read.
+
+Standards re-audit: prior campaign exclusions are hypotheses, not permanent
+  bans. Readable inline helpers, canonical gotos, SDK hardware unions and
+  volatility, and legacy MSL/fdlibm word access are admissible when semantics
+  and target/compiler/reference evidence agree. Dummy/self assignments,
+  uninitialized reads, fake volatility, fabricated constants or layouts,
+  semantic changes, `.inc` source, and asm wrappers remain rejected.
+  Canonical `GetFontSize`/`ReadFont` helpers replaced an unsupported
+  block-scope-extern coercion and made OSLoadFont exact. Unsupported volatile
+  qualifiers were removed from VI's ordinary software shadow arrays with no
+  score change; real MMIO, interrupt-shared state, and the SDK delay counter
+  remain volatile.
+
+New exact source: canonical OSLoadFont (+820 bytes), fdlibm
+  `__ieee754_sqrt` (+548), SITransfer (+364), SIGetTypeAsync (+316),
+  `__timesdec` (+632), and GXSetClipMode (+40). New partial source includes
+  SI transfer/type internals, HSD TObj loading/matrix/animation bodies,
+  THP audio consumption at 98.63636%, GXSetGPMetric at 95.76792%, and
+  `__two_exp_800DCCB8` at 99.91561%.
+
+HSD bytecode sqrt: the old 96.27564% bespoke volatile-union shape was rejected
+  as unsupported. The reference-authentic MSL inline sqrt/classifier is
+  96.11863%; canonical extern-inline spelling, constants, expression ordering,
+  and meaningful locals produce no lift. The nine-byte-equivalent handoff
+  regression is retained for source fidelity; only the artificial volatile
+  shape recovered it.
+
+Compiler provenance: `sdk_range_800C5458.c` now uses canonical MSL GC/2.5
+  with read-only string pooling. The remaining `__two_exp` mismatch is a
+  leading max-double pool string with no semantic consumer in this source
+  subset; no unused constant was added to force it.
+
+Candidate topology: ff62ca1e and ac0125b6 remain explicitly disclosed,
+  score-driven CodeCandidate splits, not evidence of original TU boundaries.
+  They add three report units while preserving 8,603 functions, 2,495,108
+  code bytes, and 2,196,100 data bytes. Do not promote them or count them as
+  linked progress without independent boundary evidence.
+
+Validation: configure, all_source/report, progress, full retail link and SHA-1
+  `870e8b9693ca780782d80f22a6a4572d8ba9458f` pass. Master-to-head regression
+  guard reports zero regressions and +75 exact functions. Object-map freeze,
+  24 quality-scan tests, source quality scan, README check, and diff check
+  pass. No `.inc`, asm-wrapper, generated-product, or invented-data changes
+  were accepted.
+
+Next action: continue byte-weighted source work from this head. Prefer
+  reference-backed SDK/HSD/MSL ports and large game/menu/people functions;
+  leave the documented walls and register-permutation residue alone.
+```
