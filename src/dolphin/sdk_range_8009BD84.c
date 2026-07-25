@@ -180,6 +180,109 @@ void OSReport(const char* format, ...) {
     vprintf(format, args);
 }
 
+/* FPSCR bits left standing when an FP exception is cleared. */
+#define FPSCR_KEEP 0x6005F8FF
+
+void __OSUnhandledException(u8 exception, OSContext* context, u32 dsisr,
+                            u32 dar) {
+    extern OSErrorHandler __OSErrorTable[17];
+    extern u8 lbl_803109B8[];
+    extern char lbl_80478994[];
+    extern s16 __OSLastInterrupt;
+    extern u32 __OSLastInterruptSrr0;
+    extern s64 __OSLastInterruptTime;
+    extern void OSReport(const char* format, ...);
+    extern s64 OSGetTime(void);
+    extern void OSDisableScheduler(void);
+    extern void OSEnableScheduler(void);
+    extern void __OSReschedule(void);
+    extern void OSLoadContext(OSContext* context);
+    extern void OSSaveFPUContext(OSContext* context);
+    extern u32 PPCMfmsr(void);
+    extern void PPCMtmsr(u32 msr);
+    extern u32 PPCMffpscr(void);
+    extern void PPCMtfpscr(u32 fpscr);
+    extern void PPCHalt(void);
+    s64 now = OSGetTime();
+    u32 msr;
+
+    if (!(context->srr1 & 0x2)) {
+        OSReport((const char*)&lbl_803109B8[0x5C], exception);
+    } else {
+        if (exception == 6 && (context->srr1 & 0x00100000) &&
+            __OSErrorTable[16]) {
+            exception = 16;
+            msr = PPCMfmsr();
+            PPCMtmsr(msr | 0x2000);
+            if (OS_FPUCONTEXT != NULL) {
+                OSSaveFPUContext(OS_FPUCONTEXT);
+            }
+            PPCMtfpscr(PPCMffpscr() & FPSCR_KEEP);
+            PPCMtmsr(msr);
+            if (OS_FPUCONTEXT == context) {
+                OSDisableScheduler();
+                __OSErrorTable[16](16, context, dsisr, dar);
+                context->srr1 &= ~0x2000;
+                OS_FPUCONTEXT = NULL;
+                context->fpscr &= FPSCR_KEEP;
+                OSEnableScheduler();
+                __OSReschedule();
+            } else {
+                context->srr1 &= ~0x2000;
+                OS_FPUCONTEXT = NULL;
+            }
+            OSLoadContext(context);
+        }
+
+        if (__OSErrorTable[exception]) {
+            OSDisableScheduler();
+            __OSErrorTable[exception](exception, context, dsisr, dar);
+            OSEnableScheduler();
+            __OSReschedule();
+            OSLoadContext(context);
+        }
+
+        if (exception == 8) {
+            OSLoadContext(context);
+        }
+
+        OSReport((const char*)&lbl_803109B8[0x7C], exception);
+    }
+
+    OSReport(lbl_80478994);
+    OSDumpContext(context);
+    OSReport((const char*)&lbl_803109B8[0x94], dsisr, dar);
+    OSReport((const char*)&lbl_803109B8[0xC8], now);
+
+    switch (exception) {
+    case 2:
+        OSReport((const char*)&lbl_803109B8[0xD8], context->srr0, dar);
+        break;
+    case 3:
+        OSReport((const char*)&lbl_803109B8[0x138], context->srr0);
+        break;
+    case 5:
+        OSReport((const char*)&lbl_803109B8[0x184], context->srr0, dar);
+        break;
+    case 6:
+        OSReport((const char*)&lbl_803109B8[0x1E8], context->srr0, dar);
+        break;
+    case 15:
+        OSReport(lbl_80478994);
+        OSReport((const char*)&lbl_803109B8[0x248],
+                 *(volatile u16*)0xCC005030, *(volatile u16*)0xCC005032);
+        OSReport((const char*)&lbl_803109B8[0x268],
+                 *(volatile u16*)0xCC005020, *(volatile u16*)0xCC005022);
+        OSReport((const char*)&lbl_803109B8[0x288],
+                 *(volatile u32*)0xCC006014);
+        break;
+    }
+
+    OSReport((const char*)&lbl_803109B8[0x2A4], __OSLastInterrupt,
+             __OSLastInterruptSrr0, __OSLastInterruptTime);
+    PPCHalt();
+}
+
 void ConfigureVideo(u16 fbWidth, u16 xfbHeight) {
     extern void VIConfigure(GXRenderModeObj* mode);
     extern void VIConfigurePan(u16 xOrigin, u16 yOrigin, u16 width, u16 height);
