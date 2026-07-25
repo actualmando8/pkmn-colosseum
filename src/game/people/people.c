@@ -165,6 +165,48 @@ extern PeopleEntry* lbl_8047B200;    /* pointer to people array (heap-allocated)
 #define gPeopleMemHandle lbl_8047B1FC
 #define gPeopleArray     lbl_8047B200
 
+/*
+ * The retail source uses these lookup helpers throughout the public people
+ * API. Keep them inline so each call site retains the original straight-line
+ * lookup and the fallback warning for an index found in a different group.
+ */
+static inline PeopleEntry* peopleFindSelf(u32 groupId, u32 index)
+{
+    s32 i;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->groupId != groupId) continue;
+        if (entry->index != index) continue;
+        return entry->selfPtr;
+    }
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->index != index) continue;
+        GSlogWrite(lbl_80273FD8, groupId, index);
+        return entry->selfPtr;
+    }
+    return NULL;
+}
+
+static inline PeopleEntry* peopleFindBySelf(PeopleEntry* found)
+{
+    s32 i;
+    PeopleEntry* entry;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        entry = peopleGetEntry(i);
+        if (!entry->active) continue;
+        if (entry->selfPtr != found) continue;
+        return entry;
+    }
+    return NULL;
+}
+
 /* ===== Sdata2 float constants ===== */
 /* lbl_8047D798 @sda21 : constant used in fn_801812C4 */
 /* lbl_8047D79C @sda21 : float 0.0 */
@@ -562,43 +604,11 @@ asm void fn_8018B220(void) {
 }
 #else
 void fn_8018B220(u32 groupId, u32 index) {
-    PeopleEntry* found;
     PeopleEntry* entry;
-    s32 i;
-    s32 j;
+    PeopleEntry* found;
 
-    /* Loop 1: search by groupId + index */
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    /* Loop 2: fallback search by index only */
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    /* Loop 3: search by selfPtr */
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         void* model = peopleGetModel(entry);
         if (model != NULL) {
@@ -651,41 +661,12 @@ extern void GSpartFree(void* part);
  * transform into *target (motionId < 0), or fetch the transform of a
  * specific model part (motionId >= 0) via the GS "part" API. */
 void fn_8018BC88(u32 groupId, u32 index, s32 motionId, void* target) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
     void* part;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry == NULL) {
         return;
     }
@@ -1915,43 +1896,6 @@ void fn_80189990(void) {
 
 /* Find an entry by (groupId, index), then report whether its current movement
  * has completed. If waitFlag is set, yield until it reaches a terminal state. */
-static inline PeopleEntry* peopleFindSelf(u32 groupId, u32 index)
-{
-    s32 i;
-    PeopleEntry* entry;
-
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        return entry->selfPtr;
-    }
-
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite(lbl_80273FD8, groupId, index);
-        return entry->selfPtr;
-    }
-    return NULL;
-}
-
-static inline PeopleEntry* peopleFindBySelf(PeopleEntry* found)
-{
-    s32 i;
-    PeopleEntry* entry;
-
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        return entry;
-    }
-    return NULL;
-}
-
 BOOL peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag)
 {
     PeopleEntry* entry;
@@ -2006,8 +1950,6 @@ void fn_8018BA04(void) {
 /* fn_8018BDF4 -- find a people entry by (groupId, index) and set its
  * position. No-op if pos is NULL (search is skipped entirely). */
 void fn_8018BDF4(u32 groupId, u32 index, void* pos) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
@@ -2015,35 +1957,8 @@ void fn_8018BDF4(u32 groupId, u32 index, void* pos) {
         return;
     }
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         fn_8018FC98(entry, pos);
     }
@@ -2053,40 +1968,11 @@ found_entry:
  * caller-supplied Vec3 of angles in place, then feed it to fn_8018FC08 and
  * stash the Y component into entry->field_40. */
 void fn_8018BF24(u32 groupId, u32 index, f32* vec) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         vec[0] = (f32)fmod(lbl_8047D7F0 + vec[0]);
         vec[1] = (f32)fmod(lbl_8047D7F0 + vec[1]);
@@ -2099,40 +1985,11 @@ found_entry:
 /* fn_8018C0A8 -- find a people entry by (groupId, index), fetch its scale
  * into *vec, then copy vec into the entry's transform. */
 void fn_8018C0A8(u32 groupId, u32 index, void* vec) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         fn_8018FC74(entry, vec);
         peopleSetTransform(entry, vec);
@@ -2146,40 +2003,11 @@ void fn_8018C1E8(void) {
 /* fn_8018C424 -- find a people entry by (groupId, index) and test flags.
  * Returns 0 if no matching entry is found. */
 BOOL fn_8018C424(u32 groupId, u32 index, u32 mask) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry == NULL) {
         return 0;
     }
@@ -2192,40 +2020,11 @@ void fn_8018C558(void) {
 
 /* fn_8018C69C -- find a people entry by (groupId, index) and clear flags. */
 void fn_8018C69C(u32 groupId, u32 index, u32 mask) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         peopleClearFlags(entry, mask);
     }
@@ -2233,40 +2032,11 @@ found_entry:
 
 /* fn_8018C7C8 -- find a people entry by (groupId, index) and set flags. */
 void fn_8018C7C8(u32 groupId, u32 index, u32 mask) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         peopleSetFlags(entry, mask);
     }
@@ -2274,40 +2044,11 @@ found_entry:
 
 /* fn_8018C8F4 -- find a people entry by (groupId, index) and overwrite flags. */
 void fn_8018C8F4(u32 groupId, u32 index, u32 flags) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         peopleWriteFlags(entry, flags);
     }
@@ -2316,40 +2057,11 @@ found_entry:
 /* fn_8018CA20 -- find a people entry by (groupId, index) and set its shadow
  * animation, forcing 0 unless the entry already has an animId set. */
 void fn_8018CA20(u32 groupId, u32 index, u8 animId) {
-    s32 i;
-    s32 j;
     PeopleEntry* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    found = peopleFindSelf(groupId, index);
+    entry = peopleFindBySelf(found);
     if (entry != NULL) {
         if (entry->animId == 0) {
             animId = 0;
