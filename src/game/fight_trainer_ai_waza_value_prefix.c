@@ -145,7 +145,8 @@ u32 fightTrainerAiWazaValueSiroikiri(void* ctx, u32 param1, u32 param2, u32 para
     return setup;
 }
 /* Address: 0x80240788 | Size: 0x448 (1096 bytes) */
-static u8 jikoanjiStatusInRange(void* ctx, u32 target, u8 low, u8 high) {
+/* The target inlines this seven-status scan once for each scoring range. */
+static inline u8 jikoanjiStatusInRange(void* ctx, u32 target, u8 low, u8 high) {
     u8 fn_802357CC(void*, u32);
     u8 fn_802358AC(void*, u32);
     u8 fn_80235910(void*, u32);
