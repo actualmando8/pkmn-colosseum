@@ -2961,8 +2961,8 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/sdk_range_800C5458.c",
-                mw_version="GC/1.3.2",
-                extra_cflags=["-use_lmw_stmw on"],
+                mw_version="GC/2.5",
+                extra_cflags=["-use_lmw_stmw on", "-str pool,readonly"],
                 progress_category="sdk",
             ),
             Object(
