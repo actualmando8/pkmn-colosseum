@@ -1853,3 +1853,38 @@ Topology: `sdk_range_800B2070` is promoted from CodeCandidate to Matching only
 Next action: continue byte-weighted reference-backed SDK/HSD work; the adjacent
   CARDCreate/CARDRead residual at 0x800B4644 is a promising canonical target.
 ```
+
+### CARD create/read/write/status round — 2026-07-25
+
+```text
+Baseline: add5e81f; 60.992270% fuzzy, 933,388 matched code bytes,
+  6,388 / 8,603 exact functions, 1,027 / 1,804 linked units
+Current report: 61.151150% fuzzy, 937,352 matched code bytes,
+  6,398 / 8,603 exact functions, 1,030 / 1,804 linked units
+Delta: +0.158880pp fuzzy, +3,964 matched code bytes, +10 exact functions,
+  +2,564 linked code bytes, +3 linked units
+
+Linked: canonical Dolphin SDK CARDCreate, CARDRead, and CARDWrite ranges,
+  comprising CreateCallbackFat, CARDCreateAsync, __CARDSeek, ReadCallback,
+  CARDReadAsync, WriteCallback, and CARDWriteAsync. All seven functions are
+  raw 100% and their three complete objects are promoted to Matching.
+Exact-source candidate: UpdateIconOffsets, CARDGetStatus, and
+  __CARDSetStatusExAsync add 1,400 exact bytes to the CARD status object. The
+  full six-function object is raw 100%, but remains CodeCandidate because a
+  safe isolated linked copy would presently require legacy compiler-shaping
+  pragmas prohibited by campaign policy.
+SDK revision evidence: Colosseum's __CARDSetStatusExAsync predates the newer
+  permission-bit publisher-field clearing found in Mario Strikers. Target
+  control flow omits those operations; using the older behavior closes the
+  72-byte revision gap exactly. Signed CARDControl.sectorSize and signed
+  CARDFileInfo offset/length agree across local SDK references and the target.
+Source quality: helper macros are readable canonical CARD block/alignment
+  expressions. No asm, artificial volatility, dummy assignments, invented
+  data, or new optimization pragmas are used.
+Repository hygiene: generated docs/progress_history.json and local
+  docs/images/ are ignored. Five tracked GitHub setup screenshots were removed
+  at user request, and their three Markdown embeds were removed with them.
+
+Next action: continue byte-weighted source recovery from 61.151150%, prioritizing
+  large reference-backed HSD/MSL/SDK and game functions.
+```

@@ -71,7 +71,7 @@ typedef struct CARDControl {
     /* 0x004 */ s32 result;
     /* 0x008 */ u16 size;
     /* 0x00A */ u16 pageSize;
-    /* 0x00C */ u32 sectorSize;
+    /* 0x00C */ s32 sectorSize;
     /* 0x010 */ u16 cBlock;
     /* 0x012 */ u8 _012[0x12];
     /* 0x024 */ s32 field_24;
@@ -197,8 +197,8 @@ typedef struct OSSramEx {
 typedef struct CARDFileInfo {
     /* 0x00 */ s32 chan;
     /* 0x04 */ s32 fileNo;
-    /* 0x08 */ u32 offset;
-    /* 0x0C */ u32 length;
+    /* 0x08 */ s32 offset;
+    /* 0x0C */ s32 length;
     /* 0x10 */ u16 startBlock;
 } CARDFileInfo;
 
@@ -353,7 +353,8 @@ extern s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback);
 extern s32 CARDUnmount(s32 chan);
 extern s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback);
 extern s32 fn_800B57D0(s32 chan, s32 fileNo, CARDDirEntry* entry);
-extern s32 fn_800B588C(s32 chan, s32 fileNo, CARDDirEntry* entry, void* callback);
+extern s32 fn_800B588C(s32 chan, s32 fileNo, CARDDirEntry* entry,
+                       CARDCallback callback);
 extern void __ARQInterruptServiceRoutine(void);
 extern void __ARHandler(__OSInterrupt interrupt, OSContext* context);
 extern void __ARChecksize(void);
@@ -397,6 +398,187 @@ extern void* __CARDGetDirBlock(CARDControl* card);
 extern u32 DummyLen(void);
 extern s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen,
                            s32 mode);
+extern u32 strlen(const char* str);
+extern char* strncpy(char* dst, const char* src, u32 length);
+extern void* __CARDGetFatBlock(CARDControl* card);
+extern s32 __CARDAllocBlock(s32 chan, u32 blocks, CARDCallback callback);
+extern s32 __CARDRead(s32 chan, u32 addr, u32 length, void* buffer,
+                      CARDCallback callback);
+extern void EraseCallback(s32 chan, s32 result);
+
+#if defined(SDK_CANDIDATE_800B5228)
+void UpdateIconOffsets(CARDDirEntry* entry, CARDStat* stat)
+{
+    u32 offset;
+    BOOL iconTlut;
+    s32 i;
+
+    offset = entry->iconAddr;
+    if (offset == 0xFFFFFFFF) {
+        stat->bannerFormat = 0;
+        stat->iconFormat = 0;
+        stat->iconSpeed = 0;
+        offset = 0;
+    }
+
+    iconTlut = FALSE;
+    switch (entry->bannerFormat & 3) {
+    case 1:
+        stat->offsetBanner = offset;
+        offset += 96 * 32;
+        stat->offsetBannerTlut = offset;
+        offset += 2 * 256;
+        break;
+    case 2:
+        stat->offsetBanner = offset;
+        offset += 2 * 96 * 32;
+        stat->offsetBannerTlut = 0xFFFFFFFF;
+        break;
+    default:
+        stat->offsetBanner = 0xFFFFFFFF;
+        stat->offsetBannerTlut = 0xFFFFFFFF;
+        break;
+    }
+
+    for (i = 0; i < 8; i++) {
+        switch ((entry->iconFormat >> (2 * i)) & 3) {
+        case 1:
+            stat->offsetIcon[i] = offset;
+            offset += 32 * 32;
+            iconTlut = TRUE;
+            break;
+        case 2:
+            stat->offsetIcon[i] = offset;
+            offset += 2 * 32 * 32;
+            break;
+        default:
+            stat->offsetIcon[i] = 0xFFFFFFFF;
+            break;
+        }
+    }
+
+    if (iconTlut) {
+        stat->offsetIconTlut = offset;
+        offset += 2 * 256;
+    } else {
+        stat->offsetIconTlut = 0xFFFFFFFF;
+    }
+    stat->offsetData = offset;
+}
+
+s32 fn_800B5530(s32 chan, s32 fileNo, CARDStat* stat)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    s32 result;
+
+    if (fileNo < 0 || fileNo >= 127) {
+        return -128;
+    }
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileNo];
+    result = fn_800B4270(card, entry);
+    if (result == -10) {
+        result = fn_800B4308(entry);
+    }
+
+    if (result >= 0) {
+        memcpy(stat->gameName, entry->gameName, 4);
+        memcpy(stat->company, entry->company, 2);
+        stat->length = (u32)entry->length * card->sectorSize;
+        memcpy(stat->fileName, entry->fileName, 32);
+        stat->time = entry->time;
+        stat->bannerFormat = entry->bannerFormat;
+        stat->iconAddr = entry->iconAddr;
+        stat->iconFormat = entry->iconFormat;
+        stat->iconSpeed = entry->animationSpeed;
+        stat->commentAddr = entry->commentAddr;
+        UpdateIconOffsets(entry, stat);
+    }
+
+    return __CARDPutControlBlock(card, result);
+}
+
+s32 fn_800B588C(s32 chan, s32 fileNo, CARDDirEntry* input,
+                CARDCallback callback)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    s32 result;
+    u8* p;
+    s32 i;
+
+    if (fileNo < 0 || fileNo >= 127 ||
+        (u8)input->fileName[0] == 0xFF || (u8)input->fileName[0] == 0) {
+        return -128;
+    }
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileNo];
+    result = fn_800B4270(card, entry);
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+
+    for (p = (u8*)input->fileName; p < (u8*)&input->time; p++) {
+        if (*p != 0) {
+            continue;
+        }
+        while (++p < (u8*)&input->time) {
+            *p = 0;
+        }
+        break;
+    }
+
+    if (memcmp(entry->fileName, input->fileName, 32) != 0 ||
+        memcmp(entry->gameName, input->gameName, 4) != 0 ||
+        memcmp(entry->company, input->company, 2) != 0) {
+        for (i = 0; i < 127; i++) {
+            if (i != fileNo) {
+                CARDDirEntry* entry = &dir[i];
+
+                if ((u8)entry->gameName[0] != 0xFF &&
+                    memcmp(entry->gameName, input->gameName, 4) == 0 &&
+                    memcmp(entry->company, input->company, 2) == 0 &&
+                    memcmp(entry->fileName, input->fileName, 32) == 0) {
+                    return __CARDPutControlBlock(card, -7);
+                }
+            }
+        }
+        memcpy(entry->fileName, input->fileName, 32);
+        memcpy(entry->gameName, input->gameName, 4);
+        memcpy(entry->company, input->company, 2);
+    }
+
+    entry->time = input->time;
+    entry->bannerFormat = input->bannerFormat;
+    entry->iconAddr = input->iconAddr;
+    entry->iconFormat = input->iconFormat;
+    entry->animationSpeed = input->animationSpeed;
+    entry->commentAddr = input->commentAddr;
+    entry->permission = input->permission;
+    entry->copyTimes = input->copyTimes;
+
+    result = __CARDUpdateDir(chan, callback);
+    if (result < 0) {
+        __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+#endif
 
 #if defined(SDK_EXACT_800B2070_800B2968)
 void __CARDCheckSum(void* ptr, s32 length, u16* checksum, u16* checksumInv)
@@ -562,10 +744,372 @@ s32 VerifyFAT(CARDControl* card, s32* currentOut)
 }
 #endif
 
+#if defined(SDK_EXACT_800B4644_800B4DC4)
+#define CARD_IS_VALID_BLOCK(card, block) \
+    ((u16)(block) >= 5 && (u16)(block) < (card)->cBlock)
+#define CARD_TRUNC(value, align) (((u32)(value)) & ~((align) - 1))
+
+static void CreateCallbackFat(s32 chan, s32 result)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    CARDCallback callback;
+
+    card = &lbl_803FC620[chan];
+    callback = card->apiCallback;
+    card->apiCallback = NULL;
+
+    if (result >= 0) {
+        dir = __CARDGetDirBlock(card);
+        entry = &dir[card->freeNo];
+        memcpy(entry->gameName, ((DVDDiskID*)card->diskId)->gameName, 4);
+        memcpy(entry->company, ((DVDDiskID*)card->diskId)->company, 2);
+        entry->permission = 4;
+        entry->copyTimes = 0;
+        entry->startBlock = card->startBlock;
+        entry->bannerFormat = 0;
+        entry->iconAddr = -1;
+        entry->iconFormat = 0;
+        entry->animationSpeed = 0;
+        entry->commentAddr = -1;
+        entry->animationSpeed = (entry->animationSpeed & ~3) | 1;
+
+        card->fileInfo->offset = 0;
+        card->fileInfo->startBlock = entry->startBlock;
+        entry->time = (u32)(OSGetTime() / (*(u32*)0x800000F8 / 4));
+        result = __CARDUpdateDir(chan, callback);
+        if (result >= 0) {
+            return;
+        }
+    }
+
+    __CARDPutControlBlock(card, result);
+    if (callback != NULL) {
+        callback(chan, result);
+    }
+}
+
+s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size,
+                    CARDFileInfo* fileInfo, CARDCallback callback)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    u16 fileNo;
+    u16 freeNo;
+    u16* fat;
+    s32 result;
+
+    if (strlen(fileName) > 32) {
+        return -12;
+    }
+
+    result = __CARDGetControlBlock(chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    if (size == 0 || size % card->sectorSize != 0) {
+        return -128;
+    }
+
+    freeNo = (u16)-1;
+    dir = __CARDGetDirBlock(card);
+    for (fileNo = 0; fileNo < 127; fileNo++) {
+        entry = &dir[fileNo];
+        if (entry->gameName[0] == 0xFF) {
+            if (freeNo == (u16)-1) {
+                freeNo = fileNo;
+            }
+        } else if (
+            memcmp(entry->gameName, ((DVDDiskID*)card->diskId)->gameName, 4) ==
+                0 &&
+            memcmp(entry->company, ((DVDDiskID*)card->diskId)->company, 2) ==
+                0 &&
+            __CARDCompareFileName(entry, fileName)) {
+            return __CARDPutControlBlock(card, -7);
+        }
+    }
+
+    if (freeNo == (u16)-1) {
+        return __CARDPutControlBlock(card, -8);
+    }
+
+    fat = __CARDGetFatBlock(card);
+    if (card->sectorSize * fat[3] < size) {
+        return __CARDPutControlBlock(card, -9);
+    }
+
+    card->apiCallback =
+        callback != NULL ? callback : __CARDDefaultApiCallback;
+    card->freeNo = freeNo;
+    entry = &dir[freeNo];
+    entry->length = (u16)(size / card->sectorSize);
+    strncpy(entry->fileName, fileName, 32);
+
+    card->fileInfo = fileInfo;
+    fileInfo->chan = chan;
+    fileInfo->fileNo = freeNo;
+
+    result =
+        __CARDAllocBlock(chan, size / card->sectorSize, CreateCallbackFat);
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+
+s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset,
+               CARDControl** cardOut)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    s32 result;
+    u16* fat;
+
+    result = __CARDGetControlBlock(fileInfo->chan, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    if (!CARD_IS_VALID_BLOCK(card, fileInfo->startBlock) ||
+        card->cBlock * card->sectorSize <= fileInfo->offset) {
+        return __CARDPutControlBlock(card, -128);
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileInfo->fileNo];
+    if (entry->length * card->sectorSize <= offset ||
+        entry->length * card->sectorSize < offset + length) {
+        return __CARDPutControlBlock(card, -11);
+    }
+
+    card->fileInfo = fileInfo;
+    fileInfo->length = length;
+    if (offset < fileInfo->offset) {
+        fileInfo->offset = 0;
+        fileInfo->startBlock = entry->startBlock;
+        if (!CARD_IS_VALID_BLOCK(card, fileInfo->startBlock)) {
+            return __CARDPutControlBlock(card, -6);
+        }
+    }
+
+    fat = __CARDGetFatBlock(card);
+    while (fileInfo->offset <
+           ((u32)offset & ~(card->sectorSize - 1))) {
+        fileInfo->offset += card->sectorSize;
+        fileInfo->startBlock = fat[fileInfo->startBlock];
+        if (!CARD_IS_VALID_BLOCK(card, fileInfo->startBlock)) {
+            return __CARDPutControlBlock(card, -6);
+        }
+    }
+
+    fileInfo->offset = offset;
+    *cardOut = card;
+    return 0;
+}
+
+static void ReadCallback(s32 chan, s32 result)
+{
+    CARDControl* card;
+    CARDCallback callback;
+    u16* fat;
+    CARDFileInfo* fileInfo;
+    s32 length;
+
+    card = &lbl_803FC620[chan];
+    if (result < 0) {
+        goto error;
+    }
+
+    fileInfo = card->fileInfo;
+    if (fileInfo->length < 0) {
+        result = -14;
+        goto error;
+    }
+
+    length =
+        CARD_TRUNC(fileInfo->offset + card->sectorSize, card->sectorSize) -
+        fileInfo->offset;
+    fileInfo->length -= length;
+    if (fileInfo->length <= 0) {
+        goto error;
+    }
+
+    fat = __CARDGetFatBlock(card);
+    fileInfo->offset += length;
+    fileInfo->startBlock = fat[fileInfo->startBlock];
+    if (!CARD_IS_VALID_BLOCK(card, fileInfo->startBlock)) {
+        result = -6;
+        goto error;
+    }
+
+    result = __CARDRead(
+        chan, card->sectorSize * (u32)fileInfo->startBlock,
+        fileInfo->length < card->sectorSize ? fileInfo->length
+                                            : card->sectorSize,
+        card->buffer, ReadCallback);
+    if (result >= 0) {
+        return;
+    }
+
+error:
+    callback = card->apiCallback;
+    card->apiCallback = NULL;
+    __CARDPutControlBlock(card, result);
+    callback(chan, result);
+}
+
+s32 fn_800B4C7C(CARDFileInfo* fileInfo, void* buffer, s32 length, s32 offset,
+                CARDCallback callback)
+{
+    CARDControl* card;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    s32 result;
+
+    if ((offset & 0x1FF) != 0 || (length & 0x1FF) != 0) {
+        return -128;
+    }
+
+    result = __CARDSeek(fileInfo, length, offset, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileInfo->fileNo];
+    result = fn_800B4270(card, entry);
+    if (result == -10) {
+        result = fn_800B4308(entry);
+    }
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+
+    DCInvalidateRange(buffer, (u32)length);
+    card->apiCallback =
+        callback != NULL ? callback : __CARDDefaultApiCallback;
+
+    offset = fileInfo->offset & (card->sectorSize - 1);
+    length =
+        length < card->sectorSize - offset ? length
+                                           : card->sectorSize - offset;
+    result = __CARDRead(
+        fileInfo->chan,
+        card->sectorSize * (u32)fileInfo->startBlock + offset, length,
+        buffer, ReadCallback);
+    if (result < 0) {
+        __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+#endif
+
+#if defined(SDK_EXACT_800B4E50_800B4FC0)
+void WriteCallback(s32 chan, s32 result)
+{
+    CARDControl* card;
+    CARDCallback callback;
+    u16* fat;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+    CARDFileInfo* fileInfo;
+
+    card = &lbl_803FC620[chan];
+    if (result >= 0) {
+        fileInfo = card->fileInfo;
+        if (fileInfo->length < 0) {
+            result = -14;
+            goto error;
+        }
+
+        fileInfo->length -= card->sectorSize;
+        if (fileInfo->length <= 0) {
+            dir = __CARDGetDirBlock(card);
+            entry = &dir[fileInfo->fileNo];
+            entry->time =
+                (u32)(OSGetTime() / (*(u32*)0x800000F8 / 4));
+            callback = card->apiCallback;
+            card->apiCallback = NULL;
+            result = __CARDUpdateDir(chan, callback);
+        } else {
+            fat = __CARDGetFatBlock(card);
+            fileInfo->offset += card->sectorSize;
+            fileInfo->startBlock = fat[fileInfo->startBlock];
+            if (fileInfo->startBlock < 5 ||
+                fileInfo->startBlock >= card->cBlock) {
+                result = -6;
+                goto error;
+            }
+            result = fn_800AFFE0(
+                chan, card->sectorSize * fileInfo->startBlock,
+                EraseCallback);
+        }
+
+        if (result >= 0) {
+            return;
+        }
+    }
+
+error:
+    callback = card->apiCallback;
+    card->apiCallback = NULL;
+    __CARDPutControlBlock(card, result);
+    callback(chan, result);
+}
+#endif
+
+#if defined(SDK_EXACT_800B5070_800B5184)
+s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buffer, s32 length,
+                   s32 offset, CARDCallback callback)
+{
+    CARDControl* card;
+    s32 result;
+    CARDDirEntry* dir;
+    CARDDirEntry* entry;
+
+    result = __CARDSeek(fileInfo, length, offset, &card);
+    if (result < 0) {
+        return result;
+    }
+
+    if ((offset & (card->sectorSize - 1)) != 0 ||
+        (length & (card->sectorSize - 1)) != 0) {
+        return __CARDPutControlBlock(card, -128);
+    }
+
+    dir = __CARDGetDirBlock(card);
+    entry = &dir[fileInfo->fileNo];
+    result = fn_800B4270(card, entry);
+    if (result < 0) {
+        return __CARDPutControlBlock(card, result);
+    }
+
+    DCStoreRange(buffer, (u32)length);
+    card->apiCallback =
+        callback != NULL ? callback : __CARDDefaultApiCallback;
+    card->buffer = buffer;
+
+    result = fn_800AFFE0(
+        fileInfo->chan, card->sectorSize * fileInfo->startBlock,
+        EraseCallback);
+    if (result < 0) {
+        __CARDPutControlBlock(card, result);
+    }
+    return result;
+}
+#endif
+
 #if defined(SDK_EXACT_800AE3F0_800AE9FC) || \
     defined(SDK_EXACT_800AF474_800AF8A0) || \
     defined(SDK_EXACT_800B1788_800B2070) || \
-    defined(SDK_EXACT_800B2070_800B2968)
+    defined(SDK_EXACT_800B2070_800B2968) || \
+    defined(SDK_EXACT_800B4644_800B4DC4) || \
+    defined(SDK_EXACT_800B4E50_800B4FC0) || \
+    defined(SDK_EXACT_800B5070_800B5184)
 #define SDK_RANGE_EXACT_ACTIVE
 #endif
 
