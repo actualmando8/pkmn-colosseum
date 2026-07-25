@@ -41,21 +41,17 @@ extern const f32 lbl_80478ACC; /* reciprocal guard epsilon (rodata) */
 extern f64 sin(f64 x);
 extern f64 cos(f64 x);
 
-static inline f32 mtxSinf(f32 x)
+/* MSL's math.h defines these float entry points as double-call inlines. */
+static inline f32 sinf(f32 x)
 {
     f64 r = sin(x);
     return (f32) r;
 }
 
-static inline f32 mtxCosf(f32 x)
+static inline f32 cosf(f32 x)
 {
     f64 r = cos(x);
     return (f32) r;
-}
-
-static inline f32 mtxSafeInverse(f32 v)
-{
-    return 1.0f / (v >= 0.0f ? v + lbl_80478ACC : v - lbl_80478ACC);
 }
 
 /* Address: 0x801A8884 | Size: 0x310 */
@@ -71,21 +67,27 @@ void HSD_MtxSRT(f32 m[3][4], Vec* vec1, Vec* vec2, Vec* vec3, Vec* vec4)
     f32 vec1y;
     f32 vec1z;
 
-    f32 sinX = mtxSinf(vec2->x);
-    f32 cosX = mtxCosf(vec2->x);
-    f32 sinY = mtxSinf(vec2->y);
-    f32 cosY = mtxCosf(vec2->y);
-    f32 sinZ = mtxSinf(vec2->z);
-    f32 cosZ = mtxCosf(vec2->z);
+    f32 sinX = sinf(vec2->x);
+    f32 cosX = cosf(vec2->x);
+    f32 sinY = sinf(vec2->y);
+    f32 cosY = cosf(vec2->y);
+    f32 sinZ = sinf(vec2->z);
+    f32 cosZ = cosf(vec2->z);
 
     vec1x_2 = vec1x_1 = vec1x = vec1->x;
     vec1y_2 = vec1y_1 = vec1y = vec1->y;
     vec1z_2 = vec1z_1 = vec1z = vec1->z;
 
     if (vec4 != NULL) {
-        f32 temp1 = mtxSafeInverse(vec4->x);
-        f32 temp2 = mtxSafeInverse(vec4->y);
-        f32 temp3 = mtxSafeInverse(vec4->z);
+        f32 temp1 =
+            1.0f / (vec4->x >= 0.0f ? vec4->x + lbl_80478ACC
+                                    : vec4->x - lbl_80478ACC);
+        f32 temp2 =
+            1.0f / (vec4->y >= 0.0f ? vec4->y + lbl_80478ACC
+                                    : vec4->y - lbl_80478ACC);
+        f32 temp3 =
+            1.0f / (vec4->z >= 0.0f ? vec4->z + lbl_80478ACC
+                                    : vec4->z - lbl_80478ACC);
 
         vec1y_2 *= vec4->y * temp1;
         vec1z_2 *= vec4->z * temp1;
@@ -112,12 +114,12 @@ void HSD_MtxSRT(f32 m[3][4], Vec* vec1, Vec* vec2, Vec* vec3, Vec* vec4)
 /* Address: 0x801A8B94 | Size: 0x188 */
 void HSD_MkRotationMtx(f32 arg0[3][4], Vec* arg1)
 {
-    f32 sinX = mtxSinf(arg1->x);
-    f32 cosX = mtxCosf(arg1->x);
-    f32 sinY = mtxSinf(arg1->y);
-    f32 cosY = mtxCosf(arg1->y);
-    f32 sinZ = mtxSinf(arg1->z);
-    f32 cosZ = mtxCosf(arg1->z);
+    f32 sinX = sinf(arg1->x);
+    f32 cosX = cosf(arg1->x);
+    f32 sinY = sinf(arg1->y);
+    f32 cosY = cosf(arg1->y);
+    f32 sinZ = sinf(arg1->z);
+    f32 cosZ = cosf(arg1->z);
 
     arg0[0][0] = cosY * cosZ;
     arg0[1][0] = cosY * sinZ;
