@@ -1,4 +1,5 @@
 #include "dolphin/types.h"
+#include "dolphin/mtx.h"
 
 /* =========================================================================
  * Partial banked source for reserved split unit 0x801A86B4 - 0x801AA608.
@@ -25,6 +26,112 @@ extern const char lbl_80274EC8[];    /* rodata string                    */
 extern const char lbl_8047DCA0;      /* sdata2 string                    */
 extern const char lbl_8047DCA8;      /* sdata2 string                    */
 extern const char lbl_8047DCB0;      /* sdata2 string                    */
+
+/* ------------------------------------------------------------------------ */
+/*  mtx.c - sysdolphin matrix builders                                       */
+/*                                                                           */
+/*  The retail range keeps the sysdolphin mtx.c bodies; the one Colosseum    */
+/*  deviation from the shipped Melee revision is the reciprocal used by      */
+/*  HSD_MtxSRT / HSD_MtxSRTQuat, which biases the divisor away from zero     */
+/*  by a small epsilon instead of dividing directly.                         */
+/* ------------------------------------------------------------------------ */
+
+extern const f32 lbl_80478ACC; /* reciprocal guard epsilon (rodata) */
+
+extern f64 sin(f64 x);
+extern f64 cos(f64 x);
+
+static inline f32 mtxSinf(f32 x)
+{
+    f64 r = sin(x);
+    return (f32) r;
+}
+
+static inline f32 mtxCosf(f32 x)
+{
+    f64 r = cos(x);
+    return (f32) r;
+}
+
+static inline f32 mtxSafeInverse(f32 v)
+{
+    return 1.0f / (v >= 0.0f ? v + lbl_80478ACC : v - lbl_80478ACC);
+}
+
+/* Address: 0x801A8884 | Size: 0x310 */
+void HSD_MtxSRT(f32 m[3][4], Vec* vec1, Vec* vec2, Vec* vec3, Vec* vec4)
+{
+    f32 vec1x_2;
+    f32 vec1y_2;
+    f32 vec1z_2;
+    f32 vec1x_1;
+    f32 vec1y_1;
+    f32 vec1z_1;
+    f32 vec1x;
+    f32 vec1y;
+    f32 vec1z;
+
+    f32 sinX = mtxSinf(vec2->x);
+    f32 cosX = mtxCosf(vec2->x);
+    f32 sinY = mtxSinf(vec2->y);
+    f32 cosY = mtxCosf(vec2->y);
+    f32 sinZ = mtxSinf(vec2->z);
+    f32 cosZ = mtxCosf(vec2->z);
+
+    vec1x_2 = vec1x_1 = vec1x = vec1->x;
+    vec1y_2 = vec1y_1 = vec1y = vec1->y;
+    vec1z_2 = vec1z_1 = vec1z = vec1->z;
+
+    if (vec4 != NULL) {
+        f32 temp1 = mtxSafeInverse(vec4->x);
+        f32 temp2 = mtxSafeInverse(vec4->y);
+        f32 temp3 = mtxSafeInverse(vec4->z);
+
+        vec1y_2 *= vec4->y * temp1;
+        vec1z_2 *= vec4->z * temp1;
+        vec1x_1 *= vec4->x * temp2;
+        vec1z_1 *= vec4->z * temp2;
+        vec1x *= vec4->x * temp3;
+        vec1y *= vec4->y * temp3;
+    }
+
+    m[0][0] = cosZ * (vec1x_2 * cosY);
+    m[1][0] = sinZ * (vec1x_1 * cosY);
+    m[2][0] = -vec1x * sinY;
+    m[0][1] = vec1y_2 * ((cosZ * (sinX * sinY)) - (cosX * sinZ));
+    m[1][1] = vec1y_1 * ((sinZ * (sinX * sinY)) + (cosX * cosZ));
+    m[2][1] = cosY * (vec1y * sinX);
+    m[0][2] = vec1z_2 * ((cosZ * (cosX * sinY)) + (sinX * sinZ));
+    m[1][2] = vec1z_1 * ((sinZ * (cosX * sinY)) - (sinX * cosZ));
+    m[2][2] = cosY * (vec1z * cosX);
+    m[0][3] = vec3->x;
+    m[1][3] = vec3->y;
+    m[2][3] = vec3->z;
+}
+
+/* Address: 0x801A8B94 | Size: 0x188 */
+void HSD_MkRotationMtx(f32 arg0[3][4], Vec* arg1)
+{
+    f32 sinX = mtxSinf(arg1->x);
+    f32 cosX = mtxCosf(arg1->x);
+    f32 sinY = mtxSinf(arg1->y);
+    f32 cosY = mtxCosf(arg1->y);
+    f32 sinZ = mtxSinf(arg1->z);
+    f32 cosZ = mtxCosf(arg1->z);
+
+    arg0[0][0] = cosY * cosZ;
+    arg0[1][0] = cosY * sinZ;
+    arg0[2][0] = -sinY;
+    arg0[0][1] = (cosZ * (sinX * sinY)) - (cosX * sinZ);
+    arg0[1][1] = (sinZ * (sinX * sinY)) + (cosX * cosZ);
+    arg0[2][1] = sinX * cosY;
+    arg0[0][2] = (cosZ * (cosX * sinY)) + (sinX * sinZ);
+    arg0[1][2] = (sinZ * (cosX * sinY)) - (sinX * cosZ);
+    arg0[2][2] = cosX * cosY;
+    arg0[0][3] = 0.0f;
+    arg0[1][3] = 0.0f;
+    arg0[2][3] = 0.0f;
+}
 
 /* Address: 0x801A9570 | Size: 0x1C  -- already-banked (GC/1.3, calibration) */
 void HSD_MtxGetTranslate(f32 mtx[3][4], f32* vec) {
