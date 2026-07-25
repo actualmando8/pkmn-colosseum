@@ -28,6 +28,71 @@ typedef enum GXTevAlphaArg_800BB30C {
     GX_TEV_ALPHA_ARG_7,
 } GXTevAlphaArg_800BB30C;
 
+typedef enum GXPerf0_800BB30C {
+    GX_PERF0_VERTICES,
+    GX_PERF0_CLIP_VTX,
+    GX_PERF0_CLIP_CLKS,
+    GX_PERF0_XF_WAIT_IN,
+    GX_PERF0_XF_WAIT_OUT,
+    GX_PERF0_XF_XFRM_CLKS,
+    GX_PERF0_XF_LIT_CLKS,
+    GX_PERF0_XF_BOT_CLKS,
+    GX_PERF0_XF_REGLD_CLKS,
+    GX_PERF0_XF_REGRD_CLKS,
+    GX_PERF0_CLIP_RATIO,
+    GX_PERF0_TRIANGLES,
+    GX_PERF0_TRIANGLES_CULLED,
+    GX_PERF0_TRIANGLES_PASSED,
+    GX_PERF0_TRIANGLES_SCISSORED,
+    GX_PERF0_TRIANGLES_0TEX,
+    GX_PERF0_TRIANGLES_1TEX,
+    GX_PERF0_TRIANGLES_2TEX,
+    GX_PERF0_TRIANGLES_3TEX,
+    GX_PERF0_TRIANGLES_4TEX,
+    GX_PERF0_TRIANGLES_5TEX,
+    GX_PERF0_TRIANGLES_6TEX,
+    GX_PERF0_TRIANGLES_7TEX,
+    GX_PERF0_TRIANGLES_8TEX,
+    GX_PERF0_TRIANGLES_0CLR,
+    GX_PERF0_TRIANGLES_1CLR,
+    GX_PERF0_TRIANGLES_2CLR,
+    GX_PERF0_QUAD_0CVG,
+    GX_PERF0_QUAD_NON0CVG,
+    GX_PERF0_QUAD_1CVG,
+    GX_PERF0_QUAD_2CVG,
+    GX_PERF0_QUAD_3CVG,
+    GX_PERF0_QUAD_4CVG,
+    GX_PERF0_AVG_QUAD_CNT,
+    GX_PERF0_CLOCKS,
+    GX_PERF0_NONE,
+} GXPerf0_800BB30C;
+
+typedef enum GXPerf1_800BB30C {
+    GX_PERF1_TEXELS,
+    GX_PERF1_TX_IDLE,
+    GX_PERF1_TX_REGS,
+    GX_PERF1_TX_MEMSTALL,
+    GX_PERF1_TC_CHECK1_2,
+    GX_PERF1_TC_CHECK3_4,
+    GX_PERF1_TC_CHECK5_6,
+    GX_PERF1_TC_CHECK7_8,
+    GX_PERF1_TC_MISS,
+    GX_PERF1_VC_ELEMQ_FULL,
+    GX_PERF1_VC_MISSQ_FULL,
+    GX_PERF1_VC_MEMREQ_FULL,
+    GX_PERF1_VC_STATUS7,
+    GX_PERF1_VC_MISSREP_FULL,
+    GX_PERF1_VC_STREAMBUF_LOW,
+    GX_PERF1_VC_ALL_STALLS,
+    GX_PERF1_VERTICES,
+    GX_PERF1_FIFO_REQ,
+    GX_PERF1_CALL_REQ,
+    GX_PERF1_VC_MISS_REQ,
+    GX_PERF1_CP_ALL_REQ,
+    GX_PERF1_CLOCKS,
+    GX_PERF1_NONE,
+} GXPerf1_800BB30C;
+
 typedef struct GXData_800BB30C {
     /* 0x000 */ GXStatus_800BB30C status;
     /* 0x004 */ u8 pad_004[0x78];
@@ -76,7 +141,10 @@ typedef struct GXData_800BB30C {
     /* 0x49C */ u8 pad_49C[0x40];
     /* 0x4DC */ u32 field_4DC;
     /* 0x4E0 */ u32 field_4E0;
-    /* 0x4E4 */ u8 pad_4E4[0x10];
+    /* 0x4E4 */ GXPerf0_800BB30C perf0;
+    /* 0x4E8 */ GXPerf1_800BB30C perf1;
+    /* 0x4EC */ u32 perfSel;
+    /* 0x4F0 */ u8 pad_4F0[4];
     /* 0x4F4 */ u32 dirtyState;
 } GXData_800BB30C;
 
@@ -104,14 +172,44 @@ typedef struct TRKEvent {
     /* 0x08 */ s32 bufferIndex;
 } TRKEvent;
 
+typedef union PPCWGPipe_800BB30C {
+    u8 u8;
+    u16 u16;
+    u32 u32;
+    f32 f32;
+} PPCWGPipe_800BB30C;
+
+#if defined(SDK_800BC618_SUFFIX_ACTIVE)
+volatile PPCWGPipe_800BB30C GXWGFifo_800BB30C : 0xCC008000;
+
+#define GX_FIFO_U8  GXWGFifo_800BB30C.u8
+#define GX_FIFO_U16 GXWGFifo_800BB30C.u16
+#define GX_FIFO_U32 GXWGFifo_800BB30C.u32
+#define GX_FIFO_F32 GXWGFifo_800BB30C.f32
+#else
 #define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
 #define GX_FIFO_U16 (*(volatile u16*)0xCC008000)
 #define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
 #define GX_FIFO_F32 (*(volatile f32*)0xCC008000)
+#endif
 
 #define GX_BP_REG(reg)       \
     do {                     \
         GX_FIFO_U8 = 0x61;   \
+        GX_FIFO_U32 = (reg); \
+    } while (0)
+
+#define GX_XF_REG(addr, reg)       \
+    do {                           \
+        GX_FIFO_U8 = 0x10;         \
+        GX_FIFO_U32 = 0x1000 + (addr); \
+        GX_FIFO_U32 = (reg);       \
+    } while (0)
+
+#define GX_CP_REG(addr, reg) \
+    do {                     \
+        GX_FIFO_U8 = 8;      \
+        GX_FIFO_U8 = (addr); \
         GX_FIFO_U32 = (reg); \
     } while (0)
 
@@ -776,6 +874,337 @@ void __GXSetMatrixIndex(s32 value) {
     }
 
     gx->field_002 = 1;
+}
+
+void fn_800BD91C(GXPerf0_800BB30C perf0, GXPerf1_800BB30C perf1) {
+    u32 reg;
+
+    switch (gx->perf0) {
+    case GX_PERF0_VERTICES:
+    case GX_PERF0_CLIP_VTX:
+    case GX_PERF0_CLIP_CLKS:
+    case GX_PERF0_XF_WAIT_IN:
+    case GX_PERF0_XF_WAIT_OUT:
+    case GX_PERF0_XF_XFRM_CLKS:
+    case GX_PERF0_XF_LIT_CLKS:
+    case GX_PERF0_XF_BOT_CLKS:
+    case GX_PERF0_XF_REGLD_CLKS:
+    case GX_PERF0_XF_REGRD_CLKS:
+    case GX_PERF0_CLIP_RATIO:
+    case GX_PERF0_CLOCKS:
+        reg = 0;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_TRIANGLES:
+    case GX_PERF0_TRIANGLES_CULLED:
+    case GX_PERF0_TRIANGLES_PASSED:
+    case GX_PERF0_TRIANGLES_SCISSORED:
+    case GX_PERF0_TRIANGLES_0TEX:
+    case GX_PERF0_TRIANGLES_1TEX:
+    case GX_PERF0_TRIANGLES_2TEX:
+    case GX_PERF0_TRIANGLES_3TEX:
+    case GX_PERF0_TRIANGLES_4TEX:
+    case GX_PERF0_TRIANGLES_5TEX:
+    case GX_PERF0_TRIANGLES_6TEX:
+    case GX_PERF0_TRIANGLES_7TEX:
+    case GX_PERF0_TRIANGLES_8TEX:
+    case GX_PERF0_TRIANGLES_0CLR:
+    case GX_PERF0_TRIANGLES_1CLR:
+    case GX_PERF0_TRIANGLES_2CLR:
+        reg = 0x23000000;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_0CVG:
+    case GX_PERF0_QUAD_NON0CVG:
+    case GX_PERF0_QUAD_1CVG:
+    case GX_PERF0_QUAD_2CVG:
+    case GX_PERF0_QUAD_3CVG:
+    case GX_PERF0_QUAD_4CVG:
+    case GX_PERF0_AVG_QUAD_CNT:
+        reg = 0x24000000;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_NONE:
+        break;
+    }
+
+    switch (gx->perf1) {
+    case GX_PERF1_TEXELS:
+    case GX_PERF1_TX_IDLE:
+    case GX_PERF1_TX_REGS:
+    case GX_PERF1_TX_MEMSTALL:
+    case GX_PERF1_TC_CHECK1_2:
+    case GX_PERF1_TC_CHECK3_4:
+    case GX_PERF1_TC_CHECK5_6:
+    case GX_PERF1_TC_CHECK7_8:
+    case GX_PERF1_TC_MISS:
+    case GX_PERF1_CLOCKS:
+        reg = 0x67000000;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_VC_ELEMQ_FULL:
+    case GX_PERF1_VC_MISSQ_FULL:
+    case GX_PERF1_VC_MEMREQ_FULL:
+    case GX_PERF1_VC_STATUS7:
+    case GX_PERF1_VC_MISSREP_FULL:
+    case GX_PERF1_VC_STREAMBUF_LOW:
+    case GX_PERF1_VC_ALL_STALLS:
+    case GX_PERF1_VERTICES:
+        gx->perfSel &= 0xFFFFFF0F;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_FIFO_REQ:
+    case GX_PERF1_CALL_REQ:
+    case GX_PERF1_VC_MISS_REQ:
+    case GX_PERF1_CP_ALL_REQ:
+        reg = 0;
+        __cpReg[3] = reg;
+        break;
+    case GX_PERF1_NONE:
+        break;
+    }
+
+    gx->perf0 = perf0;
+    switch (gx->perf0) {
+    case GX_PERF0_VERTICES:
+        reg = 0x273;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_CLIP_VTX:
+        reg = 0x14A;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_CLIP_CLKS:
+        reg = 0x16B;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_WAIT_IN:
+        reg = 0x84;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_WAIT_OUT:
+        reg = 0xC6;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_XFRM_CLKS:
+        reg = 0x210;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_LIT_CLKS:
+        reg = 0x252;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_BOT_CLKS:
+        reg = 0x231;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_REGLD_CLKS:
+        reg = 0x1AD;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_XF_REGRD_CLKS:
+        reg = 0x1CE;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_CLOCKS:
+        reg = 0x21;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_CLIP_RATIO:
+        reg = 0x153;
+        GX_XF_REG(6, reg);
+        break;
+    case GX_PERF0_TRIANGLES:
+        reg = 0x2300AE7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_CULLED:
+        reg = 0x23008E7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_PASSED:
+        reg = 0x23009E7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_SCISSORED:
+        reg = 0x23001E7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_0TEX:
+        reg = 0x2300AC3F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_1TEX:
+        reg = 0x2300AC7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_2TEX:
+        reg = 0x2300ACBF;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_3TEX:
+        reg = 0x2300ACFF;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_4TEX:
+        reg = 0x2300AD3F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_5TEX:
+        reg = 0x2300AD7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_6TEX:
+        reg = 0x2300ADBF;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_7TEX:
+        reg = 0x2300ADFF;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_8TEX:
+        reg = 0x2300AE3F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_0CLR:
+        reg = 0x2300A27F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_1CLR:
+        reg = 0x2300A67F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_TRIANGLES_2CLR:
+        reg = 0x2300AA7F;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_0CVG:
+        reg = 0x2402C0C6;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_NON0CVG:
+        reg = 0x2402C16B;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_1CVG:
+        reg = 0x2402C0E7;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_2CVG:
+        reg = 0x2402C108;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_3CVG:
+        reg = 0x2402C129;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_QUAD_4CVG:
+        reg = 0x2402C14A;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_AVG_QUAD_CNT:
+        reg = 0x2402C1AD;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF0_NONE:
+        break;
+    }
+
+    gx->perf1 = perf1;
+    switch (gx->perf1) {
+    case GX_PERF1_TEXELS:
+        reg = 0x67000042;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TX_IDLE:
+        reg = 0x67000084;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TX_REGS:
+        reg = 0x67000063;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TX_MEMSTALL:
+        reg = 0x67000129;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TC_MISS:
+        reg = 0x67000252;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_CLOCKS:
+        reg = 0x67000021;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TC_CHECK1_2:
+        reg = 0x6700014B;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TC_CHECK3_4:
+        reg = 0x6700018D;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TC_CHECK5_6:
+        reg = 0x670001CF;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_TC_CHECK7_8:
+        reg = 0x67000211;
+        GX_BP_REG(reg);
+        break;
+    case GX_PERF1_VC_ELEMQ_FULL:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x20;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VC_MISSQ_FULL:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x30;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VC_MEMREQ_FULL:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x40;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VC_STATUS7:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x50;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VC_MISSREP_FULL:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x60;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VC_STREAMBUF_LOW:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x70;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VC_ALL_STALLS:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x90;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_VERTICES:
+        gx->perfSel = (gx->perfSel & 0xFFFFFF0F) | 0x80;
+        GX_CP_REG(0x20, gx->perfSel);
+        break;
+    case GX_PERF1_FIFO_REQ:
+        reg = 2;
+        __cpReg[3] = reg;
+        break;
+    case GX_PERF1_CALL_REQ:
+        reg = 3;
+        __cpReg[3] = reg;
+        break;
+    case GX_PERF1_VC_MISS_REQ:
+        reg = 4;
+        __cpReg[3] = reg;
+        break;
+    case GX_PERF1_CP_ALL_REQ:
+        reg = 5;
+        __cpReg[3] = reg;
+        break;
+    case GX_PERF1_NONE:
+        break;
+    }
+
+    gx->field_002 = 0;
 }
 
 void fn_800BE30C(void) {
