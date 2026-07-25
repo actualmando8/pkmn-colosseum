@@ -2954,7 +2954,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "dolphin/sdk_range_800C5458.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.3.2",
                 progress_category="sdk",
             ),
             Object(
