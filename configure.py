@@ -6225,9 +6225,29 @@ config.libs = [
                     (Matching, "game/gs_gfx_layer_exact_800D7E5C.c"),
                     (CodeCandidate, "game/gs_gfx_layer_candidate_800D85D4.c"),
                     (Matching, "game/gs_gfx_layer_exact_800D87AC.c"),
-                    (CodeCandidate, "game/gs_gfx_layer_candidate_800D892C.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "game/gs_gfx_layer_candidate_800D892C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_gfx_layer_candidate_800D923C.c",
+                mw_version="GC/1.1p1",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gs_gfx_layer_candidate_800D963C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
             Object(
                 Matching,
                 "game/gs_gfx_range_800D9AF0.c",
