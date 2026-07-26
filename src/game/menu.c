@@ -15,6 +15,11 @@
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
+extern void  fn_8010C224(u32 count);
+extern u32   fn_800D7894(void);
+extern void  fn_800D7868(u32, u32, u32, u32, u32, u32, u32, u32);
+extern void* GStextureLoad(void* data);
+extern void  GSresRegisterResource(void* texture, u32, u32 resourceId, u32);
 
 /* GSmem */
 extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
@@ -102,6 +107,12 @@ extern f32 lbl_8047AD3C;
 extern u32 lbl_8047AD28;
 extern u16 lbl_8047AD18;  /* GSmem handle */
 extern u8* lbl_8047AD1C;  /* object pool pointer */
+extern u32 lbl_8047AD00;
+extern u8  lbl_8047AD04[4];
+extern u8  lbl_8047AD08[4];
+extern u8  lbl_803156E0[];
+extern u8  lbl_803254E0[];
+extern u8  lbl_803357E0[];
 extern volatile f32 lbl_8047CDC0;  /* sdata2: float constant */
 extern f32 lbl_8047CDC4;  /* sdata2: float constant */
 typedef f32 MenuAngle;
@@ -215,10 +226,10 @@ extern void menuButtonNormal(void* p);
 extern void menuPlaySe(void* p, void* q);
 extern void fn_801034DC(void);
 extern void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK();
-extern void menuGetKeyInfo(void);
+extern void menuGetKeyInfo(void* output, s32 port);
 extern u8 menuGetEnablePort(void);
 extern u8 menuSetEnablePort(u8 val);
-extern void menuInit(void);
+extern void menuInit(u16 windowCount);
 extern u32 cursorBiosGetPos(u16 idx);
 extern u32 cursorBiosSetPos(u16 idx, u16* out);
 extern void cursorBiosInit(void);
@@ -257,7 +268,7 @@ extern void* windowOpen(s32* cursor_out, void* menu_id, u32 parent_id,
                         MenuVaListArray args);
 extern void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(void);
 extern void windowInit(u16 count);
-extern void windowGetPortKeyInfo(void);
+extern void* windowGetPortKeyInfo(u8 ports);
 extern void* windowGetKeyInfo(void);
 extern void fn_80105634(void);
 extern void winMsgDraw(void);
@@ -1422,13 +1433,24 @@ void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(void) {
 #pragma pop
 
 /* 0x80103BA8 | 0x108 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void menuGetKeyInfo(void) {
-    /* TODO: match -- 264 bytes at 0x80103BA8 */
+void menuGetKeyInfo(void* output, s32 port) {
+    u8 info[0x1A];
+    u8 mask;
+
+    switch (port) {
+    case 1: mask = 1; break;
+    case 2: mask = 2; break;
+    case 3: mask = 4; break;
+    case 4: mask = 8; break;
+    default: mask = 0; break;
+    }
+    if (mask != 0) {
+        memcpy(info, windowGetPortKeyInfo(mask), sizeof(info));
+    } else {
+        memset(info, 0, sizeof(info));
+    }
+    memcpy(output, info, sizeof(info));
 }
-#pragma pop
 
 /* 0x80103CB0 | 0x10 */
 u8 menuGetEnablePort(void) {
@@ -1443,10 +1465,30 @@ u8 menuSetEnablePort(u8 val) {
 }
 
 /* 0x80103CD8 | 0x190 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void menuInit(void) {
-    /* TODO: match -- 400 bytes at 0x80103CD8 */
+void menuInit(u16 windowCount) {
+    void* texture;
+
+    windowInit(windowCount);
+    cursorBiosInit();
+    menuOffScreenInit();
+    fn_8010C224(0x18);
+    lbl_80404ACC[0x92] = 1;
+    memset(lbl_8047AD04, 0, sizeof(lbl_8047AD04));
+    memset(lbl_8047AD08, 0, sizeof(lbl_8047AD08));
+
+    if (lbl_8047AD00 == 0) {
+        lbl_8047AD00 = fn_800D7894();
+        fn_800D7868(lbl_8047AD00, 1, 0, 0, 3, 0, 0, 0);
+        fn_800D7868(lbl_8047AD00, 4, 0, 6, 10, 0, 0, 0);
+        fn_800D7868(lbl_8047AD00, 6, 0, 8, 4, 0, 0, 0);
+        fn_800D7868(lbl_8047AD00, 7, 0, 8, 4, 0, 0, 0);
+        fn_800D7868(lbl_8047AD00, 8, 0, 8, 4, 0, 0, 0);
+    }
+
+    texture = GStextureLoad(lbl_803156E0);
+    GSresRegisterResource(texture, 0, 0x31A1200, 0);
+    texture = GStextureLoad(lbl_803254E0);
+    GSresRegisterResource(texture, 0, 0x6221200, 0);
+    texture = GStextureLoad(lbl_803357E0);
+    GSresRegisterResource(texture, 0, 0x6F71200, 0);
 }
-#pragma pop

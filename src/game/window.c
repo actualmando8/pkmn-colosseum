@@ -15,6 +15,7 @@
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
+extern u32   GSmsgGetRect(void* message);
 
 /* GSmem */
 extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
@@ -97,6 +98,7 @@ extern f32 lbl_8047CDC4;  /* sdata2: float constant */
 extern u16 lbl_8047CDE0;  /* sdata2: */
 extern u16 lbl_8047CDE4;  /* sdata2: */
 extern u16 lbl_8047E718;
+extern u32 lbl_8047CDE8;
 extern f32 lbl_8047CD80;  /* sdata2: float constant */
 extern f32 lbl_8047CD84;  /* sdata2: float constant */
 extern f32 lbl_8047CD88;  /* sdata2: float constant */
@@ -109,11 +111,15 @@ extern f32 lbl_8047CE50;  /* sdata2: float constant */
 extern f32 lbl_8047CE5C;  /* sdata2: float constant */
 extern f32 lbl_8047CE70;  /* sdata2: float constant */
 extern u8  lbl_80404A98[];  /* table for display */
+extern u8  lbl_80404AB0[];
 extern u8  lbl_80271E10[];  /* format string */
+extern u8  lbl_80271E40[];
+extern u8  lbl_80271E64[];
 extern u8  lbl_80271E4C[];  /* format string */
 extern u8  lbl_80271EE8[];  /* format string */
 extern u8  lbl_80271F18[];  /* format string */
 extern u8  lbl_8035B060[];  /* module name string */
+extern u8  lbl_8035B070[];
 extern u8  lbl_8035B3F0[];  /* module name string */
 
 /* Additional external functions (not already declared above) */
@@ -132,16 +138,20 @@ extern void fn_800D67BC(s32);
 extern void fn_800D6680(f32);
 extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
+extern void fn_800FE6AC(s16* x, s16* y);
+extern void winSpriteDraw(void* context, void* sprite);
+extern u8* winSpriteAdd(void* head);
 
 /* Forward declarations for functions defined later in this TU */
 extern u8    menuOffScreenCheckEnable(u8 param);
-extern void  windowClose(void* ptr, u32 flags);
+extern s32   windowClose(void* ptr, u32 flags);
 extern void* windowSearchID(s32 param);
 extern s32   _menuCBOffScreen__FP9GStextureUlPv(void);
 extern void  winSpriteSetDisp(void* node, u32 enable);
 extern s32   windowGetValue(s32 param);
-extern void  windowCheckCursor(void* p, u8 flags);
-extern void  windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
+extern s32   windowCheckCursor(s32 id, u8 wait);
+extern void  windowDrawSprite2(void* x, void* y, s16 width, s16 height,
+                               s32 color, s32 context, s32 spriteId, s32 flags);
 extern u8    menuOffScreenFadeSync(u8 param);
 extern void  menuOffScreenFadeSet(f32 f1, f32 f2);
 extern u8    menuOffScreenCreate(u32 param);
@@ -208,23 +218,24 @@ extern void* windowGetFreeWork(void* ptr);
 extern void windowSetParam(void* ptr, u32 idx, u32 val);
 extern u32 windowGetParam(void* ptr, u32 idx);
 extern void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data);
-extern void windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
+extern void windowDrawSprite2(void* x, void* y, s16 width, s16 height,
+                              s32 color, s32 context, s32 spriteId, s32 flags);
 extern u8* windowGetCursorToItem(u8* arg);
 extern s32 windowGetValue(s32 param);
 extern s32 fn_801044D0(s32 param, u16* val);
 extern u32 windowGetCursor(s32 param);
-extern void windowCheckCursor(void* p, u8 flags);
+extern s32 windowCheckCursor(s32 id, u8 wait);
 extern u32 windowGetActiveID(void);
 extern void* windowSearchItemID(void* head, s32 key);
 extern void* windowSearchID(s32 param);
 extern void windowCloseMain(void* obj);
-extern void windowClose(void* ptr, u32 flags);
-extern void _windowCreateItemSprite__FP14tagWINDOW_WORK(void);
-extern void windowCreateCursorSprite(void);
+extern s32 windowClose(void* ptr, u32 flags);
+extern s32 _windowCreateItemSprite__FP14tagWINDOW_WORK(u8* window);
+extern void windowCreateCursorSprite(u8* window);
 extern void windowOpen(void);
-extern void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(void);
+extern void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(u8* item, s16* width, s16* height);
 extern void windowInit(u16 count);
-extern void windowGetPortKeyInfo(void);
+extern void* windowGetPortKeyInfo(u8 ports);
 extern void* windowGetKeyInfo(void);
 extern void fn_80105634(void);
 extern void winMsgDraw(void);
@@ -346,19 +357,52 @@ void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data) {
     u32 r31 = data;
     if ((u16)r30 != 0) {
         void* r6 = menuSpriteBiosGetPtr((s32)(u16)r30);
-        windowDrawSprite2(r27, r28, *(s16*)((u8*)r6 + 0xc), *(s16*)((u8*)r6 + 0xe), (s32)r29, (s32)(u16)r30, (s32)r31, -1);
+        windowDrawSprite2(r27, r28, *(s16*)((u8*)r6 + 0xc),
+                          *(s16*)((u8*)r6 + 0xe), (s32)r29,
+                          (s32)(u16)r30, (s32)r31, -1);
     }
 }
 
 /* 0x80104160 | 0x1B8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10) {
-    /* TODO: match -- 440 bytes at 0x80104160 */
-    (void)r3; (void)r4; (void)r5; (void)r6; (void)r7; (void)r8; (void)r9; (void)r10;
+void windowDrawSprite2(void* x, void* y, s16 width, s16 height, s32 color,
+                       s32 contextValue, s32 spriteValue, s32 flags) {
+    u8 sprite[0x78];
+    u8 localContext[0xB4];
+    void* context = (void*)contextValue;
+    u8* info = menuSpriteBiosGetPtr((u16)spriteValue);
+    s16 unusedX;
+    s16 unusedY;
+    u32 type;
+
+    memset(sprite, 0, sizeof(sprite));
+    sprite[4] = 7;
+    *(u32*)(sprite + 0x64) = color;
+    *(f32*)(sprite + 0x68) = 1.0f;
+    *(f32*)(sprite + 0x6C) = 1.0f;
+    type = (info[0] >> 4) & 3;
+    if (type == 1) {
+        sprite[5] |= 1;
+        *(u32*)(sprite + 0x58) = *(u32*)(info + 0x10);
+    } else if (type == 2) {
+        sprite[5] |= 2;
+        *(u32*)(sprite + 0x08) = *(u32*)(info + 0x10);
+    }
+    *(s16*)(sprite + 0x50) = (s16)((s32)x + (s8)info[5]);
+    *(s16*)(sprite + 0x52) = (s16)((s32)y + (s8)info[6]);
+    *(s16*)(sprite + 0x54) = width;
+    *(s16*)(sprite + 0x56) = height;
+    memcpy(sprite + 0x5C, info + 0x08, 8);
+    sprite[0x67] = (u8)(((u32)info[7] * sprite[0x67]) / 255);
+    if ((flags & 1) != 0) *(s16*)(sprite + 0x54) = -(s16)width;
+    if ((flags & 2) != 0) *(s16*)(sprite + 0x56) = -(s16)height;
+    if (context == NULL) {
+        context = localContext;
+        memset(context, 0, sizeof(localContext));
+        fn_800FE6AC(&unusedX, &unusedY);
+        *(s32*)(localContext + 0x88) = -1;
+    }
+    winSpriteDraw(context, sprite);
 }
-#pragma pop
 
 /* 0x80104318 | 0x8C */
 #pragma push
@@ -460,14 +504,29 @@ u32 windowGetCursor(s32 param) {
 }
 
 /* 0x801045A8 | 0x110 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowCheckCursor(void* p, u8 flags) {
-    /* TODO: match -- 272 bytes at 0x801045A8 */
-    (void)p; (void)flags;
+s32 windowCheckCursor(s32 id, u8 wait) {
+    u8* window;
+
+    do {
+        window = mdl_find(id);
+        if (window == NULL) {
+            GSlogWrite((const char*)lbl_80271E40, (const char*)lbl_8035B070, id);
+            return 0;
+        }
+        if (window[0x98] != 0 || window[0x99] != 0) {
+            return 0;
+        }
+        if (wait == 0) {
+            break;
+        }
+        if (GSthreadGetCurrentThread() != 0) {
+            GSlogWrite((const char*)lbl_80271E64, (const char*)lbl_8035B070, id);
+            break;
+        }
+        _threadSwitch();
+    } while (1);
+    return 1;
 }
-#pragma pop
 
 /* 0x801046B8 | 0x10 */
 u32 windowGetActiveID(void) {
@@ -545,31 +604,200 @@ void windowCloseMain(void* obj) {
 #pragma pop
 
 /* 0x80104828 | 0x26C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowClose(void* ptr, u32 flags) {
-    /* TODO: match -- 620 bytes at 0x80104828 */
+s32 windowClose(void* ptr, u32 flags) {
+    u8* window = ptr;
+    u8* current;
+    u8* active;
+    u8 found;
+
+    if ((flags & 2) == 0) {
+        for (current = *(u8**)(lbl_80404ACC + 0x0C);
+             current != NULL; current = *(u8**)(current + 0x10)) {
+            u8* link = current;
+
+            found = 0;
+            if (current != window) {
+                do {
+                    link = *(u8**)(link + 0x0C);
+                    if (link == window) {
+                        found = 1;
+                        break;
+                    }
+                } while (link != NULL);
+            }
+            if (found && (flags & 4) != 0) {
+                u8* data = menuDataBiosGetPtr(*(void**)(current + 0x04));
+                if ((data[0] & 8) == 0) {
+                    current[0x0A] = 1;
+                }
+            }
+        }
+    }
+    if ((flags & 1) == 0 && window != NULL) {
+        if ((flags & 4) != 0) {
+            u8* data = menuDataBiosGetPtr(*(void**)(window + 0x04));
+            if ((data[0] & 8) == 0) {
+                window[0x0A] = 1;
+            }
+        }
+        if ((flags & 2) != 0) {
+            for (current = *(u8**)(lbl_80404ACC + 0x0C);
+                 current != NULL; current = *(u8**)(current + 0x10)) {
+                if (*(u8**)(current + 0x0C) == window) {
+                    *(u8**)(current + 0x0C) = *(u8**)(window + 0x0C);
+                }
+            }
+        }
+    }
+
+    active = windowSearchID(*(s32*)(lbl_80404ACC + 0x04));
+    found = 0;
+    for (window = active; window != NULL; window = *(u8**)(window + 0x0C)) {
+        if (window[0x0A] == 0 && window[0x18] != 0) {
+            for (current = *(u8**)(lbl_80404ACC + 0x0C);
+                 current != NULL; current = *(u8**)(current + 0x10)) {
+                u8* link;
+
+                if (current[0x0A] != 0 || current[0x18] != 0) continue;
+                link = current;
+                if (current != *(u8**)(window + 0x0C)) {
+                    do {
+                        link = *(u8**)(link + 0x0C);
+                        if (link == *(u8**)(window + 0x0C)) {
+                            *(s32*)(lbl_80404ACC + 0x04) =
+                                *(s32*)(current + 0x04);
+                            found = 1;
+                            break;
+                        }
+                    } while (link != NULL);
+                }
+            }
+            if (found) break;
+        } else if (window[0x0A] == 0) {
+            *(s32*)(lbl_80404ACC + 0x04) = *(s32*)(window + 0x04);
+            break;
+        }
+    }
+    if (window == NULL) {
+        *(s32*)(lbl_80404ACC + 0x04) = 0;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x80104A94 | 0x20C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void _windowCreateItemSprite__FP14tagWINDOW_WORK(void) {
-    /* TODO: match -- 524 bytes at 0x80104A94 */
+s32 _windowCreateItemSprite__FP14tagWINDOW_WORK(u8* window) {
+    u8* menuData = menuDataBiosGetPtr(*(void**)(window + 0x04));
+    s16 itemId = *(s16*)(menuData + 0x04);
+    u8* item = menuItemBiosGetPtr(itemId);
+    s16 width;
+    s16 height;
+
+    winSpriteRelease(window + 0x1C);
+    _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(item, &width, &height);
+    for (;;) {
+        u8* sprite;
+        u8* spriteData;
+        u32 type;
+        u16 sequence;
+
+        item = menuItemBiosGetPtr(itemId);
+        sprite = winSpriteAdd(window + 0x1C);
+        if (sprite == NULL) {
+            winSpriteRelease(window + 0x1C);
+            return 1;
+        }
+        *(s16*)(sprite + 0x06) = itemId;
+        *(s16*)(sprite + 0x50) = *(s16*)(item + 0x02);
+        *(s16*)(sprite + 0x52) = *(s16*)(item + 0x04);
+        *(s16*)(sprite + 0x54) = *(s16*)(item + 0x06);
+        *(s16*)(sprite + 0x56) = *(s16*)(item + 0x08);
+        sprite[0x67] = item[0x01];
+        sprite[0x74] = (item[0] >> 4) & 3;
+
+        if (*(s16*)(item + 0x0A) != 0) {
+            spriteData = menuSpriteBiosGetPtr(*(s16*)(item + 0x0A));
+            type = (spriteData[0] >> 4) & 3;
+            if (type == 1) {
+                sprite[5] |= 1;
+                *(u32*)(sprite + 0x58) = *(u32*)(spriteData + 0x10);
+            } else if (type == 2) {
+                sprite[5] |= 2;
+                *(u32*)(sprite + 0x08) = *(u32*)(spriteData + 0x10);
+            }
+            memcpy(sprite + 0x5C, spriteData + 0x08, 8);
+            sprite[0x67] = (u8)(((u32)sprite[0x67] * spriteData[7]) / 255);
+            if ((spriteData[0] & 0x40) != 0) {
+                *(s16*)(sprite + 0x54) = width;
+                *(s16*)(sprite + 0x56) = height;
+            }
+            sequence = *(u16*)spriteData & 0x0FFF;
+            if (sequence != 0) {
+                winSetSequence(sprite + 0x0C, sequence);
+            }
+        }
+        *(u32*)(sprite + 0x4C) = *(u32*)(item + 0x10);
+        if (*(u32*)(item + 0x14) != 0) {
+            sprite[5] |= 8;
+            *(u32*)(sprite + 0x48) = *(u32*)(item + 0x14);
+        }
+        if ((item[0] & 0x40) != 0) break;
+        itemId = *(s16*)(item + 0x18);
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x80104CA0 | 0x1E0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowCreateCursorSprite(void) {
-    /* TODO: match -- 480 bytes at 0x80104CA0 */
+void windowCreateCursorSprite(u8* window) {
+    u8* menuData = menuDataBiosGetPtr(*(void**)(window + 0x04));
+    u8* item = menuItemBiosGetPtr(*(s16*)(menuData + 0x04));
+    u8* selected = NULL;
+    s32 index = 0;
+
+    while (item != NULL) {
+        if ((item[0] & 0x80) != 0 && (s8)window[0x95] == index) {
+            selected = item;
+            break;
+        }
+        if ((item[0] & 0x40) != 0) break;
+        item = menuItemBiosGetPtr(*(s16*)(item + 0x18));
+        index++;
+    }
+    if (selected == NULL) return;
+
+    winSpriteRelease(window + 0x20);
+    if (*(s16*)(selected + 0x0C) == 0) return;
+    for (item = menuSpriteBiosGetPtr(*(s16*)(selected + 0x0C));
+         item != NULL;) {
+        u8* sprite = winSpriteAdd(window + 0x20);
+        u32 type;
+        u16 sequence;
+
+        if (sprite == NULL) {
+            winSpriteRelease(window + 0x20);
+            return;
+        }
+        type = (item[0] >> 4) & 3;
+        if (type == 1) {
+            sprite[5] |= 1;
+            *(u32*)(sprite + 0x58) = *(u32*)(item + 0x10);
+        } else if (type == 2) {
+            sprite[5] |= 2;
+            *(u32*)(sprite + 0x08) = *(u32*)(item + 0x10);
+        }
+        *(s16*)(sprite + 0x06) = *(s16*)(menuData + 0x04);
+        *(s16*)(sprite + 0x50) = *(s16*)(selected + 0x02) + (s8)item[5];
+        *(s16*)(sprite + 0x52) = *(s16*)(selected + 0x04) + (s8)item[6];
+        memcpy(sprite + 0x54, item + 0x0C, 4);
+        memcpy(sprite + 0x5C, item + 0x08, 8);
+        sprite[0x67] = item[7];
+        sequence = *(u16*)item & 0x0FFF;
+        if (sequence != 0) {
+            winSetSequence(sprite + 0x0C, sequence);
+        }
+        if ((item[0] & 0x80) != 0) break;
+        item = menuSpriteBiosGetPtr(*(s16*)(item + 0x14));
+    }
 }
-#pragma pop
 
 /* 0x80104E80 | 0x474 */
 #pragma push
@@ -581,13 +809,38 @@ void windowOpen(void) {
 #pragma pop
 
 /* 0x801052F4 | 0x11C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(void) {
-    /* TODO: match -- 284 bytes at 0x801052F4 */
+void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(u8* item, s16* width, s16* height) {
+    s32 minX = 0x280;
+    s32 minY = 0x1E0;
+    s32 maxX = 0;
+    s32 maxY = 0;
+
+    *width = 0;
+    *height = 0;
+    while (item != NULL) {
+        u32 rect;
+        s16 textWidth;
+        s16 textHeight;
+        s16 x = *(s16*)(item + 0x02);
+        s16 y = *(s16*)(item + 0x04);
+
+        menuSpriteBiosGetPtr(*(s16*)(item + 0x0A));
+        rect = *(void**)(item + 0x10) != NULL
+            ? GSmsgGetRect(*(void**)(item + 0x10)) : 0;
+        textWidth = (s16)(rect >> 16);
+        textHeight = (s16)rect;
+        if (x < minX) minX = x;
+        if (x + *(s16*)(item + 0x06) > maxX) maxX = x + *(s16*)(item + 0x06);
+        if (x + textWidth > maxX) maxX = x + textWidth;
+        if (y < minY) minY = y;
+        if (y + *(s16*)(item + 0x08) > maxY) maxY = y + *(s16*)(item + 0x08);
+        if (y + textHeight > maxY) maxY = y + textHeight;
+        if ((item[0] & 0x40) != 0) break;
+        item = menuItemBiosGetPtr(*(s16*)(item + 0x18));
+    }
+    *width = (s16)(maxX - minX);
+    *height = (s16)(maxY - minY);
 }
-#pragma pop
 
 /* 0x80105410 | 0xA8 */
 #pragma push
@@ -619,13 +872,24 @@ void windowInit(u16 count) {
 #pragma pop
 
 /* 0x801054B8 | 0x16C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowGetPortKeyInfo(void) {
-    /* TODO: match -- 364 bytes at 0x801054B8 */
+void* windowGetPortKeyInfo(u8 ports) {
+    u8 masks[4];
+    u16* output = (u16*)lbl_80404AB0;
+    u32 i;
+
+    *(u32*)masks = lbl_8047CDE8;
+    memset(output, 0, 0x1A);
+    for (i = 0; i < 4; i++) {
+        u16* keys = (u16*)(lbl_80404ACC + 0x2A + i * 0x1A);
+        u32 j;
+
+        if ((ports & masks[i]) == 0) continue;
+        for (j = 0; j < 5; j++) {
+            output[j] |= keys[j];
+        }
+    }
+    return output;
 }
-#pragma pop
 
 /* 0x80105624 | 0x10 */
 void* windowGetKeyInfo(void) {

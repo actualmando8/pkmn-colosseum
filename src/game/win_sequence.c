@@ -309,7 +309,8 @@ extern void winMsgCheck(void);
 extern void winMsgClose(void);
 extern void winMsgOpenWithSE(void);
 extern void winMsgOpen(void);
-extern void fn_80106F98(void);
+extern void fn_80106F98(s32 windowId);
+extern void _winSeqMoveSub(void* targetPtr, void* statePtr);
 extern s32 winSeqCheckMove(s32 param);
 extern s32 fn_80107170(s32 r3, s32 r31);
 extern void winSeqMoveMenu(void);
@@ -342,13 +343,42 @@ extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
 /* 0x80106F98 | 0x15C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80106F98(void) {
-    /* TODO: match -- 348 bytes at 0x80106F98 */
+void fn_80106F98(s32 windowId) {
+    u8* window = windowSearchID(windowId);
+    u8* node;
+
+    if (window == NULL) return;
+    for (node = *(u8**)(window + 0x20); node != NULL; node = *(u8**)node) {
+        u8* scratch = lbl_80404B68;
+        u32 i;
+        u8* item;
+
+        *(u32*)(node + 0x0C) = 0;
+        *(u16*)(node + 0x10) = 0;
+        *(s16*)(scratch + 0x00) = *(s16*)(node + 0x50);
+        *(s16*)(scratch + 0x02) = *(s16*)(node + 0x52);
+        *(u32*)(scratch + 0x04) = *(u32*)(node + 0x64);
+        *(f32*)(scratch + 0x0C) = *(f32*)(node + 0x68);
+        *(f32*)(scratch + 0x10) = *(f32*)(node + 0x6C);
+        scratch[0x20] = node[0x04];
+        *(u32*)(scratch + 0x14) = *(u32*)(node + 0x58);
+        memcpy(scratch + 0x18, node + 0x5C, 8);
+        item = menuItemBiosGetPtr(*(s16*)(node + 0x06));
+        *(s16*)(scratch + 0x08) = *(s16*)(item + 0x02);
+        *(s16*)(scratch + 0x0A) = *(s16*)(item + 0x04);
+        for (i = 0; i < fn_800D3088(); i++) {
+            _winSeqMoveSub(scratch, node + 0x0C);
+        }
+        *(s16*)(node + 0x50) = *(s16*)(scratch + 0x00);
+        *(s16*)(node + 0x52) = *(s16*)(scratch + 0x02);
+        *(u32*)(node + 0x64) = *(u32*)(scratch + 0x04);
+        *(f32*)(node + 0x68) = *(f32*)(scratch + 0x0C);
+        *(f32*)(node + 0x6C) = *(f32*)(scratch + 0x10);
+        node[0x04] = scratch[0x20];
+        *(u32*)(node + 0x58) = *(u32*)(scratch + 0x14);
+        memcpy(node + 0x5C, scratch + 0x18, 8);
+    }
 }
-#pragma pop
 
 /* 0x801070F4 | 0x7C */
 s32 winSeqCheckMove(s32 param) {
