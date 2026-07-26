@@ -553,6 +553,80 @@ u8 fn_801EE8F4(u16 id)
 
 #if defined(BATTLE_RANGE_CANDIDATE_801EE958)
 
+void fn_801EE958(u32 id, u32 value)
+{
+    extern u8* fn_801EF1E4(void* data);
+    extern u32 fightFloorGetStatus(s32, s32, s32, s32);
+    BattleRangeDef* def;
+    u8* data;
+    s16* activeIndex;
+    u32 next;
+    u16 slot;
+
+    def = &lbl_80478F6C[(u16)id];
+    if ((u16)id == 0 || (u16)id > 0x60) {
+        def = NULL;
+    }
+    if (def == NULL) {
+        return;
+    }
+
+    if (def->flag16 == 0 || fn_801902E0(def->flag16) == 0) {
+        data = fn_801EF1E4(NULL);
+        if (data != NULL) {
+            activeIndex = (s16*)(data + (u16)id * 0x18 + 0x4A4);
+            if (*activeIndex < 0) {
+                next = *(u32*)data;
+                *(u32*)data = next + 1;
+                *activeIndex = (s16)next;
+            }
+        }
+        if (def->flag0C != 0) {
+            _flagSet(def->flag0C, 1);
+        }
+    }
+
+    id = fightFloorGetStatus(0, 0, 0x4A, 0);
+    slot = def->runtimeSlot;
+    data = fn_801EF1E4(NULL);
+    *(u32*)(data + slot * 0xC + 0xC) = id;
+    if (def->flag16 != 0) {
+        _flagSet(def->flag16, (u8)value);
+    }
+}
+
+void fn_801EEB34(u32 id, u32 value)
+{
+    extern u8* fn_801EF1E4(void* data);
+    extern u32 fightFloorGetStatus(s32, s32, s32, s32);
+    BattleRangeDef* def;
+    u8* data;
+    u32 fightStatus;
+    u16 slot;
+
+    def = &lbl_80478F6C[(u16)id];
+    if ((u16)id == 0 || (u16)id > 0x60) {
+        def = NULL;
+    }
+    if (def == NULL) {
+        return;
+    }
+
+    if (def->flag16 == 0 || fn_801902E0(def->flag16) == 0) {
+        if (def->flag0C != 0) {
+            _flagSet(def->flag0C, 1);
+        }
+    }
+
+    fightStatus = fightFloorGetStatus(0, 0, 0x4A, 0);
+    slot = def->runtimeSlot;
+    data = fn_801EF1E4(NULL);
+    *(u32*)(data + slot * 0xC + 0xC) = fightStatus;
+    if (def->flag12 != 0) {
+        _flagSet(def->flag12, (u8)value);
+    }
+}
+
 u8 fn_801EEAD0(u16 id)
 {
     BattleRangeDef* def = &lbl_80478F6C[id];

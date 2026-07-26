@@ -1031,6 +1031,74 @@ LAB_00209430:
   return 1;
 }
 
+void fightActionFlowKaisiPreSubLoad(void)
+{
+    extern u32 fightTargetGetPtrAsNowFightType(u32 type, u32 relative);
+    extern u32 fightTrainerGetStatus(u32 trainer, u32 index, u32 status, u32 subindex);
+    extern u32 fightFloorGetStatus(u32 floor, u32 index, u32 status, u32 subindex);
+    extern u32 fightEncountDataBiosGetPtr(u16 id);
+    extern u16 fightEncountDataBiosGetSyoukaiWzxDataId(void);
+    extern u8 fn_801F1888(u32 floor);
+    extern void fn_801DDD28(u32 owner, u16 id, u32 type, u32 arg);
+    extern u16 fn_800E0C54(void);
+    extern u8 lbl_80478D18;
+    extern u16 lbl_80375970[];
+    extern u16 lbl_8047B5F8;
+    u16 encounterIndex;
+    u32 heroTarget;
+    u32 heroOwner;
+    u32 enemyTarget;
+    u32 enemyOwner;
+    u16 trainerIndex;
+    u32 introResource;
+    u16 introMessage;
+    u32 secondaryMessage;
+    u16 resource;
+
+    encounterIndex = fightFloorGetStatus(0, 0, 0xE, 0);
+    heroTarget = fightTargetGetPtrAsNowFightType(0xB, 0);
+    heroOwner = fightTrainerGetStatus(heroTarget, 0, 0x4C, 0);
+    enemyTarget = fightTargetGetPtrAsNowFightType(9, heroTarget);
+    enemyOwner = fightTrainerGetStatus(enemyTarget, 0, 0x4C, 0);
+    trainerIndex = fightTrainerGetStatus(enemyTarget, 0, 0x43, 0);
+    introResource = fightFloorGetStatus(0, 0, 0x10, 0);
+    encounterIndex = fightFloorGetStatus(0, encounterIndex, 0xD, 0);
+    fightEncountDataBiosGetPtr(encounterIndex);
+    resource = fightEncountDataBiosGetSyoukaiWzxDataId();
+    introMessage = fightTrainerGetStatus(enemyTarget, trainerIndex, 7, 0);
+    if (introMessage == 0) {
+        introMessage = 0x5F;
+    }
+    secondaryMessage = fightTrainerGetStatus(0, trainerIndex, 8, 0);
+
+    if (fn_801F1888(0) == 0) {
+        if (introResource != 0) {
+            if (resource != 0) {
+                fn_801DDD28(enemyOwner, resource, 4, 0);
+            }
+            fn_801DDD28(enemyOwner, (u16)introResource, 4, 0);
+            if ((u8)fightFloorGetStatus(0, 0, 0x33, 0) == 1) {
+                u16 index = fn_800E0C54() % lbl_80478D18;
+                lbl_8047B5F8 = index;
+                lbl_8047B5F8 = lbl_80375970[index];
+                fn_801DDD28(enemyOwner, lbl_8047B5F8, 4, 0);
+            } else {
+                lbl_8047B5F8 = 0;
+            }
+        }
+        if (secondaryMessage != 0) {
+            fn_801DDD28(enemyOwner, 0x5F, 4, 0);
+        }
+        if ((u8)fightFloorGetStatus(0, 0, 0x33, 0) == 1) {
+            fn_801DDD28(enemyOwner, introMessage, 4, 0);
+        }
+    } else {
+        fn_801DDD28(heroOwner, 0x54, 4, 0);
+        fn_801DDD28(enemyOwner, 0x55, 4, 0);
+        fn_801DDD28(heroOwner, 0x56, 4, 0);
+    }
+}
+
 /* Address: 0x8020CA98 | Size: 0x548 | Ghidra import */
 u32 fightActionFlowKaisiNyuujouPokemon(void* action)
 

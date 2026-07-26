@@ -204,7 +204,7 @@ void* gamedatasaveBiosGetPtr(void* data);
 void gamedatasaveBiosSetMemcardID(void* data, u64 memcard_id);
 u16 fn_8006A718(void* data);
 void fn_8006AF44(void* data, void* value);
-void fn_801CBE44(void* data, u32 size, void* hash, u32 hash_size);
+void fn_801CBE44(void* data, u32 size, void* hash, u32 offset);
 u16 fn_800E0C54(void);
 void* heroGetStatus(void* data, s32 status, s32 index);
 void heroSetStatus(void* data, s32 status, void* value);
@@ -696,6 +696,85 @@ void fn_801CBBAC(u8 digest[20], const u8* input, u32 length)
     }
     memcpy(&context.buffer[index], &input[i], length - i);
     fn_801CBF64(digest, &context);
+}
+
+u32 fn_801CBCDC(u8* data, u32 size, const u32 expected[5], u32 offset)
+{
+    u32* savedDigest;
+    u32* digest;
+    u32* key;
+    u8* cursor;
+    u32 processed;
+    s32 i;
+
+    savedDigest = &lbl_804670E8[16];
+    digest = &lbl_804670E8[21];
+    key = &lbl_804670E8[26];
+    memcpy(savedDigest, expected, 20);
+    key[0] = ~expected[0];
+    key[1] = ~expected[1];
+    key[2] = ~expected[2];
+    key[3] = ~expected[3];
+    key[4] = ~expected[4];
+
+    cursor = data + offset;
+    processed = offset;
+    while (processed < size) {
+        fn_801CBBAC((u8*)digest, cursor, 20);
+        ((u32*)cursor)[0] ^= key[0];
+        ((u32*)cursor)[1] ^= key[1];
+        ((u32*)cursor)[2] ^= key[2];
+        ((u32*)cursor)[3] ^= key[3];
+        ((u32*)cursor)[4] ^= key[4];
+        memcpy(key, digest, 20);
+        cursor += 20;
+        processed += 20;
+    }
+
+    fn_801CBBAC((u8*)key, data, size);
+    for (i = 0; i < 5; i++) {
+        if (key[i] != savedDigest[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void fn_801CBE44(void* dataArg, u32 size, void* outArg, u32 offset)
+{
+    extern u32 lbl_80467128[];
+    extern u32 lbl_80467150[];
+    u32* digest;
+    u32* key;
+    u8* cursor;
+    u8* data;
+    u8* outDigest;
+    u32 processed;
+
+    data = dataArg;
+    outDigest = outArg;
+    digest = lbl_80467128;
+    key = lbl_80467150;
+    fn_801CBBAC((u8*)digest, data, size);
+    key[0] = ~digest[0];
+    key[1] = ~digest[1];
+    key[2] = ~digest[2];
+    key[3] = ~digest[3];
+    key[4] = ~digest[4];
+
+    cursor = data + offset;
+    processed = offset;
+    while (processed < size) {
+        ((u32*)cursor)[0] ^= key[0];
+        ((u32*)cursor)[1] ^= key[1];
+        ((u32*)cursor)[2] ^= key[2];
+        ((u32*)cursor)[3] ^= key[3];
+        ((u32*)cursor)[4] ^= key[4];
+        fn_801CBBAC((u8*)key, cursor, 20);
+        cursor += 20;
+        processed += 20;
+    }
+    memcpy(outDigest, digest, 20);
 }
 
 void fn_801CBF64(u8 digest[20], FieldSha1Context* context)
@@ -1683,6 +1762,58 @@ s32 fn_801CF568(void)
     return 37;
 }
 
+s32 fn_801CF7E4(void)
+{
+    u8* task;
+    u8* save;
+    u8* destination;
+    u32* header;
+    u32 sum;
+    s32 taskKind;
+
+    task = (u8*)lbl_8047B3D4;
+    save = *(u8**)(task + 0x50);
+    *(u32*)(save + 0xC) = 0;
+    if (fn_801CBCDC(save, 0x1DFD8, (u32*)(save + 0x1DFEC), 0x18) != 0) {
+        taskKind = *(s32*)task;
+        if (taskKind != 3) {
+            *(u32*)(task + 0x2C) = *(u32*)(save + 4);
+            if (*(s32*)(task + 0x30) > *(s32*)(task + 0x2C)) {
+                *(u32*)(task + 0x2C) = *(u32*)(task + 0x30);
+                *(u32*)(task + 4) = 5;
+                if (taskKind >= 1 && taskKind < 3) {
+                    destination = *(u8**)(task + 0x58);
+                    memcpy(destination, save + 8, 0x1DFD0);
+                    *(u32*)(task + 0x10) = 0x25;
+                } else {
+                    *(u32*)(task + 0x10) = 0x24;
+                }
+                return 0x30;
+            }
+        }
+
+        if (taskKind >= 1 && taskKind < 4) {
+            destination = *(u8**)(task + 0x58);
+            memcpy(destination, save + 8, 0x1DFD0);
+            *(u32*)(task + 4) = 12;
+            *(u32*)(task + 8) = 3;
+            if (task[0x40] != 0) {
+                return 0x11;
+            }
+            return 0x2C;
+        }
+        return 0x24;
+    }
+
+    header = (u32*)(save + 0x1E000 + (*(u32*)(task + 0x20) << 9));
+    header[1] = 0;
+    header[3] = 0;
+    sum = header[0] + header[1] + header[2] + header[3];
+    sum += header[4] + header[5] + header[6] + header[7];
+    header[3] = -sum;
+    return 0x1F;
+}
+
 s32 fn_801CFD08(void)
 {
     s32 free_bytes;
@@ -1818,4 +1949,133 @@ scan_done:
 void fn_801D0080(void)
 {
     lbl_8047B3D4->callback_finished = 1;
+}
+
+s32 fn_801D0090(s32 error)
+{
+    extern void winMsgOpen(s32 window, u32 message, s32 arg2, s32 arg3);
+    extern s8 menuSubOpenYesNo(s32 port, s32 x, s32 y, s32 initial);
+    extern void msgctrlSetValue(s32 slot, s32 value);
+    u32 message;
+    u8 ask;
+    s32 initial;
+    s32 taskKind;
+
+    ask = 0;
+    taskKind = lbl_8047B3D4->task_kind;
+    switch (error) {
+    case 0:
+        return 0;
+    case 1:
+        message = 0x3C29;
+        break;
+    case 2:
+        if ((taskKind >= 5 && taskKind < 8) || taskKind == 13) {
+            message = 0x3C2C;
+        } else {
+            message = 0x3C04;
+        }
+        break;
+    case 3:
+        message = 0x3BFB;
+        break;
+    case 4:
+        message = 0x3C55;
+        break;
+    case 5:
+        message = 0x4421;
+        break;
+    case 6:
+        message = 0x3BFA;
+        ask = 1;
+        initial = 0;
+        break;
+    case 7:
+        message = 0x3C33;
+        ask = 1;
+        initial = 0;
+        break;
+    case 8:
+        message = 0x3D45;
+        ask = 1;
+        initial = 1;
+        break;
+    case 9:
+        message = 0x3C57;
+        break;
+    case 10:
+        if ((taskKind >= 5 && taskKind < 8) || taskKind == 13) {
+            message = 0x3C2E;
+        } else {
+            message = 0x3C06;
+        }
+        break;
+    case 11:
+        message = 0x3BFD;
+        break;
+    case 12:
+        message = 0x44E5;
+        break;
+    case 13:
+        message = 0x3D43;
+        break;
+    case 14:
+        message = 0x44D8;
+        break;
+    case 15:
+        if ((taskKind >= 5 && taskKind < 8) || taskKind == 13) {
+            message = 0x44D8;
+        } else {
+            message = 0x4444;
+        }
+        break;
+    case 16:
+        message = 0x3C34;
+        break;
+    case 17:
+        message = 0x4422;
+        if (taskKind != 2) {
+            winMsgOpen((s8)(u32)lbl_8047B3D4->gapp, message, 1, 1);
+            message = 0x44E4;
+        }
+        break;
+    case 18:
+        message = 0x4423;
+        break;
+    case 19:
+        message = 0x3C30;
+        break;
+    case -3:
+        message = 0x3C32;
+        break;
+    case -4:
+        message = 0x3C31;
+        break;
+    case -5:
+        message = 0x3C5B;
+        break;
+    case -6:
+    case -13:
+        if (taskKind >= 1 && taskKind < 3 &&
+            lbl_8047B3D4->disk_id == (MemcardDiskId*)0x32) {
+            message = 0x4424;
+        } else {
+            message = 0x3C30;
+        }
+        break;
+    case -8:
+    case -9:
+        message = 0x3C5F;
+        msgctrlSetValue(0x2F, 0x30);
+        break;
+    default:
+        message = 0x3C30;
+        break;
+    }
+
+    winMsgOpen((s8)(u32)lbl_8047B3D4->gapp, message, 1, 1);
+    if (ask != 0 && menuSubOpenYesNo(0, 0x3C, 0xAA, initial) != 0) {
+        ask = 0;
+    }
+    return ask;
 }
