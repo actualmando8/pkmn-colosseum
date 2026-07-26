@@ -282,6 +282,7 @@ extern void fn_800B7D3C(void);
 extern void fn_800B7874(s32 attribute, s32 type);
 extern void fn_800B928C(s32 primitive, s32 format, s32 count);
 extern void fn_800B9404(s32 width, s32 offset);
+extern void fn_800B944C(s32 width, s32 offset);
 extern void generateParticle_8017424C(PSGeneratorState* gen);
 extern void HSD_MulColor(GXColor* a, GXColor* b, GXColor* dest);
 
@@ -1479,7 +1480,7 @@ PSParticle* psGenerateParticle0(
     pp->sizeYTimer = 0;
     pp->sizeXTarget = 0xFF;
     pp->sizeYTarget = 0xFF;
-    *(f32*)&pp->pad88 = lbl_8047D5B8;
+    pp->alphaScale = lbl_8047D5B8;
 
     if (interpretNow != 0) {
         psInterpretParticle0(pp, NULL);
@@ -1653,6 +1654,11 @@ void psSetupTev(PSParticle* pp) {
         fn_800BC6F0(0, 0, 0, 4);
         fn_800BC1A0(0, 4, 2, 8, 0xF);
         fn_800BC1E4(0, 2, 1, 4, 7);
+    } else if (state == 0x100400) {
+        fn_800BC8C8(1);
+        fn_800B884C(1);
+        fn_800BC6F0(0, 0, 0, 4);
+        GXSetTevOp(0, 0);
     } else if (state == (s32)0x80000400) {
         fn_800BC8C8(2);
         fn_800B884C(1);
@@ -2684,6 +2690,7 @@ void psDispSubAppSRT(PSParticle* pp, Mtx parentMatrix) {
     } else {
         PSMTXMultVec(appSRT->matrix, &position, &position);
     }
+
 }
 
 void psDispSubMakePolygon(PSParticle* pp, void* polygonData,
@@ -2748,6 +2755,8 @@ void psDispSubPointTrail(PSParticle* pp) {
     f32 widthValue;
     s32 width;
     u8 cachedWidth;
+    Vec previous;
+    PSColor color;
 
     if (lbl_8047B12C != 0) {
         lbl_8047B12C = 0;
@@ -2765,6 +2774,87 @@ void psDispSubPointTrail(PSParticle* pp) {
     if (lbl_8047B164 != cachedWidth) {
         lbl_8047B164 = cachedWidth;
         fn_800B9404(width, 5);
+    }
+
+    if (pp->flags & 4) {
+        if (pp->peopleObj != NULL) {
+            return;
+        }
+        previous.x = pp->positionX;
+        previous.y = pp->positionY;
+        previous.z = pp->positionZ;
+    } else {
+        previous.x = pp->positionX - pp->velocityX;
+        previous.y = pp->positionY - pp->velocityY;
+        previous.z = pp->positionZ - pp->velocityZ;
+    }
+
+    switch (pp->flags & 0x80000080) {
+    case 0:
+        if (pp->color1Timer != 0) {
+            s32 step =
+                ((s32)pp->color1Countdown << 16) / pp->color1Timer;
+
+            color.r = (((s32)pp->color1TargetR << 16) +
+                       step * ((s32)pp->color1R -
+                               (s32)pp->color1TargetR)) >> 16;
+            color.g = (((s32)pp->color1TargetG << 16) +
+                       step * ((s32)pp->color1G -
+                               (s32)pp->color1TargetG)) >> 16;
+            color.b = (((s32)pp->color1TargetB << 16) +
+                       step * ((s32)pp->color1B -
+                               (s32)pp->color1TargetB)) >> 16;
+            color.a = (((s32)pp->color1TargetA << 16) +
+                       step * ((s32)pp->color1A -
+                               (s32)pp->color1TargetA)) >> 16;
+        } else {
+            color.r = pp->color1R;
+            color.g = pp->color1G;
+            color.b = pp->color1B;
+            color.a = pp->color1A;
+        }
+        break;
+    case 0x80:
+    case 0x80000080:
+        color.r = 0xFF;
+        color.g = 0xFF;
+        color.b = 0xFF;
+        color.a = 0xFF;
+        break;
+    default:
+        return;
+    }
+
+    fn_800B7D3C();
+    fn_800B7874(9, 1);
+    fn_800B7874(11, 1);
+    if (pp->flags & 0x400) {
+        fn_800B7874(13, 2);
+        fn_800B928C(0xA8, 2, 2);
+    } else {
+        fn_800B928C(0xA8, 3, 2);
+    }
+
+    GX_FIFO_F32 = previous.x;
+    GX_FIFO_F32 = previous.y;
+    GX_FIFO_F32 = previous.z;
+    GX_FIFO_U8 = color.r;
+    GX_FIFO_U8 = color.g;
+    GX_FIFO_U8 = color.b;
+    GX_FIFO_U8 = (u8)(color.a * pp->alphaScale);
+    if (pp->flags & 0x400) {
+        GX_FIFO_U8 = 0;
+    }
+
+    GX_FIFO_F32 = pp->positionX;
+    GX_FIFO_F32 = pp->positionY;
+    GX_FIFO_F32 = pp->positionZ;
+    GX_FIFO_U8 = color.r;
+    GX_FIFO_U8 = color.g;
+    GX_FIFO_U8 = color.b;
+    GX_FIFO_U8 = color.a;
+    if (pp->flags & 0x400) {
+        GX_FIFO_U8 = 1;
     }
 }
 
@@ -2819,6 +2909,24 @@ void psDispSubAPPSRTPoint(PSParticle* pp) {
         position.z += appSRT->rotationZ;
     } else {
         PSMTXMultVec(appSRT->matrix, &position, &position);
+    }
+
+    {
+        f32 widthValue = pp->lerpValue > lbl_8047D5E0
+            ? lbl_8047D5D8
+            : lbl_8047D5DC * pp->lerpValue;
+        s32 width = (s32)widthValue;
+        u8 rasterWidth = (u8)width;
+
+        if (pp->flags & 0x100000) {
+            if (lbl_8047B164 != rasterWidth) {
+                lbl_8047B164 = rasterWidth;
+                fn_800B9404(width, 5);
+            }
+        } else if (lbl_8047B168 != rasterWidth) {
+            lbl_8047B168 = rasterWidth;
+            fn_800B944C(width, 5);
+        }
     }
 }
 
@@ -2994,6 +3102,7 @@ void setupChanReg(PSParticle* pp) {
 void setupTevReg(PSParticle* pp) {
     PSColor color1;
     PSColor color2;
+    PSColor sizeColor;
 
     if (pp->color1Timer != 0) {
         s32 step = ((s32)pp->color1Countdown << 16) / pp->color1Timer;
@@ -3067,6 +3176,40 @@ void setupTevReg(PSParticle* pp) {
         color2.a = 0;
         lbl_8047B134 = color2;
         fn_800BC2F8(2, &color2);
+    }
+
+    if (pp->flags & 0x80000000) {
+        s32 value;
+
+        if (pp->sizeXTimer != 0) {
+            s32 step = ((s32)pp->sizeXCountdown << 16) / pp->sizeXTimer;
+
+            value = (((s32)pp->sizeXTargetFinal << 16) +
+                     step * ((s32)pp->sizeXTarget -
+                             (s32)pp->sizeXTargetFinal)) >> 16;
+            sizeColor.a =
+                (((s32)pp->sizeYTargetFinal << 16) +
+                 step * ((s32)pp->sizeYTarget -
+                         (s32)pp->sizeYTargetFinal)) >> 16;
+        } else {
+            value = pp->sizeXTarget;
+            sizeColor.a = pp->sizeYTarget;
+        }
+
+        sizeColor.r = value;
+        sizeColor.g = value;
+        sizeColor.b = value;
+        if ((pp->flags & 0x80) == 0) {
+            sizeColor.a = (sizeColor.a * color1.a) >> 8;
+        }
+
+        if (sizeColor.r != lbl_8047B130.r ||
+            sizeColor.g != lbl_8047B130.g ||
+            sizeColor.b != lbl_8047B130.b ||
+            sizeColor.a != lbl_8047B130.a) {
+            lbl_8047B130 = sizeColor;
+            fn_800BC2F8(3, &sizeColor);
+        }
     }
 }
 
@@ -3186,8 +3329,13 @@ void psExecGenerator(u32 linkMask) {
         u8* raw = (u8*)gen;
         u16 generatorFlags = *(u16*)(raw + 0x88);
 
-        if ((linkMask & (1 << (gen->linkNo + 16))) != 0 ||
-            (gen->flags & 0x800) != 0) {
+        if ((linkMask & (1 << (gen->linkNo + 16))) != 0) {
+            lbl_8047B184 = (PSGeneratorState**)gen;
+            gen = gen->next;
+            continue;
+        }
+
+        if ((gen->flags & 0x800) != 0) {
             lbl_8047B184 = (PSGeneratorState**)gen;
             gen = gen->next;
             continue;
