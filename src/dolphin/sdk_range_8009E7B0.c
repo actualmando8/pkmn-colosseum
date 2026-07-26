@@ -65,8 +65,8 @@ typedef struct {
     OSModuleInfo* tail;
 } OSModuleQueue;
 
-extern OSModuleQueue __OSModuleInfoList;
-extern const void* __OSStringTable;
+extern OSModuleQueue __OSModuleInfoList : (0x800030C8);
+extern const void* __OSStringTable : (0x800030D0);
 extern void DCFlushRange(void* address, u32 length);
 extern void ICInvalidateRange(void* address, u32 length);
 extern void OSReport(const char* format, ...);
@@ -120,6 +120,9 @@ found:
             *p = (*p & ~0x03FFFFFC) | (x & 0x03FFFFFC);
             break;
         case 3:
+            x = offset + rel->addend;
+            *(u16*)p = x & 0xFFFF;
+            break;
         case 4:
             x = offset + rel->addend;
             *(u16*)p = x & 0xFFFF;
@@ -130,7 +133,7 @@ found:
             break;
         case 6:
             x = offset + rel->addend;
-            *(u16*)p = ((x >> 16) + ((x & 0x8000) != 0)) & 0xFFFF;
+            *(u16*)p = ((x >> 16) + ((x & 0x8000) ? 1 : 0)) & 0xFFFF;
             break;
         case 7:
         case 8:

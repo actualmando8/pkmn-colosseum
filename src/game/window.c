@@ -59,7 +59,7 @@ extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
 extern void* menuSpriteBiosGetPtr(s32);
 extern int   fn_80166A28(u16);
-extern s32   GSthreadGetCurrentThread(void);    /* poll/yield -- 0 if pending */
+extern u32   GSthreadGetCurrentThread(void);    /* poll/yield -- 0 if pending */
 extern void  _threadSwitch(void);    /* yield */
 extern u32   fn_800BE31C(void);    /* rand or tick */
 extern u32   fn_800B8FD8(void*);   /* register fn, returns handle */
@@ -773,6 +773,7 @@ void windowCreateCursorSprite(u8* window) {
         *(s16*)((u8*)menuDataBiosGetPtr(*(void**)(window + 0x04)) + 0x04));
     u8* selected = NULL;
     s32 index = 0;
+    s32 spriteId;
 
     while (item != NULL) {
         if ((item[0] & 0x80) != 0) {
@@ -788,8 +789,9 @@ void windowCreateCursorSprite(u8* window) {
     if (selected == NULL) return;
 
     winSpriteRelease(window + 0x20);
-    if (*(s16*)(selected + 0x0C) == 0) return;
-    for (item = menuSpriteBiosGetPtr(*(s16*)(selected + 0x0C));
+    spriteId = *(s16*)(selected + 0x0C);
+    if (spriteId == 0) return;
+    for (item = menuSpriteBiosGetPtr(spriteId);
          item != NULL;) {
         u8* sprite = winSpriteAdd(window + 0x20);
         u32 type;
