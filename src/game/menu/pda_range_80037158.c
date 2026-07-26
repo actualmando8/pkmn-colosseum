@@ -5702,3 +5702,189 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
     }
 }
 #pragma peephole reset
+
+extern u32 lbl_8047A4F0;
+extern u16 lbl_803A67E8[];
+extern u8 pokemonDataBiosGetTokuseiDataId(void* data, s32 slot);
+extern void* pokemonTokuseiDataBiosGetPtr(u32 id);
+extern void* pokemonTokuseiDataBiosGetName(void* data);
+extern u32 pokemonDataBiosGetTypeName(void* data);
+
+/* Whether the highlighted memo entry has actually been seen. */
+static inline u8 pdaEntrySeen(void)
+{
+    return (lbl_8047A4E4[lbl_803A6818.currentIndex] & 0x8000) ? 0 : 1;
+}
+
+/* Species-name message for the highlighted entry, 0 when unavailable. */
+static inline u32 pdaCurrentNameMsg(void)
+{
+    u32 work = pdaLoadPokemon(lbl_803A6818.currentIndex);
+
+    if (work != 0) {
+        return GSmsgGetGSchar((u32)pokemonDataBiosGetName(
+            pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work))));
+    }
+    return 0;
+}
+
+/* Bios record for the highlighted entry, NULL when unavailable. */
+static inline void* pdaCurrentData(void)
+{
+    return pokemonDataBiosGetPtr(
+        pokemonBiosGetPokemonDataId(pdaLoadPokemon(lbl_803A6818.currentIndex)));
+}
+
+/* Height of the highlighted entry, 0 when unavailable. */
+static inline u16 pdaCurrentHeight(void)
+{
+    u32 work = pdaLoadPokemon(lbl_803A6818.currentIndex);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetHeight(data);
+        }
+        return 0;
+    }
+    return 0;
+}
+
+/* Weight of the highlighted entry, 0 when unavailable. */
+static inline u16 pdaCurrentWeight(void)
+{
+    u32 work = pdaLoadPokemon(lbl_803A6818.currentIndex);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetWeight(data);
+        }
+        return 0;
+    }
+    return 0;
+}
+
+/* Species panel: name, abilities, height, weight and type for the entry. */
+#pragma peephole off
+void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
+{
+    extern void fn_800FB8C8(s32 x, s32 y, s16 w, s16 h, void* color, s32 msg);
+    extern void fn_800FBB34(s32 x, s32 y, s16 w, s16 h, void* color, s32 msg);
+    PdaSprite* sprite = (PdaSprite*)event;
+    u32 name;
+    u16 tokusei0;
+    u16 tokusei1;
+    u16 height;
+    u16 weight;
+    u16 digit;
+    s32 i;
+    s32 digits;
+
+    name = pdaCurrentNameMsg();
+    if (name == 0) {
+        name = GSmsgGetGSchar(1);
+    }
+    msgctrlSetValue(0x37, name);
+    fn_800FB680(0, 0, alphaSprite->alphaByte | -0x100, (void*)0xce);
+
+    if (pdaEntrySeen() != 0) {
+        tokusei0 = pokemonDataBiosGetTokuseiDataId(pdaCurrentData(), 0);
+        msgctrlSetValue(0x37,
+                        GSmsgGetGSchar((u32)pokemonTokuseiDataBiosGetName(
+                            pokemonTokuseiDataBiosGetPtr(tokusei0))));
+        fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x5a5a) - sprite->field_50 + 4,
+                    *(s16*)(lbl_802EF0A8 + 0x5a5c) - sprite->field_52,
+                    alphaSprite->alphaByte | -0x100, (void*)0xe7);
+    } else {
+        fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x5a5a) - sprite->field_50 + 4,
+                    *(s16*)(lbl_802EF0A8 + 0x5a5c) - sprite->field_52,
+                    alphaSprite->alphaByte | -0x100, (void*)0x3721);
+    }
+
+    if (pdaEntrySeen() != 0) {
+        tokusei1 = pokemonDataBiosGetTokuseiDataId(pdaCurrentData(), 1);
+        if (tokusei1 != 0 && tokusei1 != tokusei0) {
+            msgctrlSetValue(0x37,
+                            GSmsgGetGSchar((u32)pokemonTokuseiDataBiosGetName(
+                                pokemonTokuseiDataBiosGetPtr(tokusei1))));
+            fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x20b42) - sprite->field_50 + 4,
+                        *(s16*)(lbl_802EF0A8 + 0x20b44) - sprite->field_52,
+                        alphaSprite->alphaByte | -0x100, (void*)0xe7);
+        }
+    } else {
+        fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x5a5a) - sprite->field_50 + 4,
+                    *(s16*)(lbl_802EF0A8 + 0x5a5c) - sprite->field_52,
+                    alphaSprite->alphaByte | -0x100, (void*)0x3721);
+    }
+
+    if (pdaEntrySeen() != 0) {
+        height = pdaCurrentHeight();
+        lbl_803A67E8[9] = 0;
+        lbl_803A67E8[8] = 0x27;
+        i = 7;
+        lbl_803A67E8[7] = 0x27;
+        digits = 3;
+        for (;;) {
+            digit = height % 10;
+            height = height / 10;
+            if (digits > 0) {
+                digits--;
+            } else if (digit == 0) {
+                break;
+            }
+            lbl_803A67E8[--i] = digit + 0x30;
+            if (digits == 1) {
+                lbl_803A67E8[--i] = 0x27;
+            }
+        }
+        msgctrlSetValue(0x37, (u32)&lbl_803A67E8[i]);
+        fn_800FB8C8(lbl_8047A4F0 +
+                        (*(s16*)(lbl_802EF0A8 + 0x5a76) - sprite->field_50),
+                    *(s16*)(lbl_802EF0A8 + 0x5a78) - sprite->field_52,
+                    *(s16*)(lbl_802EF0A8 + 0x5a7a),
+                    *(s16*)(lbl_802EF0A8 + 0x5a7c),
+                    (void*)(alphaSprite->alphaByte | -0x100), 0xcf);
+    } else {
+        fn_800FBB34(lbl_8047A4F0 +
+                        (*(s16*)(lbl_802EF0A8 + 0x5a76) - sprite->field_50),
+                    *(s16*)(lbl_802EF0A8 + 0x5a78) - sprite->field_52,
+                    *(s16*)(lbl_802EF0A8 + 0x5a7a),
+                    *(s16*)(lbl_802EF0A8 + 0x5a7c),
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x371b);
+    }
+
+    if (pdaEntrySeen() != 0) {
+        weight = pdaCurrentWeight();
+        msgctrlSetValue(0x34, weight / 10);
+        msgctrlSetValue(0x35, weight - weight / 10 * 10);
+        fn_800FBB34(lbl_8047A4F0 +
+                        (*(s16*)(lbl_802EF0A8 + 0x5a92) - sprite->field_50),
+                    *(s16*)(lbl_802EF0A8 + 0x5a94) - sprite->field_52,
+                    *(s16*)(lbl_802EF0A8 + 0x5a96),
+                    *(s16*)(lbl_802EF0A8 + 0x5a98),
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x189c);
+    } else {
+        fn_800FBB34(lbl_8047A4F0 +
+                        (*(s16*)(lbl_802EF0A8 + 0x5a92) - sprite->field_50),
+                    *(s16*)(lbl_802EF0A8 + 0x5a94) - sprite->field_52,
+                    *(s16*)(lbl_802EF0A8 + 0x5a96),
+                    *(s16*)(lbl_802EF0A8 + 0x5a98),
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x371a);
+    }
+
+    if (pdaEntrySeen() != 0) {
+        msgctrlSetValue(0x31, pokemonDataBiosGetTypeName(pdaCurrentData()));
+    } else {
+        msgctrlSetValue(0x31, 0x371c);
+    }
+    fn_800FBB34(lbl_8047A4F0 +
+                    (*(s16*)(lbl_802EF0A8 + 0x5a22) - sprite->field_50),
+                *(s16*)(lbl_802EF0A8 + 0x5a24) - sprite->field_52,
+                *(s16*)(lbl_802EF0A8 + 0x5a26),
+                *(s16*)(lbl_802EF0A8 + 0x5a28),
+                (void*)(alphaSprite->alphaByte | -0x100), 0x371e);
+}
+#pragma peephole reset
