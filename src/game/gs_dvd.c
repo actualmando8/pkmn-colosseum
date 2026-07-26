@@ -379,11 +379,13 @@ typedef struct GSFilter {
 typedef struct GSFilterState {
     GSFilter* filters;
     u8* colors;
-    u8 _pad08[0x10];
+    u16 viewport[8];
     u8 capacity;
     u8 count;
     u8 drawingCount;
-    u8 _pad1B[5];
+    u8 _pad1B;
+    u16 filterHandle;
+    u16 colorHandle;
     u32 renderState;
 } GSFilterState;
 
@@ -479,6 +481,12 @@ extern void fn_800D67BC(u32);
 extern void fn_800D5FA4(u32);
 extern void fn_800D5A38(u32, u32);
 extern void fn_800D6728(void);
+extern u16 _toolentryAlloc__FUl(u32 size);
+extern void* fn_800D7894(void);
+extern void fn_800D7868(void*, u32, u32, u32, u32, u8, void*, u8);
+extern void fn_800D75F4(void*);
+extern void* memset(void*, int, u32);
+extern GSFilter* lbl_8047B100;
 
 void _sndInitParms(GSsndEntry* entry, GSsndWork* work);
 s32 fn_80167ED0(GSDVDWork* work, void* addr, s32 length, s32 offset);
@@ -532,6 +540,7 @@ void fn_80167B70(void)
 
 u8 fn_80167070(u32 index, u32 stop)
 {
+    extern void fn_8016782C(u8* flag);
     GSsndEntry* entry = &lbl_80478FAC[index];
     GSsndWork* work;
 
@@ -556,6 +565,7 @@ u8 fn_80167118(u32 slot, u32 stream, const char* path, u32 offset,
                void* resourceOwner, u32 resourceId3, u32 resourceId1,
                u32 resourceId2)
 {
+    extern void fn_80167B70();
     GSsndOpenState* state = &lbl_80478FB4[slot];
     void* resource1;
     void* resource2;
@@ -603,7 +613,7 @@ u8 fn_80167118(u32 slot, u32 stream, const char* path, u32 offset,
         return 0;
     }
     if (stream == 1) {
-        fn_80167B70();
+        fn_80167B70(lbl_8047B0C0);
         fn_80167E64((u8*)lbl_8047B0BC);
     }
     state->active = 1;
@@ -616,10 +626,16 @@ void* _sndSetSampleDataUploadCallbackFunction(u32 offset, u32 length)
 
     while (ARGetDMAStatus() != 0) {
     }
-    do {
+    for (;;) {
         result = fn_80167ED0(lbl_8047B0BC, lbl_8047B0C0, length,
                             offset + lbl_8047B0B8);
-    } while (result >= -3 && result != -2 && result < 0);
+        switch (result) {
+        case -3:
+        case -1:
+            continue;
+        }
+        break;
+    }
     return lbl_8047B0C0;
 }
 
@@ -631,19 +647,20 @@ u32 fn_8016758C(GSsndEntry* entry, u32 id)
         fn_80166B3C(id, 0, 0);
     }
     work = entry->work;
-    if (work == NULL) {
-        return 0;
+    if (work != NULL) {
+        work->handle =
+            sndFXStartEx(entry->waveId, work->priority, work->unk2, 0);
+        sndFXCtrl(work->handle, 7, work->priority);
+        return 1;
     }
-    work->handle = sndFXStartEx(entry->waveId, work->priority, work->unk2, 0);
-    sndFXCtrl(work->handle, 7, work->priority);
-    return 1;
+    return 0;
 }
 
 u32 fn_8016761C(GSsndEntry* entry, u16 value)
 {
     GSsndStartParams params;
-    GSsndWork* work = entry->work;
     void* resource;
+    GSsndWork* work = entry->work;
 
     if (work == NULL || ((GSsndFlagBits*)&entry->flags)->active != 1 ||
         work->handle != -1U) {
@@ -809,9 +826,9 @@ void fn_8016821C(void)
 
 void fn_80168284(void)
 {
-    GSFilter* filter;
+    u32 index;
     u8 capacity;
-    u8 index;
+    GSFilter* filter;
 
     if (lbl_804526E0.count == 0 || lbl_804526E0.drawingCount == 0) {
         return;
@@ -902,27 +919,95 @@ GSFilter* GSfilterCreate(const u8* color)
     GSFilter* filter;
     u8 index;
 
-    if (lbl_804526E0.count >= lbl_804526E0.capacity) {
-        return NULL;
-    }
-    filter = lbl_804526E0.filters;
-    for (index = 0; index < lbl_804526E0.capacity; index++, filter++) {
-        if (filter->active == 0) {
-            u8* destination = &lbl_804526E0.colors[index * 4];
-            destination[0] = color[0];
-            destination[1] = color[1];
-            destination[2] = color[2];
-            destination[3] = color[3];
-            if (color[3] != 0 && filter->drawing == 0) {
-                filter->drawing = 1;
-                lbl_804526E0.drawingCount++;
+    if (lbl_804526E0.count < lbl_804526E0.capacity) {
+        filter = lbl_804526E0.filters;
+        for (index = 0; index < lbl_804526E0.capacity; index++, filter++) {
+            if (filter->active == 0) {
+                u8* destination = &lbl_804526E0.colors[index * 4];
+                destination[0] = color[0];
+                destination[1] = color[1];
+                destination[2] = color[2];
+                destination[3] = color[3];
+                if (color[3] != 0 && filter->drawing == 0) {
+                    filter->drawing = 1;
+                    lbl_804526E0.drawingCount++;
+                }
+                filter->active = 1;
+                lbl_804526E0.count++;
+                return filter;
             }
-            filter->active = 1;
-            lbl_804526E0.count++;
-            return filter;
         }
     }
     return NULL;
+}
+
+void fn_80168638(u32 capacity)
+{
+    u32 size;
+    u16 handle;
+    u32 index;
+    void* renderState;
+    u32 clearColor;
+
+    memset(&lbl_804526E0, 0, sizeof(GSFilterState));
+    size = (capacity & 0xFF) * sizeof(GSFilter);
+
+    handle = _toolentryAlloc__FUl(size);
+    if (handle == 0) {
+        return;
+    }
+    lbl_804526E0.filterHandle = handle;
+    lbl_804526E0.filters = fn_800E27B0(handle);
+    memset(lbl_804526E0.filters, 0, size);
+
+    handle = _toolentryAlloc__FUl(size);
+    if (handle == 0) {
+        fn_800E24B0(lbl_804526E0.filterHandle);
+        fn_800E209C(lbl_804526E0.filterHandle);
+        memset(&lbl_804526E0, 0, sizeof(GSFilterState));
+        return;
+    }
+    lbl_804526E0.colorHandle = handle;
+    lbl_804526E0.colors = fn_800E27B0(handle);
+    memset(lbl_804526E0.colors, 0, size);
+
+    handle = _toolentryAlloc__FUl(size);
+    if (handle == 0) {
+        fn_800E24B0(lbl_804526E0.filterHandle);
+        fn_800E209C(lbl_804526E0.filterHandle);
+        fn_800E24B0(lbl_804526E0.colorHandle);
+        fn_800E209C(lbl_804526E0.colorHandle);
+        if (lbl_804526E0.renderState != 0) {
+            fn_800D75F4((void*)lbl_804526E0.renderState);
+        }
+        memset(&lbl_804526E0, 0, sizeof(GSFilterState));
+        return;
+    }
+
+    lbl_804526E0.viewport[0] = 0;
+    lbl_804526E0.viewport[1] = 0;
+    lbl_804526E0.viewport[2] = 0;
+    lbl_804526E0.viewport[3] = 480;
+    lbl_804526E0.viewport[4] = 640;
+    lbl_804526E0.viewport[5] = 480;
+    lbl_804526E0.viewport[6] = 640;
+    lbl_804526E0.viewport[7] = 0;
+    lbl_804526E0.capacity = capacity;
+
+    renderState = fn_800D7894();
+    if (renderState != NULL) {
+        fn_800D7868(renderState, 1, 1, 0, 2, 0, lbl_804526E0.viewport, 4);
+        fn_800D7868(renderState, 4, 1, 6, 10, 0, lbl_804526E0.colors, 4);
+    }
+    lbl_804526E0.renderState = (u32)renderState;
+
+    for (index = 0; index < (capacity & 0xFF); index++) {
+        lbl_804526E0.filters[index].index = index;
+    }
+
+    clearColor = 0;
+    lbl_8047B100 = GSfilterCreate((const u8*)&clearColor);
+    GSgappCreate(1, 0xFC, 0, fn_80168284);
 }
 
 u32 fn_8016737C(GSsndEntry* entry, u32 volume, u32 limit)
