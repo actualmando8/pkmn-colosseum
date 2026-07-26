@@ -324,6 +324,12 @@ config.libs = [
                 mw_version="GC/1.3",
                 progress_category="runtime",
             ),
+            Object(
+                CodeCandidate,
+                "trk/TRKDispatch_range_800C0504.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
             *[
                 Object(status, path, mw_version="GC/1.3", progress_category="runtime")
                 for status, path in [
