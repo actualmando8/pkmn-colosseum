@@ -339,6 +339,12 @@ config.libs = [
                     (CodeCandidate, "trk/TRKDispatch_candidate_800C0E60.c"),
                 ]
             ],  # PR414_TRK_DISPATCH
+            Object(
+                CodeCandidate,
+                "trk/TRKInterrupt.c",
+                mw_version="GC/1.3",
+                progress_category="runtime",
+            ),
             Object(CodeCandidate, "trk/TRKTarget_range_800C1348.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(Matching, "trk/TRKTarget_exact_800C1548.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
             Object(CodeCandidate, "trk/TRKTarget_residual_800C17CC.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK3
@@ -393,6 +399,12 @@ config.libs = [
                 Matching,
                 "crt/mem.c",
                 mw_version="GC/2.0",
+                progress_category="runtime",
+            ),
+            Object(
+                CodeCandidate,
+                "crt/string_range_800CA78C.c",
+                mw_version="GC/1.3",
                 progress_category="runtime",
             ),
             Object(

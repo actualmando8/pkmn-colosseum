@@ -52,7 +52,7 @@ extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
 /* Additional externs used by various functions */
 extern void  GSmodelFree(u32);     /* GSmem release/unref */
 extern void  fn_800D2738(void);
-extern void* menuDataBiosGetPtr(void);    /* linked list head */
+extern void* menuDataBiosGetPtr(void* key);
 extern void* menuItemBiosGetPtr(s16 idx); /* node by index */
 extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
@@ -96,6 +96,7 @@ extern f32 lbl_8047CDC0;  /* sdata2: float constant */
 extern f32 lbl_8047CDC4;  /* sdata2: float constant */
 extern u16 lbl_8047CDE0;  /* sdata2: */
 extern u16 lbl_8047CDE4;  /* sdata2: */
+extern u16 lbl_8047E718;
 extern f32 lbl_8047CD80;  /* sdata2: float constant */
 extern f32 lbl_8047CD84;  /* sdata2: float constant */
 extern f32 lbl_8047CD88;  /* sdata2: float constant */
@@ -138,7 +139,7 @@ extern void  windowClose(void* ptr, u32 flags);
 extern void* windowSearchID(s32 param);
 extern s32   _menuCBOffScreen__FP9GStextureUlPv(void);
 extern void  winSpriteSetDisp(void* node, u32 enable);
-extern void  windowGetValue(s32 param);
+extern s32   windowGetValue(s32 param);
 extern void  windowCheckCursor(void* p, u8 flags);
 extern void  windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8    menuOffScreenFadeSync(u8 param);
@@ -176,7 +177,7 @@ extern s32 menuGetSelectItemNum(void);
 extern s32 menuGetCursorFromItemID(void* unused, u32 param);
 extern void fn_801021F8(void* p, u32 val);
 extern void menuSetDisp(void* p, u32 enable);
-extern void* menuGetCursorItemID(void* p, u32 target);
+extern s32   menuGetCursorItemID(s32 windowId);
 extern s32 menuSetCursor(void* p, u32 val);
 extern s32 menuGetCursor(void* p);
 extern s32 menuCloseSync(void* p, u8 flag);
@@ -209,9 +210,9 @@ extern u32 windowGetParam(void* ptr, u32 idx);
 extern void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data);
 extern void windowDrawSprite2(void* r3, void* r4, s16 r5, s16 r6, s32 r7, s32 r8, s32 r9, s32 r10);
 extern u8* windowGetCursorToItem(u8* arg);
-extern void windowGetValue(s32 param);
+extern s32 windowGetValue(s32 param);
 extern s32 fn_801044D0(s32 param, u16* val);
-extern void windowGetCursor(void);
+extern u32 windowGetCursor(s32 param);
 extern void windowCheckCursor(void* p, u8 flags);
 extern u32 windowGetActiveID(void);
 extern void* windowSearchItemID(void* head, s32 key);
@@ -388,14 +389,35 @@ u8* windowGetCursorToItem(u8* arg) {
 #pragma pop
 
 /* 0x801043A4 | 0x12C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowGetValue(s32 param) {
-    /* TODO: match -- 300 bytes at 0x801043A4 */
-    (void)param;
+static inline void* mdl_find(s32 param);
+
+s32 windowGetValue(s32 param) {
+    u8* window = mdl_find(param);
+    u8* menuData;
+    u32 type;
+
+    if (window == NULL || window[0x99] != 0) {
+        return -1;
+    }
+    menuData = menuDataBiosGetPtr(*(void**)(window + 0x04));
+    if (menuData == NULL) {
+        return (s8)window[0x94] + (s8)window[0x95];
+    }
+
+    type = (menuData[0] >> 6) & 3;
+    switch (type) {
+    case 0:
+        return 0;
+    case 1:
+        return (s8)window[0x94] + (s8)window[0x95];
+    case 2:
+        return *(s32*)(window + 0x80);
+    case 3:
+        return menuGetCursorItemID(param);
+    default:
+        return -1;
+    }
 }
-#pragma pop
 
 /* shared model-table lookup, inlined by the find-and-act helpers below */
 static inline void* mdl_find(s32 param) {
@@ -425,13 +447,17 @@ s32 fn_801044D0(s32 param, u16* val) {
 #pragma pop
 
 /* 0x80104530 | 0x78 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void windowGetCursor(void) {
-    /* TODO: match -- 120 bytes at 0x80104530 */
+u32 windowGetCursor(s32 param) {
+    u8* window = mdl_find(param);
+    u16 cursor;
+
+    if (window != NULL) {
+        cursor = *(u16*)(window + 0x94);
+    } else {
+        cursor = lbl_8047E718;
+    }
+    return (u32)cursor << 16;
 }
-#pragma pop
 
 /* 0x801045A8 | 0x110 */
 #pragma push
@@ -614,4 +640,3 @@ void fn_80105634(void) {
     /* TODO: match -- 664 bytes at 0x80105634 */
 }
 #pragma pop
-

@@ -15,6 +15,14 @@
 extern void* memset(void* dst, int val, u32 size);
 extern void* memcpy(void* dst, const void* src, u32 n);
 extern void  GSlogWrite(const char* fmt, ...);         /* OSReport / GSlog */
+extern void  fn_800FE6D0(s16 x, s16 y);
+extern void  spriteSetEnv(void);
+extern void  fn_8001EC08(s32, s32, s16, s16, u8, s32);
+extern void  fn_800FBE7C(void* message, u32 state, u8 flag);
+extern void  fn_800FBD88(void* message);
+extern u32   GSmsgGetRect(void* message);
+extern void  GSmsgExec(void* message, u8 a, u8 b);
+extern s32   GSmsgIsCheck(void* message);
 
 /* GSmem */
 extern u16   _toolentryAlloc__FUl(u32 size);                     /* GSmemAllocRaw */
@@ -226,8 +234,8 @@ extern void windowInit(u16 count);
 extern void windowGetPortKeyInfo(void);
 extern void* windowGetKeyInfo(void);
 extern void fn_80105634(void);
-extern void winMsgDraw(void);
-extern void winMsgCtrl(void);
+extern s32 winMsgDraw(u8* window, u8* item);
+extern s32 winMsgCtrl(u8* window);
 extern void winMsgButton(void* p);
 extern void winMsgCloseLevelUpStatus(u8 wait);
 extern s32 winMsgOpenLevelUpFiledStatus(u32 message, u32 wait);
@@ -240,12 +248,12 @@ extern s32 winMsgOpenFightNoWait(u32 message, u32 wait, u8 pause);
 extern s32 winMsgOpenFight(u32 message, u32 wait, u8 pause);
 extern s32 winMsgCheckField(void);
 extern void winMsgCloseField(u8 wait);
-extern void winMsgOpenFieldWithSE(void);
-extern void winMsgOpenField(void);
-extern void winMsgCheck(void);
-extern void winMsgClose(void);
-extern void winMsgOpenWithSE(void);
-extern void winMsgOpen(void);
+extern s32 winMsgOpenFieldWithSE(u32 message, u32 wait, u8 pause, u8 sound);
+extern s32 winMsgOpenField(u32 message, u32 wait, u8 pause);
+extern s32 winMsgCheck(void);
+extern void winMsgClose(u8 wait);
+extern s32 winMsgOpenWithSE(s8 type, u32 message, u32 wait, u8 pause, u8 sound);
+extern s32 winMsgOpen(s8 type, u32 message, u32 wait, u8 pause);
 extern void fn_80106F98(void);
 extern s32 winSeqCheckMove(s32 param);
 extern s32 fn_80107170(s32 r3, s32 r31);
@@ -311,22 +319,97 @@ static inline void winMsgCloseCurrent(u8 wait)
 }
 
 /* 0x801058CC | 0x170 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgDraw(void) {
-    /* TODO: match -- 368 bytes at 0x801058CC */
+s32 winMsgDraw(u8* window, u8* item) {
+    u8* work = windowGetFreeWork(window);
+    s16 x;
+    s16 y;
+    s16 left;
+    s16 top;
+
+    if (*(s32*)(window + 0x04) == 0x50) {
+        x = *(s16*)(work + 0x0C);
+        y = *(s16*)(work + 0x0E);
+    } else {
+        x = *(s16*)(item + 0x54);
+        y = *(s16*)(item + 0x56);
+    }
+
+    left = *(s16*)(window + 0x84) + *(s16*)(item + 0x50);
+    top = *(s16*)(window + 0x86) + *(s16*)(item + 0x52)
+        + (*(s16*)(item + 0x56) - 4 - y);
+    fn_800FE6D0(left, top);
+    spriteSetEnv();
+
+    switch (*(s32*)(window + 0x04)) {
+    case 0x40:
+    case 0x50:
+    case 0x51:
+        fn_8001EC08(0, 2, x, y, window[0x8B], 1);
+        break;
+    case 0x10C:
+        fn_8001EC08(0, 2, x, y, window[0x8B], 0);
+        break;
+    }
+
+    if ((s8)window[1] == 2 && *(s32*)(window + 0x04) != 0x51) {
+        fn_800FBE7C(*(void**)work, *(u32*)(work + 0x08),
+                    (window[0] & 4) == 0);
+        *(u32*)(work + 0x08) = 0;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x80105A3C | 0x1F4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCtrl(void) {
-    /* TODO: match -- 500 bytes at 0x80105A3C */
+s32 winMsgCtrl(u8* window) {
+    u8* work = windowGetFreeWork(window);
+    u8 ready = 0;
+    u32 rect;
+
+    switch ((s8)window[1]) {
+    case 0:
+        if (*(void**)work != NULL) {
+            fn_800FBD88(*(void**)work);
+        }
+        *(u32*)work = windowGetParam(window, 0);
+        work[4] = (u8)windowGetParam(window, 1);
+        work[5] = (u8)windowGetParam(window, 2);
+
+        if ((s8)window[2] == 0
+            || (u8)winSeqIsCheck(*(s32*)(window + 0x04), 0x2A) == 1
+            || window[0x0A] != 0) {
+            ready = 1;
+        }
+        if (ready != 0) {
+            winSeqSetMenu(*(s32*)(window + 0x04),
+                          *(s32*)(window + 0x04) == 0x40 ? 0x26 : 0x22);
+            window[2] = 1;
+        }
+        if (*(s32*)(window + 0x04) == 0x50) {
+            rect = GSmsgGetRect(*(void**)work);
+            *(s16*)(work + 0x0C) = (s16)(rect >> 16);
+            *(s16*)(work + 0x0E) = (s16)rect;
+        }
+        break;
+    case 2:
+        if ((s8)window[2] == 0) {
+            GSmsgExec(*(void**)work, work[4], work[5]);
+            window[2] = 1;
+        }
+        window[0x98] = GSmsgIsCheck(*(void**)work) == 0;
+        break;
+    case 3:
+        if ((s8)window[2] == 0) {
+            winSeqSetMenu(*(s32*)(window + 0x04), 0x2A);
+            window[2] = 1;
+        }
+        break;
+    case 5:
+        fn_800FBD88(*(void**)work);
+        *(void**)work = NULL;
+        break;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x80105C30 | 0x38 */
 void winMsgButton(void* p) {
@@ -498,55 +581,128 @@ void winMsgCloseField(u8 wait) {
 }
 
 /* 0x80106698 | 0x150 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenFieldWithSE(void) {
-    /* TODO: match -- 336 bytes at 0x80106698 */
+s32 winMsgOpenFieldWithSE(u32 message, u32 wait, u8 pause, u8 sound) {
+    u8 flags = 0;
+
+    if (lbl_80478B30 != 3 && lbl_8047AD10 == 0) {
+        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        if ((u8)menuIsCheck(old_id)) {
+            menuCloseCustom((void*)old_id, 2, wait);
+        }
+    }
+    lbl_80478B30 = 3;
+    if (pause != 0) {
+        flags |= 1;
+    }
+    return menuOpenCustom((void*)0x40, windowGetActiveID(), 0, 0,
+                          (void*)wait, 3, message, flags, sound);
 }
-#pragma pop
 
 /* 0x801067E8 | 0x14C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenField(void) {
-    /* TODO: match -- 332 bytes at 0x801067E8 */
+s32 winMsgOpenField(u32 message, u32 wait, u8 pause) {
+    u8 flags = 0;
+
+    if (lbl_80478B30 != 3 && lbl_8047AD10 == 0) {
+        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        if ((u8)menuIsCheck(old_id)) {
+            menuCloseCustom((void*)old_id, 2, wait);
+        }
+    }
+    lbl_80478B30 = 3;
+    if (pause != 0) {
+        flags |= 1;
+    }
+    return menuOpenCustom((void*)0x40, windowGetActiveID(), 0, 0,
+                          (void*)wait, 3, message, flags, 0);
 }
-#pragma pop
 
 /* 0x80106934 | 0xC8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCheck(void) {
-    /* TODO: match -- 200 bytes at 0x80106934 */
+s32 winMsgCheck(void) {
+    u8* window = windowSearchID(winMsgGetMenuId(lbl_80478B30));
+
+    if (window == NULL) {
+        return -1;
+    }
+    if (window[0x98] != 0) {
+        return 0;
+    }
+    return window[0x99] == 0;
 }
-#pragma pop
 
 /* 0x801069FC | 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgClose(void) {
-    /* TODO: match -- 224 bytes at 0x801069FC */
+void winMsgClose(u8 wait) {
+    winMsgCloseCurrent(wait);
+    if (lbl_8047AD10 == 0) {
+        lbl_80478B30 = -1;
+    }
 }
-#pragma pop
 
 /* 0x80106ADC | 0x260 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenWithSE(void) {
-    /* TODO: match -- 608 bytes at 0x80106ADC */
+s32 winMsgOpenWithSE(s8 type, u32 message, u32 wait, u8 pause, u8 sound) {
+    s32 id = winMsgGetMenuId(type);
+    s32 parent;
+    u8 flags = 0;
+    u8 error = 0;
+
+    if (id == 0) {
+        return 0;
+    }
+    if (type == 6) {
+        error = 1;
+        parent = -1;
+        lbl_8047AD10 = 1;
+        wait = 0;
+    } else {
+        if (type != lbl_80478B30 && lbl_8047AD10 == 0) {
+            s32 old_id = winMsgGetMenuId(lbl_80478B30);
+            if ((u8)menuIsCheck(old_id)) {
+                menuCloseCustom((void*)old_id, 2, wait);
+            }
+        }
+        lbl_80478B30 = type;
+        parent = windowGetActiveID();
+    }
+    if (pause != 0) {
+        flags |= 1;
+    }
+    if (error != 0) {
+        flags |= 2;
+    }
+    return menuOpenCustom((void*)id, parent, 0, 0, (void*)wait, 3,
+                          message, flags, sound);
 }
-#pragma pop
 
 /* 0x80106D3C | 0x25C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpen(void) {
-    /* TODO: match -- 604 bytes at 0x80106D3C */
+s32 winMsgOpen(s8 type, u32 message, u32 wait, u8 pause) {
+    s32 id = winMsgGetMenuId(type);
+    s32 parent;
+    u8 flags = 0;
+    u8 error = 0;
+
+    if (id == 0) {
+        return 0;
+    }
+    if (type == 6) {
+        error = 1;
+        parent = -1;
+        lbl_8047AD10 = 1;
+        wait = 0;
+    } else {
+        if (type != lbl_80478B30 && lbl_8047AD10 == 0) {
+            s32 old_id = winMsgGetMenuId(lbl_80478B30);
+            if ((u8)menuIsCheck(old_id)) {
+                menuCloseCustom((void*)old_id, 2, wait);
+            }
+        }
+        lbl_80478B30 = type;
+        parent = windowGetActiveID();
+    }
+    if (pause != 0) {
+        flags |= 1;
+    }
+    if (error != 0) {
+        flags |= 2;
+    }
+    return menuOpenCustom((void*)id, parent, 0, 0, (void*)wait, 3,
+                          message, flags, 0);
 }
-#pragma pop

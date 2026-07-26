@@ -5,6 +5,8 @@ extern void* memset(void* dst, int val, u32 len);
 
 extern s32  TRKTargetReadInstruction(u8* buf, u32 pc);
 extern void TRKAppendBuffer_ui8(s32 a, void* buf, u32 len);
+extern s32 TRKAppendBuffer_ui32(s32 buffer, u32* data, u32 count);
+extern s32 TRKReadBuffer_ui32(s32 buffer, u32* data, u32 count);
 
 /* TRK state and CPU state structures */
 extern u8 gTRKState[];
@@ -15,6 +17,14 @@ extern u8 lbl_80313834[];
 
 /* TRK exception status structure @ 0x80313824 */
 extern u8 gTRKExceptionStatus_80313824[];
+extern u8 gTRKRestoreFlags[];
+
+typedef struct TRKTargetExceptionStatus {
+    u32 words[3];
+    u8 pad_0C;
+    u8 exceptionDetected;
+    u8 pad_0E[2];
+} TRKTargetExceptionStatus;
 
 /* "TargetDoStep()\n" */
 extern u8 lbl_8026FB70[];
@@ -222,6 +232,97 @@ s32 TRKTargetReadInstruction(u8* buf, u32 pc) {
 #endif
 
 #if !defined(TRK_TARGET_RANGE_SPLIT)
+
+s32 TRKTargetAccessExtended1(u32 firstRegister, u32 lastRegister, s32 buffer,
+                             u32* transferSize, s32 read)
+{
+    TRKTargetExceptionStatus savedState;
+    s32 result;
+    u32* registers;
+    s32 registerCount;
+
+    if (lastRegister > 0x60) {
+        return 0x701;
+    }
+
+    savedState =
+        *(TRKTargetExceptionStatus*) gTRKExceptionStatus_80313824;
+    gTRKExceptionStatus_80313824[0xD] = 0;
+    *transferSize = 0;
+    if (firstRegister <= lastRegister) {
+        registers = (u32*) (gTRKCPUState + 0x1A8) + firstRegister;
+        registerCount = lastRegister - firstRegister + 1;
+        *transferSize += registerCount * sizeof(u32);
+        if (read) {
+            result = TRKAppendBuffer_ui32(buffer, registers, registerCount);
+        } else {
+            if (registers <= (u32*) (gTRKCPUState + 0x1EC) &&
+                registers + registerCount - 1 >=
+                    (u32*) (gTRKCPUState + 0x1E8))
+            {
+                gTRKRestoreFlags[0] = 1;
+            }
+            if (registers <= (u32*) (gTRKCPUState + 0x278) &&
+                registers + registerCount - 1 >=
+                    (u32*) (gTRKCPUState + 0x278))
+            {
+                gTRKRestoreFlags[1] = 1;
+            }
+            result = TRKReadBuffer_ui32(buffer, registers, registerCount);
+        }
+    }
+    if (gTRKExceptionStatus_80313824[0xD] != 0) {
+        *transferSize = 0;
+        result = 0x702;
+    }
+    *(TRKTargetExceptionStatus*) gTRKExceptionStatus_80313824 = savedState;
+    return result;
+}
+
+s32 TRKTargetAccessMemory(void* data, u32 start, u32* length,
+                          s32 accessOptions, s32 read)
+{
+    extern void* TRKTargetTranslate(u32 address);
+    extern s32 TRKValidMemory32(void* address, u32 length, s32 write);
+    extern u32 fn_800C0E60(void);
+    extern void TRK_ppc_memcpy(void* destination, const void* source,
+                               u32 length, u32 destinationMSR,
+                               u32 sourceMSR);
+    extern void TRK_flush_cache(void* address, u32 length);
+
+    TRKTargetExceptionStatus savedState =
+        *(TRKTargetExceptionStatus*) gTRKExceptionStatus_80313824;
+    s32 result;
+    u32 currentMSR;
+    void* address;
+    u32 targetMSR;
+
+    gTRKExceptionStatus_80313824[0xD] = 0;
+    address = TRKTargetTranslate(start);
+    result = TRKValidMemory32(address, *length, read == FALSE);
+    if (result != 0) {
+        *length = 0;
+    } else {
+        currentMSR = fn_800C0E60();
+        targetMSR =
+            currentMSR | (*(u32*) (gTRKCPUState + 0x1F8) & 0x10);
+        if (read) {
+            TRK_ppc_memcpy(data, address, *length, currentMSR, targetMSR);
+        } else {
+            TRK_ppc_memcpy(address, data, *length, targetMSR, currentMSR);
+            TRK_flush_cache(address, *length);
+            if ((void*) start != address) {
+                TRK_flush_cache((void*) start, *length);
+            }
+        }
+    }
+    if (gTRKExceptionStatus_80313824[0xD] != 0) {
+        *length = 0;
+        result = 0x702;
+    }
+    *(TRKTargetExceptionStatus*) gTRKExceptionStatus_80313824 = savedState;
+    return result;
+}
 
 /* TRKAccessFile - 0x800C29F0 | size: 0x8 | scope global */
 u32 TRKAccessFile(u32 cmd, u32 dir, u32* addrBuf, u32 len) {
