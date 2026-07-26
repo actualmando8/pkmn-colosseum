@@ -484,7 +484,12 @@ def _scan_functions(src: str):
 def prune_source(src: str, keep_fn: str):
     """Replace every top-level function body except keep_fn's with ';'.
     'static'/'asm' qualifiers on stripped definitions are rewritten so the
-    result still compiles (a declared-but-undefined static is an error)."""
+    result still compiles (a declared-but-undefined static is an error).
+
+    `static inline` helpers keep their bodies: the target may expand them, and
+    a declaration-only stub would change the isolated target's code.  This is
+    fail-closed -- if such a helper is *not* inlined it emits its own symbol
+    and the single-symbol gate rejects the unit."""
     funcs = _scan_functions(src)
     kept = [f for f in funcs if f[0] == keep_fn]
     if not kept:
@@ -493,6 +498,10 @@ def prune_source(src: str, keep_fn: str):
     pos = 0
     for name, hdr_start, body_open, body_close, knr_paren in funcs:
         if name == keep_fn:
+            continue
+        if knr_paren is None and re.search(
+            r"(^|\s)inline(\s)", src[hdr_start:body_open]
+        ):
             continue
         out.append(src[pos:hdr_start])
         if knr_paren is not None:
