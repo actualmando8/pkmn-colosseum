@@ -162,8 +162,8 @@ typedef struct PeopleEntry {
     u32  groupId;           /* 0x28 */
     u32  index;             /* 0x2C */
     void* scriptRef;        /* 0x30 */
-    u32  field_34;          /* 0x34 */
-    u32  field_38;          /* 0x38 */
+    f32  field_34;          /* 0x34 */
+    f32  field_38;          /* 0x38 */
     f32  talkRange;         /* 0x3C */
     f32  field_40;          /* 0x40 */
     u32  field_44;          /* 0x44 */
@@ -194,7 +194,7 @@ typedef struct PeopleEntry {
     u8   isTalkable;        /* 0x95 (stored from talk check) */
     u8   moveType;          /* 0x96 */
     u8   pad97;             /* 0x97 */
-    u32  field_98;          /* 0x98 */
+    f32  field_98;          /* 0x98 */
     u8   transform[0x0C];   /* 0x9C - 0xA7: position transform */
     f32  targetX;           /* 0xA8 */
     f32  targetY;           /* 0xAC */
