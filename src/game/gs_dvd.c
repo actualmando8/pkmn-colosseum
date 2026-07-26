@@ -128,120 +128,18 @@ void fn_80167FA4(void);
  *   lbl_80273748: "_sndCheckSndWorkALL:Start"
  *   lbl_80273764: "_sndCheckSndWorkALL:End"
  * ================================================================== */
-void _sndCheckSndWorkALL(void) {
-    extern u8 lbl_804526E0[];
-    extern f32 lbl_8047D5A0;
-    extern f32 lbl_8047D5A4;
-    extern f32 lbl_8047D5A8;
-    extern void fn_800D5A38();
-    extern void fn_800D5FA4();
-    extern void fn_800D6728();
-    extern void fn_800D67BC();
-    extern void fn_800D6A00();
-    extern void fn_800D7820();
-    extern void fn_800D888C();
-    extern void fn_800D88DC();
-    extern void fn_800D9B58();
-    extern void fn_800D9ED8();
-    extern void fn_800DA028();
-    extern void fn_800DA100();
-    extern void fn_800DA1E8();
-    extern void fn_800DA2BC();
-    extern void fn_800DA4C4();
-    u8 sp[0x20];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r7 = 0;
-    u32 r8 = 0;
-    u32 r29 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
-    f32 f1 = 0.0f;
-    f32 f2 = 0.0f;
-    f32 f3 = 0.0f;
-    f32 f4 = 0.0f;
+extern u32 lbl_8047B0E8;
+extern void fn_801666BC(u32 index);
 
-    r3 = (u32)lbl_804526E0;
-    r31 = (u32)lbl_804526E0;
-    tmp = *(u8*)((u8*)r31 + 0x19);
-    if (tmp == 0) return;
-    tmp = *(u8*)((u8*)r31 + 0x1A);
-    if (tmp == 0) return;
-    r30 = *(u8*)((u8*)r31 + 0x18);
-    r3 = 0x1;
-    r29 = *(u32*)((u8*)r31 + 0x0);
-    fn_800D88DC();
-    r3 = 0x6;
-    fn_800D888C();
-    f1 = lbl_8047D5A0;
-    f3 = lbl_8047D5A4;
-    f2 = f1;
-    f4 = lbl_8047D5A8;
-    fn_800D9B58();
-    r3 = 0x1;
-    r4 = 0x6;
-    r5 = 0x7;
-    fn_800DA4C4();
-    r3 = 0x1;
-    r4 = 0x1;
-    r5 = 0x0;
-    fn_800DA2BC();
-    r3 = 0x0;
-    r4 = 0x7;
-    r5 = 0x0;
-    r6 = 0x0;
-    r7 = 0x7;
-    r8 = 0x0;
-    fn_800DA100();
-    r3 = 0x1;
-    r4 = 0x1;
-    r5 = 0x1;
-    fn_800DA1E8();
-    r3 = 0x1;
-    fn_800D9ED8();
-    r3 = 0x0;
-    fn_800DA028();
-    r3 = (u32)lbl_804526E0;
-    r3 = (u32)lbl_804526E0;
-    r3 = *(u32*)((u8*)r3 + 0x20);
-    fn_800D7820();
-    r3 = 0x6;
-    fn_800D6A00();
-    tmp = *(u8*)((u8*)r31 + 0x1A);
-    fn_800D67BC();
-    for (r31 = 0x0; (r31 & 0xFF) < r30; r31++, r29 += 0x4) {
-        tmp = *(u8*)((u8*)r29 + 0x2);
-        if (tmp != 0) {
-            r3 = 0x0;
-            fn_800D5FA4();
-            r4 = r31;
-            r3 = 0x0;
-            fn_800D5A38();
-            r3 = 0x1;
-            fn_800D5FA4();
-            r4 = r31;
-            r3 = 0x0;
-            fn_800D5A38();
-            r3 = 0x2;
-            fn_800D5FA4();
-            r4 = r31;
-            r3 = 0x0;
-            fn_800D5A38();
-            r3 = 0x3;
-            fn_800D5FA4();
-            r4 = r31;
-            r3 = 0x0;
-            fn_800D5A38();
-        }
+void _sndCheckSndWorkALL(void)
+{
+    u32 i;
+
+    GSlogWrite(lbl_80273748);
+    for (i = 0; i < lbl_8047B0E8; i++) {
+        fn_801666BC(i);
     }
-    fn_800D6728();
-    r3 = 0x0;
-    fn_800D9ED8();
-
-    return;
+    GSlogWrite(lbl_80273764);
 }
 
 /*
@@ -290,6 +188,9 @@ extern u8 *lbl_8047B0C4;
 extern u32 lbl_8047B0C8;
 extern u8 *lbl_8047B0CC;
 extern u32 lbl_8047B0D0;
+extern u8 *lbl_8047B0DC;
+extern u32 lbl_8047B0E0;
+extern void winMsgOpenError(u32 message, u32 mode, u32 wait);
 
 void fn_80167040(u32 handle)
 {
@@ -326,6 +227,76 @@ void fn_8016782C(u8 *flag)
     enabled = OSDisableInterrupts();
     *flag = 0;
     OSRestoreInterrupts(enabled);
+}
+
+u8 *fn_80167864(void)
+{
+    BOOL enabled;
+    u32 i;
+    u8 *entry;
+    u8 *result;
+
+    enabled = OSDisableInterrupts();
+    entry = lbl_8047B0C4;
+    result = 0;
+    for (i = 0; i < lbl_8047B0C8; i++, entry += 0x78) {
+        if (*entry != 1) {
+            *entry = 1;
+            result = entry;
+            break;
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+u8 *fn_801678E4(void)
+{
+    BOOL enabled;
+    u32 i;
+    u8 *entry;
+    u8 *result;
+
+    enabled = OSDisableInterrupts();
+    entry = lbl_8047B0CC;
+    result = 0;
+    for (i = 0; i < lbl_8047B0D0; i++, entry += 0xD0) {
+        if (*entry != 1) {
+            *entry = 1;
+            result = entry;
+            break;
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+u8 *fn_80167964(void)
+{
+    BOOL enabled;
+    u32 i;
+    u8 *entry;
+    u8 *result;
+
+    enabled = OSDisableInterrupts();
+    entry = lbl_8047B0DC;
+    result = 0;
+    for (i = 0; i < lbl_8047B0E0; i++, entry += 0x14) {
+        if (*entry != 1) {
+            *entry = 1;
+            result = entry;
+            break;
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
+void _gsdvdError_MsgOpen(u32 message)
+{
+    if (message != 1) {
+        winMsgOpenError(message, 1, 1);
+    }
 }
 
 void fn_801679E4(void)

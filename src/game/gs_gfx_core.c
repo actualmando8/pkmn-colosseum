@@ -33,7 +33,7 @@ extern void* fn_800E27B0(u16 handle);                  /* GSmemGetPtr */
 
 /* SDK GX functions */
 extern void  fn_800AA2F0(void);                        /* GXSetViewport */
-extern void  fn_800BD640(void);                        /* GXSetProjection */
+extern void  fn_800BD640(f32, f32, f32, f32, f32, f32); /* GXSetProjection */
 extern void  fn_800BD744(void);                        /* GXLoadPosMtxImm */
 extern void  GXInvalidateTexAll(void);                        /* GXInvalidateTexAll */
 
@@ -486,13 +486,19 @@ extern u32 lbl_8047AB3C;
  *   ; mode 0: memcpy(lbl_80400248, r4, 0x5A0)
  *   ; mode 1: memcpy(r4=r31, lbl_80400248, 0x5A0)
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSgfx_VBlankCallback(s32 mode, void* buffer) {
-    /* TODO: match -- 120 bytes at 0x800D3E4C */
+void _gfxScratchNotify__F15GSscratchNotifyPvUc(s32 mode, void* buffer, u8 unused)
+{
+    switch (mode) {
+    case 0:
+        memcpy(lbl_80400248, buffer, 0x5A0);
+        lbl_8047AA80 = (u32)lbl_80400248;
+        break;
+    case 1:
+        memcpy(buffer, lbl_80400248, 0x5A0);
+        lbl_8047AA80 = (u32)buffer;
+        break;
+    }
 }
-#pragma pop
 
 
 /* ==================================================================
@@ -511,14 +517,20 @@ void GSgfx_VBlankCallback(s32 mode, void* buffer) {
  *   bl fn_800AA2F0                   ; GXSetViewport
  *   bl fn_800BD640                   ; GXSetProjection
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSgfx_PreRetraceCallback(s32 flag, f32 p1, f32 p2,
-                                f32 p3, f32 p4, f32 p5, f32 p6) {
-    /* TODO: match -- 140 bytes at 0x800D3EC4 */
+typedef void (*GSgfxRetraceCallback)(s32, f32, f32, f32, f32, f32, f32);
+extern GSgfxRetraceCallback lbl_8047AA88;
+
+void fn_800D3EC4(s32 flag, f32 p1, f32 p2, f32 p3, f32 p4, f32 p5, f32 p6)
+{
+    if (lbl_8047AA88 != 0) {
+        lbl_8047AA88(flag, p1, p2, p3, p4, p5, p6);
+    } else if (flag != 0) {
+        fn_800AA2F0();
+        fn_800BD640(p1, p2, p3, p4, p5, p6);
+    } else {
+        fn_800BD744();
+    }
 }
-#pragma pop
 
 
 /* ==================================================================
@@ -545,13 +557,20 @@ void GSgfx_DrawDoneCallback(void) {
  * Increment frame counter and dispatch queued operations.
  * 72 bytes.
  * ================================================================== */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GSgfx_FrameEndCallback(void) {
-    /* TODO: match -- 72 bytes at 0x800D3F5C */
+typedef void (*GSgfxFrameCallback)(u32);
+
+void fn_800D3F5C(void)
+{
+    u8* state = (u8*)lbl_8047AA80;
+    GSgfxFrameCallback callback;
+
+    (*(u32*)(state + 0x4C))++;
+    state = (u8*)lbl_8047AA80;
+    callback = *(GSgfxFrameCallback*)(state + 0x48);
+    if (callback != 0) {
+        callback(*(u32*)(state + 0x4C));
+    }
 }
-#pragma pop
 
 
 extern u8 lbl_8047AA91;

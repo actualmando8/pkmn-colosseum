@@ -191,8 +191,8 @@ extern void* heroBiosGetItemNormalPtr(u8* ptr, u16 idx);
 extern u32 heroBiosGetNamePtr(void* ptr);
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
-extern void fn_80113F48(void);
-extern void fn_8018C1E8(void);
+extern void* fn_80113F48(void);
+extern void fn_8018C1E8(void*, u32, u32);
 extern void fn_801653CC(void);
 extern void msgctrlSetValue(void);
 extern void winMsgOpen(void);
@@ -1433,83 +1433,58 @@ extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 /* 0x80115CB4 | 0xB0 */
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
-#if 0
-asm void fn_80115CB4(void) {
-#include "src/game/gs_field_world_fn_80115CB4.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-void* fn_80115CB4(u32 param) {
-    extern u32 lbl_80478EB8;
-    extern u32 lbl_80478EBC;
-    u32 r4 = param & 0x7FFF0000;
-    u32 r31;
-    u8* r30 = (u8*)0;
-    u32 r29;
-    u32 r28 = 0;
-    u32 r27;
-    if ((u32)(r4 - 0x7FFF0000) != 0) {
-        return (void*)0;
+
+void* floorEventGetTresureList(u32 param)
+{
+    u32 type = param & 0x7FFF0000;
+    u32 target;
+    u32 found = 0;
+    u32 index;
+    u8* entry = 0;
+
+    if (type != 0x7FFF0000) {
+        return 0;
     }
-    r27 = param & 0x1FF;
-    r29 = 0;
-    r31 = 0;
-    while (r29 < *(u32*)lbl_80478EB8) {
-        r30 = (u8*)lbl_80478EBC + r31;
-        if (*(u16*)(r30 + 0x4) == (u32)fn_800FF56C()) {
-            if (r27 == r28++) break;
-        }
-        r31 = r31 + 0x1c;
-        r29 = r29 + 0x1;
-    }
-    if (r29 == *(u32*)lbl_80478EB8) {
-        return (void*)0;
-    }
-    return (void*)r30;
-}
-#pragma pop
-#endif
-/* 0x80115D64 | 0xA0 */
-extern void fn_80113F48(void);
-extern void fn_8018C1E8(void);
-extern u32 lbl_80478EBC;
-extern u32 lbl_80478EB8;
-#if 0
-asm void fn_80115D64(void) {
-#include "src/game/gs_field_world_fn_80115D64.inc"
-}
-#else
-#pragma push
-#pragma peephole off
-void fn_80115D64(u32 r25, u32 r26) {
-    extern u32 lbl_80478EB8;
-    extern u32 lbl_80478EBC;
-    extern void* fn_80113F48();
-    extern void fn_8018C1E8();
-    u32 r27;
-    u32 r28 = 0;
-    u32 r29 = 0;
-    u8* r30 = (u8*)0;
-    u32 r31 = 0;
-    while (r29 < *(u32*)lbl_80478EB8) {
-        r30 = (u8*)lbl_80478EBC + r31;
-        if (*(u16*)(r30 + 0x4) == (u32)fn_800FF56C()) {
-            if (r29 == r25) {
-                r27 = r28 | (0x7fff << 16);
+
+    target = param & 0x1FF;
+    for (index = 0; index < *(u32*)lbl_80478EB8; index++) {
+        entry = (u8*)lbl_80478EBC + index * 0x1C;
+        if (*(u16*)(entry + 4) == (u32)fn_800FF56C()) {
+            if (target == found++) {
                 break;
             }
-            r28 = r28 + 0x1;
         }
-        r31 = r31 + 0x1c;
-        r29 = r29 + 0x1;
     }
-    if (r29 != *(u32*)lbl_80478EB8) {
-        fn_8018C1E8(fn_80113F48(), r27, r26);
+
+    if (index == *(u32*)lbl_80478EB8) {
+        return 0;
+    }
+    return entry;
+}
+
+/* 0x80115D64 | 0xA0 */
+void floorEventSetTresureDisp(u32 rawIndex, u32 display)
+{
+    u32 encoded;
+    u32 found = 0;
+    u32 index;
+    u8* entry;
+
+    for (index = 0; index < *(u32*)lbl_80478EB8; index++) {
+        entry = (u8*)lbl_80478EBC + index * 0x1C;
+        if (*(u16*)(entry + 4) == (u32)fn_800FF56C()) {
+            if (index == rawIndex) {
+                encoded = found | 0x7FFF0000;
+                break;
+            }
+            found++;
+        }
+    }
+
+    if (index != *(u32*)lbl_80478EB8) {
+        fn_8018C1E8(fn_80113F48(), encoded, display);
     }
 }
-#pragma pop
-#endif
 extern u32 lbl_80478EB8;
 extern u8 lbl_8035BB70[];
 extern u32 lbl_80478EBC;
