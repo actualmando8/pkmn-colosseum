@@ -223,34 +223,42 @@ def main() -> None:
         "--append", type=Path, help="add one point from a built report.json"
     )
     parser.add_argument(
-        "--write-history", action="store_true", help=f"refresh {HISTORY.name}"
+        "--history",
+        type=Path,
+        default=HISTORY,
+        help="series file to read and update (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--write-history", action="store_true", help="refresh the series file"
     )
     args = parser.parse_args()
+    history: Path = args.history
 
     if args.append:
-        rows = json.loads(HISTORY.read_text()) if HISTORY.exists() else []
+        rows = json.loads(history.read_text()) if history.exists() else []
         point = from_report(args.append)
         if is_duplicate(point, rows):
             print("progress unchanged since the last recorded point; nothing to do")
             return
         rows = merge(rows, [point])
         if args.write_history:
-            HISTORY.write_text(json.dumps(rows, indent=1) + "\n")
-            print(f"wrote {HISTORY} ({len(rows)} points)")
+            history.parent.mkdir(parents=True, exist_ok=True)
+            history.write_text(json.dumps(rows, indent=1) + "\n")
+            print(f"wrote {history} ({len(rows)} points)")
         render(rows, args.out)
         return
 
-    if args.merge or not HISTORY.exists():
+    if args.merge or not history.exists():
         groups = [from_readme()]
         if args.merge:
             groups.append(from_harvest(args.merge))
         rows = merge(*groups)
         if args.write_history:
-            HISTORY.parent.mkdir(parents=True, exist_ok=True)
-            HISTORY.write_text(json.dumps(rows, indent=1) + "\n")
-            print(f"wrote {HISTORY} ({len(rows)} points)")
+            history.parent.mkdir(parents=True, exist_ok=True)
+            history.write_text(json.dumps(rows, indent=1) + "\n")
+            print(f"wrote {history} ({len(rows)} points)")
     else:
-        rows = json.loads(HISTORY.read_text())
+        rows = json.loads(history.read_text())
 
     if not rows:
         raise SystemExit("no progress points found")

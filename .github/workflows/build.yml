@@ -80,12 +80,30 @@ jobs:
 
     # Render the progress chart from the report this run just built. Every point
     # on the chart is a real objdiff measurement, never a hand-entered number.
+    #
+    # The chart and its series live on the unprotected `progress-chart` branch,
+    # not on master: master requires status checks, so a push from inside a
+    # check is rejected (GH006) and would turn every master build red.
     - name: Render progress chart
       if: matrix.version == 'GC6E01'
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
+        REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}"
+        rm -rf /tmp/chart
+        if ! git clone --quiet --depth 1 --branch progress-chart "$REMOTE" /tmp/chart; then
+          echo "progress-chart branch missing; starting it"
+          git clone --quiet --depth 1 "$REMOTE" /tmp/chart
+          git -C /tmp/chart checkout --quiet --orphan progress-chart
+          git -C /tmp/chart rm -rq --cached .
+          find /tmp/chart -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
+        fi
+        # Writes nothing when the metrics are unchanged, so an ordinary no-op
+        # push produces no commit and cannot fill the branch with duplicate PNGs.
         uv run --with matplotlib tools/plot_progress.py \
             --append build/${{ matrix.version }}/report.json \
-            --write-history -o docs/progress.png
+            --history /tmp/chart/progress_history.json \
+            --write-history -o /tmp/chart/progress.png
 
     # On a PR the chart is a preview artifact only: it is not committed, and a
     # fork PR has no write token anyway.
@@ -94,24 +112,25 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: progress_chart_preview
-        path: docs/progress.png
+        path: /tmp/chart/progress.png
         if-no-files-found: ignore
 
-    # On master the new point is recorded so the README image stays current.
-    # plot_progress.py writes nothing when the metrics are unchanged, so an
-    # ordinary no-op push produces no commit and the loop terminates.
-    - name: Commit updated chart
+    # On master the measured point is published so the README image stays
+    # current. The branch carries only the chart and its series, so master's
+    # history stays free of regenerated binaries.
+    - name: Publish progress chart
       if: >-
         github.event_name == 'push'
         && github.ref == 'refs/heads/master'
         && matrix.version == 'GC6E01'
       run: |
-        if git diff --quiet -- docs/progress.png docs/progress_history.json; then
-          echo "progress unchanged; nothing to commit"
+        cd /tmp/chart
+        git add progress.png progress_history.json
+        if git diff --cached --quiet; then
+          echo "progress unchanged; nothing to publish"
           exit 0
         fi
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add docs/progress.png docs/progress_history.json
-        git commit -m "chore: update progress chart [skip ci]"
-        git push origin HEAD:master
+        git commit --quiet -m "Update progress chart for ${GITHUB_SHA}"
+        git push --quiet origin progress-chart
