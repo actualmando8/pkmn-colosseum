@@ -16,7 +16,8 @@ typedef struct GXData_800B771C {
     /* 0x008 */ u8 _008[0xC];
     /* 0x014 */ u32 vcdLo;
     /* 0x018 */ u32 vcdHi;
-    /* 0x01C */ u8 _01C[0x400];
+    /* 0x01C */ u8 _01C[0x3FC];
+    /* 0x418 */ u32 nrmType;
     /* 0x41C */ u8 hasNrms;
     /* 0x41D */ u8 hasBiNrms;
     /* 0x41E */ u8 _41E[0xD6];
@@ -31,6 +32,127 @@ extern const u8 lbl_80478A70[];
 
 #define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
 #define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
+
+typedef struct GXVtxAttrFmtList_800B771C {
+    s32 attr;
+    s32 cnt;
+    s32 type;
+    u8 frac;
+} GXVtxAttrFmtList_800B771C;
+
+static inline void SetVcdAttr(s32 attr, s32 type)
+{
+    switch (attr) {
+    case 0: gx->vcdLo = (gx->vcdLo & ~1U) | type; break;
+    case 1: gx->vcdLo = (gx->vcdLo & ~2U) | (type << 1); break;
+    case 2: gx->vcdLo = (gx->vcdLo & ~4U) | (type << 2); break;
+    case 3: gx->vcdLo = (gx->vcdLo & ~8U) | (type << 3); break;
+    case 4: gx->vcdLo = (gx->vcdLo & ~0x10U) | (type << 4); break;
+    case 5: gx->vcdLo = (gx->vcdLo & ~0x20U) | (type << 5); break;
+    case 6: gx->vcdLo = (gx->vcdLo & ~0x40U) | (type << 6); break;
+    case 7: gx->vcdLo = (gx->vcdLo & ~0x80U) | (type << 7); break;
+    case 8: gx->vcdLo = (gx->vcdLo & ~0x100U) | (type << 8); break;
+    case 9: gx->vcdLo = (gx->vcdLo & ~0x600U) | (type << 9); break;
+    case 10:
+        if (type != 0) {
+            gx->hasNrms = 1;
+            gx->hasBiNrms = 0;
+            gx->nrmType = type;
+        } else {
+            gx->hasNrms = 0;
+        }
+        break;
+    case 25:
+        if (type != 0) {
+            gx->hasBiNrms = 1;
+            gx->hasNrms = 0;
+            gx->nrmType = type;
+        } else {
+            gx->hasBiNrms = 0;
+        }
+        break;
+    case 11: gx->vcdLo = (gx->vcdLo & ~0x6000U) | (type << 13); break;
+    case 12: gx->vcdLo = (gx->vcdLo & ~0x18000U) | (type << 15); break;
+    case 13: gx->vcdHi = (gx->vcdHi & ~3U) | type; break;
+    case 14: gx->vcdHi = (gx->vcdHi & ~0xCU) | (type << 2); break;
+    case 15: gx->vcdHi = (gx->vcdHi & ~0x30U) | (type << 4); break;
+    case 16: gx->vcdHi = (gx->vcdHi & ~0xC0U) | (type << 6); break;
+    case 17: gx->vcdHi = (gx->vcdHi & ~0x300U) | (type << 8); break;
+    case 18: gx->vcdHi = (gx->vcdHi & ~0xC00U) | (type << 10); break;
+    case 19: gx->vcdHi = (gx->vcdHi & ~0x3000U) | (type << 12); break;
+    case 20: gx->vcdHi = (gx->vcdHi & ~0xC000U) | (type << 14); break;
+    }
+}
+
+void fn_800B771C(void)
+{
+    u32 nCols;
+    u32 nNrms;
+    u32 nTex;
+    u32 vcdLo;
+    u32 vcdHi;
+
+    vcdLo = gx->vcdLo;
+    if (((vcdLo >> 13) & 3) != 0) {
+        nCols = 1;
+    } else {
+        nCols = 0;
+    }
+    if (((vcdLo >> 15) & 3) != 0) {
+        nCols += 1;
+    }
+
+    if (gx->hasBiNrms) {
+        nNrms = 2;
+    } else if (gx->hasNrms) {
+        nNrms = 1;
+    } else {
+        nNrms = 0;
+    }
+
+    nTex = 0;
+    vcdHi = gx->vcdHi;
+    if ((vcdHi & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 2) & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 4) & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 6) & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 8) & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 10) & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 12) & 3) != 0) {
+        nTex += 1;
+    }
+    if (((vcdHi >> 14) & 3) != 0) {
+        nTex += 1;
+    }
+
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = 0x1008;
+    GX_FIFO_U32 = nCols | (nNrms << 2) | (nTex << 4);
+    *(volatile u16*)((u8*)gx + 2) = 1;
+}
+
+void fn_800B7874(s32 attr, s32 type)
+{
+    SetVcdAttr(attr, type);
+    if (gx->hasNrms || gx->hasBiNrms) {
+        gx->vcdLo = (gx->vcdLo & ~0x1800U) | (gx->nrmType << 11);
+    } else {
+        gx->vcdLo &= ~0x1800U;
+    }
+    gx->dirtyState |= 8;
+}
 
 void __GXCalculateVLim(void)
 {
@@ -72,6 +194,102 @@ void __GXCalculateVLim(void)
         limit += lbl_80478A6C[(vcdHi >> 14) & 3];
         gx->vLim = limit;
     }
+}
+
+static inline void SetVat(u32* va, u32* vb, u32* vc, s32 attr, s32 cnt,
+                          s32 type, u8 frac)
+{
+    switch (attr) {
+    case 9:
+        *va = (*va & ~1U) | cnt;
+        *va = (*va & ~0xEU) | (type << 1);
+        *va = (*va & ~0x1F0U) | (frac << 4);
+        break;
+    case 10:
+    case 25:
+        *va = (*va & ~0x1C00U) | (type << 10);
+        if (cnt == 2) {
+            *va |= 0x200U;
+            *va |= 0x80000000U;
+        } else {
+            *va = (*va & ~0x200U) | (cnt << 9);
+            *va &= ~0x80000000U;
+        }
+        break;
+    case 11:
+        *va = (*va & ~0x2000U) | (cnt << 13);
+        *va = (*va & ~0x1C000U) | (type << 14);
+        break;
+    case 12:
+        *va = (*va & ~0x20000U) | (cnt << 17);
+        *va = (*va & ~0x1C0000U) | (type << 18);
+        break;
+    case 13:
+        *va = (*va & ~0x200000U) | (cnt << 21);
+        *va = (*va & ~0x1C00000U) | (type << 22);
+        *va = (*va & ~0x3E000000U) | (frac << 25);
+        break;
+    case 14:
+        *vb = (*vb & ~1U) | cnt;
+        *vb = (*vb & ~0xEU) | (type << 1);
+        *vb = (*vb & ~0x1F0U) | (frac << 4);
+        break;
+    case 15:
+        *vb = (*vb & ~0x200U) | (cnt << 9);
+        *vb = (*vb & ~0x1C00U) | (type << 10);
+        *vb = (*vb & ~0x3E000U) | (frac << 13);
+        break;
+    case 16:
+        *vb = (*vb & ~0x40000U) | (cnt << 18);
+        *vb = (*vb & ~0x380000U) | (type << 19);
+        *vb = (*vb & ~0x7C00000U) | (frac << 22);
+        break;
+    case 17:
+        *vb = (*vb & ~0x8000000U) | (cnt << 27);
+        *vb = (*vb & ~0x70000000U) | (type << 28);
+        *vc = (*vc & ~0x1FU) | frac;
+        break;
+    case 18:
+        *vc = (*vc & ~0x20U) | (cnt << 5);
+        *vc = (*vc & ~0x1C0U) | (type << 6);
+        *vc = (*vc & ~0x3E00U) | (frac << 9);
+        break;
+    case 19:
+        *vc = (*vc & ~0x4000U) | (cnt << 14);
+        *vc = (*vc & ~0x38000U) | (type << 15);
+        *vc = (*vc & ~0x7C0000U) | (frac << 18);
+        break;
+    case 20:
+        *vc = (*vc & ~0x800000U) | (cnt << 23);
+        *vc = (*vc & ~0x7000000U) | (type << 24);
+        *vc = (*vc & ~0xF8000000U) | (frac << 27);
+        break;
+    }
+}
+
+void fn_800B7D74(s32 vtxfmt, s32 attr, s32 cnt, s32 type, u8 frac)
+{
+    u32* va = (u32*)((u8*)gx + 0x1C + vtxfmt * 4);
+    u32* vb = (u32*)((u8*)gx + 0x3C + vtxfmt * 4);
+    u32* vc = (u32*)((u8*)gx + 0x5C + vtxfmt * 4);
+
+    SetVat(va, vb, vc, attr, cnt, type, frac);
+    gx->dirtyState |= 0x10;
+    *(volatile u8*)((u8*)gx + 0x4F3) |= 1 << vtxfmt;
+}
+
+void fn_800B80CC(s32 vtxfmt, const GXVtxAttrFmtList_800B771C* list)
+{
+    u32* va = (u32*)((u8*)gx + 0x1C + vtxfmt * 4);
+    u32* vb = (u32*)((u8*)gx + 0x3C + vtxfmt * 4);
+    u32* vc = (u32*)((u8*)gx + 0x5C + vtxfmt * 4);
+
+    while (list->attr != 0xFF) {
+        SetVat(va, vb, vc, list->attr, list->cnt, list->type, list->frac);
+        list++;
+    }
+    gx->dirtyState |= 0x10;
+    *(volatile u8*)((u8*)gx + 0x4F3) |= 1 << vtxfmt;
 }
 
 void fn_800B7BC4(void) {

@@ -99,6 +99,12 @@ extern u16 lbl_8047CDE0;  /* sdata2: */
 extern u16 lbl_8047CDE4;  /* sdata2: */
 extern u16 lbl_8047E718;
 extern u32 lbl_8047CDE8;
+extern u32 lbl_8047CDF0;
+extern u32 lbl_8047CDF4;
+extern f32 lbl_8047CDF8;
+extern f32 lbl_8047CDFC;
+extern f32 lbl_8047CE00;
+extern f64 lbl_8047CE08;
 extern f32 lbl_8047CD80;  /* sdata2: float constant */
 extern f32 lbl_8047CD84;  /* sdata2: float constant */
 extern f32 lbl_8047CD88;  /* sdata2: float constant */
@@ -121,6 +127,7 @@ extern u8  lbl_80271F18[];  /* format string */
 extern u8  lbl_8035B060[];  /* module name string */
 extern u8  lbl_8035B070[];
 extern u8  lbl_8035B3F0[];  /* module name string */
+extern u8  lbl_80314E08[];
 
 /* Additional external functions (not already declared above) */
 extern void fn_800BF74C(void);
@@ -138,6 +145,12 @@ extern void fn_800D67BC(s32);
 extern void fn_800D6680(f32);
 extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
+extern void fn_800D61E4(s16 x, s16 y);
+extern void fn_800D5BA0(s32 index, u32 color);
+extern void fn_800D5648(f32 value);
+extern void fn_800FE38C(s16 x, s16 y, s16 width, s16 height);
+extern void fn_800FE35C(void);
+extern f64 fmod(f64 value, f64 modulus);
 extern void fn_800FE6AC(s16* x, s16* y);
 extern void winSpriteDraw(void* context, void* sprite);
 extern u8* winSpriteAdd(void* head);
@@ -237,7 +250,7 @@ extern void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(u8* item, s16* width, s1
 extern void windowInit(u16 count);
 extern void* windowGetPortKeyInfo(u8 ports);
 extern void* windowGetKeyInfo(void);
-extern void fn_80105634(void);
+extern s32 fn_80105634(u8* window, u8* sprite);
 extern void winMsgDraw(void);
 extern void winMsgCtrl(void);
 extern void winMsgButton(void* p);
@@ -897,10 +910,66 @@ void* windowGetKeyInfo(void) {
 }
 
 /* 0x80105634 | 0x298 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80105634(void) {
-    /* TODO: match -- 664 bytes at 0x80105634 */
+s32 fn_80105634(u8* window, u8* sprite) {
+    u32 colors[2];
+    f32 alpha = (f32)(((u32)window[0x8B] * sprite[0x67]) / 255);
+    s16 id = *(s16*)(sprite + 0x06);
+
+    colors[0] = lbl_8047CDF0;
+    colors[1] = lbl_8047CDF4;
+    switch (id) {
+    case 0x68:
+    case 0x75:
+    case 0x82:
+        ((u8*)colors)[3] = (u8)(((u32)((u8*)colors)[3] * alpha));
+        ((u8*)colors)[7] = (u8)(((u32)((u8*)colors)[7] * alpha));
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D6A00(6);
+        fn_800D7820((s32)lbl_80314E08);
+        fn_800D67BC(4);
+        fn_800D61E4(0, 0);
+        fn_800D5BA0(0, colors[0]);
+        fn_800D61E4(*(s16*)(sprite + 0x54), 0);
+        fn_800D5BA0(0, colors[0]);
+        fn_800D61E4(*(s16*)(sprite + 0x54), *(s16*)(sprite + 0x56));
+        fn_800D5BA0(0, colors[1]);
+        fn_800D61E4(0, *(s16*)(sprite + 0x56));
+        fn_800D5BA0(0, colors[1]);
+        fn_800D6728();
+        fn_800FE38C(0, 0, *(s16*)(sprite + 0x54),
+                    *(s16*)(sprite + 0x56));
+        break;
+    case 0x6B:
+    case 0x78:
+    case 0x83: {
+        s16 y;
+
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D5648(lbl_8047CDF8);
+        fn_800D6A00(1);
+        fn_800D7820((s32)lbl_80314E08);
+        colors[0] = 0xFFFFFF00 | (u8)(lbl_8047CDFC * alpha);
+        for (y = 0; y < *(s16*)(sprite + 0x56); y += 4) {
+            fn_800D67BC(2);
+            fn_800D61E4(0, y);
+            fn_800D5BA0(0, colors[0]);
+            fn_800D61E4(*(s16*)(sprite + 0x54), y);
+            fn_800D5BA0(0, colors[0]);
+            fn_800D6728();
+        }
+        fn_800FE35C();
+        break;
+    }
+    case 0x69:
+    case 0x6A:
+    case 0x76:
+    case 0x77:
+        *(f32*)(sprite + 0x70) =
+            (f32)fmod(*(f32*)(sprite + 0x70) + lbl_8047CE00,
+                      lbl_8047CE08);
+        break;
+    }
+    return 0;
 }
-#pragma pop

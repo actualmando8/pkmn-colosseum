@@ -133,6 +133,30 @@ extern void fn_800D67BC(s32);
 extern void fn_800D6680(f32);
 extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
+extern u32 fn_801DAC3C(u32 sequence);
+extern void fn_800EC134(u32 model);
+extern void GSmodelSetPEdescr(u32 model, void* descriptor);
+extern void GSmodelResetPEdescr(u32 model);
+extern void GSmodelDrawModel(u32 model, u32 flags);
+extern void GSlightSetActive(u32 light, u32 active);
+extern u32 GScameraGetActiveCamera(void);
+extern void fn_800D4604(u32 layer);
+extern void fn_800D377C(u32 state);
+extern void fn_800D9B24(u16* left, u16* top, u16* right, u16* bottom);
+extern void fn_800D9AF0(u16* left, u16* top, u16* right, u16* bottom);
+extern void fn_800D258C(u32 camera);
+extern u32 GStextureGetXsize(u32 texture);
+extern u32 GStextureGetYsize(u32 texture);
+extern void fn_800D9D68(u16 left, u16 top, u16 right, u16 bottom);
+extern void fn_800D9C24(u16 left, u16 top, u16 right, u16 bottom);
+extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
+extern void fn_800D3410(u32 texture, u32 slot);
+extern void fn_801DA4E8(u32 sequence, u32 active);
+extern void fn_801DA448(u32 sequence, u32 active);
+extern void fn_801DB088(void);
+extern void fn_801DAAAC(u32 sequence);
+extern void fn_800D3190(void);
+extern u8 lbl_8035B468[];
 
 /* Forward declarations for functions defined later in this TU */
 extern u8    menuOffScreenCheckEnable(u8 param);
@@ -276,7 +300,7 @@ extern u8 menuOffScreenCreate(u32 param);
 extern void menuOffScreenInit(void);
 extern s32 _menuCBOffScreen__FP9GStextureUlPv(void);
 extern s32 menuModelSetMotion(void* p, u32 val);
-extern void menuModelRender(void);
+extern u32 menuModelRender(u8* work);
 extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
@@ -308,13 +332,72 @@ s32 menuModelSetMotion(void* p, u32 val) {
 #pragma pop
 
 /* 0x80109934 | 0x25C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void menuModelRender(void) {
-    /* TODO: match -- 604 bytes at 0x80109934 */
+u32 menuModelRender(u8* work) {
+    u32 model;
+    u32 renderModel;
+    u32 previousCamera;
+    u16 viewLeft;
+    u16 viewTop;
+    u16 viewRight;
+    u16 viewBottom;
+    u16 scissorLeft;
+    u16 scissorTop;
+    u16 scissorRight;
+    u16 scissorBottom;
+    u16 width;
+    u16 height;
+    s32 i;
+
+    if (work == NULL || *(u32*)(work + 0x34) == 0 || work[0] != 2) {
+        return 0;
+    }
+    model = *(u32*)(work + 0x24);
+    renderModel = work[0x14] != 0 ? fn_801DAC3C(model) : model;
+    if (renderModel == 0) return 0;
+
+    fn_800EC134(renderModel);
+    GSmodelSetPEdescr(renderModel, lbl_8035B468);
+    for (i = 0; i < 3; i++) {
+        u32 light = *(u32*)(work + 0x3C + i * 4);
+        if (light != 0) GSlightSetActive(light, 1);
+    }
+    previousCamera = GScameraGetActiveCamera();
+    fn_800D4604(2);
+    fn_800D377C(2);
+    fn_800D9B24(&viewLeft, &viewTop, &viewRight, &viewBottom);
+    fn_800D9AF0(&scissorLeft, &scissorTop, &scissorRight, &scissorBottom);
+    fn_800D258C(*(u32*)(work + 0x38));
+    fn_800D258C(*(u32*)(work + 0x38));
+    width = (u16)(GStextureGetXsize(*(u32*)(work + 0x34)) - 1);
+    height = (u16)(GStextureGetYsize(*(u32*)(work + 0x34)) - 1);
+    fn_800D9D68(0, 0, width, height);
+    fn_800D9C24(0, 0, width, height);
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+    fn_800D3410(*(u32*)(work + 0x34), 0);
+    if (work[0x14] != 0) {
+        fn_801DA4E8(model, 1);
+        fn_801DA448(model, 1);
+        fn_801DB088();
+        fn_801DAAAC(model);
+        fn_801DA4E8(model, 0);
+        fn_801DA448(model, 0);
+    } else {
+        GSmodelDrawModel(model, 0x3010);
+    }
+    fn_800D3190();
+    fn_800D377C(1);
+    fn_800D258C(previousCamera);
+    fn_800D9D68(viewLeft, viewTop, viewRight, viewBottom);
+    fn_800D9C24(scissorLeft, scissorTop, scissorRight, scissorBottom);
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+    fn_800D4604(1);
+    for (i = 0; i < 3; i++) {
+        u32 light = *(u32*)(work + 0x3C + i * 4);
+        if (light != 0) GSlightSetActive(light, 0);
+    }
+    GSmodelResetPEdescr(renderModel);
+    return *(u32*)(work + 0x34);
 }
-#pragma pop
 
 /* 0x80109B90 | 0x6C */
 #pragma push
@@ -359,4 +442,3 @@ s32 menuModelFree(void* p) {
     return 1;
 }
 #pragma pop
-

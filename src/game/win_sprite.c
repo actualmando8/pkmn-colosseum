@@ -106,7 +106,14 @@ extern f32 lbl_8047CD94;  /* sdata2: float constant */
 extern f64 lbl_8047CD98;  /* sdata2: double constant */
 extern const f32 lbl_8047CE3C;  /* sdata2: float constant */
 extern f32 lbl_8047CE50;  /* sdata2: float constant */
+extern f32 lbl_8047CE48;
+extern f32 lbl_8047CE4C;
+extern f32 lbl_8047CE54;
+extern f32 lbl_8047CE58;
 extern f32 lbl_8047CE5C;  /* sdata2: float constant */
+extern f64 lbl_8047CE60;
+extern f64 lbl_8047CE68;
+extern u8 lbl_80314AE8[];
 extern f32 lbl_8047CE70;  /* sdata2: float constant */
 extern u8  lbl_80404A98[];  /* table for display */
 extern u8  lbl_80271E10[];  /* format string */
@@ -129,7 +136,7 @@ extern void fn_800DA028(s32);
 extern void fn_800D6A00(s32);
 extern void fn_800D7820(s32);
 extern void fn_800D67BC(s32);
-extern void fn_800D6680(f32);
+extern void fn_800D6680(f32, f32, f32);
 extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
 extern void* fn_800F92D4(u32);
@@ -137,6 +144,8 @@ extern void fn_800D85D4(s32, void*);
 extern u16 GStextureGetXsize(void*);
 extern u16 GStextureGetYsize(void*);
 extern void fn_800D59B8(s32, f32, f32);
+extern s32 fn_800D37CC(void);
+extern void fn_800D9F40(s32);
 extern void fn_800D61E4(s32, s32);
 extern void fn_800E0718(void*, const void*, f32);
 extern void set__5GSvecFfff(void*, f32, f32, f32);
@@ -695,11 +704,52 @@ void winSpriteInit(void) {
 
 #if defined(WIN_SPRITE_SUFFIX_801093C8)
 /* 0x801093C8 | 0x29C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801093C8(void) {
-    /* TODO: match -- 668 bytes at 0x801093C8 */
+    s32 alpha;
+    f32 progress;
+
+    if (lbl_8047AD24 != 0) {
+        lbl_8047AD3C += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        if (lbl_8047AD3C >= lbl_8047AD38) {
+            lbl_8047AD3C = lbl_8047AD38;
+            lbl_8047AD24 = 0;
+        }
+    }
+    if (lbl_8047AD22 == 0 || lbl_8047AD20 == 0) return;
+
+    progress = lbl_8047AD2C +
+        (lbl_8047AD3C / lbl_8047AD38) * (lbl_8047AD34 - lbl_8047AD2C);
+    lbl_8047AD30 = progress;
+    alpha = (s32)(lbl_8047CE48 -
+        (lbl_8047CE48 * progress) / lbl_8047CE4C);
+
+    fn_800D9ED8(lbl_8047AD23 != 0);
+    fn_800D88DC(3);
+    fn_800D888C(4);
+    fn_800D9B58(lbl_8047CE50, lbl_8047CE50,
+                lbl_8047CE54, lbl_8047CE58);
+    fn_800DA4C4(0, 1, 1);
+    fn_800DA2BC(1, 1, 1);
+    fn_800DA1E8(1, 2, 1);
+    fn_800DA028(0);
+    fn_800D6A00(4);
+    fn_800D7820((s32)lbl_80314AE8);
+    fn_800D85D4(0, (void*)lbl_8047AD28);
+    fn_800D67BC(4);
+
+    fn_800D6680(lbl_8047CE50, lbl_8047CE50, lbl_8047CE50);
+    fn_800D5CB8(0, alpha, alpha, alpha, 0xFF);
+    fn_800D59B8(0, lbl_8047CE50, lbl_8047CE50);
+    fn_800D6680(lbl_8047CE54, lbl_8047CE50, lbl_8047CE50);
+    fn_800D5CB8(0, alpha, alpha, alpha, 0xFF);
+    fn_800D59B8(0, lbl_8047CE5C, lbl_8047CE50);
+    fn_800D6680(lbl_8047CE50, lbl_8047CE58, lbl_8047CE50);
+    fn_800D5CB8(0, alpha, alpha, alpha, 0xFF);
+    fn_800D59B8(0, lbl_8047CE50, lbl_8047CE5C);
+    fn_800D6680(lbl_8047CE54, lbl_8047CE58, lbl_8047CE50);
+    fn_800D5CB8(0, alpha, alpha, alpha, 0xFF);
+    fn_800D59B8(0, lbl_8047CE5C, lbl_8047CE5C);
+    fn_800D6728();
+    if (lbl_8047AD23 == 0) fn_800D9F40(0);
 }
-#pragma pop
 #endif
