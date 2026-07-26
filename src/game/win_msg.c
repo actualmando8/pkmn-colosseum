@@ -149,7 +149,7 @@ extern u32   windowGetActiveID(void);
 extern void* windowGetKeyInfo(void);
 extern void* menuSeqBiosGetPtr(u32 idx);
 extern void* windowSearchItemID(void* head, s32 key);
-extern void  menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
+extern s32   menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
 extern u8    menuOffScreenSetPriority(u8 val);
 extern u8    menuOffScreenSetDisp(u8 val);
 extern u32   fn_800D3088(void);
@@ -186,7 +186,7 @@ extern void menuClose(s32 p);
 extern s32 menuCloseCustom(void* p, u32 mode, u8 wait);
 extern s32 menuIsCheck(s32 param);
 extern void menuOpen(void* p, void* q);
-extern void menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
+extern s32 menuOpenCustom(void* p, u32 r4, s32 r5, s32 r6, void* r7, s32 r8, ...);
 extern void menuSetPosition(void* p, s16 a, s16 b);
 extern void menuButtonNormal(void* p);
 extern void menuPlaySe(void* p, void* q);
@@ -229,17 +229,17 @@ extern void fn_80105634(void);
 extern void winMsgDraw(void);
 extern void winMsgCtrl(void);
 extern void winMsgButton(void* p);
-extern void winMsgCloseLevelUpStatus(void);
-extern void winMsgOpenLevelUpFiledStatus(void);
-extern void winMsgOpenLevelUpStatus(void);
+extern void winMsgCloseLevelUpStatus(u8 wait);
+extern s32 winMsgOpenLevelUpFiledStatus(u32 message, u32 wait);
+extern s32 winMsgOpenLevelUpStatus(u32 message, u32 wait);
 extern void winMsgCloseError(void);
-extern void winMsgOpenError(void);
-extern void winMsgCloseFight(void);
-extern void winMsgCloseCheckFight(void);
-extern void winMsgOpenFightNoWait(void);
-extern void winMsgOpenFight(void);
-extern void winMsgCheckField(void);
-extern void winMsgCloseField(void);
+extern s32 winMsgOpenError(u32 message, u32 mode, u8 wait);
+extern void winMsgCloseFight(u8 wait);
+extern u8 winMsgCloseCheckFight(void);
+extern s32 winMsgOpenFightNoWait(u32 message, u32 wait, u8 pause);
+extern s32 winMsgOpenFight(u32 message, u32 wait, u8 pause);
+extern s32 winMsgCheckField(void);
+extern void winMsgCloseField(u8 wait);
 extern void winMsgOpenFieldWithSE(void);
 extern void winMsgOpenField(void);
 extern void winMsgCheck(void);
@@ -278,6 +278,38 @@ extern void menuModelRender(void);
 extern s32 menuModelCheck(void* obj, u8 wait);
 extern s32 menuModelFree(void* p);
 
+extern s8 lbl_80478B30;
+
+static inline s32 winMsgGetMenuId(s8 status)
+{
+    switch (status) {
+    case 0: return 0x40;
+    case 1: return 0x0F;
+    case 2: return 0x10;
+    case 3: return 0x40;
+    case 4: return 0x50;
+    case 5: return 0x51;
+    case 6: return 0x10C;
+    case 7: return 0xE6;
+    case 8: return 0xE8;
+    case 9: return 0x107;
+    default: return 0;
+    }
+}
+
+static inline void winMsgCloseCurrent(u8 wait)
+{
+    s32 id;
+
+    if (lbl_8047AD10 != 0) {
+        return;
+    }
+    id = winMsgGetMenuId(lbl_80478B30);
+    if ((u8)menuIsCheck(id)) {
+        menuCloseCustom((void*)id, 2, wait);
+    }
+}
+
 /* 0x801058CC | 0x170 */
 #pragma push
 #pragma optimization_level 0
@@ -304,31 +336,48 @@ void winMsgButton(void* p) {
 }
 
 /* 0x80105C68 | 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCloseLevelUpStatus(void) {
-    /* TODO: match -- 224 bytes at 0x80105C68 */
+void winMsgCloseLevelUpStatus(u8 wait) {
+    winMsgCloseCurrent(wait);
+    if (lbl_8047AD10 == 0) {
+        lbl_80478B30 = -1;
+    }
 }
-#pragma pop
 
 /* 0x80105D48 | 0x134 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenLevelUpFiledStatus(void) {
-    /* TODO: match -- 308 bytes at 0x80105D48 */
+s32 winMsgOpenLevelUpFiledStatus(u32 message, u32 wait) {
+    s32 id = 0x107;
+
+    if (id == 0) {
+        return 0;
+    }
+    if (lbl_80478B30 != 9 && lbl_8047AD10 == 0) {
+        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        if ((u8)menuIsCheck(old_id)) {
+            menuCloseCustom((void*)old_id, 2, wait);
+        }
+    }
+    lbl_80478B30 = 9;
+    return menuOpenCustom((void*)id, windowGetActiveID(), 0, 0,
+                          (void*)wait, 3, message, 1, 0);
 }
-#pragma pop
 
 /* 0x80105E7C | 0x134 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenLevelUpStatus(void) {
-    /* TODO: match -- 308 bytes at 0x80105E7C */
+s32 winMsgOpenLevelUpStatus(u32 message, u32 wait) {
+    s32 id = 0x51;
+
+    if (id == 0) {
+        return 0;
+    }
+    if (lbl_80478B30 != 5 && lbl_8047AD10 == 0) {
+        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        if ((u8)menuIsCheck(old_id)) {
+            menuCloseCustom((void*)old_id, 2, wait);
+        }
+    }
+    lbl_80478B30 = 5;
+    return menuOpenCustom((void*)id, windowGetActiveID(), 0, 0,
+                          (void*)wait, 3, message, 1, 0);
 }
-#pragma pop
 
 /* 0x80105FB0 | 0x48 */
 #pragma push
@@ -345,67 +394,108 @@ void winMsgCloseError(void) {
 #pragma pop
 
 /* 0x80105FF8 | 0x88 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenError(void) {
-    /* TODO: match -- 136 bytes at 0x80105FF8 */
+s32 winMsgOpenError(u32 message, u32 mode, u8 wait) {
+    u8 flags = 0;
+
+    if (wait != 0) {
+        flags |= 1;
+    }
+    lbl_8047AD10 = 1;
+    flags |= 2;
+    return menuOpenCustom((void*)0x10C, -1, 0, 0, NULL, 3, message,
+                          flags, 0);
 }
-#pragma pop
 
 /* 0x80106080 | 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCloseFight(void) {
-    /* TODO: match -- 224 bytes at 0x80106080 */
+void winMsgCloseFight(u8 wait) {
+    winMsgCloseCurrent(wait);
+    if (lbl_8047AD10 == 0) {
+        lbl_80478B30 = -1;
+    }
 }
-#pragma pop
 
 /* 0x80106160 | 0xE4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCloseCheckFight(void) {
-    /* TODO: match -- 228 bytes at 0x80106160 */
+u8 winMsgCloseCheckFight(void) {
+    s32 id = winMsgGetMenuId(lbl_80478B30);
+    u8* window = windowSearchID(id);
+    s8 result;
+
+    if (window == NULL) {
+        result = -1;
+    } else if (window[0x98] != 0 || window[0x99] != 0) {
+        result = 0;
+    } else {
+        result = 1;
+    }
+    return result >= 0;
 }
-#pragma pop
 
 /* 0x80106244 | 0x150 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenFightNoWait(void) {
-    /* TODO: match -- 336 bytes at 0x80106244 */
+s32 winMsgOpenFightNoWait(u32 message, u32 wait, u8 pause) {
+    s32 id = 0x50;
+    u8 flags = 0;
+
+    if (id == 0) {
+        return 0;
+    }
+    if (lbl_80478B30 != 4 && lbl_8047AD10 == 0) {
+        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        if ((u8)menuIsCheck(old_id)) {
+            menuCloseCustom((void*)old_id, 2, wait);
+        }
+    }
+    lbl_80478B30 = 4;
+    if (pause != 0) {
+        flags |= 1;
+    }
+    flags |= 2;
+    return menuOpenCustom((void*)id, windowGetActiveID(), 0, 0,
+                          (void*)wait, 3, message, flags, 0);
 }
-#pragma pop
 
 /* 0x80106394 | 0x14C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgOpenFight(void) {
-    /* TODO: match -- 332 bytes at 0x80106394 */
+s32 winMsgOpenFight(u32 message, u32 wait, u8 pause) {
+    s32 id = 0x50;
+    u8 flags = 0;
+
+    if (id == 0) {
+        return 0;
+    }
+    if (lbl_80478B30 != 4 && lbl_8047AD10 == 0) {
+        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        if ((u8)menuIsCheck(old_id)) {
+            menuCloseCustom((void*)old_id, 2, wait);
+        }
+    }
+    lbl_80478B30 = 4;
+    if (pause != 0) {
+        flags |= 1;
+    }
+    return menuOpenCustom((void*)id, windowGetActiveID(), 0, 0,
+                          (void*)wait, 3, message, flags, 0);
 }
-#pragma pop
 
 /* 0x801064E0 | 0xD8 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCheckField(void) {
-    /* TODO: match -- 216 bytes at 0x801064E0 */
+s32 winMsgCheckField(void) {
+    s32 id = winMsgGetMenuId(lbl_80478B30);
+    u8* window = windowSearchID(id);
+
+    if (window == NULL) {
+        return -1;
+    }
+    if (window[0x98] != 0 || window[0x99] != 0) {
+        return 0;
+    }
+    return 1;
 }
-#pragma pop
 
 /* 0x801065B8 | 0xE0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winMsgCloseField(void) {
-    /* TODO: match -- 224 bytes at 0x801065B8 */
+void winMsgCloseField(u8 wait) {
+    winMsgCloseCurrent(wait);
+    if (lbl_8047AD10 == 0) {
+        lbl_80478B30 = -1;
+    }
 }
-#pragma pop
 
 /* 0x80106698 | 0x150 */
 #pragma push
@@ -460,4 +550,3 @@ void winMsgOpen(void) {
     /* TODO: match -- 604 bytes at 0x80106D3C */
 }
 #pragma pop
-

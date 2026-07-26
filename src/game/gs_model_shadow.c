@@ -34,7 +34,8 @@ typedef struct {
 
 /* Slot table used by the debug shadow-texture pool: lbl_80401490, stride 0x58 */
 typedef struct {
-    u8 _pad[0x50];
+    GSmodel* model;
+    u8 _pad[0x4C];
     u8 flag;    /* 0x50 */
     u8 _pad2[3];
     void* obj;  /* 0x54 */

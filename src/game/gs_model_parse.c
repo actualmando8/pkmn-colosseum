@@ -13,8 +13,13 @@
  * collide with this TU's own out-of-line instances of those names below
  * (same idiom as src/game/ps_range_80168C64.c's local PSJObjTransform). */
 typedef struct HSD_JObj {
-    u8 _pad0[0x14];
+    u8 _pad0[0x08];
+    struct HSD_JObj* next;
+    struct HSD_JObj* parent;
+    struct HSD_JObj* child;
     u32 flags;
+    u8 _pad18[0x2C];
+    f32 matrix[3][4];
 } HSD_JObj;
 
 #define JOBJ_PTCL   (1 << 5)
