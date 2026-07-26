@@ -4881,3 +4881,123 @@ u8 fn_80047CC0(u8* work)
     return 1;
 }
 #pragma peephole reset
+
+extern f32 lbl_8047BD20;
+extern f32 lbl_8047BD24;
+extern f32 lbl_8047BD28;
+extern f32 lbl_8047BD2C;
+extern void* GSsplineCreate(s32 a, s32 b, s32 count);
+extern void GSsplineAddControlVectorValue(void* spline, void* vec, f32 t);
+extern void GSsplineFree(void* spline);
+
+/* Draw one memo stat polyline through a spline fitted to its byte samples. */
+#pragma peephole off
+void fn_800473E0(PdaOrbitPoint* point)
+{
+    extern u8 lbl_80314E08[];
+    extern void fn_800D5648(f32 width);
+    extern void fn_800D5BA0(s32 index, u32 color);
+    u8* p = (u8*)point;
+    u8* data;
+    void* spline;
+    PdaVec3 ctrl;
+    PdaVec3 v0;
+    PdaVec3 v1;
+    u32 count;
+    s32 i;
+    s32 off;
+    f32 step;
+    f32 t;
+    f32 dx;
+    f32 zero;
+
+    data = *(u8**)p;
+    if (data == NULL) {
+        return;
+    }
+    count = (u8)(data[0] + 2);
+    *(f32*)(p + 4) = (f32)count;
+    if (*(s32*)(p + 0x18) < (s32)count) {
+        *(s32*)(p + 0x18) = *(s32*)(p + 0x18) + 1;
+    } else if (*(s32*)(p + 0x10) < (s32)count) {
+        *(s32*)(p + 0x10) = *(s32*)(p + 0x10) + 1;
+    } else if (*(s32*)(p + 0x10) < (s32)count + 30) {
+        *(s32*)(p + 0x10) = *(s32*)(p + 0x10) + 1;
+        if (*(f32*)(p + 0x14) < (f32)count) {
+            *(f32*)(p + 0x14) = *(f32*)(p + 0x14) + *(f32*)(p + 0x20);
+        }
+    } else {
+        if (*(f32*)(p + 0xc) < (f32)count) {
+            *(f32*)(p + 0xc) = *(f32*)(p + 0xc) + *(f32*)(p + 0x20);
+            if (*(f32*)(p + 0x14) < (f32)count) {
+                *(f32*)(p + 0x14) = *(f32*)(p + 0x14) + *(f32*)(p + 0x20);
+            }
+        } else {
+            if (*(f32*)(p + 0x14) < (f32)count) {
+                *(f32*)(p + 0x14) = *(f32*)(p + 0x14) + *(f32*)(p + 0x20);
+            }
+        }
+    }
+    spline = GSsplineCreate(3, 1, (u8)count);
+    if (spline == NULL) {
+        return;
+    }
+    step = lbl_8047BCBC / (f32)count;
+    ctrl.x = lbl_8047BC94;
+    ctrl.y = lbl_8047BC94;
+    ctrl.z = *(f32*)(p + 0x1c);
+    dx = *(f32*)(p + 4);
+    GSsplineAddControlVectorValue(spline, &ctrl, lbl_8047BC94);
+    dx = lbl_8047BD20 / dx;
+    t = step;
+    ctrl.x = ctrl.x + dx;
+    for (i = 0; i < (s32)count - 2; i++) {
+        ctrl.y = (f32)(s8)data[i + 1];
+        ctrl.y = -ctrl.y;
+        GSsplineAddControlVectorValue(spline, &ctrl, t);
+        t = t + step;
+        ctrl.x = ctrl.x + dx;
+    }
+    ctrl.y = lbl_8047BC94;
+    ctrl.x = lbl_8047BD20;
+    GSsplineAddControlVectorValue(spline, &ctrl, lbl_8047BCBC);
+    off = 0;
+    zero = lbl_8047BC94;
+    for (i = 0; i < (s32)*(f32*)(p + 0xc); i++) {
+        GSvecCopy(&v0, (u8*)*(void**)((u8*)spline + 0xc) + off);
+        v0.z = zero;
+        GSvecCopy((u8*)*(void**)((u8*)spline + 0xc) + off, &v0);
+        off += 0xc;
+    }
+    off = (s32)*(f32*)(p + 0xc) * 0xc;
+    for (i = (s32)*(f32*)(p + 0xc); i < (s32)*(f32*)(p + 0x14); i++) {
+        GSvecCopy(&v0, (u8*)*(void**)((u8*)spline + 0xc) + off);
+        v0.z = *(f32*)(p + 0x1c) /
+               (f32)((s32)*(f32*)(p + 0x14) - (s32)*(f32*)(p + 0xc)) *
+               (f32)(i - (s32)*(f32*)(p + 0xc));
+        GSvecCopy((u8*)*(void**)((u8*)spline + 0xc) + off, &v0);
+        off += 0xc;
+    }
+    off = 0;
+    for (i = 0; i < *(s32*)(p + 0x18) - 1; i++) {
+        GSvecCopy(&v0, (u8*)*(void**)((u8*)spline + 0xc) + off);
+        GSvecCopy(&v1, (u8*)*(void**)((u8*)spline + 0xc) + (i + 1) * 0xc);
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D7820(lbl_80314E08);
+        fn_800D6A00(1);
+        fn_800D5648(lbl_8047BCA8);
+        fn_800D67BC(2);
+        fn_800D61E4((s32)(lbl_8047BD24 + v0.x),
+                    (s32)(lbl_8047BD2C * v0.y + lbl_8047BD28));
+        fn_800D5BA0(0, (u8)(s32)v0.z | 0x361e0500);
+        fn_800D61E4((s32)(lbl_8047BD24 + v1.x),
+                    (s32)(lbl_8047BD2C * v1.y + lbl_8047BD28));
+        fn_800D5BA0(0, (u8)(s32)v1.z | 0x361e0500);
+        fn_800D6728();
+        fn_800D5648(lbl_8047BCBC);
+        off += 0xc;
+    }
+    GSsplineFree(spline);
+}
+#pragma peephole reset
