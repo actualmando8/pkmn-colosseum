@@ -516,15 +516,20 @@ void winMsgCloseError(void) {
 
 /* 0x80105FF8 | 0x88 */
 s32 winMsgOpenError(u32 message, u32 mode, u8 wait) {
+    s32 id = 0x10C;
+    s32 result = 0;
     u8 flags = 0;
 
+    if (id == 0) {
+        return result;
+    }
+    lbl_8047AD10 = 1;
     if (wait != 0) {
         flags |= 1;
     }
-    lbl_8047AD10 = 1;
     flags |= 2;
-    return menuOpenCustom((void*)0x10C, -1, 0, 0, NULL, 3, message,
-                          flags, 0);
+    result = menuOpenCustom((void*)id, -1, 0, 0, NULL, 3, message, flags, 0);
+    return result;
 }
 
 /* 0x80106080 | 0xE0 */
@@ -546,7 +551,9 @@ u8 winMsgCloseCheckFight(void) {
 
     if (window == NULL) {
         result = -1;
-    } else if (window[0x98] != 0 || window[0x99] != 0) {
+    } else if (window[0x98] != 0) {
+        result = 0;
+    } else if (window[0x99] != 0) {
         result = 0;
     } else {
         result = 1;
@@ -603,14 +610,18 @@ s32 winMsgOpenFight(u32 message, u32 wait, u8 pause) {
 s32 winMsgCheckField(void) {
     s32 id = winMsgResolveMenuId(lbl_80478B30);
     u8* window = windowSearchID(id);
+    s8 result;
 
     if (window == NULL) {
-        return -1;
+        result = -1;
+    } else if (window[0x98] != 0) {
+        result = 0;
+    } else if (window[0x99] != 0) {
+        result = 0;
+    } else {
+        result = 1;
     }
-    if (window[0x98] != 0 || window[0x99] != 0) {
-        return 0;
-    }
-    return 1;
+    return result;
 }
 
 /* 0x801065B8 | 0xE0 */
