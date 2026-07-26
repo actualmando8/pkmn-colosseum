@@ -27,6 +27,12 @@ _DECL_RE = re.compile(
 # Keywords that begin a STATEMENT, never a declaration.
 _STMT_KW = re.compile(r'^\s*(?:if|for|while|return|switch|do|else|goto|break|'
                       r'continue|case|default)\b')
+# Pointer-typedef declaration: "Type* name = ..." / "Type *name;". Requires a
+# literal '*' BETWEEN two identifiers, immediately followed by =/;/[/,. Plain
+# assignments ("x = y") lack the star; multiplications ("foo = a * b") have an
+# operator before the star, so ^-anchoring avoids them.
+_PTR_DECL_RE = re.compile(
+    r'^\s*[A-Za-z_]\w*\s*\*\s*[A-Za-z_]\w*\s*(?:=|;|\[|,)')
 
 
 def _strip_comments(s: str) -> str:
@@ -58,7 +64,7 @@ def lint(body: str):
         # false positives on assignments ("x = ...;") -- and a false reject
         # poisons the compile loop worse than a missed lint (the compiler
         # still catches typedef-name mid-block decls, just less legibly).
-        looks_decl = bool(_DECL_RE.match(line))
+        looks_decl = bool(_DECL_RE.match(line)) or bool(_PTR_DECL_RE.match(line))
         is_pure_brace = line in ("{", "}") or set(line) <= set("{}; ")
 
         if not is_pure_brace and not is_label:
@@ -128,8 +134,26 @@ void f(void) {
     handle = other();
 }
 """
+    ptr_bad = """
+void f(void) {
+    u32 a;
+    a = get();
+    GSpart* p = getp();    /* VIOLATION: pointer-typedef decl after statement */
+    use(p);
+}
+"""
+    mult_ok = """
+void f(void) {
+    u32 a;
+    u32 b;
+    a = get();
+    b = a * a;             /* OK: multiplication, not a decl */
+    use(b);
+}
+"""
     tests = [("bad", bad, 1), ("good", good, 0),
-             ("good_nested", good_nested, 0), ("assigns_ok", assigns_ok, 0)]
+             ("good_nested", good_nested, 0), ("assigns_ok", assigns_ok, 0),
+             ("ptr_bad", ptr_bad, 1), ("mult_ok", mult_ok, 0)]
     ok = True
     for name, src, expect in tests:
         v = lint(src)

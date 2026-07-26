@@ -95,8 +95,19 @@ def measure(unit, symbol):
 
 
 def splice(text, symbol, body):
-    m = re.search(r'^[A-Za-z_][^\n;]*\b' + re.escape(symbol) + r'\s*\([^;]*?\)\s*\{',
-                  text, re.M)
+    # Match the function's definition line. Skip the dead `#if 0 asm void X(){
+    # #include ...inc }` reference stubs that wrap most functions -- those start
+    # with `asm ` and splicing into them changes nothing (the real #else C is
+    # what compiles). Pick the first NON-asm definition.
+    pat = re.compile(r'^([A-Za-z_][^\n;]*?\b' + re.escape(symbol)
+                     + r'\s*\([^;]*?\)\s*)\{', re.M)
+    m = None
+    for cand in pat.finditer(text):
+        head = cand.group(1)
+        if re.match(r'^\s*asm\b', head):
+            continue           # dead #if 0 reference stub
+        m = cand
+        break
     if not m:
         return None
     i = m.start()
@@ -135,11 +146,15 @@ def main():
     obj = ROOT / "build" / "GC6E01" / Path(a.source).with_suffix(".o")
     backup = src.read_bytes()
 
+    # decode as utf-8/replace (NOT the Windows cp1252 locale) -- gen_brief
+    # embeds the source, and many game TUs contain Shift-JIS bytes that cp1252
+    # cannot decode; force utf-8 both directions.
+    env = dict(os.environ, PYTHONIOENCODING="utf-8")
     br = subprocess.run(
         [sys.executable, str(ROOT / "tools/decomp_work/handoff/gen_brief.py"),
          "--source", a.source, "--symbol", a.symbol],
-        cwd=ROOT, capture_output=True, text=True)
-    brief = br.stdout
+        cwd=ROOT, capture_output=True, encoding="utf-8", errors="replace", env=env)
+    brief = br.stdout or ""
     if not brief.strip():
         sys.exit("gen_brief produced no output -- likely missing "
                  "build/GC6E01/report.json (run: ninja all_source "
@@ -202,11 +217,22 @@ def main():
             if obj.exists():
                 obj.unlink()
             cc = subprocess.run(["ninja", str(obj.relative_to(ROOT)).replace("\\", "/")],
-                                cwd=ROOT, capture_output=True, text=True)
+                                cwd=ROOT, capture_output=True,
+                                encoding="utf-8", errors="replace")
             if not obj.exists():
-                errs = [l for l in (cc.stdout + cc.stderr).splitlines()
-                        if "Error" in l or "error" in l][:15]
-                pct, rows = None, ["COMPILE FAILED:"] + errs
+                # mwcc prints the offending SOURCE LINE above the "Error: ^"
+                # caret; grepping only "Error" lines drops the actionable
+                # context. Capture a window around each error/caret instead,
+                # and skip the non-fatal blanket Shift-JIS warning.
+                out = ((cc.stdout or "") + (cc.stderr or "")).splitlines()
+                keep, seen = [], set()
+                for idx, l in enumerate(out):
+                    low = l.lower()
+                    if ("error" in low or "syntax" in low) and "shift jis" not in low:
+                        for j in range(max(0, idx - 2), min(len(out), idx + 2)):
+                            if j not in seen and out[j].strip():
+                                seen.add(j); keep.append(out[j].rstrip())
+                pct, rows = None, ["COMPILE FAILED (fix the C, keep it C89):"] + keep[:20]
             else:
                 pct, rows = measure(unit, a.symbol)
             print(f"round {rnd}: {pct if pct is not None else 'compile-fail'}",
