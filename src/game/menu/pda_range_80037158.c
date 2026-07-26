@@ -4416,3 +4416,108 @@ void fn_800439BC(void* scene)
     *(u16*)(work + 6) = trig;
 }
 #pragma peephole reset
+
+extern f32 lbl_8047BCA4;
+extern f32 lbl_8047BCA8;
+extern f32 lbl_8047BD10;
+extern f32 lbl_8047BD14;
+extern u32 GSmsgGetRect(s32 id);
+
+/* Tab captions: pulse the active page's title and centre each caption. */
+#pragma peephole off
+void fn_80043FA8(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern f64 sin(f64 x);
+    f32 v;
+    s32 tint;
+
+    alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+    switch (sprite->eventId) {
+    case 0x6d7:
+        alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+        v = lbl_8047BD14 *
+                (f32)sin(lbl_8047BCA4 * (lbl_8047BCA8 * lbl_803A6818.angle)) +
+            lbl_8047BD10;
+        if (v > lbl_8047BCA0) {
+            v = lbl_8047BCA0;
+        }
+        if (v < lbl_8047BC94) {
+            v = lbl_8047BC94;
+        }
+        sprite->alpha = (u8)v;
+        if (lbl_803A6818.field_28 == 2) {
+            sprite->flags |= 2;
+        } else {
+            sprite->flags &= ~2;
+        }
+        break;
+    case 0x6d8:
+        alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+        v = lbl_8047BD14 *
+                (f32)sin(lbl_8047BCA4 * (lbl_8047BCA8 * lbl_803A6818.angle)) +
+            lbl_8047BD10;
+        if (v > lbl_8047BCA0) {
+            v = lbl_8047BCA0;
+        }
+        if (v < lbl_8047BC94) {
+            v = lbl_8047BC94;
+        }
+        sprite->alpha = (u8)v;
+        if (lbl_803A6818.field_28 == 1) {
+            sprite->flags |= 2;
+        } else {
+            sprite->flags &= ~2;
+        }
+        break;
+    case 0x6d9:
+        alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+        v = lbl_8047BD14 *
+                (f32)sin(lbl_8047BCA4 * (lbl_8047BCA8 * lbl_803A6818.angle)) +
+            lbl_8047BD10;
+        if (v > lbl_8047BCA0) {
+            v = lbl_8047BCA0;
+        }
+        if (v < lbl_8047BC94) {
+            v = lbl_8047BC94;
+        }
+        sprite->alpha = (u8)v;
+        if (lbl_803A6818.field_28 == 0) {
+            sprite->flags |= 2;
+        } else {
+            sprite->flags &= ~2;
+        }
+        break;
+    case 0x10c7:
+        if (lbl_803A6818.field_28 == 0) {
+            tint = 0x140000;
+        } else {
+            tint = 0x4a0000;
+        }
+        fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x3717) >> 16)) / 2), 0,
+                    tint | alphaSprite->alphaByte, (void*)0x3717);
+        break;
+    case 0x10c8:
+        if (lbl_803A6818.field_28 == 1) {
+            tint = 0x140000;
+        } else {
+            tint = 0x4a0000;
+        }
+        fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x3718) >> 16)) / 2), 0,
+                    tint | alphaSprite->alphaByte, (void*)0x3718);
+        break;
+    case 0x10c9:
+        if (lbl_803A6818.field_28 == 2) {
+            tint = 0x140000;
+        } else {
+            tint = 0x4a0000;
+        }
+        fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x3719) >> 16)) / 2), 0,
+                    tint | alphaSprite->alphaByte, (void*)0x3719);
+        break;
+    case 0xfbf:
+        break;
+    default:
+        break;
+    }
+}
+#pragma peephole reset
