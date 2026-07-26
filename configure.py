@@ -272,7 +272,7 @@ config.libs = [
             Object(Matching, "hsd/hsd_obj_forget_exact_801AA350.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 exact
             Object(CodeCandidate, "hsd/hsd_mobj_candidate_801AA35C.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 residual
             Object(Matching, "hsd/hsd_obj_info_exact_801AA568.c", mw_version="GC/1.3", progress_category="hsd"),  # PR419 exact
-            Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", progress_category="hsd"),  # BANK_HSD_POBJ
+            Object(CodeCandidate, "hsd/hsd_pobj_range_801AA608.c", mw_version="GC/1.3", extra_cflags=["-use_lmw_stmw on"], progress_category="hsd"),  # BANK_HSD_POBJ
             Object(Matching, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
             Object(
                 Matching,
@@ -3520,6 +3520,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_range_801920E4.c",
                 mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -3539,7 +3540,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_robj_range_801AEBE4.c",
                 mw_version="GC/1.3",
-                extra_cflags=["-O2"],
+                extra_cflags=["-O2", "-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -3564,6 +3565,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_tobj_candidate_801BBDDC.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -6758,6 +6760,8 @@ config.libs = [
                             "hsd/hsd_cobj_candidate_80193C24.c",
                             "hsd/hsd_cobj_candidate_80194510.c",
                         )
+                        else ["-use_lmw_stmw on"]
+                        if path == "hsd/hsd_cobj_candidate_80197344.c"
                         else []
                     ),
                     progress_category="hsd",
@@ -6823,6 +6827,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_jobj_residual_801A05EC.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -6847,6 +6852,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_jobj_residual_801A0D94.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -6871,6 +6877,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_jobj_residual_801A1B7C.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -6883,6 +6890,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_lobj.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -7029,6 +7037,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_mobj_candidate_801A6FF0.c",
                 mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -7084,6 +7093,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_texp_candidate_801B28C8.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
