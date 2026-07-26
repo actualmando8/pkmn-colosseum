@@ -3970,3 +3970,182 @@ void fn_80044630(void) {
     }
     lbl_8047A4E4 = 0;
 }
+
+/* People-screen: draw the currently highlighted Pokemon's type icons. */
+#pragma peephole off
+void fn_80041BD0(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern u16 lbl_802E554C[];
+    extern u32 gamedataGetStatus(s32 a, s32 b);
+    extern void pokemonCreate(u32 work, u16 species, s32 level, u32 trainer);
+    extern u32 memoDataGetPokemonRndFromID(s32 a, u32 id);
+    extern u32 memoDataGetPokemonTrainerRndFromID(s32 a, u32 id);
+    extern void pokemonBiosSetRnd(u32 work, u32 rnd);
+    extern void pokemonBiosSetCatchTrainerRnd(u32 work, u32 rnd);
+    extern u32 pokemonGetStatus(u32 a, u32 b, s32 id, s32 index);
+    extern void windowDrawSprite(s16 x, s16 y, PdaSprite* sprite, u16 id, s32 arg4);
+    PdaSceneWork* scene = &lbl_803A6818;
+    u32 work = lbl_8047A4E0;
+    u32 pokemon;
+    u32 id;
+    u32 rnd;
+    u16 type0;
+    u16 type1;
+    u8 seen;
+
+    if (work != 0) {
+        id = lbl_8047A4E4[scene->currentIndex];
+        if (id >= 0x8000) {
+            id = id & 0x3fff;
+        }
+        pokemonCreate(work, (u16)id, 10, gamedataGetStatus(0, 1));
+        rnd = memoDataGetPokemonRndFromID(0, id);
+        id = memoDataGetPokemonTrainerRndFromID(0, id);
+        pokemonBiosSetRnd(work, rnd);
+        pokemonBiosSetCatchTrainerRnd(work, id);
+        pokemon = lbl_8047A4E0;
+    } else {
+        pokemon = 0;
+    }
+
+    alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+    seen = (lbl_8047A4E4[lbl_803A6818.currentIndex] & 0x8000) ? 0 : 1;
+    if (seen != 0) {
+        type0 = pokemonGetStatus(
+            0, (u16)pokemonGetStatus(pokemon, 0, 0x6e, 0), 0x16, 0);
+        windowDrawSprite(
+            (s16)(*(s16*)(lbl_802EF0A8 + 0x5996) - sprite->field_50),
+            (s16)(*(s16*)(lbl_802EF0A8 + 0x5998) - sprite->field_52),
+            alphaSprite, lbl_802E554C[type0], 0);
+        type1 = pokemonGetStatus(
+            0, (u16)pokemonGetStatus(pokemon, 0, 0x6e, 0), 0x16, 1);
+        if (type0 != type1) {
+            windowDrawSprite(
+                (s16)(*(s16*)(lbl_802EF0A8 + 0x59b2) - sprite->field_50),
+                (s16)(*(s16*)(lbl_802EF0A8 + 0x59b4) - sprite->field_52),
+                alphaSprite, lbl_802E554C[type1], 0);
+        }
+    } else {
+        windowDrawSprite((s16)(*(s16*)(lbl_802EF0A8 + 0x5996) - sprite->field_50),
+                         (s16)(*(s16*)(lbl_802EF0A8 + 0x5998) - sprite->field_52),
+                         alphaSprite, 0x5d, 0);
+        windowDrawSprite((s16)(*(s16*)(lbl_802EF0A8 + 0x59b2) - sprite->field_50),
+                         (s16)(*(s16*)(lbl_802EF0A8 + 0x59b4) - sprite->field_52),
+                         alphaSprite, 0x5d, 0);
+    }
+}
+#pragma peephole reset
+
+typedef struct PdaVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} PdaVec3;
+
+extern void GSvecCopy(void* dst, void* src);
+extern void* GSmodelGetBound(void* model);
+extern void ObjInfoInit(void* bound, void* out);
+extern void GScameraGetPerspective(void* cam, f32* a, f32* b, f32* c, f32* d);
+extern void GScameraSetPerspective(void* cam, f32 a, f32 b, f32 c, f32 d);
+extern void GScameraSetPosition(void* cam, void* pos);
+extern void GScameraSetRotation(void* cam, void* rot);
+extern void GScameraLookAt(void* cam, void* a, void* b);
+extern void set__5GSvecFfff(void* vec, f32 x, f32 y, f32 z);
+extern void GSlightSetType(void* light, s32 type);
+extern void GSlightSetColor(void* light, void* color);
+extern void GSlightSetPosition(void* light, void* pos);
+extern void GSlightSetTarget(void* light, void* target);
+extern void GSlightSetActive(void* light, s32 active);
+extern u8 lbl_802E543C[];
+extern u8 lbl_802E5448[];
+extern u8 lbl_80267180[];
+extern f32 lbl_8047BC9C;
+extern u8 fn_80047CC0(u8* work);
+extern u8 fn_800478B4(u8* work, u8* sub);
+
+/* Bring the PDA model/camera/light rig online for the summary screen. */
+static inline u8 fn_8003D1FC_setup(u8* sub)
+{
+    void* model;
+    void* cam;
+    f32 persp0;
+    f32 persp1;
+    f32 persp2;
+    f32 persp3;
+    PdaVec3 color;
+    PdaVec3 lightPos;
+    PdaVec3 lightTarget;
+    PdaVec3 pos;
+    PdaVec3 bound;
+    f32 dist;
+
+    if (sub == NULL) {
+        return 0;
+    }
+    model = *(void**)((u8*)&lbl_803A6818 + 0xe8);
+    if (model == NULL) {
+        *sub = 0;
+        return 0;
+    }
+    GSvecCopy(&pos, (u8*)&lbl_803A6818 + 0x1e8);
+    GSvecCopy(lbl_802E5448, (u8*)&lbl_803A6818 + 0x1f4);
+    persp0 = *(f32*)((u8*)&lbl_803A6818 + 0x200);
+    persp1 = *(f32*)((u8*)&lbl_803A6818 + 0x204);
+    persp2 = *(f32*)((u8*)&lbl_803A6818 + 0x208);
+    persp3 = *(f32*)((u8*)&lbl_803A6818 + 0x20c);
+    dist = *(f32*)((u8*)&lbl_803A6818 + 0x210);
+    ObjInfoInit(GSmodelGetBound(model), &bound);
+    GSscene_SetMode(3);
+    GScameraGetPerspective(*(void**)((u8*)&lbl_803A6818 + 0xfc), &persp0, &persp1, &persp2,
+                           &persp3);
+    set__5GSvecFfff(&pos, lbl_8047BC94, lbl_8047BC94, dist);
+    GScameraSetPosition(*(void**)((u8*)&lbl_803A6818 + 0xfc), &pos);
+    GScameraSetPerspective(*(void**)((u8*)&lbl_803A6818 + 0xfc), persp0, persp1, persp2,
+                           persp3);
+    GScameraLookAt(*(void**)((u8*)&lbl_803A6818 + 0xfc), lbl_802E543C, lbl_802E5448);
+    color = *(PdaVec3*)lbl_80267180;
+    memcpy(&lightPos, &pos, 12);
+    lightPos.x = lightPos.x - lbl_8047BC98;
+    lightPos.y = lightPos.y + lbl_8047BC9C;
+    GSlightSetType(*(void**)((u8*)&lbl_803A6818 + 0x108), 2);
+    GSlightSetColor(*(void**)((u8*)&lbl_803A6818 + 0x108), &color);
+    GSlightSetPosition(*(void**)((u8*)&lbl_803A6818 + 0x108), &lightPos);
+    GSlightSetTarget(*(void**)((u8*)&lbl_803A6818 + 0x108), &lightTarget);
+    GSlightSetActive(*(void**)((u8*)&lbl_803A6818 + 0x108), 1);
+    cam = *(void**)((u8*)&lbl_803A6818 + 0x114);
+    if (cam != NULL) {
+        GScameraSetPosition(cam, (u8*)&lbl_803A6818 + 0x118);
+        GScameraSetRotation(cam, (u8*)&lbl_803A6818 + 0x124);
+        GScameraSetPerspective(cam, *(f32*)((u8*)&lbl_803A6818 + 0x13c), *(f32*)((u8*)&lbl_803A6818 + 0x140),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x144), *(f32*)((u8*)&lbl_803A6818 + 0x148));
+    }
+    GSscene_SetMode(3);
+    GSscene_SetMode(4);
+    return 1;
+}
+
+s32 fn_8003D1FC(void)
+{
+    switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 6:
+    case 7:
+    case 8:
+    case 0xb:
+    case 0xc:
+        *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
+        break;
+    case 5:
+        *((u8*)&lbl_803A6818 + 0x214) =
+            fn_800478B4((u8*)&lbl_803A6818 + 0x7c, (u8*)&lbl_803A6818 + 0xc4);
+        *((u8*)&lbl_803A6818 + 0x214) =
+            fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
