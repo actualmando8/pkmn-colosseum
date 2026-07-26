@@ -13,6 +13,67 @@ typedef struct FlagStateEntry {
     u32* buffer;
 } FlagStateEntry;
 
+typedef struct FlagDefinition {
+    u8 typeAndWidth;
+    u8 _pad01[3];
+    u16 bitPosition;
+    u8 _pad06[2];
+} FlagDefinition;
+
+extern const char lbl_802741F8[];
+extern void GSlogWrite(const char* fmt, ...);
+
+void GSflagInitBitPos(FlagDefinition* definitions, u32 count, u32 capacity1,
+                      u32 capacity2, u32 capacity3)
+{
+    u16 next1 = 0;
+    u16 next2 = 0;
+    u16 next3 = 0;
+    u32 i;
+
+    for (i = 0; i < count; i++, definitions++) {
+        u32 width = definitions->typeAndWidth & 0x3F;
+        u32 type;
+
+        if (width > 32) {
+            GSlogWrite(lbl_802741F8 + 0xF8, i, width, 32);
+            definitions->typeAndWidth =
+                (definitions->typeAndWidth & 0xC0) | 32;
+        } else if (width == 0) {
+            GSlogWrite(lbl_802741F8 + 0x144, i, width, 32);
+            definitions->typeAndWidth =
+                (definitions->typeAndWidth & 0xC0) | 1;
+        }
+
+        width = definitions->typeAndWidth & 0x3F;
+        type = (definitions->typeAndWidth >> 6) & 3;
+        switch (type) {
+        case 1:
+            definitions->bitPosition = next1;
+            next1 += width;
+            break;
+        case 2:
+            definitions->bitPosition = next2;
+            next2 += width;
+            break;
+        case 3:
+            definitions->bitPosition = next3;
+            next3 += width;
+            break;
+        }
+    }
+
+    if (capacity1 <= ((next1 + 31) >> 5)) {
+        GSlogWrite(lbl_802741F8 + 0x18C, (next1 + 31) >> 5, capacity1);
+    }
+    if (capacity2 <= ((next2 + 31) >> 5)) {
+        GSlogWrite(lbl_802741F8 + 0x1D8, (next2 + 31) >> 5, capacity2);
+    }
+    if (capacity3 <= ((next3 + 31) >> 5)) {
+        GSlogWrite(lbl_802741F8 + 0x224, (next3 + 31) >> 5, capacity3);
+    }
+}
+
 u8 fn_801902E0(s32 flagId)
 {
     extern u8* lbl_80478F9C;
