@@ -317,6 +317,8 @@ asm void debugMenuColorBarDisp(void) {
 #include "src/game/effect/effect_util_fn_80133450.inc"
 }
 #else
+#pragma optimization_level 4
+#pragma scheduling on
 u32 debugMenuColorBarDisp(void) {
     *(u8*)&lbl_80478820 = 0;
     menuOpenCustom(5, 0, 0, 0, 1, 0);
@@ -324,6 +326,7 @@ u32 debugMenuColorBarDisp(void) {
     *(u8*)&lbl_80478820 = 1;
     return 0;
 }
+#pragma scheduling off
 #endif
 
 
