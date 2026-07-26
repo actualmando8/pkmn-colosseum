@@ -13,7 +13,7 @@
 extern s32   fn_801A6990(void* obj);
 extern void  fn_800B7D3C(void);
 extern void  fn_801C27F4(void* aobj, void* pobj, void* method);
-extern void  PObjRelease(void);
+extern void  PObjRelease(HSD_Class* object);
 extern void  PObjAmnesia(void* pobj);
 extern void  PObjSetupMtx(void);
 extern void  PObjLoad(void);
@@ -21,6 +21,10 @@ extern void  PObjUpdateFunc(HSD_PObj* pobj, s32 idx, f32* weight_ptr);
 extern void  HSD_JObjUnrefThis(HSD_JObj* jobj);
 extern void  HSD_JObjRefThis(HSD_JObj* jobj);
 extern void* HSD_IDGetDataFromTable(void* table, u32 id, s32* success);
+extern void  HSD_AObjRemove(HSD_AObj* aobj);
+extern void  fn_801A6960(void* mem);
+extern void  fn_80193AF0(void* mem, s32 size);
+extern HSD_SList* fn_801A3E64(HSD_SList* list);
 
 /* Data / global symbols (DTK names). */
 extern u8    lbl_8036CCD0[];         /* PObj class info (data)      */
@@ -58,6 +62,55 @@ void HSD_PObjInit(void)
     *(void**) ((u8*) lbl_8036CCD0 + 0x48) = (void*) PObjUpdateFunc;
 }
 #pragma pop
+
+static inline void PObjFreeEnvelopeList(HSD_SList* list)
+{
+    while (list != NULL) {
+        HSD_Envelope* envelope = list->data;
+
+        while (envelope != NULL) {
+            HSD_Envelope* next = envelope->next;
+            HSD_JObjUnrefThis(envelope->jobj);
+            fn_80193AF0(envelope, sizeof(HSD_Envelope));
+            envelope = next;
+        }
+        list = fn_801A3E64(list);
+    }
+}
+
+static inline void PObjFreeShapeSet(HSD_ShapeSet* shapeSet)
+{
+    if (shapeSet == NULL) {
+        return;
+    }
+    if (shapeSet->flags & 2) {
+        fn_801A6960(shapeSet->blend.bp);
+    }
+    fn_80193AF0(shapeSet, sizeof(HSD_ShapeSet));
+}
+
+void PObjRelease(HSD_Class* object)
+{
+    HSD_PObj* pobj = HSD_POBJ(object);
+
+    if (pobj->aobj != NULL) {
+        HSD_AObjRemove(pobj->aobj);
+    }
+    switch (pobj->flags & 0x3000) {
+    case 0x1000:
+        PObjFreeShapeSet(pobj->u.shape_set);
+        break;
+    case 0x2000:
+        PObjFreeEnvelopeList(pobj->u.envelope_list);
+        break;
+    case 0:
+        HSD_JObjUnrefThis(pobj->u.jobj);
+        break;
+    default:
+        break;
+    }
+    ((HSD_ClassInfo*)lbl_8036CCD0)->head.parent->release(object);
+}
 
 /* Address: 0x801AA6D0 | Size: 0xB8  -- PObj remove */
 #pragma push
@@ -524,6 +577,51 @@ void get_shape_vertex_xyz(HSD_ShapeSet* shape_set, s32 shape_id, s32 arrayidx,
             HSD_Panic(&lbl_8047DCB8, 1125, "unexpected vertex type.\n");
         }
     }
+}
+
+typedef struct EulerVec {
+    f32 x;
+    f32 y;
+    f32 z;
+} EulerVec;
+
+typedef struct Quaternion {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+} Quaternion;
+
+extern const f32 lbl_8047DD1C;
+extern double cos(double x);
+extern double sin(double x);
+
+s32 fn_801ADAAC(EulerVec* euler, Quaternion* q)
+{
+    f32 cx;
+    f32 cy;
+    f32 cz;
+    f32 sx;
+    f32 sy;
+    f32 sz;
+    f32 cc;
+    f32 ss;
+
+    cx = cos(lbl_8047DD1C * euler->x);
+    cy = cos(lbl_8047DD1C * euler->y);
+    cz = cos(lbl_8047DD1C * euler->z);
+    sx = sin(lbl_8047DD1C * euler->x);
+    sy = sin(lbl_8047DD1C * euler->y);
+    sz = sin(lbl_8047DD1C * euler->z);
+
+    ss = sy * sz;
+    cc = cy * cz;
+    q->w = cx * cc + sx * ss;
+    q->x = sx * cc - cx * ss;
+    q->y = cz * (cx * sy) + sz * (sx * cy);
+    q->z = sz * (cx * cy) - cz * (sx * sy);
+
+    return 1;
 }
 
 /* Address: 0x801ADC08 | Size: 0x34  -- Forget RNG memory state */

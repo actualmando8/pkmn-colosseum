@@ -104,8 +104,8 @@ typedef struct GXData_800BB30C {
     /* 0x0D8 */ u32 suTs1[8];
     /* 0x0F8 */ u32 scissorTL;
     /* 0x0FC */ u32 scissorBR;
-    /* 0x100 */ u8 pad_100[0x20];
-    /* 0x120 */ u32 field_120;
+    /* 0x100 */ u32 tref[8];
+    /* 0x120 */ u32 iref;
     /* 0x124 */ u32 field_124;
     /* 0x128 */ u8 pad_128[0x8];
     /* 0x130 */ u32 tevColorEnv[16];
@@ -138,9 +138,9 @@ typedef struct GXData_800BB30C {
     /* 0x454 */ u8 pad_454[0x8];
     /* 0x45C */ u32 texMapSize[8];
     /* 0x47C */ u32 texMapWrap[8];
-    /* 0x49C */ u8 pad_49C[0x40];
-    /* 0x4DC */ u32 field_4DC;
-    /* 0x4E0 */ u32 field_4E0;
+    /* 0x49C */ u32 texmapId[16];
+    /* 0x4DC */ u32 tcsManEnab;
+    /* 0x4E0 */ u32 tevTcEnab;
     /* 0x4E4 */ GXPerf0_800BB30C perf0;
     /* 0x4E8 */ GXPerf1_800BB30C perf1;
     /* 0x4EC */ u32 perfSel;
@@ -229,6 +229,120 @@ void fn_800BB30C(u32 texMap, u32 texCoord) {
     p->field_002 = 0;
 }
 
+void __GXSetSUTexRegs(void) {
+    extern void fn_800BB30C(u32 texMap, u32 texCoord);
+    u32 nStages;
+    u32 nIndStages;
+    u32 i;
+    u32 map;
+    u32 texMap;
+    u32 texCoord;
+    u32* tref;
+
+    if (gx->tcsManEnab != 0xFF) {
+        nStages = ((gx->genMode >> 10) & 0xF) + 1;
+        nIndStages = (gx->genMode >> 16) & 7;
+        for (i = 0; i < nIndStages; i++) {
+            switch (i) {
+            case 0:
+                texMap = gx->iref & 7;
+                texCoord = (gx->iref >> 3) & 7;
+                break;
+            case 1:
+                texMap = (gx->iref >> 6) & 7;
+                texCoord = (gx->iref >> 9) & 7;
+                break;
+            case 2:
+                texMap = (gx->iref >> 12) & 7;
+                texCoord = (gx->iref >> 15) & 7;
+                break;
+            case 3:
+                texMap = (gx->iref >> 18) & 7;
+                texCoord = (gx->iref >> 21) & 7;
+                break;
+            }
+            if (!(gx->tcsManEnab & (1 << texCoord))) {
+                fn_800BB30C(texMap, texCoord);
+            }
+        }
+
+        for (i = 0; i < nStages; i++) {
+            tref = &gx->tref[i / 2];
+            map = gx->texmapId[i];
+            texMap = map & ~0x100U;
+            if (i & 1) {
+                texCoord = (*tref >> 15) & 7;
+            } else {
+                texCoord = (*tref >> 3) & 7;
+            }
+            if (texMap != 0xFF &&
+                !(gx->tcsManEnab & (1 << texCoord)) &&
+                (gx->tevTcEnab & (1 << i))) {
+                fn_800BB30C(texMap, texCoord);
+            }
+        }
+    }
+}
+
+void __GXSetTmemConfig(u32 config) {
+    switch (config) {
+    case 2:
+        GX_BP_REG(0x8C0D8000);
+        GX_BP_REG(0x900DC000);
+        GX_BP_REG(0x8D0D8800);
+        GX_BP_REG(0x910DC800);
+        GX_BP_REG(0x8E0D9000);
+        GX_BP_REG(0x920DD000);
+        GX_BP_REG(0x8F0D9800);
+        GX_BP_REG(0x930DD800);
+        GX_BP_REG(0xAC0DA000);
+        GX_BP_REG(0xB00DC400);
+        GX_BP_REG(0xAD0DA800);
+        GX_BP_REG(0xB10DCC00);
+        GX_BP_REG(0xAE0DB000);
+        GX_BP_REG(0xB20DD400);
+        GX_BP_REG(0xAF0DB800);
+        GX_BP_REG(0xB30DDC00);
+        break;
+    case 1:
+        GX_BP_REG(0x8C0D8000);
+        GX_BP_REG(0x900DC000);
+        GX_BP_REG(0x8D0D8800);
+        GX_BP_REG(0x910DC800);
+        GX_BP_REG(0x8E0D9000);
+        GX_BP_REG(0x920DD000);
+        GX_BP_REG(0x8F0D9800);
+        GX_BP_REG(0x930DD800);
+        GX_BP_REG(0xAC0DA000);
+        GX_BP_REG(0xB00DE000);
+        GX_BP_REG(0xAD0DA800);
+        GX_BP_REG(0xB10DE800);
+        GX_BP_REG(0xAE0DB000);
+        GX_BP_REG(0xB20DF000);
+        GX_BP_REG(0xAF0DB800);
+        GX_BP_REG(0xB30DF800);
+        break;
+    default:
+        GX_BP_REG(0x8C0D8000);
+        GX_BP_REG(0x900DC000);
+        GX_BP_REG(0x8D0D8400);
+        GX_BP_REG(0x910DC400);
+        GX_BP_REG(0x8E0D8800);
+        GX_BP_REG(0x920DC800);
+        GX_BP_REG(0x8F0D8C00);
+        GX_BP_REG(0x930DCC00);
+        GX_BP_REG(0xAC0D9000);
+        GX_BP_REG(0xB00DD000);
+        GX_BP_REG(0xAD0D9400);
+        GX_BP_REG(0xB10DD400);
+        GX_BP_REG(0xAE0D9800);
+        GX_BP_REG(0xB20DD800);
+        GX_BP_REG(0xAF0D9C00);
+        GX_BP_REG(0xB30DDC00);
+        break;
+    }
+}
+
 void fn_800BB780(u32 dstCoord, u32 func, u32 srcParam, u32 mtx,
                  u32 normalize, u32 postMtx, u32 normalizeColor,
                  u8 bias, u8 arg8, u32 arg9) {
@@ -287,16 +401,16 @@ void fn_800BC024(void) {
     for (i = 0; i < nIndStages; i++) {
         switch (i) {
         case 0:
-            texMap = gx->field_120 & 7;
+            texMap = gx->iref & 7;
             break;
         case 1:
-            texMap = (gx->field_120 >> 6) & 7;
+            texMap = (gx->iref >> 6) & 7;
             break;
         case 2:
-            texMap = (gx->field_120 >> 12) & 7;
+            texMap = (gx->iref >> 12) & 7;
             break;
         case 3:
-            texMap = (gx->field_120 >> 18) & 7;
+            texMap = (gx->iref >> 18) & 7;
             break;
         }
         mask |= 1 << texMap;

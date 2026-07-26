@@ -260,6 +260,7 @@ volatile u16 __DSPRegs[32] AT_ADDRESS(0xCC005000);
 volatile u32 __AIRegs[4] AT_ADDRESS(0xCC006C00);
 
 extern const char* lbl_80478A30;
+extern const char* lbl_80478A28;
 extern const char* lbl_80478A38;
 extern const char* lbl_80478A40;
 extern const char* lbl_80478A48;
@@ -268,7 +269,13 @@ extern AISCallback lbl_8047A8C8;
 extern AIDCallback lbl_8047A8CC;
 extern void* lbl_8047A8D0;
 extern void* lbl_8047A8D4;
+extern BOOL lbl_8047A8D8;
 extern BOOL lbl_8047A8DC;
+extern s64 lbl_8047A8E0;
+extern s64 lbl_8047A8E8;
+extern s64 lbl_8047A8F0;
+extern s64 lbl_8047A8F8;
+extern s64 lbl_8047A900;
 extern ARCallback lbl_8047A908;
 extern u32 lbl_8047A90C;
 extern u32 lbl_8047A910;
@@ -397,6 +404,13 @@ extern void DCInvalidateRange(void* addr, u32 length);
 extern DSPTaskInfo* DSPAddTask(DSPTaskInfo* task);
 extern void InitCallback(void* task);
 extern void DoneCallback(void* task);
+extern void __AIDHandler(__OSInterrupt interrupt, OSContext* context);
+extern void __AISHandler(__OSInterrupt interrupt, OSContext* context);
+
+#define OS_BUS_CLOCK_800AC02C   (*(u32*)0x800000F8)
+#define OS_TIMER_CLOCK_800AC02C (OS_BUS_CLOCK_800AC02C / 4)
+#define OSNanosecondsToTicks_800AC02C(nsec) \
+    (((nsec) * (OS_TIMER_CLOCK_800AC02C / 125000)) / 8000)
 
 #if defined(SDK_AC02C_EXACT_AI_800AC02C_800AC440) || \
     defined(SDK_AC02C_EXACT_AI_800AC5AC_800AC6D4) || \
@@ -557,6 +571,36 @@ void AISetStreamVolRight(u32 volume) {
 u32 AIGetStreamVolRight(void) {
     return (AI_REGS->volume >> 8) & 0xff;
 }
+
+#if !defined(SDK_AC02C_EXACT_ACTIVE)
+void AIInit(u8* stack) {
+    if (lbl_8047A8D8 != TRUE) {
+        OSRegisterVersion(lbl_80478A28);
+
+        lbl_8047A8E0 = OSNanosecondsToTicks_800AC02C(31524);
+        lbl_8047A8E8 = OSNanosecondsToTicks_800AC02C(42024);
+        lbl_8047A8F0 = OSNanosecondsToTicks_800AC02C(42000);
+        lbl_8047A8F8 = OSNanosecondsToTicks_800AC02C(63000);
+        lbl_8047A900 = OSNanosecondsToTicks_800AC02C(3000);
+        AISetStreamVolRight(0);
+        AISetStreamVolLeft(0);
+        __AIRegs[0] = (__AIRegs[0] & ~0x20) | 0x20;
+        __AIRegs[1] &= ~0xFF;
+        __AIRegs[2] = 0;
+        __AIRegs[3] = 0;
+        __AI_set_stream_sample_rate(1);
+        AISetDSPSampleRate(0);
+        lbl_8047A8C8 = NULL;
+        lbl_8047A8CC = NULL;
+        lbl_8047A8D0 = stack;
+        __OSSetInterruptHandler(5, __AIDHandler);
+        __OSUnmaskInterrupts(0x04000000);
+        __OSSetInterruptHandler(8, __AISHandler);
+        __OSUnmaskInterrupts(0x00800000);
+        lbl_8047A8D8 = TRUE;
+    }
+}
+#endif
 #endif
 
 #if !defined(SDK_AC02C_EXACT_ACTIVE) || \
@@ -602,6 +646,46 @@ void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
 void __AICallbackStackSwitch(AIDCallback callback) {
     *(void**)0x8047A8D4 = (void*)OSGetStackPointer();
     OSSwitchFiber((u32)callback, *(u32*)0x8047A8D0);
+}
+
+void __AI_SRC_INIT(void) {
+    s64 rising32 = 0;
+    s64 rising48 = 0;
+    s64 diff = 0;
+    s64 wait = 0;
+    u32 sample;
+    u32 done = 0;
+
+    while (!done) {
+        __AIRegs[0] = (__AIRegs[0] & ~0x20) | 0x20;
+        __AIRegs[0] &= ~2U;
+        __AIRegs[0] = (__AIRegs[0] & ~1U) | 1;
+        sample = __AIRegs[2];
+        while (sample == __AIRegs[2]) {
+        }
+        rising32 = OSGetTime();
+
+        __AIRegs[0] = (__AIRegs[0] & ~2U) | 2;
+        __AIRegs[0] = (__AIRegs[0] & ~1U) | 1;
+        sample = __AIRegs[2];
+        while (sample == __AIRegs[2]) {
+        }
+        rising48 = OSGetTime();
+        diff = rising48 - rising32;
+
+        __AIRegs[0] &= ~2U;
+        __AIRegs[0] &= ~1U;
+        if (diff < lbl_8047A8E0 - lbl_8047A900) {
+            wait = lbl_8047A8F0;
+            done = 1;
+        } else if (diff >= lbl_8047A8E0 + lbl_8047A900 &&
+                   diff < lbl_8047A8E8 - lbl_8047A900) {
+            wait = lbl_8047A8F8;
+            done = 1;
+        }
+    }
+    while (rising48 + wait > OSGetTime()) {
+    }
 }
 #endif
 

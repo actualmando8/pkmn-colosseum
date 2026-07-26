@@ -40,6 +40,7 @@ struct HSD_PObj {
         HSD_ShapeSet* shape_set;
         HSD_SList* envelope_list;
     } u;
+    HSD_AObj* aobj;
 };
 
 /* ========================================================================= */
