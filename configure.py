@@ -2643,7 +2643,12 @@ config.libs = [
                 CodeCandidate,
                 "game/menu/cardesavedata_80084038.c",
                 mw_version="GC/2.5",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-O3",
+                ],
                 progress_category="game",
             ),
             Object(
@@ -2692,7 +2697,12 @@ config.libs = [
                 CodeCandidate,
                 "game/gbaCommunication_candidate_80094650_gc125n.c",
                 mw_version="GC/1.2.5n",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-O0",
+                ],
                 progress_category="game",
             ),
             Object(
@@ -5815,6 +5825,10 @@ config.libs = [
                 CodeCandidate,
                 "game/gs_range_800E0DDC_r40_800E1544_gc125n.c",
                 mw_version="GC/1.2.5n",
+                cflags=[
+                    "-O3" if flag == "-O4,p" else flag
+                    for flag in cflags_base
+                ],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -8072,6 +8086,12 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "hsd/hsd_texp_compile_candidate_801B4300.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
                 "hsd/hsd_texp_candidate_801B4300.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
@@ -8115,6 +8135,12 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "hsd/hsd_texp_candidate_801B7BD4_r40_801B8B84.c",
+                mw_version="GC/1.3",
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_texp_candidate_801B8D5C.c",
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),

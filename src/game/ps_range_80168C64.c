@@ -65,6 +65,8 @@
  *     guessed.
  */
 #include "dolphin/types.h"
+#include "dolphin/mtx.h"
+#include "dolphin/gx/GXInternal.h"
 #include "game/ps_types.h"
 #include "game/script/script.h"
 #include "hsd/hsd_object.h"
@@ -102,13 +104,34 @@ typedef struct PSJObjTransform {
     f32 translateZ;
 } PSJObjTransform;
 
+typedef struct PSCameraView {
+    u8 pad00[0x0C];
+    Vec position;
+} PSCameraView;
+
+typedef struct PSCameraObject {
+    u8 pad00[0x24];
+    PSCameraView* view;
+} PSCameraObject;
+
+typedef struct PSColor {
+    u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
+} PSColor;
+
 extern s32 lbl_8047B170;
 extern PSFloatBytes lbl_8047B178;
 
 extern PSGeneratorState* lbl_8047B188;
+extern PSGeneratorState** lbl_8047B184;
+extern PSGeneratorState* lbl_8047B18C;
 extern PSAppSRT* lbl_8047B124;
 extern u32 lbl_80452708[];
 extern u32 lbl_80452748[];
+extern void* lbl_80452AC8[];
+extern s32 lbl_80452CC8[];
 extern PSParticle* lbl_80452788[];
 extern PSParticle* lbl_8047B108;
 extern HSD_Obj* lbl_8047B128;
@@ -117,11 +140,23 @@ extern const char lbl_802737B8[];
 extern const char lbl_802737C4[];
 extern const char lbl_80273820[];
 extern const char lbl_8027382C[];
+extern const char lbl_802739E4[];
+extern const char lbl_802739F0[];
 extern u16 lbl_8047B110;
 extern u16 lbl_8047B114;
 extern u16 lbl_8047B116;
 extern u16 lbl_8047B120;
 extern u16 lbl_8047B11A;
+extern u16 lbl_8047B112;
+extern u16 lbl_8047B118;
+extern u8 lbl_80478C30;
+extern u16 lbl_80478C38;
+extern s32 lbl_8047B12C;
+extern s32 lbl_8047B164;
+extern PSColor lbl_8047B13C;
+extern PSColor lbl_8047B140;
+extern PSColor lbl_8047B134;
+extern PSColor lbl_8047B138;
 
 /* ======================================================================
  * External functions - real symbol names per config/GC6E01/symbols.txt.
@@ -137,7 +172,7 @@ extern f32 fn_801ADC7C(void);                                           /* psRan
 extern PSParticle* psGenerateParticleID0(PSParticle* pp, s32 linkNo,
                                          s32 bankIdx, s32 scriptId,
                                          void* arg);                    /* 0x80169A48 */
-extern PSParticle* psCreateGeneratorID(PSParticle* pp, u8 linkNo, u8 bankIdx, u16 scriptId);
+extern PSGeneratorState* psCreateGeneratorID(s32 linkNo, s32 bankIdx, s32 scriptId);
 extern void psCopyGeneratorData(PSParticle* gen, void* peopleObj);       /* 0x80172930 */
 extern s32 psChangeParticleAppSRT(PSParticle* pp, PSAppSRT* parentObj); /* 0x8016A878 */
 extern s32 psAttachParticleAppSRT(PSParticle* pp, PSAppSRT* parentObj);
@@ -171,6 +206,34 @@ extern void fn_801A6960(void* ptr);
 extern void* fn_801A6928(s32 size);
 extern void __assert(const char* file, u32 line, const char* msg);
 extern void* memset(void* dst, s32 value, u32 size);
+extern void PSMTXIdentity(Mtx m);
+extern void PSMTXCopy(const Mtx source, Mtx destination);
+extern void PSMTXRotRad(Mtx m, char axis, f32 angle);
+extern void PSMTXConcat(const Mtx a, const Mtx b, Mtx out);
+extern void PSVECNormalize(const Vec* src, Vec* dst);
+extern void PSVECCrossProduct(const Vec* a, const Vec* b, Vec* out);
+extern void HSD_CObjGetUpVector(void* camera, Vec* up);
+extern f32 lbl_8047D6B4;
+extern f32 lbl_8047D5CC;
+extern f32 lbl_8047D618;
+extern f64 lbl_8047D5E0;
+extern f32 lbl_8047D5D8;
+extern f32 lbl_8047D5DC;
+extern f32 lbl_8047B14C;
+extern f32 lbl_8047B150;
+extern f32 lbl_8047B154;
+extern f32 lbl_8047B158;
+extern f32 lbl_8047B15C;
+extern f32 lbl_8047B160;
+extern u8 lbl_80452DE8[];
+extern void fn_800BD554(s32 mode);
+extern void fn_800B7D3C(void);
+extern void fn_800B7874(s32 attribute, s32 type);
+extern void fn_800B928C(s32 primitive, s32 format, s32 count);
+extern void fn_800B9404(s32 width, s32 offset);
+extern void fn_800BA4C8(s32 channel, const PSColor* color);
+extern void fn_800BA5BC(s32 channel, const PSColor* color);
+extern void fn_800BC2F8(s32 reg, const PSColor* color);
 
 #if !defined(PR410_PS_SPLIT) || defined(PR410_PS_PREFIX)
 
@@ -1175,7 +1238,7 @@ void psInterpretParticles(u32 linkMask) {
  * Executes one frame of a single particle script. See file header for
  * identification evidence and coverage notes.
  * ====================================================================== */
-PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
+PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
     u8* stream;
     u8 opcode;
     u16 delay;
@@ -1453,7 +1516,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         spawned->positionX = pp->positionX;
                         spawned->positionY = pp->positionY;
                         spawned->positionZ = pp->positionZ;
-                        psinterpret_Main(spawned, pp);
+                        psInterpretParticle0(spawned, pp);
                         break;
                     }
 
@@ -1482,7 +1545,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         spawned->positionX = pp->positionX;
                         spawned->positionY = pp->positionY;
                         spawned->positionZ = pp->positionZ;
-                        psinterpret_Main(spawned, pp);
+                        psInterpretParticle0(spawned, pp);
                         break;
                     }
 
@@ -1528,6 +1591,77 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
+                    /* ---- 0xAB: scale velocity (verified @ 0x80170988) ---- */
+                    case 0xAB: {
+                        f32 factor;
+
+                        stream = getFloat(stream, &factor);
+                        pp->velocityX *= factor;
+                        pp->velocityY *= factor;
+                        pp->velocityZ *= factor;
+                        break;
+                    }
+
+                    /* ---- 0xAC: randomized lerp target (verified @ 0x801709CC) ---- */
+                    case 0xAC: {
+                        f32 range;
+
+                        stream = getTime(stream, &pp->lerpTimer);
+                        stream = getFloat(stream, &pp->lerpTarget);
+                        stream = getFloat(stream, &range);
+                        pp->lerpTarget += range * fn_801ADC7C();
+                        if (pp->lerpTimer == 0) {
+                            pp->lerpValue = pp->lerpTarget;
+                        }
+                        break;
+                    }
+
+                    /* ---- 0xAD..0xB1: motion flags (verified @ 0x80170A18) ---- */
+                    case 0xAD:
+                        pp->flags |= 0x80;
+                        break;
+                    case 0xAE:
+                        pp->flags &= ~0x60;
+                        break;
+                    case 0xAF:
+                        pp->flags = (pp->flags & ~0x40) | 0x20;
+                        break;
+                    case 0xB0:
+                        pp->flags = (pp->flags & ~0x20) | 0x40;
+                        break;
+                    case 0xB1:
+                        pp->flags |= 0x60;
+                        break;
+
+                    /* ---- 0xB4/0xB5: toggle bit 0x200 (verified @ 0x80170BF8) ---- */
+                    case 0xB4:
+                        pp->flags |= 0x200;
+                        break;
+                    case 0xB5:
+                        pp->flags &= ~0x200;
+                        break;
+
+                    /* ---- 0xB6: add heading target (verified @ 0x80170C18) ---- */
+                    case 0xB6: {
+                        f32 delta;
+
+                        stream = getTime(stream, &pp->headingTimer);
+                        stream = getFloat(stream, &delta);
+                        pp->headingSpeed += delta;
+                        if (pp->headingTimer == 0) {
+                            pp->heading = pp->headingSpeed;
+                        }
+                        break;
+                    }
+
+                    /* ---- 0xB7: bind velocity to camera slot (verified @ 0x80170C58) ---- */
+                    case 0xB7: {
+                        u8 slot = *stream++;
+
+                        setVelToJObj(pp, lbl_80452DC8[pp->cameraSlot + slot]);
+                        break;
+                    }
+
                     /* ---- 0xF0: SPAWN_GENERATOR via table (verified @ 0x80170364) ---- */
                     case 0xF0: {
                         PSParticle* gen;
@@ -1536,7 +1670,7 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
                         u32* bank = (u32*)lbl_804527C8[pp->bankIndex];
                         u16 scriptId = bank ? (u16)bank[tblIdx] : 0;
                         stream += 3;
-                        gen = psCreateGeneratorID(pp, pp->linkNo, pp->bankIndex, scriptId);
+                        gen = (PSParticle*)psCreateGeneratorID(pp->linkNo, pp->bankIndex, scriptId);
                         if (gen == NULL) break;
                         gen->scriptId = pp->scriptId;
                         psCopyGeneratorData(gen, pp->peopleObj);
@@ -1653,6 +1787,524 @@ PSParticle* psinterpret_Main(PSParticle* pp, PSParticle* parentCtx) {
 
     _psListGetNext(pp);
     return pp;
+}
+
+/*
+ * Refreshes the application SRT matrix before particle display. The remaining
+ * display-space composition is still asm-only; this verified prefix is the
+ * entry block at 0x8016CE2C.
+ */
+void psDispSubAppSRT(PSParticle* pp, Mtx parentMatrix) {
+    PSAppSRT* appSRT = (PSAppSRT*)pp->parentObj;
+    Mtx appMatrix;
+
+    if (appSRT->flags != lbl_80478C30) {
+        if (appSRT->type != 2) {
+            HSD_MtxSRT(appSRT->matrix, &appSRT->scaleX,
+                       &appSRT->translationX, &appSRT->rotationX, NULL);
+        }
+        if (appSRT->type == 1) {
+            appSRT->type = 2;
+        }
+    }
+
+    appSRT->flags = lbl_80478C30;
+    PSMTXCopy(appSRT->matrix, appMatrix);
+}
+
+void psDispSubMakePolygon(PSParticle* pp, void* polygonData,
+                          f32 centerX, f32 centerY, f32 centerZ,
+                          f32 velocityX, f32 velocityY, f32 velocityZ,
+                          f32 axisXX, f32 axisXY, f32 axisXZ,
+                          f32 axisYX, f32 axisYY, f32 axisYZ);
+
+/*
+ * Prepares the two screen-space polygon axes and delegates emission. The
+ * camera/people-relative orientation modes remain asm-only; this covers the
+ * direct basis path and target-verified generator scaling.
+ */
+void psDispSub(PSParticle* pp, void* polygonData) {
+    f32 axisXX;
+    f32 axisXY;
+    f32 axisXZ;
+    f32 axisYX;
+    f32 axisYY;
+    f32 axisYZ;
+    f32 size = pp->lerpValue;
+    PSGeneratorState* generator = (PSGeneratorState*)pp->peopleObj;
+
+    if (polygonData != NULL) {
+        f32* view = (f32*)(lbl_80452DE8 + 0x7C);
+
+        axisXX = view[0] * size;
+        axisXY = -view[1] * size;
+        axisXZ = view[4] * size;
+        axisYX = -view[5] * size;
+        axisYY = view[8] * size;
+        axisYZ = -view[9] * size;
+    } else {
+        axisXX = lbl_8047B160 * size;
+        axisXY = lbl_8047B15C * size;
+        axisXZ = lbl_8047B158 * size;
+        axisYX = lbl_8047B154 * size;
+        axisYY = lbl_8047B150 * size;
+        axisYZ = lbl_8047B14C * size;
+    }
+
+    if (generator != NULL && (generator->generatorFlags & 0x20)) {
+        axisXX *= generator->generatorData[3];
+        axisXY *= generator->generatorData[3];
+        axisXZ *= generator->generatorData[4];
+        axisYX *= generator->generatorData[4];
+        axisYY *= generator->generatorData[5];
+        axisYZ *= generator->generatorData[5];
+    }
+
+    psDispSubMakePolygon(pp, polygonData,
+                         pp->positionX, pp->positionY, pp->positionZ,
+                         pp->velocityX, pp->velocityY, pp->velocityZ,
+                         axisXX, axisXZ, axisYY, axisXY, axisYX, axisYZ);
+}
+
+/*
+ * Configures point-trail raster width. Geometry/color emission remains
+ * asm-only; this entry block is verified at 0x8016D8EC-0x8016D954.
+ */
+void psDispSubPointTrail(PSParticle* pp) {
+    f32 widthValue;
+    s32 width;
+    u8 cachedWidth;
+
+    if (lbl_8047B12C != 0) {
+        lbl_8047B12C = 0;
+        fn_800BD554(0);
+    }
+
+    if (pp->lerpValue > lbl_8047D5E0) {
+        widthValue = lbl_8047D5D8;
+    } else {
+        widthValue = lbl_8047D5DC * pp->lerpValue;
+    }
+
+    width = (s32)widthValue;
+    cachedWidth = (u8)width;
+    if (lbl_8047B164 != cachedWidth) {
+        lbl_8047B164 = cachedWidth;
+        fn_800B9404(width, 5);
+    }
+}
+
+/*
+ * Allocates and links a generator after validating its bank/script tuple.
+ * Script-record initialization remains asm-only; this is the verified
+ * validation and pool/list prefix at 0x80173718-0x80173888.
+ */
+PSGeneratorState* psCreateGeneratorID(s32 linkNo, s32 bankIdx, s32 scriptId) {
+    PSGeneratorState* gen;
+    void** bank;
+    u16 activeCount;
+    u16 familyId;
+
+    if (bankIdx >= 64 || linkNo >= 8 ||
+        scriptId >= lbl_80452CC8[bankIdx]) {
+        return NULL;
+    }
+
+    bank = (void**)lbl_80452AC8[bankIdx];
+    if (bank[scriptId] == NULL) {
+        return NULL;
+    }
+
+    if (lbl_8047B18C == NULL) {
+        lbl_8047B18C = fn_801A6928(sizeof(PSGeneratorState));
+        memset(lbl_8047B18C, 0, sizeof(PSGeneratorState));
+    }
+
+    gen = lbl_8047B18C;
+    if (gen == NULL) {
+        return NULL;
+    }
+
+    activeCount = lbl_8047B118 + 1;
+    lbl_8047B118 = activeCount;
+    if (activeCount > lbl_8047B112) {
+        lbl_8047B112 = activeCount;
+    }
+
+    lbl_8047B18C = gen->next;
+    if (lbl_8047B184 == NULL || *lbl_8047B184 == NULL) {
+        if (lbl_8047B188 == NULL) {
+            gen->next = NULL;
+            lbl_8047B188 = gen;
+        } else {
+            gen->next = lbl_8047B188->next;
+            lbl_8047B188->next = gen;
+        }
+    } else {
+        gen->next = (*lbl_8047B184)->next;
+        (*lbl_8047B184)->next = gen;
+    }
+
+    familyId = lbl_80478C38 + 1;
+    lbl_80478C38 = familyId;
+    if (familyId < 0x100) {
+        familyId = 0x100;
+        lbl_80478C38 = familyId;
+    }
+    gen->familyId = familyId;
+    gen->appSRT = NULL;
+    return gen;
+}
+
+/*
+ * Updates the particle material and ambient channel colors. Dynamic light
+ * multiplication remains asm-only; interpolation and GX cache updates are
+ * verified against 0x8016E814-0x8016EA78.
+ */
+void setupChanReg(PSParticle* pp) {
+    PSColor material;
+    PSColor ambient;
+    s32 value;
+
+    if ((pp->flags & 0x80000000) == 0) {
+        return;
+    }
+
+    if (pp->sizeYTimer != 0) {
+        s32 step = ((s32)pp->sizeYCountdown << 16) / pp->sizeYTimer;
+
+        value = ((s32)pp->sizeXTargetFinal << 16) +
+                step * ((s32)pp->sizeXTarget -
+                        (s32)pp->sizeXTargetFinal);
+        value >>= 16;
+    } else {
+        value = pp->sizeXTarget;
+    }
+    material.r = value;
+    material.g = value;
+    material.b = value;
+    material.a = pp->sizeYTimer != 0
+        ? (((s32)pp->sizeYTargetFinal << 16) +
+           (((s32)pp->sizeYCountdown << 16) / pp->sizeYTimer) *
+           ((s32)pp->sizeYTarget - (s32)pp->sizeYTargetFinal)) >> 16
+        : pp->sizeYTarget;
+
+    if (pp->flags & 0x80) {
+        ambient.r = 0xFF;
+        ambient.g = 0xFF;
+        ambient.b = 0xFF;
+        ambient.a = pp->color1A;
+    } else if (pp->color1Timer != 0) {
+        s32 step = ((s32)pp->color1Countdown << 16) / pp->color1Timer;
+
+        ambient.r = (((s32)pp->color1TargetR << 16) +
+                     step * ((s32)pp->color1R -
+                             (s32)pp->color1TargetR)) >> 16;
+        ambient.g = (((s32)pp->color1TargetG << 16) +
+                     step * ((s32)pp->color1G -
+                             (s32)pp->color1TargetG)) >> 16;
+        ambient.b = (((s32)pp->color1TargetB << 16) +
+                     step * ((s32)pp->color1B -
+                             (s32)pp->color1TargetB)) >> 16;
+        ambient.a = (((s32)pp->color1TargetA << 16) +
+                     step * ((s32)pp->color1A -
+                             (s32)pp->color1TargetA)) >> 16;
+    } else {
+        ambient.r = pp->color1R;
+        ambient.g = pp->color1G;
+        ambient.b = pp->color1B;
+        ambient.a = pp->color1A;
+    }
+
+    material.r = (material.r * ambient.r) >> 8;
+    material.g = (material.g * ambient.g) >> 8;
+    material.b = (material.b * ambient.b) >> 8;
+
+    if (ambient.r != lbl_8047B140.r ||
+        ambient.g != lbl_8047B140.g ||
+        ambient.b != lbl_8047B140.b) {
+        lbl_8047B140 = ambient;
+        fn_800BA5BC(0, &ambient);
+    }
+
+    if (material.r != lbl_8047B13C.r ||
+        material.g != lbl_8047B13C.g ||
+        material.b != lbl_8047B13C.b) {
+        lbl_8047B13C = material;
+        fn_800BA4C8(0, &material);
+    }
+}
+
+/*
+ * Updates the two interpolated particle TEV colors. Texture-size TEV state
+ * remains asm-only; these register-cache paths are verified against
+ * 0x8016E40C-0x8016E698.
+ */
+void setupTevReg(PSParticle* pp) {
+    PSColor color1;
+    PSColor color2;
+
+    if (pp->color1Timer != 0) {
+        s32 step = ((s32)pp->color1Countdown << 16) / pp->color1Timer;
+
+        color1.r = (((s32)pp->color1TargetR << 16) +
+                    step * ((s32)pp->color1R -
+                            (s32)pp->color1TargetR)) >> 16;
+        color1.g = (((s32)pp->color1TargetG << 16) +
+                    step * ((s32)pp->color1G -
+                            (s32)pp->color1TargetG)) >> 16;
+        color1.b = (((s32)pp->color1TargetB << 16) +
+                    step * ((s32)pp->color1B -
+                            (s32)pp->color1TargetB)) >> 16;
+        color1.a = (((s32)pp->color1TargetA << 16) +
+                    step * ((s32)pp->color1A -
+                            (s32)pp->color1TargetA)) >> 16;
+    } else {
+        color1.r = pp->color1R;
+        color1.g = pp->color1G;
+        color1.b = pp->color1B;
+        color1.a = pp->color1A;
+    }
+
+    if (pp->color2Timer != 0) {
+        s32 step = ((s32)pp->color2Countdown << 16) / pp->color2Timer;
+
+        color2.r = (((s32)pp->color2TargetR << 16) +
+                    step * ((s32)pp->color2R -
+                            (s32)pp->color2TargetR)) >> 16;
+        color2.g = (((s32)pp->color2TargetG << 16) +
+                    step * ((s32)pp->color2G -
+                            (s32)pp->color2TargetG)) >> 16;
+        color2.b = (((s32)pp->color2TargetB << 16) +
+                    step * ((s32)pp->color2B -
+                            (s32)pp->color2TargetB)) >> 16;
+        color2.a = (((s32)pp->color2TargetA << 16) +
+                    step * ((s32)pp->color2A -
+                            (s32)pp->color2TargetA)) >> 16;
+    } else {
+        color2.r = pp->color2R;
+        color2.g = pp->color2G;
+        color2.b = pp->color2B;
+        color2.a = pp->color2A;
+    }
+
+    if ((pp->flags & 0x80) ||
+        (pp->flags & 0x80000000) ||
+        (pp->flags & 0x100000)) {
+        if (color1.r != lbl_8047B138.r ||
+            color1.g != lbl_8047B138.g ||
+            color1.b != lbl_8047B138.b ||
+            color1.a != lbl_8047B138.a) {
+            lbl_8047B138 = color1;
+            fn_800BC2F8(1, &color1);
+        }
+    }
+
+    if (pp->flags & 0x80) {
+        if (color2.r != lbl_8047B134.r ||
+            color2.g != lbl_8047B134.g ||
+            color2.b != lbl_8047B134.b ||
+            color2.a != lbl_8047B134.a) {
+            lbl_8047B134 = color2;
+            fn_800BC2F8(2, &color2);
+        }
+    } else if (lbl_8047B134.r != 0 || lbl_8047B134.g != 0 ||
+               lbl_8047B134.b != 0 || lbl_8047B134.a != 0) {
+        color2.r = 0;
+        color2.g = 0;
+        color2.b = 0;
+        color2.a = 0;
+        lbl_8047B134 = color2;
+        fn_800BC2F8(2, &color2);
+    }
+}
+
+/*
+ * Emits one particle polygon. The geometry modes remain asm-only; this
+ * verified entry gate is shared by every mode at 0x8016C1E0-0x8016C240.
+ */
+void psDispSubMakePolygon(PSParticle* pp, void* polygonData,
+                          f32 centerX, f32 centerY, f32 centerZ,
+                          f32 velocityX, f32 velocityY, f32 velocityZ,
+                          f32 axisXX, f32 axisXY, f32 axisXZ,
+                          f32 axisYX, f32 axisYY, f32 axisYZ) {
+    if (lbl_8047B12C != 0) {
+        lbl_8047B12C = 0;
+        fn_800BD554(0);
+    }
+
+    if ((pp->flags & 0x100000) == 0) {
+        if (polygonData == NULL) {
+            u32 textureIndex = (pp->flags >> 14) & 3;
+
+            fn_800B7D3C();
+            fn_800B7874(9, 1);
+            if (pp->flags & 0x400) {
+                fn_800B7874(13, 2);
+                fn_800B928C(0x80, 0, 4);
+            } else {
+                fn_800B928C(0x80, 1, 4);
+            }
+
+            GX_FIFO_F32 = centerX - axisXX;
+            GX_FIFO_F32 = centerY - axisXY;
+            GX_FIFO_F32 = centerZ - axisXZ;
+            if (pp->flags & 0x400) {
+                GX_FIFO_U8 = textureIndex;
+            }
+
+            GX_FIFO_F32 = centerX - axisYX;
+            GX_FIFO_F32 = centerY - axisYY;
+            GX_FIFO_F32 = centerZ - axisYZ;
+            if (pp->flags & 0x400) {
+                GX_FIFO_U8 = textureIndex + 1;
+            }
+
+            GX_FIFO_F32 = centerX + axisXX;
+            GX_FIFO_F32 = centerY + axisXY;
+            GX_FIFO_F32 = centerZ + axisXZ;
+            if (pp->flags & 0x400) {
+                GX_FIFO_U8 = textureIndex + 2;
+            }
+
+            GX_FIFO_F32 = centerX + axisYX;
+            GX_FIFO_F32 = centerY + axisYY;
+            GX_FIFO_F32 = centerZ + axisYZ;
+            if (pp->flags & 0x400) {
+                GX_FIFO_U8 = textureIndex + 3;
+            }
+        } else {
+            u8* stream = polygonData;
+            u32 packetCount = *(u32*)stream;
+
+            stream += 4;
+            while (packetCount != 0) {
+                u8 primitive = stream[0];
+                u8 vertexCount = stream[1];
+                s32 i;
+
+                stream += 4;
+                fn_800B7D3C();
+                fn_800B7874(9, 1);
+                if (pp->flags & 0x400) {
+                    fn_800B7874(13, 1);
+                    fn_800B928C(primitive, 4, vertexCount);
+                } else {
+                    fn_800B928C(primitive, 1, vertexCount);
+                }
+
+                for (i = 0; i < vertexCount; i++) {
+                    f32 u = *(f32*)&stream[0];
+                    f32 v = *(f32*)&stream[4];
+                    f32 xWeight = lbl_8047D5CC * (u - lbl_8047D618);
+                    f32 yWeight = lbl_8047D5CC * (v - lbl_8047D618);
+
+                    stream += 8;
+                    if (pp->flags & 0x40000) {
+                        u = 1.0f - u;
+                    }
+                    if (pp->flags & 0x80000) {
+                        v = 1.0f - v;
+                    }
+
+                    GX_FIFO_F32 = centerX + axisXX * xWeight + axisYX * yWeight;
+                    GX_FIFO_F32 = centerY + axisXY * xWeight + axisYY * yWeight;
+                    GX_FIFO_F32 = centerZ + axisXZ * xWeight + axisYZ * yWeight;
+                    if (pp->flags & 0x400) {
+                        GX_FIFO_F32 = u;
+                        GX_FIFO_F32 = v;
+                    }
+                }
+                packetCount--;
+            }
+        }
+        return;
+    }
+}
+
+/*
+ * Builds the generator's emission basis. The remainder of the emitter modes
+ * is still asm-only; this verified prefix corresponds to 0x801742C8-8017455C.
+ */
+void generateParticle_8017424C(PSGeneratorState* gen) {
+    Mtx basis;
+    Mtx rotationX;
+    Mtx rotationY;
+    Mtx rotationZ;
+    Vec column;
+    Vec forward;
+    Vec up;
+    Vec side;
+
+    if (gen->lifetime < lbl_8047D6B4) {
+        return;
+    }
+
+    PSMTXIdentity(basis);
+
+    if ((gen->flags & 0x30000) == 0) {
+        PSMTXRotRad(rotationX, 'X', gen->generatorData[0]);
+        PSMTXRotRad(rotationY, 'Y', gen->generatorData[1]);
+        PSMTXRotRad(rotationZ, 'Z', gen->generatorData[2]);
+        PSMTXConcat(rotationY, rotationX, rotationX);
+        PSMTXConcat(rotationZ, rotationX, rotationX);
+
+        column.x = rotationX[0][0];
+        column.y = rotationX[1][0];
+        column.z = rotationX[2][0];
+        PSVECNormalize(&column, &column);
+        basis[0][0] = column.x;
+        basis[1][0] = column.y;
+        basis[2][0] = column.z;
+
+        column.x = rotationX[0][1];
+        column.y = rotationX[1][1];
+        column.z = rotationX[2][1];
+        PSVECNormalize(&column, &column);
+        basis[0][1] = column.x;
+        basis[1][1] = column.y;
+        basis[2][1] = column.z;
+
+        column.x = rotationX[0][2];
+        column.y = rotationX[1][2];
+        column.z = rotationX[2][2];
+        PSVECNormalize(&column, &column);
+        basis[0][2] = column.x;
+        basis[1][2] = column.y;
+        basis[2][2] = column.z;
+        basis[0][3] = 0.0f;
+        basis[1][3] = 0.0f;
+        basis[2][3] = 0.0f;
+    }
+
+    if (gen->flags & 0x20000) {
+        PSCameraObject* camera = (PSCameraObject*)lbl_8047B190;
+
+        if (camera == NULL) {
+            __assert(lbl_802739E4, 0x272, lbl_802739F0);
+        }
+
+        camera = (PSCameraObject*)lbl_8047B190;
+        forward.x = camera->view->position.x - gen->positionX;
+        forward.y = camera->view->position.y - gen->positionY;
+        forward.z = camera->view->position.z - gen->positionZ;
+        PSVECNormalize(&forward, &forward);
+
+        HSD_CObjGetUpVector(camera, &up);
+        PSVECNormalize(&up, &up);
+        PSVECCrossProduct(&up, &forward, &side);
+        PSVECCrossProduct(&forward, &side, &up);
+
+        basis[0][0] = side.x;
+        basis[1][0] = side.y;
+        basis[2][0] = side.z;
+        basis[0][1] = up.x;
+        basis[1][1] = up.y;
+        basis[2][1] = up.z;
+        basis[0][2] = forward.x;
+        basis[1][2] = forward.y;
+        basis[2][2] = forward.z;
+    }
 }
 
 static inline s32 PSJObjMtxIsDirty(PSJObjTransform* jobj) {
