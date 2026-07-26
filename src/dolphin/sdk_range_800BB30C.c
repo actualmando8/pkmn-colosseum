@@ -107,7 +107,8 @@ typedef struct GXData_800BB30C {
     /* 0x100 */ u32 tref[8];
     /* 0x120 */ u32 iref;
     /* 0x124 */ u32 field_124;
-    /* 0x128 */ u8 pad_128[0x8];
+    /* 0x128 */ u32 indTexScale0;
+    /* 0x12C */ u32 indTexScale1;
     /* 0x130 */ u32 tevColorEnv[16];
     /* 0x170 */ u32 tevAlphaEnv[16];
     /* 0x1B0 */ u32 field_1B0[8];

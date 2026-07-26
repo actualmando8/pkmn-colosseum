@@ -55,7 +55,7 @@ extern void psInitAppSRT();
 extern void psInitParticle();
 extern void psSetGeneratorAngleRadiusScale();
 extern void sin();
-extern void statusGetStatus();
+extern u8* statusGetStatus(u32, u8*, u32, u32, u32);
 /* GSfloor / GScolsys */
 extern void* fn_800FF56C(void);                             /* GSfloor get active */
 extern void  GScolsys2GetObjEnable(u32 triIdx, void* outFlag);        /* GScolsys query */
@@ -453,7 +453,7 @@ extern u32 fn_800E3CBC(struct GSmodel* model);
 extern u32 GSmodelGetGSparticleLinkAttachMode(struct GSmodel* model);
 extern u32 GSmodelGetVisibility(struct GSmodel* model);
 extern void fn_80135E44(void);
-void fn_8011A0A8(void);
+void fn_8011A0A8(u8*, u8*, u16);
 extern s32 kaisuuGetKaisuu(u32);
 extern void jumptable_8035C260();
 extern void fightWazaBiosSetWazaBanme(void);
@@ -2520,8 +2520,50 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_8011A0A8_8011A280)
 /* 0x8011A0A8 | 0x1D8 */
 extern void fn_80135E44(void);
-/* Unrecovered function, forward-declared for callers. */
-void fn_8011A0A8(void);
+void fn_8011A0A8(u8* dst, u8* src, u16 type)
+{
+    u8* dst_entry;
+    u8* src_entry;
+    u8 index;
+
+    if (type == 0) {
+        return;
+    }
+
+    index = fn_80119E90(type);
+    dst_entry = statusGetStatus(fn_80119F10(type), dst, 0,
+                                fn_80119ED0(type), 0);
+    if (dst_entry != NULL) {
+        dst_entry += index * 16;
+    }
+    if (dst_entry == NULL) {
+        return;
+    }
+
+    index = fn_80119E90(type);
+    src_entry = statusGetStatus(fn_80119F10(type), src, 0,
+                                fn_80119ED0(type), 0);
+    if (src_entry != NULL) {
+        src_entry += index * 16;
+    }
+    if (src_entry == NULL || fn_8011A090(src_entry) == 0 ||
+        fn_8011A090(src_entry) != type) {
+        return;
+    }
+
+    index = fn_80119E90(type);
+    src_entry = statusGetStatus(fn_80119F10(type), src, 0,
+                                fn_80119ED0(type), 0);
+    if (src_entry != NULL) {
+        src_entry += index * 16;
+    }
+    if (src_entry != NULL) {
+        ((u32*)dst_entry)[0] = ((u32*)src_entry)[0];
+        ((u32*)dst_entry)[1] = ((u32*)src_entry)[1];
+        ((u32*)dst_entry)[2] = ((u32*)src_entry)[2];
+        ((u32*)dst_entry)[3] = ((u32*)src_entry)[3];
+    }
+}
 #endif
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_EXACT_8011A280_8011B2C0)
@@ -3483,7 +3525,6 @@ extern u32 lbl_8047AD6C;
 extern f32 lbl_8047CFD0;
 extern f32 lbl_8047CFDC;
 extern f32 lbl_8047CFE0;
-/* Unrecovered function, forward-declared for callers. */
 u8 floorUpdateFieldCamera(void);
 extern u32 lbl_80478B48;  /* NPC count (SDA) */
 #pragma optimization_level 4

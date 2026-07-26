@@ -177,7 +177,7 @@ extern void pokemonSetStatus();
 extern u16 pokemonDataBiosGetSinkaPokemonDataId(u8* ptr, u16 idx);
 extern u16 pokemonDataBiosGetSinkaBuff(u8* ptr, u16 idx);
 extern u8 pokemonDataBiosGetSinkaKind(u8* ptr, u16 idx);
-extern u8 floorUpdateFieldCamera();
+extern u8 floorUpdateFieldCamera(u8*, f32*, f32*, f32*);
 extern void updateAnimation__Ff15HEROMOVE_MEMBER(void);
 extern void* heroBiosGetPokemonPtr(u8* ptr, u16 idx);
 extern void* heroBiosGetHizukiNamePtr(void* ptr);
@@ -651,7 +651,7 @@ extern u8 lbl_8035BB70[];
 extern u32 lbl_8047CFC0;
 extern u32 lbl_8047CFC8;
 extern u32 lbl_8047CFC4;
-extern void GSvecSquareDistance(void);
+extern f32 GSvecSquareDistance(f32*, f32*);
 extern f32 lbl_8047CFDC;
 extern f32 lbl_8047CFE0;
 extern u32 lbl_80478B48; /* NPC count (SDA) */
@@ -1440,6 +1440,61 @@ extern u32 lbl_8047ADC0;
 /* Address: 0x801174EC | Size: 0x8 | Pattern: sda_getter */
 u8 fn_801174EC(void) {
     return lbl_8047AD71;
+}
+
+u8 floorUpdateFieldCamera(u8* pos, f32* out_x, f32* out_y, f32* out_z)
+{
+    f32 point[3];
+    f32 total;
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 distance;
+    f32 weight;
+    f32* entry;
+    u32 i;
+
+    if (lbl_8047AD68 == 1) {
+        entry = (f32*)lbl_8047AD6C;
+        *out_x = entry[4];
+        *out_y = entry[3];
+        *out_z = entry[5];
+        return 1;
+    }
+
+    total = lbl_8047CFD0;
+    x = lbl_8047CFD0;
+    y = lbl_8047CFD0;
+    z = lbl_8047CFD0;
+    entry = (f32*)lbl_8047AD6C;
+    for (i = 0; i < lbl_8047AD68; i++, entry += 6) {
+        set__5GSvecFfff(point, entry[0], entry[1], entry[2]);
+        distance = GSvecSquareDistance(point, (f32*)pos);
+        if (distance > lbl_8047CFDC) {
+            weight = lbl_8047CFE0 / distance;
+            total += weight;
+            x += entry[3] * weight;
+            y += entry[4] * weight;
+            z += entry[5] * weight;
+        } else {
+            total = lbl_8047CFDC;
+            x = entry[3];
+            y = entry[4];
+            z = entry[5];
+            break;
+        }
+    }
+
+    if (total == lbl_8047CFD0) {
+        GSlogWrite(lbl_80272770);
+        return 0;
+    }
+
+    weight = lbl_8047CFDC / total;
+    *out_x = y * weight;
+    *out_y = x * weight;
+    *out_z = z * weight;
+    return 1;
 }
 /* 0x8011711C | 0x38 */
 void fn_8011711C(u32 arg) {
