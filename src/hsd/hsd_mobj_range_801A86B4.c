@@ -127,6 +127,12 @@ extern void PSMTXConcat(const f32 a[3][4], const f32 b[3][4],
                         f32 result[3][4]);
 extern void PSMTXQuat(f32 m[3][4], const HSD_Quaternion* quat);
 extern void PSMTXTrans(f32 m[3][4], f32 x, f32 y, f32 z);
+extern f32 VECMag(const Vec* vec);
+extern void VECNormalize(const Vec* src, Vec* dst);
+extern f32 VECDotProduct(const Vec* a, const Vec* b);
+extern void VECScale(const Vec* src, Vec* dst, f32 scale);
+extern void VECSubtract(const Vec* a, const Vec* b, Vec* dst);
+extern void VECCrossProduct(const Vec* a, const Vec* b, Vec* dst);
 
 void HSD_MtxSRTQuat(f32 m[3][4], Vec* scale, HSD_Quaternion* rotate,
                     Vec* translate, Vec* parent_scale)
@@ -172,6 +178,45 @@ void HSD_MkRotationMtx(f32 arg0[3][4], Vec* arg1)
     arg0[0][3] = 0.0f;
     arg0[1][3] = 0.0f;
     arg0[2][3] = 0.0f;
+}
+
+void HSD_MtxGetScale(f32 m[3][4], Vec* scale)
+{
+    Vec x;
+    Vec y;
+    Vec z;
+    Vec projection;
+
+    x.x = m[0][0];
+    x.y = m[1][0];
+    x.z = m[2][0];
+    scale->x = VECMag(&x);
+    VECNormalize(&x, &x);
+
+    y.x = m[0][1];
+    y.y = m[1][1];
+    y.z = m[2][1];
+    VECScale(&x, &projection, VECDotProduct(&x, &y));
+    VECSubtract(&y, &projection, &y);
+    scale->y = VECMag(&y);
+    VECNormalize(&y, &y);
+
+    z.x = m[0][2];
+    z.y = m[1][2];
+    z.z = m[2][2];
+    VECScale(&y, &projection, VECDotProduct(&y, &z));
+    VECSubtract(&z, &projection, &z);
+    VECScale(&x, &projection, VECDotProduct(&x, &z));
+    VECSubtract(&z, &projection, &z);
+    scale->z = VECMag(&z);
+    VECNormalize(&z, &z);
+    VECCrossProduct(&y, &z, &projection);
+
+    if (VECDotProduct(&x, &projection) < 0.0f) {
+        scale->x = -scale->x;
+        scale->y = -scale->y;
+        scale->z = -scale->z;
+    }
 }
 
 /* Address: 0x801A9570 | Size: 0x1C  -- already-banked (GC/1.3, calibration) */
