@@ -69,6 +69,7 @@
 #include "dolphin/gx/GXInternal.h"
 #include "game/ps_types.h"
 #include "game/script/script.h"
+#include "hsd/hsd_lobj.h"
 #include "hsd/hsd_object.h"
 
 /* ======================================================================
@@ -173,6 +174,10 @@ extern u8 lbl_80478C30;
 extern u16 lbl_80478C38;
 extern s32 lbl_8047B12C;
 extern s32 lbl_8047B164;
+extern s32 lbl_8047B168;
+extern s32 lbl_8047B144;
+extern s32 lbl_8047B148;
+extern PSColor lbl_8047B130;
 extern PSColor lbl_8047B13C;
 extern PSColor lbl_8047B140;
 extern PSColor lbl_8047B134;
@@ -260,6 +265,8 @@ extern void fn_800BC52C(s32 stage, s32 a, s32 b);
 void psDispSub(PSParticle* pp, void* polygonData);
 void psDispSubAppSRT(PSParticle* pp, Mtx parentMatrix);
 void psDispSubAPPSRTPoint(PSParticle* pp);
+void psSetupTevInvalidState(void);
+void psSetupTevCommon(void);
 extern f32 lbl_8047D5DC;
 extern f32 lbl_8047B14C;
 extern f32 lbl_8047B150;
@@ -269,11 +276,14 @@ extern f32 lbl_8047B15C;
 extern f32 lbl_8047B160;
 extern u8 lbl_80452DE8[];
 extern void fn_800BD554(s32 mode);
+extern void fn_800BCEBC(s32 mode);
+extern void HSD_FogSet(void* fog);
 extern void fn_800B7D3C(void);
 extern void fn_800B7874(s32 attribute, s32 type);
 extern void fn_800B928C(s32 primitive, s32 format, s32 count);
 extern void fn_800B9404(s32 width, s32 offset);
 extern void generateParticle_8017424C(PSGeneratorState* gen);
+extern void HSD_MulColor(GXColor* a, GXColor* b, GXColor* dest);
 
 void psSetGeneratorAngleRadiusScale(PSGeneratorState* gen, f32* scale,
                                     u8 applyToMotion) {
@@ -1134,6 +1144,7 @@ s32 psInitAppSRT(s32 count, s32 size) {
  */
 void fn_8016AB94(u32 linkMask, s32 mode) {
     s32 linkNo;
+    s32 initialized = FALSE;
 
     if (mode == 0) {
         u8 frame = lbl_80478C30;
@@ -1171,6 +1182,46 @@ void fn_8016AB94(u32 linkMask, s32 mode) {
                 (pp->flags & 0x20000000) == 0) {
                 void* polygonData = NULL;
                 void** bank = lbl_804528C8[pp->bankIndex];
+
+                if (!initialized) {
+                    initialized = TRUE;
+                    lbl_8047B168 = -1;
+                    lbl_8047B164 = -1;
+                    lbl_8047B144 = -1;
+                    psSetupTevInvalidState();
+                    HSD_FogSet(NULL);
+
+                    lbl_8047B140.r = 0xFF;
+                    lbl_8047B140.g = 0xFF;
+                    lbl_8047B140.b = 0xFF;
+                    lbl_8047B140.a = 0xFF;
+                    lbl_8047B13C.r = 0xFF;
+                    lbl_8047B13C.g = 0xFF;
+                    lbl_8047B13C.b = 0xFF;
+                    lbl_8047B13C.a = 0xFF;
+                    fn_800BA5BC(4, &lbl_8047B140);
+                    fn_800BA4C8(4, &lbl_8047B13C);
+                    psSetupTevInvalidState();
+                    psSetupTevCommon();
+
+                    lbl_8047B138.r = 0xFF;
+                    lbl_8047B138.g = 0xFF;
+                    lbl_8047B138.b = 0xFF;
+                    lbl_8047B138.a = 0xFF;
+                    lbl_8047B134.r = 0;
+                    lbl_8047B134.g = 0;
+                    lbl_8047B134.b = 0;
+                    lbl_8047B134.a = 0;
+                    lbl_8047B130.r = 0xFF;
+                    lbl_8047B130.g = 0xFF;
+                    lbl_8047B130.b = 0xFF;
+                    lbl_8047B130.a = 0xFF;
+                    fn_800BC2F8(1, &lbl_8047B138);
+                    fn_800BC2F8(2, &lbl_8047B134);
+                    fn_800BC2F8(3, &lbl_8047B130);
+                    lbl_8047B148 = -1;
+                    fn_800BCEBC(0);
+                }
 
                 if (bank != NULL) {
                     void** object = (void**)bank[pp->animIndex];
@@ -2343,6 +2394,28 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         goto after_dispatch;
                     }
 
+                    /* ---- 0xA8: randomized local position offset
+                     * (verified @ 0x8017068C) ---- */
+                    case 0xA8: {
+                        f32 amplitude;
+                        f32 offset[3];
+
+                        stream = getFloat(stream, &amplitude);
+                        offset[0] = amplitude -
+                            2.0f * amplitude * fn_801ADC7C();
+                        stream = getFloat(stream, &amplitude);
+                        offset[1] = amplitude -
+                            2.0f * amplitude * fn_801ADC7C();
+                        stream = getFloat(stream, &amplitude);
+                        offset[2] = amplitude -
+                            2.0f * amplitude * fn_801ADC7C();
+                        psApplyOffsetLocalRotation(pp, offset);
+                        pp->positionX += offset[0];
+                        pp->positionY += offset[1];
+                        pp->positionZ += offset[2];
+                        break;
+                    }
+
                     /* ---- 0xA9: MODIFY_DIR (verified @ 0x80170744) ---- */
                     case 0xA9: {
                         f32 f;
@@ -2570,6 +2643,8 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
 void psDispSubAppSRT(PSParticle* pp, Mtx parentMatrix) {
     PSAppSRT* appSRT = (PSAppSRT*)pp->parentObj;
     Mtx appMatrix;
+    Vec velocity;
+    Vec position;
 
     if (appSRT->flags != lbl_80478C30) {
         if (appSRT->type != 2) {
@@ -2583,6 +2658,32 @@ void psDispSubAppSRT(PSParticle* pp, Mtx parentMatrix) {
 
     appSRT->flags = lbl_80478C30;
     PSMTXCopy(appSRT->matrix, appMatrix);
+    appMatrix[0][3] -= appSRT->rotationX;
+    appMatrix[1][3] -= appSRT->rotationY;
+    appMatrix[2][3] -= appSRT->rotationZ;
+
+    velocity.x = pp->velocityX;
+    velocity.y = pp->velocityY;
+    velocity.z = pp->velocityZ;
+    PSMTXMultVec(appMatrix, &velocity, &velocity);
+    if (appSRT->active != 0 && (pp->flags & 4) == 0) {
+        PSMTXMultVec((const f32(*)[4])lbl_80452DE8,
+                     &velocity, &velocity);
+    }
+
+    position.x = pp->positionX;
+    position.y = pp->positionY;
+    position.z = pp->positionZ;
+    if (appSRT->active != 0) {
+        PSMTXMultVec(appMatrix, &position, &position);
+        PSMTXMultVec((const f32(*)[4])lbl_80452DE8,
+                     &position, &position);
+        position.x += appSRT->rotationX;
+        position.y += appSRT->rotationY;
+        position.z += appSRT->rotationZ;
+    } else {
+        PSMTXMultVec(appSRT->matrix, &position, &position);
+    }
 }
 
 void psDispSubMakePolygon(PSParticle* pp, void* polygonData,
@@ -2780,13 +2881,23 @@ PSGeneratorState* psCreateGeneratorID(s32 linkNo, s32 bankIdx, s32 scriptId) {
     }
     gen->familyId = familyId;
     gen->appSRT = NULL;
+    gen->generatorFlags = 2;
+    gen->linkedJObj = NULL;
+    gen->generatorData[0] = 0.0f;
+    gen->generatorData[1] = 0.0f;
+    gen->generatorData[2] = 0.0f;
+    gen->generatorData[3] = 1.0f;
+    gen->generatorData[4] = 1.0f;
+    gen->generatorData[5] = 1.0f;
+    gen->angleRadiusScale[0] = 1.0f;
+    gen->angleRadiusScale[1] = 1.0f;
+    gen->angleRadiusScale[2] = 1.0f;
     return gen;
 }
 
 /*
- * Updates the particle material and ambient channel colors. Dynamic light
- * multiplication remains asm-only; interpolation and GX cache updates are
- * verified against 0x8016E814-0x8016EA78.
+ * Updates the particle material and ambient channel colors, including the
+ * active alpha-light contribution. Verified against 0x8016E814-0x8016EA78.
  */
 void setupChanReg(PSParticle* pp) {
     PSColor material;
@@ -2852,6 +2963,19 @@ void setupChanReg(PSParticle* pp) {
         ambient.b != lbl_8047B140.b) {
         lbl_8047B140 = ambient;
         fn_800BA5BC(0, &ambient);
+    }
+
+    {
+        HSD_LObj* alphaLight = HSD_LObjGetActiveByID(0x100);
+
+        if (alphaLight != NULL) {
+            HSD_MulColor((GXColor*)&material, &alphaLight->color,
+                         (GXColor*)&material);
+        } else {
+            material.r = 0;
+            material.g = 0;
+            material.b = 0;
+        }
     }
 
     if (material.r != lbl_8047B13C.r ||
@@ -3154,14 +3278,30 @@ void generateParticle_8017424C(PSGeneratorState* gen) {
     Mtx rotationX;
     Mtx rotationY;
     Mtx rotationZ;
+    Mtx direction;
     Vec column;
+    Vec emissionVelocity;
     Vec forward;
     Vec up;
     Vec side;
+    f32 magnitude;
 
     if (gen->lifetime < lbl_8047D6B4) {
         return;
     }
+
+    emissionVelocity.x = gen->velocityX;
+    emissionVelocity.y = gen->velocityY;
+    emissionVelocity.z = gen->velocityZ;
+    if ((gen->angleFlags & 0xF) == 2 &&
+        (gen->generatorFlags & 0x80) != 0) {
+        emissionVelocity.x *= gen->generatorData[3];
+        emissionVelocity.y *= gen->generatorData[4];
+        emissionVelocity.z *= gen->generatorData[5];
+    }
+    magnitude = sqrtf(emissionVelocity.x * emissionVelocity.x +
+                      emissionVelocity.y * emissionVelocity.y +
+                      emissionVelocity.z * emissionVelocity.z);
 
     PSMTXIdentity(basis);
 
@@ -3227,6 +3367,51 @@ void generateParticle_8017424C(PSGeneratorState* gen) {
         basis[0][2] = forward.x;
         basis[1][2] = forward.y;
         basis[2][2] = forward.z;
+    }
+
+    if ((gen->angleFlags & 0xF) != 1 && magnitude > lbl_80478ACC) {
+        f32 yaw;
+        f32 pitch;
+        f32 yawSin;
+        f32 yawCos;
+        f32 pitchSin;
+        f32 pitchCos;
+        f32 flattened;
+
+        PSVECNormalize(&emissionVelocity, &emissionVelocity);
+        if (fabsf(emissionVelocity.z) < lbl_80478AC8) {
+            yaw = emissionVelocity.y >= 0.0f
+                ? lbl_8047D694 : lbl_8047D698;
+        } else {
+            yaw = atan2(emissionVelocity.y, emissionVelocity.z);
+        }
+        yawSin = sin(yaw);
+        yawCos = cos(yaw);
+        flattened = emissionVelocity.z * yawCos +
+                    emissionVelocity.y * yawSin;
+
+        if (fabsf(flattened) < lbl_80478AC8) {
+            pitch = emissionVelocity.x >= 0.0f
+                ? lbl_8047D694 : lbl_8047D698;
+        } else {
+            pitch = atan2(emissionVelocity.x, flattened);
+        }
+        pitchSin = sin(pitch);
+        pitchCos = cos(pitch);
+
+        direction[0][0] = pitchCos;
+        direction[0][1] = pitchSin;
+        direction[0][2] = 0.0f;
+        direction[0][3] = 0.0f;
+        direction[1][0] = -yawSin * pitchSin;
+        direction[1][1] = yawCos;
+        direction[1][2] = yawSin * pitchCos;
+        direction[1][3] = 0.0f;
+        direction[2][0] = -yawCos * pitchSin;
+        direction[2][1] = -yawSin;
+        direction[2][2] = yawCos * pitchCos;
+        direction[2][3] = 0.0f;
+        PSMTXConcat(basis, direction, basis);
     }
 }
 
