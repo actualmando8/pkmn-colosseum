@@ -165,7 +165,7 @@ typedef struct PeopleEntry {
     u32  field_34;          /* 0x34 */
     u32  field_38;          /* 0x38 */
     f32  talkRange;         /* 0x3C */
-    u32  field_40;          /* 0x40 */
+    f32  field_40;          /* 0x40 */
     u32  field_44;          /* 0x44 */
     s32  walkTargetNode;    /* 0x48 */
     u16  flagId;            /* 0x4C */
@@ -176,10 +176,19 @@ typedef struct PeopleEntry {
     u8   talkLock;          /* 0x56 */
     u8   prevState;         /* 0x57 */
     f32  moveSpeed;         /* 0x58 */
-    u8   field_5C[0x18];    /* 0x5C - 0x73: position/rotation */
-    u8   collisionData[0x10]; /* 0x74 - 0x83: collision position */
+    u8   field_5C[0x0C];    /* 0x5C - 0x67 */
+    u16  walkListCapacity;  /* 0x68 */
+    u16  walkListCount;     /* 0x6A */
+    u16  walkListHandle;    /* 0x6C */
+    u16  pad6E;             /* 0x6E */
+    struct GSvec* walkList; /* 0x70 */
+    f32  collisionX;        /* 0x74 */
+    f32  collisionY;        /* 0x78 */
+    f32  collisionZ;        /* 0x7C */
+    f32  field_80;          /* 0x80 */
     f32  animBlendFactor;   /* 0x84 */
-    u8   field_88[0x08];    /* 0x88 - 0x8F */
+    f32  field_88;          /* 0x88 */
+    f32  field_8C;          /* 0x8C */
     u32  motionIndex;       /* 0x90 */
     u8   field_94;          /* 0x94 */
     u8   isTalkable;        /* 0x95 (stored from talk check) */
@@ -192,7 +201,12 @@ typedef struct PeopleEntry {
     f32  targetZ;           /* 0xB0 */
     u32  field_B4;          /* 0xB4 */
     u32  field_B8;          /* 0xB8 */
-    u8   spawnData[0x20];   /* 0xBC - 0xDB: extended data from floor */
+    u8   spawnData[0x0C];   /* 0xBC - 0xC7 */
+    s32  walkNodeA;         /* 0xC8 */
+    s32  walkNodeB;         /* 0xCC */
+    s32  walkNodeC;         /* 0xD0 */
+    f32  syncMotion;        /* 0xD4 */
+    f32  walkAnimRate;      /* 0xD8 */
 } PeopleEntry;
 
 /**

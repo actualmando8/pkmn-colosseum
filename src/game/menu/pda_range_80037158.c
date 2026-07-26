@@ -1508,3 +1508,793 @@ void fn_800472CC(PdaSprite* alphaSprite)
         }
     }
 }
+
+extern u8 lbl_802EF0A8[];
+extern u8 lbl_80314F98[];
+extern u8 lbl_80267190[];
+extern u8 lbl_803A6A60[];
+extern PdaListEntry* lbl_8047A4D4;
+extern u32 lbl_8047A4D0;
+extern u32 lbl_8047A4D8;
+extern u32 lbl_8047A4DC;
+extern u32 lbl_8047A4E0;
+extern u16* lbl_8047A4E4;
+extern u16 lbl_8047A4E8;
+extern s32 lbl_804788C0;
+extern s16 lbl_804788C8[2];
+extern s16 lbl_804788CC[2];
+extern s16 lbl_804788D0[2];
+extern f32 lbl_8047BC94;
+extern f32 lbl_8047BC98;
+extern f32 lbl_8047BCA0;
+extern f32 lbl_8047BAC4;
+extern f32 lbl_8047BAC8;
+extern f32 lbl_8047BCB8;
+extern f32 lbl_8047BCBC;
+extern f32 lbl_8047BCC0;
+extern f32 lbl_8047BCC4;
+extern f32 lbl_8047BCC8;
+extern f32 lbl_8047BCF4;
+extern f32 lbl_8047BCF8;
+extern f32 lbl_8047BAC0;
+extern f32 lbl_8047BDAC;
+extern f32 lbl_8047BDF0;
+
+extern u32 fn_800D59B8();
+extern u32 fn_800D5CB8();
+extern u32 fn_800D61E4();
+extern u32 fn_800D6728();
+extern u32 fn_800D67BC();
+extern u32 fn_800D6A00();
+extern u32 fn_800D7820();
+extern u32 fn_800D85D4();
+extern u32 fn_800D888C();
+extern u32 fn_800D88DC();
+extern u32 fn_800E202C();
+extern u32 fn_800E209C();
+extern u32 fn_800E24B0();
+extern u32 fn_800E27B0();
+extern u32 fn_800E2C04();
+extern u32 fn_800FA280();
+extern void fn_8005DA18(u32);
+extern u32 fn_80102510();
+extern u32 fn_8010264C();
+extern u32 fn_801040F0();
+extern u8* fn_80105624();
+extern u32 fn_80109934();
+extern u32 fn_80109B90();
+extern u32 fn_8011D8D8();
+extern u32 fn_8011D8F4();
+extern u32 fn_8011DFE0();
+extern u32 fn_801231A4();
+extern u32 fn_801240C4();
+extern u32 fn_80132A38();
+extern u32 fn_80166AB8(u32, u32, u32);
+extern u32 fn_8017B1CC();
+extern u32 fn_8017B2CC();
+extern u32 fn_8017B3E4();
+extern u32 fn_801EE0BC();
+extern u16 fn_801EE248();
+extern u32 fn_801EE328();
+extern u16 fn_801EE614();
+extern u32 fn_801EE750();
+extern u8 fn_801EE8F4();
+extern u8 fn_801EEAD0();
+extern u8 fn_801EEC74();
+extern void fn_801EED88(u16);
+extern u16 fn_801EEFAC();
+extern u32 fn_801FCC7C();
+extern u32 fn_801FCCC4();
+extern u32 gamedataGetStatus();
+extern void menuCloseSync(s32, s32);
+extern u32 fn_80018F54();
+extern u32 fn_800F915C();
+
+void fn_8003AFDC(u8* context, PdaSprite* sprite)
+{
+    u16 battleId;
+    u32 texture;
+    s32 state;
+    s32 messageId;
+    u8* layout;
+
+    switch (sprite->eventId) {
+    case 0xD96:
+    case 0xD97:
+    case 0xD99:
+    case 0x308:
+    case 0x30B:
+        break;
+    case 0xD98:
+        battleId = lbl_8047A4D4[lbl_803A6748.field_08].battleId;
+        if (fn_801EE8F4(battleId) != 0 &&
+            fn_80109B90((u8*)&lbl_803A6748 + 0x4C, 0) == 0) {
+            texture = fn_80109934((u8*)&lbl_803A6748 + 0x4C);
+            if (texture != 0) {
+                fn_800D88DC(3);
+                fn_800D888C(4);
+                fn_800D6A00(7);
+                fn_800D7820(lbl_80314F98);
+                fn_800D85D4(0, texture);
+                fn_800D67BC(2);
+                fn_800D61E4(0, 0);
+                fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+                fn_800D59B8(0, lbl_8047BAC4, lbl_8047BAC4);
+                fn_800D61E4(sprite->x, sprite->y);
+                fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+                fn_800D59B8(0, lbl_8047BAC8, lbl_8047BAC8);
+                fn_800D6728();
+            }
+        }
+        break;
+    default:
+        battleId = lbl_8047A4D4[lbl_803A6748.field_08].battleId;
+        fn_801EED88(battleId);
+        fn_801EE614(battleId);
+        fn_801EE8F4(battleId);
+        if (fn_801EEAD0(battleId) != 0) {
+            state = fn_801EEC74(battleId) != 0;
+        } else {
+            state = 2;
+        }
+        layout = lbl_802EF0A8;
+        if (state == 0) {
+            fn_801040F0(
+                *(s16*)(layout + 0x55FA) - sprite->field_50 - 7,
+                *(s16*)(layout + 0x55FC) - sprite->field_52 - 4,
+                context, 0x161, 0);
+        } else if (state == 1) {
+            fn_801040F0(
+                *(s16*)(layout + 0x55FA) - sprite->field_50,
+                *(s16*)(layout + 0x55FC) - sprite->field_52,
+                context, 0x160, 0);
+        }
+        if (fn_801EE8F4(battleId) == 0) {
+            messageId = 0x36E8;
+        } else if (fn_801EEC74(battleId) == 0) {
+            messageId = 0x36E6;
+        } else {
+            messageId = 0x36E7;
+        }
+        fn_800FB680(0, 0, (s8)context[0x8B], (void*)messageId);
+        break;
+    }
+}
+
+void fn_800492CC(u8* context, PdaSprite* sprite)
+{
+    u32 firstTexture;
+    u32 secondTexture;
+    s32 alpha;
+    s32 mode;
+
+    secondTexture = 0;
+    if (lbl_804788C0 == 0) {
+        return;
+    }
+    mode = *(s32*)((u8*)&lbl_803A6818 + 0x1C);
+    if (mode == 0xC) {
+        return;
+    }
+    switch (mode) {
+    case 1:
+    case 2:
+        lbl_804788C8[0] = lbl_804788CC[0];
+        lbl_804788C8[1] = lbl_804788CC[1];
+        break;
+    case 4:
+        lbl_804788C8[0] = 0;
+        lbl_804788C8[1] = 0;
+        break;
+    case 5:
+        lbl_804788C8[0] = lbl_804788D0[0];
+        lbl_804788C8[1] = lbl_804788D0[1];
+        break;
+    }
+    if (*((u8*)&lbl_803A6818 + 0x214) != 0) {
+        firstTexture = fn_80109934((u8*)&lbl_803A6818 + 0x7C);
+        if (mode == 5) {
+            secondTexture = fn_80109934((u8*)&lbl_803A6818 + 0xC4);
+        }
+    } else {
+        firstTexture = 0;
+    }
+    alpha = lbl_8047BCA0 * *(f32*)((u8*)&lbl_803A6818 + 0x5C);
+    if (firstTexture != 0) {
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, firstTexture);
+        fn_800D67BC(2);
+        fn_800D61E4(lbl_804788C8[0], lbl_804788C8[1]);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+        fn_800D59B8(0, lbl_8047BC94, lbl_8047BC94);
+        fn_800D61E4(lbl_804788C8[0] + sprite->x,
+                     lbl_804788C8[1] + sprite->y);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+        fn_800D59B8(0, lbl_8047BCBC, lbl_8047BCBC);
+        fn_800D6728();
+    }
+    if (secondTexture != 0) {
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, secondTexture);
+        fn_800D67BC(2);
+        fn_800D61E4(lbl_804788C8[0], lbl_804788C8[1]);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+        fn_800D59B8(0, lbl_8047BC94, lbl_8047BC94);
+        fn_800D61E4(lbl_804788C8[0] + sprite->x,
+                     lbl_804788C8[1] + sprite->y);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, alpha);
+        fn_800D59B8(0, lbl_8047BCBC, lbl_8047BCBC);
+        fn_800D6728();
+    }
+}
+
+void fn_80040018(u8* menu)
+{
+    u8* scene;
+    f32 target;
+    f32 current;
+    f32 step;
+    f32 difference;
+
+    scene = (u8*)&lbl_803A6818;
+    target = *(f32*)(scene + 0x50);
+    current = *(f32*)(scene + 0x4C);
+    if (target != current) {
+        step = *(f32*)(scene + 0x3C) / lbl_8047BCB8;
+        if (target > current) {
+            current += step;
+            if (current > lbl_8047BCBC) {
+                current = lbl_8047BCBC;
+            }
+        } else {
+            current -= step;
+            if (current < lbl_8047BC94) {
+                current = lbl_8047BC94;
+            }
+        }
+        *(f32*)(scene + 0x4C) = current;
+    }
+
+    target = *(f32*)(scene + 0x58);
+    current = *(f32*)(scene + 0x54);
+    if (target != current) {
+        step = *(f32*)(scene + 0x3C) / lbl_8047BCB8;
+        if (target > current) {
+            current += step;
+            if (current > lbl_8047BCBC) {
+                current = lbl_8047BCBC;
+            }
+        } else {
+            current -= step;
+            if (current < lbl_8047BC94) {
+                current = lbl_8047BC94;
+            }
+        }
+        *(f32*)(scene + 0x54) = current;
+    }
+
+    target = *(f32*)(scene + 0x60);
+    current = *(f32*)(scene + 0x5C);
+    if (target != current) {
+        step = *(f32*)(scene + 0x3C) / lbl_8047BCC0;
+        if (target > current) {
+            current += step;
+            if (current > lbl_8047BCBC) {
+                current = lbl_8047BCBC;
+            }
+        } else {
+            current -= step;
+            if (current < lbl_8047BC94) {
+                current = lbl_8047BC94;
+            }
+        }
+        *(f32*)(scene + 0x5C) = current;
+    }
+
+    current = *(f32*)(scene + 0x1DC);
+    target = *(f32*)(scene + 0x1E0);
+    if (current != target) {
+        difference = target - current;
+        step = lbl_8047BCC4 * difference * *(f32*)(scene + 0x3C);
+        if (step > lbl_8047BC98) {
+            step = lbl_8047BC98;
+        }
+        if (step <= lbl_8047BCC8) {
+            step = lbl_8047BCC8;
+        }
+        current = *(f32*)(scene + 0x1DC) + step;
+        difference = target - current;
+        *(f32*)(scene + 0x1DC) = current;
+        if (step < lbl_8047BC94) {
+            step = -step;
+        }
+        if (difference < lbl_8047BC94) {
+            current = -difference;
+        } else {
+            current = difference;
+        }
+        if (current <= step || current < lbl_8047BCBC) {
+            *(f32*)(scene + 0x1DC) = target;
+        }
+    }
+
+    if (*(f32*)(scene + 0x50) == *(f32*)(scene + 0x4C) && menu != 0) {
+        u8* keyInfo;
+        u16 buttons;
+
+        fn_8005DA18(*(u32*)(menu + 4));
+        keyInfo = fn_80105624();
+        buttons = *(u16*)(keyInfo + 4);
+        if (lbl_804788C0 != 0) {
+            if (buttons & 0x10) {
+                fn_80166AB8(0x24, 0, 0);
+                menu[0x98] = 1;
+                *(s32*)(scene + 0x18) = 0;
+            }
+            if (buttons & 0x40) {
+                fn_80166AB8(0x24, 0, 0);
+                menu[0x98] = 1;
+                *(s32*)(scene + 0x18) = 1;
+            }
+        }
+        if (buttons & 0x20) {
+            fn_80166AB8(0x25, 0, 0);
+            *(s32*)(scene + 0x18) = -1;
+            menu[0x98] = 1;
+            menu[0x99] = 1;
+        }
+    }
+}
+
+void fn_80044378(u8* context, PdaSprite* sprite)
+{
+    u8* scene;
+    u8* entry;
+    s16 messageId;
+    s32 i;
+    s32 offset;
+    f32 y;
+    u16 pokemonId;
+    u32 model;
+
+    scene = (u8*)&lbl_803A6818;
+    if (sprite->messageId == 0x12B2) {
+        context[0x8B] = lbl_8047BCA0 * *(f32*)(scene + 0x54);
+    } else {
+        context[0x8B] = lbl_8047BCA0 * *(f32*)(scene + 0x4C);
+    }
+    messageId = sprite->eventId;
+    switch (messageId) {
+    case 0xD46:
+    case 0x12B2:
+    case 0x31D:
+    case 0x31E:
+        return;
+    case 0x119B:
+        if (fn_8004BDEC() == 1 && fn_8004BDFC() >= 1) {
+            fn_800492CC(context, sprite);
+        }
+        return;
+    case 0x76D:
+        fn_80132A38(0x34, fn_8025FEE4(0));
+        return;
+    }
+
+    entry = lbl_802EF0A8 + messageId * 0x1C;
+    fn_800FE38C(
+        *(s16*)(lbl_802EF0A8 + 0x5712) - *(s16*)(entry + 2),
+        *(s16*)(lbl_802EF0A8 + 0x5714) - *(s16*)(entry + 4),
+        *(s16*)(lbl_802EF0A8 + 0x5716),
+        *(s16*)(lbl_802EF0A8 + 0x5718));
+    y = *(f32*)(scene + 0x30);
+    offset = 0;
+    for (i = 0; i < lbl_8047A4E8; i++, offset += 2) {
+        if (i >= *(s32*)(scene + 8) - 1 &&
+            i <= *(s32*)(scene + 0xC) + 1) {
+            model = lbl_8047A4E0;
+            if (model != 0) {
+                pokemonId = lbl_8047A4E4[i];
+                if (pokemonId >= 0x8000) {
+                    pokemonId &= 0x3FFF;
+                }
+                fn_801240C4(model, pokemonId, 0xA,
+                             gamedataGetStatus(0, 1));
+                fn_8011DFE0(model, fn_8025FDDC(0, pokemonId));
+                fn_8011DF90(model, fn_8025FD34(0, pokemonId));
+                fn_8011F5C8();
+                fn_8011E778();
+                model = fn_800FA280(fn_8011E760());
+            }
+            if (model == 0) {
+                model = fn_800FA280(1);
+            }
+            fn_80132A38(0x37, model);
+            fn_800FB680(0, (s32)y - 2, (s8)context[0x8B],
+                         (void*)0xE7);
+        }
+        y += lbl_8047BCF4;
+    }
+    fn_800FE35C();
+}
+
+void fn_8003B478(u8* context)
+{
+    u8* window;
+    PdaListEntry* entry;
+    u16 battleId;
+    u32 model;
+    u32 message;
+    s32 battleState;
+
+    window = (u8*)&lbl_803A6748;
+    context[0x8B] = lbl_8047BAC0 * *(f32*)(window + 0x44);
+    entry = &lbl_8047A4D4[*(u32*)window];
+    battleId = entry->battleId;
+    fn_801EE614(battleId);
+    fn_801EE8F4(battleId);
+    if (fn_801EEAD0(battleId) != 0) {
+        battleState = fn_801EEC74(battleId) != 0;
+    } else {
+        battleState = 2;
+    }
+
+    model = lbl_8047A4D0;
+    fn_801240C4(model, entry->field_00, 0xA, gamedataGetStatus(0, 1));
+    fn_801EE750(battleId);
+    fn_8011DFE0(model, *(u32*)(window + 0x98));
+    if (battleState == 1) {
+        fn_8011D8F4(model, 0);
+        fn_8011D8D8(model, 0);
+    } else {
+        fn_8011D8F4(model, 1);
+        fn_8011D8D8(model, 0xA);
+    }
+
+    if (model == 0 || battleId == 0) {
+        message = 0x80;
+    } else if (fn_801EE8F4(battleId) != 0) {
+        fn_8011DFE0(model, fn_801EE750(battleId));
+        message = fn_801231A4(model);
+        fn_8011DFE0(model, *(u32*)(window + 0x98));
+    } else {
+        message = 2;
+    }
+    message &= 0xFF;
+    if (message == 0x80) {
+        fn_80132A38(0x37, fn_800FA280(1));
+    } else if (message == 0) {
+        fn_80132A38(0x37, fn_800FA280(0xD67));
+    } else if (message == 1) {
+        fn_80132A38(0x37, fn_800FA280(0xD68));
+    } else if (message == 2) {
+        fn_80132A38(0x37, fn_800FA280(0xD69));
+    } else {
+        fn_80132A38(0x37, fn_800FA280(0xD68));
+    }
+    fn_800FB680(0, 0, (s8)context[0x8B], (void*)0xCF);
+}
+
+void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
+{
+    u32 periods[3];
+    s8 selection;
+    f32* angles;
+    s16* layout;
+    u32 active;
+
+    periods[0] = ((u32*)lbl_80267190)[0];
+    periods[1] = ((u32*)lbl_80267190)[1];
+    periods[2] = ((u32*)lbl_80267190)[2];
+    switch (messageId) {
+    case 0x6E7:
+    case 0x75D:
+    case 0x760:
+    case 0x763:
+        *(u32*)(lbl_803A6A60 + 0x44) = 0;
+        break;
+    case 0x6E8:
+    case 0x75E:
+    case 0x761:
+    case 0x764:
+        *(u32*)(lbl_803A6A60 + 0x44) = 1;
+        break;
+    case 0x6E9:
+    case 0x75F:
+    case 0x762:
+    case 0x765:
+        *(u32*)(lbl_803A6A60 + 0x44) = 2;
+        break;
+    }
+
+    selection = (s8)lbl_803A6A60[0];
+    if (selection < 0) {
+        selection = (s8)lbl_803A6A60[0x48];
+    } else {
+        lbl_803A6A60[0x48] = selection;
+    }
+    active = *(u32*)(lbl_803A6A60 + 0x44);
+    switch (selection) {
+    case 0:
+        layout = (s16*)(lbl_802EF0A8 + (active + 0x6E7) * 0x1C);
+        break;
+    case 1:
+        layout = (s16*)(lbl_802EF0A8 + (active + 0x75D) * 0x1C);
+        break;
+    case 2:
+        layout = (s16*)(lbl_802EF0A8 + (active + 0x760) * 0x1C);
+        break;
+    case 3:
+        layout = (s16*)(lbl_802EF0A8 + (active + 0x763) * 0x1C);
+        break;
+    default:
+        layout = (s16*)(lbl_802EF0A8 + 0xC144);
+        break;
+    }
+
+    angles = (f32*)(lbl_803A6A60 + 0xC);
+    angles[active] += *(f32*)(lbl_803A6A60 + 8) *
+                      (lbl_8047BDF0 / *(f32*)&periods[active]);
+    if (angles[active] > lbl_8047BDF0) {
+        angles[active] -= lbl_8047BDF0;
+    }
+    if (angles[active] < lbl_8047BDAC) {
+        angles[active] += lbl_8047BDF0;
+    }
+    sprite->value = angles[active];
+    sprite->field_50 = layout[1];
+    sprite->field_52 = layout[2];
+}
+
+void fn_8003CF38(void)
+{
+    u8 temporary[8];
+    u8* sortEntries;
+    s32 count;
+    s32 gap;
+    s32 i;
+    s32 j;
+    u32 allocation;
+    u32 handle;
+
+    lbl_8047A4DC = 0x60;
+    lbl_8047A4D0 = 0;
+    allocation = fn_800E2C04(0x140, 0x20);
+    if ((u16)allocation != 0) {
+        lbl_8047A4D0 = fn_800E27B0();
+    }
+    allocation = fn_800E2C04(
+        ((lbl_8047A4DC * 4) + 0x1F) & ~0x1F, 0x20);
+    if ((u16)allocation != 0) {
+        lbl_8047A4D4 = (PdaListEntry*)fn_800E27B0();
+    } else {
+        lbl_8047A4D4 = 0;
+    }
+    allocation = fn_800E2C04(
+        ((lbl_8047A4DC * 8) + 0x1F) & ~0x1F, 0x20);
+    if ((u16)allocation != 0) {
+        lbl_8047A4D8 = fn_800E27B0();
+    } else {
+        lbl_8047A4D8 = 0;
+    }
+
+    count = 0;
+    for (i = 0; i < (s32)lbl_8047A4DC; i++) {
+        u16 value;
+        u16 battleId;
+
+        battleId = i + 1;
+        value = fn_801EE248(battleId);
+        if (value != 0 &&
+            (fn_801EE8F4(battleId) != 0 ||
+             fn_801EE614(battleId) != 0)) {
+            lbl_8047A4D4[count].field_00 = value;
+            lbl_8047A4D4[count].battleId = battleId;
+            *(u32*)((u8*)lbl_8047A4D8 + count * 8) =
+                fn_801EE0BC();
+            *(PdaListEntry*)((u8*)lbl_8047A4D8 + count * 8 + 4) =
+                lbl_8047A4D4[count];
+            count++;
+        }
+    }
+    lbl_8047A4DC = count;
+
+    sortEntries = (u8*)lbl_8047A4D8;
+    for (gap = count / 2; gap > 0; gap /= 2) {
+        for (i = gap; i < count; i++) {
+            j = i - gap;
+            while (j >= 0 &&
+                   *(s32*)(sortEntries + j * 8) >
+                       *(s32*)(sortEntries + (j + gap) * 8)) {
+                memcpy(temporary, sortEntries + j * 8, 8);
+                memcpy(sortEntries + j * 8,
+                       sortEntries + (j + gap) * 8, 8);
+                memcpy(sortEntries + (j + gap) * 8, temporary, 8);
+                j -= gap;
+            }
+        }
+    }
+    for (i = 0; i < count; i++) {
+        lbl_8047A4D4[i] =
+            *(PdaListEntry*)(sortEntries + i * 8 + 4);
+    }
+
+    handle = fn_800E202C(lbl_8047A4D8);
+    if ((u16)handle != 0) {
+        fn_800E24B0(handle);
+        fn_800E209C(handle);
+    }
+    lbl_8047A4D8 = 0;
+}
+
+u32 fn_80043728(u32 unused, s32 mode, u16 buttons)
+{
+    u8* scene;
+    u16 total;
+    s32 selected;
+    s32 next;
+    s32 difference;
+
+    scene = (u8*)&lbl_803A6818;
+    *(s32*)(scene + 0x1C) = 2;
+    total = lbl_8047A4E8;
+    if ((buttons & 2) && total != 0 &&
+        *(s32*)scene < (s32)total - 1) {
+        *(s32*)scene += 1;
+        fn_80166AB8(0x23, 0, 0);
+        *(f32*)(scene + 0x38) -= lbl_8047BCF4;
+        *(s32*)(scene + 8) += 1;
+        *(s32*)(scene + 0xC) += 1;
+    } else if ((buttons & 1) && total != 0 &&
+               *(s32*)scene > 0) {
+        *(s32*)scene -= 1;
+        fn_80166AB8(0x23, 0, 0);
+        *(f32*)(scene + 0x38) += lbl_8047BCF4;
+        *(s32*)(scene + 8) -= 1;
+        *(s32*)(scene + 0xC) -= 1;
+    } else if ((buttons & 8) && mode == 0 && total != 0) {
+        selected = *(s32*)scene;
+        next = selected + 10;
+        *(s32*)scene = next;
+        if (next > (s32)total - 1) {
+            next = total - 1;
+            *(f32*)(scene + 0x38) = -(f32)(next * 0x1B);
+            *(s32*)scene = next;
+            if (selected != next) {
+                difference = next - selected;
+                *(s32*)(scene + 8) += difference;
+                *(s32*)(scene + 0xC) += difference;
+            }
+        } else {
+            *(f32*)(scene + 0x38) -= lbl_8047BCF8;
+            *(s32*)(scene + 8) += 10;
+            *(s32*)(scene + 0xC) += 10;
+            fn_80166AB8(0x23, 0, 0);
+        }
+    } else if ((buttons & 4) && mode == 0 && total != 0) {
+        selected = *(s32*)scene;
+        next = selected - 10;
+        *(s32*)scene = next;
+        if (next < 0) {
+            *(s32*)scene = 0;
+            *(f32*)(scene + 0x38) = lbl_8047BC94;
+            if (selected != 0) {
+                *(s32*)(scene + 8) = -5;
+                if (total >= 5) {
+                    *(s32*)(scene + 0xC) = 5;
+                } else {
+                    *(s32*)(scene + 0xC) = total;
+                }
+                *(s32*)(scene + 0x10) = total;
+            }
+        } else {
+            *(f32*)(scene + 0x38) += lbl_8047BCF8;
+            *(s32*)(scene + 8) -= 10;
+            *(s32*)(scene + 0xC) -= 10;
+            fn_80166AB8(0x23, 0, 0);
+        }
+    }
+    return 0;
+}
+
+void fn_8003A520(void)
+{
+    s32 result;
+
+    result = 0;
+    while ((u32)(result - 3) > 1) {
+        result = fn_80039498(result);
+        switch (result) {
+        case 0:
+            fn_80102510(0x19);
+            fn_80102510(0x1B);
+            menuCloseSync(0x19, 1);
+            menuCloseSync(0x1B, 1);
+            fn_8003A10C(0);
+            fn_8010264C(0x1B, 0);
+            fn_8010264C(0x19, 0);
+            break;
+        case 1:
+            fn_80102510(0x19);
+            fn_80102510(0x1A);
+            fn_80102510(0x1B);
+            menuCloseSync(0x19, 1);
+            menuCloseSync(0x1A, 1);
+            menuCloseSync(0x1B, 1);
+            fn_8017B3E4(0x66F);
+            while (fn_8017B2CC(0x66F) == 1) {
+                _threadSwitch();
+            }
+            fn_80018F54(4, 0, 0);
+            fn_8017B1CC(0x66F);
+            fn_800F915C(0x66F);
+            fn_8010264C(0x1A, 0);
+            fn_8010264C(0x1B, 0);
+            fn_8010264C(0x19, 0);
+            break;
+        case 2:
+            fn_80102510(0x19);
+            fn_80102510(0x1B);
+            menuCloseSync(0x19, 1);
+            menuCloseSync(0x1B, 1);
+            fn_8003A10C(1);
+            fn_8010264C(0x1B, 0);
+            fn_8010264C(0x19, 0);
+            break;
+        }
+    }
+}
+
+void fn_8003B2D8(u8* context)
+{
+    u8* window;
+    u16 battleId;
+    u32 message;
+    u32 secondary;
+    s32 variant;
+
+    extern s32 fn_801EE544(u16, s8*);
+
+    window = (u8*)&lbl_803A6748;
+    context[0x8B] = lbl_8047BAC0 * *(f32*)(window + 0x44);
+    secondary = 0;
+    if (lbl_8047A4D0 == 0) {
+        message = 0;
+    } else {
+        battleId = lbl_8047A4D4[(u16)*(u32*)window].battleId;
+        message = fn_801EE544(battleId, (s8*)(window + 0x94));
+        variant = *(u8*)(window + 0x94);
+        if (variant == 0) {
+            message = 0x371F;
+        } else if (variant < 3) {
+            if (battleId == 0x43) {
+                message = 0x12B0;
+            } else if (fn_801EEFAC(battleId, 0) == 9) {
+                message = fn_801EE328(battleId);
+                secondary = 1;
+            } else {
+                fn_801FCCC4();
+                message = fn_801FCC7C();
+            }
+        }
+        if (secondary == 0) {
+            message = fn_800FA280(message);
+        }
+    }
+    if (message == 0) {
+        message = fn_800FA280(1);
+    }
+    secondary = fn_8003CE1C(*(u32*)window);
+    if (secondary == 0) {
+        secondary = fn_800FA280(1);
+    }
+    fn_80132A38(0x37, secondary);
+    fn_800FB680(0, 0, (s8)context[0x8B], (void*)0xE7);
+    fn_80132A38(0x37, message);
+    fn_800FB680(0xB4, 0, (s8)context[0x8B], (void*)0xE7);
+}
