@@ -37,6 +37,7 @@ extern const f32 lbl_8047C2BC;
 extern f32 tanf(f32 x);
 
 #if !defined(SDK_800A37CC_SUFFIX_ACTIVE)
+#if !defined(SDK_MTXLOOKAT_BEFORE_EXCLUDE)
 void PSMTXIdentity(Mtx m)
 {
     f32 zero = lbl_8047C28C;
@@ -237,7 +238,9 @@ void PSMTXScaleApply(const Mtx src, Mtx dst, f32 xS, f32 yS, f32 zS)
     }
 }
 #pragma optimize_for_size reset
+#endif
 
+#if !defined(SDK_MTXLOOKAT_EXCLUDE)
 void C_MTXLookAt(Mtx m, const Vec* cameraPosition, const Vec* cameraUp,
                  const Vec* target)
 {
@@ -273,7 +276,9 @@ void C_MTXLookAt(Mtx m, const Vec* cameraPosition, const Vec* cameraUp,
     m[2][3] = -(cameraPosition->x * look.x + cameraPosition->y * look.y +
                   cameraPosition->z * look.z);
 }
+#endif
 
+#if !defined(SDK_MTXLOOKAT_AFTER_EXCLUDE)
 #pragma peephole off
 void C_MTXLightFrustum(Mtx m, f32 top, f32 bottom, f32 left, f32 right, f32 near,
                        f32 scaleS, f32 scaleT, f32 transS, f32 transT)
@@ -331,8 +336,10 @@ void C_MTXLightPerspective(Mtx m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT,
 }
 #pragma peephole reset
 #endif
+#endif
 
 #if defined(SDK_800A37CC_SUFFIX_ACTIVE)
+#if !defined(SDK_CQUATSLERP_ONLY)
 void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst)
 {
     const f64* mPairs = (const f64*)m;
@@ -649,7 +656,9 @@ void C_QUATRotAxisRad(Quaternion* quat, const Vec* axis, f32 rad)
     quat->w = cosHalf;
 }
 #pragma dont_inline reset
+#endif
 
+#if !defined(SDK_CQUATSLERP_EXCLUDE)
 void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t)
 {
     extern f32 acosf(f32 x);
@@ -686,4 +695,5 @@ void C_QUATSlerp(const Quaternion* p, const Quaternion* q, Quaternion* r, f32 t)
     r->z = pScale * p->z + qScale * q->z;
     r->w = pScale * p->w + qScale * q->w;
 }
+#endif
 #endif
