@@ -609,8 +609,8 @@ void GSlightPopState(u8* obj, u8* snapshot) {
     HSD_LObjSetPosition(*(void**)(obj + 0xc), snapshot + 4);
     HSD_LObjSetInterest(*(void**)(obj + 0xc), snapshot + 0x10);
 
+    GSlightSetAnimIndexInline(obj, *(u32*)(snapshot + 0x1c));
     if (obj[2]) {
-        GSlightSetAnimIndexInline(obj, *(u32*)(snapshot + 0x1c));
         *(f32*)(obj + 0x68) = *(f32*)(snapshot + 0x20);
         speed = *(f32*)(snapshot + 0x24);
         if (fn_800D37CC() == 0x32) {
@@ -871,7 +871,6 @@ asm void GSlightLoad(void) {
 u8* GSlightLoad(void* data) {
     u32 i;
     u8* obj;
-    u32 frames;
 
     obj = (u8*)lbl_8047AAEC;
     for (i = lbl_8047AAF0; i != 0; i--, obj += 0x74) {
@@ -898,11 +897,10 @@ u8* GSlightLoad(void* data) {
         *(u32*)(obj + 0x5c) = 1;
         obj[0x70] = 0;
 
-        frames = 0;
-        while (((u32**)((u8*)data + 4))[0][frames] != 0) {
-            frames++;
+        *(u32*)(obj + 0x58) = 0;
+        while (((u32**)((u8*)data + 4))[0][*(u32*)(obj + 0x58)] != 0) {
+            (*(u32*)(obj + 0x58))++;
         }
-        *(u32*)(obj + 0x58) = frames;
         GSlightSetAnimIndex(obj, 0);
     } else {
         obj[2] = 0;
@@ -1020,6 +1018,22 @@ extern void HSD_LObjDeleteCurrentAll(void*);
 extern void HSD_LObjSetup(void*);
 extern u32 lbl_8047AAEC;
 extern u32 lbl_8047AAF0;
+
+static inline s32 GSlightFindFirstActive(GSlightEntry* light, u32 count)
+{
+    s32 index = 0;
+
+    while (count != 0) {
+        if (light->allocated == 1 && light->active != 0) {
+            return index;
+        }
+        index++;
+        light++;
+        count--;
+    }
+    return -1;
+}
+
 #if 0
 asm void fn_800DD174(void) {
 #include "src/game/gs_render_fn_800DD174.inc"
@@ -1038,15 +1052,7 @@ void GSlightSetupLights(void* arg) {
     HSD_LObjDeleteCurrentAll(0);
 
     lightList = (GSlightEntry*)lbl_8047AAEC;
-    for (firstIndex = 0, light = lightList;
-         firstIndex < (s32)lbl_8047AAF0; firstIndex++, light++) {
-        if (light->allocated == 1 && light->active != 0) {
-            break;
-        }
-    }
-    if (firstIndex >= (s32)lbl_8047AAF0) {
-        firstIndex = -1;
-    }
+    firstIndex = GSlightFindFirstActive(lightList, lbl_8047AAF0);
 
     if (firstIndex != -1) {
         last = &lightList[firstIndex];

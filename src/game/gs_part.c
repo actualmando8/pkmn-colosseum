@@ -164,10 +164,10 @@ void GSpartRegisterRotation(GSpart* part, void* userData, void* callback)
 void* GSpartGetMaterial(GSpart* part, u32 index)
 {
     u8* jobj = part->jobj;
+    u32 count;
     u8* material;
     void* source;
     void* result;
-    u32 count;
 
     if (union_type_dobj((HSD_JObj*)jobj)) {
         material = *(u8**)(jobj + 0x18);
@@ -205,13 +205,12 @@ static inline void GSpartCountMaterials(u8* material, u32* result)
     u32 count = 0;
 
     while (material != NULL) {
-        if ((u16)count == 0xFFFF) {
+        if (count++ == (u32)-1) {
             if (result != NULL) {
                 *result = -1;
             }
             return;
         }
-        count++;
         material = *(u8**)(material + 4);
     }
     if (result != NULL) {
