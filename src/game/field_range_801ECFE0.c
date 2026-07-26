@@ -57,6 +57,63 @@ s32 fn_801ECFE0(void* arg0, void* arg1) {
 }
 #pragma pop
 
+s32 fn_801ED0CC(u8* status, u8* pokemon)
+{
+    extern u8* savedataGetStatus(u8* data, u16 index);
+    extern u8 pokemonBiosGetLevel(u8* pokemon);
+    extern u8 fn_80121ADC(u8* pokemon, u32 value);
+    extern void fn_80121B4C(u8* pokemon, u32 value);
+    extern u8 pokemonBiosGetDarkFlag(u8* pokemon);
+    extern u32 pokemonBiosGetDp(u8* pokemon);
+    extern void pokemonInit(u8* pokemon);
+    u8* stored;
+    u8 level;
+
+    if (status == NULL) {
+        status = savedataGetStatus(NULL, 0xB);
+    }
+    if (pokemon == NULL) {
+        return 0;
+    }
+
+    level = pokemonBiosGetLevel(pokemon);
+    stored = status;
+    if (stored == NULL) {
+        stored = savedataGetStatus(NULL, 0xB);
+    }
+    if (stored != NULL) {
+        stored[1] = level;
+    }
+
+    stored = status;
+    if (stored == NULL) {
+        stored = savedataGetStatus(NULL, 0xB);
+    }
+    stored += 8;
+    if (stored == NULL) {
+        return 0;
+    }
+
+    if (fn_80121ADC(pokemon, 0x3E) != 0) {
+        fn_80121B4C(pokemon, 0x3E);
+    }
+    *(PokemonCopy*)stored = *(PokemonCopy*)pokemon;
+    if (pokemonBiosGetDarkFlag(pokemon) != 0) {
+        *(u32*)(status + 4) = pokemonBiosGetDp(pokemon);
+    } else {
+        *(u32*)(status + 4) = 0;
+    }
+
+    if (status == NULL) {
+        status = savedataGetStatus(NULL, 0xB);
+    }
+    if (status != NULL) {
+        status[0] = 1;
+    }
+    pokemonInit(pokemon);
+    return 1;
+}
+
 u8 fn_801ED218(void* arg0) {
     u8* status;
     u8 result;

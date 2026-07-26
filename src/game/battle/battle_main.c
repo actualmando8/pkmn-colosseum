@@ -148,6 +148,43 @@ extern const u32 lbl_80279B84[BATTLE_SCENE_OBJ_COUNT];
 /* Scene initialization table */
 extern u32 lbl_80279B78[3]; /* function pointers for scene callbacks */
 
+#if defined(BATTLE_MAIN_ALL) || defined(BATTLE_MAIN_RESIDUAL_801EF4B0_ONLY)
+
+void _fightInitialize__FUi14FloorEnterMode(u32 unused, s32 enterMode)
+{
+    extern u8 fn_800FF548(void);
+    extern void* fn_800FF560(void);
+    extern void fn_801EFA08(void);
+    extern void* GSthreadCreate(s32 priority, void* userData, u32 stackSize,
+                                s32 arg3, s32 arg4, void (*entry)(void));
+    extern u8 lbl_8046D730[];
+    extern u8 lbl_80375CC8[];
+    extern const char lbl_80279C00[];
+
+    if (fn_800FF548() != 0) {
+        dbgMenuClose();
+        dbgMenuSetEnable(0);
+        return;
+    }
+
+    GSlogWrite(lbl_80279C00);
+    lbl_8047B5DA = 1;
+    lbl_8047B5D5 = dbgMenuGetEnable();
+    dbgMenuClose();
+    dbgMenuSetEnable(0);
+    fightActionFifoInit();
+    fn_801DAEF8(10);
+    lbl_8047B5D4 = GSscene_GetMode();
+    fightActionCreateAndFlowFifo(lbl_8046D730, 0, 0, 1, 0, lbl_80375CC8);
+    fightActionCreateAndFlowFifo(lbl_8046D730, 0, 0, 3, 5, lbl_80375CC8);
+    fightActionCreateAndFlowFifo(lbl_8046D730, 0, 0, 3, 4, lbl_80375CC8);
+    fightActionDispFifoAll();
+    lbl_8047B5D0 = (u32)GSthreadCreate(0x14, fn_800FF560(), 0x4000, 1, 0,
+                                      fn_801EFA08);
+}
+
+#endif
+
 /* =========================================================================
  * Implementation
  *

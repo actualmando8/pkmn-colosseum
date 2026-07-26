@@ -31,7 +31,20 @@ typedef struct MenuCBBattleStartParams {
     s32 mode;
 } MenuCBBattleStartParams;
 
+typedef struct UICmdMsg {
+    u8 pad0[4];
+    s8 flags4;
+    u8 pad5;
+    s16 cmd;
+    u8 pad8[0x48];
+    s16 field50;
+    s16 field52;
+    s16 field54;
+    s16 field56;
+} UICmdMsg;
+
 extern MenuCBBattleStartState lbl_803A9A60;
+extern u8 lbl_803A9E40[];
 
 extern void fn_8005DFC8(void* arg);
 
@@ -229,3 +242,703 @@ s32 fn_80062284(s32 trainer) {
     return 1;
 }
 #pragma pop
+
+/* Battle-start command dispatcher. */
+void fn_8005E7F0(void* ctx, void* arg1)
+{
+    UICmdMsg* msg = (UICmdMsg*) arg1;
+    u32* tbl = (u32*) lbl_803A9E40;
+
+    switch (msg->cmd) {
+    case 0x8A6:
+        fn_800608C4(ctx, (MenuCBBattleStartDrawParams*)msg);
+        break;
+    case 0xC01:
+        fn_8006106C(ctx, msg, 0, tbl[0], 2);
+        break;
+    case 0xC02:
+        fn_8006106C(ctx, msg, 0, tbl[1], 2);
+        break;
+    case 0xC03:
+        fn_8006106C(ctx, msg, 0, tbl[2], 2);
+        break;
+    case 0xC04:
+        fn_8006106C(ctx, msg, 0, tbl[3], 2);
+        break;
+    case 0xC05:
+        fn_8006106C(ctx, msg, 0, tbl[4], 2);
+        break;
+    case 0xC06:
+        fn_8006106C(ctx, msg, 0, tbl[5], 2);
+        break;
+    case 0xC0D:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC0E:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC0F:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC10:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC11:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC12:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC13:
+        fn_80061A2C(ctx, msg, 0, tbl[0], 2);
+        break;
+    case 0xC14:
+        fn_80061A2C(ctx, msg, 0, tbl[1], 2);
+        break;
+    case 0xC15:
+        fn_80061A2C(ctx, msg, 0, tbl[2], 2);
+        break;
+    case 0xC16:
+        fn_80061A2C(ctx, msg, 0, tbl[3], 2);
+        break;
+    case 0xC17:
+        fn_80061A2C(ctx, msg, 0, tbl[4], 2);
+        break;
+    case 0xC18:
+        fn_80061A2C(ctx, msg, 0, tbl[5], 2);
+        break;
+    case 0xC19:
+        fn_80061BBC(ctx, msg, 0, tbl[0], 2);
+        break;
+    case 0xC1A:
+        fn_80061BBC(ctx, msg, 0, tbl[1], 2);
+        break;
+    case 0xC1B:
+        fn_80061BBC(ctx, msg, 0, tbl[2], 2);
+        break;
+    case 0xC1C:
+        fn_80061BBC(ctx, msg, 0, tbl[3], 2);
+        break;
+    case 0xC1D:
+        fn_80061BBC(ctx, msg, 0, tbl[4], 2);
+        break;
+    case 0xC1E:
+        fn_80061BBC(ctx, msg, 0, tbl[5], 2);
+        break;
+    case 0xDB5:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC1F:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC20:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC21:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC22:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC23:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC27:
+        fn_8006106C(ctx, msg, 1, tbl[6], 2);
+        break;
+    case 0xC28:
+        fn_8006106C(ctx, msg, 1, tbl[7], 2);
+        break;
+    case 0xC29:
+        fn_8006106C(ctx, msg, 1, tbl[8], 2);
+        break;
+    case 0xC2A:
+        fn_8006106C(ctx, msg, 1, tbl[9], 2);
+        break;
+    case 0xC2B:
+        fn_8006106C(ctx, msg, 1, tbl[10], 2);
+        break;
+    case 0xC2C:
+        fn_8006106C(ctx, msg, 1, tbl[11], 2);
+        break;
+    case 0xC33:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC34:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC35:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC36:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC37:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC38:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC39:
+        fn_80061A2C(ctx, msg, 1, tbl[6], 2);
+        break;
+    case 0xC3A:
+        fn_80061A2C(ctx, msg, 1, tbl[7], 2);
+        break;
+    case 0xC3B:
+        fn_80061A2C(ctx, msg, 1, tbl[8], 2);
+        break;
+    case 0xC3C:
+        fn_80061A2C(ctx, msg, 1, tbl[9], 2);
+        break;
+    case 0xC3D:
+        fn_80061A2C(ctx, msg, 1, tbl[10], 2);
+        break;
+    case 0xC3E:
+        fn_80061A2C(ctx, msg, 1, tbl[11], 2);
+        break;
+    case 0xC3F:
+        fn_80061BBC(ctx, msg, 1, tbl[6], 2);
+        break;
+    case 0xC40:
+        fn_80061BBC(ctx, msg, 1, tbl[7], 2);
+        break;
+    case 0xC41:
+        fn_80061BBC(ctx, msg, 1, tbl[8], 2);
+        break;
+    case 0xC42:
+        fn_80061BBC(ctx, msg, 1, tbl[9], 2);
+        break;
+    case 0xC43:
+        fn_80061BBC(ctx, msg, 1, tbl[10], 2);
+        break;
+    case 0xC44:
+        fn_80061BBC(ctx, msg, 1, tbl[11], 2);
+        break;
+    case 0xDB4:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC45:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC46:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC47:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC48:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC49:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC4D:
+        fn_8006106C(ctx, msg, 2, tbl[12], 2);
+        break;
+    case 0xC4E:
+        fn_8006106C(ctx, msg, 2, tbl[13], 2);
+        break;
+    case 0xC4F:
+        fn_8006106C(ctx, msg, 2, tbl[14], 2);
+        break;
+    case 0xC50:
+        fn_8006106C(ctx, msg, 2, tbl[15], 2);
+        break;
+    case 0xC51:
+        fn_8006106C(ctx, msg, 2, tbl[16], 2);
+        break;
+    case 0xC52:
+        fn_8006106C(ctx, msg, 2, tbl[17], 2);
+        break;
+    case 0xC59:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC5A:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC5B:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC5C:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC5D:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC5E:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC5F:
+        fn_80061A2C(ctx, msg, 2, tbl[12], 2);
+        break;
+    case 0xC60:
+        fn_80061A2C(ctx, msg, 2, tbl[13], 2);
+        break;
+    case 0xC61:
+        fn_80061A2C(ctx, msg, 2, tbl[14], 2);
+        break;
+    case 0xC62:
+        fn_80061A2C(ctx, msg, 2, tbl[15], 2);
+        break;
+    case 0xC63:
+        fn_80061A2C(ctx, msg, 2, tbl[16], 2);
+        break;
+    case 0xC64:
+        fn_80061A2C(ctx, msg, 2, tbl[17], 2);
+        break;
+    case 0xC65:
+        fn_80061BBC(ctx, msg, 2, tbl[12], 2);
+        break;
+    case 0xC66:
+        fn_80061BBC(ctx, msg, 2, tbl[13], 2);
+        break;
+    case 0xC67:
+        fn_80061BBC(ctx, msg, 2, tbl[14], 2);
+        break;
+    case 0xC68:
+        fn_80061BBC(ctx, msg, 2, tbl[15], 2);
+        break;
+    case 0xC69:
+        fn_80061BBC(ctx, msg, 2, tbl[16], 2);
+        break;
+    case 0xC6A:
+        fn_80061BBC(ctx, msg, 2, tbl[17], 2);
+        break;
+    case 0xDAF:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC6B:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC6C:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC6D:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC6E:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC6F:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC73:
+        fn_8006106C(ctx, msg, 3, tbl[18], 2);
+        break;
+    case 0xC74:
+        fn_8006106C(ctx, msg, 3, tbl[19], 2);
+        break;
+    case 0xC75:
+        fn_8006106C(ctx, msg, 3, tbl[20], 2);
+        break;
+    case 0xC76:
+        fn_8006106C(ctx, msg, 3, tbl[21], 2);
+        break;
+    case 0xC77:
+        fn_8006106C(ctx, msg, 3, tbl[22], 2);
+        break;
+    case 0xC78:
+        fn_8006106C(ctx, msg, 3, tbl[23], 2);
+        break;
+    case 0xC7F:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC80:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC81:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC82:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC83:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC84:
+        msg->flags4 &= ~2;
+        break;
+    case 0xC85:
+        fn_80061A2C(ctx, msg, 3, tbl[18], 2);
+        break;
+    case 0xC86:
+        fn_80061A2C(ctx, msg, 3, tbl[19], 2);
+        break;
+    case 0xC87:
+        fn_80061A2C(ctx, msg, 3, tbl[20], 2);
+        break;
+    case 0xC88:
+        fn_80061A2C(ctx, msg, 3, tbl[21], 2);
+        break;
+    case 0xC89:
+        fn_80061A2C(ctx, msg, 3, tbl[22], 2);
+        break;
+    case 0xC8A:
+        fn_80061A2C(ctx, msg, 3, tbl[23], 2);
+        break;
+    case 0xC8B:
+        fn_80061BBC(ctx, msg, 3, tbl[18], 2);
+        break;
+    case 0xC8C:
+        fn_80061BBC(ctx, msg, 3, tbl[19], 2);
+        break;
+    case 0xC8D:
+        fn_80061BBC(ctx, msg, 3, tbl[20], 2);
+        break;
+    case 0xC8E:
+        fn_80061BBC(ctx, msg, 3, tbl[21], 2);
+        break;
+    case 0xC8F:
+        fn_80061BBC(ctx, msg, 3, tbl[22], 2);
+        break;
+    case 0xC90:
+        fn_80061BBC(ctx, msg, 3, tbl[23], 2);
+        break;
+    case 0xDB3:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC91:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC92:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC93:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC94:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xC95:
+        fn_80061B74(ctx, (MenuCBBattleStartMessage*)msg);
+        break;
+    case 0xDB6:
+        fn_8006106C(ctx, msg, 0, tbl[0], 0);
+        break;
+    case 0xDB7:
+        fn_8006106C(ctx, msg, 0, tbl[1], 0);
+        break;
+    case 0xDB8:
+        fn_8006106C(ctx, msg, 0, tbl[2], 0);
+        break;
+    case 0xDB9:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDBA:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDBB:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDBC:
+        fn_80061A2C(ctx, msg, 0, tbl[0], 0);
+        break;
+    case 0xDBD:
+        fn_80061A2C(ctx, msg, 0, tbl[1], 0);
+        break;
+    case 0xDBE:
+        fn_80061A2C(ctx, msg, 0, tbl[2], 0);
+        break;
+    case 0xDBF:
+        fn_80061BBC(ctx, msg, 0, tbl[0], 0);
+        break;
+    case 0xDC0:
+        fn_80061BBC(ctx, msg, 0, tbl[1], 0);
+        break;
+    case 0xDC1:
+        fn_80061BBC(ctx, msg, 0, tbl[2], 0);
+        break;
+    case 0xDC2:
+        fn_8006106C(ctx, msg, 1, tbl[6], 0);
+        break;
+    case 0xDC3:
+        fn_8006106C(ctx, msg, 1, tbl[7], 0);
+        break;
+    case 0xDC4:
+        fn_8006106C(ctx, msg, 1, tbl[8], 0);
+        break;
+    case 0xDC5:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDC6:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDC7:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDC8:
+        fn_80061A2C(ctx, msg, 1, tbl[6], 0);
+        break;
+    case 0xDC9:
+        fn_80061A2C(ctx, msg, 1, tbl[7], 0);
+        break;
+    case 0xDCA:
+        fn_80061A2C(ctx, msg, 1, tbl[8], 0);
+        break;
+    case 0xDCB:
+        fn_80061BBC(ctx, msg, 1, tbl[6], 0);
+        break;
+    case 0xDCC:
+        fn_80061BBC(ctx, msg, 1, tbl[7], 0);
+        break;
+    case 0xDCD:
+        fn_80061BBC(ctx, msg, 1, tbl[8], 0);
+        break;
+    case 0xDD8:
+        fn_8006106C(ctx, msg, 0, tbl[0], 1);
+        break;
+    case 0xDD9:
+        fn_8006106C(ctx, msg, 0, tbl[1], 1);
+        break;
+    case 0xDDA:
+        fn_8006106C(ctx, msg, 0, tbl[2], 1);
+        break;
+    case 0xDE4:
+        fn_8006106C(ctx, msg, 0, tbl[3], 1);
+        break;
+    case 0xDE5:
+        fn_8006106C(ctx, msg, 0, tbl[4], 1);
+        break;
+    case 0xDE6:
+        fn_8006106C(ctx, msg, 0, tbl[5], 1);
+        break;
+    case 0xDDB:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDDC:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDDD:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDE7:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDE8:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDE9:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDDE:
+        fn_80061A2C(ctx, msg, 0, tbl[0], 1);
+        break;
+    case 0xDDF:
+        fn_80061A2C(ctx, msg, 0, tbl[1], 1);
+        break;
+    case 0xDE0:
+        fn_80061A2C(ctx, msg, 0, tbl[2], 1);
+        break;
+    case 0xDEA:
+        fn_80061A2C(ctx, msg, 0, tbl[3], 1);
+        break;
+    case 0xDEB:
+        fn_80061A2C(ctx, msg, 0, tbl[4], 1);
+        break;
+    case 0xDEC:
+        fn_80061A2C(ctx, msg, 0, tbl[5], 1);
+        break;
+    case 0xDE1:
+        fn_80061BBC(ctx, msg, 0, tbl[0], 1);
+        break;
+    case 0xDE2:
+        fn_80061BBC(ctx, msg, 0, tbl[1], 1);
+        break;
+    case 0xDE3:
+        fn_80061BBC(ctx, msg, 0, tbl[2], 1);
+        break;
+    case 0xDED:
+        fn_80061BBC(ctx, msg, 0, tbl[3], 1);
+        break;
+    case 0xDEE:
+        fn_80061BBC(ctx, msg, 0, tbl[4], 1);
+        break;
+    case 0xDEF:
+        fn_80061BBC(ctx, msg, 0, tbl[5], 1);
+        break;
+    case 0xDF3:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDF4:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDF5:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDFF:
+        msg->flags4 &= ~2;
+        break;
+    case 0xE00:
+        msg->flags4 &= ~2;
+        break;
+    case 0xE01:
+        msg->flags4 &= ~2;
+        break;
+    case 0xDF6:
+        fn_80061A2C(ctx, msg, 1, tbl[6], 1);
+        break;
+    case 0xDF7:
+        fn_80061A2C(ctx, msg, 1, tbl[7], 1);
+        break;
+    case 0xDF8:
+        fn_80061A2C(ctx, msg, 1, tbl[8], 1);
+        break;
+    case 0xE02:
+        fn_80061A2C(ctx, msg, 1, tbl[9], 1);
+        break;
+    case 0xE03:
+        fn_80061A2C(ctx, msg, 1, tbl[10], 1);
+        break;
+    case 0xE04:
+        fn_80061A2C(ctx, msg, 1, tbl[11], 1);
+        break;
+    case 0xDF0:
+        fn_8006106C(ctx, msg, 1, tbl[6], 1);
+        break;
+    case 0xDF1:
+        fn_8006106C(ctx, msg, 1, tbl[7], 1);
+        break;
+    case 0xDF2:
+        fn_8006106C(ctx, msg, 1, tbl[8], 1);
+        break;
+    case 0xDFC:
+        fn_8006106C(ctx, msg, 1, tbl[9], 1);
+        break;
+    case 0xDFD:
+        fn_8006106C(ctx, msg, 1, tbl[10], 1);
+        break;
+    case 0xDFE:
+        fn_8006106C(ctx, msg, 1, tbl[11], 1);
+        break;
+    case 0xDF9:
+        fn_80061BBC(ctx, msg, 1, tbl[6], 1);
+        break;
+    case 0xDFA:
+        fn_80061BBC(ctx, msg, 1, tbl[7], 1);
+        break;
+    case 0xDFB:
+        fn_80061BBC(ctx, msg, 1, tbl[8], 1);
+        break;
+    case 0xE05:
+        fn_80061BBC(ctx, msg, 1, tbl[9], 1);
+        break;
+    case 0xE06:
+        fn_80061BBC(ctx, msg, 1, tbl[10], 1);
+        break;
+    case 0xE07:
+        fn_80061BBC(ctx, msg, 1, tbl[11], 1);
+        break;
+    case 0xDD4:
+        fn_80060D70(ctx, msg, 0, 0);
+        break;
+    case 0xDD5:
+        fn_80060D70(ctx, msg, 0, 1);
+        break;
+    case 0xDD6:
+        fn_80060D70(ctx, msg, 1, 0);
+        break;
+    case 0xDD7:
+        fn_80060D70(ctx, msg, 1, 1);
+        break;
+    case 0x102C:
+        fn_80060D70(ctx, msg, 1, 2);
+        break;
+    case 0x102D:
+        fn_80060D70(ctx, msg, 1, 2);
+        break;
+    case 0xBF1:
+    case 0xBF2:
+        fn_80060EF4(ctx, msg, 6);
+        break;
+    case 0xBF3:
+    case 0xBF4:
+        fn_80060EF4(ctx, msg, 6);
+        break;
+    case 0xBF5:
+        fn_80060EF4(ctx, msg, -1);
+        break;
+    case 0xBF6:
+    case 0xBF7:
+        fn_80060EF4(ctx, msg, 3);
+        break;
+    case 0xBF8:
+    case 0xBF9:
+        fn_80060EF4(ctx, msg, 4);
+        break;
+    case 0xBFA:
+    case 0xBFB:
+        fn_80060EF4(ctx, msg, 2);
+        break;
+    case 0xBFC:
+    case 0xBFD:
+        fn_80060EF4(ctx, msg, 1);
+        break;
+    case 0xBFE:
+        fn_80060EF4(ctx, msg, 0);
+        break;
+    case 0xDD0:
+        fn_800617E0(ctx, msg, 0, 0);
+        break;
+    case 0xDD1:
+        fn_800617E0(ctx, msg, 1, 0);
+        break;
+    case 0xDCF:
+        fn_800615F4(ctx, msg, 0, 0);
+        break;
+    case 0xDCE:
+        fn_800615F4(ctx, msg, 1, 0);
+        break;
+    case 0xDD3:
+        fn_80061454(ctx, msg, 0, 0);
+        break;
+    case 0xDD2:
+        fn_80061454(ctx, msg, 1, 0);
+        break;
+    case 0xC26:
+        fn_800617E0(ctx, msg, 0, 2);
+        break;
+    case 0xC4C:
+        fn_800617E0(ctx, msg, 1, 2);
+        break;
+    case 0xC72:
+        fn_800617E0(ctx, msg, 2, 2);
+        break;
+    case 0xC98:
+        fn_800617E0(ctx, msg, 3, 2);
+        break;
+    case 0xC24:
+        fn_80061454(ctx, msg, 0, 2);
+        break;
+    case 0xC4A:
+        fn_80061454(ctx, msg, 1, 2);
+        break;
+    case 0xC70:
+        fn_80061454(ctx, msg, 2, 2);
+        break;
+    case 0xC96:
+        fn_80061454(ctx, msg, 3, 2);
+        break;
+    case 0xC25:
+        fn_800615F4(ctx, msg, 0, 2);
+        break;
+    case 0xC4B:
+        fn_800615F4(ctx, msg, 1, 2);
+        break;
+    case 0xC71:
+        fn_800615F4(ctx, msg, 2, 2);
+        break;
+    case 0xC97:
+        fn_800615F4(ctx, msg, 3, 2);
+        break;
+    case 0xBFF:
+        fn_800609B4(ctx, (MenuCBBattleStartSprite*)msg, *(f32*) ((u8*)&lbl_803A9A60 + 0x48));
+        break;
+    case 0xC00:
+        fn_800609B4(ctx, (MenuCBBattleStartSprite*)msg, *(f32*) ((u8*)&lbl_803A9A60 + 0x4c));
+        break;
+    case 0x1096:
+        fn_80060434(ctx, msg);
+        break;
+    }
+}

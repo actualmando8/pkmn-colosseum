@@ -3619,3 +3619,83 @@ void fn_8007C23C(u8* r3) {
     OSResumeThread((u32)(r3 + 0x28));
 }
 #pragma pop
+
+int fn_80079C1C(s32 arg0, int arg1, int arg2, s32 arg3) {
+    if ((u8)arg1 == 0 && (u8)arg2 == 0) {
+        fn_801067E8(0x43D2, 1, 0);
+        fn_801069FC(1);
+        fn_801067E8(0x43D3, 1, 0);
+        fn_801069FC(1);
+        if (arg0 == 0) {
+            fn_80106D3C(2, 0x44CF, 1, 0);
+            fn_801069FC(1);
+        }
+        fn_80102510(0xEF);
+        *(u32*)&lbl_8047A638 = 1;
+        return 0;
+    }
+    if ((u8)arg1 == 0) {
+        fn_801067E8(0x43D2, 1, 0);
+        fn_801069FC(1);
+        if (arg0 == 0) {
+            fn_80106D3C(2, 0x44CF, 1, 0);
+            fn_801069FC(1);
+        }
+        fn_80102510(0xEF);
+        *(u32*)&lbl_8047A638 = 1;
+        return 0;
+    }
+    if ((u8)arg2 == 0) {
+        fn_801067E8(0x43D3, 1, 0);
+        fn_801069FC(1);
+        if (arg0 == 0) {
+            fn_80106D3C(2, 0x44CF, 1, 0);
+            fn_801069FC(1);
+        }
+        fn_80102510(0xEF);
+        *(u32*)&lbl_8047A638 = 1;
+        return 0;
+    }
+    if (lbl_8047A632 != 0) {
+        fn_80132A38(0x2D, 0x47);
+        fn_80165668(0x3CA, 0, 0xFF);
+        switch (arg0) {
+        case 1:
+            fn_801067E8(0x43AD, 1, 0);
+            break;
+        case 0:
+            fn_80132A38(0x4D, arg3);
+            fn_801067E8(0x4436, 1, 0);
+            break;
+        }
+        fn_801069FC(1);
+    }
+    if (lbl_8047A631 != 0) {
+        fn_80165668(0x3D2, 0, 0xFF);
+        switch (arg0) {
+        case 1:
+            fn_801067E8(0x4437, 1, 0);
+            break;
+        case 0:
+            fn_80132A38(0x4D, arg3);
+            fn_801067E8(0x443B, 1, 0);
+            break;
+        }
+        fn_801069FC(1);
+    }
+    if (lbl_8047A630 != 0) {
+        fn_80132A38(0x2D, 1);
+        fn_80165668(0x3CA, 0, 0xFF);
+        switch (arg0) {
+        case 1:
+            fn_801067E8(0x43AD, 1, 0);
+            break;
+        case 0:
+            fn_80132A38(0x4D, arg3);
+            fn_801067E8(0x4436, 1, 0);
+            break;
+        }
+        fn_801069FC(1);
+    }
+    return 1;
+}

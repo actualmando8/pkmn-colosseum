@@ -71,14 +71,22 @@ void fn_8018F4C8(void* entry, u8 param, s32* outNode, u8* outResult);
 void* fn_8018D998(u32 groupId, u32 index);
 s32 fn_801812E8(u32 groupId, u32 index, u8 doInteract);
 s32 fn_80181478(u32 groupId, u32 index, u8 doSetup);
-void fn_8018E1C4(PeopleEntry* entry, void* spawnData, u32 motionId, u32 param);
+int fn_8018E1C4(PeopleEntry* entry, u32 groupId, u32 indexId, s32 objectId);
 void fn_8018FB60(PeopleEntry* entry, u8 animId);
 void fn_8018FB2C(PeopleEntry* entry, u8 animId);
-void fn_8018FC2C(PeopleEntry* entry);
+void fn_8018FC2C(PeopleEntry* entry, void* rotation);
 void fn_8018FC74(PeopleEntry* entry, void* vec);
 void fn_8018FC98(PeopleEntry* entry, void* pos);
 void* fn_8018FCBC(PeopleEntry* entry);
 void fn_8018FC08(PeopleEntry* entry, void* vec);
+void fn_80184A90(PeopleEntry* entry);
+void fn_80184D80(PeopleEntry* entry);
+void fn_8018524C(PeopleEntry* entry, u8 loopPath);
+void fn_801858C4(PeopleEntry* entry);
+void fn_80185B90(PeopleEntry* entry, f32 amount);
+void fn_8018F30C(void);
+void fn_8018ECEC(PeopleEntry* entry, f32 step);
+s32 fn_80185AAC(PeopleEntry* entry);
 void* peopleInfoBiosGetPtr(void* scriptObj);
 u8 fn_80188214();
 void fn_8018E9B4(PeopleEntry* entry, void* position, void* transform);
@@ -152,6 +160,8 @@ extern const char lbl_80273F80[];  /* floor name for blank-frame init */
 extern const char lbl_80273FD8[];  /* "Warining: people[%d,%d] group is different!!\n" */
 extern f32 lbl_8047D8B0;           /* default moveSpeed constant */
 extern f32 lbl_8047D798;
+extern f32 lbl_8047D79C;
+extern f32 lbl_8047D7A0;
 extern const void* lbl_80273F90[];
 
 /* ===== Global state (sbss, owned by the data split — extern here) ===== */
@@ -492,70 +502,53 @@ void fn_80181224(void)
  * ======================================================================= */
 void fn_80181850(void)
 {
-    s32 maxCount;
     s32 i;
     PeopleEntry* entry;
-    s32 shouldUpdate;
-    u32 j;
+    GSvec modelPosition;
+    GSvec modelRotation;
+    GSvec currentPosition;
+    BOOL visible;
 
-    maxCount = peopleGetMaxCount();
-
-    for (i = maxCount - 1; i >= 0; /* decremented at bottom */) {
+    for (i = peopleGetMaxCount() - 1; i >= 0; i--) {
         entry = peopleGetEntry(i);
-        if (entry->active == 0) {
-            goto next_entry;
+        if (!entry->active) {
+            continue;
         }
 
-        /* Check if model has PEOPLE_FLAG_HAS_MODEL flag set */
-        if (peopleTestFlags(entry, PEOPLE_FLAG_HAS_MODEL)) {
-            /* Update collision/interaction position from model world coords */
-            void* modelPos;
-            void* modelTrans;
-            modelPos = fn_8018FCBC(entry);
-            GSvecCopy((u8*)entry + 0x2C, modelPos);  /* simplified */
-
-            modelTrans = peopleGetTransform(entry);
-            GSvecCopy((u8*)entry + 0x38, modelTrans); /* simplified */
+        if (peopleTestFlags(entry, 0x40000000)) {
+            GSvecCopy(&modelPosition, fn_8018FCBC(entry));
+            GSvecCopy(&modelRotation, peopleGetTransform(entry));
+            fn_800E0168(&entry->collisionX, &modelPosition, &modelRotation);
         }
 
-        /* Update entry position tracking */
-        fn_8018FC98(entry, (void*)((u8*)entry + 0x44));
-        peopleSetTransform(entry, (void*)((u8*)entry + 0x44));
+        fn_8018FC98(entry, &currentPosition);
+        peopleSetTransform(entry, &currentPosition);
+        entry->talkRange = lbl_8047D7A0;
 
-        /* Reset talk range to 0 */
-        entry->talkRange = 0.0f;
-
-        /* Determine visibility */
-        if (entry->visible != 0) {
-            shouldUpdate = 1;
-        } else {
-            /* Check game flag for dynamic visibility */
-            if (fn_800F7108(entry->flagId) == 0) {
-                shouldUpdate = 1;
-            } else {
-                shouldUpdate = 0;
+        visible = entry->visible != 0 || fn_800F7108(entry->flagId) == 0;
+        if (visible && !entry->talkLock) {
+            switch (entry->state) {
+            case 1:
+                fn_801858C4(entry);
+                break;
+            case 2:
+                fn_8018524C(entry, 0);
+                break;
+            case 3:
+                fn_8018524C(entry, 1);
+                break;
+            case 4:
+                fn_80184D80(entry);
+                break;
             }
-        }
 
-        if (shouldUpdate) {
-            /* Skip if NPC is locked in talk interaction */
-            if (entry->talkLock != 0) {
-                goto check_movement;
-            }
-            /* ... (extensive state machine for walk, idle, talk transitions) ... */
+            fn_80184A90(entry);
+            fn_80185B90(entry, entry->talkRange);
+            fn_8018ECEC(entry, lbl_8047D798);
         }
-
-    check_movement:
-        /* Run movement dispatch based on moveType */
-        if (entry->moveType != PEOPLE_MOVE_NONE) {
-            for (j = 0; j < PEOPLE_UPDATE_TICK_COUNT; j++) {
-                fn_801812C4(entry);
-            }
-        }
-
-    next_entry:
-        i--;
     }
+
+    fn_8018F30C();
 }
 
 /* 0x8018A44C | 0x2B4 */
@@ -574,8 +567,8 @@ void fn_8018A44C(void) {
 
 /* 0x8018A700 | 0x3CC */
 extern f32 fn_800E008C(void* param);
-extern void fn_800E013C(void);
-extern void GSvecAdd(void);
+extern void fn_800E013C(void*, void*, f32);
+extern void GSvecAdd(void*, void*, void*);
 extern u32 lbl_8047D800;
 extern f32 lbl_8047D7A0;
 extern f32 lbl_8047D79C;
@@ -719,7 +712,7 @@ extern void atan2(void);
 extern f64 fmod(f64 angle);
 extern void fn_800E0718(void);
 extern void GSvecTransformQuat(void);
-extern void GSvecDistance(void);
+extern f32 GSvecDistance(void*, void*);
 extern f32 lbl_8047D7A4;
 extern f32 lbl_8047D7A0;
 extern f64 lbl_8047D7F0;
@@ -764,7 +757,7 @@ void fn_8018DCA8(void) {
 
 /* 0x8018E9B4 | 0x338 */
 extern void* GSresGetResource();
-extern void fn_800F7BC4(void);
+extern u32 fn_800F7BC4(s32);
 extern void fn_80101B90(void);
 extern void GScolsys2ThruGetEventID(void);
 extern void fn_8012BAF0(void);
@@ -793,7 +786,7 @@ asm void fn_8018E9B4(void) {
 #endif
 
 /* 0x8018ECEC | 0x3A0 */
-extern void fn_800D3088(void);
+extern u32 fn_800D3088(void);
 extern f32 lbl_8047D7A0;
 extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
@@ -833,7 +826,7 @@ extern void fn_801CBA0C(void);
 extern void fn_800E3CC8(void);
 extern void GSmodelClearShadowFlags(void);
 extern void fn_801CB834(void);
-extern void fn_80166A28(void);
+extern void fn_80166A28(u32);
 extern u16 fn_800F7318(u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 #if 0
 asm void fn_80181EB0(void) {
@@ -855,7 +848,29 @@ asm void fn_801821B8(void) {
 #include "src/game/people/people_fn_801821B8.inc"
 }
 #else
-void fn_801821B8(void) { /* TODO: match -- 3680 bytes at 0x801821B8 */ }
+void fn_801821B8(u32 groupId, u32 index)
+{
+    PeopleEntry* entry;
+    GSvec position;
+    u8 shadowAnim;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return;
+    }
+
+    fn_8018FC98(entry, &position);
+    fn_8018FB60(entry, 1);
+    shadowAnim = entry->animId != 0;
+    fn_8018FB2C(entry, shadowAnim);
+    peopleClearFlags(entry, 8);
+    fn_80166A28(0x49E);
+    entry->motionIndex = 7;
+
+    entry->animBlendFactor += lbl_8047D7D8;
+    fn_8018FC74(entry, &position);
+    peopleSetTransform(entry, &position);
+}
 #endif
 
 /* 0x801837D8 | 0x180 */
@@ -1114,15 +1129,15 @@ asm void fn_80184A90(void) {
 #include "src/game/people/people_fn_80184A90.inc"
 }
 #else
-void fn_80184A90(void) { /* TODO: match -- 752 bytes at 0x80184A90 */ }
+void fn_80184A90(PeopleEntry* entry) { /* TODO: match -- 752 bytes at 0x80184A90 */ }
 #endif
 
 /* 0x80184D80 | 0x4CC */
-extern void fn_800D37CC(void);
-extern void fn_800E0BE4(void);
+extern s32 fn_800D37CC(void);
+extern f32 fn_800E0BE4(void);
 extern void fn_800CE148(void);
 extern void fn_800CDBE0(void);
-extern void fn_800E0BA0(void);
+extern f32 fn_800E0BA0(void);
 extern u8 lbl_80273FC0[];
 extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7C8;
@@ -1139,7 +1154,43 @@ asm void fn_80184D80(void) {
 #include "src/game/people/people_fn_80184D80.inc"
 }
 #else
-void fn_80184D80(void) { /* TODO: match -- 1228 bytes at 0x80184D80 */ }
+void fn_80184D80(PeopleEntry* entry)
+{
+    GSvec offset;
+    s32 frameCount;
+    u32 ticks;
+
+    GSvecCopy(&offset, lbl_80273FC0);
+    switch (entry->subState) {
+    case 0:
+        if (entry->animBlendFactor > lbl_8047D7A0) {
+            frameCount = fn_800D37CC();
+            ticks = fn_800D3088();
+            entry->animBlendFactor -= (f32)ticks / (f32)frameCount;
+            if (entry->animBlendFactor < lbl_8047D7A0) {
+                entry->animBlendFactor = lbl_8047D7A0;
+            }
+            break;
+        }
+        entry->subState = 1;
+        /* fallthrough */
+    case 1:
+        entry->subState = 2;
+        /* fallthrough */
+    case 2:
+        switch (fn_80185AAC(entry)) {
+        case 2:
+            entry->subState = 2;
+            break;
+        case 1:
+            entry->animBlendFactor =
+                entry->field_8C * fn_800E0BA0() + entry->field_88;
+            entry->subState = 0;
+            break;
+        }
+        break;
+    }
+}
 #endif
 
 /* 0x8018524C | 0x678 */
@@ -1156,7 +1207,52 @@ asm void fn_8018524C(void) {
 #include "src/game/people/people_fn_8018524C.inc"
 }
 #else
-void fn_8018524C(void) { /* TODO: match -- 1656 bytes at 0x8018524C */ }
+void fn_8018524C(PeopleEntry* entry, u8 loopPath)
+{
+    GSvec delta;
+    GSvec target;
+    f32 oldDistance;
+    f32 distance;
+
+    if (entry->subState == 1) {
+        GSvecCopy(entry->field_5C,
+                  &entry->walkList[entry->walkListCount]);
+        fn_800E0168(&delta, entry->field_5C, fn_8018FCBC(entry));
+        entry->subState = 2;
+    }
+
+    if (entry->subState != 2) {
+        return;
+    }
+
+    fn_80188214(entry->groupId, entry->index, entry->moveSpeed);
+    fn_800E0168(&delta, entry->transform, fn_8018FCBC(entry));
+    oldDistance = fn_800E008C(&delta);
+
+    fn_800E0168(&delta, entry->transform, entry->field_5C);
+    distance = fn_800E008C(&delta);
+    if (distance < oldDistance) {
+        GSvecCopy(entry->transform, entry->field_5C);
+        entry->walkListCount++;
+        if (entry->walkListCount >= entry->walkListCapacity) {
+            if (loopPath) {
+                entry->walkListCount = 0;
+            } else {
+                fn_8018FC74(entry, entry->field_5C);
+                peopleSetTransform(entry, entry->field_5C);
+                entry->state = PEOPLE_STATE_IDLE;
+                return;
+            }
+        }
+        GSvecCopy(entry->field_5C,
+                  &entry->walkList[entry->walkListCount]);
+        return;
+    }
+
+    fn_800E013C(&target, &delta, oldDistance / distance);
+    GSvecAdd(&target, entry->transform, &target);
+    fn_8018E9B4(entry, &target, entry->transform);
+}
 #endif
 
 /* 0x801858C4 | 0x1E8 */
@@ -1166,7 +1262,7 @@ asm void fn_801858C4(void) {
 #include "src/game/people/people_fn_801858C4.inc"
 }
 #else
-void fn_801858C4(void) { /* TODO: match -- 488 bytes at 0x801858C4 */ }
+void fn_801858C4(PeopleEntry* entry) { /* TODO: match -- 488 bytes at 0x801858C4 */ }
 #endif
 
 /* 0x80185AAC | 0xE4 */
@@ -1210,7 +1306,7 @@ asm void fn_80185B90(void) {
 #include "src/game/people/people_fn_80185B90.inc"
 }
 #else
-void fn_80185B90(void) { /* TODO: match -- 856 bytes at 0x80185B90 */ }
+void fn_80185B90(PeopleEntry* entry, f32 amount) { /* TODO: match -- 856 bytes at 0x80185B90 */ }
 #endif
 
 /* 0x80185F44 | 0x1B4 */
@@ -1243,7 +1339,7 @@ void peopleGazeHeroCheck(u32 a, u32 b) {
 
 /* 0x80186284 | 0x39C */
 extern void fn_8010F188(void);
-extern u32 lbl_8047D83C;
+extern f32 lbl_8047D83C;
 extern u32 lbl_8047D800;
 extern f64 lbl_8047D7F0;
 extern u32 lbl_8047D7A8;
@@ -1280,22 +1376,74 @@ extern void heroMoveSetLockFrame(void);
 extern u32 lbl_8047D840;
 extern u8 lbl_80314638[];
 extern u32 lbl_8047D844;
-extern u32 lbl_8047D83C;
+extern f32 lbl_8047D83C;
 extern f32 lbl_8047D7A0;
 extern f32 lbl_8047D79C;
 extern u32 lbl_8047D848;
+void fn_80186B5C(GSvec* output, u32 groupId, u32 index);
+void fn_801870E8(void*, void*, void*, void*, void*, f32);
 #if 0
 asm void fn_80186620(void) {
 #include "src/game/people/people_fn_80186620.inc"
 }
 #else
-void fn_80186620(void) { /* TODO: match -- 1340 bytes at 0x80186620 */ }
+s32 fn_80186620(u32 groupId, u32 index, u8 mode, f32 x0, f32 z0,
+                f32 x1, f32 z1)
+{
+    PeopleEntry* entry;
+    GSvec origin;
+    GSvec facing;
+    GSvec endpoint;
+    GSvec lineStart;
+    GSvec lineEnd;
+    void* resource;
+    f32 reach;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return 0;
+    }
+
+    if (peopleTestFlags(entry, 0x40000000)) {
+        GSvecCopy(&origin, &entry->collisionX);
+        fn_800E013C(&facing, &origin, lbl_8047D840);
+        fn_80186B5C(&origin, 0, 100);
+        GSvecCopy(&facing, peopleGetTransform(entry));
+        GSvecAdd(&endpoint, &facing, &origin);
+    } else {
+        GSvecCopy(&endpoint, fn_8018FCBC(entry));
+        GSvecCopy(&facing, peopleGetTransform(entry));
+        fn_800E0168(&origin, &endpoint, &facing);
+    }
+
+    lineStart.x = x0;
+    lineStart.y = endpoint.y;
+    lineStart.z = z0;
+    lineEnd.x = x1;
+    lineEnd.y = endpoint.y;
+    lineEnd.z = z1;
+
+    resource = GSresGetResource(0, 2);
+    if (resource != NULL && *(u8*)resource != 0) {
+        cameraGetActive();
+        fn_800D258C();
+        _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+    }
+
+    reach = fn_800E008C(&origin);
+    if (reach <= lbl_8047D7A0) {
+        return 0;
+    }
+    fn_801870E8(&lineStart, &lineEnd, &endpoint, &facing, &origin, reach);
+    return 0;
+}
 #endif
 
 /* 0x80186B5C | 0x58C */
-extern void fn_800F7A7C(void);
-extern void fn_800F7A08(void);
-extern void cameraGetRotY(void);
+extern s8 fn_800F7A7C(s32, s32);
+extern s8 fn_800F7A08(s32, s32);
+extern u32 fn_800F7BC4(s32);
+extern f32 cameraGetRotY(void);
 extern u8 lbl_80273FB4[];
 extern u32 lbl_8047D7C8;
 extern u32 lbl_8047D84C;
@@ -1320,7 +1468,44 @@ asm void fn_80186B5C(void) {
 #include "src/game/people/people_fn_80186B5C.inc"
 }
 #else
-void fn_80186B5C(void) { /* TODO: match -- 1420 bytes at 0x80186B5C */ }
+void fn_80186B5C(GSvec* output, u32 groupId, u32 index)
+{
+    PeopleEntry* entry;
+    s8 stickX;
+    s8 stickY;
+    s8 cstickX;
+    s8 cstickY;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        GSvecCopy(output, lbl_80273FB4);
+        return;
+    }
+
+    stickX = fn_800F7A7C(1, 1);
+    stickY = fn_800F7A08(1, 1);
+    cstickX = fn_800F7A7C(1, 0);
+    cstickY = fn_800F7A08(1, 0);
+
+    if (stickX == 0 && stickY == 0) {
+        u32 buttons = fn_800F7BC4(1);
+        if (buttons & 8) stickY = -56;
+        if (buttons & 4) stickY = 56;
+        if (buttons & 1) stickX = -56;
+        if (buttons & 2) stickX = 56;
+        cstickX = stickX;
+        cstickY = stickY;
+    }
+
+    if (stickX > 56) stickX = 56;
+    if (stickX < -56) stickX = -56;
+    if (stickY > 56) stickY = 56;
+    if (stickY < -56) stickY = -56;
+
+    output->x = (f32)stickX / lbl_8047D84C;
+    output->y = lbl_8047D7A0;
+    output->z = (f32)stickY / lbl_8047D84C;
+}
 #endif
 
 /* 0x801870E8 | 0x3D4 */
@@ -1335,7 +1520,11 @@ asm void fn_801870E8(void) {
 #include "src/game/people/people_fn_801870E8.inc"
 }
 #else
-void fn_801870E8(void) { /* TODO: match -- 980 bytes at 0x801870E8 */ }
+void fn_801870E8(void* lineStart, void* lineEnd, void* endpoint, void* facing,
+                 void* direction, f32 reach)
+{
+    /* Collision resolution after the recovered geometric setup remains. */
+}
 #endif
 
 /* 0x801874BC | 0x450 */
@@ -1952,11 +2141,11 @@ found_entry:
         goto end;
     }
     t = fn_800E008C(param3);
-    endTime = *(f32*)&entry->field_38;
+    endTime = entry->field_38;
     if (endTime <= t) {
         result = lbl_8047D7C4;
     } else {
-        startTime = *(f32*)&entry->field_34;
+        startTime = entry->field_34;
         if (startTime <= t) {
             if (endTime != lbl_8047D7A0) {
                 result = lbl_8047D79C + (t - startTime) / (endTime - startTime);
@@ -2041,11 +2230,94 @@ found_entry:
 }
 
 /* fn_80189490 -- not recovered, gap in archive campaign (size 0x500) */
-void fn_80189490(void) {
+extern void winMsgClose(s32);
+extern s32 winMsgCheckField(void);
+
+void fn_80189490(u32 groupId, u32 index) {
+    PeopleEntry* entry;
+    PeopleEntry* stateEntry;
+    GSvec rotation;
+    u32 flags;
+    u8 talkable;
+
+    winMsgClose(0);
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry != NULL) {
+        stateEntry = peopleFindBySelf(peopleFindSelf(groupId, index));
+        flags = stateEntry != NULL ? stateEntry->flags : 0;
+
+        if (entry->field_94) {
+            entry->field_94 = 0;
+            if ((flags & 0x60) == 0x60) {
+                fn_8018FC2C(entry, &rotation);
+                entry->pad22 = 1;
+                entry->field_40 = rotation.y + entry->field_98;
+                entry->field_44 = 0;
+            } else if (flags & 0x10) {
+                entry->threadHandle = entry->nextLink;
+                talkable = entry->isTalkable;
+                stateEntry =
+                    peopleFindBySelf(peopleFindSelf(groupId, index));
+                if (stateEntry != NULL) {
+                    peopleTestFlags(stateEntry, PEOPLE_FLAG_TALKABLE);
+                    if (talkable) {
+                        peopleSetFlags(stateEntry, PEOPLE_FLAG_TALKABLE);
+                    } else {
+                        peopleClearFlags(stateEntry, PEOPLE_FLAG_TALKABLE);
+                    }
+                }
+            }
+        }
+    }
+
+    while (winMsgCheckField() != -1) {
+        _threadSwitch();
+    }
 }
 
 /* fn_80189990 -- not recovered, gap in archive campaign (size 0x8F0) */
-void fn_80189990(void) {
+extern void winMsgOpenFieldWithSE(s32, s32, s32, s32);
+
+void fn_80189990(u32 groupId, u32 index, s32 messageId) {
+    PeopleEntry* entry;
+    PeopleEntry* stateEntry;
+    u32 flags;
+    s32 messageValue;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry != NULL) {
+        stateEntry = peopleFindBySelf(peopleFindSelf(groupId, index));
+        flags = stateEntry != NULL ? stateEntry->flags : 0;
+        if (flags & 0x20) {
+            if (!entry->field_94) {
+                entry->field_98 = entry->field_40;
+                entry->field_94 = 1;
+            }
+            stateEntry = peopleFindBySelf(peopleFindSelf(groupId, index));
+            if (stateEntry != NULL) {
+                while (stateEntry->pad22) {
+                    _threadSwitch();
+                }
+            }
+        } else if (flags & 0x10) {
+            if (!entry->field_94) {
+                entry->threadHandle = entry->nextLink;
+                entry->field_94 = 1;
+            }
+            fn_80188F78(groupId, index);
+            stateEntry = peopleFindBySelf(peopleFindSelf(groupId, index));
+            if (stateEntry != NULL) {
+                entry->isTalkable =
+                    peopleTestFlags(stateEntry, PEOPLE_FLAG_TALKABLE);
+                peopleSetFlags(stateEntry, PEOPLE_FLAG_TALKABLE);
+            }
+        }
+
+        messageValue = fn_8018F4AC(peopleInfoBiosGetPtr(entry->scriptRef));
+    } else {
+        messageValue = 0;
+    }
+    winMsgOpenFieldWithSE(messageId, 1, 0, messageValue);
 }
 
 /* Find an entry by (groupId, index), then report whether its current movement
@@ -2229,7 +2501,40 @@ void fn_8018CB5C(void) {
 }
 
 /* fn_8018CD08 -- not recovered, gap in archive campaign (size 0x978) */
-void fn_8018CD08(void) {
+void* fn_8018CD08(u32 groupId, u32 index, f32 radius, f32 angle) {
+    PeopleEntry* source;
+    PeopleEntry* candidate;
+    PeopleInfoBiosEntry* info;
+    GSvec sourcePosition;
+    GSvec candidatePosition;
+    f32 interactionRadius;
+    s32 i;
+
+    source = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (source == NULL) {
+        return NULL;
+    }
+
+    GSvecCopy(&sourcePosition, fn_8018FCBC(source));
+    info = peopleInfoBiosGetPtr(source->scriptRef);
+    interactionRadius =
+        info != NULL ? fn_8018F5E4(info) : lbl_8047D83C;
+    interactionRadius += radius;
+
+    for (i = 0; i < peopleGetMaxCount(); i++) {
+        candidate = peopleGetEntry(i);
+        if (!candidate->active || candidate == source ||
+            candidate->animId == 0 || peopleTestFlags(candidate, 1)) {
+            continue;
+        }
+
+        GSvecCopy(&candidatePosition, fn_8018FCBC(candidate));
+        if (GSvecDistance(&sourcePosition, &candidatePosition) <=
+            interactionRadius) {
+            return candidate;
+        }
+    }
+    return NULL;
 }
 
 /* fn_8018D7D0 -- not recovered, gap in archive campaign (size 0x158) */
@@ -2303,8 +2608,39 @@ void fn_8018E050(void) {
 }
 
 /* fn_8018E1C4 = fn_8018E1C4 (see people.h) -- not recovered, gap in archive campaign */
-void fn_8018E1C4(PeopleEntry* entry, void* spawnData, u32 motionId, u32 param) {
+extern void* floorOpenObject(s32, const void*);
+extern void GSresRegisterResource(u32, u32, u32);
+extern void GSmodelSetBoundCheck(void*, s32);
 
+int fn_8018E1C4(PeopleEntry* entry, u32 groupId, u32 indexId, s32 objectId) {
+    PeopleEntry* stateEntry;
+    void* model;
+
+    model = floorOpenObject(objectId, lbl_80273F90);
+    if (model == NULL) {
+        return 0;
+    }
+
+    GSresRegisterResource(groupId, indexId, 0);
+    entry->modelHandle = model;
+    entry->groupId = groupId;
+    entry->index = indexId;
+    entry->scriptRef = (void*)objectId;
+    entry->visible = 1;
+    entry->animId = 1;
+    entry->motionIndex = 1;
+
+    stateEntry = peopleFindBySelf(peopleFindSelf(groupId, indexId));
+    if (stateEntry != NULL) {
+        peopleWriteFlags(stateEntry, PEOPLE_WALK_LIST_ACTIVE);
+    }
+
+    entry->walkNodeA = -1;
+    entry->walkNodeB = -1;
+    entry->walkNodeC = -1;
+    entry->moveType = PEOPLE_MOVE_NONE;
+    GSmodelSetBoundCheck(model, 0);
+    return 1;
 }
 
 /* fn_8018E920 -- not recovered, gap in archive campaign (size 0x94) */
@@ -2458,9 +2794,9 @@ void fn_8018FC08(PeopleEntry* entry, void* vec) {
 }
 
 /* fn_8018FC2C = fn_8018FC2C (see people.h) -- not recovered, gap in archive campaign */
-void fn_8018FC2C(PeopleEntry* entry) {
-    extern void GSmodelGetRotation(void*);
-    GSmodelGetRotation(entry->modelHandle);
+void fn_8018FC2C(PeopleEntry* entry, void* rotation) {
+    extern void GSmodelGetRotation(void*, void*);
+    GSmodelGetRotation(entry->modelHandle, rotation);
 }
 
 /* fn_8018FC74 = fn_8018FC74 (see people.h) -- not recovered, gap in archive campaign
