@@ -1,8 +1,8 @@
 #include "dolphin/gx/GXInternal.h"
 
-void fn_800BD744(void)
+void fn_800BD744(f32 left, f32 top, f32 width, f32 height, f32 nearz, f32 farz)
 {
-    fn_800BD640(1);
+    fn_800BD640(left, top, width, height, nearz, farz, 1);
 }
 
 void fn_800BD768(f32* projection)

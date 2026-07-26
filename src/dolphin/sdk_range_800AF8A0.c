@@ -5,6 +5,113 @@
 
 #include "src/dolphin/sdk_range_800AE3F0.c"
 
+static inline void SetupTimeoutAlarm(CARDControl* card)
+{
+    OSCancelAlarm(&card->alarm);
+    switch (card->cmd[0]) {
+    case 0xF2:
+        OSSetAlarm(&card->alarm, OSMillisecondsToTicks(100),
+                   (OSAlarmHandler) TimeoutHandler);
+        break;
+    case 0xF3:
+        break;
+    case 0xF4:
+        if (card->pageSize > 0x80) {
+            OSSetAlarm(&card->alarm,
+                       OSSecondsToTicks((OSTime) 2) * (card->cBlock / 0x40),
+                       (OSAlarmHandler) TimeoutHandler);
+            break;
+        }
+    case 0xF1:
+        OSSetAlarm(&card->alarm,
+                   OSSecondsToTicks((OSTime) 2) *
+                       (card->sectorSize / 0x2000),
+                   (OSAlarmHandler) TimeoutHandler);
+        break;
+    }
+}
+
+s32 fn_800AF8A0(s32 chan)
+{
+    CARDControl* card;
+
+    card = &lbl_803FC620[chan];
+    if (!EXISelect(chan, 0, 4)) {
+        EXIUnlock(chan);
+        return -3;
+    }
+
+    SetupTimeoutAlarm(card);
+    if (!fn_80098368(chan, card->cmd, card->cmdLen, 1)) {
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+        return -3;
+    }
+
+    if (card->cmd[0] == 0x52 &&
+        !fn_80098368(chan, (u8*) card->workArea + sizeof(CARDID),
+                     *(u32*) ((u8*) card + 0x14), 1))
+    {
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+        return -3;
+    }
+
+    if (card->field_A4 == -1) {
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+        return 0;
+    }
+
+    if (!EXIDma(chan, card->buffer,
+                card->cmd[0] == 0x52 ? 0x200 : card->pageSize,
+                card->field_A4, (EXICallback) __CARDTxHandler))
+    {
+        EXIDeselect(chan);
+        EXIUnlock(chan);
+        return -3;
+    }
+
+    return 0;
+}
+
+s32 fn_800AFBDC(s32 chan, void* txCallback, void* exiCallback)
+{
+    BOOL enabled;
+    CARDControl* card;
+    s32 result;
+
+    enabled = OSDisableInterrupts();
+    card = &lbl_803FC620[chan];
+    if (!card->attached) {
+        result = -3;
+    } else {
+        if (txCallback != NULL) {
+            card->txCallback = (CARDCallback) txCallback;
+        }
+        if (exiCallback != NULL) {
+            card->callback_CC = (CARDCallback) exiCallback;
+        }
+
+        card->unlockCallback = UnlockedCallback;
+        if (!EXILock(chan, 0, __CARDUnlockedHandler)) {
+            result = -1;
+        } else {
+            card->unlockCallback = NULL;
+            if (!EXISelect(chan, 0, 4)) {
+                EXIUnlock(chan);
+                result = -3;
+            } else {
+                SetupTimeoutAlarm(card);
+                result = 0;
+            }
+        }
+    }
+
+    OSRestoreInterrupts(enabled);
+    return result;
+}
+
 s32 __CARDReadSegment(s32 chan, CARDCallback callback)
 {
     CARDControl* card;

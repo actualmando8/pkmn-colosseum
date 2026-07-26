@@ -159,7 +159,8 @@ extern u32 lbl_80313608[];
 extern void fn_800BB780(u32 dstCoord, u32 func, u32 srcParam, u32 mtx,
                         u32 normalize, u32 postMtx, u32 normalizeColor,
                         u8 bias, u8 arg8, u32 arg9);
-extern void fn_800BD640(u32 value);
+extern void fn_800BD640(f32 left, f32 top, f32 width, f32 height, f32 nearz,
+                        f32 farz, u32 field);
 extern void __GXSetMatrixIndex(s32 value);
 extern void fn_800BE164(u32* hi, u32* lo);
 extern void fn_800B91EC(void);
@@ -931,8 +932,52 @@ void GXLoadTexMtxImm(f32 mtx[3][4], u32 id, s32 type) {
     }
 }
 
+void fn_800BD640(f32 left, f32 top, f32 width, f32 height, f32 nearz,
+                 f32 farz, u32 field) {
+    GXData_800BB30C* p;
+    f32 sx;
+    f32 sy;
+    f32 sz;
+    f32 ox;
+    f32 oy;
+    f32 oz;
+
+    if (field == 0) {
+        top -= 0.5f;
+    }
+
+    p = gx;
+    p->projection[0] = left;
+    p->projection[1] = top;
+    p->projection[2] = width;
+    p->projection[3] = height;
+    p->projection[4] = nearz;
+    p->projection[5] = farz;
+
+    sx = width * 0.5f;
+    sy = -height * 0.5f;
+    ox = 342.0f + left + sx;
+    oy = 342.0f + top + height * 0.5f;
+    sz = 16777215.0f * farz - 16777215.0f * nearz;
+    oz = 16777215.0f * farz;
+
+    if (p->pad_454[0] != 0) {
+        fn_800BD0F8();
+    }
+
+    GX_FIFO_U8 = 0x10;
+    GX_FIFO_U32 = 0x5101A;
+    GX_FIFO_F32 = sx;
+    GX_FIFO_F32 = sy;
+    GX_FIFO_F32 = sz;
+    GX_FIFO_F32 = ox;
+    GX_FIFO_F32 = oy;
+    GX_FIFO_F32 = oz;
+    p->field_002 = 1;
+}
+
 void fn_800BD744(void) {
-    fn_800BD640(1);
+    fn_800BD640(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);
 }
 
 void fn_800BD768(f32* projection) {
