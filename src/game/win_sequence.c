@@ -449,15 +449,17 @@ void _winSeqMoveSub(void* targetPtr, void* statePtr) {
             target->y = state->startY + t * (state->endY - state->startY);
             break;
         case 2:
-            t = ((f32)state->positionFrame * (f32)state->positionDuration /
+            t = ((f32)state->positionFrame * (f32)state->positionFrame /
                  (f32)state->positionDuration) /
                 (f32)state->positionDuration;
             target->x = state->startX + t * (state->endX - state->startX);
             target->y = state->startY + t * (state->endY - state->startY);
             break;
         case 3:
-            t = (f32)(sqrt((f64)state->positionFrame) /
-                      sqrt((f64)state->positionDuration));
+            {
+                f64 durationRoot = sqrt((f64)state->positionDuration);
+                t = (f32)(sqrt((f64)state->positionFrame) / durationRoot);
+            }
             target->x = state->startX + t * (state->endX - state->startX);
             target->y = state->startY + t * (state->endY - state->startY);
             break;
@@ -783,7 +785,7 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
         while (r26 < 0x168) {
             u8* r27 = lbl_8047AD1C + r31;
             if ((s8)*(u8*)(r27 + 0x4) != 0 && *(s16*)(r27 + 0x6) == (s16)r29) {
-                if (r28 == 0) {
+                if ((u16)r25 == 0) {
                     *(u32*)(r27 + 0xc) = 0;
                     *(u16*)(r27 + 0x10) = 0;
                 } else {

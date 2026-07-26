@@ -489,10 +489,7 @@ void winSpriteDraw(u8* context, WinSpriteDrawNode* sprite)
 #if defined(WIN_SPRITE_PREFIX_80108580)
 void winSpriteDrawTexture(u8* context, WinSpriteDrawNode* sprite)
 {
-    f32* tex_v = (f32*)(lbl_80404B68 + 0x48);
-    f32* tex_u = (f32*)(lbl_80404B68 + 0x58);
-    f32* quad_y = (f32*)(lbl_80404B68 + 0x68);
-    f32* quad_x = (f32*)(lbl_80404B68 + 0x78);
+    f32* work = (f32*)lbl_80404B68;
     u8 red;
     u8 green;
     u8 blue;
@@ -546,18 +543,18 @@ void winSpriteDrawTexture(u8* context, WinSpriteDrawNode* sprite)
         }
 
         texture_width = GStextureGetXsize(texture);
-        tex_u[0] = tex_u[1] = (f32)left / (f32)texture_width;
+        work[22] = work[23] = (f32)left / (f32)texture_width;
         texture_width = GStextureGetXsize(texture);
-        tex_u[2] = tex_u[3] = (f32)(left + width) / (f32)texture_width;
+        work[24] = work[25] = (f32)(left + width) / (f32)texture_width;
         texture_height = GStextureGetYsize(texture);
-        tex_v[0] = tex_v[3] = (f32)(top + height) / (f32)texture_height;
+        work[18] = work[21] = (f32)(top + height) / (f32)texture_height;
         texture_height = GStextureGetYsize(texture);
-        tex_v[1] = tex_v[2] = (f32)top / (f32)texture_height;
+        work[19] = work[20] = (f32)top / (f32)texture_height;
     } else {
-        tex_u[0] = tex_u[1] = 0.0f;
-        tex_u[2] = tex_u[3] = 1.0f;
-        tex_v[0] = tex_v[3] = 1.0f;
-        tex_v[1] = tex_v[2] = 0.0f;
+        work[22] = work[23] = 0.0f;
+        work[24] = work[25] = 1.0f;
+        work[18] = work[21] = 1.0f;
+        work[19] = work[20] = 0.0f;
     }
 
     width = sprite->width < 0 ? -sprite->width : sprite->width;
@@ -566,37 +563,37 @@ void winSpriteDrawTexture(u8* context, WinSpriteDrawNode* sprite)
     center_y = (f32)sprite->y + (f32)height * 0.5f;
 
     if (sprite->width < 0) {
-        quad_x[0] = quad_x[1] = (f32)(sprite->x + width) - center_x;
-        quad_x[2] = quad_x[3] = (f32)sprite->x - center_x;
+        work[30] = work[31] = (f32)(sprite->x + width) - center_x;
+        work[32] = work[33] = (f32)sprite->x - center_x;
     } else {
-        quad_x[0] = quad_x[1] = (f32)sprite->x - center_x;
-        quad_x[2] = quad_x[3] = (f32)(sprite->x + width) - center_x;
+        work[30] = work[31] = (f32)sprite->x - center_x;
+        work[32] = work[33] = (f32)(sprite->x + width) - center_x;
     }
 
     if (sprite->height < 0) {
-        quad_y[0] = quad_y[3] = (f32)sprite->y - center_y;
-        quad_y[1] = quad_y[2] = (f32)(sprite->y + height) - center_y;
+        work[26] = work[29] = (f32)sprite->y - center_y;
+        work[27] = work[28] = (f32)(sprite->y + height) - center_y;
     } else {
-        quad_y[0] = quad_y[3] = (f32)(sprite->y + height) - center_y;
-        quad_y[1] = quad_y[2] = (f32)sprite->y - center_y;
+        work[26] = work[29] = (f32)(sprite->y + height) - center_y;
+        work[27] = work[28] = (f32)sprite->y - center_y;
     }
 
     fn_800E0718(quaternion, lbl_8031554C, sprite->rotation);
     for (i = 0; i < 4; i++) {
-        set__5GSvecFfff(&point, quad_x[i], 0.0f, quad_y[i]);
+        set__5GSvecFfff(&point, work[30 + i], 0.0f, work[26 + i]);
         GSvecTransformQuat(&point, quaternion, &point);
-        quad_x[i] = point.x * sprite->scale_x;
-        quad_y[i] = point.z * sprite->scale_y;
+        work[30 + i] = point.x * sprite->scale_x;
+        work[26 + i] = point.z * sprite->scale_y;
     }
 
     fn_800D6A00(6);
     fn_800D7820((s32)lbl_80314F98);
     fn_800D67BC(4);
     for (i = 0; i < 4; i++) {
-        fn_800D61E4((s32)(center_x + quad_x[i]),
-                    (s32)(center_y + quad_y[i]));
+        fn_800D61E4((s32)(center_x + work[30 + i]),
+                    (s32)(center_y + work[26 + i]));
         fn_800D5CB8(0, red, green, blue, alpha);
-        fn_800D59B8(0, tex_u[i], tex_v[i]);
+        fn_800D59B8(0, work[22 + i], work[18 + i]);
     }
     fn_800D6728();
 }
@@ -715,7 +712,8 @@ void fn_801093C8(void) {
             lbl_8047AD24 = 0;
         }
     }
-    if (lbl_8047AD22 == 0 || lbl_8047AD20 == 0) return;
+    if (lbl_8047AD22 == 0) return;
+    if (lbl_8047AD20 == 0) return;
 
     progress = lbl_8047AD2C +
         (lbl_8047AD3C / lbl_8047AD38) * (lbl_8047AD34 - lbl_8047AD2C);
