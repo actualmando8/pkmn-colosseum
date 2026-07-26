@@ -18,6 +18,9 @@ extern void  PObjAmnesia(void* pobj);
 extern void  PObjSetupMtx(void);
 extern void  PObjLoad(void);
 extern void  PObjUpdateFunc(HSD_PObj* pobj, s32 idx, f32* weight_ptr);
+extern void  HSD_JObjUnrefThis(HSD_JObj* jobj);
+extern void  HSD_JObjRefThis(HSD_JObj* jobj);
+extern void* HSD_IDGetDataFromTable(void* table, u32 id, s32* success);
 
 /* Data / global symbols (DTK names). */
 extern u8    lbl_8036CCD0[];         /* PObj class info (data)      */
@@ -35,6 +38,8 @@ extern void* lbl_8047B308;           /* active texture desc         */
 extern u32   lbl_8047B30C;           /* texture count               */
 extern void* lbl_80478C90;           /* RNG default state instance  */
 extern void* lbl_80478C94;           /* RNG current state pointer   */
+extern char  lbl_8047DCB8;           /* "pobj.c"                    */
+extern char  lbl_8047DD10;           /* "pobj"                      */
 
 /* Address: 0x801AA608 | Size: 0xC8  -- PObj class info init */
 #pragma push
@@ -101,6 +106,62 @@ void HSD_ClearVtxDesc(void)
     lbl_8047B300 = NULL;
 }
 #pragma pop
+
+static inline void resolveEnvelopeRefs(HSD_SList* list,
+                                       HSD_EnvelopeDesc** desc_list)
+{
+    for (; list != NULL && *desc_list != NULL;
+         list = list->next, desc_list++)
+    {
+        HSD_Envelope* envelope = list->data;
+        HSD_EnvelopeDesc* desc = *desc_list;
+
+        while (envelope != NULL && desc->joint != NULL) {
+            HSD_JObjUnrefThis(envelope->jobj);
+            envelope->jobj = HSD_IDGetDataFromTable(
+                NULL, (u32) desc->joint, NULL);
+            if (envelope->jobj == NULL) {
+                __assert(&lbl_8047DCB8, 0x2E0, &lbl_8047DD10);
+            }
+            HSD_JObjRefThis(envelope->jobj);
+            envelope = envelope->next;
+            desc++;
+        }
+    }
+}
+
+static inline void resolvePObjRefs(HSD_PObj* pobj, HSD_PObjDesc* desc)
+{
+    if (pobj == NULL || desc == NULL) {
+        return;
+    }
+    switch (pobj->flags & 0x3000) {
+    case 0x2000:
+        resolveEnvelopeRefs(pobj->u.envelope_list, desc->u.envelope_p);
+        break;
+    case 0:
+        HSD_JObjUnrefThis(pobj->u.jobj);
+        pobj->u.jobj = NULL;
+        if (desc->u.joint != NULL) {
+            pobj->u.jobj = HSD_IDGetDataFromTable(
+                NULL, (u32) desc->u.joint, NULL);
+            if (pobj->u.jobj == NULL) {
+                __assert(&lbl_8047DCB8, 0x2FB, &lbl_8047DD10);
+            }
+            HSD_JObjRefThis(pobj->u.jobj);
+        }
+        break;
+    }
+}
+
+void HSD_PObjResolveRefsAll(HSD_PObj* pobj, HSD_PObjDesc* desc)
+{
+    for (; pobj != NULL && desc != NULL;
+         pobj = pobj->next, desc = desc->next)
+    {
+        resolvePObjRefs(pobj, desc);
+    }
+}
 
 /* Address: 0x801AD214 | Size: 0x74  -- Walk pobj list, vtable[0x30] + [0x34] */
 #pragma push

@@ -827,6 +827,7 @@ static u32 gobj_next_id;
 extern u8 lbl_80465728[];
 extern u8 lbl_80465754[];
 extern u8 lbl_80465780[];
+extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 extern char lbl_8047DE70;
 extern char lbl_8047DE90;
 extern char lbl_802753DC[];
@@ -849,21 +850,11 @@ void* HSD_RenderGetAllocData(void) {
     return lbl_80465780;
 }
 
-/*
- * HSD_TExpAllocNode - 0x801B4264 | Size: 0x5C
- * Allocate and initialize a new TExp node.
- */
-void* HSD_RenderInitAllocData(u32 type) {
-    u8* node;
-    node = (u8*)hsdAllocMemPiece(0x40);
-    if (node != NULL) {
-        u32 i;
-        for (i = 0; i < 0x40; i++) {
-            node[i] = 0;
-        }
-        *(u32*)(node + 0x0) = type;
-    }
-    return node;
+void HSD_RenderInitAllocData(void)
+{
+    HSD_ObjAllocInit(lbl_80465780, 0x1C, 4);
+    HSD_ObjAllocInit(lbl_80465754, 0x14, 4);
+    HSD_ObjAllocInit(lbl_80465728, 0x30, 4);
 }
 
 extern void fn_80193AF0(void* ptr, s32 size);
