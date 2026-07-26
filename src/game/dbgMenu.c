@@ -195,11 +195,16 @@ u32 fn_801330C8(void) {
 
 
 /* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
+/* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuGSmemOptimize(void) {
     u32 val = fn_800E1544();
     GSlogWrite(lbl_80272AB8, val);
     return 0;
 }
+#pragma pop
 
 
 /* 0x80133250 | 0x2C -- fn_800E0E14(1, 1), return 0 */
