@@ -72,7 +72,8 @@ extern u32 lbl_80313608[];
 
 void fn_800B91EC(void);
 void __GXSendFlushPrim(void);
-void fn_800BD640(u32 value);
+void fn_800BD640(f32 left, f32 top, f32 width, f32 height, f32 nearz,
+                 f32 farz, u32 field);
 void __GXSetMatrixIndex(s32 value);
 void fn_800BE164(u32* hi, u32* lo);
 u32 __cvt_fp2unsigned(f32 value);

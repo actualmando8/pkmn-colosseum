@@ -230,7 +230,7 @@ extern void* windowAllocMemory(void* p, s32 size);
 extern void* windowGetFreeWork(void* ptr);
 extern void windowSetParam(void* ptr, u32 idx, u32 val);
 extern u32 windowGetParam(void* ptr, u32 idx);
-extern void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data);
+extern void windowDrawSprite(void* p, void* a, void* b, u32 key, u32 data);
 extern void windowDrawSprite2(void* x, void* y, s16 width, s16 height,
                               s32 color, s32 context, s32 spriteId, s32 flags);
 extern u8* windowGetCursorToItem(u8* arg);
@@ -362,9 +362,9 @@ u32 windowGetParam(void* ptr, u32 idx) {
 
 /* 0x801040F0 | 0x70 */
 /* menuSpriteBiosGetPtr already declared above */
-void windowDrawSprite(void* p, void* a, void* b, u16 key, u32 data) {
-    if (key != 0) {
-        u8* sprite = menuSpriteBiosGetPtr(key);
+void windowDrawSprite(void* p, void* a, void* b, u32 key, u32 data) {
+    if ((u16)key != 0) {
+        u8* sprite = menuSpriteBiosGetPtr((u16)key);
 
         windowDrawSprite2(p, a, *(s16*)(sprite + 0x0C),
                           *(s16*)(sprite + 0x0E), -1, (s32)b,
@@ -404,7 +404,7 @@ void windowDrawSprite2(void* x, void* y, s16 width, s16 height, s32 color,
     *(s16*)(sprite + 0x5E) = *(s16*)(info + 0x0A);
     *(s16*)(sprite + 0x60) = *(s16*)(info + 0x0C);
     *(s16*)(sprite + 0x62) = *(s16*)(info + 0x0E);
-    sprite[0x67] = (u8)(((u32)info[7] * sprite[0x67]) / 255);
+    sprite[0x67] = (u8)((info[7] * sprite[0x67]) / 255);
     if ((flags & 1) != 0) *(s16*)(sprite + 0x54) = -(s16)width;
     if ((flags & 2) != 0) *(s16*)(sprite + 0x56) = -(s16)height;
     if (context == NULL) {
@@ -444,9 +444,19 @@ u8* windowGetCursorToItem(u8* arg) {
 }
 #pragma pop
 
-/* 0x801043A4 | 0x12C */
-static inline void* mdl_find(s32 param);
+/* shared model-table lookup, inlined by the find-and-act helpers below */
+static inline void* mdl_find(s32 param) {
+    void* r;
+    if (param <= 0) { return (void*)0; }
+    r = *(void**)((u8*)lbl_80404ACC + 0xc);
+    while (r != (void*)0) {
+        if (*(s32*)((u8*)r + 0x4) == param) { return r; }
+        r = *(void**)((u8*)r + 0x10);
+    }
+    return (void*)0;
+}
 
+/* 0x801043A4 | 0x12C */
 s32 windowGetValue(s32 param) {
     u8* window = mdl_find(param);
     u8* menuData;
@@ -480,18 +490,6 @@ s32 windowGetValue(s32 param) {
         }
     }
     return result;
-}
-
-/* shared model-table lookup, inlined by the find-and-act helpers below */
-static inline void* mdl_find(s32 param) {
-    void* r;
-    if (param <= 0) { return (void*)0; }
-    r = *(void**)((u8*)lbl_80404ACC + 0xc);
-    while (r != (void*)0) {
-        if (*(s32*)((u8*)r + 0x4) == param) { return r; }
-        r = *(void**)((u8*)r + 0x10);
-    }
-    return (void*)0;
 }
 
 /* 0x801044D0 | 0x60 */
@@ -743,7 +741,10 @@ s32 _windowCreateItemSprite__FP14tagWINDOW_WORK(u8* window) {
                 sprite[5] |= 2;
                 *(u32*)(sprite + 0x08) = *(u32*)(spriteData + 0x10);
             }
-            memcpy(sprite + 0x5C, spriteData + 0x08, 8);
+            *(s16*)(sprite + 0x5C) = *(s16*)(spriteData + 0x08);
+            *(s16*)(sprite + 0x5E) = *(s16*)(spriteData + 0x0A);
+            *(s16*)(sprite + 0x60) = *(s16*)(spriteData + 0x0C);
+            *(s16*)(sprite + 0x62) = *(s16*)(spriteData + 0x0E);
             sprite[0x67] = (u8)(((u32)sprite[0x67] * spriteData[7]) / 255);
             if ((spriteData[0] & 0x40) != 0) {
                 *(s16*)(sprite + 0x54) = width;
@@ -901,18 +902,22 @@ void windowInit(u16 count) {
 void* windowGetPortKeyInfo(u8 ports) {
     u8 masks[4];
     u16* output = (u16*)lbl_80404AB0;
+    u8* state = lbl_80404ACC;
     u32 i;
 
     *(u32*)masks = lbl_8047CDE8;
     memset(output, 0, 0x1A);
     for (i = 0; i < 4; i++) {
-        u16* keys = (u16*)(lbl_80404ACC + 0x2A + i * 0x1A);
-        u32 j;
+        u16* keys = (u16*)(state + 0x2A);
 
-        if ((ports & masks[i]) == 0) continue;
-        for (j = 0; j < 5; j++) {
-            output[j] |= keys[j];
+        if ((ports & masks[i]) != 0) {
+            output[0] |= keys[0];
+            output[1] |= keys[1];
+            output[2] |= keys[2];
+            output[3] |= keys[3];
+            output[4] |= keys[4];
         }
+        state += 0x1A;
     }
     return output;
 }

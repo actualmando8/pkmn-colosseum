@@ -348,7 +348,13 @@ u32 menuModelRender(u8* work) {
     u16 height;
     s32 i;
 
-    if (work == NULL || *(u32*)(work + 0x34) == 0 || work[0] != 2) {
+    if (work == NULL) {
+        return 0;
+    }
+    if (*(u32*)(work + 0x34) == 0) {
+        return 0;
+    }
+    if (work[0] != 2) {
         return 0;
     }
     model = *(u32*)(work + 0x24);

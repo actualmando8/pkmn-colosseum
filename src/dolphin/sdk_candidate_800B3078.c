@@ -94,3 +94,62 @@ void __CARDMountCallback(s32 chan, s32 result)
     __CARDPutControlBlock(card, result);
     callback(chan, result);
 }
+
+s32 CARDMountAsync(s32 chan, void* workArea, CARDCallback detachCallback,
+                   CARDCallback attachCallback)
+{
+    extern u32 fn_800993A8(s32 chan);
+    extern BOOL fn_80098790(s32 chan, EXICallback callback);
+    CARDControl* card;
+    BOOL enabled;
+
+    if (chan < 0 || chan >= 2) {
+        return -128;
+    }
+    if (*(volatile u8*) 0x800030E3 & 0x80) {
+        return -3;
+    }
+
+    card = &lbl_803FC620[chan];
+    enabled = OSDisableInterrupts();
+    if (card->result == -1) {
+        OSRestoreInterrupts(enabled);
+        return -1;
+    }
+
+    if (!card->attached && (fn_800993A8(chan) & 8)) {
+        OSRestoreInterrupts(enabled);
+        return -2;
+    }
+
+    card->result = -1;
+    card->workArea = workArea;
+    card->extCallback = detachCallback;
+    card->apiCallback =
+        attachCallback != NULL ? attachCallback : __CARDDefaultApiCallback;
+    card->callback_CC = NULL;
+
+    if (!card->attached &&
+        !fn_80098790(chan, (EXICallback) __CARDExtHandler))
+    {
+        card->result = -3;
+        OSRestoreInterrupts(enabled);
+        return -3;
+    }
+
+    card->field_24 = 0;
+    card->attached = TRUE;
+    fn_8009870C(chan, NULL);
+    OSCancelAlarm(&card->alarm);
+    card->dirBlock = NULL;
+    card->fatBlock = NULL;
+    OSRestoreInterrupts(enabled);
+
+    card->unlockCallback = __CARDMountCallback;
+    if (!EXILock(chan, 0, __CARDUnlockedHandler)) {
+        return 0;
+    }
+
+    card->unlockCallback = NULL;
+    return fn_800B31F4(chan);
+}
