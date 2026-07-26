@@ -236,6 +236,94 @@ extern void GSmodelStartAnimation(GSmodel* model);
 
 void fn_800E85E8(GSmodel* model);
 
+extern void fn_801B25C4(u32 mask);
+extern void* GScameraGetActiveCamera(void);
+extern s32 fn_80195A6C(void* camera);
+extern void GSlightSetupLights(void* camera);
+extern void modelShadowPrepare__FP8_GSmodelb(GSmodel* model, s32 active);
+extern void fn_801A13CC(HSDJObj* jobj, s32 arg1, s32 flags, s32 arg3);
+extern void fn_800D6A5C(s32 vertexCount, s32 polygonCount);
+extern void fn_80195A48(void);
+extern void fn_800D87AC(s32 mode);
+
+void fn_800E3604(u32 flags, u8 slot)
+{
+    void* camera;
+
+    fn_801B25C4(0x7F);
+    camera = GScameraGetActiveCamera();
+    if (camera != NULL && fn_80195A6C(*(void**)((u8*)camera + 0xC)) != 0) {
+        u32 i;
+
+        GSlightSetupLights(*(void**)((u8*)camera + 0xC));
+        for (i = 0; i < lbl_8047AB78; i++) {
+            GSmodel* model = &lbl_8047AB74[i];
+            u32 modelFlags = model->flags.raw;
+
+            if ((modelFlags & 1) != 0 && (modelFlags & 2) != 0 &&
+                (modelFlags & 0x400400) != 0 &&
+                ((modelFlags >> 9) & 1) == slot) {
+                HSDJObj* jobj;
+
+                modelShadowPrepare__FP8_GSmodelb(model, 1);
+                jobj = (modelFlags & 0x80) ? model->renderJObjAlt
+                                           : model->renderJObj;
+                if ((flags & 0x10) != 0) {
+                    fn_801A13CC(jobj, 0, 1, 0);
+                    fn_800D6A5C(model->vertexCount, model->polygonCount);
+                }
+                if ((flags & 0x1000) != 0) {
+                    fn_801A13CC(jobj, 0, 4, 0);
+                }
+                if ((flags & 0x2000) != 0) {
+                    fn_801A13CC(jobj, 0, 2, 0);
+                }
+                modelShadowPrepare__FP8_GSmodelb(model, 0);
+            }
+        }
+        fn_80195A48();
+    }
+    fn_800D87AC(-1);
+}
+
+void GSmodelDrawModel(GSmodel* model, u32 flags)
+{
+    void* camera;
+
+    if ((model->flags.raw & 1) == 0) {
+        return;
+    }
+
+    fn_801B25C4(0x7F);
+    camera = GScameraGetActiveCamera();
+    if (camera != NULL) {
+        if (fn_80195A6C(*(void**)((u8*)camera + 0xC)) != 0) {
+            HSDJObj* jobj;
+
+            GSlightSetupLights(*(void**)((u8*)camera + 0xC));
+            modelShadowPrepare__FP8_GSmodelb(model, 1);
+            jobj = (model->flags.raw & 0x80) ? model->renderJObjAlt
+                                             : model->renderJObj;
+            if ((flags & 0x10) != 0) {
+                fn_801A13CC(jobj, 0, 1, 0);
+                fn_800D6A5C(model->vertexCount, model->polygonCount);
+            }
+            if ((flags & 0x1000) != 0) {
+                fn_801A13CC(jobj, 0, 4, 0);
+            }
+            if ((flags & 0x2000) != 0) {
+                fn_801A13CC(jobj, 0, 2, 0);
+            }
+            modelShadowPrepare__FP8_GSmodelb(model, 0);
+            fn_80195A48();
+        }
+        if ((model->flags.raw & 0x200000) != 0) {
+            fn_80190E60(&model->bound);
+        }
+    }
+    fn_800D87AC(-1);
+}
+
 
 
 
