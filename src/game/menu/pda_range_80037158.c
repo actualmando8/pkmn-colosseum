@@ -5001,3 +5001,126 @@ void fn_800473E0(PdaOrbitPoint* point)
     GSsplineFree(spline);
 }
 #pragma peephole reset
+
+extern u8 lbl_802E53F4[];
+extern u8 lbl_802E5400[];
+extern void GSmtxMakeYRotation(f32* mtx, f32 angle);
+extern void fn_800E0370(f32* mtx, f32 angle);
+extern void fn_800E0560(f32* mtx, void* vec);
+extern void GSvecTransform(void* dst, f32* mtx, void* src);
+
+/* Orbit camera for the PDA's rotatable model page. */
+#pragma peephole off
+u8 fn_800484A4(u8* work)
+{
+    extern f64 tan(f64 x);
+    f32 mtx1[12];
+    f32 mtx0[12];
+    PdaVec3 bound;
+    PdaVec3 target;
+    PdaVec3 camPos;
+    PdaVec3 lightPos;
+    PdaVec3 color;
+    f32 persp0;
+    f32 persp1;
+    f32 persp2;
+    f32 persp3;
+    f32 scale;
+    void* model;
+    f32* box;
+    f32 spread;
+    f32 zoom;
+    f32 extent;
+    f32 dist;
+
+    zoom = lbl_8047BCC0;
+    scale = lbl_8047BCBC;
+    memoGetScaleAngle(
+        pokemonBiosGetPokemonDataId(pdaLoadPokemon(lbl_803A6818.currentIndex)),
+        &scale, NULL);
+    zoom = zoom * scale;
+    if (work == NULL) {
+        return 0;
+    }
+    if (*(void**)(work + 0x34) == NULL) {
+        return 0;
+    }
+    if (work[0] != 2) {
+        return 0;
+    }
+    if (menuModelCheck(work, 0) == 1) {
+        return 0;
+    }
+    if (work[0x14] != 0) {
+        model = fn_801DAC3C(*(void**)(work + 0x24));
+        switch (fn_801DAC24(*(void**)(work + 0x24))) {
+        case -2:
+            spread = lbl_8047BD3C;
+            break;
+        case -1:
+            spread = lbl_8047BD40;
+            break;
+        case 0:
+            spread = lbl_8047BD44;
+            break;
+        case 1:
+            spread = lbl_8047BD44;
+            break;
+        case 2:
+            spread = lbl_8047BD48;
+            break;
+        case 3:
+            spread = lbl_8047BD4C;
+            break;
+        }
+    } else {
+        model = *(void**)(work + 0x24);
+    }
+    if (model == NULL) {
+        return 0;
+    }
+    GSscene_SetMode(3);
+    GScameraGetPerspective(*(void**)(work + 0x38), &persp0, &persp1, &persp2,
+                           &persp3);
+    box = GSmodelGetBound(model);
+    ObjInfoInit(box, &bound);
+    persp0 = lbl_8047BD30;
+    persp1 = (f32)*(s32*)(work + 0x2c) / (f32)*(s32*)(work + 0x30);
+    if (bound.y >= bound.x) {
+        extent = bound.y;
+    } else {
+        extent = bound.x;
+    }
+    if (lbl_8047BCBC == scale) {
+        dist = extent * zoom / (f32)tan(lbl_8047BD34);
+    } else {
+        dist = zoom * (extent / spread) / (f32)tan(lbl_8047BD34);
+    }
+    set__5GSvecFfff(&camPos, lbl_8047BC94, lbl_8047BC94,
+                    dist * *(f32*)((u8*)&lbl_803A6818 + 0x64));
+    GSmtxMakeYRotation(mtx1, -*(f32*)((u8*)&lbl_803A6818 + 0x70));
+    fn_800E0370(mtx1, -*(f32*)((u8*)&lbl_803A6818 + 0x6c));
+    GSvecTransform(&camPos, mtx1, &camPos);
+    GScameraSetPosition(*(void**)(work + 0x38), &camPos);
+    GScameraSetPerspective(*(void**)(work + 0x38), persp0, persp1, persp2,
+                           persp3);
+    target.x = lbl_8047BC94;
+    target.z = lbl_8047BC94;
+    target.y = -(box[5] + box[8]) * lbl_8047BD18;
+    fn_800E064C(mtx0);
+    fn_800E0560(mtx0, &target);
+    GSmodelSetMatrix(model, mtx0);
+    GScameraLookAt(*(void**)(work + 0x38), lbl_802E53F4, lbl_802E5400);
+    color = *(PdaVec3*)lbl_80267180;
+    memcpy(&lightPos, &camPos, 12);
+    lightPos.x = lightPos.x - lbl_8047BC98;
+    lightPos.y = lightPos.y + lbl_8047BC9C;
+    GSlightSetType(*(void**)(work + 0x44), 2);
+    GSlightSetColor(*(void**)(work + 0x44), &color);
+    GSlightSetPosition(*(void**)(work + 0x44), &lightPos);
+    GSlightSetTarget(*(void**)(work + 0x44), &target);
+    GSlightSetActive(*(void**)(work + 0x44), 1);
+    GSscene_SetMode(4);
+    return 1;
+}
+#pragma peephole reset
