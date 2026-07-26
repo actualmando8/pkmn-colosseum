@@ -431,6 +431,105 @@ void fn_801E4B08(u32 msg)
 }
 #define lbl_8046AE58 (lbl_8046AE20 + 0x38)
 
+typedef struct THPReadBuffer {
+    u8 *ptr;
+    u32 frameNumber;
+} THPReadBuffer;
+
+typedef struct THPDecodedAudioBuffer {
+    s16 *buffer;
+    s16 *curPtr;
+    u32 validSample;
+} THPDecodedAudioBuffer;
+
+extern u32 THPAudioDecode(s16 *audioBuffer, u8 *audioFrame, s32 flag);
+
+static inline void THPDecodeAudioFrame(THPReadBuffer *readBuffer)
+{
+    u32 *componentSizes = (u32 *)(readBuffer->ptr + 8);
+    u8 *componentData =
+        readBuffer->ptr + *(u32 *)(lbl_8046AC60 + 0x6C) * sizeof(u32) + 8;
+    THPDecodedAudioBuffer *audioBuffer;
+    u32 component;
+
+    fn_8009F2F8(lbl_8046AE58, (u32 *)&audioBuffer, 1);
+    for (component = 0;
+         component < *(u32 *)(lbl_8046AC60 + 0x6C);
+         component++) {
+        if (lbl_8046AC60[0x70 + component] == 1) {
+            audioBuffer->validSample =
+                THPAudioDecode(audioBuffer->buffer,
+                               componentData +
+                                   componentSizes[component] *
+                                       *(u32 *)(lbl_8046AC60 + 0xDC),
+                               0);
+            audioBuffer->curPtr = audioBuffer->buffer;
+            fn_8009F230(lbl_8046AE38, (u32)audioBuffer, 1);
+        }
+        componentData += componentSizes[component];
+    }
+}
+
+void *fn_801E4B38(void *arg)
+{
+    THPReadBuffer readBuffer;
+    u8 *data = arg;
+    u32 stride = *(u32 *)(lbl_8046AC60 + 0xBC);
+    s32 frame = 0;
+
+    for (;;) {
+        readBuffer.ptr = data;
+        readBuffer.frameNumber = frame;
+        THPDecodeAudioFrame(&readBuffer);
+
+        if ((frame + *(u32 *)(lbl_8046AC60 + 0xC0)) %
+                *(u32 *)(lbl_8046AC60 + 0x50) ==
+            *(u32 *)(lbl_8046AC60 + 0x50) - 1) {
+            if (lbl_8046AC60[0xA6] & 1) {
+                stride = *(u32 *)data;
+                data = *(u8 **)(lbl_8046AC60 + 0xB4);
+            } else {
+                if (frame < 2) {
+                    fn_801E446C(1);
+                }
+                OSSuspendThread((OSThread *)(lbl_8046AE20 + 0x1058));
+            }
+        } else {
+            u32 nextStride = *(u32 *)data;
+            data += stride;
+            stride = nextStride;
+        }
+        if (frame == 2) {
+            fn_801E446C(1);
+        }
+        frame++;
+    }
+}
+
+void *fn_801E4C80(void *arg)
+{
+    s32 frame = 0;
+
+    (void)arg;
+    for (;;) {
+        THPReadBuffer *readBuffer =
+            (THPReadBuffer *)fn_801E1BE8();
+
+        THPDecodeAudioFrame(readBuffer);
+        if (frame < 2 && !(lbl_8046AC60[0xA6] & 1) &&
+            readBuffer->frameNumber +
+                    *(u32 *)(lbl_8046AC60 + 0xC0) ==
+                *(u32 *)(lbl_8046AC60 + 0x50) - 1) {
+            fn_801E446C(1);
+        }
+        if (frame == 2) {
+            fn_801E446C(1);
+        }
+        fn_801E1B54(readBuffer);
+        frame++;
+    }
+}
+
 /* ---- Thread A: additional send-only queue wrapper (lbl_8046A4B4) ---- */
 BOOL fn_801E446C(u32 msg)
 {
@@ -481,6 +580,146 @@ BOOL fn_801E4F34(u32 msg)
 }
 #define lbl_8046C1C8 (lbl_8046C190 + 0x38)
 
+typedef struct THPTextureSet {
+    void *yTexture;
+    void *uTexture;
+    void *vTexture;
+    u32 frameNumber;
+} THPTextureSet;
+
+extern s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV,
+                          void *work);
+extern u32 OSDisableInterrupts(void);
+extern void OSRestoreInterrupts(u32 level);
+
+static inline void THPDecodeVideoFrame(THPReadBuffer *readBuffer)
+{
+    u32 *componentSizes = (u32 *)(readBuffer->ptr + 8);
+    u8 *componentData =
+        readBuffer->ptr + *(u32 *)(lbl_8046AC60 + 0x6C) * sizeof(u32) + 8;
+    THPTextureSet *textureSet;
+    u32 component;
+
+    fn_8009F2F8(lbl_8046C1C8, (u32 *)&textureSet, 1);
+    for (component = 0;
+         component < *(u32 *)(lbl_8046AC60 + 0x6C);
+         component++) {
+        if (lbl_8046AC60[0x70 + component] == 0) {
+            u32 interruptLevel;
+
+            *(s32 *)(lbl_8046AC60 + 0xAC) =
+                THPVideoDecode(componentData, textureSet->yTexture,
+                               textureSet->uTexture, textureSet->vTexture,
+                               *(void **)(lbl_8046AC60 + 0x9C));
+            if (*(s32 *)(lbl_8046AC60 + 0xAC) != 0) {
+                if (lbl_8047B48C) {
+                    fn_801E446C(0);
+                    lbl_8047B48C = FALSE;
+                }
+                OSSuspendThread((OSThread *)(lbl_8046C190 + 0x1058));
+            }
+            textureSet->frameNumber = readBuffer->frameNumber;
+            fn_8009F230(lbl_8046C1A8, (u32)textureSet, 1);
+            interruptLevel = OSDisableInterrupts();
+            (*(s32 *)(lbl_8046AC60 + 0xD8))++;
+            OSRestoreInterrupts(interruptLevel);
+        }
+        componentData += componentSizes[component];
+    }
+    if (lbl_8047B48C) {
+        fn_801E446C(1);
+        lbl_8047B48C = FALSE;
+    }
+}
+
+void *fn_801E4F64(void *arg)
+{
+    THPReadBuffer readBuffer;
+    u8 *data = arg;
+    u32 stride = *(u32 *)(lbl_8046AC60 + 0xBC);
+    s32 frame = 0;
+
+    for (;;) {
+        if (lbl_8046AC60[0xA7]) {
+            while (*(s32 *)(lbl_8046AC60 + 0xD8) < 0) {
+                u32 interruptLevel = OSDisableInterrupts();
+                (*(s32 *)(lbl_8046AC60 + 0xD8))++;
+                OSRestoreInterrupts(interruptLevel);
+
+                if ((frame + *(u32 *)(lbl_8046AC60 + 0xC0)) %
+                        *(u32 *)(lbl_8046AC60 + 0x50) ==
+                    *(u32 *)(lbl_8046AC60 + 0x50) - 1) {
+                    if (!(lbl_8046AC60[0xA6] & 1)) {
+                        break;
+                    }
+                    stride = *(u32 *)data;
+                    data = *(u8 **)(lbl_8046AC60 + 0xB4);
+                } else {
+                    u32 nextStride = *(u32 *)data;
+                    data += stride;
+                    stride = nextStride;
+                }
+                frame++;
+            }
+        }
+
+        readBuffer.ptr = data;
+        readBuffer.frameNumber = frame;
+        THPDecodeVideoFrame(&readBuffer);
+
+        if ((frame + *(u32 *)(lbl_8046AC60 + 0xC0)) %
+                *(u32 *)(lbl_8046AC60 + 0x50) ==
+            *(u32 *)(lbl_8046AC60 + 0x50) - 1) {
+            if (lbl_8046AC60[0xA6] & 1) {
+                stride = *(u32 *)data;
+                data = *(u8 **)(lbl_8046AC60 + 0xB4);
+            } else {
+                OSSuspendThread((OSThread *)(lbl_8046C190 + 0x1058));
+            }
+        } else {
+            u32 nextStride = *(u32 *)data;
+            data += stride;
+            stride = nextStride;
+        }
+        frame++;
+    }
+}
+
+void *fn_801E5154(void *arg)
+{
+    THPReadBuffer *readBuffer;
+
+    (void)arg;
+    for (;;) {
+        if (lbl_8046AC60[0xA7]) {
+            while (*(s32 *)(lbl_8046AC60 + 0xD8) < 0) {
+                u32 interruptLevel;
+
+                readBuffer = (THPReadBuffer *)fn_801E1B84();
+                if ((readBuffer->frameNumber +
+                         *(u32 *)(lbl_8046AC60 + 0xC0)) %
+                            *(u32 *)(lbl_8046AC60 + 0x50) ==
+                        *(u32 *)(lbl_8046AC60 + 0x50) - 1 &&
+                    !(lbl_8046AC60[0xA6] & 1)) {
+                    THPDecodeVideoFrame(readBuffer);
+                }
+                fn_801E1BB8(readBuffer);
+                interruptLevel = OSDisableInterrupts();
+                (*(s32 *)(lbl_8046AC60 + 0xD8))++;
+                OSRestoreInterrupts(interruptLevel);
+            }
+        }
+
+        if (lbl_8046AC60[0xA7]) {
+            readBuffer = (THPReadBuffer *)fn_801E1B84();
+        } else {
+            readBuffer = (THPReadBuffer *)fn_801E1BE8();
+        }
+        THPDecodeVideoFrame(readBuffer);
+        fn_801E1BB8(readBuffer);
+    }
+}
+
 /* ---- Thread B: cancel/resume ---- */
 extern OSThread lbl_8046BE78;
 void fn_801E4DAC(void)
@@ -523,6 +762,7 @@ void fn_801E543C(void)
 BOOL fn_801E4E1C(s32 priority, u32 mode)
 {
     u8 *base = lbl_8046AE20;
+    void *messageBuffer = base;
 
     if (mode != 0) {
         if (!OSCreateThread((OSThread *)(base + 0x1058), (void *(*)(void *))fn_801E4B38,
@@ -536,7 +776,7 @@ BOOL fn_801E4E1C(s32 priority, u32 mode)
         }
     }
     fn_8009F1D0(base + 0x38, (u32)(base + 0xC), 3);
-    fn_8009F1D0(base + 0x18, (u32)(base + 0x0), 3);
+    fn_8009F1D0(base + 0x18, (u32)messageBuffer, 3);
     lbl_8047B480 = TRUE;
     return TRUE;
 }
@@ -545,6 +785,7 @@ BOOL fn_801E4E1C(s32 priority, u32 mode)
 BOOL fn_801E5470(s32 priority, u32 mode)
 {
     u8 *base = lbl_8046C190;
+    void *messageBuffer = base;
 
     if (mode != 0) {
         if (!OSCreateThread((OSThread *)(base + 0x1058), (void *(*)(void *))fn_801E4F64,
@@ -558,7 +799,7 @@ BOOL fn_801E5470(s32 priority, u32 mode)
         }
     }
     fn_8009F1D0(base + 0x38, (u32)(base + 0xC), 3);
-    fn_8009F1D0(base + 0x18, (u32)(base + 0x0), 3);
+    fn_8009F1D0(base + 0x18, (u32)messageBuffer, 3);
     lbl_8047B488 = TRUE;
     lbl_8047B48C = TRUE;
     return TRUE;

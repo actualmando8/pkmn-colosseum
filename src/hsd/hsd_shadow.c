@@ -12,7 +12,13 @@
 
 #include "dolphin/types.h"
 #include "hsd/hsd_class.h"
+#include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
+#include "hsd/hsd_lobj.h"
+#include "hsd/hsd_mobj.h"
+#include "hsd/hsd_object.h"
+#include "hsd/hsd_tobj.h"
+#include "crt/math.h"
 
 extern u8 lbl_8047B310;
 void fn_801B06D4(u8 value)
@@ -25,6 +31,18 @@ typedef struct HSDShadowOwner {
     struct HSDShadowObject* object; /* 0x08 */
 } HSDShadowOwner;
 
+typedef struct HSDShadow {
+    HSD_SList* objects; /* 0x00 */
+    HSD_CObj* camera;   /* 0x04 */
+    HSD_TObj* texture;  /* 0x08 */
+    f32 scale_s;        /* 0x0C */
+    f32 scale_t;        /* 0x10 */
+    f32 trans_s;        /* 0x14 */
+    f32 trans_t;        /* 0x18 */
+    s32 active;         /* 0x1C */
+    u8 intensity;       /* 0x20 */
+} HSDShadow;
+
 typedef struct HSDShadowObject {
     u8 unk_00[0x58];
     struct HSDShadowData* shadow; /* 0x58 */
@@ -36,13 +54,92 @@ typedef struct HSDShadowData {
     u16 height; /* 0x06 */
 } HSDShadowData;
 
+typedef struct HSDShadowVec {
+    f32 x;
+    f32 y;
+    f32 z;
+} HSDShadowVec;
+
+typedef struct HSDViewingRect {
+    HSDShadowVec origin;     /* 0x00 */
+    HSDShadowVec axis_x;     /* 0x0C */
+    HSDShadowVec axis_y;     /* 0x18 */
+    HSDShadowVec direction;  /* 0x24 */
+    HSDShadowVec normal;     /* 0x30 */
+    f32 distance;            /* 0x3C */
+    f32 min_x;               /* 0x40 */
+    f32 max_x;               /* 0x44 */
+    f32 max_y;               /* 0x48 */
+    f32 min_y;               /* 0x4C */
+    void* object;            /* 0x50 */
+} HSDViewingRect;
+
+void fn_801B1524(HSDShadow* shadow, u16 width, u16 height);
+
 /* ========================================================================= */
 /*  Shadow setup functions                                                   */
 /* ========================================================================= */
 
 /* Address: 0x801B019C | Size: 0x204 | Proposed: HSD_ShadowFunc1 */
 /* Shadow map initialization and projection matrix setup */
-void fn_801B019C(void) {
+void fn_801B019C(HSDViewingRect* rect, HSDShadowVec* point,
+                 f32 x_max, f32 x_min, f32 y_min, f32 y_max) {
+    extern char lbl_802752C0[];
+    extern char lbl_802752CC[];
+    extern char lbl_8047DDB8;
+    extern f32 lbl_8047DDC0;
+    extern void PSVECSubtract(void* a, void* b, void* out);
+    extern f32 PSVECDotProduct(void* a, void* b);
+    extern void PSVECScale(void* src, void* dst, f32 scale);
+    HSDShadowVec delta;
+    HSDShadowVec projected;
+    HSDShadowVec normal_distance;
+    f32 distance;
+    f32 scale;
+    f32 x;
+    f32 y;
+
+    if (rect == NULL) {
+        __assert(lbl_802752C0, 0x3A2, &lbl_8047DDB8);
+    }
+    if (point == NULL) {
+        __assert(lbl_802752C0, 0x3A3, lbl_802752CC);
+    }
+
+    PSVECSubtract(point, &rect->origin, &delta);
+    distance = PSVECDotProduct(&delta, &rect->normal);
+    if (rect->object != NULL) {
+        if (distance <= lbl_8047DDC0) {
+            return;
+        }
+        scale = rect->distance / distance;
+        PSVECScale(&delta, &delta, scale);
+        PSVECSubtract(&delta, &rect->direction, &projected);
+        y = PSVECDotProduct(&rect->axis_y, &projected);
+        x = PSVECDotProduct(&rect->axis_x, &projected);
+        x_max *= scale;
+        x_min *= scale;
+        y_min *= scale;
+        y_max *= scale;
+    } else {
+        PSVECScale(&rect->normal, &normal_distance, distance);
+        PSVECSubtract(&delta, &normal_distance, &projected);
+        y = PSVECDotProduct(&rect->axis_y, &projected);
+        x = PSVECDotProduct(&rect->axis_x, &projected);
+    }
+
+    if (y + y_max > rect->min_y) {
+        rect->min_y = y + y_max;
+    }
+    if (y + y_min < rect->max_y) {
+        rect->max_y = y + y_min;
+    }
+    if (x + x_max > rect->min_x) {
+        rect->min_x = x + x_max;
+    }
+    if (x + x_min < rect->max_x) {
+        rect->max_x = x + x_min;
+    }
 }
 
 /* Address: 0x801B03A0 | Size: 0x68 | Proposed: HSD_ShadowFunc2 */
@@ -66,12 +163,81 @@ s32 HSD_ViewingRectCheck(void* arg0) {
 
 /* Address: 0x801B0408 | Size: 0xD8 | Proposed: HSD_ShadowFunc3 */
 /* Shadow TEV stage configuration */
-void fn_801B0408(void) {
+void fn_801B0408(HSDViewingRect* rect, HSDShadowVec* origin,
+                 HSDShadowVec* target, HSDShadowVec* up, void* object) {
+    extern char lbl_802752C0[];
+    extern char lbl_8047DDB8;
+    extern f32 lbl_8047DDC4;
+    extern f32 lbl_8047DDC8;
+    extern void PSVECSubtract(void* a, void* b, void* out);
+    extern void PSVECNormalize(void* src, void* dst);
+    extern void PSVECCrossProduct(void* a, void* b, void* out);
+    extern f32 PSVECMag(void* vec);
+    HSDShadowVec normalized_up;
+
+    if (rect == NULL) {
+        __assert(lbl_802752C0, 0x366, &lbl_8047DDB8);
+    }
+
+    rect->origin = *origin;
+    PSVECSubtract(target, origin, &rect->direction);
+    PSVECNormalize(&rect->direction, &rect->normal);
+    PSVECNormalize(up, &normalized_up);
+    PSVECCrossProduct(&rect->normal, &normalized_up, &rect->axis_y);
+    PSVECCrossProduct(&rect->axis_y, &rect->normal, &rect->axis_x);
+    rect->distance = PSVECMag(&rect->direction);
+    rect->min_y = lbl_8047DDC4;
+    rect->min_x = lbl_8047DDC4;
+    rect->max_y = lbl_8047DDC8;
+    rect->max_x = lbl_8047DDC8;
+    rect->object = object;
 }
 
 /* Address: 0x801B04E0 | Size: 0x1F4 | Proposed: HSD_ShadowFunc4 */
 /* Shadow map projection computation */
-void fn_801B04E0(void) {
+void fn_801B04E0(HSDShadow* shadow, f32 top, f32 bottom, f32 left, f32 right) {
+    extern char lbl_802752C0[];
+    extern char lbl_8047DDCC;
+    extern char lbl_8047DDD4;
+    extern f32 lbl_8047DDC0;
+    HSD_CObj* camera;
+    f32 distance;
+    f32 width;
+    f32 height;
+    f32 scale;
+
+    if (shadow == NULL) {
+        __assert(lbl_802752C0, 0x31C, &lbl_8047DDCC);
+    }
+
+    camera = shadow->camera;
+    distance = HSD_CObjGetEyeDistance(camera);
+    if (distance <= lbl_8047DDC0) {
+        __assert(lbl_802752C0, 0x320, lbl_802752C0 + 0x34);
+    }
+
+    switch (HSD_CObjGetProjectionType(camera)) {
+    case 1:
+        width = __fabs(top) > __fabs(bottom) ? __fabs(top) : __fabs(bottom);
+        height = __fabs(left) > __fabs(right) ? __fabs(left) : __fabs(right);
+        HSD_CObjSetAspect(camera, height / width);
+        HSD_CObjSetFov(camera, (f32)atan2(height, distance));
+        break;
+    case 2:
+        scale = HSD_CObjGetNear(camera) / distance;
+        if (scale <= lbl_8047DDC0) {
+            __assert(lbl_802752C0, 0x33D, lbl_802752C0 + 0x44);
+        }
+        HSD_CObjSetFrustum(camera, scale * top, scale * bottom, scale * left,
+                           scale * right);
+        break;
+    case 3:
+        HSD_CObjSetOrtho(camera, top, bottom, left, right);
+        break;
+    default:
+        __assert(lbl_802752C0, 0x345, &lbl_8047DDD4);
+        break;
+    }
 }
 
 /* ========================================================================= */
@@ -129,7 +295,22 @@ void fn_801B073C(HSD_SList** list, void* object) {
 
 /* Address: 0x801B07D4 | Size: 0xAC */
 /* Shadow light direction setup */
-void fn_801B07D4(void) {
+void fn_801B07D4(HSD_SList** list, void* object) {
+    extern HSD_SList* HSD_SListPrepend(HSD_SList* next, void* data);
+    HSD_SList* current;
+
+    if (list == NULL || object == NULL) {
+        return;
+    }
+
+    for (current = *list; current != NULL; current = current->next) {
+        if (current->data == object) {
+            return;
+        }
+    }
+
+    *list = HSD_SListPrepend(*list, object);
+    ref_INC(object);
 }
 
 /* ========================================================================= */
@@ -137,28 +318,218 @@ void fn_801B07D4(void) {
 /* ========================================================================= */
 
 /* Address: 0x801B0880 | Size: 0x218 | Proposed: HSD_ShadowFunc5 */
-/* Shadow pass setup - configures GX for shadow map rendering */
-void fn_801B0880(void) {
+/* Enable or disable shadow texture application. */
+void fn_801B0880(HSDShadow* shadow, s32 active) {
+    extern char lbl_802752C0[];
+    extern char lbl_8047DDCC;
+    extern void HSD_MObjDeleteShadowTexture(HSD_TObj* texture);
+    HSD_ImageDesc* image;
+
+    if (shadow == NULL) {
+        __assert(lbl_802752C0, 0x278, &lbl_8047DDCC);
+    }
+    if ((shadow->active && active) || (!shadow->active && !active)) {
+        return;
+    }
+
+    shadow->active = active;
+    if (active) {
+        image = shadow->texture->imagedesc;
+        if (image->image_ptr == NULL) {
+            fn_801B1524(shadow, image->width, image->height);
+        }
+        HSD_MObjAddShadowTexture(shadow->texture);
+    } else {
+        HSD_MObjDeleteShadowTexture(shadow->texture);
+    }
 }
 
 /* Address: 0x801B0A98 | Size: 0x140 | Proposed: HSD_ShadowFunc6 */
 /* Shadow receiver configuration */
-void fn_801B0A98(void) {
+void fn_801B0A98(HSDShadow* shadow, HSD_LObj* light, f32 distance) {
+    extern char lbl_802752C0[];
+    extern char lbl_802752F4[];
+    extern char lbl_8047DDCC;
+    extern char lbl_8047DDD4;
+    extern char lbl_8047DDE0;
+    extern f32 lbl_8047DDC0;
+    extern f32 PSVECMag(void* vec);
+    extern void PSVECScale(void* src, void* dst, f32 scale);
+    extern void PSVECAdd(void* a, void* b, void* out);
+    Vec interest;
+    Vec position;
+    Vec eye;
+
+    if (shadow == NULL) {
+        __assert(lbl_802752C0, 0x24D, &lbl_8047DDCC);
+    }
+    if (light == NULL) {
+        __assert(lbl_802752C0, 0x24E, &lbl_8047DDE0);
+    }
+
+    switch (light->flags & 3) {
+    case 1:
+        if (distance <= lbl_8047DDC0) {
+            __assert(lbl_802752C0, 0x252, lbl_802752F4);
+        }
+        HSD_CObjGetInterest(shadow->camera, &interest);
+        HSD_LObjGetPosition(light, &position);
+        PSVECScale(&position, &position, distance / PSVECMag(&position));
+        PSVECAdd(&interest, &position, &eye);
+        HSD_CObjSetEyePosition(shadow->camera, &eye);
+        break;
+    case 2:
+    case 3:
+        HSD_LObjGetPosition(light, &eye);
+        HSD_CObjSetEyePosition(shadow->camera, &eye);
+        break;
+    default:
+        __assert(lbl_802752C0, 0x262, &lbl_8047DDD4);
+        break;
+    }
 }
 
 /* Address: 0x801B0BD8 | Size: 0x2E0 | Proposed: HSD_ShadowFunc7 */
-/* Shadow caster traversal and rendering */
-void fn_801B0BD8(void) {
+/* Copy the shadow map and update its texture projection matrix. */
+void fn_801B0BD8(HSDShadow* shadow) {
+    extern char lbl_802752C0[];
+    extern char lbl_8047DDCC;
+    extern char lbl_8047DDD4;
+    extern void fn_800B9FE4(void* destination, u8 clear);
+    extern void fn_800B8E74(void);
+    extern void GXInvalidateTexAll(void);
+    extern void C_MTXLightPerspective(Mtx m, f32 fov, f32 aspect,
+                                      f32 scale_s, f32 scale_t, f32 trans_s,
+                                      f32 trans_t);
+    extern void C_MTXLightFrustum(Mtx m, f32 top, f32 bottom, f32 left,
+                                  f32 right, f32 near, f32 scale_s,
+                                  f32 scale_t, f32 trans_s, f32 trans_t);
+    extern void C_MTXLightOrtho(Mtx m, f32 top, f32 bottom, f32 left,
+                                f32 right, f32 scale_s, f32 scale_t,
+                                f32 trans_s, f32 trans_t);
+    extern void PSMTXConcat(Mtx a, Mtx b, Mtx out);
+    HSD_ImageDesc* image;
+    Mtx projection;
+
+    if (shadow == NULL) {
+        __assert(lbl_802752C0, 0x229, &lbl_8047DDCC);
+    }
+
+    image = shadow->texture->imagedesc;
+    if (image->image_ptr == NULL) {
+        fn_801B1524(shadow, image->width, image->height);
+    }
+
+    fn_800B9FE4(image->image_ptr, 1);
+    fn_800B8E74();
+    GXInvalidateTexAll();
+
+    switch (HSD_CObjGetProjectionType(shadow->camera)) {
+    case 1:
+        C_MTXLightPerspective(
+            projection, shadow->camera->projection_param.perspective.fov,
+            shadow->camera->projection_param.perspective.aspect,
+            shadow->scale_s, shadow->scale_t, shadow->trans_s,
+            shadow->trans_t);
+        break;
+    case 2:
+        C_MTXLightFrustum(
+            projection, shadow->camera->projection_param.frustum.top,
+            shadow->camera->projection_param.frustum.bottom,
+            shadow->camera->projection_param.frustum.left,
+            shadow->camera->projection_param.frustum.right,
+            shadow->camera->near, shadow->scale_s, shadow->scale_t,
+            shadow->trans_s, shadow->trans_t);
+        break;
+    case 3:
+        C_MTXLightOrtho(projection,
+                        shadow->camera->projection_param.ortho.top,
+                        shadow->camera->projection_param.ortho.bottom,
+                        shadow->camera->projection_param.ortho.left,
+                        shadow->camera->projection_param.ortho.right,
+                        shadow->scale_s, shadow->scale_t, shadow->trans_s,
+                        shadow->trans_t);
+        break;
+    default:
+        __assert(lbl_802752C0, 0x305, &lbl_8047DDD4);
+        break;
+    }
+
+    PSMTXConcat(projection, shadow->camera->view_mtx, shadow->texture->mtx);
 }
 
 /* Address: 0x801B0EB8 | Size: 0x66C | Proposed: HSD_ShadowMain */
 /* Main shadow system entry point - orchestrates shadow map gen and apply */
-void fn_801B0EB8(void) {
+void fn_801B0EB8(HSDShadow* shadow) {
+    extern char lbl_802752C0[];
+    extern char lbl_8047DDCC;
+
+    if (shadow == NULL) {
+        __assert(lbl_802752C0, 0x18D, &lbl_8047DDCC);
+    }
+    if (shadow->camera == NULL) {
+        __assert(lbl_802752C0, 0x18E, lbl_802752C0 + 0xAC);
+    }
+    if (shadow->texture == NULL) {
+        __assert(lbl_802752C0, 0x18F, lbl_802752C0 + 0xBC);
+    }
+    if (shadow->texture->imagedesc == NULL) {
+        __assert(lbl_802752C0, 0x190, lbl_802752C0 + 0xCC);
+    }
 }
 
 /* Address: 0x801B1524 | Size: 0x19C | Proposed: HSD_ShadowFunc9 */
 /* Shadow cleanup / restore GX state */
-void fn_801B1524(void) {
+void fn_801B1524(HSDShadow* shadow, u16 width, u16 height) {
+    extern char lbl_802752C0[];
+    extern char lbl_8047DDCC;
+    extern f32 lbl_8047DDC0;
+    extern u32 GXGetTexBufferSize(u16 width, u16 height, u32 format,
+                                  u32 mipmap, u32 max_lod);
+    extern void* fn_800E202C(void* handle);
+    extern void fn_800E24B0(void);
+    extern void fn_800E209C(void* saved);
+    extern u16 fn_800E2B00(u32 size, u32 alignment);
+    extern void* fn_800E27B0(u16 handle);
+    HSD_ImageDesc* image;
+    void* saved;
+    u16 handle;
+    u32 size;
+
+    if (shadow == NULL) {
+        __assert(lbl_802752C0, 0x12C, &lbl_8047DDCC);
+    }
+    if (width == 0) {
+        __assert(lbl_802752C0, 0x12D, lbl_802752C0 + 0x88);
+    }
+    if (height == 0) {
+        __assert(lbl_802752C0, 0x12E, lbl_802752C0 + 0x94);
+    }
+
+    image = shadow->texture->imagedesc;
+    if (image->image_ptr != NULL && image->width == width &&
+        image->height == height) {
+        return;
+    }
+
+    if (image->image_ptr != NULL) {
+        saved = fn_800E202C(image->image_ptr);
+        fn_800E24B0();
+        fn_800E209C(saved);
+        image->image_ptr = NULL;
+    }
+
+    size = GXGetTexBufferSize(width, height, 0, 0, 0);
+    if (size == 0) {
+        __assert(lbl_802752C0, 0x13F, lbl_802752C0 + 0xA0);
+    }
+    handle = fn_800E2B00(size, 0x20);
+    image->image_ptr = fn_800E27B0(handle);
+    image->width = width;
+    image->height = height;
+    HSD_CObjSetViewportfx4(shadow->camera, lbl_8047DDC0, (f32)width,
+                           lbl_8047DDC0, (f32)height);
+    HSD_CObjSetScissorx4(shadow->camera, 0, width, 0, height);
 }
 
 /* Address: 0x801B16C0 | Size: 0x70 | Proposed: HSD_ShadowFunc10 */
