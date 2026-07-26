@@ -80,6 +80,9 @@ extern void* lbl_804529C8[]; /* sLinkDataBanks: per-bank object data */
 extern void* lbl_80452DC8[]; /* sCameraSlots */
 
 extern f32 lbl_8047D630; /* 0.0f */
+extern f32 lbl_8047D5B0; /* 3.0f */
+extern f32 lbl_8047D5B4; /* 0.0f */
+extern f32 lbl_8047D5B8; /* 1.0f */
 extern f32 lbl_8047D634; /* 3.0f */
 extern f32 lbl_8047D638; /* 1.0f */
 extern f32 lbl_8047D63C; /* 0.5f */
@@ -87,6 +90,10 @@ extern f32 lbl_8047D640; /* 2.0f */
 extern f64 lbl_8047D660; /* int->float bias (0x4330000000000000) */
 extern f64 lbl_8047D668; /* signed int->float bias */
 extern f32 lbl_8047D690; /* 255.0f */
+extern f32 lbl_8047D694; /* pi / 2 */
+extern f32 lbl_8047D698; /* -pi / 2 */
+extern f64 lbl_8047D6A0; /* 2.0 */
+extern f64 lbl_8047D6A8; /* pi */
 extern const char lbl_8047D670[7];
 extern const char lbl_8047D678[5];
 
@@ -138,6 +145,7 @@ extern PSFloatBytes lbl_8047B178;
 extern PSGeneratorState* lbl_8047B188;
 extern PSGeneratorState** lbl_8047B184;
 extern PSGeneratorState* lbl_8047B18C;
+extern void* lbl_8047B180;
 extern PSAppSRT* lbl_8047B124;
 extern u32 lbl_80452708[];
 extern u32 lbl_80452748[];
@@ -196,14 +204,16 @@ extern void modifyDirGenBase(PSParticle* pp, f32 a, f32 b, f32 c, f32 d); /* 0x8
 extern f32 sqrtf(f32 x);
 extern s32 applyForceJObj(PSParticle* pp, PSForceJObj* jobj,
                          f32 force, f32 radius);                       /* 0x80172BBC */
-extern void setVelToJObj(void* jobj, void* camData);                    /* 0x80172D00 */
+extern void setVelToJObj(PSParticle* pp, PSForceJObj* jobj);            /* 0x80172D00 */
 extern u8 U8ClampAdd(u8 cur, f32 delta);                                /* 0x801728B0 */
 extern PSParticle* _psListGetNext(PSParticle* pp);                         /* psCleanup, 0x80172928 */
 extern s32 psRemoveParticleAppSRT(PSParticle* pp);                      /* 0x?? */
 extern void psDeletePntJObjwithParticle(PSParticle* pp);
 extern void psKillGeneratorID(s32 familyId);
+extern u32 psGetNewIDNum(void);
 extern void _psListDelete(PSParticle* pp, PSParticle* parent);
 extern PSParticle* _psListGetFirst(s32 linkNo);
+extern PSParticle* _psListNew(PSParticle* parent, u32 linkNo);
 extern f32 sinf(f32 x); /* sinf-family */
 extern f32 cosf(f32 x); /* cosf-family */
 extern f32 tanf(f32 x);
@@ -218,6 +228,7 @@ extern void fn_8019D9DC(PSForceJObj* jobj);
 extern void HSD_MtxSRT(void* dst, void* scale, void* rot, void* trans, void* order);
 extern void fn_801A6960(void* ptr);
 extern void* fn_801A6928(s32 size);
+extern void* fn_801A3E64(void);
 extern void __assert(const char* file, u32 line, const char* msg);
 extern void* memset(void* dst, s32 value, u32 size);
 extern void PSMTXIdentity(Mtx m);
@@ -233,6 +244,10 @@ extern f32 lbl_8047D618;
 extern f64 lbl_8047D5E0;
 extern f32 lbl_8047D5D8;
 extern f32 lbl_80478ACC;
+extern f32 lbl_80478AC8;
+extern double sin(double x);
+extern double cos(double x);
+extern double atan2(double y, double x);
 extern void particleSort(s32 linkNo, PSParticle** first, PSParticle** second);
 extern void fn_800BC8C8(s32 count);
 extern void fn_800B884C(s32 count);
@@ -258,6 +273,59 @@ extern void fn_800B7D3C(void);
 extern void fn_800B7874(s32 attribute, s32 type);
 extern void fn_800B928C(s32 primitive, s32 format, s32 count);
 extern void fn_800B9404(s32 width, s32 offset);
+extern void generateParticle_8017424C(PSGeneratorState* gen);
+
+void psSetGeneratorAngleRadiusScale(PSGeneratorState* gen, f32* scale,
+                                    u8 applyToMotion) {
+    u8* raw = (u8*)gen;
+    u16 mode = gen->angleFlags & 0xF;
+    u16 objectIndex = *(u16*)(raw + 0x8A);
+    f32* object = ((f32**)lbl_80452AC8[gen->bankIndex])[objectIndex];
+    f32 average = (scale[0] + scale[1] + scale[2]) / lbl_8047D5B0;
+
+    switch (mode) {
+    case 0:
+    case 3:
+    case 4:
+        *(f32*)(raw + 0x54) = average * object[0x30 / 4];
+        *(f32*)(raw + 0x58) = average * object[0x34 / 4];
+        break;
+    case 1:
+        *(f32*)(raw + 0x54) = scale[0] * object[0x30 / 4];
+        *(f32*)(raw + 0x58) = scale[1] * object[0x34 / 4];
+        *(f32*)(raw + 0x5C) = scale[2] * object[0x38 / 4];
+        break;
+    case 5:
+        *(f32*)(raw + 0x54) = scale[0] * object[0x30 / 4];
+        *(f32*)(raw + 0x60) = *(f32*)(raw + 0x54);
+        *(f32*)(raw + 0x58) = scale[1] * object[0x34 / 4];
+        *(f32*)(raw + 0x70) = *(f32*)(raw + 0x58);
+        *(f32*)(raw + 0x5C) = scale[2] * object[0x38 / 4];
+        *(f32*)(raw + 0x80) = *(f32*)(raw + 0x5C);
+        break;
+    case 6:
+    case 7:
+        *(f32*)(raw + 0x54) = average * object[0x30 / 4];
+        *(f32*)(raw + 0x58) = average * object[0x34 / 4];
+        *(f32*)(raw + 0x5C) = average * object[0x38 / 4];
+        break;
+    case 8:
+        *(f32*)(raw + 0x5C) = average * object[0x30 / 4];
+        *(f32*)(raw + 0x64) = average * object[0x34 / 4];
+        break;
+    }
+
+    *(f32*)(raw + 0x44) = average * object[0x20 / 4];
+    if (applyToMotion == TRUE) {
+        *(f32*)(raw + 0x38) *= average;
+        *(f32*)(raw + 0x3C) *= average;
+        *(u16*)(raw + 0x88) |= 0x1000;
+    }
+
+    gen->angleRadiusScale[0] = scale[0];
+    gen->angleRadiusScale[1] = scale[1];
+    gen->angleRadiusScale[2] = scale[2];
+}
 extern void fn_800BA4C8(s32 channel, const PSColor* color);
 extern void fn_800BA5BC(s32 channel, const PSColor* color);
 extern void fn_800BC2F8(s32 reg, const PSColor* color);
@@ -797,7 +865,131 @@ void psRemoveParticle(void) {
     }
 }
 
-void psInitDataBankLocate(void* data, void* objects, void* locations);
+typedef struct PSTextureGroup {
+    u32 count;
+    u32 format;
+    u8 pad08[0x0C];
+    u16 paletteCount;
+    u16 paletteFlags;
+    u32 entries[];
+} PSTextureGroup;
+
+typedef struct PSFormGroup {
+    u32 count;
+    u32 entries[];
+} PSFormGroup;
+
+void psInitDataBankLocate(void* data, void* objects, void* locations) {
+    s32 commandCount;
+    s32 firstCommand;
+    s32 i;
+    s32* commandTable;
+    s32* command;
+    s32* dataWords = data;
+    s32 version = *(u16*)data;
+
+    if (version == 0) {
+        commandCount = dataWords[1];
+        commandTable = dataWords + 2;
+        firstCommand = 0;
+        for (i = 0; i < commandCount; i++) {
+            dataWords[i + 2] += (s32)data;
+        }
+    } else if (version >= 0x40 && version < 0x44) {
+        firstCommand = dataWords[1];
+        commandCount = dataWords[2] + firstCommand;
+        commandTable = dataWords + 3 - firstCommand;
+        command = dataWords;
+        for (i = 0; i < dataWords[2]; i++) {
+            if (command[3] != 0) {
+                command[3] += (s32)data;
+            }
+            command++;
+        }
+    } else {
+        return;
+    }
+
+    for (i = firstCommand; i < commandCount; i++) {
+        s32* entry = (s32*)commandTable[i];
+
+        if (entry != NULL) {
+            entry[2] &= 0xF1FFFFFF;
+            entry[2] |= 0x08000000;
+        }
+    }
+
+    {
+        s32 groupCount = *(s32*)objects;
+        s32* groups = (s32*)objects + 1;
+
+        for (i = 0; i < groupCount; i++) {
+            if (groups[i] != 0) {
+                groups[i] += (s32)objects;
+            }
+        }
+
+        for (i = 0; i < groupCount; i++) {
+            PSTextureGroup* group = (PSTextureGroup*)groups[i];
+            u32 j;
+
+            if (group == NULL) {
+                continue;
+            }
+
+            for (j = 0; j < group->count; j++) {
+                if (group->entries[j] != 0) {
+                    group->entries[j] += (u32)objects;
+                }
+            }
+
+            if (group->format != 8 && group->format != 9 &&
+                group->format != 10) {
+                continue;
+            }
+
+            if (group->paletteFlags & 1) {
+                if (group->entries[group->count] != 0) {
+                    group->entries[group->count] += (u32)objects;
+                }
+            } else if (group->paletteCount != 0) {
+                for (j = group->count;
+                     j < group->count + group->paletteCount; j++) {
+                    if (group->entries[j] != 0) {
+                        group->entries[j] += (u32)objects;
+                    }
+                }
+            } else {
+                for (j = group->count; j < group->count * 2; j++) {
+                    if (group->entries[j] != 0) {
+                        group->entries[j] += (u32)objects;
+                    }
+                }
+            }
+        }
+
+        if (locations != NULL) {
+            s32* groups = (s32*)locations + 1;
+
+            for (i = 0; i < groupCount; i++) {
+                PSFormGroup* group;
+                u32 j;
+
+                if (groups[i] == 0) {
+                    continue;
+                }
+
+                groups[i] += (s32)locations;
+                group = (PSFormGroup*)groups[i];
+                for (j = 0; j < group->count; j++) {
+                    if (group->entries[j] != 0) {
+                        group->entries[j] += (u32)locations;
+                    }
+                }
+            }
+        }
+    }
+}
 
 void psInitDataBank(s32 bankIndex, void* data, void* objects,
                     void* bankData, void* locations) {
@@ -1150,6 +1342,100 @@ void psKillAllParticle(void) {
 }
 #pragma dont_inline reset
 
+PSParticle* psGenerateParticle0(
+    PSParticle* parent, s32 linkNo, s32 bankIndex, void* object,
+    f32 posX, f32 posY, f32 posZ, u32 unused, u32 flags,
+    f32 velocityX, f32 velocityY, f32 velocityZ, u8 animIndex,
+    void* scriptData, u16 repeatCount, f32 lerpValue, f32 scaleFactor,
+    f32 frictionFactor, s32 objectValue, PSGeneratorState* generator,
+    s32 interpretNow) {
+    PSParticle* pp = _psListNew(parent, linkNo);
+
+    if (pp == NULL) {
+        return NULL;
+    }
+
+    if (generator != NULL) {
+        pp->scriptId = generator->familyId;
+    } else {
+        pp->scriptId = psGetNewIDNum();
+    }
+
+    pp->parentObj = NULL;
+    if (generator != NULL && generator->appSRT != NULL) {
+        psAttachParticleAppSRT(pp, generator->appSRT);
+    }
+
+    pp->bankIndex = bankIndex;
+    pp->linkNo = linkNo;
+    pp->flags = flags;
+    pp->animIndex = animIndex;
+    pp->positionX = posX;
+    pp->positionY = posY;
+    pp->positionZ = posZ;
+    pp->velocityX = velocityX;
+    pp->velocityY = velocityY;
+    pp->velocityZ = velocityZ;
+    pp->lerpValue = lerpValue;
+    pp->scaleFactor = scaleFactor;
+    pp->frictionFactor = frictionFactor;
+    pp->repeatCount = repeatCount + 1;
+    pp->scriptData = scriptData;
+    pp->savedPC = 0;
+    pp->pc = 0;
+
+    if (objectValue != 0) {
+        pp->flags |= 0x10;
+    }
+
+    pp->waitTimer = scriptData != NULL;
+    pp->objRefIndex = 0;
+    pp->pad0B = 0xFF;
+    pp->color1R = 0xFF;
+    pp->color1G = 0xFF;
+    pp->color1B = 0xFF;
+    pp->color1A = 0xFF;
+    pp->color2R = 0;
+    pp->color2G = 0;
+    pp->color2B = 0;
+    pp->color2A = 0;
+    pp->color1Timer = 0;
+    pp->color2Timer = 0;
+    pp->lerpTimer = 0;
+    pp->color1Countdown = 0;
+    pp->color2Countdown = 0;
+    pp->alphaMode = 0x33;
+    pp->alphaStart = ((flags >> 22) & 3) >= 2 ? 0 : 1;
+    pp->alphaEnd = 0xFF;
+    pp->alphaCountdown = 0;
+    pp->alphaTimer = 0;
+    pp->headingTimer = 0;
+    pp->headingAccel = lbl_8047D5B4;
+    pp->headingSpeed = lbl_8047D5B4;
+    pp->heading = lbl_8047D5B4;
+    pp->peopleObj = generator;
+
+    if (generator != NULL) {
+        generator->childCount++;
+    }
+
+    pp->cameraSlot = 0;
+    pp->sizeXCountdown = 0;
+    pp->sizeXTimer = 0;
+    pp->sizeXCurrent = 0xFF;
+    pp->sizeYCurrent = 0xFF;
+    pp->sizeYCountdown = 0;
+    pp->sizeYTimer = 0;
+    pp->sizeXTarget = 0xFF;
+    pp->sizeYTarget = 0xFF;
+    *(f32*)&pp->pad88 = lbl_8047D5B8;
+
+    if (interpretNow != 0) {
+        psInterpretParticle0(pp, NULL);
+    }
+    return pp;
+}
+
 PSParticle* psGenerateParticle(u8 linkNo, u8 bankIndex, u32 arg2,
                                f32 posX, f32 posY, f32 posZ, u32 flags,
                                f32 velocityX, f32 velocityY, f32 velocityZ,
@@ -1408,6 +1694,140 @@ s32 applyForceJObj(PSParticle* pp, PSForceJObj* jobj,
     pp->velocityY += force * dy;
     pp->velocityZ += force * dz;
     return FALSE;
+}
+
+void setVelToJObj(PSParticle* pp, PSForceJObj* jobj) {
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 speed;
+    f32 distanceSquared;
+    f32 scale;
+
+    if (jobj == NULL) {
+        return;
+    }
+
+    if (!(jobj->flags & 0x800000) && (jobj->flags & 0x40)) {
+        fn_8019D9DC(jobj);
+    }
+
+    speed = sqrtf(pp->velocityX * pp->velocityX +
+                  pp->velocityY * pp->velocityY +
+                  pp->velocityZ * pp->velocityZ);
+    dx = jobj->worldX - pp->positionX;
+    dy = jobj->worldY - pp->positionY;
+    dz = jobj->worldZ - pp->positionZ;
+    distanceSquared = dx * dx + dy * dy + dz * dz;
+    if (distanceSquared == 0.0f) {
+        return;
+    }
+
+    scale = speed / sqrtf(distanceSquared);
+    pp->velocityX = dx * scale;
+    pp->velocityY = dy * scale;
+    pp->velocityZ = dz * scale;
+}
+
+void modifyDir(PSParticle* pp, f32 angle) {
+    f32 yaw;
+    f32 pitch;
+    f32 yawSin;
+    f32 yawCos;
+    f32 pitchSin;
+    f32 pitchCos;
+    f32 magnitude;
+    f32 azimuth;
+    f32 radial;
+    f32 radialX;
+    f32 radialY;
+    f32 forward;
+    f32 flattened;
+
+    if (fabsf(pp->velocityZ) < lbl_80478AC8) {
+        yaw = pp->velocityY >= 0.0f ? lbl_8047D694 : lbl_8047D698;
+    } else {
+        yaw = atan2(pp->velocityY, pp->velocityZ);
+    }
+    yawSin = sin(yaw);
+    yawCos = cos(yaw);
+
+    flattened = pp->velocityZ * yawCos + pp->velocityY * yawSin;
+    if (fabsf(flattened) < lbl_80478AC8) {
+        pitch = pp->velocityX >= 0.0f ? lbl_8047D694 : lbl_8047D698;
+    } else {
+        pitch = atan2(pp->velocityX, flattened);
+    }
+    pitchSin = sin(pitch);
+    pitchCos = cos(pitch);
+
+    magnitude = sqrtf(pp->velocityX * pp->velocityX +
+                      pp->velocityY * pp->velocityY +
+                      pp->velocityZ * pp->velocityZ);
+    azimuth = lbl_8047D6A0 * lbl_8047D6A8 * fn_801ADC7C();
+    radial = magnitude * sin(angle);
+    radialX = radial * cos(azimuth);
+    radialY = radial * sin(azimuth);
+    forward = magnitude * cos(angle);
+
+    pp->velocityX = forward * pitchSin + radialX * pitchCos;
+    pp->velocityY = pitchSin * (-radialX * yawSin) +
+                    radialY * yawCos + pitchCos * (forward * yawSin);
+    pp->velocityZ = pitchSin * (-radialX * yawCos) -
+                    radialY * yawSin + pitchCos * (forward * yawCos);
+}
+
+void modifyDirGenBase(PSParticle* pp, f32 angle, f32 offsetX,
+                      f32 offsetY, f32 offsetZ) {
+    PSGeneratorState* generator = pp->peopleObj;
+    f32 baseX = generator->velocityX + offsetX;
+    f32 baseY = generator->velocityY + offsetY;
+    f32 baseZ = generator->velocityZ + offsetZ;
+    f32 yaw;
+    f32 pitch;
+    f32 yawSin;
+    f32 yawCos;
+    f32 pitchSin;
+    f32 pitchCos;
+    f32 magnitude;
+    f32 azimuth;
+    f32 radial;
+    f32 radialX;
+    f32 radialY;
+    f32 forward;
+    f32 flattened;
+
+    if (fabsf(baseZ) < lbl_80478AC8) {
+        yaw = baseY >= 0.0f ? lbl_8047D694 : lbl_8047D698;
+    } else {
+        yaw = atan2(baseY, baseZ);
+    }
+    yawSin = sin(yaw);
+    yawCos = cos(yaw);
+
+    flattened = baseZ * yawCos + baseY * yawSin;
+    if (fabsf(flattened) < lbl_80478AC8) {
+        pitch = baseX >= 0.0f ? lbl_8047D694 : lbl_8047D698;
+    } else {
+        pitch = atan2(baseX, flattened);
+    }
+    pitchSin = sin(pitch);
+    pitchCos = cos(pitch);
+
+    magnitude = sqrtf(pp->velocityX * pp->velocityX +
+                      pp->velocityY * pp->velocityY +
+                      pp->velocityZ * pp->velocityZ);
+    azimuth = lbl_8047D6A0 * lbl_8047D6A8 * fn_801ADC7C();
+    radial = magnitude * sin(angle);
+    radialX = radial * cos(azimuth);
+    radialY = radial * sin(azimuth);
+    forward = magnitude * cos(angle);
+
+    pp->velocityX = forward * pitchSin + radialX * pitchCos;
+    pp->velocityY = pitchSin * (-radialX * yawSin) +
+                    radialY * yawCos + pitchCos * (forward * yawSin);
+    pp->velocityZ = pitchSin * (-radialX * yawCos) -
+                    radialY * yawSin + pitchCos * (forward * yawCos);
 }
 
 void psCopyGeneratorData(PSParticle* gen, void* peopleObj) {
@@ -2626,6 +3046,102 @@ void psDispSubMakePolygon(PSParticle* pp, void* polygonData,
             }
         }
         return;
+    }
+}
+
+void psExecGenerator(u32 linkMask) {
+    PSGeneratorState* gen;
+
+    while (lbl_8047B180 != NULL) {
+        lbl_8047B180 = fn_801A3E64();
+    }
+
+    lbl_8047B184 = NULL;
+    gen = lbl_8047B188;
+    while (gen != NULL) {
+        u8* raw = (u8*)gen;
+        u16 generatorFlags = *(u16*)(raw + 0x88);
+
+        if ((linkMask & (1 << (gen->linkNo + 16))) != 0 ||
+            (gen->flags & 0x800) != 0) {
+            lbl_8047B184 = (PSGeneratorState**)gen;
+            gen = gen->next;
+            continue;
+        }
+
+        if ((generatorFlags & 2) == 0 && (generatorFlags & 1) != 0 &&
+            gen->linkedJObj != NULL) {
+            PSForceJObj* jobj = gen->linkedJObj;
+
+            if (!(jobj->flags & 0x800000) && (jobj->flags & 0x40)) {
+                fn_8019D9DC(jobj);
+            }
+            gen->positionX = jobj->worldX;
+            gen->positionY = jobj->worldY;
+            gen->positionZ = jobj->worldZ;
+        }
+
+        if (*(f32*)(raw + 0x08) < 0.0f) {
+            gen->lifetime -= *(f32*)(raw + 0x08);
+        } else {
+            gen->lifetime += *(f32*)(raw + 0x08) * fn_801ADC7C();
+        }
+
+        if (gen->lifetime >= 1.0f) {
+            generateParticle_8017424C(gen);
+        }
+
+        if (gen->maxLife != 0) {
+            gen->maxLife--;
+            if (gen->maxLife == 0) {
+                PSGeneratorState* previous = (PSGeneratorState*)lbl_8047B184;
+
+                if (raw[0x17] != 0) {
+                    gen->flags |= 0x800;
+                } else {
+                    if (gen->angleFlags & 0x80) {
+                        psKillGeneratorChild(gen);
+                    }
+
+                    if (gen->childCount != 0) {
+                        *(f32*)(raw + 0x08) = 0.0f;
+                        gen->maxLife = 1;
+                        previous = gen;
+                    } else if ((gen->angleFlags & 0x3800) != 0 &&
+                               gen->appSRT != NULL &&
+                               ((PSAppSRT*)gen->appSRT)->owner == gen &&
+                               ((PSAppSRT*)gen->appSRT)->refCount != 1) {
+                        *(f32*)(raw + 0x08) = 0.0f;
+                        gen->maxLife = 1;
+                        previous = gen;
+                    } else {
+                        if (previous == NULL) {
+                            lbl_8047B188 = gen->next;
+                        } else {
+                            previous->next = gen->next;
+                        }
+
+                        if (gen->appSRT != NULL) {
+                            psRemoveGeneratorAppSRT(gen);
+                        }
+                        gen->next = lbl_8047B18C;
+                        lbl_8047B18C = gen;
+                        lbl_8047B118--;
+                    }
+                    lbl_8047B184 = (PSGeneratorState**)previous;
+                }
+
+                if (lbl_8047B184 != NULL) {
+                    gen = ((PSGeneratorState*)lbl_8047B184)->next;
+                } else {
+                    gen = lbl_8047B188;
+                }
+                continue;
+            }
+        }
+
+        lbl_8047B184 = (PSGeneratorState**)gen;
+        gen = gen->next;
     }
 }
 
