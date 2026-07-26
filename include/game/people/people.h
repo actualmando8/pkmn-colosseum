@@ -166,7 +166,7 @@ typedef struct PeopleEntry {
     f32  field_38;          /* 0x38 */
     f32  talkRange;         /* 0x3C */
     f32  field_40;          /* 0x40 */
-    u32  field_44;          /* 0x44 */
+    f32  field_44;          /* 0x44 */
     s32  walkTargetNode;    /* 0x48 */
     u16  flagId;            /* 0x4C */
     u16  pad4E;             /* 0x4E */

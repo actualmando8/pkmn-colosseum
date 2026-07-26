@@ -37,6 +37,9 @@ extern const volatile f64 lbl_8047DE30;
 extern const volatile f32 lbl_8047DE38;
 extern const volatile f32 lbl_8047DE3C;
 extern const volatile f32 lbl_8047DE40;
+extern const f32 lbl_8047DE50;
+extern const f32 lbl_8047DE54;
+extern const f32 lbl_8047DE58;
 
 typedef union SplineFloatShape {
     f32 value;
@@ -213,6 +216,31 @@ struct HSD_Spline {
     f32* segLength;
     f32 (*segPoly)[5];
 };
+
+f32 fn_801B2560(f32 a, f32 b, f32 c, f32 d, f32 e, f32 f)
+{
+    f32 b2 = b * b;
+    f32 a2 = a * a;
+    f32 b3 = b2 * b;
+    f32 scaled_b2 = lbl_8047DE40 * b2;
+    f32 ab2 = b2 * a;
+    f32 a2b3 = a2 * b3;
+    f32 a2b2 = scaled_b2 * a2;
+    f32 weighted = lbl_8047DE3C * a2b3;
+    f32 difference = a2b3 - ab2;
+    f32 last = a2b3 - ab2;
+    f32 middle = difference - ab2;
+    f32 first = weighted * a;
+    f32 neg_first = -first;
+
+    first -= a2b2;
+    b += middle;
+    neg_first += a2b2;
+    neg_first *= d;
+    neg_first = c * first + neg_first;
+    neg_first = e * b + neg_first;
+    return f * last + neg_first;
+}
 
 static inline void ColSplGetCardinalPoint(SplineVec3* p, SplineVec3* cp,
                                           f32 tension, f32 u)
@@ -603,6 +631,21 @@ extern void fn_800BA6F4(s32 chan, u8 enable, s32 ambSrc, s32 matSrc,
                         s32 lightMask, s32 diffFn, s32 attnFn);
 extern void HSD_MulColor(HsdChanColor* color0, HsdChanColor* color1,
                          HsdChanColor* result);
+
+void fn_801B28C8(HsdChanColor* ambient, HsdChanColor* diffuse,
+                 HsdChanColor* specular, f32 alpha)
+{
+    lbl_80465710.ambient = *ambient;
+    lbl_80465710.diffuse = *diffuse;
+    lbl_80465710.specular = *specular;
+
+    if (alpha <= lbl_8047DE50) {
+        alpha = lbl_8047DE50;
+    } else if (alpha >= lbl_8047DE54) {
+        alpha = lbl_8047DE54;
+    }
+    lbl_80465710.alpha = lbl_8047DE58 * alpha;
+}
 
 void fn_801B3D1C(HSD_Chan* ch);
 void fn_801B3AE8(s32 chan);
