@@ -22,7 +22,6 @@ extern void  PObjSetupMtx(HSD_PObj* pobj, Mtx vmtx, Mtx pmtx,
 extern s32   PObjLoad(HSD_PObj* pobj, HSD_PObjDesc* desc);
 extern void  PObjUpdateFunc(HSD_PObj* pobj, s32 idx, f32* weight_ptr);
 extern void  HSD_JObjUnrefThis(HSD_JObj* jobj);
-extern void  HSD_JObjRefThis(HSD_JObj* jobj);
 extern void* HSD_IDGetDataFromTable(void* table, u32 id, s32* success);
 extern void  HSD_AObjRemove(HSD_AObj* aobj);
 extern void  fn_801A6960(void* mem);
@@ -714,6 +713,139 @@ void HSD_ClearVtxDesc(void)
 }
 #pragma pop
 
+void fn_801ACDAC(HSD_PObj* pobj, u32* vertex_count, u32* triangle_count)
+{
+    u32 vertices = 0;
+    u32 triangles = 0;
+
+    for (; pobj != NULL; pobj = pobj->next) {
+        HSD_VtxDescList* desc = pobj->verts;
+        u32 stride = 0;
+
+        for (; desc->attr != 0xFF; desc++) {
+            u32 size;
+
+            switch (desc->attr_type) {
+            case 2:
+                stride += 1;
+                continue;
+            case 3:
+                stride += 2;
+                continue;
+            case 1:
+                break;
+            default:
+                continue;
+            }
+
+            if (desc->attr == 11 || desc->attr == 12) {
+                switch (desc->comp_type) {
+                case 0:
+                case 3:
+                    size = 2;
+                    break;
+                case 1:
+                case 4:
+                    size = 3;
+                    break;
+                case 2:
+                case 5:
+                    size = 4;
+                    break;
+                }
+            } else {
+                switch (desc->comp_type) {
+                case 0:
+                case 1:
+                    size = 1;
+                    break;
+                case 2:
+                case 3:
+                    size = 2;
+                    break;
+                case 4:
+                    size = 4;
+                    break;
+                default:
+                    goto next_pobj;
+                }
+            }
+
+            switch (desc->attr) {
+            case 0:
+                stride += 1;
+                break;
+            case 9:
+                stride += size * (desc->comp_cnt == 0 ? 2 : 3);
+                break;
+            case 10:
+                if (desc->comp_cnt == 0) {
+                    stride += size * 3;
+                }
+                break;
+            case 11:
+            case 12:
+                stride += size;
+                break;
+            default:
+                if (desc->attr >= 13 && desc->attr < 21) {
+                    stride += size * (desc->comp_cnt == 0 ? 1 : 2);
+                } else {
+                    goto next_pobj;
+                }
+                break;
+            }
+        }
+
+        if (pobj->display != NULL) {
+            u8* display = pobj->display;
+            u32 offset = 0;
+            u32 length = pobj->n_display << 5;
+
+            while (offset < length) {
+                u32 primitive = display[offset++] & 0xF8;
+
+                if (primitive != 0) {
+                    u32 count =
+                        ((u32) display[offset] << 8) | display[offset + 1];
+                    offset += count * stride + 2;
+                    vertices += count;
+
+                    switch (primitive) {
+                    case 0x80:
+                        triangles += count >> 1;
+                        break;
+                    case 0x90:
+                        triangles += count / 3;
+                        break;
+                    case 0x98:
+                    case 0xA0:
+                        triangles += count - 2;
+                        break;
+                    }
+                }
+            }
+        }
+
+    next_pobj:
+        continue;
+    }
+
+    if (vertex_count != NULL) {
+        *vertex_count = vertices;
+    }
+    if (triangle_count != NULL) {
+        *triangle_count = triangles;
+    }
+}
+
+static inline void HSD_JObjRefThis(HSD_JObj* jobj)
+{
+    if (jobj != NULL) {
+        iref_INC(jobj);
+    }
+}
+
 static inline void resolveEnvelopeRefs(HSD_SList* list,
                                        HSD_EnvelopeDesc** desc_list)
 {
@@ -728,7 +860,8 @@ static inline void resolveEnvelopeRefs(HSD_SList* list,
             envelope->jobj = HSD_IDGetDataFromTable(
                 NULL, (u32) desc->joint, NULL);
             if (envelope->jobj == NULL) {
-                __assert(&lbl_8047DCB8, 0x2E0, &lbl_8047DD10);
+                __assert(&lbl_8047DCB8, 0x2CA,
+                         (char*) lbl_80274EE0 + 0x1F0);
             }
             HSD_JObjRefThis(envelope->jobj);
             envelope = envelope->next;
@@ -753,7 +886,8 @@ static inline void resolvePObjRefs(HSD_PObj* pobj, HSD_PObjDesc* desc)
             pobj->u.jobj = HSD_IDGetDataFromTable(
                 NULL, (u32) desc->u.joint, NULL);
             if (pobj->u.jobj == NULL) {
-                __assert(&lbl_8047DCB8, 0x2FB, &lbl_8047DD10);
+                __assert(&lbl_8047DCB8, 0x2E5,
+                         (char*) lbl_80274EE0 + 0x230);
             }
             HSD_JObjRefThis(pobj->u.jobj);
         }
@@ -899,7 +1033,6 @@ static inline HSD_ShapeSet* loadShapeSetDesc(HSD_ShapeSetDesc* desc)
     } else {
         shape_set->blend.bl = 0.0f;
     }
-    shape_set->aobj = NULL;
     return shape_set;
 }
 
@@ -1238,6 +1371,68 @@ void drawShapeAnim(HSD_PObj* pobj)
     fn_801ABDD4(pobj, vertex_buffer, normal_buffer);
 }
 
+void fn_801AC1F8(HSD_ShapeSet* shape_set, s32 shape_id, s32 arrayidx,
+                 f32 dst[9])
+{
+    char* strings = (char*) lbl_80274EE0;
+    u8* index_array;
+    s32 i;
+    s32 idx;
+    void* src_base;
+
+    if (shape_set->normal_desc->attr != 25) {
+        __assert(&lbl_8047DCB8, 1201, strings + 0x130);
+    }
+
+    index_array = shape_set->normal_idx_list[shape_id];
+    if (shape_set->normal_desc->attr_type == 3) {
+        idx = index_array[arrayidx * 2];
+        idx = (idx << 8) + index_array[arrayidx * 2 + 1];
+    } else {
+        idx = index_array[arrayidx];
+    }
+
+    if (shape_set->normal_desc->comp_cnt != 0) {
+        __assert(&lbl_8047DCB8, 1210, strings + 0x15C);
+    }
+
+    src_base = (u8*) shape_set->normal_desc->vertex +
+               idx * shape_set->normal_desc->stride;
+    if (shape_set->normal_desc->comp_type == 4) {
+        extern void* memcpy(void*, const void*, u32);
+        memcpy(dst, src_base, sizeof(f32[9]));
+    } else {
+        s32 decimal_point = 1 << shape_set->normal_desc->frac;
+
+        switch (shape_set->normal_desc->comp_type) {
+        case 0:
+            for (i = 0; i < 9; i++) {
+                dst[i] = (f32) ((u8*) src_base)[i] / decimal_point;
+            }
+            break;
+        case 1:
+            for (i = 0; i < 9; i++) {
+                dst[i] = (f32) ((s8*) src_base)[i] / decimal_point;
+            }
+            break;
+        case 2:
+            for (i = 0; i < 9; i++) {
+                dst[i] = (f32) ((u16*) src_base)[i] / decimal_point;
+            }
+            break;
+        case 3:
+            for (i = 0; i < 9; i++) {
+                dst[i] = (f32) ((s16*) src_base)[i] / decimal_point;
+            }
+            break;
+        default:
+            HSD_Panic(&lbl_8047DCB8, 1241,
+                      strings + 0x18C);
+            break;
+        }
+    }
+}
+
 /* Shape-anim source decoders. The retail range keeps the sysdolphin
  * pobj.c bodies (assert/panic lines 1145/1188 and 1082/1125), so the
  * component fetch below mirrors that source one-for-one. */
@@ -1389,9 +1584,64 @@ typedef struct Quaternion {
     f32 w;
 } Quaternion;
 
+extern double acos(double x);
+extern double sin(double x);
+
+s32 fn_801AD7CC(Quaternion* p, Quaternion* q, Quaternion* out, f32 t)
+{
+    f32 cosom;
+    f32 t2;
+    f32 theta;
+    f32 sinom;
+    f32 sp;
+    f32 sq;
+
+    cosom = p->x * q->x + p->y * q->y + p->z * q->z + p->w * q->w;
+
+    if ((1.0F + cosom) > 1e-10F) {
+        if ((1.0F - cosom) > 1e-10F) {
+            theta = acos(cosom);
+            sinom = sin(theta);
+            sp = (f32) sin((1.0F - t) * theta) / sinom;
+            sq = (f32) sin(t * theta) / sinom;
+        } else {
+            sq = t;
+            sp = (f32) (1.0 - (f64) t);
+        }
+        out->x = sp * p->x + sq * q->x;
+        out->y = sp * p->y + sq * q->y;
+        out->z = sp * p->z + sq * q->z;
+        out->w = sp * p->w + sq * q->w;
+    } else {
+        out->x = -p->y;
+        out->y = p->x;
+        out->z = -p->w;
+        out->w = p->z;
+
+        if (t < 0.5F) {
+            sp = sin((f32) (1.5707963267948966 * (1.0F - (2.0F * t))));
+            sq = sin((f32) (1.5707963267948966 * (2.0F * t)));
+            out->x = sp * p->x + sq * q->x;
+            out->y = sp * p->y + sq * q->y;
+            out->z = sp * p->z + sq * q->z;
+            out->w = sp * p->w + sq * q->w;
+        } else {
+            t -= 0.5F;
+            t2 = 2.0F * t;
+            sp = sin((f32) (1.5707963267948966 * (1.0F - t2)));
+            sq = sin((f32) (1.5707963267948966 * t2));
+            out->x = sp * p->x + sq * q->x;
+            out->y = sp * p->y + sq * q->y;
+            out->z = sp * p->z + sq * q->z;
+            out->w = sp * p->w + sq * q->w;
+        }
+    }
+
+    return 1;
+}
+
 extern const f32 lbl_8047DD1C;
 extern double cos(double x);
-extern double sin(double x);
 
 s32 fn_801ADAAC(EulerVec* euler, Quaternion* q)
 {

@@ -4130,7 +4130,13 @@ hsd/hsd_displayfunc.c:
 	.text       start:0x80197A64 end:0x80198F7C
 
 hsd/hsd_dobj.c:
-	.text       start:0x80198F7C end:0x8019B750
+	.text       start:0x80198F7C end:0x8019A24C
+
+hsd/hsd_dobj_r43_8019A24C.c:
+	.text       start:0x8019A24C end:0x8019B490
+
+hsd/hsd_dobj_r43_8019B490.c:
+	.text       start:0x8019B490 end:0x8019B750
 
 hsd/hsd_fobj_tail_exact_8019B750.c:
 	.text       start:0x8019B750 end:0x8019B7C0
@@ -4313,7 +4319,31 @@ hsd/hsd_obj_info_exact_801AA568.c:
 	.text       start:0x801AA568 end:0x801AA608
 
 hsd/hsd_pobj_range_801AA608.c:
-	.text       start:0x801AA608 end:0x801ADD48
+	.text       start:0x801AA608 end:0x801AAEA8
+
+hsd/hsd_pobj_r43_801AAEA8.c:
+	.text       start:0x801AAEA8 end:0x801AB538
+
+hsd/hsd_pobj_r43_801AB538.c:
+	.text       start:0x801AB538 end:0x801AB67C
+
+hsd/hsd_pobj_r43_801AB67C.c:
+	.text       start:0x801AB67C end:0x801ABDD4
+
+hsd/hsd_pobj_r43_801ABDD4.c:
+	.text       start:0x801ABDD4 end:0x801AC1F8
+
+hsd/hsd_pobj_r43_801AC1F8.c:
+	.text       start:0x801AC1F8 end:0x801AC4BC
+
+hsd/hsd_pobj_r43_suffix_801AC4BC.c:
+	.text       start:0x801AC4BC end:0x801AD354
+
+hsd/hsd_pobj_r43_801AD354.c:
+	.text       start:0x801AD354 end:0x801AD61C
+
+hsd/hsd_pobj_r43_801AD61C.c:
+	.text       start:0x801AD61C end:0x801ADD48
 
 hsd/hsd_robj_range_801ADD48.c:
 	.text       start:0x801ADD48 end:0x801ADF54
