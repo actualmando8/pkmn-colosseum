@@ -11,7 +11,7 @@
  */
 #include "dolphin/types.h"
 
-extern u8 lbl_8047A470;
+extern s8 lbl_8047A470;
 extern void* lbl_8047A480;
 extern s8 lbl_8047A490;
 extern f32 lbl_8047A478;

@@ -160,7 +160,7 @@ void fn_80035F34(void) {
  *    li r4, 0
  *    bl floorLink
  *
- *    ; Reset floor allocation (0x59608)
+ *    ; Reset floor allocation (0x05960008)
  *    li r3, 0
  *    lis r4, 0x596
  *    addi r4, r4, 8
@@ -175,10 +175,11 @@ void fn_80035E04(void) {
     extern const MovieCue lbl_802E51A8[5];
     extern s32 fn_801E16D0(void);
     extern void fn_80166A28(u32);
+    u32 nextIndex;
     u32 cueIndex = 0;
 
     while ((fn_801E1874() & 0xFF) == THP_STATE_PLAYING) {
-        u32 nextIndex = cueIndex;
+        nextIndex = cueIndex;
 
         if (cueIndex < 5) {
             s32 frame = fn_801E16D0();
@@ -206,7 +207,7 @@ void fn_80035E04(void) {
     floorLink(1, 0);
 
     /* Reset floor allocation parameters */
-    floorSetFadeScript(0, 0x59608);
+    floorSetFadeScript(0, 0x05960008);
 }
 
 /* =======================================================================

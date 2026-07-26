@@ -725,7 +725,7 @@ GSDVDWork* fn_80167F28(const char* path)
         return NULL;
     }
     if (!DVDOpen(path, work->fileInfo)) {
-        __assert(lbl_8047D584, 0x26A, lbl_8047D58C);
+        __assert("GSdvd.c", 0x26A, "FALSE");
         fn_80168164((u8*)work);
         return NULL;
     }
@@ -768,11 +768,11 @@ u32 fn_80167FA8(u32 workCount)
     if (fn_800057A8() != 4) {
         switch (fn_800057A0()) {
         case 0:
-            lbl_80478C24 = lbl_8047D578;
+            lbl_80478C24 = (const u8*)"GC6J";
             break;
         case 1:
         case 2:
-            lbl_80478C24 = lbl_8047D594;
+            lbl_80478C24 = (const u8*)"GC6E";
             break;
         }
         destination = fn_800A7BCC();
@@ -830,38 +830,39 @@ void fn_80168284(void)
     u8 capacity;
     GSFilter* filter;
 
-    if (lbl_804526E0.count == 0 || lbl_804526E0.drawingCount == 0) {
-        return;
-    }
-    capacity = lbl_804526E0.capacity;
-    filter = lbl_804526E0.filters;
-    fn_800D88DC(1);
-    fn_800D888C(6);
-    fn_800D9B58(lbl_8047D5A0, lbl_8047D5A0, lbl_8047D5A4,
-                lbl_8047D5A8);
-    fn_800DA4C4(1, 6, 7);
-    fn_800DA2BC(1, 1, 0);
-    fn_800DA100(0, 7, 0, 0, 7, 0);
-    fn_800DA1E8(1, 1, 1);
-    fn_800D9ED8(1);
-    fn_800DA028(0);
-    fn_800D7820(lbl_804526E0.renderState);
-    fn_800D6A00(6);
-    fn_800D67BC(lbl_804526E0.drawingCount * 4);
-    for (index = 0; index < capacity; index++, filter++) {
-        if (filter->drawing != 0) {
-            fn_800D5FA4(0);
-            fn_800D5A38(0, index);
-            fn_800D5FA4(1);
-            fn_800D5A38(0, index);
-            fn_800D5FA4(2);
-            fn_800D5A38(0, index);
-            fn_800D5FA4(3);
-            fn_800D5A38(0, index);
+    if (lbl_804526E0.count != 0) {
+        if (lbl_804526E0.drawingCount != 0) {
+            capacity = lbl_804526E0.capacity;
+            filter = lbl_804526E0.filters;
+            fn_800D88DC(1);
+            fn_800D888C(6);
+            fn_800D9B58(lbl_8047D5A0, lbl_8047D5A0, lbl_8047D5A4,
+                        lbl_8047D5A8);
+            fn_800DA4C4(1, 6, 7);
+            fn_800DA2BC(1, 1, 0);
+            fn_800DA100(0, 7, 0, 0, 7, 0);
+            fn_800DA1E8(1, 1, 1);
+            fn_800D9ED8(1);
+            fn_800DA028(0);
+            fn_800D7820(lbl_804526E0.renderState);
+            fn_800D6A00(6);
+            fn_800D67BC(lbl_804526E0.drawingCount * 4);
+            for (index = 0; index < capacity; index++, filter++) {
+                if (filter->drawing != 0) {
+                    fn_800D5FA4(0);
+                    fn_800D5A38(0, index);
+                    fn_800D5FA4(1);
+                    fn_800D5A38(0, index);
+                    fn_800D5FA4(2);
+                    fn_800D5A38(0, index);
+                    fn_800D5FA4(3);
+                    fn_800D5A38(0, index);
+                }
+            }
+            fn_800D6728();
+            fn_800D9ED8(0);
         }
     }
-    fn_800D6728();
-    fn_800D9ED8(0);
 }
 
 void* fn_8016824C(u32 size)
@@ -1191,11 +1192,11 @@ void _errorTask_State_None_80187B24(s32 state)
     case -1:
         lbl_8047B0F0 = 9;
         break;
-    case 4:
-        lbl_8047B0F0 = 3;
-        break;
     case 5:
         lbl_8047B0F0 = 1;
+        break;
+    case 4:
+        lbl_8047B0F0 = 3;
         break;
     case 6:
         lbl_8047B0F0 = 5;
