@@ -15,7 +15,15 @@ typedef struct GSbound {
 typedef struct HSDJObj {
     u8 _pad0[0x14];
     u32 flags;
+    u8 _pad18[0x2C];
+    f32 matrix[3][4];
 } HSDJObj;
+
+typedef struct GSvec {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSvec;
 
 typedef struct GSmodelResource {
     HSD_Joint* joint;
@@ -28,9 +36,14 @@ typedef struct GSmodel {
     HSD_JObj* blendJObj;
     HSD_JObj* blendJObjA;
     HSD_JObj* blendJObjB;
-    u8 _pad18[0x34];
+    GSvec position;
+    GSvec rotation;
+    GSvec scale;
+    u8 _pad3C[0x10];
     GSbound bound;
-    u8 _pad80[0xC4];
+    u8 _pad80[0x54];
+    f32 blendFactor;
+    u8 _padD8[0x6C];
     void* linkedGSparticleBank;
 } GSmodel;
 
@@ -118,11 +131,6 @@ void GSmodelRecalculateBound(GSmodel* model)
 void _modelBoundVertex__FUlPvPv(u32 flags, void* vertex, void* arg)
 {
     typedef f32 GSmtx[3][4];
-    typedef struct GSvec {
-        f32 x;
-        f32 y;
-        f32 z;
-    } GSvec;
     typedef struct ModelBoundArgs {
         GSmodel* model;
         GSmtx* matrix;
