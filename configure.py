@@ -3940,6 +3940,24 @@ config.libs = [
             ),
             Object(
                 CodeCandidate,
+                "hsd/hsd_tobj_candidate_801BBDDC_r42_801BC33C.c",
+                mw_version="GC/1.3",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-fp_contract off",
+                    "-O2",
+                ],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_tobj_candidate_801BBDDC_r42_801BC8BC.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-fp_contract off"],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
                 "hsd/hsd_tobj_candidate_801BBDDC_r41_801BDD74_gc125n.c",
                 mw_version="GC/1.2.5n",
                 extra_cflags=["-use_lmw_stmw on", "-fp_contract off"],
@@ -4459,6 +4477,34 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/effect/fade_range_801C4CB8.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/fade_r42_801C41C8_gc125n.c",
+                mw_version="GC/1.2.5n",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/fade_r42_801C423C.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/fade_candidate_801C43F4_r42_801C43F4_gc125n.c",
+                mw_version="GC/1.2.5n",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/effect/fade_candidate_801C43F4_r42_801C47D0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -5896,7 +5942,6 @@ config.libs = [
                     (Matching, "game/effect/fade_exact_801C431C.c"),
                     (CodeCandidate, "game/effect/fade_candidate_801C432C.c"),
                     (Matching, "game/effect/fade_exact_801C43E4.c"),
-                    (CodeCandidate, "game/effect/fade_candidate_801C43F4.c"),
                 ]
             ],
             *[
@@ -5942,6 +5987,20 @@ config.libs = [
                     (CodeCandidate, "game/gba/gba_misc_candidate_8008ABE4.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "game/gba/gba_misc_candidate_8008ABE4_r42_8008AC34_gc20.c",
+                mw_version="GC/2.0",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
+            Object(
+                CodeCandidate,
+                "game/gba/gba_misc_candidate_8008ABE4_r42_8008AE18.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                progress_category="game",
+            ),
             Object(
                 CodeCandidate,
                 "game/gba/gba_misc_candidate_80089F78.c",
@@ -7671,6 +7730,34 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
+                CodeCandidate,
+                "hsd/hsd_lobj_r42_801A4B00.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on", "-O2"],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_lobj_r42_801A4F54.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_lobj_r42_801A66E0.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on", "-O2"],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_lobj_r42_801A678C.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="hsd",
+            ),
+            Object(
                 Matching,
                 "hsd/hsd_lobj_tail_exact_801A68D0.c",
                 mw_version="GC/1.3",
@@ -8050,6 +8137,44 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "hsd/hsd_aobj_candidate_801C028C.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-inline deferred",
+                    "-O2",
+                ],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_aobj_candidate_801C028C_r42_801C25E4.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-inline deferred",
+                ],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_aobj_candidate_801C028C_r42_801C2670.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-inline deferred",
+                    "-O2",
+                ],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_aobj_candidate_801C028C_r42_801C27F4.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=[
                     "-use_lmw_stmw on",

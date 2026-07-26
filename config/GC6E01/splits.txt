@@ -868,7 +868,13 @@ game/gba/gba_misc_exact_8008AB4C.c:
 	.text       start:0x8008AB4C end:0x8008ABE4
 
 game/gba/gba_misc_candidate_8008ABE4.c:
-	.text       start:0x8008ABE4 end:0x8008C7B0
+	.text       start:0x8008ABE4 end:0x8008AC34
+
+game/gba/gba_misc_candidate_8008ABE4_r42_8008AC34_gc20.c:
+	.text       start:0x8008AC34 end:0x8008AE18
+
+game/gba/gba_misc_candidate_8008ABE4_r42_8008AE18.c:
+	.text       start:0x8008AE18 end:0x8008C7B0
 
 game/gbaCommunication_prefix.c:
 	.text       start:0x8008C7B0 end:0x80090720
@@ -4205,7 +4211,19 @@ hsd/hsd_jobj_exact_801A301C.c:
 	.text       start:0x801A301C end:0x801A4000
 
 hsd/hsd_lobj.c:
-	.text       start:0x801A4000 end:0x801A68D0
+	.text       start:0x801A4000 end:0x801A4B00
+
+hsd/hsd_lobj_r42_801A4B00.c:
+	.text       start:0x801A4B00 end:0x801A4F54
+
+hsd/hsd_lobj_r42_801A4F54.c:
+	.text       start:0x801A4F54 end:0x801A66E0
+
+hsd/hsd_lobj_r42_801A66E0.c:
+	.text       start:0x801A66E0 end:0x801A678C
+
+hsd/hsd_lobj_r42_801A678C.c:
+	.text       start:0x801A678C end:0x801A68D0
 
 hsd/hsd_lobj_tail_exact_801A68D0.c:
 	.text       start:0x801A68D0 end:0x801A69C0
@@ -4445,7 +4463,13 @@ hsd/hsd_tobj_image_exact_801BBD3C.c:
 	.text       start:0x801BBD3C end:0x801BBDDC
 
 hsd/hsd_tobj_candidate_801BBDDC.c:
-	.text       start:0x801BBDDC end:0x801BDD74
+	.text       start:0x801BBDDC end:0x801BC33C
+
+hsd/hsd_tobj_candidate_801BBDDC_r42_801BC33C.c:
+	.text       start:0x801BC33C end:0x801BC8BC
+
+hsd/hsd_tobj_candidate_801BBDDC_r42_801BC8BC.c:
+	.text       start:0x801BC8BC end:0x801BDD74
 
 hsd/hsd_tobj_candidate_801BBDDC_r41_801BDD74_gc125n.c:
 	.text       start:0x801BDD74 end:0x801BE2B4
@@ -4466,7 +4490,16 @@ hsd/hsd_aobj_exact_801C0270.c:
 	.text       start:0x801C0270 end:0x801C028C
 
 hsd/hsd_aobj_candidate_801C028C.c:
-	.text       start:0x801C028C end:0x801C29C4
+	.text       start:0x801C028C end:0x801C25E4
+
+hsd/hsd_aobj_candidate_801C028C_r42_801C25E4.c:
+	.text       start:0x801C25E4 end:0x801C2670
+
+hsd/hsd_aobj_candidate_801C028C_r42_801C2670.c:
+	.text       start:0x801C2670 end:0x801C27F4
+
+hsd/hsd_aobj_candidate_801C028C_r42_801C27F4.c:
+	.text       start:0x801C27F4 end:0x801C29C4
 
 hsd/hsd_aobj_exact_801C29C4.c:
 	.text       start:0x801C29C4 end:0x801C2A60
@@ -4508,7 +4541,13 @@ game/battle/battle_grid_exact_801C3F10.c:
 	.text       start:0x801C3F10 end:0x801C4078
 
 game/effect/fade.c:
-	.text       start:0x801C4078 end:0x801C431C
+	.text       start:0x801C4078 end:0x801C41C8
+
+game/effect/fade_r42_801C41C8_gc125n.c:
+	.text       start:0x801C41C8 end:0x801C423C
+
+game/effect/fade_r42_801C423C.c:
+	.text       start:0x801C423C end:0x801C431C
 
 game/effect/fade_exact_801C431C.c:
 	.text       start:0x801C431C end:0x801C432C
@@ -4519,8 +4558,11 @@ game/effect/fade_candidate_801C432C.c:
 game/effect/fade_exact_801C43E4.c:
 	.text       start:0x801C43E4 end:0x801C43F4
 
-game/effect/fade_candidate_801C43F4.c:
-	.text       start:0x801C43F4 end:0x801C4814
+game/effect/fade_candidate_801C43F4_r42_801C43F4_gc125n.c:
+	.text       start:0x801C43F4 end:0x801C47D0
+
+game/effect/fade_candidate_801C43F4_r42_801C47D0.c:
+	.text       start:0x801C47D0 end:0x801C4814
 
 game/effect/fade_effect_candidate_801C4814.c:
 	.text       start:0x801C4814 end:0x801C4C98
