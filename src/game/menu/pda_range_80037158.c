@@ -4005,10 +4005,31 @@ static inline u32 pdaLoadPokemon(s32 index)
     return 0;
 }
 
-/* Shiny/color variant of the memo entry, or 0 when it cannot be resolved. */
-static inline u8 pdaGetPokemonColor(s32 index)
+/* As pdaLoadPokemon, but from an entry ID the caller already has in hand. */
+static inline u32 pdaLoadPokemonId(u16 id)
 {
-    u32 work = pdaLoadPokemon(index);
+    u32 work = lbl_8047A4E0;
+    u32 species = id;
+    u32 rnd;
+
+    if (work != 0) {
+        if (id >= 0x8000) {
+            species = id & 0x3fff;
+        }
+        pokemonCreate(work, (u16)species, 10, gamedataGetStatus(0, 1));
+        rnd = memoDataGetPokemonRndFromID(0, species);
+        species = memoDataGetPokemonTrainerRndFromID(0, species);
+        pokemonBiosSetRnd(work, rnd);
+        pokemonBiosSetCatchTrainerRnd(work, species);
+        return lbl_8047A4E0;
+    }
+    return 0;
+}
+
+/* Shiny/color variant of the memo entry, or 0 when it cannot be resolved. */
+static inline u8 pdaGetPokemonColor(u16 id)
+{
+    u32 work = pdaLoadPokemonId(id);
     void* data;
 
     if (work != 0) {
@@ -4202,9 +4223,9 @@ void fn_8003D4C8(void)
         for (i = 0; i < lbl_8047A4E8; i++) {
             u16 id = lbl_8047A4E4[i];
             if ((id & 0x8000) == 0) {
-                pdaLoadPokemon(i);
+                pdaLoadPokemonId(id);
                 if (*(s8*)((u8*)&lbl_803A6818 + 0x159) ==
-                    pdaGetPokemonColor(i)) {
+                    pdaGetPokemonColor(id)) {
                     buf[count] = id;
                     count++;
                 }
@@ -4245,9 +4266,9 @@ extern void GScharMakeFromSJIS(u16* dst, u32 sjis);
 extern void* pokemonDataBiosGetName(void* data);
 
 /* Name of the memo entry as a wide string, or NULL when unavailable. */
-static inline void* pdaGetPokemonName(s32 index)
+static inline void* pdaGetPokemonName(u16 id)
 {
-    u32 work = pdaLoadPokemon(index);
+    u32 work = pdaLoadPokemonId(id);
 
     if (work != 0) {
         return pokemonDataBiosGetName(
@@ -4290,8 +4311,8 @@ void fn_8003D8CC(void)
     total = 0;
     for (i = 0; i < lbl_8047A4E8; i++) {
         u16 id = lbl_8047A4E4[i];
-        pdaLoadPokemon(i);
-        if ((u32)fn_800F96E4((u8*)nameBuf, 0x100, (u8*)pdaGetPokemonName(i)) !=
+        pdaLoadPokemonId(id);
+        if ((u32)fn_800F96E4((u8*)nameBuf, 0x100, (u8*)pdaGetPokemonName(id)) !=
             0) {
             for (j = 0; j < count; j++) {
                 if (nameBuf[0] == tbl[j].text[0]) {
@@ -5122,5 +5143,83 @@ u8 fn_800484A4(u8* work)
     GSlightSetActive(*(void**)(work + 0x44), 1);
     GSscene_SetMode(4);
     return 1;
+}
+#pragma peephole reset
+
+/* Icon index of one of a memo entry's two types. */
+static inline u16 pdaGetTypeIcon(u16 id, s32 slot)
+{
+    u16 type = pokemonGetStatus(
+        0, (u16)pokemonGetStatus(pdaLoadPokemonId(id), 0, 0x6e, 0), 0x16, slot);
+
+    if (type >= 9) {
+        type = type - 1;
+    }
+    return type + 1;
+}
+
+/* Filter the memo index table down to the active type tabs. */
+#pragma peephole off
+void fn_8003DC54(void)
+{
+    u8* S = (u8*)&lbl_803A6818;
+    u16 buf1[500];
+    u16 buf0[500];
+    u16 type0;
+    u16 type1;
+    u16 single;
+    u16 i;
+    u16 count;
+    u16 a;
+    u16 b;
+
+    if (*(s8*)(S + 0x15a) == 0 && *(s8*)(S + 0x15b) == 0) {
+        return;
+    }
+    type0 = *(s8*)(S + 0x15a);
+    type1 = *(s8*)(S + 0x15b);
+    if (type0 != 0 && type1 != 0) {
+        single = 0;
+    } else {
+        if (type0 == 0) {
+            type0 = type1;
+        }
+        single = 1;
+    }
+    if (single == 0) {
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                pdaLoadPokemonId(id);
+                a = pdaGetTypeIcon(id, 0);
+                b = pdaGetTypeIcon(id, 1);
+                if ((type0 == a && type1 == b) || (type0 == b && type1 == a)) {
+                    buf1[count++] = id;
+                }
+            }
+        }
+        for (i = 0; i < count; i++) {
+            lbl_8047A4E4[i] = buf1[i];
+        }
+        lbl_8047A4E8 = count;
+    } else {
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                pdaLoadPokemonId(id);
+                a = pdaGetTypeIcon(id, 0);
+                b = pdaGetTypeIcon(id, 1);
+                if (type0 == a || type0 == b) {
+                    buf0[count++] = id;
+                }
+            }
+        }
+        for (i = 0; i < count; i++) {
+            lbl_8047A4E4[i] = buf0[i];
+        }
+        lbl_8047A4E8 = count;
+    }
 }
 #pragma peephole reset
