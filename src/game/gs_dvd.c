@@ -232,6 +232,7 @@ u8 *fn_80167864(void)
 {
     BOOL enabled;
     u32 i;
+    u32 offset;
     u8 *entry;
     u8 *result;
 
@@ -240,8 +241,9 @@ u8 *fn_80167864(void)
     result = 0;
     for (i = 0; i < lbl_8047B0C8; i++, entry += 0x78) {
         if (*entry != 1) {
-            *entry = 1;
-            result = entry;
+            offset = i * 0x78;
+            lbl_8047B0C4[offset] = 1;
+            result = &lbl_8047B0C4[offset];
             break;
         }
     }
@@ -253,6 +255,7 @@ u8 *fn_801678E4(void)
 {
     BOOL enabled;
     u32 i;
+    u32 offset;
     u8 *entry;
     u8 *result;
 
@@ -261,8 +264,9 @@ u8 *fn_801678E4(void)
     result = 0;
     for (i = 0; i < lbl_8047B0D0; i++, entry += 0xD0) {
         if (*entry != 1) {
-            *entry = 1;
-            result = entry;
+            offset = i * 0xD0;
+            lbl_8047B0CC[offset] = 1;
+            result = &lbl_8047B0CC[offset];
             break;
         }
     }
@@ -274,6 +278,7 @@ u8 *fn_80167964(void)
 {
     BOOL enabled;
     u32 i;
+    u32 offset;
     u8 *entry;
     u8 *result;
 
@@ -282,8 +287,9 @@ u8 *fn_80167964(void)
     result = 0;
     for (i = 0; i < lbl_8047B0E0; i++, entry += 0x14) {
         if (*entry != 1) {
-            *entry = 1;
-            result = entry;
+            offset = i * 0x14;
+            lbl_8047B0DC[offset] = 1;
+            result = &lbl_8047B0DC[offset];
             break;
         }
     }
@@ -377,7 +383,8 @@ typedef struct GSFilterState {
     u8 capacity;
     u8 count;
     u8 drawingCount;
-    u8 _pad1B[9];
+    u8 _pad1B[5];
+    u32 renderState;
 } GSFilterState;
 
 typedef struct GSsndStartParams {
@@ -454,6 +461,24 @@ extern u32 ARQGetChunkSize(void);
 extern void fn_80159ED0(u8* callback, u32 chunkSize);
 extern u8 fn_80159EF0(void* resource, u16 soundId, void* sampleData,
                      void* resource2, void* resource3);
+extern const f32 lbl_8047D5A0;
+extern const f32 lbl_8047D5A4;
+extern const f32 lbl_8047D5A8;
+extern void fn_800D88DC(u32 enable);
+extern void fn_800D888C(u32 value);
+extern void fn_800D9B58(f32 red, f32 green, f32 blue, f32 alpha);
+extern void fn_800DA4C4(u32, u32, u32);
+extern void fn_800DA2BC(u32, u32, u32);
+extern void fn_800DA100(u32, u32, u32, u32, u32, u32);
+extern void fn_800DA1E8(u32, u32, u32);
+extern void fn_800D9ED8(u32);
+extern void fn_800DA028(u32);
+extern void fn_800D7820(u32);
+extern void fn_800D6A00(u32);
+extern void fn_800D67BC(u32);
+extern void fn_800D5FA4(u32);
+extern void fn_800D5A38(u32, u32);
+extern void fn_800D6728(void);
 
 void _sndInitParms(GSsndEntry* entry, GSsndWork* work);
 s32 fn_80167ED0(GSDVDWork* work, void* addr, s32 length, s32 offset);
@@ -594,7 +619,7 @@ void* _sndSetSampleDataUploadCallbackFunction(u32 offset, u32 length)
     do {
         result = fn_80167ED0(lbl_8047B0BC, lbl_8047B0C0, length,
                             offset + lbl_8047B0B8);
-    } while (result == -3 || result == -1);
+    } while (result >= -3 && result != -2 && result < 0);
     return lbl_8047B0C0;
 }
 
@@ -782,6 +807,46 @@ void fn_8016821C(void)
     }
 }
 
+void fn_80168284(void)
+{
+    GSFilter* filter;
+    u8 capacity;
+    u8 index;
+
+    if (lbl_804526E0.count == 0 || lbl_804526E0.drawingCount == 0) {
+        return;
+    }
+    capacity = lbl_804526E0.capacity;
+    filter = lbl_804526E0.filters;
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D9B58(lbl_8047D5A0, lbl_8047D5A0, lbl_8047D5A4,
+                lbl_8047D5A8);
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA2BC(1, 1, 0);
+    fn_800DA100(0, 7, 0, 0, 7, 0);
+    fn_800DA1E8(1, 1, 1);
+    fn_800D9ED8(1);
+    fn_800DA028(0);
+    fn_800D7820(lbl_804526E0.renderState);
+    fn_800D6A00(6);
+    fn_800D67BC(lbl_804526E0.drawingCount * 4);
+    for (index = 0; index < capacity; index++, filter++) {
+        if (filter->drawing != 0) {
+            fn_800D5FA4(0);
+            fn_800D5A38(0, index);
+            fn_800D5FA4(1);
+            fn_800D5A38(0, index);
+            fn_800D5FA4(2);
+            fn_800D5A38(0, index);
+            fn_800D5FA4(3);
+            fn_800D5A38(0, index);
+        }
+    }
+    fn_800D6728();
+    fn_800D9ED8(0);
+}
+
 void* fn_8016824C(u32 size)
 {
     u32 handle = fn_800E2C04(size, 0x20);
@@ -886,10 +951,11 @@ u8 _sndSetVolumeWork(u32 id, u32 volume)
     GSsndWork* work;
 
     if (((GSsndFlagBits*)&entry->flags)->active != 1) {
-        if (((GSsndFlagBits*)&entry->flags)->isSe != 1) {
+        if (((GSsndFlagBits*)&entry->flags)->isSe == 1) {
+            fn_80166B3C(id, 0, 0);
+        } else {
             return 0;
         }
-        fn_80166B3C(id, 0, 0);
     }
 
     work = entry->work;
@@ -941,13 +1007,18 @@ u32 _sndStopBGM(GSsndEntry* entry, u32 fade, u32 arg2)
 u32 fn_80167720(u32 handle)
 {
     GSsndEntry* entry;
+    u32 count;
     u32 i;
 
     entry = lbl_80478FAC;
-    for (i = 0; i < lbl_8047B0E8; i++, entry++) {
+    i = 0;
+    count = lbl_8047B0E8;
+    while (i < count) {
         if (entry->work != NULL && entry->work->handle == handle) {
             return i;
         }
+        entry++;
+        i++;
     }
     return 0;
 }
@@ -955,14 +1026,19 @@ u32 fn_80167720(u32 handle)
 u32 fn_80167768(u32 unkC, u32 unk10)
 {
     GSsndEntry* entry;
+    u32 count;
     u32 i;
 
     entry = lbl_80478FAC;
-    for (i = 0; i < lbl_8047B0E8; i++, entry++) {
+    i = 0;
+    count = lbl_8047B0E8;
+    while (i < count) {
         if (entry->work != NULL && entry->work->unkC == unkC &&
             entry->work->unk10 == unk10) {
             return i;
         }
+        entry++;
+        i++;
     }
     return -1;
 }
@@ -1047,6 +1123,8 @@ void _errorTask_State_None_80187B24(s32 state)
 
 void _gsdvdErrorTask_801879AC(void)
 {
+    extern void _errorTask_State_None_80187B24(s32 state);
+    extern void _gsdvdError_MsgOpen(u32 message);
     s32 driveState = fn_80167E34();
 
     switch (lbl_8047B0F0) {

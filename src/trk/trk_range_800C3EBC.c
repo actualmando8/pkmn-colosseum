@@ -19,6 +19,66 @@ typedef struct CircleBuffer {
     u32 state;
 } CircleBuffer;
 
+extern void* memcpy(void* dst, const void* src, u32 len);
+extern void fn_800C45B8(u32* state);
+extern void fn_800C45D4(u32* state);
+
+/* CircleBufferReadBytes - 0x800C3F44 | size: 0x108 | scope global */
+s32 CircleBufferReadBytes(CircleBuffer* circle, u8* buffer, u32 size) {
+    s32 available;
+
+    if (size > circle->used) {
+        return -1;
+    }
+    fn_800C45B8(&circle->state);
+    available = circle->size - (circle->readPtr - circle->buffer);
+    if (size < available) {
+        memcpy(buffer, circle->readPtr, size);
+        circle->readPtr += size;
+    } else {
+        memcpy(buffer, circle->readPtr, available);
+        memcpy(buffer + available, circle->buffer, size - available);
+        circle->readPtr = circle->buffer + size - available;
+    }
+
+    if (circle->size == circle->readPtr - circle->buffer) {
+        circle->readPtr = circle->buffer;
+    }
+
+    circle->free += size;
+    circle->used -= size;
+    fn_800C45D4(&circle->state);
+    return 0;
+}
+
+/* CircleBufferWriteBytes - 0x800C404C | size: 0x108 | scope global */
+s32 CircleBufferWriteBytes(CircleBuffer* circle, u8* buffer, u32 size) {
+    s32 available;
+
+    if (size > circle->free) {
+        return -1;
+    }
+    fn_800C45B8(&circle->state);
+    available = circle->size - (circle->writePtr - circle->buffer);
+    if (available >= size) {
+        memcpy(circle->writePtr, buffer, size);
+        circle->writePtr += size;
+    } else {
+        memcpy(circle->writePtr, buffer, available);
+        memcpy(circle->buffer, buffer + available, size - available);
+        circle->writePtr = circle->buffer + size - available;
+    }
+
+    if (circle->size == circle->writePtr - circle->buffer) {
+        circle->writePtr = circle->buffer;
+    }
+
+    circle->free -= size;
+    circle->used += size;
+    fn_800C45D4(&circle->state);
+    return 0;
+}
+
 /* ddh_cc_initialize - 0x800C3EBC | size: 0x88 | scope global */
 s32 ddh_cc_initialize(u8** comm, void (*callback)(s32)) {
     extern const char lbl_8026FD4C[];

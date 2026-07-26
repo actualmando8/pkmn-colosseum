@@ -396,6 +396,12 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
+                CodeCandidate,
+                "crt/mem_range_800C811C.c",
+                mw_version="GC/2.0",
+                progress_category="runtime",
+            ),
+            Object(
                 Matching,
                 "crt/mem.c",
                 mw_version="GC/2.0",
