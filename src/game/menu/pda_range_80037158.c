@@ -4306,3 +4306,113 @@ void fn_8003D8CC(void)
     lbl_8047A4E8 = total;
 }
 #pragma peephole reset
+
+extern f32 lbl_8047BCFC;
+extern f32 lbl_8047BD00;
+extern f32 lbl_8047BD04;
+extern f32 lbl_8047BD08;
+extern u8 lbl_804788C4;
+
+static inline f32 pdaFabs(f32 v)
+{
+    if (v > lbl_8047BC94) {
+        return v;
+    }
+    return -v;
+}
+
+/* Sample the stick and buttons into the PDA's own key-repeat state. */
+#pragma peephole off
+void fn_800439BC(void* scene)
+{
+    extern s8 fn_800F7A08(s32 chan, s32 index);
+    extern s8 fn_800F7A7C(s32 chan, s32 index);
+    extern u32 fn_800F7BC4(s32 chan);
+    extern s8 fn_800D3088(void);
+    extern f64 atan2(f64 y, f64 x);
+    s8 x;
+    s8 y;
+    f32 ang;
+    u16 buttons;
+    u16 held;
+    u16 trig;
+    u32 raw;
+    s32 i;
+    u8* work = (u8*)scene;
+
+    buttons = 0;
+    *(u16*)(work + 2) = *(u16*)work;
+    x = fn_800F7A08(1, 0);
+    y = fn_800F7A7C(1, 0);
+    if ((y < 0 ? -y : y) > 0x20 || (x < 0 ? -x : x) > 0x20) {
+        ang = atan2((f64)y, (f64)x);
+        if (pdaFabs(ang) < lbl_8047BCFC) {
+            buttons |= 2;
+        } else if (pdaFabs(ang) > lbl_8047BD00) {
+            buttons |= 1;
+        }
+        if (lbl_8047BD04 < pdaFabs(ang) && pdaFabs(ang) < lbl_8047BD08) {
+            if (ang >= lbl_8047BC94) {
+                buttons |= 8;
+            } else {
+                buttons |= 4;
+            }
+        }
+    }
+    raw = fn_800F7BC4(1);
+    if ((raw & 0x8) != 0) {
+        buttons |= 1;
+    }
+    if ((raw & 0x4) != 0) {
+        buttons |= 2;
+    }
+    if ((raw & 0x1) != 0) {
+        buttons |= 4;
+    }
+    if ((raw & 0x2) != 0) {
+        buttons |= 8;
+    }
+    if ((raw & 0x100) != 0) {
+        buttons |= 0x10;
+    }
+    if ((raw & 0x200) != 0) {
+        buttons |= 0x20;
+    }
+    if ((raw & 0x400) != 0) {
+        buttons |= 0x40;
+    }
+    if ((raw & 0x800) != 0) {
+        buttons |= 0x80;
+    }
+    if ((raw & 0x10) != 0) {
+        buttons |= 0x100;
+    }
+    if ((raw & 0x40) != 0) {
+        buttons |= 0x200;
+    }
+    if ((raw & 0x20) != 0) {
+        buttons |= 0x400;
+    }
+    if ((raw & 0x1000) != 0) {
+        buttons |= 0x800;
+    }
+    held = (*(u16*)(work + 2) ^ 0xffff) & buttons;
+    trig = 0;
+    for (i = 0; i < 16; i++) {
+        u16 mask = 1 << i;
+        if ((held & mask) != 0) {
+            work[i + 0xa] = 15;
+            trig |= mask;
+        } else if ((buttons & mask) != 0) {
+            work[i + 0xa] -= fn_800D3088();
+            if ((s8)work[i + 0xa] <= 0) {
+                work[i + 0xa] = lbl_804788C4;
+                trig |= mask;
+            }
+        }
+    }
+    *(u16*)work = buttons;
+    *(u16*)(work + 4) = held;
+    *(u16*)(work + 6) = trig;
+}
+#pragma peephole reset
