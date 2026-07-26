@@ -1618,3 +1618,490 @@ void fn_8004E9C0(s32 mailId)
     fn_8017B1CC(group);
     fn_800F915C(group);
 }
+
+extern u32 fn_80103E68(u32 id);
+extern s32 fn_8004BE40(s32 index);
+extern s32 fn_801D1A88(s32 id);
+extern s32 fn_801D1ACC(s32 id);
+extern s32 fn_801D16F0(s32 id);
+extern void fn_80132A38(u32 id, u32 value);
+extern u32 fn_800FA280(void);
+extern void fn_80109220(u32 object, u32 visible);
+extern const s32 lbl_802672A0[10];
+extern const s32 lbl_80267278[10];
+extern const s32 lbl_80267250[10];
+extern const s32 lbl_80267228[10];
+extern const s32 lbl_80267200[10];
+
+u32 fn_8004C6C0(u8* context, u8* object)
+{
+    s32 table[10];
+    s32 index;
+    s32 value;
+    u16 page;
+    u32 i;
+
+    for (i = 0; i < 10; i++) {
+        table[i] = lbl_802672A0[i];
+    }
+    page = fn_80103E68(10) >> 16;
+    value = *(s16*)(object + 6);
+    for (index = 0; index < 10 && value != table[index]; index++) {
+    }
+    if (index >= 10) {
+        return 0;
+    }
+    index += (s8)(page >> 8) * 10;
+    if (fn_801D1A88(fn_8004BE40(index)) != 0) {
+        fn_80132A38(0x37, fn_800FA280());
+        *(u32*)(object + 0x4C) = 0xE7;
+    } else {
+        *(u32*)(object + 0x4C) = 0;
+    }
+    if (fn_8004BE40(index) >= 0) {
+        if (fn_801D1B78(fn_8004BE40(index)) != 0) {
+            object[0x64] = 0xFF;
+            object[0x65] = 0xFF;
+            object[0x66] = 0xFF;
+        } else {
+            object[0x64] = 0xD5;
+            object[0x65] = 0xAA;
+            object[0x66] = 0x33;
+        }
+    }
+    return 0;
+}
+
+u32 fn_8004C8AC(u8* context, u8* object)
+{
+    s32 table[10];
+    s32 index;
+    s32 value;
+    u16 page;
+    u32 i;
+
+    for (i = 0; i < 10; i++) {
+        table[i] = lbl_80267278[i];
+    }
+    page = fn_80103E68(10) >> 16;
+    value = *(s16*)(object + 6);
+    for (index = 0; index < 10 && value != table[index]; index++) {
+    }
+    if (index >= 10) {
+        return 0;
+    }
+    index += (s8)(page >> 8) * 10;
+    if (fn_801D1ACC(fn_8004BE40(index)) != 0) {
+        fn_80132A38(0x37, fn_800FA280());
+        *(u32*)(object + 0x4C) = 0xE7;
+    } else {
+        *(u32*)(object + 0x4C) = 0;
+    }
+    if (fn_8004BE40(index) >= 0) {
+        if (fn_801D1B78(fn_8004BE40(index)) != 0) {
+            object[0x64] = 0xFF;
+            object[0x65] = 0xFF;
+            object[0x66] = 0xFF;
+        } else {
+            object[0x64] = 0xD5;
+            object[0x65] = 0xAA;
+            object[0x66] = 0x33;
+        }
+    }
+    return 0;
+}
+
+u32 fn_8004CA98(u8* context, u8* object)
+{
+    s32 table[10];
+    s32 index;
+    s32 value;
+    u16 page;
+    u32 i;
+    u8 visible;
+
+    for (i = 0; i < 10; i++) {
+        table[i] = lbl_80267250[i];
+    }
+    page = fn_80103E68(10) >> 16;
+    value = *(s16*)(object + 6);
+    for (index = 0; index < 10 && value != table[index]; index++) {
+    }
+    if (index >= 10) {
+        return 0;
+    }
+    index += (s8)(page >> 8) * 10;
+    if (fn_8004BE40(index) < 0) {
+        visible = 0;
+    } else {
+        visible = fn_801D16F0(fn_8004BE40(index)) != 0;
+    }
+    fn_80109220((u32)object, visible);
+    return 0;
+}
+
+u32 fn_8004CC38(u8* context, u8* object)
+{
+    s32 table[10];
+    s32 index;
+    s32 value;
+    u16 page;
+    u32 i;
+    u8 visible;
+
+    for (i = 0; i < 10; i++) {
+        table[i] = lbl_80267228[i];
+    }
+    page = fn_80103E68(10) >> 16;
+    value = *(s16*)(object + 6);
+    for (index = 0; index < 10 && value != table[index]; index++) {
+    }
+    if (index >= 10) {
+        return 0;
+    }
+    index += (s8)(page >> 8) * 10;
+    if (fn_8004BE40(index) < 0) {
+        visible = 0;
+    } else {
+        visible = fn_801D1B78(fn_8004BE40(index)) != 0;
+    }
+    fn_80109220((u32)object, visible);
+    return 0;
+}
+
+u32 fn_8004CDD8(u8* context, u8* object)
+{
+    s32 table[10];
+    s32 index;
+    s32 value;
+    u16 page;
+    u32 i;
+    u8 visible;
+
+    for (i = 0; i < 10; i++) {
+        table[i] = lbl_80267200[i];
+    }
+    page = fn_80103E68(10) >> 16;
+    value = *(s16*)(object + 6);
+    for (index = 0; index < 10 && value != table[index]; index++) {
+    }
+    if (index >= 10) {
+        return 0;
+    }
+    index += (s8)(page >> 8) * 10;
+    if (fn_8004BE40(index) < 0) {
+        visible = 0;
+    } else {
+        visible = fn_801D1B78(fn_8004BE40(index)) == 0;
+    }
+    fn_80109220((u32)object, visible);
+    return 0;
+}
+
+extern u8* fn_80105624(void);
+extern u32 fn_801D1650(u32 index);
+extern void fn_801666BC(u32 id);
+extern void fn_80166B18(u32 id);
+extern void fn_801654E0(u32 id, u32 buffer, u32 size);
+extern void fn_80166B3C(u32 id, u32 arg1, u32 arg2);
+extern s32 fn_801D1618(void);
+extern void fn_801669E4(u32 id, u32 arg1, u32 arg2);
+extern s32 lbl_8047A520;
+extern u8 lbl_8047A524;
+extern u32 lbl_8047A528;
+extern u32 lbl_8047A52C;
+
+u32 fn_8004DDC0(u8* context)
+{
+    u8* input;
+    u32 soundId;
+    s32 limit;
+    s8 selection;
+
+    input = fn_80105624();
+    if (lbl_8047A520 != 0) {
+        soundId = fn_801D1650(lbl_8047A524);
+        if (soundId != 0) {
+            fn_801666BC(soundId);
+        }
+        soundId = fn_801D1650(lbl_8047A524);
+        if (soundId != 0) {
+            fn_80166B18(soundId);
+        }
+        lbl_8047A524 = context[0x95];
+        soundId = fn_801D1650(context[0x95]);
+        if (soundId != 0) {
+            fn_801654E0(soundId, lbl_8047A52C, 0x10000);
+            fn_80166B3C(soundId, 0, 0x408);
+            fn_80166A50(soundId, 0, 0xFF, 0);
+            lbl_8047A528 = 0;
+        }
+        lbl_8047A520 = 0;
+    }
+
+    if ((*(u16*)(input + 4) & 2) != 0) {
+        limit = fn_801D1618();
+        selection = context[0x95] + 1;
+        context[0x95] = selection;
+        if (selection >= limit + 1) {
+            context[0x95] = limit;
+        }
+    }
+    if ((*(u16*)(input + 4) & 1) != 0) {
+        selection = context[0x95] - 1;
+        context[0x95] = selection;
+        if (selection < 0) {
+            context[0x95] = 0;
+        }
+    }
+    if (lbl_8047A524 != (s8)context[0x95]) {
+        soundId = fn_801D1650(lbl_8047A524);
+        if (soundId != 0) {
+            fn_801669E4(soundId, 0, 0);
+        }
+        lbl_8047A520 = 1;
+    }
+    return 0;
+}
+
+extern u32 fn_8016557C(void);
+extern u32 fn_800F9418(u32 size, u32 align, u32 arg2, u32 group, u32 arg4);
+extern void fn_800F9378(u32 buffer, u32 arg1, u32 group, u32 arg3);
+extern void fn_800F9210(u32 arg0, u32 group);
+extern void fn_80165548(u32 state);
+extern s32 fn_801026A4(u32 menuId, ...);
+extern u32 fn_801046B8(void);
+extern void fn_80102510(u32 menuId);
+
+u8 fn_8004DFCC(u8 initialSelection)
+{
+    u32 selection;
+    u32 state;
+    u32 soundId;
+    s32 result;
+
+    selection = initialSelection;
+    state = fn_8016557C();
+    lbl_8047A52C = fn_800F9418(0x10000, 0x20, 0, 0x408, 0);
+    fn_800F9378(lbl_8047A52C, 0, 0x408, 0);
+    lbl_8047A524 = initialSelection;
+    soundId = fn_801D1650(initialSelection);
+    if (soundId != 0) {
+        fn_801654E0(soundId, lbl_8047A52C, 0x10000);
+        fn_80166B3C(soundId, 0, 0x408);
+        fn_80166A50(soundId, 0, 0xFF, 0);
+        lbl_8047A528 = 0;
+    }
+
+    result = fn_801026A4(0x76, fn_801046B8(), &selection, 0, 1, 0);
+    if (result < 0 || result >= fn_801D1618()) {
+        result = 0xFF;
+    }
+    fn_80102510(0x76);
+    menuCloseSync(0x76, 1);
+
+    soundId = fn_801D1650(lbl_8047A524);
+    if (soundId != 0) {
+        fn_801669E4(soundId, 0, 0);
+    }
+    soundId = fn_801D1650(lbl_8047A524);
+    if (soundId != 0) {
+        fn_801666BC(soundId);
+    }
+    soundId = fn_801D1650(lbl_8047A524);
+    if (soundId != 0) {
+        fn_80166B18(soundId);
+    }
+    fn_800F9210(0, 0x408);
+    fn_80165548(state);
+    return result;
+}
+
+extern u32 mailGetAttachFileGroup(s32 index);
+extern s32 fn_8017B2CC(u32 fileHandle);
+extern s32 fn_8017B448(u32 fileHandle);
+extern u32 fn_8017B4BC(u32 fileHandle, u32 index);
+extern u32 fn_8017B5A4(void);
+extern u32 GSmsgGetRect(s32 messageId);
+extern const f32 lbl_8047BE38;
+extern const f32 lbl_8047BE3C;
+
+s32 fn_8004E180(u8* context, u8* object)
+{
+    u8* attachmentState;
+    u32 fileHandle;
+    s32 count;
+    s32 current;
+    s32 total;
+    s32 index;
+    s16 selectedWidth;
+    s16 normalWidth;
+    s32 x;
+
+    attachmentState = *(u8**)(context + 0x60);
+    count = *(u32*)(attachmentState + 4);
+    current = **(s32**)(attachmentState + 8);
+    fileHandle = mailGetAttachFileGroup(count);
+    if (fn_8017B2CC(fileHandle) == 1) {
+        count = -1;
+    } else {
+        total = fn_8017B448(fileHandle);
+        count = 0;
+        for (index = 0; index < total; index++) {
+            fn_8017B4BC(fileHandle, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+        }
+    }
+    if (count <= 0) {
+        return 0;
+    }
+
+    selectedWidth = GSmsgGetRect(0x36CE) >> 16;
+    normalWidth = GSmsgGetRect(0x36CF) >> 16;
+    x = *(s16*)(object + 0x54) / 2 -
+        (selectedWidth + normalWidth * (count - 1)) / 2;
+    for (index = 0; index < count; index++) {
+        if (index == current) {
+            fn_800FB680(x, 0, 0xE6AA00FF, 0x36CE);
+            x += selectedWidth;
+        } else {
+            fn_800FB680(x, 0, 0xAAAAAAFF, 0x36CF);
+            x += normalWidth;
+        }
+    }
+    return 0;
+}
+
+s32 fn_8004E2E0(u8* context, u8* object)
+{
+    u8* attachmentState;
+    u32 fileHandle;
+    s32 count;
+    s32 total;
+    s32 index;
+
+    attachmentState = *(u8**)(context + 0x60);
+    count = *(u32*)(attachmentState + 4);
+    fileHandle = mailGetAttachFileGroup(count);
+    if (fn_8017B2CC(fileHandle) == 1) {
+        count = -1;
+    } else {
+        total = fn_8017B448(fileHandle);
+        count = 0;
+        for (index = 0; index < total; index++) {
+            fn_8017B4BC(fileHandle, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+        }
+    }
+
+    fn_80109220((u32)object, count >= 2);
+    if (*(s16*)(object + 6) == 0x507) {
+        *(s16*)(object + 0x50) =
+            lbl_8047BE38 * **(f32**)attachmentState +
+            (f32)*(s32*)(attachmentState + 0xC);
+    } else {
+        *(s16*)(object + 0x50) =
+            lbl_8047BE3C * **(f32**)attachmentState +
+            (f32)*(s32*)(attachmentState + 0x10);
+    }
+    return 0;
+}
+
+extern u8 fn_8017B07C(u32 fileHandle, u32 entry);
+extern void fn_800D88DC(u32 mask);
+extern void fn_800D888C(u32 value);
+extern void fn_800D85D4(u32 slot, void* texture);
+extern void fn_800D6A00(u32 mode);
+extern void fn_800D67BC(u32 count);
+extern void fn_800D61E4(s16 x, s16 y);
+extern void fn_800D5BA0(u32 slot, s32 value);
+extern void fn_800D59B8(u32 slot, f32 x, f32 y);
+extern void fn_800D6728(void);
+extern f32 lbl_8047BE48;
+extern f32 lbl_8047BE4C;
+
+s32 fn_8004E510(u8* context, u8* object)
+{
+    u8* attachmentState;
+    u32 fileHandle;
+    u32 entry;
+    u32 texture;
+    u32 selected;
+    s32 count;
+    s32 total;
+    s32 index;
+
+    attachmentState = *(u8**)(context + 0x60);
+    fileHandle = mailGetAttachFileGroup(*(u32*)(attachmentState + 4));
+    if (fn_8017B2CC(fileHandle) == 1) {
+        count = -1;
+    } else {
+        total = fn_8017B448(fileHandle);
+        count = 0;
+        for (index = 0; index < total; index++) {
+            fn_8017B4BC(fileHandle, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+        }
+    }
+    if (count <= 0) {
+        return 0;
+    }
+
+    selected = **(u32**)(attachmentState + 8);
+    fileHandle = mailGetAttachFileGroup(*(u32*)(attachmentState + 4));
+    if (fn_8017B2CC(fileHandle) == 1) {
+        count = -1;
+    } else {
+        total = fn_8017B448(fileHandle);
+        count = 0;
+        for (index = 0; index < total; index++) {
+            fn_8017B4BC(fileHandle, index);
+            if (fn_8017B5A4() == 9) {
+                count++;
+            }
+        }
+    }
+    if (count <= (s32)selected) {
+        return 0;
+    }
+
+    entry = -1;
+    count = 0;
+    for (index = 0; index < total; index++) {
+        entry = fn_8017B4BC(fileHandle, index);
+        if (fn_8017B5A4() == 9) {
+            if ((u32)count >= selected) {
+                break;
+            }
+            count++;
+        }
+    }
+    if (entry == -1 || fileHandle == 0 ||
+        fn_8017B07C(fileHandle, entry) == 0) {
+        return 0;
+    }
+
+    texture = (u32)fn_800F92D4(entry);
+    if (texture == 0) {
+        return 0;
+    }
+    fn_800D88DC(3);
+    fn_800D888C(4);
+    fn_800D85D4(0, (void*)texture);
+    fn_800D6A00(7);
+    fn_800D67BC(2);
+    fn_800D61E4(0, 0);
+    fn_800D5BA0(0, -1);
+    fn_800D59B8(0, lbl_8047BE48, lbl_8047BE48);
+    fn_800D61E4(*(s16*)(object + 0x54), *(s16*)(object + 0x56));
+    fn_800D5BA0(0, -1);
+    fn_800D59B8(0, lbl_8047BE4C, lbl_8047BE4C);
+    fn_800D6728();
+    return 0;
+}
