@@ -115,6 +115,41 @@ void HSD_MtxSRT(f32 m[3][4], Vec* vec1, Vec* vec2, Vec* vec3, Vec* vec4)
     m[2][3] = vec3->z;
 }
 
+typedef struct HSD_Quaternion {
+    f32 x;
+    f32 y;
+    f32 z;
+    f32 w;
+} HSD_Quaternion;
+
+extern void PSMTXScale(f32 m[3][4], f32 x, f32 y, f32 z);
+extern void PSMTXConcat(const f32 a[3][4], const f32 b[3][4],
+                        f32 result[3][4]);
+extern void PSMTXQuat(f32 m[3][4], const HSD_Quaternion* quat);
+extern void PSMTXTrans(f32 m[3][4], f32 x, f32 y, f32 z);
+
+void HSD_MtxSRTQuat(f32 m[3][4], Vec* scale, HSD_Quaternion* rotate,
+                    Vec* translate, Vec* parent_scale)
+{
+    f32 temp[3][4];
+
+    PSMTXScale(m, scale->x, scale->y, scale->z);
+    if (parent_scale != NULL) {
+        PSMTXScale(temp, parent_scale->x, parent_scale->y, parent_scale->z);
+        PSMTXConcat(temp, m, m);
+    }
+    PSMTXQuat(temp, rotate);
+    PSMTXConcat(temp, m, m);
+    if (parent_scale != NULL) {
+        PSMTXScale(temp, 1.0F / parent_scale->x,
+                   1.0F / parent_scale->y,
+                   1.0F / parent_scale->z);
+        PSMTXConcat(temp, m, m);
+    }
+    PSMTXTrans(temp, translate->x, translate->y, translate->z);
+    PSMTXConcat(temp, m, m);
+}
+
 /* Address: 0x801A8B94 | Size: 0x188 */
 void HSD_MkRotationMtx(f32 arg0[3][4], Vec* arg1)
 {
