@@ -3971,42 +3971,67 @@ void fn_80044630(void) {
     lbl_8047A4E4 = 0;
 }
 
+extern u32 gamedataGetStatus(s32 a, s32 b);
+extern void pokemonCreate(u32 work, u16 species, s32 level, u32 trainer);
+extern u32 memoDataGetPokemonRndFromID(s32 a, u32 id);
+extern u32 memoDataGetPokemonTrainerRndFromID(s32 a, u32 id);
+extern void pokemonBiosSetRnd(u32 work, u32 rnd);
+extern void pokemonBiosSetCatchTrainerRnd(u32 work, u32 rnd);
+extern u32 pokemonGetStatus(u32 a, u32 b, s32 id, s32 index);
+extern u32 pokemonBiosGetPokemonDataId(u32 work);
+extern void* pokemonDataBiosGetPtr(u32 id);
+extern u8 pokemonDataBiosGetColor(void* data, s32 index);
+extern void windowDrawSprite(s16 x, s16 y, PdaSprite* sprite, u16 id, s32 arg4);
+
+/* Reload the scratch Pokemon slot from a memo entry ID. */
+static inline u32 pdaLoadPokemon(s32 index)
+{
+    u32 work = lbl_8047A4E0;
+    u32 species;
+    u32 rnd;
+
+    if (work != 0) {
+        species = lbl_8047A4E4[index];
+        if (species >= 0x8000) {
+            species = species & 0x3fff;
+        }
+        pokemonCreate(work, (u16)species, 10, gamedataGetStatus(0, 1));
+        rnd = memoDataGetPokemonRndFromID(0, species);
+        species = memoDataGetPokemonTrainerRndFromID(0, species);
+        pokemonBiosSetRnd(work, rnd);
+        pokemonBiosSetCatchTrainerRnd(work, species);
+        return lbl_8047A4E0;
+    }
+    return 0;
+}
+
+/* Shiny/color variant of the memo entry, or 0 when it cannot be resolved. */
+static inline u8 pdaGetPokemonColor(s32 index)
+{
+    u32 work = pdaLoadPokemon(index);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetColor(data, 0);
+        }
+        return 0;
+    }
+    return 0;
+}
+
 /* People-screen: draw the currently highlighted Pokemon's type icons. */
 #pragma peephole off
 void fn_80041BD0(PdaSprite* alphaSprite, PdaSprite* sprite)
 {
     extern u16 lbl_802E554C[];
-    extern u32 gamedataGetStatus(s32 a, s32 b);
-    extern void pokemonCreate(u32 work, u16 species, s32 level, u32 trainer);
-    extern u32 memoDataGetPokemonRndFromID(s32 a, u32 id);
-    extern u32 memoDataGetPokemonTrainerRndFromID(s32 a, u32 id);
-    extern void pokemonBiosSetRnd(u32 work, u32 rnd);
-    extern void pokemonBiosSetCatchTrainerRnd(u32 work, u32 rnd);
-    extern u32 pokemonGetStatus(u32 a, u32 b, s32 id, s32 index);
-    extern void windowDrawSprite(s16 x, s16 y, PdaSprite* sprite, u16 id, s32 arg4);
-    PdaSceneWork* scene = &lbl_803A6818;
-    u32 work = lbl_8047A4E0;
     u32 pokemon;
-    u32 id;
-    u32 rnd;
     u16 type0;
     u16 type1;
     u8 seen;
 
-    if (work != 0) {
-        id = lbl_8047A4E4[scene->currentIndex];
-        if (id >= 0x8000) {
-            id = id & 0x3fff;
-        }
-        pokemonCreate(work, (u16)id, 10, gamedataGetStatus(0, 1));
-        rnd = memoDataGetPokemonRndFromID(0, id);
-        id = memoDataGetPokemonTrainerRndFromID(0, id);
-        pokemonBiosSetRnd(work, rnd);
-        pokemonBiosSetCatchTrainerRnd(work, id);
-        pokemon = lbl_8047A4E0;
-    } else {
-        pokemon = 0;
-    }
+    pokemon = pdaLoadPokemon(lbl_803A6818.currentIndex);
 
     alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
     seen = (lbl_8047A4E4[lbl_803A6818.currentIndex] & 0x8000) ? 0 : 1;
@@ -4149,3 +4174,56 @@ s32 fn_8003D1FC(void)
     }
     return 0;
 }
+
+/* Rebuild the memo index table, optionally filtered by the active color tab. */
+#pragma peephole off
+void fn_8003D4C8(void)
+{
+    extern u16 memoDataGetCount(s32 a);
+    extern u16 memoDataGetPokemonID(s32 a, u16 index);
+    extern void fn_8003D8CC(void);
+    extern void fn_8003DC54(void);
+    extern void fn_8003E394(void);
+    u16 buf[500];
+    u16 i;
+    u16 count;
+    u16 total;
+
+    count = 0;
+    for (i = 0; i < memoDataGetCount(0); i++) {
+        lbl_8047A4E4[i] = memoDataGetPokemonID(0, i);
+        count++;
+    }
+    lbl_8047A4E8 = count;
+    fn_8003D8CC();
+    if (*(s8*)((u8*)&lbl_803A6818 + 0x159) != 0) {
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                pdaLoadPokemon(i);
+                if (*(s8*)((u8*)&lbl_803A6818 + 0x159) ==
+                    pdaGetPokemonColor(i)) {
+                    buf[count] = id;
+                    count++;
+                }
+            }
+        }
+        for (i = 0; i < count; i++) {
+            lbl_8047A4E4[i] = buf[i];
+        }
+        lbl_8047A4E8 = count;
+    }
+    fn_8003DC54();
+    fn_8003E394();
+    total = lbl_8047A4E8;
+    *(s32*)((u8*)&lbl_803A6818 + 0x8) = -5;
+    if (total >= 5) {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = 5;
+    } else {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = total;
+    }
+    *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+    *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+}
+#pragma peephole reset
