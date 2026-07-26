@@ -696,6 +696,29 @@ void _sndInitParms(GSsndEntry* entry, GSsndWork* work)
     OSRestoreInterrupts(enabled);
 }
 
+extern s32 lbl_8047B0F0;
+
+void _errorTask_State_None_80187B24(s32 state)
+{
+    switch (state) {
+    case -1:
+        lbl_8047B0F0 = 9;
+        break;
+    case 4:
+        lbl_8047B0F0 = 3;
+        break;
+    case 5:
+        lbl_8047B0F0 = 1;
+        break;
+    case 6:
+        lbl_8047B0F0 = 5;
+        break;
+    case 11:
+        lbl_8047B0F0 = 7;
+        break;
+    }
+}
+
 void fn_80167DC0(u32 arg0, u32 arg1, u32 arg2, u32 arg3, u32 arg4)
 {
     lbl_80478C10 = arg0;
