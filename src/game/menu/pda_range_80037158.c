@@ -4227,3 +4227,82 @@ void fn_8003D4C8(void)
     *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
 }
 #pragma peephole reset
+
+typedef struct PdaNameEntry {
+    u8 used;
+    u8 pad01;
+    u16 text[8];
+} PdaNameEntry;
+
+typedef struct PdaKanaGroup {
+    u32 words[15];
+    s32 count;
+} PdaKanaGroup;
+
+extern PdaKanaGroup* lbl_802E60B0[];
+extern void GScharMakeFromSJIS(u16* dst, u32 sjis);
+extern void* pokemonDataBiosGetName(void* data);
+
+/* Name of the memo entry as a wide string, or NULL when unavailable. */
+static inline void* pdaGetPokemonName(s32 index)
+{
+    u32 work = pdaLoadPokemon(index);
+
+    if (work != 0) {
+        return pokemonDataBiosGetName(
+            pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work)));
+    }
+    return NULL;
+}
+
+/* Filter the memo index table down to the active kana-row tab. */
+#pragma peephole off
+void fn_8003D8CC(void)
+{
+    u16 nameBuf[0x80];
+    PdaNameEntry tbl[15];
+    u16 out[500];
+    PdaKanaGroup* group;
+    s32 tab;
+    s32 n;
+    u16 i;
+    u16 j;
+    u16 k;
+    u16 count;
+    u16 total;
+
+    tab = *(s8*)((u8*)&lbl_803A6818 + 0x158);
+    if (tab == 0) {
+        return;
+    }
+    for (n = 0; n < 15; n++) {
+        tbl[n].used = 0;
+    }
+    if (tab != 0) {
+        group = &lbl_802E60B0[0][tab - 1];
+        for (n = 0; n < group->count; n++) {
+            tbl[n].used = 1;
+            GScharMakeFromSJIS(tbl[n].text, group->words[n]);
+        }
+    }
+    count = group->count;
+    total = 0;
+    for (i = 0; i < lbl_8047A4E8; i++) {
+        u16 id = lbl_8047A4E4[i];
+        pdaLoadPokemon(i);
+        if ((u32)fn_800F96E4((u8*)nameBuf, 0x100, (u8*)pdaGetPokemonName(i)) !=
+            0) {
+            for (j = 0; j < count; j++) {
+                if (nameBuf[0] == tbl[j].text[0]) {
+                    out[total++] = id;
+                    break;
+                }
+            }
+        }
+    }
+    for (i = 0; i < total; i++) {
+        lbl_8047A4E4[i] = out[i];
+    }
+    lbl_8047A4E8 = total;
+}
+#pragma peephole reset
