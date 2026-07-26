@@ -1095,8 +1095,11 @@ dolphin/os/OSArena.c:
 dolphin/sdk_exact_8009AFD0.c:
 	.text       start:0x8009AFD0 end:0x8009AFFC
 
-dolphin/sdk_candidate_8009AFFC.c:
-	.text       start:0x8009AFFC end:0x8009B290
+dolphin/sdk_r53_8009AFFC_o1.c:
+	.text       start:0x8009AFFC end:0x8009B1B8
+
+dolphin/sdk_r53_8009B1B8_suffix.c:
+	.text       start:0x8009B1B8 end:0x8009B290
 
 dolphin/os/OSCache_privileged_prefix.c:
 	.text       start:0x8009B290 end:0x8009B4D8
@@ -1726,8 +1729,11 @@ dolphin/sdk_candidate_800BD58C.c:
 dolphin/gx/GX_exact_800BD744.c:
 	.text       start:0x800BD744 end:0x800BD7A0
 
-dolphin/sdk_candidate_800BD7A0.c:
-	.text       start:0x800BD7A0 end:0x800BE30C
+dolphin/sdk_r52_800BD7A0_prefix.c:
+	.text       start:0x800BD7A0 end:0x800BE164
+
+dolphin/sdk_r52_800BE164_o3.c:
+	.text       start:0x800BE164 end:0x800BE30C
 
 dolphin/gx/GX_exact_800BE30C.c:
 	.text       start:0x800BE30C end:0x800BE348
@@ -1806,8 +1812,11 @@ trk/TRKDispatch_range_800BF53C_r41_suffix.c:
 trk/TRKDispatchConnected.c:
 	.text       start:0x800C04E8 end:0x800C0504
 
-trk/TRKDispatch_range_800C0504.c:
-	.text       start:0x800C0504 end:0x800C0AA0
+trk/TRKDispatch_r52_800C0504_prefix.c:
+	.text       start:0x800C0504 end:0x800C08C0
+
+trk/TRKDispatch_r52_800C08C0_inline_noauto.c:
+	.text       start:0x800C08C0 end:0x800C0AA0
 
 trk/TRKDispatch_range_800C0504_r41_800C0AA0.c:
 	.text       start:0x800C0AA0 end:0x800C0CC0
@@ -1866,8 +1875,11 @@ trk/TRKTarget_residual_800C25FC.c:
 trk/TRKSaveState.c:
 	.text       start:0x800C2A10 end:0x800C2D80
 
-trk/TRKInit.c:
-	.text       start:0x800C2D80 end:0x800C3344
+trk/TRKInit_r53_800C2D80_prefix.c:
+	.text       start:0x800C2D80 end:0x800C3218
+
+trk/TRKInit_r53_800C3218_lmw_on.c:
+	.text       start:0x800C3218 end:0x800C3344
 
 trk/TRKInit_exact_800C3344.c:
 	.text       start:0x800C3344 end:0x800C33BC
@@ -1977,11 +1989,35 @@ dolphin/sdk_candidate_800C4758.c:
 dolphin/sdk_candidate_800C47A4_gc13.c:
 	.text       start:0x800C47A4 end:0x800C47F0
 
-dolphin/sdk_candidate_800C47F0.c:
-	.text       start:0x800C47F0 end:0x800C4C98
+dolphin/sdk_r52_800C47F0_prefix.c:
+	.text       start:0x800C47F0 end:0x800C483C
 
-dolphin/sdk_candidate_800C4C98_gc13.c:
-	.text       start:0x800C4C98 end:0x800C4E44
+dolphin/sdk_r52_800C483C_o3.c:
+	.text       start:0x800C483C end:0x800C4928
+
+dolphin/sdk_r52_800C4928_middle.c:
+	.text       start:0x800C4928 end:0x800C4A60
+
+dolphin/sdk_r52_800C4A60_o3.c:
+	.text       start:0x800C4A60 end:0x800C4B44
+
+dolphin/sdk_r52_800C4B44_suffix.c:
+	.text       start:0x800C4B44 end:0x800C4C50
+
+dolphin/sdk_r53_800C4C50_o1.c:
+	.text       start:0x800C4C50 end:0x800C4C74
+
+dolphin/sdk_r53_800C4C74_o1.c:
+	.text       start:0x800C4C74 end:0x800C4C98
+
+dolphin/sdk_r52_800C4C98_prefix.c:
+	.text       start:0x800C4C98 end:0x800C4CC0
+
+dolphin/sdk_r52_800C4CC0_o3.c:
+	.text       start:0x800C4CC0 end:0x800C4D8C
+
+dolphin/sdk_r52_800C4D8C_suffix.c:
+	.text       start:0x800C4D8C end:0x800C4E44
 
 crt/exit.c:
 	.text       start:0x800C4E44 end:0x800C5458
@@ -5607,8 +5643,14 @@ game/fight_trainer_range_801F87CC_r41_801F8A18.c:
 game/fight_trainer_exact_801F8D80.c:
 	.text       start:0x801F8D80 end:0x801F9130
 
-game/fight_trainer_range_801F9130.c:
-	.text       start:0x801F9130 end:0x801F9790
+game/fight_trainer_r53_801F9130_prefix.c:
+	.text       start:0x801F9130 end:0x801F93F8
+
+game/fight_trainer_r53_801F93F8_gc20p1_o1.c:
+	.text       start:0x801F93F8 end:0x801F9600
+
+game/fight_trainer_r53_801F9600_suffix.c:
+	.text       start:0x801F9600 end:0x801F9790
 
 game/fight_trainer_exact_801F9790.c:
 	.text       start:0x801F9790 end:0x801F99C8
