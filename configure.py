@@ -3482,6 +3482,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_robj_range_801AE008.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-O2"],
                 progress_category="hsd",
             ),
             Object(
@@ -6938,12 +6939,14 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_util.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-O2"],
                 progress_category="hsd",
             ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_video.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-O2"],
                 progress_category="hsd",
             ),
             *[
@@ -6958,12 +6961,18 @@ config.libs = [
                     (Matching, "hsd/hsd_mobj_exact_801A6DC4.c"),
                     (CodeCandidate, "hsd/hsd_mobj_candidate_801A6DDC.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A6E00.c"),
-                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6E24.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A6F78.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A7E3C.c"),
                     (CodeCandidate, "hsd/hsd_mobj_candidate_801A7E84.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj_candidate_801A6E24.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O2"],
+                progress_category="hsd",
+            ),
             Object(
                 CodeCandidate,
                 "hsd/hsd_mobj_candidate_801A6FF0.c",
