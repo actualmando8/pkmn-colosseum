@@ -3970,3 +3970,892 @@ void fn_80044630(void) {
     }
     lbl_8047A4E4 = 0;
 }
+
+extern u32 gamedataGetStatus(s32 a, s32 b);
+extern void pokemonCreate(u32 work, u16 species, s32 level, u32 trainer);
+extern u32 memoDataGetPokemonRndFromID(s32 a, u32 id);
+extern u32 memoDataGetPokemonTrainerRndFromID(s32 a, u32 id);
+extern void pokemonBiosSetRnd(u32 work, u32 rnd);
+extern void pokemonBiosSetCatchTrainerRnd(u32 work, u32 rnd);
+extern u32 pokemonGetStatus(u32 a, u32 b, s32 id, s32 index);
+extern u32 pokemonBiosGetPokemonDataId(u32 work);
+extern void* pokemonDataBiosGetPtr(u32 id);
+extern u8 pokemonDataBiosGetColor(void* data, s32 index);
+extern void windowDrawSprite(s16 x, s16 y, PdaSprite* sprite, u16 id, s32 arg4);
+
+/* Reload the scratch Pokemon slot from a memo entry ID. */
+static inline u32 pdaLoadPokemon(s32 index)
+{
+    u32 work = lbl_8047A4E0;
+    u32 species;
+    u32 rnd;
+
+    if (work != 0) {
+        species = lbl_8047A4E4[index];
+        if (species >= 0x8000) {
+            species = species & 0x3fff;
+        }
+        pokemonCreate(work, (u16)species, 10, gamedataGetStatus(0, 1));
+        rnd = memoDataGetPokemonRndFromID(0, species);
+        species = memoDataGetPokemonTrainerRndFromID(0, species);
+        pokemonBiosSetRnd(work, rnd);
+        pokemonBiosSetCatchTrainerRnd(work, species);
+        return lbl_8047A4E0;
+    }
+    return 0;
+}
+
+/* Shiny/color variant of the memo entry, or 0 when it cannot be resolved. */
+static inline u8 pdaGetPokemonColor(s32 index)
+{
+    u32 work = pdaLoadPokemon(index);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetColor(data, 0);
+        }
+        return 0;
+    }
+    return 0;
+}
+
+/* People-screen: draw the currently highlighted Pokemon's type icons. */
+void fn_80041BD0(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern u16 lbl_802E554C[];
+    u32 pokemon;
+    u16 type0;
+    u16 type1;
+    u8 seen;
+
+    pokemon = pdaLoadPokemon(lbl_803A6818.currentIndex);
+
+    alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+    seen = (lbl_8047A4E4[lbl_803A6818.currentIndex] & 0x8000) ? 0 : 1;
+    if (seen != 0) {
+        type0 = pokemonGetStatus(
+            0, (u16)pokemonGetStatus(pokemon, 0, 0x6e, 0), 0x16, 0);
+        windowDrawSprite(
+            (s16)(*(s16*)(lbl_802EF0A8 + 0x5996) - sprite->field_50),
+            (s16)(*(s16*)(lbl_802EF0A8 + 0x5998) - sprite->field_52),
+            alphaSprite, lbl_802E554C[type0], 0);
+        type1 = pokemonGetStatus(
+            0, (u16)pokemonGetStatus(pokemon, 0, 0x6e, 0), 0x16, 1);
+        if (type0 != type1) {
+            windowDrawSprite(
+                (s16)(*(s16*)(lbl_802EF0A8 + 0x59b2) - sprite->field_50),
+                (s16)(*(s16*)(lbl_802EF0A8 + 0x59b4) - sprite->field_52),
+                alphaSprite, lbl_802E554C[type1], 0);
+        }
+    } else {
+        windowDrawSprite((s16)(*(s16*)(lbl_802EF0A8 + 0x5996) - sprite->field_50),
+                         (s16)(*(s16*)(lbl_802EF0A8 + 0x5998) - sprite->field_52),
+                         alphaSprite, 0x5d, 0);
+        windowDrawSprite((s16)(*(s16*)(lbl_802EF0A8 + 0x59b2) - sprite->field_50),
+                         (s16)(*(s16*)(lbl_802EF0A8 + 0x59b4) - sprite->field_52),
+                         alphaSprite, 0x5d, 0);
+    }
+}
+typedef struct PdaVec3 {
+    f32 x;
+    f32 y;
+    f32 z;
+} PdaVec3;
+
+extern void GSvecCopy(void* dst, void* src);
+extern void* GSmodelGetBound(void* model);
+extern void ObjInfoInit(void* bound, void* out);
+extern void GScameraGetPerspective(void* cam, f32* a, f32* b, f32* c, f32* d);
+extern void GScameraSetPerspective(void* cam, f32 a, f32 b, f32 c, f32 d);
+extern void GScameraSetPosition(void* cam, void* pos);
+extern void GScameraSetRotation(void* cam, void* rot);
+extern void GScameraLookAt(void* cam, void* a, void* b);
+extern void set__5GSvecFfff(void* vec, f32 x, f32 y, f32 z);
+extern void GSlightSetType(void* light, s32 type);
+extern void GSlightSetColor(void* light, void* color);
+extern void GSlightSetPosition(void* light, void* pos);
+extern void GSlightSetTarget(void* light, void* target);
+extern void GSlightSetActive(void* light, s32 active);
+extern u8 lbl_802E543C[];
+extern u8 lbl_802E5448[];
+extern u8 lbl_80267180[];
+extern f32 lbl_8047BC9C;
+extern u8 fn_80047CC0(u8* work);
+extern u8 fn_800478B4(void* work, void* sub);
+
+/* Bring the PDA model/camera/light rig online for the summary screen. */
+static inline u8 fn_8003D1FC_setup(u8* sub)
+{
+    void* model;
+    void* cam;
+    f32 persp0;
+    f32 persp1;
+    f32 persp2;
+    f32 persp3;
+    PdaVec3 color;
+    PdaVec3 lightPos;
+    PdaVec3 lightTarget;
+    PdaVec3 pos;
+    PdaVec3 bound;
+    f32 dist;
+
+    if (sub == NULL) {
+        return 0;
+    }
+    model = *(void**)((u8*)&lbl_803A6818 + 0xe8);
+    if (model == NULL) {
+        *sub = 0;
+        return 0;
+    }
+    GSvecCopy(&pos, (u8*)&lbl_803A6818 + 0x1e8);
+    GSvecCopy(lbl_802E5448, (u8*)&lbl_803A6818 + 0x1f4);
+    persp0 = *(f32*)((u8*)&lbl_803A6818 + 0x200);
+    persp1 = *(f32*)((u8*)&lbl_803A6818 + 0x204);
+    persp2 = *(f32*)((u8*)&lbl_803A6818 + 0x208);
+    persp3 = *(f32*)((u8*)&lbl_803A6818 + 0x20c);
+    dist = *(f32*)((u8*)&lbl_803A6818 + 0x210);
+    ObjInfoInit(GSmodelGetBound(model), &bound);
+    GSscene_SetMode(3);
+    GScameraGetPerspective(*(void**)((u8*)&lbl_803A6818 + 0xfc), &persp0, &persp1, &persp2,
+                           &persp3);
+    set__5GSvecFfff(&pos, lbl_8047BC94, lbl_8047BC94, dist);
+    GScameraSetPosition(*(void**)((u8*)&lbl_803A6818 + 0xfc), &pos);
+    GScameraSetPerspective(*(void**)((u8*)&lbl_803A6818 + 0xfc), persp0, persp1, persp2,
+                           persp3);
+    GScameraLookAt(*(void**)((u8*)&lbl_803A6818 + 0xfc), lbl_802E543C, lbl_802E5448);
+    color = *(PdaVec3*)lbl_80267180;
+    memcpy(&lightPos, &pos, 12);
+    lightPos.x = lightPos.x - lbl_8047BC98;
+    lightPos.y = lightPos.y + lbl_8047BC9C;
+    GSlightSetType(*(void**)((u8*)&lbl_803A6818 + 0x108), 2);
+    GSlightSetColor(*(void**)((u8*)&lbl_803A6818 + 0x108), &color);
+    GSlightSetPosition(*(void**)((u8*)&lbl_803A6818 + 0x108), &lightPos);
+    GSlightSetTarget(*(void**)((u8*)&lbl_803A6818 + 0x108), &lightTarget);
+    GSlightSetActive(*(void**)((u8*)&lbl_803A6818 + 0x108), 1);
+    cam = *(void**)((u8*)&lbl_803A6818 + 0x114);
+    if (cam != NULL) {
+        GScameraSetPosition(cam, (u8*)&lbl_803A6818 + 0x118);
+        GScameraSetRotation(cam, (u8*)&lbl_803A6818 + 0x124);
+        GScameraSetPerspective(cam, *(f32*)((u8*)&lbl_803A6818 + 0x13c), *(f32*)((u8*)&lbl_803A6818 + 0x140),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x144), *(f32*)((u8*)&lbl_803A6818 + 0x148));
+    }
+    GSscene_SetMode(3);
+    GSscene_SetMode(4);
+    return 1;
+}
+s32 fn_8003D1FC(void)
+{
+    switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 6:
+    case 7:
+    case 8:
+    case 0xb:
+    case 0xc:
+        *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
+        break;
+    case 5:
+        *((u8*)&lbl_803A6818 + 0x214) =
+            fn_800478B4((u8*)&lbl_803A6818 + 0x7c, (u8*)&lbl_803A6818 + 0xc4);
+        *((u8*)&lbl_803A6818 + 0x214) =
+            fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+
+/* Rebuild the memo index table, optionally filtered by the active color tab. */
+void fn_8003D4C8(void)
+{
+    extern u16 memoDataGetCount(s32 a);
+    extern u16 memoDataGetPokemonID(s32 a, u16 index);
+    extern void fn_8003D8CC(void);
+    extern void fn_8003DC54(void);
+    extern void fn_8003E394(void);
+    u16 buf[500];
+    u16 i;
+    u16 count;
+    u16 total;
+
+    count = 0;
+    for (i = 0; i < memoDataGetCount(0); i++) {
+        lbl_8047A4E4[i] = memoDataGetPokemonID(0, i);
+        count++;
+    }
+    lbl_8047A4E8 = count;
+    fn_8003D8CC();
+    if (*(s8*)((u8*)&lbl_803A6818 + 0x159) != 0) {
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                pdaLoadPokemon(i);
+                if (*(s8*)((u8*)&lbl_803A6818 + 0x159) ==
+                    pdaGetPokemonColor(i)) {
+                    buf[count] = id;
+                    count++;
+                }
+            }
+        }
+        for (i = 0; i < count; i++) {
+            lbl_8047A4E4[i] = buf[i];
+        }
+        lbl_8047A4E8 = count;
+    }
+    fn_8003DC54();
+    fn_8003E394();
+    total = lbl_8047A4E8;
+    *(s32*)((u8*)&lbl_803A6818 + 0x8) = -5;
+    if (total >= 5) {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = 5;
+    } else {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = total;
+    }
+    *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+    *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+}
+typedef struct PdaNameEntry {
+    u8 used;
+    u8 pad01;
+    u16 text[8];
+} PdaNameEntry;
+
+typedef struct PdaKanaGroup {
+    u32 words[15];
+    s32 count;
+} PdaKanaGroup;
+
+extern PdaKanaGroup* lbl_802E60B0[];
+extern void GScharMakeFromSJIS(u16* dst, u32 sjis);
+extern void* pokemonDataBiosGetName(void* data);
+
+/* Name of the memo entry as a wide string, or NULL when unavailable. */
+static inline void* pdaGetPokemonName(s32 index)
+{
+    u32 work = pdaLoadPokemon(index);
+
+    if (work != 0) {
+        return pokemonDataBiosGetName(
+            pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work)));
+    }
+    return NULL;
+}
+
+/* Filter the memo index table down to the active kana-row tab. */
+void fn_8003D8CC(void)
+{
+    u16 nameBuf[0x80];
+    PdaNameEntry tbl[15];
+    u16 out[500];
+    PdaKanaGroup* group;
+    s32 tab;
+    s32 n;
+    u16 i;
+    u16 j;
+    u16 k;
+    u16 count;
+    u16 total;
+
+    tab = *(s8*)((u8*)&lbl_803A6818 + 0x158);
+    if (tab == 0) {
+        return;
+    }
+    for (n = 0; n < 15; n++) {
+        tbl[n].used = 0;
+    }
+    if (tab != 0) {
+        group = &lbl_802E60B0[0][tab - 1];
+        for (n = 0; n < group->count; n++) {
+            tbl[n].used = 1;
+            GScharMakeFromSJIS(tbl[n].text, group->words[n]);
+        }
+    }
+    count = group->count;
+    total = 0;
+    for (i = 0; i < lbl_8047A4E8; i++) {
+        u16 id = lbl_8047A4E4[i];
+        pdaLoadPokemon(i);
+        if ((u32)fn_800F96E4((u8*)nameBuf, 0x100, (u8*)pdaGetPokemonName(i)) !=
+            0) {
+            for (j = 0; j < count; j++) {
+                if (nameBuf[0] == tbl[j].text[0]) {
+                    out[total++] = id;
+                    break;
+                }
+            }
+        }
+    }
+    for (i = 0; i < total; i++) {
+        lbl_8047A4E4[i] = out[i];
+    }
+    lbl_8047A4E8 = total;
+}
+extern f32 lbl_8047BCFC;
+extern f32 lbl_8047BD00;
+extern f32 lbl_8047BD04;
+extern f32 lbl_8047BD08;
+extern u8 lbl_804788C4;
+
+static inline f32 pdaFabs(f32 v)
+{
+    if (v > lbl_8047BC94) {
+        return v;
+    }
+    return -v;
+}
+
+/* Sample the stick and buttons into the PDA's own key-repeat state. */
+void fn_800439BC(void* scene)
+{
+    extern s8 fn_800F7A08(s32 chan, s32 index);
+    extern s8 fn_800F7A7C(s32 chan, s32 index);
+    extern u32 fn_800F7BC4(s32 chan);
+    extern s8 fn_800D3088(void);
+    extern f64 atan2(f64 y, f64 x);
+    s8 x;
+    s8 y;
+    f32 ang;
+    u16 buttons;
+    u16 held;
+    u16 trig;
+    u32 raw;
+    s32 i;
+    u8* work = (u8*)scene;
+
+    buttons = 0;
+    *(u16*)(work + 2) = *(u16*)work;
+    x = fn_800F7A08(1, 0);
+    y = fn_800F7A7C(1, 0);
+    if ((y < 0 ? -y : y) > 0x20 || (x < 0 ? -x : x) > 0x20) {
+        ang = atan2((f64)y, (f64)x);
+        if (pdaFabs(ang) < lbl_8047BCFC) {
+            buttons |= 2;
+        } else if (pdaFabs(ang) > lbl_8047BD00) {
+            buttons |= 1;
+        }
+        if (lbl_8047BD04 < pdaFabs(ang) && pdaFabs(ang) < lbl_8047BD08) {
+            if (ang >= lbl_8047BC94) {
+                buttons |= 8;
+            } else {
+                buttons |= 4;
+            }
+        }
+    }
+    raw = fn_800F7BC4(1);
+    if ((raw & 0x8) != 0) {
+        buttons |= 1;
+    }
+    if ((raw & 0x4) != 0) {
+        buttons |= 2;
+    }
+    if ((raw & 0x1) != 0) {
+        buttons |= 4;
+    }
+    if ((raw & 0x2) != 0) {
+        buttons |= 8;
+    }
+    if ((raw & 0x100) != 0) {
+        buttons |= 0x10;
+    }
+    if ((raw & 0x200) != 0) {
+        buttons |= 0x20;
+    }
+    if ((raw & 0x400) != 0) {
+        buttons |= 0x40;
+    }
+    if ((raw & 0x800) != 0) {
+        buttons |= 0x80;
+    }
+    if ((raw & 0x10) != 0) {
+        buttons |= 0x100;
+    }
+    if ((raw & 0x40) != 0) {
+        buttons |= 0x200;
+    }
+    if ((raw & 0x20) != 0) {
+        buttons |= 0x400;
+    }
+    if ((raw & 0x1000) != 0) {
+        buttons |= 0x800;
+    }
+    held = (*(u16*)(work + 2) ^ 0xffff) & buttons;
+    trig = 0;
+    for (i = 0; i < 16; i++) {
+        u16 mask = 1 << i;
+        if ((held & mask) != 0) {
+            work[i + 0xa] = 15;
+            trig |= mask;
+        } else if ((buttons & mask) != 0) {
+            work[i + 0xa] -= fn_800D3088();
+            if ((s8)work[i + 0xa] <= 0) {
+                work[i + 0xa] = lbl_804788C4;
+                trig |= mask;
+            }
+        }
+    }
+    *(u16*)work = buttons;
+    *(u16*)(work + 4) = held;
+    *(u16*)(work + 6) = trig;
+}
+extern f32 lbl_8047BCA4;
+extern f32 lbl_8047BCA8;
+extern f32 lbl_8047BD10;
+extern f32 lbl_8047BD14;
+extern u32 GSmsgGetRect(s32 id);
+
+/* Tab captions: pulse the active page's title and centre each caption. */
+void fn_80043FA8(PdaSprite* alphaSprite, PdaSprite* sprite)
+{
+    extern f64 sin(f64 x);
+    f32 v;
+    s32 tint;
+
+    alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+    switch (sprite->eventId) {
+    case 0x6d7:
+        alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+        v = lbl_8047BD14 *
+                (f32)sin(lbl_8047BCA4 * (lbl_8047BCA8 * lbl_803A6818.angle)) +
+            lbl_8047BD10;
+        if (v > lbl_8047BCA0) {
+            v = lbl_8047BCA0;
+        }
+        if (v < lbl_8047BC94) {
+            v = lbl_8047BC94;
+        }
+        sprite->alpha = (u8)v;
+        if (lbl_803A6818.field_28 == 2) {
+            sprite->flags |= 2;
+        } else {
+            sprite->flags &= ~2;
+        }
+        break;
+    case 0x6d8:
+        alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+        v = lbl_8047BD14 *
+                (f32)sin(lbl_8047BCA4 * (lbl_8047BCA8 * lbl_803A6818.angle)) +
+            lbl_8047BD10;
+        if (v > lbl_8047BCA0) {
+            v = lbl_8047BCA0;
+        }
+        if (v < lbl_8047BC94) {
+            v = lbl_8047BC94;
+        }
+        sprite->alpha = (u8)v;
+        if (lbl_803A6818.field_28 == 1) {
+            sprite->flags |= 2;
+        } else {
+            sprite->flags &= ~2;
+        }
+        break;
+    case 0x6d9:
+        alphaSprite->alphaByte = lbl_8047BCA0 * lbl_803A6818.alphaScale;
+        v = lbl_8047BD14 *
+                (f32)sin(lbl_8047BCA4 * (lbl_8047BCA8 * lbl_803A6818.angle)) +
+            lbl_8047BD10;
+        if (v > lbl_8047BCA0) {
+            v = lbl_8047BCA0;
+        }
+        if (v < lbl_8047BC94) {
+            v = lbl_8047BC94;
+        }
+        sprite->alpha = (u8)v;
+        if (lbl_803A6818.field_28 == 0) {
+            sprite->flags |= 2;
+        } else {
+            sprite->flags &= ~2;
+        }
+        break;
+    case 0x10c7:
+        if (lbl_803A6818.field_28 == 0) {
+            tint = 0x140000;
+        } else {
+            tint = 0x4a0000;
+        }
+        fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x3717) >> 16)) / 2), 0,
+                    tint | alphaSprite->alphaByte, (void*)0x3717);
+        break;
+    case 0x10c8:
+        if (lbl_803A6818.field_28 == 1) {
+            tint = 0x140000;
+        } else {
+            tint = 0x4a0000;
+        }
+        fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x3718) >> 16)) / 2), 0,
+                    tint | alphaSprite->alphaByte, (void*)0x3718);
+        break;
+    case 0x10c9:
+        if (lbl_803A6818.field_28 == 2) {
+            tint = 0x140000;
+        } else {
+            tint = 0x4a0000;
+        }
+        fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x3719) >> 16)) / 2), 0,
+                    tint | alphaSprite->alphaByte, (void*)0x3719);
+        break;
+    case 0xfbf:
+        break;
+    default:
+        break;
+    }
+}
+extern f32 lbl_8047BD18;
+extern f32 lbl_8047BD30;
+extern f32 lbl_8047BD34;
+extern u8 lbl_802E5424[];
+extern u8 lbl_802E5430[];
+extern void* fn_801DAC3C(void* h);
+extern s32 fn_801DAC24(void* h);
+extern void GSmodelGetPosition(void* model, void* out);
+extern void GSmodelSetPosition(void* model, void* pos);
+extern void GSmodelSetMatrix(void* model, void* mtx);
+extern void fn_800E064C(f32* mtx);
+extern void fn_800E03B4(f32* mtx, void* vec);
+
+/* Frame the two compared models in the PDA's side-by-side camera. */
+u8 fn_800478B4(void* work, void* sub)
+{
+    extern f64 tan(f64 x);
+    f32 mtx0[12];
+    f32 mtx1[12];
+    PdaVec3 pos0;
+    PdaVec3 camPos;
+    PdaVec3 pos1;
+    PdaVec3 bound0;
+    PdaVec3 bound1;
+    PdaVec3 lightPos;
+    PdaVec3 color;
+    f32 persp0;
+    f32 persp1;
+    f32 persp2;
+    f32 persp3;
+    void* model0;
+    void* model1;
+    void* cam;
+    f32 height;
+    f32 width;
+    f32 dist;
+    f32 fovy;
+    f32 aspect;
+    f32 znear;
+    f32 zfar;
+
+    if (work == NULL) {
+        return 0;
+    }
+    if (sub == NULL) {
+        return 0;
+    }
+    if (*(u8*)((u8*)work + 0x14) != 0) {
+        model0 = fn_801DAC3C(*(void**)((u8*)work + 0x24));
+        if (model0 == NULL) {
+            return 0;
+        }
+        fn_801DAC24(*(void**)((u8*)work + 0x24));
+    } else {
+        model0 = *(void**)((u8*)work + 0x24);
+    }
+    if (sub != NULL) {
+        model1 = *(void**)((u8*)sub + 0x24);
+    }
+    if (model0 == NULL) {
+        *(u8*)work = 0;
+        return 0;
+    }
+    if (model1 == NULL) {
+        return 0;
+    }
+    GSscene_SetMode(3);
+    GScameraGetPerspective(*(void**)((u8*)work + 0x38), &persp0, &persp1,
+                           &persp2, &persp3);
+    ObjInfoInit(GSmodelGetBound(model0), &bound0);
+    ObjInfoInit(GSmodelGetBound(model1), &bound1);
+    height = bound0.y;
+    width = bound0.x + bound1.x;
+    if (height >= bound1.y) {
+    } else {
+        height = bound1.y;
+    }
+    persp0 = lbl_8047BD30;
+    persp1 = (f32)*(s32*)((u8*)work + 0x2c) / (f32)*(s32*)((u8*)work + 0x30);
+    if (height >= width) {
+        dist = height;
+    } else {
+        dist = width;
+    }
+    dist = dist / (f32)tan(lbl_8047BD34);
+    set__5GSvecFfff(&camPos, lbl_8047BC94, lbl_8047BC94, dist);
+    GSvecCopy((u8*)&lbl_803A6818 + 0x1e8, &camPos);
+    GSvecCopy((u8*)&lbl_803A6818 + 0x1f4, lbl_802E5430);
+    fovy = persp0;
+    aspect = persp1;
+    znear = persp2;
+    zfar = persp3;
+    *(f32*)((u8*)&lbl_803A6818 + 0x200) = fovy;
+    *(f32*)((u8*)&lbl_803A6818 + 0x204) = aspect;
+    *(f32*)((u8*)&lbl_803A6818 + 0x208) = znear;
+    *(f32*)((u8*)&lbl_803A6818 + 0x20c) = zfar;
+    *(f32*)((u8*)&lbl_803A6818 + 0x210) = dist;
+    GScameraSetPerspective(*(void**)((u8*)work + 0x38), fovy, aspect, znear,
+                           zfar);
+    GScameraSetPosition(*(void**)((u8*)work + 0x38), &camPos);
+    *(f32*)(lbl_802E5430 + 4) = height * lbl_8047BD18;
+    GScameraLookAt(*(void**)((u8*)work + 0x38), lbl_802E5424, lbl_802E5430);
+    GSmodelGetPosition(model0, &pos0);
+    pos0.x = -(bound0.x * lbl_8047BD18);
+    pos0.y = lbl_8047BC94;
+    pos0.z = lbl_8047BC94;
+    GSmodelSetPosition(model0, &pos0);
+    fn_800E064C(mtx0);
+    fn_800E03B4(mtx0, &pos0);
+    GSmodelSetMatrix(model0, mtx0);
+    GSmodelGetPosition(model1, &pos1);
+    pos1.x = bound1.x * lbl_8047BD18;
+    pos1.y = lbl_8047BC94;
+    pos1.z = lbl_8047BC94;
+    GSmodelSetPosition(model1, &pos1);
+    fn_800E064C(mtx1);
+    fn_800E03B4(mtx1, &pos1);
+    GSmodelSetMatrix(model1, mtx1);
+    color = *(PdaVec3*)lbl_80267180;
+    memcpy(&lightPos, &camPos, 12);
+    lightPos.x = lightPos.x - lbl_8047BC98;
+    lightPos.y = lightPos.y + lbl_8047BC9C;
+    GSlightSetType(*(void**)((u8*)work + 0x44), 2);
+    GSlightSetColor(*(void**)((u8*)work + 0x44), &color);
+    GSlightSetPosition(*(void**)((u8*)work + 0x44), &lightPos);
+    GSlightSetTarget(*(void**)((u8*)work + 0x44), &pos0);
+    GSlightSetActive(*(void**)((u8*)work + 0x44), 1);
+    cam = *(void**)((u8*)&lbl_803A6818 + 0x114);
+    if (cam != NULL) {
+        GScameraSetPosition(cam, (u8*)&lbl_803A6818 + 0x118);
+        GScameraSetRotation(cam, (u8*)&lbl_803A6818 + 0x124);
+        GScameraSetPerspective(cam, *(f32*)((u8*)&lbl_803A6818 + 0x13c),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x140),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x144),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x148));
+    }
+    GSscene_SetMode(3);
+    GSscene_SetMode(4);
+    return 1;
+}
+extern f64 __frsqrte(f64 value);
+extern f32 lbl_80478AC0[];
+extern f32 lbl_8047BCBC;
+extern f32 lbl_8047BCC0;
+extern f32 lbl_8047BD38;
+extern f32 lbl_8047BD3C;
+extern f32 lbl_8047BD40;
+extern f32 lbl_8047BD44;
+extern f32 lbl_8047BD48;
+extern f32 lbl_8047BD4C;
+extern f32 lbl_8047BD68;
+extern u8 lbl_802E540C[];
+extern u8 lbl_802E5418[];
+extern u32 pokemonBiosGetPokemonDataId(u32 work);
+extern void memoGetScaleAngle(u32 id, f32* scale, f32* angle);
+extern u8 menuModelCheck(void* work, s32 index);
+extern void GSmodelCenterNull(void* model);
+extern void modelRemoveCenterNull(void* model);
+extern s32 fn_800EE0E8(void* model);
+extern void* GSmodelGetPart(void* model, s32 index);
+extern void GSpartGetTransform(void* part, void* out, s32 a, s32 b);
+extern void GSpartFree(void* part);
+extern void fn_800E032C(f32* mtx, f32 angle);
+
+/* MSL math.h inlines: float classification and the frsqrte-based sqrtf. */
+static inline s32 pdaFpClassifyF(f32 value)
+{
+    switch (*(s32*)&value & 0x7F800000) {
+    case 0x7F800000: {
+        if (*(s32*)&value & 0x007FFFFF) {
+            return 1;
+        } else {
+            return 2;
+        }
+        break;
+    }
+    case 0: {
+        if (*(s32*)&value & 0x007FFFFF) {
+            return 5;
+        } else {
+            return 3;
+        }
+        break;
+    }
+    }
+    return 4;
+}
+
+extern f64 lbl_8047BD50;
+extern f64 lbl_8047BD58;
+extern f64 lbl_8047BD60;
+
+static inline f32 pdaSqrtf(f32 value)
+{
+    if (value > lbl_8047BC94) {
+        f64 guess = __frsqrte(value);
+        guess = lbl_8047BD50 * guess *
+                (lbl_8047BD58 - value * (guess * guess));
+        guess = lbl_8047BD50 * guess *
+                (lbl_8047BD58 - value * (guess * guess));
+        guess = lbl_8047BD50 * guess *
+                (lbl_8047BD58 - value * (guess * guess));
+        return (f32)(value * guess);
+    }
+    if ((f64)value < lbl_8047BD60) {
+        return lbl_80478AC0[0];
+    }
+    if (pdaFpClassifyF(value) == 1) {
+        return lbl_80478AC0[0];
+    }
+    return value;
+}
+
+/* Frame the highlighted Pokemon's model for the single-model PDA page. */
+u8 fn_80047CC0(u8* work)
+{
+    extern f64 tan(f64 x);
+    extern f64 atan(f64 x);
+    extern f64 sin(f64 x);
+    f32 mtx[12];
+    PdaVec3 bound;
+    PdaVec3 target;
+    PdaVec3 camPos;
+    PdaVec3 xform;
+    PdaVec3 modelPos;
+    PdaVec3 lightPos;
+    PdaVec3 color;
+    f32 persp0;
+    f32 persp1;
+    f32 persp2;
+    f32 persp3;
+    f32 angle;
+    f32 scale;
+    void* model;
+    void* part;
+    void* cam;
+    f32 spread;
+    f32 zoom;
+    f32 pitch;
+
+    zoom = lbl_8047BCC0;
+    angle = lbl_8047BD38;
+    scale = lbl_8047BCBC;
+    memoGetScaleAngle(
+        pokemonBiosGetPokemonDataId(pdaLoadPokemon(lbl_803A6818.currentIndex)),
+        &scale, &angle);
+    zoom = zoom * scale;
+    if (work == NULL) {
+        return 0;
+    }
+    if (*(void**)(work + 0x34) == NULL) {
+        return 0;
+    }
+    if (menuModelCheck(work, 0) == 1) {
+        return 0;
+    }
+    if (work[0x14] != 0) {
+        model = fn_801DAC3C(*(void**)(work + 0x24));
+        if (model == NULL) {
+            return 0;
+        }
+        switch (fn_801DAC24(*(void**)(work + 0x24))) {
+        case -2:
+            spread = lbl_8047BD3C;
+            break;
+        case -1:
+            spread = lbl_8047BD40;
+            break;
+        case 0:
+            spread = lbl_8047BD44;
+            break;
+        case 1:
+            spread = lbl_8047BD44;
+            break;
+        case 2:
+            spread = lbl_8047BD48;
+            break;
+        case 3:
+            spread = lbl_8047BD4C;
+            break;
+        }
+    } else {
+        model = *(void**)(work + 0x24);
+    }
+    GSscene_SetMode(3);
+    GScameraGetPerspective(*(void**)(work + 0x38), &persp0, &persp1, &persp2,
+                           &persp3);
+    ObjInfoInit(GSmodelGetBound(model), &bound);
+    persp0 = lbl_8047BD30;
+    persp1 = (f32)*(s32*)(work + 0x2c) / (f32)*(s32*)(work + 0x30);
+    GSmodelGetPosition(model, &modelPos);
+    zoom = zoom * (pdaSqrtf(bound.y * bound.y + bound.x * bound.x) / spread) /
+           (f32)tan(lbl_8047BD68 * persp0 * lbl_8047BD18);
+    zoom = zoom * *(f32*)((u8*)&lbl_803A6818 + 0x68);
+    GScameraSetPerspective(*(void**)(work + 0x38), persp0, persp1, persp2,
+                           persp3);
+    pitch = (f32)atan(
+        pdaSqrtf((*(f32*)((u8*)&lbl_803A6818 + 0x228) -
+                  *(f32*)((u8*)&lbl_803A6818 + 0x21c)) *
+                 (*(f32*)((u8*)&lbl_803A6818 + 0x228) -
+                  *(f32*)((u8*)&lbl_803A6818 + 0x21c))) /
+        pdaSqrtf((*(f32*)((u8*)&lbl_803A6818 + 0x224) -
+                  *(f32*)((u8*)&lbl_803A6818 + 0x218)) *
+                     (*(f32*)((u8*)&lbl_803A6818 + 0x224) -
+                      *(f32*)((u8*)&lbl_803A6818 + 0x218)) +
+                 (*(f32*)((u8*)&lbl_803A6818 + 0x22c) -
+                  *(f32*)((u8*)&lbl_803A6818 + 0x220)) *
+                     (*(f32*)((u8*)&lbl_803A6818 + 0x22c) -
+                      *(f32*)((u8*)&lbl_803A6818 + 0x220))));
+    GSmodelGetPosition(model, &modelPos);
+    target.x = lbl_8047BC94;
+    target.z = lbl_8047BC94;
+    target.y = lbl_8047BC94;
+    fn_800E064C(mtx);
+    fn_800E03B4(mtx, &target);
+    fn_800E032C(mtx, angle);
+    GSmodelSetMatrix(model, mtx);
+    GSmodelCenterNull(model);
+    part = GSmodelGetPart(model, fn_800EE0E8(model) - 1);
+    if (part != NULL) {
+        GSpartGetTransform(part, &xform, 0, 0);
+        GSpartFree(part);
+    }
+    modelRemoveCenterNull(model);
+    set__5GSvecFfff(&camPos, lbl_8047BC94,
+                    zoom * (f32)sin(pitch) + (lbl_8047BC94 + xform.y), zoom);
+    GScameraSetPosition(*(void**)(work + 0x38), &camPos);
+    *(f32*)(lbl_802E5418 + 0) = lbl_8047BC94;
+    *(f32*)(lbl_802E5418 + 4) = xform.y;
+    *(f32*)(lbl_802E5418 + 8) = xform.z;
+    GScameraLookAt(*(void**)(work + 0x38), lbl_802E540C, lbl_802E5418);
+    color = *(PdaVec3*)lbl_80267180;
+    memcpy(&lightPos, &camPos, 12);
+    lightPos.x = lightPos.x - lbl_8047BC98;
+    lightPos.y = lightPos.y + lbl_8047BC9C;
+    GSlightSetType(*(void**)(work + 0x44), 2);
+    GSlightSetColor(*(void**)(work + 0x44), &color);
+    GSlightSetPosition(*(void**)(work + 0x44), &lightPos);
+    GSlightSetTarget(*(void**)(work + 0x44), &target);
+    GSlightSetActive(*(void**)(work + 0x44), 1);
+    cam = *(void**)((u8*)&lbl_803A6818 + 0x114);
+    if (cam != NULL) {
+        GScameraSetPosition(cam, (u8*)&lbl_803A6818 + 0x118);
+        GScameraSetRotation(cam, (u8*)&lbl_803A6818 + 0x124);
+        GScameraSetPerspective(cam, *(f32*)((u8*)&lbl_803A6818 + 0x13c),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x140),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x144),
+                               *(f32*)((u8*)&lbl_803A6818 + 0x148));
+    }
+    GSscene_SetMode(3);
+    GSscene_SetMode(4);
+    return 1;
+}
