@@ -588,6 +588,7 @@ u8 fn_80167118(u32 slot, u32 stream, const char* path, u32 offset,
         return 0;
     }
     if (stream == 1) {
+        sampleData = NULL;
         fn_80159ED0((u8*)_sndSetSampleDataUploadCallbackFunction,
                     ARQGetChunkSize());
         lbl_8047B0BC = fn_80167F28(path);
@@ -600,7 +601,6 @@ u8 fn_80167118(u32 slot, u32 stream, const char* path, u32 offset,
             fn_80167E64((u8*)lbl_8047B0BC);
             return 0;
         }
-        sampleData = NULL;
     } else {
         sampleData = (void*)path;
         fn_80159ED0(NULL, 0);
@@ -662,8 +662,13 @@ u32 fn_8016761C(GSsndEntry* entry, u16 value)
     void* resource;
     GSsndWork* work = entry->work;
 
-    if (work == NULL || ((GSsndFlagBits*)&entry->flags)->active != 1 ||
-        work->handle != -1U) {
+    if (work == NULL) {
+        return 0;
+    }
+    if (((GSsndFlagBits*)&entry->flags)->active != 1) {
+        return 0;
+    }
+    if (work->handle != -1U) {
         return 0;
     }
     resource = (void*)GSresGetResource((void*)work->unkC, work->unk10);
@@ -771,6 +776,8 @@ u32 fn_80167FA8(u32 workCount)
             lbl_80478C24 = (const u8*)"GC6J";
             break;
         case 1:
+            lbl_80478C24 = (const u8*)"GC6E";
+            break;
         case 2:
             lbl_80478C24 = (const u8*)"GC6E";
             break;
@@ -846,8 +853,8 @@ void fn_80168284(void)
             fn_800DA028(0);
             fn_800D7820(lbl_804526E0.renderState);
             fn_800D6A00(6);
-            fn_800D67BC(lbl_804526E0.drawingCount * 4);
-            for (index = 0; index < capacity; index++, filter++) {
+            fn_800D67BC((u16)(lbl_804526E0.drawingCount * 4));
+            for (index = 0; (u8)index < capacity; index++, filter++) {
                 if (filter->drawing != 0) {
                     fn_800D5FA4(0);
                     fn_800D5A38(0, index);
@@ -918,11 +925,12 @@ void fn_80168408(GSFilter* filter, const u8* color)
 GSFilter* GSfilterCreate(const u8* color)
 {
     GSFilter* filter;
+    u8 capacity = lbl_804526E0.capacity;
     u8 index;
 
-    if (lbl_804526E0.count < lbl_804526E0.capacity) {
+    if (lbl_804526E0.count < capacity) {
         filter = lbl_804526E0.filters;
-        for (index = 0; index < lbl_804526E0.capacity; index++, filter++) {
+        for (index = 0; index < capacity; index++, filter++) {
             if (filter->active == 0) {
                 u8* destination = &lbl_804526E0.colors[index * 4];
                 destination[0] = color[0];
@@ -1047,9 +1055,8 @@ u8 _sndSetVolumeWork(u32 id, u32 volume)
     work = entry->work;
     if (work != NULL) {
         work->priority = volume & 0x7F;
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 u32 _sndStopSE(GSsndEntry* entry, u32 arg1, u32 arg2)
