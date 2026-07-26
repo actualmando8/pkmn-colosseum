@@ -5223,3 +5223,178 @@ void fn_8003DC54(void)
     }
 }
 #pragma peephole reset
+
+typedef struct PdaSortPair {
+    u16 index;
+    u16 key;
+} PdaSortPair;
+
+extern u16 pokemonDataBiosGetWeight(void* data);
+extern u16 pokemonDataBiosGetHeight(void* data);
+
+static inline void* pdaAlloc(s32 size, s32 align)
+{
+    u32 h = fn_800E2C04(size, align);
+
+    if ((u16)h != 0) {
+        return (void*)fn_800E27B0(h);
+    }
+    return NULL;
+}
+
+static inline void pdaFree(void* p)
+{
+    u32 h;
+
+    if (p != NULL) {
+        h = fn_800E202C(p);
+        if ((u16)h != 0) {
+            fn_800E24B0();
+            fn_800E209C(h);
+        }
+    }
+}
+
+static inline u16 pdaGetWeight(u16 id)
+{
+    u32 work = pdaLoadPokemonId(id);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetWeight(data);
+        }
+        return 0;
+    }
+    return 0;
+}
+
+static inline u16 pdaGetHeight(u16 id)
+{
+    u32 work = pdaLoadPokemonId(id);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetHeight(data);
+        }
+        return 0;
+    }
+    return 0;
+}
+
+/* Reorder the memo index table for the active sort tab. */
+#pragma peephole off
+void fn_8003E394(void)
+{
+    PdaSortPair* pairs;
+    u16* ids;
+    u16 i;
+    u16 j;
+    u16 count;
+
+    switch (*(s8*)((u8*)&lbl_803A6818 + 0x15c)) {
+    case 0:
+        fn_8003F040();
+        break;
+    case 1:
+        pairs = (PdaSortPair*)pdaAlloc(0x640, 0x20);
+        ids = (u16*)pdaAlloc(0x320, 0x20);
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                u16 key = pdaGetWeight(id);
+                ids[count] = id;
+                pairs[count].key = key;
+                pairs[count].index = i;
+                count++;
+            }
+        }
+        fn_8003F2DC((u8*)pairs, count, 1);
+        for (j = 0; j < count; j++) {
+            lbl_8047A4E4[j] = ids[pairs[j].index];
+        }
+        lbl_8047A4E8 = count;
+        pdaFree(pairs);
+        pdaFree(ids);
+        break;
+    case 2:
+        pairs = (PdaSortPair*)pdaAlloc(0x640, 0x20);
+        ids = (u16*)pdaAlloc(0x320, 0x20);
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                u16 key = pdaGetWeight(id);
+                ids[count] = id;
+                pairs[count].key = key;
+                pairs[count].index = i;
+                count++;
+            }
+        }
+        if (count != 0) {
+            fn_8003F2DC((u8*)pairs, count, 0);
+            for (j = 0; j < count; j++) {
+                lbl_8047A4E4[j] = ids[pairs[j].index];
+            }
+        }
+        lbl_8047A4E8 = count;
+        pdaFree(pairs);
+        pdaFree(ids);
+        break;
+    case 3:
+        pairs = (PdaSortPair*)pdaAlloc(0x640, 0x20);
+        ids = (u16*)pdaAlloc(0x320, 0x20);
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                u16 key = pdaGetHeight(id);
+                ids[count] = id;
+                pairs[count].key = key;
+                pairs[count].index = i;
+                count++;
+            }
+        }
+        if (count != 0) {
+            fn_8003F2DC((u8*)pairs, count, 1);
+            for (j = 0; j < count; j++) {
+                lbl_8047A4E4[j] = ids[pairs[j].index];
+            }
+        }
+        lbl_8047A4E8 = count;
+        pdaFree(pairs);
+        pdaFree(ids);
+        break;
+    case 4:
+        pairs = (PdaSortPair*)pdaAlloc(0x640, 0x20);
+        ids = (u16*)pdaAlloc(0x320, 0x20);
+        count = 0;
+        for (i = 0; i < lbl_8047A4E8; i++) {
+            u16 id = lbl_8047A4E4[i];
+            if ((id & 0x8000) == 0) {
+                u16 key = pdaGetHeight(id);
+                ids[count] = id;
+                pairs[count].key = key;
+                pairs[count].index = i;
+                count++;
+            }
+        }
+        if (count != 0) {
+            fn_8003F2DC((u8*)pairs, count, 0);
+            for (j = 0; j < count; j++) {
+                lbl_8047A4E4[j] = ids[pairs[j].index];
+            }
+        }
+        lbl_8047A4E8 = count;
+        pdaFree(pairs);
+        pdaFree(ids);
+        break;
+    default:
+        break;
+    }
+}
+#pragma peephole reset
