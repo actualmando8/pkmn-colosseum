@@ -8,7 +8,7 @@ A matching decompilation project for the GameCube game **Pokémon Colosseum**
 
 ## Status
 
-![Progress over time](docs/progress.png)
+![Progress over time](https://raw.githubusercontent.com/dougchansan/pkmn-colosseum/progress-chart/progress.png)
 
 Every point on the chart is a real `objdiff` measurement. Points from
 2026-07-01 onward come from the report built in CI (or, for that first stretch,
@@ -16,10 +16,16 @@ from this table's own git history); earlier points were recovered by checking
 out each historical commit and running the build against it. The campaign
 starts on 2026-06-27, when `config/GC6E01/splits.txt` grew past its stub and
 units first became matchable — before that date this metric did not exist, and
-the work of that period was measured a different way. Regenerate with:
+the work of that period was measured a different way.
+
+The build workflow republishes the chart on every push to master, to the
+[`progress-chart`](https://github.com/dougchansan/pkmn-colosseum/tree/progress-chart)
+branch — master is protection-gated, so CI cannot commit there, and keeping the
+regenerated image off master stops its history growing a copy per push. Render
+one locally with:
 
 ```bash
-uv run --with matplotlib tools/plot_progress.py
+uv run --with matplotlib tools/plot_progress.py -o /tmp/progress.png
 ```
 
 | Metric | Value |
