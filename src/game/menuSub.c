@@ -155,78 +155,39 @@ void menuSubOpenSelect(void) {
 #endif
 
 /* 0x8001D994 | 0xCC */
-extern u32 pokemonBiosGetPokemonDataId();
-extern u32 pokemonDataBiosGetPtr();
-extern void pokemonDataBiosGetName(void);
-extern u32 GSmsgGetGSchar();
-extern void fn_800F9EE4(void);
-extern void pokemonGetSex(void);
-#if 0
-asm void fn_8001D994(void) {
-#include "src/game/gs_pcbox_fn_8001D994.inc"
-}
-#else
-void fn_8001D994(void) {
-    extern void fn_800F9EE4();
-    extern u32 GSmsgGetGSchar();
-    extern void pokemonDataBiosGetName();
-    extern u32 pokemonDataBiosGetPtr();
-    extern u32 pokemonBiosGetPokemonDataId();
-    extern void pokemonGetSex();
-    extern void pokemonCheckValid();
-    extern void pokemonGetStatus();
-    u8 sp[0x10];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r4 = 0;
-    u32 r5 = 0;
-    u32 r6 = 0;
-    u32 r30 = 0;
-    u32 r31 = 0;
+extern u16 pokemonBiosGetPokemonDataId(void*);
+extern void* pokemonDataBiosGetPtr(u16);
+extern void* pokemonDataBiosGetName(void*);
+extern void* GSmsgGetGSchar(void*);
+extern s32 GScharCmp(void*, void*);
+extern u8 pokemonGetSex(void*);
+extern u8 pokemonCheckValid(void*);
+extern u32 pokemonGetStatus(void*, s32, s32, s32);
 
-    r30 = r3;
-    pokemonCheckValid();
-    tmp = r3 & 0xFF;
-    if (tmp == 0) {
-        r3 = 0xff;
-        return;
+u8 menuSubGetPokemonSexForFightDisp(void* pokemon)
+{
+    void* species;
+    void* name;
+    u16 species_id;
+
+    if (!pokemonCheckValid(pokemon)) {
+        return 0xFF;
     }
-    r3 = r30;
-    pokemonBiosGetPokemonDataId();
-    tmp = r3 & 0xFFFF;
 
-    do {
-        if (tmp != 0x1d && tmp != 0x20) break;
-
-        r3 = r30;
-        r4 = 0x0;
-        r5 = 0x6e;
-        r6 = 0x0;
-        pokemonGetStatus();
-        r3 = r3 & 0xFFFF;
-        pokemonDataBiosGetPtr();
-        if (r3 == 0) break;
-        pokemonDataBiosGetName();
-        GSmsgGetGSchar();
-        tmp = r3;
-        r3 = r30;
-        r31 = tmp;
-        r4 = 0x0;
-        r5 = 0x77;
-        r6 = 0x0;
-        pokemonGetStatus();
-        r4 = r31;
-        fn_800F9EE4();
-        if ((s32)r3 != 0) break;
-        r3 = 0x2;
-        return;
-    } while (0);
-    r3 = r30;
-    pokemonGetSex();
-
-    return;
+    species_id = pokemonBiosGetPokemonDataId(pokemon);
+    if (species_id == 0x1D || species_id == 0x20) {
+        species = pokemonDataBiosGetPtr(
+            (u16)pokemonGetStatus(pokemon, 0, 0x6E, 0));
+        if (species != NULL) {
+            name = GSmsgGetGSchar(pokemonDataBiosGetName(species));
+            if (GScharCmp((void*)pokemonGetStatus(pokemon, 0, 0x77, 0),
+                          name) == 0) {
+                return 2;
+            }
+        }
+    }
+    return pokemonGetSex(pokemon);
 }
-#endif
 
 /* 0x8001DACC | 0x4DC */
 extern void fn_800F92D4(void);

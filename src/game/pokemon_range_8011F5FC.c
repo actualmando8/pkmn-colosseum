@@ -429,8 +429,8 @@ extern u8 itemDataBiosGetKind(u8* ptr);
 extern u32 itemDataBiosGetBuff(u8* ptr);
 extern f32 lbl_8047D018;
 void pokemonAddDpFormPokemonDpFilterId(u8* ptr, u16 itemDataId, u16 filterId);
-extern void* fn_801EEEB8();
-void pokemonSetDarkPokemonStatus(void);
+extern u16 fn_801EEEB8();
+void pokemonSetDarkPokemonStatus(u8*, u16);
 extern void GScharCpy();
 extern u16 fn_8010BBB8();
 extern void fn_8001D994(void);
@@ -1470,11 +1470,11 @@ extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 /* 0x8011FC74 | 0x30 */
 /* 0x8011FCA4 | 0x124 */
-extern void* fn_801EEEB8();
+extern u16 fn_801EEEB8();
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonSetDarkPokemonStatus(void);
+void pokemonSetDarkPokemonStatus(u8*, u16);
 /* 0x8011FDC8 | 0x504 */
 extern void GScharCpy();
 extern u16 fn_8010BBB8();
@@ -2180,6 +2180,25 @@ u8 pokemonIsDarkPokemon(u32 arg) {
 #endif /* POKEMON_RANGE_CANDIDATE_8011F910 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_8011FCA4)
+void pokemonSetDarkPokemonStatus(u8* pokemon, u16 dark_id)
+{
+    s32 dp;
+
+    if (pokemon == NULL) {
+        return;
+    }
+
+    pokemonSetStatus(pokemon, 0, 0xC3, 0, 0);
+    pokemonSetStatus(pokemon, 0, 0xC5, 0, -100);
+    pokemonSetStatus(pokemon, 0, 0xC6, 0, 0);
+    pokemonSetStatus(pokemon, 0, 0xC7, 0, 0);
+    fn_8011B950((u8*)pokemonGetStatus(pokemon, 0, 0xC8, 0), 1);
+    pokemonSetStatus(pokemon, 0, 0xC3, 0, dark_id);
+
+    dp = (s32)(lbl_8047CFF4 * fn_801EEEB8(dark_id));
+    pokemonSetStatus(pokemon, 0, 0xC5, 0, dp);
+}
+
 static inline u32 pokemonGetLevelToExpInline(u32 pokemon, u8 level)
 {
     u16 dataId;
