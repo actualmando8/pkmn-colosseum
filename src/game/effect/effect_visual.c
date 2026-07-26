@@ -752,8 +752,9 @@ u32 fn_80138BBC(void* ptr) {
     void* obj;
     u32 modelCount;
     u32 partCount;
-    u16 i;
-    u16 entryCount;
+    u32 i;
+    u32 j;
+    u32 entryCount;
     u16 handle;
 
     if (ptr != NULL) {
@@ -762,10 +763,9 @@ u32 fn_80138BBC(void* ptr) {
         entry = *(u8**)p;
         handle = *(u16*)(p + 0x4);
         for (i = 0; i < entryCount; i++, entry += 0x5C) {
-            obj = *(void**)(entry + 0x58);
-            if (obj != NULL) {
-                GSmodelSetVisibility(obj, 0);
-                GSmodelFree(obj);
+            if (*(void**)(entry + 0x58) != NULL) {
+                GSmodelSetVisibility(*(void**)(entry + 0x58), 0);
+                GSmodelFree(*(void**)(entry + 0x58));
                 *(void**)(entry + 0x58) = NULL;
             }
         }
@@ -776,9 +776,8 @@ u32 fn_80138BBC(void* ptr) {
             part = GSmodelGetPart(model, i);
             if (part != NULL) {
                 partCount = GSpartGetMaterialCount(part);
-                while (partCount != 0) {
-                    partCount--;
-                    obj = GSpartGetMaterial(part, partCount);
+                for (j = 0; j < partCount; j++) {
+                    obj = GSpartGetMaterial(part, j);
                     if (obj != NULL) {
                         GSmaterialSetAlpha(obj, *(f32*)&lbl_8047D160);
                         fn_800DF608(obj);
@@ -806,14 +805,13 @@ asm u32 fn_80138CCC(void* ptr) {
 u32 fn_80138CCC(void* ptr) {
     u8* p;
     u8* entry;
-    u16 count;
+    u32 count;
     u16 handle;
     u32 size;
-    u16 i;
+    u32 i;
 
     if (ptr == NULL) {
-        GSlogWrite((const char*)lbl_80272C90);
-        return 0;
+        goto allocation_error;
     }
 
     p = ptr;
@@ -825,26 +823,32 @@ u32 fn_80138CCC(void* ptr) {
 
     *(void**)(p + 0x8) = GSresGetResource(*(u16*)(p + 0x40), *(u16*)(p + 0x44));
     if (*(void**)(p + 0x8) == NULL) {
-        GSlogWrite((const char*)lbl_80272C30, *(u16*)(p + 0x40), *(u16*)(p + 0x44));
-        return 0;
+        goto resource_error;
     }
 
     size = count * 0x5C;
     handle = _toolentryAlloc__FUl(size);
     *(u16*)(p + 0x4) = handle;
     if (handle == 0) {
-        GSlogWrite((const char*)lbl_80272C90);
-        return 0;
+        goto allocation_error;
     }
 
-    entry = fn_800E27B0(handle);
-    *(void**)p = entry;
-    memset(entry, 0, size);
+    *(void**)p = fn_800E27B0(handle);
+    entry = *(u8**)p;
+    memset(*(void**)p, 0, size);
     *(u16*)(p + 0x3C) = 0;
     for (i = 0; i < count; i++, entry += 0x5C) {
         _leaffxGenerateLeafData(p, entry);
     }
     return 1;
+
+resource_error:
+    GSlogWrite((const char*)lbl_80272C30, *(u16*)(p + 0x40), *(u16*)(p + 0x44));
+    return 0;
+
+allocation_error:
+    GSlogWrite((const char*)lbl_80272C90);
+    return 0;
 }
 #endif
 extern void GSbezierCalculateVector(void);
@@ -1441,40 +1445,54 @@ u32 fn_8013AB60(void* ptr, u8* src, u8* dst, u32 alpha) {
     u8* node;
     u8* tail;
     u16 handle;
-    u32 i;
-
-    if (ptr == NULL || src == NULL || dst == NULL) {
-        return 0;
-    }
+    f32 start;
+    f32 end;
 
     p = ptr;
     handle = _toolentryAlloc__FUl(0x14);
-    if (handle == 0) {
-        return 0;
-    }
-
-    node = fn_800E27B0(handle);
-    for (i = 0; i < 4; i++) {
-        node[i] = src[i];
-        node[i + 4] = dst[i];
-    }
-    *(u32*)(node + 0x8) = alpha;
-    *(u16*)(node + 0xC) = handle;
-    *(u16*)(node + 0xE) = 0;
-    *(void**)(node + 0x10) = NULL;
-
-    tail = *(u8**)(p + 0x50);
-    if (tail == NULL) {
-        *(void**)(p + 0x50) = node;
-        *(void**)(p + 0x54) = node;
-        *(u32*)(p + 0x58) = 0;
-    } else {
-        while (*(void**)(tail + 0x10) != NULL) {
-            tail = *(u8**)(tail + 0x10);
+    if (handle != 0) {
+        node = fn_800E27B0(handle);
+        *(u16*)(node + 0xC) = handle;
+        if (alpha == 0xFFFFFFFF) {
+            start = src[0];
+            end = dst[0];
+            node[0] = start + 0.5f * (end - start);
+            start = src[1];
+            end = dst[1];
+            node[1] = start + 0.5f * (end - start);
+            start = src[2];
+            end = dst[2];
+            node[2] = start + 0.5f * (end - start);
+            start = src[3];
+            end = dst[3];
+            node[3] = start + 0.5f * (end - start);
+            node[4] = node[0];
+            node[5] = node[1];
+            node[6] = node[2];
+            node[7] = node[3];
+        } else {
+            node[0] = src[0];
+            node[1] = src[1];
+            node[2] = src[2];
+            node[3] = src[3];
+            node[4] = dst[0];
+            node[5] = dst[1];
+            node[6] = dst[2];
+            node[7] = dst[3];
         }
-        *(void**)(tail + 0x10) = node;
+        *(u32*)(node + 0x8) = alpha;
+        tail = *(u8**)(p + 0x50);
+        if (tail != NULL) {
+            while (*(void**)(tail + 0x10) != NULL) {
+                tail = *(u8**)(tail + 0x10);
+            }
+            *(void**)(tail + 0x10) = node;
+        } else {
+            *(void**)(p + 0x50) = node;
+        }
+        *(void**)(node + 0x10) = NULL;
     }
-    return 1;
+    return 0;
 }
 #endif
 #endif
@@ -1502,14 +1520,21 @@ u32 fn_8013AD68(void* ptr) {
 #endif
 
 #if !defined(EFFECT_VISUAL_BANK_ACTIVE)
-extern void fn_80168408(void);
+extern void fn_80168408(void* filter, u8* color);
 extern u32 lbl_8047D1E8;
 extern u32 lbl_8047D1F0;
 extern u32 lbl_8047D1F4;
 u32 fn_8013AD9C(void* ptr, u32 delta) {
     u8* p;
     u8* node;
+    u8* previous;
+    u8 color[4];
+    void* filter;
+    u32 elapsed;
     u32 duration;
+    f32 ratio;
+    f32 start;
+    f32 end;
 
     if (ptr == NULL) {
         return 0;
@@ -1524,22 +1549,60 @@ u32 fn_8013AD9C(void* ptr, u32 delta) {
     duration = *(u32*)(node + 0x8);
     if (duration == 0xFFFFFFFF) {
         *(u32*)(p + 0x58) = 0;
-    } else {
-        while (node != NULL) {
-            if (*(u32*)(p + 0x58) < *(u32*)(node + 0x8)) {
-                break;
-            }
-            *(u32*)(p + 0x58) -= *(u32*)(node + 0x8);
-            node = *(u8**)(node + 0x10);
-            *(void**)(p + 0x54) = node;
-        }
+    }
+    while (*(u32*)(p + 0x58) >= duration) {
+        *(u32*)(p + 0x58) -= duration;
+        previous = node;
+        node = *(u8**)(node + 0x10);
+        *(void**)(p + 0x54) = node;
         if (node == NULL) {
+            if (*(u8*)(p + 0x4C) != 0) {
+                fn_8013B268(p, previous + 4);
+            } else {
+                filter = *(void**)p;
+                if (filter != NULL) {
+                    fn_80168408(filter, previous + 4);
+                }
+            }
             return 0;
+        }
+        duration = *(u32*)(node + 0x8);
+        if (duration == 0xFFFFFFFF) {
+            *(u32*)(p + 0x58) = 0;
+            break;
         }
     }
 
+    elapsed = *(u32*)(p + 0x58);
+    ratio = (f32)elapsed / (f32)duration;
+    if (ratio < *(f32*)&lbl_8047D1F0) {
+        ratio = *(f32*)&lbl_8047D1F0;
+    }
+    if (ratio > *(f32*)&lbl_8047D1F4) {
+        ratio = *(f32*)&lbl_8047D1F4;
+    }
+
+    start = node[0];
+    end = node[4];
+    color[0] = start + ratio * (end - start);
+    start = node[1];
+    end = node[5];
+    color[1] = start + ratio * (end - start);
+    start = node[2];
+    end = node[6];
+    color[2] = start + ratio * (end - start);
+    start = node[3];
+    end = node[7];
+    color[3] = start + ratio * (end - start);
+
     if (*(u8*)(p + 0x4C) != 0) {
-        fn_8013B268(p, node);
+        fn_8013B268(p, color);
+    } else {
+        filter = *(void**)p;
+        if (filter == NULL) {
+            return 0;
+        }
+        fn_80168408(filter, color);
     }
     *(u32*)(p + 0x58) += delta;
     return 1;

@@ -860,13 +860,13 @@ void GSmsgSetFontInfo(void* obj) {
     u32 offset;
     u8* arr;
     u8* entry;
-    u16 val;
+    u32 val;
 
     o = (u8*)obj;
     head = (u8*)lbl_80478B08;
+    offset = 0;
     count = *(u16*)(head + 0x4);
     if ((s32)count <= 0) return;
-    offset = 0;
     do {
         arr = (u8*)*(u32*)(head + 0x24);
         entry = arr + offset;
@@ -1013,13 +1013,13 @@ asm void GSmsgIsCheck(void) {
 #pragma optimization_level 2
 static inline u8* GSmsgFindCheck(u8* head, u32 key)
 {
-    u32 count;
+    s32 count;
     u8* entry;
     u8 i;
 
     count = *(u16*)head;
-    for (i = 0; i < count; i++) {
-        entry = *(u8**)(head + 0x20) + i * 0x68;
+    for (i = 0; i < count;) {
+        entry = *(u8**)(head + 0x20) + i++ * 0x68;
         if (entry[0] != 0 && *(u32*)(entry + 0x1C) == key) {
             return entry;
         }
@@ -2010,22 +2010,12 @@ asm void fn_800FBD88(void) {
 #pragma optimization_level 2
 void fn_800FBD88(u32 key) {
     u8* head;
-    u32 count;
     u8* entry;
-    u8 i;
     u8 type;
     u32 r3;
 
     head = (u8*)lbl_80478B08;
-    count = *(u16*)head;
-    entry = NULL;
-    for (i = 0; (u32)(i & 0xFF) < count; i++) {
-        u8* e = (u8*)*(u32*)(head + 0x20) + (u32)(i & 0xFF) * 0x68;
-        if (*(u8*)(e + 0x0) != 0 && *(u32*)(e + 0x1C) == key) {
-            entry = e;
-            break;
-        }
-    }
+    entry = GSmsgFindCheck(head, key);
     if (entry == NULL) return;
     type = *(u8*)(entry + 0x3);
     r3 = 0;
@@ -2052,20 +2042,10 @@ asm void fn_800FBE7C(void) {
 #pragma optimization_level 2
 s32 fn_800FBE7C(u32 key, u32 r4arg) {
     u8* head;
-    u32 count;
     u8* entry;
-    u8 i;
 
     head = (u8*)lbl_80478B08;
-    count = *(u16*)head;
-    entry = NULL;
-    for (i = 0; (u32)(i & 0xFF) < count; i++) {
-        u8* e = (u8*)*(u32*)(head + 0x20) + (u32)(i & 0xFF) * 0x68;
-        if (*(u8*)(e + 0x0) != 0 && *(u32*)(e + 0x1C) == key) {
-            entry = e;
-            break;
-        }
-    }
+    entry = GSmsgFindCheck(head, key);
     if (entry == NULL) return -1;
     return fn_800FC7E0(entry, *(u8*)(entry + 0x44), r4arg);
 }
@@ -2248,7 +2228,7 @@ asm void GSmsgOpen(void) {
 }
 #else
 #pragma optimization_level 2
-void GSmsgOpen(u32* item) {
+u32* GSmsgOpen(u32* item) {
     u32* head;
     u32* p;
 
@@ -2257,16 +2237,16 @@ void GSmsgOpen(u32* item) {
         head[2] = (u32)item;
         item[2] = 0;
         item[3] = 0;
-        return;
+        return item;
     }
     p = (u32*)head[2];
     while (1) {
-        if (p == item) return;
+        if (p == item) return NULL;
         if (p[2] == 0) {
             p[2] = (u32)item;
             item[2] = 0;
             item[3] = (u32)p;
-            return;
+            return item;
         }
         p = (u32*)p[2];
     }
