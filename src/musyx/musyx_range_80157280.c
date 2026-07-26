@@ -857,6 +857,98 @@ skip_spread:
 }
 #pragma pop
 
+/* s_data.c: project group insertion. */
+typedef struct SDataGroup {
+    u32 nextOffset;
+    u16 id;
+    u16 type;
+    u32 macroOffset;
+    u32 sampleOffset;
+    u32 curveOffset;
+    u32 keymapOffset;
+    u32 layerOffset;
+    u32 normalPageOffset;
+} SDataGroup;
+
+typedef struct SDataStackEntry {
+    SDataGroup* group;
+    void* sampleDirectory;
+    void* project;
+} SDataStackEntry;
+
+extern u8 lbl_8047AF18;
+extern s16 lbl_8047AFE8;
+extern SDataStackEntry lbl_80447860[128];
+extern void* fn_80162FAC(void* address); /* hwTransAddr */
+extern u32 fn_80151770(void* sampleDirectory, void* samples); /* dataInsertSDir */
+extern void fn_80151A68(u16 group, void* effects, u16 count); /* dataInsertFX */
+extern void fn_80159C54(u16 id, MusyxPoolData* data, u8 type,
+                        u32 remove); /* InsertData */
+extern void fn_80163188(void); /* hwSyncSampleMem */
+
+static inline void sdataScanIDList(u16* reference, MusyxPoolData* data,
+                                   u8 type) {
+    u16 id;
+
+    while (*reference != 0xFFFF) {
+        if ((*reference & 0x8000) != 0) {
+            id = *reference & 0x3FFF;
+            while (id <= reference[1]) {
+                fn_80159C54(id, data, type, 0);
+                id++;
+            }
+            reference += 2;
+        } else {
+            fn_80159C54(*reference++, data, type, 0);
+        }
+    }
+}
+
+u32 fn_80159EF0(void* project, u16 group, void* samples,
+                void* sampleDirectory,
+                MusyxPoolData* pool) { /* sndPushGroup */
+    SDataGroup* entry;
+
+    if (lbl_8047AF18 != 0 && lbl_8047AFE8 < 128) {
+        entry = project;
+        while (entry->nextOffset != 0xFFFFFFFF) {
+            if (entry->id == group) {
+                lbl_80447860[lbl_8047AFE8].group = entry;
+                lbl_80447860[lbl_8047AFE8].sampleDirectory =
+                    sampleDirectory;
+                lbl_80447860[lbl_8047AFE8].project = project;
+
+                samples = fn_80162FAC(samples);
+                if (fn_80151770(sampleDirectory, samples) != 0) {
+                    sdataScanIDList((u16*)((u8*)project +
+                                          entry->sampleOffset),
+                                    (MusyxPoolData*)sampleDirectory, 1);
+                }
+                sdataScanIDList((u16*)((u8*)project + entry->macroOffset),
+                                pool, 0);
+                sdataScanIDList((u16*)((u8*)project + entry->curveOffset),
+                                pool, 4);
+                sdataScanIDList((u16*)((u8*)project + entry->keymapOffset),
+                                pool, 2);
+                sdataScanIDList((u16*)((u8*)project + entry->layerOffset),
+                                pool, 3);
+
+                if (entry->type == 1) {
+                    u8* effectData =
+                        (u8*)project + entry->normalPageOffset;
+                    fn_80151A68(group, effectData + 4,
+                                *(u16*)effectData);
+                }
+                fn_80163188();
+                lbl_8047AFE8++;
+                return 1;
+            }
+            entry = (SDataGroup*)((u8*)project + entry->nextOffset);
+        }
+    }
+    return 0;
+}
+
 /* snd_service: periodically advances active sound emitters and publishes
  * positional updates to the synthesizer. */
 typedef struct SndServiceSource {
@@ -892,7 +984,9 @@ typedef struct SndServiceVoice {
     u32 group;
     u16 effectId;
     u8 fallbackStudio;
-    u8 _47[5];
+    u8 maxVoices;
+    u16 volumeLevelCount;
+    u8 _4A[2];
     f32 fade;
 } SndServiceVoice;
 
@@ -902,21 +996,41 @@ typedef struct SndVec3 {
     f32 z;
 } SndVec3;
 
-typedef struct SndListener {
-    struct SndListener* next;
-    u32 _04;
-    void* studioRef;
+typedef struct SndFMatrix {
+    f32 m[3][3];
+    f32 t[3];
+} SndFMatrix;
+
+typedef struct SndRoom {
+    struct SndRoom* next;
+    struct SndRoom* prev;
     u32 flags;
     SndVec3 position;
-    f32 offsetDistance;
-    SndVec3 velocity;
-    SndVec3 offsetDirection;
-    u8 _38[0x18];
-    f32 matrix[12];
-    f32 rearRange;
-    f32 frontRange;
+    f32 averageDistance;
+    u8 studio;
+    u8 _1D[3];
+    void (*activateReverb)(u8 studio, void* user);
+    void (*deactivateReverb)(u8 studio);
+    void* user;
+    u32 currentMasterVolume;
+} SndRoom;
+
+typedef struct SndListener {
+    struct SndListener* next;
+    struct SndListener* prev;
+    SndRoom* room;
+    u32 flags;
+    SndVec3 position;
+    f32 volumePositionOffset;
+    SndVec3 direction;
+    SndVec3 heading;
+    SndVec3 right;
+    SndVec3 up;
+    SndFMatrix matrix;
+    f32 surroundDistanceFront;
+    f32 surroundDistanceBack;
     f32 soundSpeed;
-    f32 gain;
+    f32 volume;
 } SndListener;
 
 typedef struct SndServiceStudio {
@@ -939,11 +1053,21 @@ typedef struct SndServiceGroupNode {
     SndServiceVoice* voice;
 } SndServiceGroupNode;
 
+typedef struct SndServiceStartNode {
+    struct SndServiceStartNode* next;
+    f32 value;
+    f32 pan;
+    f32 volume;
+    f32 surround;
+    f32 pitch;
+    SndServiceVoice* voice;
+} SndServiceStartNode;
+
 typedef struct SndServiceGroup {
     u32 key;
-    u32 _04;
-    SndServiceGroupNode* voices;
-    u16 count;
+    SndServiceStartNode* starting;
+    SndServiceGroupNode* running;
+    u16 numRunning;
     u16 _0E;
 } SndServiceGroup;
 
@@ -966,21 +1090,302 @@ extern u8 lbl_8047B04C;
 extern u8 lbl_8047B032;
 extern u8 lbl_8047B031;
 extern u8 lbl_8047B030;
+extern u8 lbl_8047B033;
 extern SndServiceEmitterPair* lbl_8047B03C;
 extern SndServiceGroup lbl_80448590[];
 extern SndServiceGroupNode lbl_80448990[];
+extern SndServiceStartNode lbl_80448C90[];
 extern f32 lbl_8047D488;
 extern f32 lbl_8047D49C;
 extern f32 lbl_8047D4A0;
+extern f32 lbl_8047D4A8;
+extern f32 lbl_8047D4AC;
 extern f32 lbl_8047D4B0[];
 extern u32 synthFXStart(u16 effect, u8 volume, u8 pan, u8 studio, u32 itd);
 extern u32 synthFXSetCtrl(u32 handle, u8 ctrl, u8 value);
 extern u32 synthFXSetCtrl14(u32 handle, u8 ctrl, u16 value);
 extern u32 sndFXCheck(u32 handle);
-extern u32 fn_8015F124(SndServiceVoice*, f32, f32, f32, f32, f32);
-extern void fn_8015F270(void);
 extern void fn_8014DD98(u8 studio, void* update);
 extern void fn_8014DDB8(u8 studio, void* update);
+extern void hwDisableIrq(void);
+extern void hwEnableIrq(void);
+extern void salCrossProduct(f32* result, const f32* first,
+                            const f32* second);
+extern void salInvertMatrix(SndFMatrix* result, const SndFMatrix* matrix);
+
+static inline void s3dMakeListenerMatrix(SndListener* listener) {
+    SndFMatrix matrix;
+
+    salCrossProduct((f32*)&listener->right, (f32*)&listener->heading,
+                    (f32*)&listener->up);
+    matrix.m[0][0] = listener->right.x;
+    matrix.m[1][0] = listener->right.y;
+    matrix.m[2][0] = listener->right.z;
+    matrix.m[0][1] = listener->up.x;
+    matrix.m[1][1] = listener->up.y;
+    matrix.m[2][1] = listener->up.z;
+    matrix.m[0][2] = -listener->heading.x;
+    matrix.m[1][2] = -listener->heading.y;
+    matrix.m[2][2] = -listener->heading.z;
+    matrix.t[0] = listener->position.x;
+    matrix.t[1] = listener->position.y;
+    matrix.t[2] = listener->position.z;
+    salInvertMatrix(&listener->matrix, &matrix);
+}
+
+static inline void s3dRemoveListenerFromRoom(SndRoom* room) {
+    SndListener* listener;
+    u32 count;
+
+    count = 0;
+    for (listener = (SndListener*)lbl_8047B044; listener != 0;
+         listener = listener->next) {
+        if (listener->room == room) {
+            count++;
+        }
+    }
+    if (count == 1) {
+        room->flags &= 0x7FFFFFFF;
+        room->flags |= 0x40000000;
+    }
+}
+
+static inline void s3dAddListenerToRoom(SndRoom* room) {
+    if ((room->flags & 0x80000000) == 0 &&
+        room->currentMasterVolume == 0) {
+        room->flags |= 0x80000000;
+    }
+}
+
+u32 fn_8015ED00(SndListener* listener, SndVec3* position,
+                SndVec3* direction, SndVec3* heading, SndVec3* up,
+                u8 volume, SndRoom* room) { /* sndUpdateListener */
+    if (lbl_8047AF18 != 0) {
+        hwDisableIrq();
+        listener->position = *position;
+        listener->direction = *direction;
+        listener->heading = *heading;
+        listener->up = *up;
+        s3dMakeListenerMatrix(listener);
+        listener->volume = volume / lbl_8047D488;
+
+        if (room != listener->room) {
+            if (listener->room != 0) {
+                s3dRemoveListenerFromRoom(listener->room);
+            }
+            listener->room = room;
+            if (room != 0) {
+                s3dAddListenerToRoom(room);
+            }
+        }
+        hwEnableIrq();
+        return 1;
+    }
+    return 0;
+}
+
+u32 fn_8015EF04(SndListener* listener, SndVec3* position,
+                SndVec3* direction, SndVec3* heading, SndVec3* up,
+                f32 surroundFront, f32 surroundBack, f32 soundSpeed,
+                u32 flags, u8 volume, SndRoom* room) { /* sndAddListener */
+    if (lbl_8047AF18 != 0) {
+        hwDisableIrq();
+        listener->next = (SndListener*)lbl_8047B044;
+        if (listener->next != 0) {
+            listener->next->prev = listener;
+        }
+        listener->prev = 0;
+        lbl_8047B044 = (MusyxEmitterListener*)listener;
+
+        listener->position = *position;
+        listener->direction = *direction;
+        listener->heading = *heading;
+        listener->up = *up;
+        listener->surroundDistanceFront = surroundFront;
+        listener->surroundDistanceBack = surroundBack;
+        listener->soundSpeed = soundSpeed;
+        listener->volumePositionOffset = lbl_8047D468;
+        s3dMakeListenerMatrix(listener);
+        listener->flags = flags;
+        listener->volume = volume / lbl_8047D488;
+        listener->room = room;
+        if (room != 0) {
+            s3dAddListenerToRoom(room);
+        }
+        hwEnableIrq();
+        return 1;
+    }
+    return 0;
+}
+
+u32 fn_8015F124(SndServiceVoice* voice, f32 value, f32 pan, f32 volume,
+                f32 surround, f32 pitch) { /* AddStartingEmitter */
+    s32 i;
+    SndServiceStartNode* node;
+
+    for (i = 0; i < lbl_8047B032; i++) {
+        if (voice->group == lbl_80448590[i].key) {
+            break;
+        }
+    }
+
+    if (i == lbl_8047B032) {
+        if (lbl_8047B032 == 64) {
+            return 0;
+        }
+        lbl_80448590[i].starting = 0;
+        lbl_80448590[i].running = 0;
+        lbl_80448590[i].numRunning = 0;
+        lbl_80448590[i].key = voice->group;
+        lbl_8047B032++;
+    }
+
+    if (lbl_8047B031 == 64) {
+        return 0;
+    }
+
+    node = lbl_80448590[i].starting;
+    if (node != 0) {
+        for (; node->next != 0; node = node->next) {
+            if (node->value < value) {
+                break;
+            }
+        }
+        lbl_80448C90[lbl_8047B031].next = node->next;
+        node->next = &lbl_80448C90[lbl_8047B031];
+    } else {
+        lbl_80448C90[lbl_8047B031].next = lbl_80448590[i].starting;
+        lbl_80448590[i].starting = &lbl_80448C90[lbl_8047B031];
+    }
+
+    lbl_80448C90[lbl_8047B031].voice = voice;
+    lbl_80448C90[lbl_8047B031].pitch = pitch;
+    lbl_80448C90[lbl_8047B031].pan = pan;
+    lbl_80448C90[lbl_8047B031].volume = volume;
+    lbl_80448C90[lbl_8047B031].surround = surround;
+    lbl_80448C90[lbl_8047B031].value = value;
+    lbl_8047B031++;
+    return 1;
+}
+
+static inline void s3dSetFXParameters(SndServiceVoice* voice, f32 value,
+                                      f32 pan, f32 volume, f32 surround,
+                                      f32 pitch) {
+    u32 converted;
+    u32 handle;
+    u8 controlValue;
+    u16 control14;
+
+    handle = voice->handle;
+    if (voice->flags & 0x100000) {
+        converted = (u32)(s32)(lbl_8047D488 * (voice->fade * value));
+    } else {
+        converted = (u32)(s32)(lbl_8047D488 * value);
+    }
+    controlValue = 0x7F;
+    if ((u8)converted <= 0x7F) {
+        controlValue = converted;
+    }
+    synthFXSetCtrl(handle, 7, controlValue);
+
+    converted = (u32)(s32)(lbl_8047D49C * (lbl_8047D48C + pan));
+    controlValue = 0x7F;
+    if ((u8)converted <= 0x7F) {
+        controlValue = converted;
+    }
+    synthFXSetCtrl(handle, 0xA, controlValue);
+
+    converted = (u32)(s32)(lbl_8047D49C * (lbl_8047D48C - surround));
+    controlValue = 0x7F;
+    if ((u8)converted <= 0x7F) {
+        controlValue = converted;
+    }
+    synthFXSetCtrl(handle, 0x83, controlValue);
+
+    converted = __cvt_fp2unsigned(lbl_8047D4A0 * pitch);
+    control14 = 0x3FFF;
+    if (converted <= 0x3FFF) {
+        control14 = converted;
+    }
+    synthFXSetCtrl14(handle, 0x84, control14);
+
+    if (voice->ctrlList != 0) {
+        u32 i;
+        SndServiceCtrl* ctrl = voice->ctrlList->controls;
+
+        for (i = 0; i < voice->ctrlList->count; i++, ctrl++) {
+            if (ctrl->ctrl < 0x40 || ctrl->ctrl == 0x80 ||
+                ctrl->ctrl == 0x84) {
+                synthFXSetCtrl14(handle, ctrl->ctrl, ctrl->value);
+            } else {
+                synthFXSetCtrl(handle, ctrl->ctrl, (u8)ctrl->value);
+            }
+        }
+    }
+}
+
+void fn_8015F270(void) { /* StartContinousEmitters */
+    s32 i;
+    SndServiceStartNode* start;
+    SndServiceVoice* voice;
+    f32 difference;
+
+    for (i = 0; i < lbl_8047B032; i++) {
+        for (start = lbl_80448590[i].starting; start != 0;
+             start = start->next) {
+            if (lbl_80448590[i].running != 0 &&
+                !((lbl_8047B033 != 0 &&
+                   (lbl_80448590[i].key & 0x80000000) != 0) &&
+                  lbl_80448590[i].numRunning <
+                      lbl_80448590[i].starting->voice->maxVoices)) {
+                difference =
+                    start->value - lbl_80448590[i].running->value;
+                if (difference <= lbl_8047D4A8) {
+                    continue;
+                } else if (difference <= lbl_8047D4AC) {
+                    if (++start->voice->volumeLevelCount < 20) {
+                        continue;
+                    }
+                } else {
+                    start->voice->volumeLevelCount = 0;
+                }
+            }
+
+            voice = start->voice;
+            if (voice->source != 0 && voice->source->studio == 0xFF) {
+                goto set_flags;
+            }
+            voice->handle =
+                synthFXStart(voice->effectId, 127, 64,
+                             voice->source != 0 ? voice->source->studio
+                                                : voice->fallbackStudio,
+                             (voice->flags & 0x10) != 0);
+            if (voice->handle == 0xFFFFFFFF) {
+set_flags:
+                if (!(voice->flags & 2)) {
+                    voice->flags |= 0x40000;
+                    voice->flags &= ~0x20000;
+                }
+            } else {
+                if (!(voice->flags & 0x20)) {
+                    voice->flags |= 0x100000;
+                    voice->fade = lbl_8047D468;
+                } else {
+                    voice->fade = lbl_8047D48C;
+                }
+                s3dSetFXParameters(voice, start->value, start->pan,
+                                   start->volume, start->surround,
+                                   start->pitch);
+                voice->flags &= ~0x20000;
+                lbl_80448590[i].numRunning++;
+                if (lbl_80448590[i].running != 0) {
+                    lbl_80448590[i].running =
+                        lbl_80448590[i].running->next;
+                }
+            }
+        }
+    }
+}
 
 #pragma push
 #pragma optimization_level 4
@@ -1113,21 +1518,21 @@ void fn_8015F620(void)
                 }
                 group = &lbl_80448590[groupIndex];
                 if (groupIndex == lbl_8047B032) {
-                    group->_04 = 0;
-                    group->voices = 0;
-                    group->count = 0;
+                    group->starting = 0;
+                    group->running = 0;
+                    group->numRunning = 0;
                     group->key = voice->group;
                     lbl_8047B032++;
                 }
-                group->count++;
+                group->numRunning++;
                 before = 0;
-                node = group->voices;
+                node = group->running;
                 while (node != 0 && node->value <= value) {
                     before = node;
                     node = node->next;
                 }
                 if (before == 0) {
-                    group->voices = &lbl_80448990[lbl_8047B030];
+                    group->running = &lbl_80448990[lbl_8047B030];
                 } else {
                     before->next = &lbl_80448990[lbl_8047B030];
                 }
@@ -2913,7 +3318,7 @@ asm void fn_80162FAC(void) {
 #include "src/game/people/people_field_fn_80162FAC.inc"
 }
 #else
-void fn_80162FAC(void) {}
+void* fn_80162FAC(void* address) { return address; }
 #endif
 #pragma pop
 #pragma push
@@ -4205,7 +4610,14 @@ typedef struct {
     u8 pad_11E[0x121 - 0x11E]; /* vGroup, studio, track */
     u8 midi;                   /* 0x121 */
     u8 midiSet;                /* 0x122 */
-    u8 pad_123[0x404 - 0x123];
+    u8 pad_123[0x1D6 - 0x123];
+    u8 pbLowerKeyRange;        /* 0x1D6 */
+    u8 pbUpperKeyRange;        /* 0x1D7 */
+    u8 pad_1D8[0x206 - 0x1D8];
+    u16 curPitch;               /* 0x206 */
+    u8 pad_208[0x214 - 0x208];
+    u32 midiDirtyFlags;        /* 0x214 */
+    u8 pad_218[0x404 - 0x218];
 } SynthVoiceMini; /* offset-mirror of SYNTH_VOICE, stride 0x404 */
 #pragma pack()
 
@@ -5566,6 +5978,88 @@ void fn_80159840(MusyxVirtualSampleBuffer* sb, u32 cpos) {
         sb->info.data.update.len2 = cpos;
         if ((len = vs->callback(1, &sb->info)) != 0) {
             sb->last = (sb->last + len) % vs->bufferLength;
+        }
+    }
+}
+
+extern u8 fn_80162878(u32 voice); /* hwGetVirtualSampleState */
+extern u32 fn_80162E14(u32 voice); /* hwGetPos */
+extern u32 hwGetVirtualSampleID(u32 voice);
+extern u32 fn_801631F4(u32 voice); /* hwVoiceInStartup */
+extern void macSampleEndNotify(SynthVoiceMini* voice);
+
+void vsSampleUpdates(void) {
+    extern void fn_80159840(MusyxVirtualSampleBuffer* buffer, u32 position);
+    extern u8 fn_80162878(u32 voice);
+    extern u32 fn_80162E14(u32 voice);
+    extern u32 hwGetVirtualSampleID(u32 voice);
+    extern u32 fn_801631F4(u32 voice);
+    extern void hwBreak(u32 voice);
+    extern void macSampleEndNotify(SynthVoiceMini* voice);
+    extern void voiceKill(u32 voice);
+    MusyxVirtualSamples* vs = (MusyxVirtualSamples*)lbl_80446F10;
+    u32 i;
+    u32 cpos;
+    u32 realCPos;
+    MusyxVirtualSampleBuffer* buffer;
+    u32 nextSamples;
+
+    if (vs->callback == NULL) {
+        return;
+    }
+
+    for (i = 0; i < 64; i++) {
+        if (vs->voices[i] != 0xFF && fn_80162878(i) != 0) {
+            buffer = &vs->streamBuffer[vs->voices[i]];
+            realCPos = fn_80162E14(i);
+            if (buffer->smpType == 5) {
+                cpos = (realCPos / 14) * 14;
+            } else {
+                cpos = realCPos;
+            }
+
+            switch (buffer->state) {
+            case 1:
+                fn_80159840(buffer, cpos);
+                break;
+            case 2:
+            case 3:
+                if (((buffer->info.instID << 8) | buffer->voice) ==
+                    hwGetVirtualSampleID(buffer->voice)) {
+                    fn_80159840(buffer, cpos);
+                    if (realCPos >= buffer->finalLast) {
+                        buffer->finalGoodSamples -=
+                            realCPos - buffer->finalLast;
+                    } else {
+                        buffer->finalGoodSamples -=
+                            vs->bufferLength -
+                            (buffer->finalLast - realCPos);
+                    }
+                    buffer->finalLast = realCPos;
+                    nextSamples =
+                        (lbl_8047AF48[buffer->voice].curPitch * 160 +
+                         0xFFF) /
+                        4096;
+                    if ((s32)nextSamples >
+                        (s32)buffer->finalGoodSamples) {
+                        if (!fn_801631F4(buffer->voice)) {
+                            if (buffer->state == 2) {
+                                hwBreak(buffer->voice);
+                                macSampleEndNotify(
+                                    &lbl_8047AF48[buffer->voice]);
+                            } else {
+                                voiceKill(buffer->voice);
+                            }
+                        }
+                        buffer->state = 0;
+                        vs->voices[buffer->voice] = 0xFF;
+                    }
+                } else {
+                    buffer->state = 0;
+                    vs->voices[buffer->voice] = 0xFF;
+                }
+                break;
+            }
         }
     }
 }
@@ -7162,7 +7656,7 @@ void fn_8015B250(u32 dest, u32 nsDelay) {
 #undef dspStudio
 
 void fn_80159C48(void) {
-    extern u16 lbl_8047AFE8;
+    extern s16 lbl_8047AFE8;
     lbl_8047AFE8 = 0;
 }
 
@@ -7559,11 +8053,6 @@ void salCrossProduct(f32* dst, const f32* a, const f32* b) {
     dst[2] = a[0] * b[1] - a[1] * b[0];
 }
 
-typedef struct SndFMatrix {
-    f32 m[3][3];
-    f32 t[3];
-} SndFMatrix;
-
 void salInvertMatrix(SndFMatrix* out, const SndFMatrix* in) {
     f32 a;
     f32 b;
@@ -7633,27 +8122,84 @@ void fn_8016039C(u8 chan, u8 midiSet, s32 flag) { /* inpSetGlobalMIDIDirtyFlag *
 
 extern void synthKeyStateUpdate(SynthVoiceMini* svoice);
 
-static void inpMirrorChannelDefault(u8 midi, u8 midiSet, u8 value) {
+static inline void inpSetRPNHi(u8 set, u8 channel, u8 value) {
     u32 i;
-    SynthVoiceMini* voice;
+    u16 rpn;
+    u8 range;
 
-    for (i = 0, voice = lbl_8047AF48; i < synthInfo.voiceNum; i++, voice++) {
-        if (voice->midiSet == midiSet && voice->midi == midi) {
-            ((u8*)voice)[0x1D7] = value;
-            ((u8*)voice)[0x1D6] = value;
+    rpn = lbl_80449590[set][channel][100] |
+          (lbl_80449590[set][channel][101] << 8);
+    switch (rpn) {
+    case 0:
+        range = value > 24 ? 24 : value;
+        lbl_8044D890[set][channel] = range;
+        for (i = 0; i < synthInfo.voiceNum; i++) {
+            if (set == lbl_8047AF48[i].midiSet &&
+                channel == lbl_8047AF48[i].midi) {
+                lbl_8047AF48[i].pbUpperKeyRange = range;
+                lbl_8047AF48[i].pbLowerKeyRange = range;
+            }
         }
+        break;
+    default:
+        break;
     }
 }
 
-static void inpDirtyLiveVoices(u8 midi, u8 midiSet) {
-    u32 i;
-    SynthVoiceMini* voice;
+static inline void inpSetRPNLo(u8 set, u8 channel, u8 value) {
+}
 
-    for (i = 0, voice = lbl_8047AF48; i < synthInfo.voiceNum; i++, voice++) {
-        if (voice->midiSet == midiSet && voice->midi == midi) {
-            *(u32*)((u8*)voice + 0x214) = 0x1FFF;
-            synthKeyStateUpdate(voice);
+static inline void inpSetRPNDec(u8 set, u8 channel) {
+    u32 i;
+    u16 rpn;
+    u8 range;
+
+    rpn = lbl_80449590[set][channel][100] |
+          (lbl_80449590[set][channel][101] << 8);
+    switch (rpn) {
+    case 0:
+        range = lbl_8044D890[set][channel];
+        if (range != 0) {
+            range--;
         }
+        lbl_8044D890[set][channel] = range;
+        for (i = 0; i < synthInfo.voiceNum; i++) {
+            if (set == lbl_8047AF48[i].midiSet &&
+                channel == lbl_8047AF48[i].midi) {
+                lbl_8047AF48[i].pbUpperKeyRange = range;
+                lbl_8047AF48[i].pbLowerKeyRange = range;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+static inline void inpSetRPNInc(u8 set, u8 channel) {
+    u32 i;
+    u16 rpn;
+    u8 range;
+
+    rpn = lbl_80449590[set][channel][100] |
+          (lbl_80449590[set][channel][101] << 8);
+    switch (rpn) {
+    case 0:
+        range = lbl_8044D890[set][channel];
+        if (range < 24) {
+            range++;
+        }
+        lbl_8044D890[set][channel] = range;
+        for (i = 0; i < synthInfo.voiceNum; i++) {
+            if (set == lbl_8047AF48[i].midiSet &&
+                channel == lbl_8047AF48[i].midi) {
+                lbl_8047AF48[i].pbUpperKeyRange = range;
+                lbl_8047AF48[i].pbLowerKeyRange = range;
+            }
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -7661,74 +8207,61 @@ static void inpDirtyLiveVoices(u8 midi, u8 midiSet) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value) { /* inpSetMidiCtrl */
-    u8* ctrlBase;
-    u8 range;
+    u32 i;
 
     if (channel == 0xFF) {
         return;
     }
 
-    ctrlBase = (set != 0xFF) ? lbl_80449590[set][channel] : lbl_8044D910[channel];
-
-    switch (ctrl) {
-    case 6:
-        if (((ctrlBase[0x64] << 8) | ctrlBase[0x65]) == 0) {
-            range = value;
-            if (range > 0x18) {
-                range = 0x18;
-            }
-            if (set != 0xFF) {
-                lbl_8044D890[set][channel] = range;
-            } else {
-                lbl_8044FA90[channel] = range;
-            }
-            inpMirrorChannelDefault(channel, set, range);
-        }
-        break;
-    case 0x60:
-        if (((ctrlBase[0x64] << 8) | ctrlBase[0x65]) == 0) {
-            if (set != 0xFF) {
-                range = lbl_8044D890[set][channel];
-                if (range != 0) {
-                    range--;
-                }
-                lbl_8044D890[set][channel] = range;
-            } else {
-                range = lbl_8044FA90[channel];
-                if (range != 0) {
-                    range--;
-                }
-                lbl_8044FA90[channel] = range;
-            }
-            inpMirrorChannelDefault(channel, set, range);
-        }
-        break;
-    case 0x61:
-        if (((ctrlBase[0x64] << 8) | ctrlBase[0x65]) == 0) {
-            if (set != 0xFF) {
-                range = lbl_8044D890[set][channel];
-                if (range < 0x18) {
-                    range++;
-                }
-                lbl_8044D890[set][channel] = range;
-            } else {
-                range = lbl_8044FA90[channel];
-                if (range < 0x18) {
-                    range++;
-                }
-                lbl_8044FA90[channel] = range;
-            }
-            inpMirrorChannelDefault(channel, set, range);
-        }
-        break;
-    }
-
-    value &= 0x7F;
-    ctrlBase[ctrl] = value;
-    inpDirtyLiveVoices(channel, set);
-
     if (set != 0xFF) {
+        switch (ctrl) {
+        case 6:
+            inpSetRPNHi(set, channel, value);
+            break;
+        case 38:
+            inpSetRPNLo(set, channel, value);
+            break;
+        case 96:
+            inpSetRPNDec(set, channel);
+            break;
+        case 97:
+            inpSetRPNInc(set, channel);
+            break;
+        }
+
+        lbl_80449590[set][channel][ctrl] = value & 0x7F;
+        for (i = 0; i < synthInfo.voiceNum; i++) {
+            if (set == lbl_8047AF48[i].midiSet &&
+                channel == lbl_8047AF48[i].midi) {
+                lbl_8047AF48[i].midiDirtyFlags = 0x1FFF;
+                synthKeyStateUpdate(&lbl_8047AF48[i]);
+            }
+        }
         ((u32(*)[16])lbl_80449390)[set][channel] = 0xFF;
+    } else {
+        switch (ctrl) {
+        case 6:
+            inpSetRPNHi(set, channel, value);
+            break;
+        case 38:
+            inpSetRPNLo(set, channel, value);
+            break;
+        case 96:
+            inpSetRPNDec(set, channel);
+            break;
+        case 97:
+            inpSetRPNInc(set, channel);
+            break;
+        }
+
+        lbl_8044D910[channel][ctrl] = value & 0x7F;
+        for (i = 0; i < synthInfo.voiceNum; i++) {
+            if (set == lbl_8047AF48[i].midiSet &&
+                channel == lbl_8047AF48[i].midi) {
+                lbl_8047AF48[i].midiDirtyFlags = 0x1FFF;
+                synthKeyStateUpdate(&lbl_8047AF48[i]);
+            }
+        }
     }
 }
 #pragma pop

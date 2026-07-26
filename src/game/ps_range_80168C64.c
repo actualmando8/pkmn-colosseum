@@ -104,6 +104,17 @@ typedef struct PSJObjTransform {
     f32 translateZ;
 } PSJObjTransform;
 
+typedef struct PSForceJObj {
+    u8 pad00[0x14];
+    u32 flags;
+    u8 pad18[0x38];
+    f32 worldX;
+    u8 pad54[0x0C];
+    f32 worldY;
+    u8 pad64[0x0C];
+    f32 worldZ;
+} PSForceJObj;
+
 typedef struct PSCameraView {
     u8 pad00[0x0C];
     Vec position;
@@ -131,6 +142,7 @@ extern PSAppSRT* lbl_8047B124;
 extern u32 lbl_80452708[];
 extern u32 lbl_80452748[];
 extern void* lbl_80452AC8[];
+extern void** lbl_804528C8[];
 extern s32 lbl_80452CC8[];
 extern PSParticle* lbl_80452788[];
 extern PSParticle* lbl_8047B108;
@@ -182,7 +194,8 @@ extern void genPosUpdate(void* obj);                                    /* 0x801
 extern void modifyDir(PSParticle* pp, f32 param);                       /* 0x80172FA8 */
 extern void modifyDirGenBase(PSParticle* pp, f32 a, f32 b, f32 c, f32 d); /* 0x801732A0 */
 extern f32 sqrtf(f32 x);
-extern void applyForceJObj(void* jobj, f32 a, f32 b);                   /* 0x80172BBC */
+extern s32 applyForceJObj(PSParticle* pp, PSForceJObj* jobj,
+                         f32 force, f32 radius);                       /* 0x80172BBC */
 extern void setVelToJObj(void* jobj, void* camData);                    /* 0x80172D00 */
 extern u8 U8ClampAdd(u8 cur, f32 delta);                                /* 0x801728B0 */
 extern PSParticle* _psListGetNext(PSParticle* pp);                         /* psCleanup, 0x80172928 */
@@ -201,6 +214,7 @@ extern void HSD_JObjSetupMatrix(void* camSlot);
 extern void HSD_JObjAddTx(PSJObjTransform* jobj, f32 dx);
 extern void HSD_JObjAddTy(PSJObjTransform* jobj, f32 dy);
 extern void HSD_JObjAddTz(PSJObjTransform* jobj, f32 dz);
+extern void fn_8019D9DC(PSForceJObj* jobj);
 extern void HSD_MtxSRT(void* dst, void* scale, void* rot, void* trans, void* order);
 extern void fn_801A6960(void* ptr);
 extern void* fn_801A6928(s32 size);
@@ -218,6 +232,19 @@ extern f32 lbl_8047D5CC;
 extern f32 lbl_8047D618;
 extern f64 lbl_8047D5E0;
 extern f32 lbl_8047D5D8;
+extern f32 lbl_80478ACC;
+extern void particleSort(s32 linkNo, PSParticle** first, PSParticle** second);
+extern void fn_800BC8C8(s32 count);
+extern void fn_800B884C(s32 count);
+extern void fn_800BC6F0(s32 stage, s32 map, s32 coord, s32 color);
+extern void fn_800BC1A0(s32 stage, s32 a, s32 b, s32 c, s32 d);
+extern void fn_800BC1E4(s32 stage, s32 a, s32 b, s32 c, s32 d);
+extern void fn_800BC228(s32 stage, s32 a, s32 b, s32 c, s32 d, s32 e);
+extern void fn_800BC290(s32 stage, s32 a, s32 b, s32 c, s32 d, s32 e);
+extern void fn_800BC52C(s32 stage, s32 a, s32 b);
+void psDispSub(PSParticle* pp, void* polygonData);
+void psDispSubAppSRT(PSParticle* pp, Mtx parentMatrix);
+void psDispSubAPPSRTPoint(PSParticle* pp);
 extern f32 lbl_8047D5DC;
 extern f32 lbl_8047B14C;
 extern f32 lbl_8047B150;
@@ -364,6 +391,31 @@ void psSetParticleVisibility(PSGeneratorState* gen, u8 visible) {
         }
         child = child->next;
     }
+}
+
+s32 _psLinkInit(s32 count) {
+    s32 i;
+
+    for (i = 0; i < PS_NUM_LINK; i++) {
+        lbl_80452708[i] = 0;
+        lbl_80452748[i] = 0;
+        lbl_80452788[i] = NULL;
+    }
+
+    lbl_8047B108 = NULL;
+    for (i = count - 1; i >= 0; i--) {
+        PSParticle* pp = fn_801A6928(sizeof(PSParticle));
+
+        memset(pp, 0, sizeof(PSParticle));
+        if (pp == NULL) {
+            return -1;
+        }
+
+        pp->next = lbl_8047B108;
+        lbl_8047B108 = pp;
+    }
+
+    return i;
 }
 
 #endif
@@ -662,6 +714,121 @@ s32 psRemoveGeneratorAppSRT(PSGeneratorState* gen) {
     return refCount;
 }
 
+void psInitParticle(s32 count) {
+    u32* banks = (u32*)lbl_804527C8;
+    s32 i;
+
+    _psLinkInit(count);
+    lbl_8047B11A = 0;
+    lbl_8047B114 = 0;
+
+    for (i = 0; i < 64; i++) {
+        banks[i] = 0;
+        banks[64 + i] = 0;
+        banks[128 + i] = 0;
+        banks[192 + i] = 0;
+        banks[256 + i] = 0;
+        banks[320 + i] = 0;
+    }
+
+    for (i = 384; i < 392; i++) {
+        banks[i] = 0;
+    }
+}
+
+void psRemoveParticle(void) {
+    u32* banks = (u32*)lbl_804527C8;
+    s32 linkNo;
+    s32 i;
+
+    for (linkNo = 0; linkNo < PS_NUM_LINK; linkNo++) {
+        PSParticle* current = _psListGetFirst(linkNo);
+
+        while (current != NULL) {
+            PSParticle* next = current->next;
+            PSParticle* previous = NULL;
+            PSParticle* scan = _psListGetFirst(current->linkNo);
+
+            while (scan != NULL) {
+                if (scan == current) {
+                    if (current->peopleObj != NULL) {
+                        ((PSGeneratorState*)current->peopleObj)->childCount--;
+                    }
+                    if (current->parentObj != NULL) {
+                        psRemoveParticleAppSRT(current);
+                    }
+                    if (current->flags & PS_FLAG_ATTACH_CAMERA) {
+                        u32 slot = (current->flags >> 12) & 7;
+
+                        if (lbl_80452DC8[slot] != NULL) {
+                            fn_801A05EC(lbl_80452DC8[slot]);
+                            lbl_80452DC8[slot] = NULL;
+                        }
+                    }
+
+                    _psListDelete(scan, previous);
+                    break;
+                }
+
+                previous = scan;
+                scan = scan->next;
+            }
+            current = next;
+        }
+    }
+
+    psKillAllGenerator();
+    _psListClear();
+
+    for (i = 0; i < 64; i++) {
+        banks[i] = 0;
+        banks[64 + i] = 0;
+        banks[128 + i] = 0;
+        banks[192 + i] = 0;
+        banks[256 + i] = 0;
+        banks[320 + i] = 0;
+    }
+
+    for (i = 0; i < 8; i++) {
+        if (lbl_80452DC8[i] != NULL) {
+            fn_801A05EC(lbl_80452DC8[i]);
+            lbl_80452DC8[i] = NULL;
+        }
+    }
+}
+
+void psInitDataBankLocate(void* data, void* objects, void* locations);
+
+void psInitDataBank(s32 bankIndex, void* data, void* objects,
+                    void* bankData, void* locations) {
+    u32* banks = (u32*)lbl_804527C8;
+    u16 format;
+
+    if (bankIndex >= 64) {
+        return;
+    }
+
+    psInitDataBankLocate(data, objects, locations);
+    banks[bankIndex] = (u32)bankData;
+    banks[256 + bankIndex] = *(u32*)objects;
+    banks[128 + bankIndex] = (u32)objects + 4;
+    banks[64 + bankIndex] =
+        locations != NULL ? (u32)locations + 4 : 0;
+
+    format = *(u16*)data;
+    if (format == 0) {
+        banks[320 + bankIndex] = *(u32*)((u8*)data + 4);
+        banks[192 + bankIndex] = (u32)data + 8;
+    } else if (format >= 0x40 && format < 0x44) {
+        u32 firstCount = *(u32*)((u8*)data + 4);
+
+        banks[320 + bankIndex] =
+            firstCount + *(u32*)((u8*)data + 8);
+        banks[192 + bankIndex] =
+            (u32)data + 0xC - firstCount * sizeof(u32);
+    }
+}
+
 s32 psChangeGeneratorAppSRT(PSGeneratorState* gen, PSAppSRT* newAppSRT) {
     PSAppSRT* oldAppSRT;
     u16 refCount;
@@ -765,6 +932,75 @@ s32 psInitAppSRT(s32 count, s32 size) {
     }
 
     return i;
+}
+
+/*
+ * Pokemon XD identifies the corresponding local function as
+ * _psDispParticlesSub.  The display path is still incomplete here, but this
+ * frame-generation update is independently verified against 0x8016ABF4-
+ * 0x8016AC14 in the Colosseum retail disassembly.
+ */
+void fn_8016AB94(u32 linkMask, s32 mode) {
+    s32 linkNo;
+
+    if (mode == 0) {
+        u8 frame = lbl_80478C30;
+
+        lbl_80478C30 = frame < 0xFF ? frame + 1 : 1;
+        return;
+    }
+
+    for (linkNo = 0; linkNo < 16; linkNo++) {
+        PSParticle* first;
+        PSParticle* second;
+        PSParticle* pp;
+
+        if ((linkMask & (1U << linkNo)) == 0) {
+            continue;
+        }
+
+        particleSort(linkNo, &first, &second);
+        if (mode == 1) {
+            pp = first;
+        } else if (mode == 2) {
+            pp = second;
+        } else {
+            continue;
+        }
+
+        while (pp != NULL) {
+            PSParticle* next = pp->next;
+
+            if (mode == 1 && (pp->flags & 8) == 0) {
+                break;
+            }
+
+            if (pp->lerpValue >= lbl_80478ACC &&
+                (pp->flags & 0x20000000) == 0) {
+                void* polygonData = NULL;
+                void** bank = lbl_804528C8[pp->bankIndex];
+
+                if (bank != NULL) {
+                    void** object = (void**)bank[pp->animIndex];
+
+                    if (object != NULL && object != (void**)-4) {
+                        polygonData = object[pp->objRefIndex + 1];
+                    }
+                }
+
+                if (pp->flags & 0x40000000) {
+                    if (pp->parentObj != NULL) {
+                        psDispSubAPPSRTPoint(pp);
+                    }
+                } else if (pp->parentObj != NULL) {
+                    psDispSubAppSRT(pp, (f32(*)[4])polygonData);
+                } else {
+                    psDispSub(pp, polygonData);
+                }
+            }
+            pp = next;
+        }
+    }
 }
 
 #endif
@@ -1036,6 +1272,89 @@ void psSetupTevInvalidState(void) {
     lbl_8047B170 = -1;
 }
 
+/*
+ * Updates cached TEV topology from the particle render flags.  Other topology
+ * combinations remain to be ported; the no-texture case is verified against
+ * 0x8016EC1C-0x8016EC4C and 0x8016EDEC-0x8016EE40.
+ */
+void psSetupTev(PSParticle* pp) {
+    s32 state = pp->flags & 0x80100480;
+
+    if (state == lbl_8047B170) {
+        return;
+    }
+    lbl_8047B170 = state;
+
+    if (state == 0x80) {
+        pp->flags &= ~0x180;
+        lbl_8047B170 &= ~0x180;
+    }
+
+    if (state == 0 || state == 0x80) {
+        fn_800BC8C8(1);
+        fn_800B884C(0);
+        fn_800BC6F0(0, 0xFF, 0xFF, 4);
+        fn_800BC1A0(0, 2, 0xF, 0xF, 0xF);
+        fn_800BC1E4(0, 1, 7, 7, 7);
+    } else if (state == (s32)0x80000000 ||
+               state == (s32)0x80000080) {
+        if (state == (s32)0x80000080) {
+            pp->flags &= ~0x180;
+            lbl_8047B170 &= ~0x180;
+        }
+
+        fn_800BC8C8(2);
+        fn_800B884C(0);
+        fn_800BC6F0(0, 0xFF, 0xFF, 4);
+        fn_800BC1A0(0, 0xF, 6, 0xA, 0xF);
+        fn_800BC1E4(0, 3, 7, 7, 7);
+        fn_800BC1A0(1, 0xF, 2, 0, 0xF);
+        fn_800BC1E4(1, 7, 1, 0, 7);
+    } else if (state == 0x400 || state == 0x480) {
+        fn_800BC8C8(1);
+        fn_800B884C(1);
+        fn_800BC6F0(0, 0, 0, 4);
+        fn_800BC1A0(0, 4, 2, 8, 0xF);
+        fn_800BC1E4(0, 2, 1, 4, 7);
+    } else if (state == (s32)0x80000400) {
+        fn_800BC8C8(2);
+        fn_800B884C(1);
+        fn_800BC6F0(0, 0, 0, 4);
+        fn_800BC1A0(0, 0xF, 6, 0xA, 0xF);
+        fn_800BC1E4(0, 3, 7, 7, 7);
+        fn_800BC1A0(1, 0xF, 8, 0, 0xF);
+        fn_800BC1E4(1, 7, 4, 0, 7);
+    } else if (state == (s32)0x80000480) {
+        fn_800BC8C8(3);
+        fn_800B884C(1);
+        fn_800BC6F0(0, 0, 0, 4);
+        fn_800BC1A0(0, 4, 2, 8, 0xF);
+        fn_800BC1E4(0, 2, 1, 4, 7);
+        fn_800BC1A0(1, 0xF, 6, 0, 0xF);
+        fn_800BC1E4(1, 7, 3, 0, 7);
+        fn_800BC1A0(2, 0xF, 0xA, 0, 0xF);
+        fn_800BC1E4(2, 0, 7, 7, 7);
+    }
+}
+
+void psSetupTevCommon(void) {
+    fn_800BC6F0(0, 0, 0, 4);
+    fn_800BC228(0, 0, 0, 0, 1, 0);
+    fn_800BC290(0, 0, 0, 0, 1, 0);
+
+    fn_800BC6F0(1, 0, 0, 4);
+    fn_800BC228(1, 0, 0, 0, 1, 0);
+    fn_800BC290(1, 0, 0, 0, 1, 0);
+
+    fn_800BC6F0(2, 0, 0, 4);
+    fn_800BC228(2, 0, 0, 0, 1, 0);
+    fn_800BC290(2, 0, 0, 0, 1, 0);
+
+    fn_800BC52C(0, 0, 0);
+    fn_800BC52C(1, 0, 0);
+    fn_800BC52C(2, 0, 0);
+}
+
 u8 U8ClampAdd(u8 cur, f32 delta) {
     f32 value = (f32)cur + delta;
 
@@ -1055,6 +1374,40 @@ void HSD_MTXSRT(void* dst, void* scale, void* rot, void* trans, void* order) {
 
 PSParticle* _psListGetNext(PSParticle* pp) {
     return pp->next;
+}
+
+s32 applyForceJObj(PSParticle* pp, PSForceJObj* jobj,
+                   f32 force, f32 radius) {
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 distanceSquared;
+
+    if (jobj == NULL || radius < 0.0f) {
+        return FALSE;
+    }
+
+    if (!(jobj->flags & 0x800000) && (jobj->flags & 0x40)) {
+        fn_8019D9DC(jobj);
+    }
+
+    dx = jobj->worldX - pp->positionX;
+    dy = jobj->worldY - pp->positionY;
+    dz = jobj->worldZ - pp->positionZ;
+    distanceSquared = dx * dx + dy * dy + dz * dz;
+
+    if (distanceSquared <= radius * radius) {
+        return TRUE;
+    }
+    if (distanceSquared == 0.0f) {
+        return FALSE;
+    }
+
+    force /= distanceSquared;
+    pp->velocityX += force * dx;
+    pp->velocityY += force * dy;
+    pp->velocityZ += force * dz;
+    return FALSE;
 }
 
 void psCopyGeneratorData(PSParticle* gen, void* peopleObj) {
@@ -1891,6 +2244,60 @@ void psDispSubPointTrail(PSParticle* pp) {
     if (lbl_8047B164 != cachedWidth) {
         lbl_8047B164 = cachedWidth;
         fn_800B9404(width, 5);
+    }
+}
+
+/*
+ * Applies an attached application's SRT to point-particle position and
+ * velocity.  Point raster emission remains to be decompiled; this is the
+ * verified transform prefix at 0x8016DD68-0x8016DF14.
+ */
+void psDispSubAPPSRTPoint(PSParticle* pp) {
+    PSAppSRT* appSRT = (PSAppSRT*)pp->parentObj;
+    Mtx appMatrix;
+    Vec velocity;
+    Vec position;
+
+    if (lbl_8047B12C != 0) {
+        lbl_8047B12C = 0;
+        fn_800BD554(0);
+    }
+
+    if (appSRT->flags != lbl_80478C30) {
+        if (appSRT->type != 2) {
+            HSD_MtxSRT(appSRT->matrix, &appSRT->scaleX,
+                       &appSRT->translationX, &appSRT->rotationX, NULL);
+        }
+        if (appSRT->type == 1) {
+            appSRT->type = 2;
+        }
+    }
+
+    appSRT->flags = lbl_80478C30;
+    PSMTXCopy(appSRT->matrix, appMatrix);
+    appMatrix[0][3] -= appSRT->rotationX;
+    appMatrix[1][3] -= appSRT->rotationY;
+    appMatrix[2][3] -= appSRT->rotationZ;
+
+    velocity.x = pp->velocityX;
+    velocity.y = pp->velocityY;
+    velocity.z = pp->velocityZ;
+    PSMTXMultVec(appMatrix, &velocity, &velocity);
+    if (appSRT->active != 0) {
+        PSMTXMultVec((const f32(*)[4])lbl_80452DE8, &velocity, &velocity);
+    }
+
+    position.x = pp->positionX;
+    position.y = pp->positionY;
+    position.z = pp->positionZ;
+    if (appSRT->active != 0) {
+        PSMTXMultVec(appMatrix, &position, &position);
+        PSMTXMultVec((const f32(*)[4])lbl_80452DE8, &position, &position);
+        position.x += appSRT->rotationX;
+        position.y += appSRT->rotationY;
+        position.z += appSRT->rotationZ;
+    } else {
+        PSMTXMultVec(appSRT->matrix, &position, &position);
     }
 }
 
