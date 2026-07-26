@@ -18,8 +18,10 @@
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 #include "hsd/hsd_class.h"
+#include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_fobj.h"
+#include "hsd/hsd_lobj.h"
 #include "hsd/hsd_object.h"
 #include "hsd/hsd_tobj.h"
 
@@ -61,6 +63,9 @@ extern char lbl_802756E8[]; /* "tobj->imagetbl" */
 extern void PSMTXTrans(Mtx m, f32 x, f32 y, f32 z);
 extern void PSMTXScale(Mtx m, f32 x, f32 y, f32 z);
 extern void PSMTXConcat(const Mtx a, const Mtx b, Mtx dst);
+extern void PSMTXMultVecSR(const Mtx m, const Vec* src, Vec* dst);
+extern void PSVECNormalize(const Vec* src, Vec* dst);
+extern void GXLoadTexMtxImm(Mtx m, u32 id, s32 type);
 extern void HSD_MkRotationMtx(Mtx m, Vec* rot);
 
 /* .sdata2 strings */
@@ -72,6 +77,8 @@ extern const char lbl_8047DECC[4]; /* "new" */
 extern const char lbl_8047DED0[4]; /* "0" */
 extern const char lbl_8047DED4[4]; /* "" */
 extern const char lbl_8047DF10[8]; /* "tobj" */
+extern const char lbl_8047DEE8[8]; /* "cobj" */
+extern Mtx lbl_8036D43C;
 
 #define HSD_TOBJ_FILE lbl_8047DEB0
 
@@ -549,7 +556,243 @@ static void MakeTextureMtx(HSD_TObj* tobj)
     PSMTXConcat(m, tobj->mtx, tobj->mtx);
 }
 
-static void TObjSetupMtx(HSD_TObj* tobj) { (void) tobj; }
+static inline u32 HSD_Index2TexMap(u32 index)
+{
+    switch (index) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 3;
+    case 4:
+        return 4;
+    case 5:
+        return 5;
+    case 6:
+        return 6;
+    case 7:
+        return 7;
+    default:
+        __assert(HSD_TOBJ_FILE, 0x794, lbl_8047DED0);
+    }
+    return 0;
+}
+
+static inline u32 HSD_Index2TexCoord(u32 index)
+{
+    switch (index) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 3;
+    case 4:
+        return 4;
+    case 5:
+        return 5;
+    case 6:
+        return 6;
+    case 7:
+        return 7;
+    default:
+        __assert(HSD_TOBJ_FILE, 0x807, lbl_8047DED0);
+    }
+    return 0;
+}
+
+static inline u32 HSD_TexMapID2PTTexMtx(u32 id)
+{
+    switch (id) {
+    case 0:
+        return 64;
+    case 1:
+        return 67;
+    case 2:
+        return 70;
+    case 3:
+        return 73;
+    case 4:
+        return 76;
+    case 5:
+        return 79;
+    case 6:
+        return 82;
+    case 7:
+        return 85;
+    default:
+        __assert(HSD_TOBJ_FILE, 0x258, lbl_8047DED0);
+    }
+    return 64;
+}
+
+s32 HSD_TObjAssignResources(HSD_TObj* tobj_top)
+{
+    HSD_TObj* tobj;
+    u32 texmap_no = 0;
+    u32 texcoord_no = 0;
+    u32 limit = 8;
+    HSD_TObj* bump = NULL;
+    HSD_TObj* toon = NULL;
+
+    if (tobj_top == NULL) {
+        return 0;
+    }
+
+    for (tobj = tobj_top; tobj != NULL; tobj = tobj->next) {
+        if (tobj_coord(tobj) == TEX_COORD_TOON) {
+            toon = tobj;
+        } else if (tobj_bump(tobj)) {
+            bump = tobj;
+        }
+    }
+
+    if (toon != NULL) {
+        limit--;
+    }
+    if (bump != NULL) {
+        limit -= 2;
+    }
+
+    for (tobj = tobj_top; tobj != NULL; tobj = tobj->next) {
+        if (tobj_coord(tobj) == TEX_COORD_TOON) {
+            if (tobj != toon) {
+                tobj->id = GX_TEXMAP_NULL;
+            }
+        } else if (tobj_bump(tobj)) {
+            if (tobj != bump) {
+                tobj->id = GX_TEXMAP_NULL;
+            }
+        } else if (texmap_no < limit) {
+            tobj->id = HSD_Index2TexMap(texmap_no++);
+            tobj->mtxid = HSD_TexMapID2PTTexMtx(tobj->id);
+            switch (tobj_coord(tobj)) {
+            case TEX_COORD_REFLECTION:
+            case TEX_COORD_HILIGHT:
+            case TEX_COORD_SHADOW:
+                tobj->coord = HSD_Index2TexCoord(texcoord_no++);
+                break;
+            }
+        } else {
+            tobj->id = GX_TEXMAP_NULL;
+        }
+    }
+
+    for (tobj = tobj_top; tobj != NULL; tobj = tobj->next) {
+        if (tobj->id != GX_TEXMAP_NULL && !tobj_bump(tobj) &&
+            tobj_coord(tobj) == TEX_COORD_UV)
+        {
+            tobj->coord = HSD_Index2TexCoord(texcoord_no++);
+        }
+    }
+
+    if (bump != NULL) {
+        bump->id = HSD_Index2TexMap(texmap_no++);
+        bump->mtxid = GX_TEXMTX9;
+        bump->coord = HSD_Index2TexCoord(texcoord_no);
+        texcoord_no += 2;
+    }
+    if (toon != NULL) {
+        toon->id = HSD_Index2TexMap(texmap_no++);
+        toon->coord = HSD_Index2TexCoord(texcoord_no++);
+    }
+
+    return texcoord_no;
+}
+
+static void TObjSetupMtx(HSD_TObj* tobj)
+{
+    int i;
+
+    if (tobj_coord(tobj) == TEX_COORD_TOON) {
+        return;
+    }
+
+    if (tobj->flags & TEX_MTX_DIRTY) {
+        HSD_TOBJ_METHOD(tobj)->make_mtx(tobj);
+        tobj->flags &= ~TEX_MTX_DIRTY;
+    }
+
+    switch (tobj_coord(tobj)) {
+    case TEX_COORD_REFLECTION: {
+        Mtx mtx;
+
+        for (i = 0; i < 3; i++) {
+            mtx[i][0] = 0.5F * tobj->mtx[i][0];
+            mtx[i][1] = -0.5F * tobj->mtx[i][1];
+            mtx[i][2] = 0.0F;
+            mtx[i][3] = 0.5F * tobj->mtx[i][0] +
+                        0.5F * tobj->mtx[i][1] + tobj->mtx[i][2] +
+                        tobj->mtx[i][3];
+        }
+        GXLoadTexMtxImm(mtx, tobj->mtxid, GX_MTX3x4);
+        break;
+    }
+
+    case TEX_COORD_HILIGHT: {
+        HSD_LObj* lobj = HSD_LObjGetCurrentByType(LOBJ_INFINITE);
+
+        if (lobj != NULL) {
+            HSD_CObj* cobj;
+            Vec ldir;
+            Vec half;
+            Mtx mtx;
+            MtxPtr vmtx;
+
+            cobj = HSD_CObjGetCurrent();
+            if (cobj == NULL) {
+                __assert(HSD_TOBJ_FILE, 0x2A8, lbl_8047DEE8);
+            }
+            vmtx = (MtxPtr) HSD_CObjGetViewingMtxPtrDirect(cobj);
+            HSD_LObjGetLightVector(lobj, &ldir);
+            PSMTXMultVecSR(vmtx, &ldir, &ldir);
+            ldir.z += -1.0F;
+            PSVECNormalize(&ldir, &half);
+            half.x *= -0.5;
+            half.y *= -0.5;
+            half.z *= -0.5;
+
+            mtx[0][0] = tobj->mtx[0][0] * half.x;
+            mtx[0][1] = tobj->mtx[0][0] * half.y;
+            mtx[0][2] = tobj->mtx[0][0] * half.z;
+            mtx[0][3] = tobj->mtx[0][0] * 0.5F + tobj->mtx[0][3];
+            mtx[1][0] = tobj->mtx[1][0] * half.x;
+            mtx[1][1] = tobj->mtx[1][0] * half.y;
+            mtx[1][2] = tobj->mtx[1][0] * half.z;
+            mtx[1][3] = tobj->mtx[1][0] * 0.5F + tobj->mtx[1][3];
+            mtx[2][0] = mtx[2][1] = mtx[2][2] = 0.0F;
+            mtx[2][3] = 1.0F;
+            GXLoadTexMtxImm(mtx, tobj->mtxid, GX_MTX3x4);
+        } else {
+            GXLoadTexMtxImm(lbl_8036D43C, tobj->mtxid, GX_MTX3x4);
+        }
+        break;
+    }
+
+    case TEX_COORD_SHADOW: {
+        HSD_CObj* cobj = HSD_CObjGetCurrent();
+        Mtx mtx;
+
+        PSMTXConcat(tobj->mtx,
+                    (MtxPtr) HSD_CObjGetInvViewingMtxPtrDirect(cobj), mtx);
+        GXLoadTexMtxImm(mtx, tobj->mtxid, GX_MTX3x4);
+        break;
+    }
+
+    default:
+        if (tobj_bump(tobj)) {
+            GXLoadTexMtxImm(tobj->mtx, tobj->mtxid, GX_MTX2x4);
+        } else {
+            GXLoadTexMtxImm(tobj->mtx, tobj->mtxid, GX_MTX3x4);
+        }
+        break;
+    }
+}
 
 static void TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
                          HSD_TExp** c, HSD_TExp** a, HSD_TExp** list)

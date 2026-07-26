@@ -18,6 +18,7 @@
 #undef ref_INC
 #include "hsd/hsd_aobj.h"
 #include "hsd/hsd_class.h"
+#include "hsd/hsd_cobj.h"
 #include "hsd/hsd_debug.h"
 #include "hsd/hsd_id.h"
 #include "hsd/hsd_mtx.h"
@@ -46,6 +47,14 @@ typedef struct HSD_JObjInfoColosseum {
     HSD_JObjInfo parent;
     HSD_ObjUpdateFunc update;
 } HSD_JObjInfoColosseum;
+
+extern f32 sqrtf(f32 x);
+extern f32 PSVECDotProduct(Vec* a, Vec* b);
+extern void PSVECScale(Vec* src, Vec* dst, f32 scale);
+extern void PSVECAdd(Vec* a, Vec* b, Vec* dst);
+extern HSD_RObj* HSD_RObjGetByType(HSD_RObj* robj, u32 type, u32 subtype);
+extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
+                        HSD_ObjUpdateFunc update_func);
 
 HSD_JObjInfo hsdJObj = { fn_8019CE50 };
 
@@ -116,7 +125,7 @@ HSD_DObj* HSD_JObjGetDObj(HSD_JObj* jobj)
 /*  Matrix dirty management                                                  */
 /* ========================================================================= */
 
-void HSD_JObjSetMtxDirtySub(HSD_JObj* jobj)
+void fn_8019D620(HSD_JObj* jobj)
 {
     HSD_JObj* child;
 
@@ -127,10 +136,80 @@ void HSD_JObjSetMtxDirtySub(HSD_JObj* jobj)
     child = jobj->child;
     while (child != NULL) {
         if (!(child->flags & JOBJ_MTX_INDEP_PARENT)) {
-            HSD_JObjSetMtxDirtySub(child);
+            fn_8019D620(child);
         }
         child = child->next;
     }
+}
+
+void resolveIKJoint1(HSD_JObj* jobj);
+void resolveIKJoint2(HSD_JObj* jobj);
+
+void fn_8019D9DC(HSD_JObj* jobj)
+{
+    HSD_JObj* parent;
+    HSD_RObj* robj;
+    Vec direction;
+    Vec origin;
+    Vec position;
+    f32 x_scale;
+
+    HSD_JOBJ_METHOD(jobj)->make_mtx(jobj);
+    jobj->flags &= ~JOBJ_MTX_DIRTY;
+
+    if (!(jobj->flags & JOBJ_USER_DEF_MTX)) {
+        switch (jobj->flags & JOBJ_JOINT) {
+        case JOBJ_JOINT1:
+            resolveIKJoint1(jobj);
+            break;
+        case JOBJ_JOINT2:
+            resolveIKJoint2(jobj);
+            break;
+        case JOBJ_EFFECTOR:
+            parent = jobj->parent;
+            x_scale = 1.0F;
+            if (parent != NULL) {
+                robj =
+                    HSD_RObjGetByType(parent->robj, REFTYPE_IKHINT, 0);
+                if (robj != NULL) {
+                    origin.x = parent->mtx[0][3];
+                    origin.y = parent->mtx[1][3];
+                    origin.z = parent->mtx[2][3];
+                    direction.x = parent->mtx[0][0];
+                    direction.y = parent->mtx[1][0];
+                    direction.z = parent->mtx[2][0];
+                    PSVECScale(
+                        &direction, &direction,
+                        sqrtf(1.0F /
+                              (1.0e-10F +
+                               PSVECDotProduct(&direction, &direction))));
+                    if (parent->scl != NULL) {
+                        x_scale = parent->scl[0];
+                    }
+                    PSVECScale(&direction, &direction,
+                               robj->u.ik_hint.bone_length * x_scale);
+                    PSVECAdd(&origin, &direction, &position);
+                    jobj->mtx[0][3] = position.x;
+                    jobj->mtx[1][3] = position.y;
+                    jobj->mtx[2][3] = position.z;
+                }
+            }
+            break;
+        default:
+            if (jobj->robj != NULL) {
+                fn_801AED88(
+                    jobj->robj, jobj,
+                    ((HSD_JObjInfoColosseum*) HSD_JOBJ_METHOD(jobj))->update);
+                if (HSD_JObjMtxIsDirty(jobj)) {
+                    HSD_JOBJ_METHOD(jobj)->make_mtx(jobj);
+                    jobj->flags &= ~JOBJ_MTX_DIRTY;
+                }
+            }
+            break;
+        }
+    }
+
+    jobj->flags &= ~JOBJ_MTX_DIRTY;
 }
 
 /* ========================================================================= */
@@ -1843,7 +1922,7 @@ extern void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc);
 extern void fn_80196E10(void* file, u32 line, void* expr);
 extern void fn_801991F8(HSD_DObj* dobj, HSD_DObjDesc* desc);
 extern void* fn_8019C128(void* table, u32 key, u32* found);
-extern void fn_801A05EC(void);
+extern void fn_801A05EC(HSD_JObj* jobj);
 extern void HSD_JObjRef(HSD_JObj* jobj);
 extern void* HSD_IDGetData(u32 key, s32* found);
 extern void fn_801A0B9C(HSD_JObj* jobj);
@@ -2052,6 +2131,11 @@ static inline void jobj_Ref(HSD_JObj* jobj, u8* base)
     if (jobj != NULL) {
         jobj_ref_INC(jobj, base);
     }
+}
+
+void fn_801A05EC(HSD_JObj* jobj)
+{
+    jobj_Unref(jobj, lbl_80274AA0);
 }
 
 /* 0x801A0D94 | 0x228 */
@@ -2608,6 +2692,33 @@ void fn_801A1988(HSD_JObj* jobj)
 }
 #pragma pop
 
+void fn_801A1A00(Mtx src, HSD_JObj* jobj, Mtx dst)
+{
+    HSD_CObj* cobj;
+    HSD_JObj* child;
+
+    if (jobj != NULL && JObjMtxIsDirtyForSetup(jobj)) {
+        fn_8019D9DC(jobj);
+    }
+
+    child = jobj->child;
+    if (child != NULL && JObjMtxIsDirtyForSetup(child)) {
+        fn_8019D9DC(child);
+    }
+
+    PSMTXInverse(child->mtx, dst);
+    PSMTXConcat(jobj->mtx, dst, dst);
+
+    if (src != NULL) {
+        PSMTXConcat(src, dst, dst);
+    } else {
+        cobj = HSD_CObjGetCurrent();
+        if (cobj != NULL) {
+            PSMTXConcat(cobj->view_mtx, dst, dst);
+        }
+    }
+}
+
 /* 0x801A1B7C | 0x3B0 */
 typedef struct JObjAnimClassInfo {
     HSD_ClassInfo parent;
@@ -2919,7 +3030,7 @@ void fn_801A20C8(void* obj, u32 type, HSD_ObjData* val)
         return;
     }
 
-#define DIRTY() HSD_JObjSetMtxDirtySub(jobj)
+#define DIRTY() fn_8019D620(jobj)
     switch (type) {
     case HSD_A_J_PATH: {
         HSD_JObj* path;

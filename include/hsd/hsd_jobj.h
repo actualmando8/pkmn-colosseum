@@ -196,8 +196,8 @@ void HSD_JObjSetFlagsAll(HSD_JObj* jobj, u32 flags);
 void HSD_JObjClearFlags(HSD_JObj* jobj, u32 flags);
 void HSD_JObjClearFlagsAll(HSD_JObj* jobj, u32 flags);
 void HSD_JObjReqAnimAll(HSD_JObj* jobj, f32 frame);
-void HSD_JObjSetupMatrixSub(HSD_JObj* jobj);
-void HSD_JObjSetMtxDirtySub(HSD_JObj* jobj);
+void fn_8019D9DC(HSD_JObj* jobj);
+void fn_8019D620(HSD_JObj* jobj);
 void HSD_JObjRef(HSD_JObj* jobj);
 void HSD_JObjUnref(HSD_JObj* jobj);
 HSD_JObj* HSD_JObjRemove(HSD_JObj* jobj);
@@ -270,13 +270,13 @@ static inline void HSD_JObjSetupMatrix(HSD_JObj* jobj)
     if (!jobj || !HSD_JObjMtxIsDirty(jobj)) {
         return;
     }
-    HSD_JObjSetupMatrixSub(jobj);
+    fn_8019D9DC(jobj);
 }
 
 #define HSD_JObjSetMtxDirty(jobj) \
     { \
         if ((jobj) != NULL && !HSD_JObjMtxIsDirty(jobj)) { \
-            HSD_JObjSetMtxDirtySub(jobj); \
+            fn_8019D620(jobj); \
         } \
     }
 

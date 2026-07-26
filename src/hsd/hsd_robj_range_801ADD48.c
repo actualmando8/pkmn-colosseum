@@ -43,4 +43,39 @@ HSD_Rvalue* fn_801ADF54(HSD_RvalueList* list)
 
     return result;
 }
+
+extern f32 fn_801AE000(void*);
+
+void fn_801ADE50(HSD_Exp* exp, HSD_ExpDesc* desc)
+{
+    extern void* memset(void* dest, int value, u32 size);
+
+    memset(exp, 0, sizeof(HSD_Exp));
+    if (desc != NULL) {
+        if (desc->func != NULL) {
+            exp->expr.func = desc->func;
+        } else {
+            exp->expr.func = fn_801AE000;
+        }
+        exp->rvalue = fn_801ADF54(desc->rvalue);
+        exp->nb_args = -1;
+    }
+}
+
+void fn_801ADD48(HSD_Exp* exp, HSD_ByteCodeExpDesc* desc)
+{
+    extern void* memset(void* dest, int value, u32 size);
+
+    memset(exp, 0, sizeof(HSD_Exp));
+    if (desc != NULL) {
+        if (desc->bytecode != NULL) {
+            exp->expr.bytecode = desc->bytecode;
+        } else {
+            exp->expr.bytecode = NULL;
+        }
+        exp->rvalue = fn_801ADF54(desc->rvalue);
+        exp->nb_args = -1;
+        exp->is_bytecode = 1;
+    }
+}
 #pragma pop
