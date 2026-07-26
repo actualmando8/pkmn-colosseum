@@ -10,7 +10,10 @@
 #include "dolphin/types.h"
 
 typedef struct GXData_800B771C {
-    /* 0x000 */ u8 _000[0x14];
+    /* 0x000 */ u8 _000[0x4];
+    /* 0x004 */ u16 vNum;
+    /* 0x006 */ u16 vLim;
+    /* 0x008 */ u8 _008[0xC];
     /* 0x014 */ u32 vcdLo;
     /* 0x018 */ u32 vcdHi;
     /* 0x01C */ u8 _01C[0x400];
@@ -22,9 +25,54 @@ typedef struct GXData_800B771C {
 
 extern volatile GXData_800B771C* const gx;
 extern void fn_800B771C(void);
+extern const u8 lbl_80478A68[];
+extern const u8 lbl_80478A6C[];
+extern const u8 lbl_80478A70[];
 
 #define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
 #define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
+
+void __GXCalculateVLim(void)
+{
+    u32 normalCount;
+    u32 limit;
+    u32 multiplier;
+    u32 vcdLo;
+    u32 vcdHi;
+    u32 vatA;
+
+    if (gx->vNum != 0) {
+        vcdLo = gx->vcdLo;
+        vcdHi = gx->vcdHi;
+        vatA = *(volatile u32*)((u8*)gx + 0x1C);
+        normalCount = (vatA >> 9) & 1;
+
+        limit = (vcdLo >> 0) & 1;
+        limit += (u8)((vcdLo >> 1) & 1);
+        limit += (u8)((vcdLo >> 2) & 1);
+        limit += (u8)((vcdLo >> 3) & 1);
+        limit += (u8)((vcdLo >> 4) & 1);
+        limit += (u8)((vcdLo >> 5) & 1);
+        limit += (u8)((vcdLo >> 6) & 1);
+        limit += (u8)((vcdLo >> 7) & 1);
+        limit += (u8)((vcdLo >> 8) & 1);
+        limit += lbl_80478A70[(vcdLo >> 9) & 3];
+
+        multiplier = normalCount == 1 ? 3 : 1;
+        limit += lbl_80478A70[(vcdLo >> 11) & 3] * multiplier;
+        limit += lbl_80478A68[(vcdLo >> 13) & 3];
+        limit += lbl_80478A68[(vcdLo >> 15) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 0) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 2) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 4) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 6) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 8) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 10) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 12) & 3];
+        limit += lbl_80478A6C[(vcdHi >> 14) & 3];
+        gx->vLim = limit;
+    }
+}
 
 void fn_800B7BC4(void) {
     volatile u32* gx32;
