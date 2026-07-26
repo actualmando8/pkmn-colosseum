@@ -1,2 +1,2 @@
 /* Score instrumentation only; not evidence of a retail TU boundary. */
-#include "src/game/fight_pokemon_range_801FDB78.c"
+#include "src/dolphin/thp/THP_range_801E1B54.c"

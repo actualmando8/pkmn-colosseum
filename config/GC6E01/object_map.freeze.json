@@ -6,12 +6,12 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 2209
+    "total_units": 2234
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 2141,
-    "source_backed_units": 2135,
+    "named_units": 2166,
+    "source_backed_units": 2160,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
@@ -23,7 +23,7 @@
     "matched_data_percent": 97.28669,
     "matched_functions": 6573,
     "matched_functions_percent": 76.40358,
-    "fuzzy_match_percent": 72.09791
+    "fuzzy_match_percent": 72.30367
   },
   "unit_topology": [
     {
@@ -4829,17 +4829,43 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/gba/gba_misc_candidate_8008ABE4_r42_8008AE18",
+      "name": "main/game/gba/gba_misc_r58_8008AE18_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 6552,
+          "size": 6076,
           "virtual_address": 2148052504
         }
       ],
-      "total_code": 6552,
+      "total_code": 6076,
       "total_data": 0,
-      "total_functions": 6
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/gba/gba_misc_r58_8008C5D4_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 296,
+          "virtual_address": 2148058580
+        }
+      ],
+      "total_code": 296,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gba/gba_misc_r58_8008C6FC_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 180,
+          "virtual_address": 2148058876
+        }
+      ],
+      "total_code": 180,
+      "total_data": 0,
+      "total_functions": 3
     },
     {
       "name": "main/game/gbaCommunication_prefix",
@@ -5775,17 +5801,43 @@
       "total_functions": 1
     },
     {
-      "name": "main/dolphin/sdk_candidate_800A2D38_prefix",
+      "name": "main/dolphin/sdk_r58_800A2D38_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 1824,
+          "size": 940,
           "virtual_address": 2148150584
         }
       ],
-      "total_code": 1824,
+      "total_code": 940,
       "total_data": 0,
-      "total_functions": 15
+      "total_functions": 7
+    },
+    {
+      "name": "main/dolphin/sdk_r58_800A30E4_o2",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 176,
+          "virtual_address": 2148151524
+        }
+      ],
+      "total_code": 176,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/sdk_r58_800A3194_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 708,
+          "virtual_address": 2148151700
+        }
+      ],
+      "total_code": 708,
+      "total_data": 0,
+      "total_functions": 7
     },
     {
       "name": "main/dolphin/sdk_candidate_800A3458",
@@ -11245,17 +11297,30 @@
       "total_functions": 0
     },
     {
-      "name": "main/game/gs_range_800E0DDC",
+      "name": "main/game/gs_range_800E0DDC_r58_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 1896,
+          "size": 56,
           "virtual_address": 2148404700
         }
       ],
-      "total_code": 1896,
+      "total_code": 56,
       "total_data": 0,
-      "total_functions": 2
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_range_800E0E14_r58_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1840,
+          "virtual_address": 2148404756
+        }
+      ],
+      "total_code": 1840,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/gs_range_800E0DDC_r40_800E1544_gc125n",
@@ -12984,17 +13049,43 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/gs_msg_candidate_800FA314_r46_800FB680",
+      "name": "main/game/gs_msg_r58b_800FB680_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 11484,
+          "size": 3752,
           "virtual_address": 2148513408
         }
       ],
-      "total_code": 11484,
+      "total_code": 3752,
       "total_data": 0,
-      "total_functions": 20
+      "total_functions": 13
+    },
+    {
+      "name": "main/game/gs_msg_r58b_800FC528_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 696,
+          "virtual_address": 2148517160
+        }
+      ],
+      "total_code": 696,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/gs_msg_r58b_800FC7E0_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 7036,
+          "virtual_address": 2148517856
+        }
+      ],
+      "total_code": 7036,
+      "total_data": 0,
+      "total_functions": 6
     },
     {
       "name": "main/game/gs_thread_hi_range_800FE35C",
@@ -21365,17 +21456,30 @@
       "total_functions": 2
     },
     {
-      "name": "main/hsd/hsd_lobj_r42_801A4F54",
+      "name": "main/hsd/hsd_lobj_r58_801A4F54_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 6028,
+          "size": 5440,
           "virtual_address": 2149207892
         }
       ],
-      "total_code": 6028,
+      "total_code": 5440,
       "total_data": 0,
-      "total_functions": 7
+      "total_functions": 6
+    },
+    {
+      "name": "main/hsd/hsd_lobj_r58_801A6494_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 588,
+          "virtual_address": 2149213332
+        }
+      ],
+      "total_code": 588,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_lobj_r42_801A66E0",
@@ -21417,17 +21521,43 @@
       "total_functions": 10
     },
     {
-      "name": "main/hsd/hsd_memory",
+      "name": "main/hsd/hsd_memory_r58_801A69C0_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 740,
+          "size": 460,
           "virtual_address": 2149214656
         }
       ],
-      "total_code": 740,
+      "total_code": 460,
       "total_data": 0,
-      "total_functions": 5
+      "total_functions": 3
+    },
+    {
+      "name": "main/hsd/hsd_memory_r58_801A6B8C_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 168,
+          "virtual_address": 2149215116
+        }
+      ],
+      "total_code": 168,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_memory_r58_801A6C34_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 112,
+          "virtual_address": 2149215284
+        }
+      ],
+      "total_code": 112,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_mobj_candidate_801A6CA4",
@@ -21989,17 +22119,43 @@
       "total_functions": 1
     },
     {
-      "name": "main/hsd/hsd_robj_r48_801AEBE4_prefix",
+      "name": "main/hsd/hsd_robj_r58_801AEBE4_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 2428,
+          "size": 1036,
           "virtual_address": 2149247972
         }
       ],
-      "total_code": 2428,
+      "total_code": 1036,
       "total_data": 0,
-      "total_functions": 4
+      "total_functions": 2
+    },
+    {
+      "name": "main/hsd/hsd_robj_r58_801AEFF0_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 564,
+          "virtual_address": 2149249008
+        }
+      ],
+      "total_code": 564,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_robj_r58_801AF224_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 828,
+          "virtual_address": 2149249572
+        }
+      ],
+      "total_code": 828,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_robj_r48_801AF560",
@@ -22145,17 +22301,43 @@
       "total_functions": 1
     },
     {
-      "name": "main/hsd/hsd_shadow_r52_801B06DC_prefix",
+      "name": "main/hsd/hsd_shadow_r58_801B06DC_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 420,
+          "size": 96,
           "virtual_address": 2149254876
         }
       ],
-      "total_code": 420,
+      "total_code": 96,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_shadow_r58_801B073C_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 152,
+          "virtual_address": 2149254972
+        }
+      ],
+      "total_code": 152,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_shadow_r58_801B07D4_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 172,
+          "virtual_address": 2149255124
+        }
+      ],
+      "total_code": 172,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_shadow_r52_801B0880_gc20p1_o4s",
@@ -22886,17 +23068,56 @@
       "total_functions": 1
     },
     {
-      "name": "main/hsd/hsd_tobj_candidate_801BBDDC_r41_801BE2B4",
+      "name": "main/hsd/hsd_tobj_r58_801BE2B4_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 3556,
+          "size": 1448,
           "virtual_address": 2149311156
         }
       ],
-      "total_code": 3556,
+      "total_code": 1448,
       "total_data": 0,
-      "total_functions": 8
+      "total_functions": 5
+    },
+    {
+      "name": "main/hsd/hsd_tobj_r58_801BE85C_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1548,
+          "virtual_address": 2149312604
+        }
+      ],
+      "total_code": 1548,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_tobj_r58_801BEE68_middle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 116,
+          "virtual_address": 2149314152
+        }
+      ],
+      "total_code": 116,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/hsd/hsd_tobj_r58_801BEEDC_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 444,
+          "virtual_address": 2149314268
+        }
+      ],
+      "total_code": 444,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/hsd/hsd_util_r52_801BF098_prefix",
@@ -24589,17 +24810,43 @@
       "total_functions": 3
     },
     {
-      "name": "main/dolphin/thp/THP_r48_801E1B54_prefix",
+      "name": "main/dolphin/thp/THP_r58_801E1B54_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 7932,
+          "size": 2744,
           "virtual_address": 2149456724
         }
       ],
-      "total_code": 7932,
+      "total_code": 2744,
       "total_data": 0,
-      "total_functions": 22
+      "total_functions": 12
+    },
+    {
+      "name": "main/dolphin/thp/THP_r58_801E260C_o4s",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 1384,
+          "virtual_address": 2149459468
+        }
+      ],
+      "total_code": 1384,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/thp/THP_r58_801E2B74_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 3804,
+          "virtual_address": 2149460852
+        }
+      ],
+      "total_code": 3804,
+      "total_data": 0,
+      "total_functions": 9
     },
     {
       "name": "main/dolphin/thp/THP_r48_801E3A50_o4s",
@@ -26302,17 +26549,82 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/fight_pokemon_candidate_801FE3F8_r40_801FEC10",
+      "name": "main/game/fight_pokemon_r58_801FEC10_prefix",
       "sections": [
         {
           "name": ".text",
-          "size": 8688,
+          "size": 300,
           "virtual_address": 2149575696
         }
       ],
-      "total_code": 8688,
+      "total_code": 300,
       "total_data": 0,
-      "total_functions": 9
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_pokemon_r58_801FED3C_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 568,
+          "virtual_address": 2149575996
+        }
+      ],
+      "total_code": 568,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_pokemon_r58_801FEF74_middle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 584,
+          "virtual_address": 2149576564
+        }
+      ],
+      "total_code": 584,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_pokemon_r58_801FF1BC_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 6304,
+          "virtual_address": 2149577148
+        }
+      ],
+      "total_code": 6304,
+      "total_data": 0,
+      "total_functions": 3
+    },
+    {
+      "name": "main/game/fight_pokemon_r58_80200A5C_middle",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 180,
+          "virtual_address": 2149583452
+        }
+      ],
+      "total_code": 180,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/game/fight_pokemon_r58_80200B10_o1",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 752,
+          "virtual_address": 2149583632
+        }
+      ],
+      "total_code": 752,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/fight_pokemon_candidate_80200E00_gc20",
@@ -28282,17 +28594,30 @@
       "total_functions": 1
     },
     {
-      "name": "main/game/fight_trainer_ai_irekae_r47_prefix",
+      "name": "main/game/fight_trainer_ai_irekae_r58b_8024F8B4_o1",
       "sections": [
         {
           "name": ".text",
-          "size": 2616,
+          "size": 1980,
           "virtual_address": 2149906612
         }
       ],
-      "total_code": 2616,
+      "total_code": 1980,
       "total_data": 0,
-      "total_functions": 3
+      "total_functions": 2
+    },
+    {
+      "name": "main/game/fight_trainer_ai_irekae_r58b_80250070_suffix",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 636,
+          "virtual_address": 2149908592
+        }
+      ],
+      "total_code": 636,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/game/fight_trainer_ai_irekae_r47_select_item_o2",

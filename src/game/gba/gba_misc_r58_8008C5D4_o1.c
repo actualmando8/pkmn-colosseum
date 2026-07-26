@@ -1,2 +1,2 @@
 /* Score instrumentation only; not evidence of a retail TU boundary. */
-#include "src/game/fight_pokemon_range_801FDB78.c"
+#include "src/game/gba/gba_misc_candidate_8008ABE4_r42_8008AE18.c"

@@ -1086,8 +1086,14 @@ game/gba/gba_misc_candidate_8008ABE4.c:
 game/gba/gba_misc_candidate_8008ABE4_r42_8008AC34_gc20.c:
 	.text       start:0x8008AC34 end:0x8008AE18
 
-game/gba/gba_misc_candidate_8008ABE4_r42_8008AE18.c:
-	.text       start:0x8008AE18 end:0x8008C7B0
+game/gba/gba_misc_r58_8008AE18_prefix.c:
+	.text       start:0x8008AE18 end:0x8008C5D4
+
+game/gba/gba_misc_r58_8008C5D4_o1.c:
+	.text       start:0x8008C5D4 end:0x8008C6FC
+
+game/gba/gba_misc_r58_8008C6FC_suffix.c:
+	.text       start:0x8008C6FC end:0x8008C7B0
 
 game/gbaCommunication_prefix.c:
 	.text       start:0x8008C7B0 end:0x80090720
@@ -1298,8 +1304,14 @@ dolphin/db/DBIsExceptionMarked.c:
 dolphin/db/DBPrintf.c:
 	.text       start:0x800A2CE8 end:0x800A2D38
 
-dolphin/sdk_candidate_800A2D38_prefix.c:
-	.text       start:0x800A2D38 end:0x800A3458
+dolphin/sdk_r58_800A2D38_prefix.c:
+	.text       start:0x800A2D38 end:0x800A30E4
+
+dolphin/sdk_r58_800A30E4_o2.c:
+	.text       start:0x800A30E4 end:0x800A3194
+
+dolphin/sdk_r58_800A3194_suffix.c:
+	.text       start:0x800A3194 end:0x800A3458
 
 dolphin/sdk_candidate_800A3458.c:
 	.text       start:0x800A3458 end:0x800A35E4
@@ -2499,8 +2511,11 @@ game/gs_math_util_exact_800E0D24.c:
 game/data/sdata2_8047CB48.c:
 	.sdata2     start:0x8047CB48 end:0x8047CB88
 
-game/gs_range_800E0DDC.c:
-	.text       start:0x800E0DDC end:0x800E1544
+game/gs_range_800E0DDC_r58_prefix.c:
+	.text       start:0x800E0DDC end:0x800E0E14
+
+game/gs_range_800E0E14_r58_o1.c:
+	.text       start:0x800E0E14 end:0x800E1544
 
 game/gs_range_800E0DDC_r40_800E1544_gc125n.c:
 	.text       start:0x800E1544 end:0x800E202C
@@ -2870,8 +2885,14 @@ game/gs_msg_candidate_r47_800FA3D0.c:
 game/gs_msg_candidate_800FA314_r46_800FB43C_o4s.c:
 	.text       start:0x800FB43C end:0x800FB680
 
-game/gs_msg_candidate_800FA314_r46_800FB680.c:
-	.text       start:0x800FB680 end:0x800FE35C
+game/gs_msg_r58b_800FB680_prefix.c:
+	.text       start:0x800FB680 end:0x800FC528
+
+game/gs_msg_r58b_800FC528_o1.c:
+	.text       start:0x800FC528 end:0x800FC7E0
+
+game/gs_msg_r58b_800FC7E0_suffix.c:
+	.text       start:0x800FC7E0 end:0x800FE35C
 
 game/gs_thread_hi_range_800FE35C.c:
 	.text       start:0x800FE35C end:0x800FE6DC
@@ -4783,8 +4804,11 @@ hsd/hsd_lobj.c:
 hsd/hsd_lobj_r42_801A4B00.c:
 	.text       start:0x801A4B00 end:0x801A4F54
 
-hsd/hsd_lobj_r42_801A4F54.c:
-	.text       start:0x801A4F54 end:0x801A66E0
+hsd/hsd_lobj_r58_801A4F54_prefix.c:
+	.text       start:0x801A4F54 end:0x801A6494
+
+hsd/hsd_lobj_r58_801A6494_o1.c:
+	.text       start:0x801A6494 end:0x801A66E0
 
 hsd/hsd_lobj_r42_801A66E0.c:
 	.text       start:0x801A66E0 end:0x801A678C
@@ -4795,8 +4819,14 @@ hsd/hsd_lobj_r42_801A678C.c:
 hsd/hsd_lobj_tail_exact_801A68D0.c:
 	.text       start:0x801A68D0 end:0x801A69C0
 
-hsd/hsd_memory.c:
-	.text       start:0x801A69C0 end:0x801A6CA4
+hsd/hsd_memory_r58_801A69C0_prefix.c:
+	.text       start:0x801A69C0 end:0x801A6B8C
+
+hsd/hsd_memory_r58_801A6B8C_o1.c:
+	.text       start:0x801A6B8C end:0x801A6C34
+
+hsd/hsd_memory_r58_801A6C34_suffix.c:
+	.text       start:0x801A6C34 end:0x801A6CA4
 
 hsd/hsd_mobj_candidate_801A6CA4.c:
 	.text       start:0x801A6CA4 end:0x801A6DC4
@@ -4927,8 +4957,14 @@ hsd/hsd_robj_range_801AE008.c:
 hsd/hsd_pobj_empty.c:
 	.text       start:0x801AEBE0 end:0x801AEBE4
 
-hsd/hsd_robj_r48_801AEBE4_prefix.c:
-	.text       start:0x801AEBE4 end:0x801AF560
+hsd/hsd_robj_r58_801AEBE4_prefix.c:
+	.text       start:0x801AEBE4 end:0x801AEFF0
+
+hsd/hsd_robj_r58_801AEFF0_o1.c:
+	.text       start:0x801AEFF0 end:0x801AF224
+
+hsd/hsd_robj_r58_801AF224_suffix.c:
+	.text       start:0x801AF224 end:0x801AF560
 
 hsd/hsd_robj_r48_801AF560.c:
 	.text       start:0x801AF560 end:0x801AFCAC
@@ -4963,8 +4999,14 @@ hsd/hsd_shadow_candidate_801B0408.c:
 hsd/hsd_shadow_exact_801B06D4.c:
 	.text       start:0x801B06D4 end:0x801B06DC
 
-hsd/hsd_shadow_r52_801B06DC_prefix.c:
-	.text       start:0x801B06DC end:0x801B0880
+hsd/hsd_shadow_r58_801B06DC_prefix.c:
+	.text       start:0x801B06DC end:0x801B073C
+
+hsd/hsd_shadow_r58_801B073C_o1.c:
+	.text       start:0x801B073C end:0x801B07D4
+
+hsd/hsd_shadow_r58_801B07D4_suffix.c:
+	.text       start:0x801B07D4 end:0x801B0880
 
 hsd/hsd_shadow_r52_801B0880_gc20p1_o4s.c:
 	.text       start:0x801B0880 end:0x801B0A98
@@ -5134,8 +5176,17 @@ hsd/hsd_tobj_r52_801BDA58_suffix.c:
 hsd/hsd_tobj_candidate_801BBDDC_r41_801BDD74_gc125n.c:
 	.text       start:0x801BDD74 end:0x801BE2B4
 
-hsd/hsd_tobj_candidate_801BBDDC_r41_801BE2B4.c:
-	.text       start:0x801BE2B4 end:0x801BF098
+hsd/hsd_tobj_r58_801BE2B4_prefix.c:
+	.text       start:0x801BE2B4 end:0x801BE85C
+
+hsd/hsd_tobj_r58_801BE85C_o1.c:
+	.text       start:0x801BE85C end:0x801BEE68
+
+hsd/hsd_tobj_r58_801BEE68_middle.c:
+	.text       start:0x801BEE68 end:0x801BEEDC
+
+hsd/hsd_tobj_r58_801BEEDC_o1.c:
+	.text       start:0x801BEEDC end:0x801BF098
 
 hsd/hsd_util_r52_801BF098_prefix.c:
 	.text       start:0x801BF098 end:0x801BF574
@@ -5527,8 +5578,14 @@ game/gs_exact_801E16D0.c:
 game/gs_candidate_801E189C.c:
 	.text       start:0x801E189C end:0x801E1B54
 
-dolphin/thp/THP_r48_801E1B54_prefix.c:
-	.text       start:0x801E1B54 end:0x801E3A50
+dolphin/thp/THP_r58_801E1B54_prefix.c:
+	.text       start:0x801E1B54 end:0x801E260C
+
+dolphin/thp/THP_r58_801E260C_o4s.c:
+	.text       start:0x801E260C end:0x801E2B74
+
+dolphin/thp/THP_r58_801E2B74_suffix.c:
+	.text       start:0x801E2B74 end:0x801E3A50
 
 dolphin/thp/THP_r48_801E3A50_o4s.c:
 	.text       start:0x801E3A50 end:0x801E3F54
@@ -5868,8 +5925,23 @@ game/fight_pokemon_candidate_801FE3F8.c:
 game/fight_pokemon_candidate_801FE3F8_r40_801FE91C_gc125n.c:
 	.text       start:0x801FE91C end:0x801FEC10
 
-game/fight_pokemon_candidate_801FE3F8_r40_801FEC10.c:
-	.text       start:0x801FEC10 end:0x80200E00
+game/fight_pokemon_r58_801FEC10_prefix.c:
+	.text       start:0x801FEC10 end:0x801FED3C
+
+game/fight_pokemon_r58_801FED3C_o1.c:
+	.text       start:0x801FED3C end:0x801FEF74
+
+game/fight_pokemon_r58_801FEF74_middle.c:
+	.text       start:0x801FEF74 end:0x801FF1BC
+
+game/fight_pokemon_r58_801FF1BC_o1.c:
+	.text       start:0x801FF1BC end:0x80200A5C
+
+game/fight_pokemon_r58_80200A5C_middle.c:
+	.text       start:0x80200A5C end:0x80200B10
+
+game/fight_pokemon_r58_80200B10_o1.c:
+	.text       start:0x80200B10 end:0x80200E00
 
 game/fight_pokemon_candidate_80200E00_gc20.c:
 	.text       start:0x80200E00 end:0x802010C8
@@ -6318,8 +6390,11 @@ game/fight_trainer_ai_irekae.c:
 game/fight_trainer_ai_irekae_candidate_8024E690_gc20.c:
 	.text       start:0x8024E690 end:0x8024F8B4
 
-game/fight_trainer_ai_irekae_r47_prefix.c:
-	.text       start:0x8024F8B4 end:0x802502EC
+game/fight_trainer_ai_irekae_r58b_8024F8B4_o1.c:
+	.text       start:0x8024F8B4 end:0x80250070
+
+game/fight_trainer_ai_irekae_r58b_80250070_suffix.c:
+	.text       start:0x80250070 end:0x802502EC
 
 game/fight_trainer_ai_irekae_r47_select_item_o2.c:
 	.text       start:0x802502EC end:0x80250980
