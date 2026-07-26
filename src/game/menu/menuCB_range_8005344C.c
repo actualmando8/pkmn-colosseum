@@ -93,6 +93,8 @@ extern void* lbl_8047A548;
 extern f32 lbl_8047A550;
 extern f32 lbl_8047A554;
 extern f32 lbl_8047A558;
+extern f32 lbl_8047A540;
+extern u32 lbl_8047A544;
 extern const f32 lbl_8047BE60;
 extern const f32 lbl_8047BE64;
 extern const f32 lbl_8047BE6C;
@@ -103,6 +105,7 @@ extern const f32 lbl_8047BE90;
 extern const f32 lbl_8047BE94;
 extern const f32 lbl_8047BE80;
 extern const f32 lbl_8047BE98;
+extern const f32 lbl_8047BE88;
 extern const MenuCBLayoutEntry lbl_802E61E8[17];
 extern const u32 lbl_80267350[18];
 extern s32 lbl_80267320[6];
@@ -662,3 +665,54 @@ void fn_8005471C(void) {
 }
 #pragma dont_inline reset
 #pragma pop
+
+s32 fn_800544A8(u8* ctx) {
+    switch ((s8)ctx[1]) {
+    case 0:
+        if ((s8)ctx[2] != 0) { break; }
+        lbl_8047A550 = lbl_8047BE68;
+        lbl_8047A54C = lbl_8047BE60;
+        lbl_8047A540 = lbl_8047BE68;
+        if (lbl_8047A544 != 0) {
+            fn_801080CC(0x8f, 0xff);
+        }
+        ctx[2] = 1;
+        break;
+    case 2:
+        if (lbl_8047A554 > lbl_8047BE68) {
+            lbl_8047A558 = lbl_8047A558 + lbl_8047A554;
+            if (lbl_8047A558 >= lbl_8047BE60) {
+                lbl_8047A558 = lbl_8047BE60;
+                lbl_8047A554 = lbl_8047BE68;
+            }
+        }
+        if (lbl_8047A554 < lbl_8047BE68) {
+            lbl_8047A558 = lbl_8047A558 + lbl_8047A554;
+            if (lbl_8047A558 <= lbl_8047BE68) {
+                lbl_8047A558 = lbl_8047BE68;
+                lbl_8047A554 = lbl_8047BE68;
+            }
+        }
+        lbl_8047A550 = lbl_8047A550 + lbl_8047BE88;
+        if (lbl_8047A550 >= lbl_8047BE60) {
+            lbl_8047A550 = lbl_8047A550 - lbl_8047BE60;
+        }
+        if (lbl_8047A54C < lbl_8047BE60) {
+            lbl_8047A54C = lbl_8047A54C + lbl_8047BE88;
+            if (lbl_8047A54C > lbl_8047BE60) {
+                lbl_8047A54C = lbl_8047BE60;
+            }
+        }
+        lbl_8047A540 = lbl_8047A540 + lbl_8047BE88;
+        if (lbl_8047A540 >= lbl_8047BE60) {
+            lbl_8047A540 = lbl_8047A540 - lbl_8047BE60;
+        }
+        break;
+    case 3:
+        if ((s8)ctx[2] != 0) { break; }
+        fn_801080CC(0x8f, 0x103);
+        ctx[2] = 1;
+        break;
+    }
+    return 0;
+}
