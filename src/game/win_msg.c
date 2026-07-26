@@ -370,10 +370,18 @@ s32 winMsgDraw(u8* window, u8* item) {
         break;
     }
 
-    if ((s8)window[1] == 2 && *(s32*)(window + 0x04) != 0x51) {
-        fn_800FBE7C(*(void**)work, *(u32*)(work + 0x08),
-                    (window[0] & 4) == 0);
-        *(u32*)(work + 0x08) = 0;
+    switch ((s8)window[1]) {
+    case 2:
+        if (*(s32*)(window + 0x04) != 0x51) {
+            fn_800FBE7C(*(void**)work, *(u32*)(work + 0x08),
+                        (window[0] & 4) == 0);
+            *(u32*)(work + 0x08) = 0;
+        }
+        break;
+    case 0:
+    case 3:
+    case 5:
+        break;
     }
     return 0;
 }
@@ -393,9 +401,13 @@ s32 winMsgCtrl(u8* window) {
         work[4] = (u8)windowGetParam(window, 1);
         work[5] = (u8)windowGetParam(window, 2);
 
-        if ((s8)window[2] == 0
-            || (u8)winSeqIsCheck(*(s32*)(window + 0x04), 0x2A) == 1
-            || window[0x0A] != 0) {
+        if ((s8)window[2] == 0) {
+            ready = 1;
+        }
+        if ((u8)winSeqIsCheck(*(s32*)(window + 0x04), 0x2A) == 1) {
+            ready = 1;
+        }
+        if (window[0x0A] != 0) {
             ready = 1;
         }
         if (ready != 0) {
@@ -414,7 +426,11 @@ s32 winMsgCtrl(u8* window) {
             GSmsgExec(*(void**)work, work[4], work[5]);
             window[2] = 1;
         }
-        window[0x98] = GSmsgIsCheck(*(void**)work) == 0;
+        if (GSmsgIsCheck(*(void**)work) != 0) {
+            window[0x98] = 0;
+        } else {
+            window[0x98] = 1;
+        }
         break;
     case 3:
         if ((s8)window[2] == 0) {
@@ -456,7 +472,7 @@ s32 winMsgOpenLevelUpFiledStatus(u32 message, u32 wait) {
         return 0;
     }
     if (lbl_80478B30 != 9 && lbl_8047AD10 == 0) {
-        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        s32 old_id = winMsgResolveMenuId(lbl_80478B30);
         if ((u8)menuIsCheck(old_id)) {
             menuCloseCustom((void*)old_id, 2, wait);
         }
@@ -474,7 +490,7 @@ s32 winMsgOpenLevelUpStatus(u32 message, u32 wait) {
         return 0;
     }
     if (lbl_80478B30 != 5 && lbl_8047AD10 == 0) {
-        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        s32 old_id = winMsgResolveMenuId(lbl_80478B30);
         if ((u8)menuIsCheck(old_id)) {
             menuCloseCustom((void*)old_id, 2, wait);
         }
@@ -631,7 +647,7 @@ s32 winMsgOpenField(u32 message, u32 wait, u8 pause) {
     u8 flags = 0;
 
     if (lbl_80478B30 != 3 && lbl_8047AD10 == 0) {
-        s32 old_id = winMsgGetMenuId(lbl_80478B30);
+        s32 old_id = winMsgResolveMenuId(lbl_80478B30);
         if ((u8)menuIsCheck(old_id)) {
             menuCloseCustom((void*)old_id, 2, wait);
         }
@@ -670,7 +686,7 @@ void winMsgClose(u8 wait) {
 
 /* 0x80106ADC | 0x260 */
 s32 winMsgOpenWithSE(s8 type, u32 message, u32 wait, u8 pause, u8 sound) {
-    s32 id = winMsgGetMenuId(type);
+    s32 id = winMsgResolveMenuId(type);
     s32 parent;
     u8 flags = 0;
     u8 error = 0;
@@ -685,7 +701,7 @@ s32 winMsgOpenWithSE(s8 type, u32 message, u32 wait, u8 pause, u8 sound) {
         wait = 0;
     } else {
         if (type != lbl_80478B30 && lbl_8047AD10 == 0) {
-            s32 old_id = winMsgGetMenuId(lbl_80478B30);
+            s32 old_id = winMsgResolveMenuId(lbl_80478B30);
             if ((u8)menuIsCheck(old_id)) {
                 menuCloseCustom((void*)old_id, 2, wait);
             }
@@ -705,7 +721,7 @@ s32 winMsgOpenWithSE(s8 type, u32 message, u32 wait, u8 pause, u8 sound) {
 
 /* 0x80106D3C | 0x25C */
 s32 winMsgOpen(s8 type, u32 message, u32 wait, u8 pause) {
-    s32 id = winMsgGetMenuId(type);
+    s32 id = winMsgResolveMenuId(type);
     s32 parent;
     u8 flags = 0;
     u8 error = 0;
@@ -720,7 +736,7 @@ s32 winMsgOpen(s8 type, u32 message, u32 wait, u8 pause) {
         wait = 0;
     } else {
         if (type != lbl_80478B30 && lbl_8047AD10 == 0) {
-            s32 old_id = winMsgGetMenuId(lbl_80478B30);
+            s32 old_id = winMsgResolveMenuId(lbl_80478B30);
             if ((u8)menuIsCheck(old_id)) {
                 menuCloseCustom((void*)old_id, 2, wait);
             }
