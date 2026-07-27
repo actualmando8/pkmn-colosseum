@@ -2882,11 +2882,22 @@ void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
 }
 #pragma peephole reset
 
+static inline void* pdaAlloc(s32 size, s32 align)
+{
+    u32 h = fn_800E2C04(size, align);
+
+    if ((u16)h != 0) {
+        return (void*)fn_800E27B0(h);
+    }
+    return NULL;
+}
+
 #pragma peephole off
 void fn_8003CF38(void)
 {
     u8 temporary[8];
     u8* sortEntries;
+    u8* lower;
     s32 count;
     s32 gap;
     s32 i;
@@ -2896,41 +2907,28 @@ void fn_8003CF38(void)
 
     lbl_8047A4DC = 0x60;
     lbl_8047A4D0 = 0;
-    allocation = fn_800E2C04(0x140, 0x20);
-    if ((u16)allocation != 0) {
-        lbl_8047A4D0 = fn_800E27B0();
-    }
-    allocation = fn_800E2C04(
-        ((lbl_8047A4DC * 4) + 0x1F) & ~0x1F, 0x20);
-    if ((u16)allocation != 0) {
-        lbl_8047A4D4 = (PdaListEntry*)fn_800E27B0();
-    } else {
-        lbl_8047A4D4 = 0;
-    }
-    allocation = fn_800E2C04(
-        ((lbl_8047A4DC * 8) + 0x1F) & ~0x1F, 0x20);
-    if ((u16)allocation != 0) {
-        lbl_8047A4D8 = fn_800E27B0();
-    } else {
-        lbl_8047A4D8 = 0;
-    }
+    lbl_8047A4D0 = (u32)pdaAlloc(0x140, 0x20);
+    lbl_8047A4D4 =
+        (PdaListEntry*)pdaAlloc(((lbl_8047A4DC * 4) + 0x1F) & ~0x1F, 0x20);
+    lbl_8047A4D8 =
+        (u32)pdaAlloc(((lbl_8047A4DC * 8) + 0x1F) & ~0x1F, 0x20);
 
     count = 0;
     for (i = 0; i < (s32)lbl_8047A4DC; i++) {
         u16 value;
-        u16 battleId;
 
-        battleId = i + 1;
-        value = fn_801EE248(battleId);
+        value = fn_801EE248((u16)(i + 1));
         if (value != 0 &&
-            (fn_801EE8F4(battleId) != 0 ||
-             fn_801EE614(battleId) != 0)) {
+            (fn_801EE8F4((u16)(i + 1)) != 0 ||
+             fn_801EE614((u16)(i + 1)) != 0)) {
             lbl_8047A4D4[count].field_00 = value;
-            lbl_8047A4D4[count].battleId = battleId;
+            lbl_8047A4D4[count].battleId = (u16)(i + 1);
             *(u32*)((u8*)lbl_8047A4D8 + count * 8) =
                 fn_801EE0BC();
-            *(PdaListEntry*)((u8*)lbl_8047A4D8 + count * 8 + 4) =
-                lbl_8047A4D4[count];
+            ((PdaListEntry*)((u8*)lbl_8047A4D8 + count * 8 + 4))->field_00 =
+                lbl_8047A4D4[count].field_00;
+            ((PdaListEntry*)((u8*)lbl_8047A4D8 + count * 8 + 4))->battleId =
+                lbl_8047A4D4[count].battleId;
             count++;
         }
     }
@@ -2940,20 +2938,23 @@ void fn_8003CF38(void)
     for (gap = count / 2; gap > 0; gap /= 2) {
         for (i = gap; i < count; i++) {
             j = i - gap;
+            lower = sortEntries + j * 8;
             while (j >= 0 &&
-                   *(s32*)(sortEntries + j * 8) >
+                   *(s32*)lower >
                        *(s32*)(sortEntries + (j + gap) * 8)) {
-                memcpy(temporary, sortEntries + j * 8, 8);
-                memcpy(sortEntries + j * 8,
-                       sortEntries + (j + gap) * 8, 8);
+                memcpy(temporary, lower, 8);
+                memcpy(lower, sortEntries + (j + gap) * 8, 8);
                 memcpy(sortEntries + (j + gap) * 8, temporary, 8);
+                lower -= gap * 8;
                 j -= gap;
             }
         }
     }
-    for (i = 0; i < count; i++) {
-        lbl_8047A4D4[i] =
-            *(PdaListEntry*)(sortEntries + i * 8 + 4);
+    for (i = 0; i < (s32)lbl_8047A4DC; i++) {
+        lbl_8047A4D4[i].field_00 =
+            ((PdaListEntry*)(sortEntries + i * 8 + 4))->field_00;
+        lbl_8047A4D4[i].battleId =
+            ((PdaListEntry*)(sortEntries + i * 8 + 4))->battleId;
     }
 
     handle = fn_800E202C(lbl_8047A4D8);
@@ -6085,15 +6086,6 @@ typedef struct PdaSortPair {
 extern u16 pokemonDataBiosGetWeight(void* data);
 extern u16 pokemonDataBiosGetHeight(void* data);
 
-static inline void* pdaAlloc(s32 size, s32 align)
-{
-    u32 h = fn_800E2C04(size, align);
-
-    if ((u16)h != 0) {
-        return (void*)fn_800E27B0(h);
-    }
-    return NULL;
-}
 
 static inline void pdaFree(void* p)
 {
