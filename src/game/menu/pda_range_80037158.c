@@ -7338,3 +7338,98 @@ s32 fn_8004B278(u8* work)
     return 0;
 }
 #pragma peephole reset
+
+typedef struct PdaPairS16 {
+    s16 x;
+    s16 y;
+} PdaPairS16;
+
+typedef struct PdaSpan12 {
+    s16 v[12];
+} PdaSpan12;
+
+extern PdaPairS16 lbl_8047BD78;
+extern PdaPairS16 lbl_8047BD7C;
+extern PdaPairS16 lbl_8047BD80;
+extern PdaPairS16 lbl_8047BD84;
+extern PdaPairS16 lbl_8047BD88;
+extern PdaPairS16 lbl_8047BD8C;
+extern PdaPairS16 lbl_8047BD90;
+extern PdaPairS16 lbl_8047BD94;
+extern PdaSpan12 lbl_8026719C;
+extern PdaSpan12 lbl_802671B4;
+
+/* Re-point the mail window layout tables at the wide or narrow variant. */
+#pragma peephole off
+void fn_8004A47C(void)
+{
+    PdaSpan12 wide;
+    PdaSpan12 narrow;
+    PdaPairS16 topWide[2];
+    PdaPairS16 topNarrow[2];
+    PdaPairS16 botWide[2];
+    PdaPairS16 botNarrow[2];
+
+    topWide[0] = lbl_8047BD78;
+    topWide[1] = lbl_8047BD7C;
+    topNarrow[0] = lbl_8047BD80;
+    topNarrow[1] = lbl_8047BD84;
+    if (fn_801902E0(0x3f0) != 0) {
+        *(s16*)(lbl_802EF0A8 + 0x7608) = topWide[0].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0x7624) = topWide[0].y - 6;
+        *(s16*)(lbl_802EF0A8 + 0x7640) = topWide[1].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0x765c) = topWide[1].y - 6;
+    } else {
+        *(s16*)(lbl_802EF0A8 + 0x7608) = topNarrow[0].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0x7624) = topNarrow[0].y - 6;
+        *(s16*)(lbl_802EF0A8 + 0x7640) = topNarrow[1].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0x765c) = topNarrow[1].y - 6;
+    }
+
+    wide = lbl_8026719C;
+    narrow = lbl_802671B4;
+    if (fn_801902E0(0x3f0) != 0) {
+        *(s16*)(lbl_802EF0A8 + 0xc148) = wide.v[0];
+        *(s16*)(lbl_802EF0A8 + 0xc164) = wide.v[1];
+        *(s16*)(lbl_802EF0A8 + 0xc180) = wide.v[2];
+        *(s16*)(lbl_802EF0A8 + 0xce30) = wide.v[3];
+        *(s16*)(lbl_802EF0A8 + 0xce4c) = wide.v[4];
+        *(s16*)(lbl_802EF0A8 + 0xce68) = wide.v[5];
+        *(s16*)(lbl_802EF0A8 + 0xce84) = wide.v[6];
+        *(s16*)(lbl_802EF0A8 + 0xcea0) = wide.v[7];
+        *(s16*)(lbl_802EF0A8 + 0xcebc) = wide.v[8];
+        *(s16*)(lbl_802EF0A8 + 0xced8) = wide.v[9];
+        *(s16*)(lbl_802EF0A8 + 0xcef4) = wide.v[10];
+        *(s16*)(lbl_802EF0A8 + 0xcf10) = wide.v[11];
+    } else {
+        *(s16*)(lbl_802EF0A8 + 0xc148) = narrow.v[0];
+        *(s16*)(lbl_802EF0A8 + 0xc164) = narrow.v[1];
+        *(s16*)(lbl_802EF0A8 + 0xc180) = narrow.v[2];
+        *(s16*)(lbl_802EF0A8 + 0xce30) = narrow.v[3];
+        *(s16*)(lbl_802EF0A8 + 0xce4c) = narrow.v[4];
+        *(s16*)(lbl_802EF0A8 + 0xce68) = narrow.v[5];
+        *(s16*)(lbl_802EF0A8 + 0xce84) = narrow.v[6];
+        *(s16*)(lbl_802EF0A8 + 0xcea0) = narrow.v[7];
+        *(s16*)(lbl_802EF0A8 + 0xcebc) = narrow.v[8];
+        *(s16*)(lbl_802EF0A8 + 0xced8) = narrow.v[9];
+        *(s16*)(lbl_802EF0A8 + 0xcef4) = narrow.v[10];
+        *(s16*)(lbl_802EF0A8 + 0xcf10) = narrow.v[11];
+    }
+
+    botWide[0] = lbl_8047BD88;
+    botWide[1] = lbl_8047BD8C;
+    botNarrow[0] = lbl_8047BD90;
+    botNarrow[1] = lbl_8047BD94;
+    if (fn_801902E0(0x3f0) != 0) {
+        *(s16*)(lbl_802EF0A8 + 0xc0d8) = botWide[0].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0xc0f4) = botWide[0].y - 6;
+        *(s16*)(lbl_802EF0A8 + 0xc110) = botWide[1].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0xc12c) = botWide[1].y - 6;
+    } else {
+        *(s16*)(lbl_802EF0A8 + 0xc0d8) = botNarrow[0].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0xc0f4) = botNarrow[0].y - 6;
+        *(s16*)(lbl_802EF0A8 + 0xc110) = botNarrow[1].x - 6;
+        *(s16*)(lbl_802EF0A8 + 0xc12c) = botNarrow[1].y - 6;
+    }
+}
+#pragma peephole reset
