@@ -72,36 +72,34 @@ void GSsplineAddControlVectorValue(GSspline* spline, void* vector, f32 value)
     if (spline == NULL) {
         return;
     }
-    if (spline->state != 1) {
+    if (spline->state == 1) {
+        index = spline->valueCount;
+        if (index < spline->capacity) {
+            storesKey = TRUE;
+            if ((spline->kind == 1 || spline->kind == 2) && index % 3 != 0) {
+                storesKey = FALSE;
+            }
+
+            GSvecCopy((u8*)spline->vectors + index * 12, vector);
+            spline->values[index] = value;
+            spline->valueCount++;
+
+            if (storesKey) {
+                spline->values[spline->keyCount] = value;
+                if (spline->keyCount == 0) {
+                    spline->firstValue = value;
+                } else if (value < spline->values[spline->keyCount - 1]) {
+                    GSlogWrite(lbl_80273ADC);
+                }
+                if (spline->valueCount == spline->capacity) {
+                    spline->lastValue = value;
+                }
+                spline->keyCount++;
+            }
+        } else {
+            GSlogWrite(lbl_80273B20);
+        }
+    } else {
         GSlogWrite(lbl_80273B5C);
-        return;
-    }
-
-    index = spline->valueCount;
-    if (index >= spline->capacity) {
-        GSlogWrite(lbl_80273B20);
-        return;
-    }
-
-    storesKey = TRUE;
-    if ((spline->kind == 1 || spline->kind == 2) && index % 3 != 0) {
-        storesKey = FALSE;
-    }
-
-    GSvecCopy((u8*)spline->vectors + index * 12, vector);
-    spline->values[index] = value;
-    spline->valueCount++;
-
-    if (storesKey) {
-        spline->values[spline->keyCount] = value;
-        if (spline->keyCount == 0) {
-            spline->firstValue = value;
-        } else if (value < spline->values[spline->keyCount - 1]) {
-            GSlogWrite(lbl_80273ADC);
-        }
-        if (spline->valueCount == spline->capacity) {
-            spline->lastValue = value;
-        }
-        spline->keyCount++;
     }
 }
