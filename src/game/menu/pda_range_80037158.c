@@ -7010,6 +7010,8 @@ s32 fn_80042658(void* work, s32 mode)
     extern s32 fn_800D37CC(void);
     u8* K = lbl_803A67FC;
     PdaVec3 spin;
+    s8 stickY;
+    s8 stickX;
     PdaVec3 pos;
     u16 keys;
     s32 held;
@@ -7106,10 +7108,12 @@ s32 fn_80042658(void* work, s32 mode)
         }
         GSmodelGetBound(model);
         rot = (f32*)((u8*)&lbl_803A6818 + 0x6c);
+        stickY = fn_800F7994(1, 1);
+        stickX = fn_800F7920(1, 1);
         spin.x = *(f32*)((u8*)&lbl_803A6818 + 0x3c) *
-                 (lbl_8047BCA4 * (f32)fn_800F7920(1, 1) * lbl_8047BCE0);
+                 (lbl_8047BCA4 * (f32)stickX * lbl_8047BCE0);
         spin.y = *(f32*)((u8*)&lbl_803A6818 + 0x3c) *
-                 (lbl_8047BCA4 * (f32)fn_800F7994(1, 1) * lbl_8047BCE0);
+                 (lbl_8047BCA4 * (f32)stickY * lbl_8047BCE0);
         GSvecAdd(rot, rot, &spin);
         if (*rot >= lbl_8047BCE4) {
             *rot = lbl_8047BCE4 - spin.x;
@@ -8379,9 +8383,6 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
     case 0x437:
         *(s32*)(lbl_803A6A60 + 0x18) = GSmsgGetRect(sprite->messageId) >> 16;
         break;
-    case 0x439:
-        *(s32*)(lbl_803A6A60 + 0x20) = GSmsgGetRect(sprite->messageId) >> 16;
-        break;
     case 0x43a:
         *(s32*)(lbl_803A6A60 + 0x24) = GSmsgGetRect(sprite->messageId) >> 16;
         cursor = menuGetCursorItemID(*(s32*)((u8*)work + 4));
@@ -8434,6 +8435,9 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
     case 0x764:
     case 0x765:
         fn_8004B598((s32)work, sprite, sprite->eventId);
+        break;
+    case 0x439:
+        *(s32*)(lbl_803A6A60 + 0x20) = GSmsgGetRect(sprite->messageId) >> 16;
         break;
     case 0x754:
         msgctrlSetValue(0x4c, fn_80005748());
