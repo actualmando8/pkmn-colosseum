@@ -2703,59 +2703,98 @@ void fn_80044378(u8* context, PdaSprite* sprite)
 #pragma peephole off
 void fn_8003B478(u8* context)
 {
-    u8* window;
-    PdaListEntry* entry;
+    u32 index;
+    u16 species;
     u16 battleId;
+    u16 curBattleId;
     u32 model;
+    u32 liveModel;
+    u32 rnd;
     u32 message;
+    u32 msg;
     s32 battleState;
+    u8 seen;
+    u8 caught;
 
-    window = (u8*)&lbl_803A6748;
-    context[0x8B] = lbl_8047BAC0 * *(f32*)(window + 0x44);
-    entry = &lbl_8047A4D4[*(u32*)window];
-    battleId = entry->battleId;
-    fn_801EE614(battleId);
-    fn_801EE8F4(battleId);
-    if (fn_801EEAD0(battleId) != 0) {
-        battleState = fn_801EEC74(battleId) != 0;
+    context[0x8B] = lbl_8047BAC0 * *(f32*)((u8*)&lbl_803A6748 + 0x44);
+    index = *(u32*)&lbl_803A6748;
+    species = lbl_8047A4D4[index].field_00;
+    battleId = lbl_8047A4D4[index].battleId;
+    curBattleId = lbl_8047A4D4[(u16)index].battleId;
+    model = lbl_8047A4D0;
+    fn_801EE614(curBattleId);
+    fn_801EE8F4(curBattleId);
+    seen = fn_801EEAD0(curBattleId);
+    caught = fn_801EEC74(curBattleId);
+    if (seen != 0) {
+        if (caught != 0) {
+            battleState = 1;
+        } else {
+            battleState = 0;
+        }
     } else {
         battleState = 2;
     }
 
-    model = lbl_8047A4D0;
-    fn_801240C4(model, entry->field_00, 0xA, gamedataGetStatus(0, 1));
+    fn_801240C4(model, species, 0xA, gamedataGetStatus(0, 1));
+    rnd = *(u32*)((u8*)&lbl_803A6748 + 0x98);
     fn_801EE750(battleId);
-    fn_8011DFE0(model, *(u32*)(window + 0x98));
-    if (battleState == 1) {
-        fn_8011D8F4(model, 0);
-        fn_8011D8D8(model, 0);
-    } else {
+    fn_8011DFE0(model, rnd);
+    switch (battleState) {
+    case 0:
+    case 2:
         fn_8011D8F4(model, 1);
         fn_8011D8D8(model, 0xA);
+        break;
+    case 1:
+        fn_8011D8F4(model, 0);
+        fn_8011D8D8(model, 0);
+        break;
     }
 
-    if (model == 0 || battleId == 0) {
-        message = 0x80;
-    } else if (fn_801EE8F4(battleId) != 0) {
-        fn_8011DFE0(model, fn_801EE750(battleId));
-        message = pokemonGetSex(model);
-        fn_8011DFE0(model, *(u32*)(window + 0x98));
+    liveModel = lbl_8047A4D0;
+    if (liveModel != 0) {
+        if (battleId != 0) {
+            if (fn_801EE8F4(battleId) != 0) {
+                fn_8011DFE0(liveModel, fn_801EE750(battleId));
+                message = pokemonGetSex(liveModel);
+                fn_8011DFE0(liveModel, *(u32*)((u8*)&lbl_803A6748 + 0x98));
+            } else {
+                message = 2;
+            }
+        } else {
+            message = 0x80;
+        }
     } else {
-        message = 2;
+        message = 0x80;
     }
     message &= 0xFF;
     if (message == 0x80) {
-        fn_80132A38(0x37, fn_800FA280(1));
-    } else if (message == 0) {
-        fn_80132A38(0x37, fn_800FA280(0xD67));
-    } else if (message == 1) {
-        fn_80132A38(0x37, fn_800FA280(0xD68));
-    } else if (message == 2) {
-        fn_80132A38(0x37, fn_800FA280(0xD69));
+        msg = fn_800FA280(1);
     } else {
-        fn_80132A38(0x37, fn_800FA280(0xD68));
+        switch (message) {
+        case 0:
+            msg = fn_800FA280(0xD67);
+            break;
+        case 1:
+            msg = fn_800FA280(0xD68);
+            break;
+        case 2:
+            msg = fn_800FA280(0xD69);
+            break;
+        default:
+            msg = fn_800FA280(0xD68);
+            break;
+        }
     }
-    fn_800FB680(0, 0, (s8)context[0x8B], (void*)0xCF);
+    fn_80132A38(0x37, msg);
+    {
+        s32 colorMask = -0x100;
+        u32 alpha = context[0x8B];
+        s32 color = alpha | colorMask;
+
+        fn_800FB680(0, 0, color, (void*)0xCF);
+    }
 }
 #pragma peephole reset
 
