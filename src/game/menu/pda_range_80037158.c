@@ -6692,14 +6692,14 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                     *(s16*)(layout + 0x5a78) - sprite->field_52,
                     *(s16*)(layout + 0x5a7a),
                     *(s16*)(layout + 0x5a7c),
-                    (void*)(alphaSprite->alphaByte | -0x100LL), 0xcf);
+                    (void*)(alphaSprite->alphaByte | -0x100), 0xcf);
     } else {
         fn_800FBB34(lbl_8047A4F0 +
                         (*(s16*)(layout + 0x5a76) - sprite->field_50),
                     *(s16*)(layout + 0x5a78) - sprite->field_52,
                     *(s16*)(layout + 0x5a7a),
                     *(s16*)(layout + 0x5a7c),
-                    (void*)(alphaSprite->alphaByte | -0x100LL), 0x371b);
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x371b);
     }
 
     if (pdaEntrySeen() != 0) {
@@ -6711,27 +6711,33 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                     *(s16*)(layout + 0x5a94) - sprite->field_52,
                     *(s16*)(layout + 0x5a96),
                     *(s16*)(layout + 0x5a98),
-                    (void*)(alphaSprite->alphaByte | -0x100LL), 0x189c);
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x189c);
     } else {
         fn_800FBB34(lbl_8047A4F0 +
                         (*(s16*)(layout + 0x5a92) - sprite->field_50),
                     *(s16*)(layout + 0x5a94) - sprite->field_52,
                     *(s16*)(layout + 0x5a96),
                     *(s16*)(layout + 0x5a98),
-                    (void*)(alphaSprite->alphaByte | -0x100LL), 0x371a);
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x371a);
     }
 
     if (pdaEntrySeen() != 0) {
         msgctrlSetValue(0x31, pokemonDataBiosGetTypeName(pdaCurrentData()));
+        fn_800FBB34(lbl_8047A4F0 +
+                        (*(s16*)(layout + 0x5a22) - sprite->field_50),
+                    *(s16*)(layout + 0x5a24) - sprite->field_52,
+                    *(s16*)(layout + 0x5a26),
+                    *(s16*)(layout + 0x5a28),
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x371e);
     } else {
         msgctrlSetValue(0x31, 0x371c);
+        fn_800FBB34(lbl_8047A4F0 +
+                        (*(s16*)(layout + 0x5a22) - sprite->field_50),
+                    *(s16*)(layout + 0x5a24) - sprite->field_52,
+                    *(s16*)(layout + 0x5a26),
+                    *(s16*)(layout + 0x5a28),
+                    (void*)(alphaSprite->alphaByte | -0x100), 0x371e);
     }
-    fn_800FBB34(lbl_8047A4F0 +
-                    (*(s16*)(layout + 0x5a22) - sprite->field_50),
-                *(s16*)(layout + 0x5a24) - sprite->field_52,
-                *(s16*)(layout + 0x5a26),
-                *(s16*)(layout + 0x5a28),
-                (void*)(alphaSprite->alphaByte | -0x100LL), 0x371e);
 }
 #pragma peephole reset
 
