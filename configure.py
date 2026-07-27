@@ -289,7 +289,9 @@ config.libs = [
             Object(CodeCandidate, "hsd/hsd_pobj_r43_801AC1F8.c", mw_version="GC/2.0p1", extra_cflags=["-O4,s", "-use_lmw_stmw on"], progress_category="hsd"),
             Object(CodeCandidate, "hsd/hsd_pobj_r43_suffix_801AC4BC.c", mw_version="GC/1.3", extra_cflags=["-use_lmw_stmw on"], progress_category="hsd"),
             Object(CodeCandidate, "hsd/hsd_pobj_r43_801AD354.c", mw_version="GC/2.0p1", extra_cflags=["-O4,s", "-use_lmw_stmw on"], progress_category="hsd"),
-            Object(CodeCandidate, "hsd/hsd_pobj_r43_801AD61C.c", mw_version="GC/1.3", extra_cflags=["-use_lmw_stmw on"], progress_category="hsd"),
+            Object(CodeCandidate, "hsd/hsd_pobj_r60_801AD61C_prefix.c", mw_version="GC/1.3", extra_cflags=["-use_lmw_stmw on"], progress_category="hsd"),
+            Object(CodeCandidate, "hsd/hsd_pobj_r60_801ADAAC_schedule_off.c", mw_version="GC/1.3", extra_cflags=["-use_lmw_stmw on", "-schedule off"], progress_category="hsd"),
+            Object(CodeCandidate, "hsd/hsd_pobj_r60_801ADC08_suffix.c", mw_version="GC/1.3", extra_cflags=["-use_lmw_stmw on"], progress_category="hsd"),
             Object(Matching, "trk/TRKTarget_range_800C1310.c", mw_version="GC/1.3", progress_category="runtime"),  # BANK_TRK2
             Object(
                 Matching,
@@ -1167,7 +1169,7 @@ config.libs = [
                 CodeCandidate,
                 "game/effect/effect_visual_candidate_8013C074_o2.c",
                 mw_version="GC/1.3",
-                cflags=["-O2" if flag == "-O4,p" else flag for flag in cflags_base],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -1809,9 +1811,9 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/fight_pokemon_candidate_801FE3F8_r40_801FE91C_gc125n.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/2.0",
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=[
-                    "-O1",
                     "-use_lmw_stmw on",
                     "-sdata 8",
                     "-sdata2 8",
@@ -2239,7 +2241,12 @@ config.libs = [
                 CodeCandidate,
                 "game/mailMain_r54b_801D2080_prefix.c",
                 mw_version="GC/1.3",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-inline deferred",
+                ],
                 progress_category="game",
             ),
             Object(
@@ -2313,14 +2320,16 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/wazaSequenceEntry_candidate_801D8B38_gc125.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.2.5",
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
                 CodeCandidate,
                 "game/wazaSequenceEntry_candidate_801D91EC_gc125.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.2.5",
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -2342,7 +2351,8 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/wazaSequenceEntry_candidate_801D9C1C_gc125.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.3",
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -4803,9 +4813,23 @@ config.libs = [
             ],
             Object(
                 CodeCandidate,
-                "hsd/hsd_robj_range_801AE008.c",
+                "hsd/hsd_robj_r60_801AE008_lmw_on.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-O2", "-use_lmw_stmw on"],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_r60_801AE4B0_middle.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-O2"],
+                progress_category="hsd",
+            ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_robj_r60_801AE5E8_lmw_on.c",
+                mw_version="GC/1.3.2",
+                extra_cflags=["-O2", "-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             *[
@@ -5256,7 +5280,8 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/menu/menuCB_BattleStart_candidate_80061A2C_r41_80062834_gc125n.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.3",
+                cflags=["-O4,s" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -5993,7 +6018,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/fight_range_80213A78.c",
-                mw_version="GC/1.3",
+                mw_version="GC/2.0",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -6188,7 +6213,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/fight_range_8021FAD4.c",
-                mw_version="GC/1.3",
+                mw_version="GC/2.0",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -6539,7 +6564,8 @@ config.libs = [
                 CodeCandidate,
                 "game/fight_trainer_ai_waza_value_middle.c",
                 mw_version="GC/1.3",
-                extra_cflags=["-O2", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
@@ -6717,8 +6743,8 @@ config.libs = [
                 CodeCandidate,
                 "game/fight_trainer_ai_waza_hit_candidate_80256ED0.c",
                 mw_version="GC/1.3",
-                cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
-                extra_cflags=["-O1", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
             Object(
@@ -6787,6 +6813,7 @@ config.libs = [
                         "-use_lmw_stmw on",
                         "-sdata 8",
                         "-sdata2 8",
+                        *(["-schedule off"] if path == "game/toolentry_candidate_8025D644.c" else []),
                     ],
                     progress_category="game",
                 )
@@ -7202,7 +7229,8 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/wazaSequence_candidate_801DC014_r40_801DCAA0_gc125n.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.3",
+                cflags=["-O4,s" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -7654,7 +7682,7 @@ config.libs = [
                 CodeCandidate,
                 "game/menu/menu_middle_range_80069C0C.c",
                 mw_version="GC/2.0",
-                cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=[
                     "-use_lmw_stmw on",
                     "-sdata 8",
@@ -7983,7 +8011,7 @@ config.libs = [
                     ("game/menu/menu_middle_r59_8006E338_o1.c", "GC/2.0", "-O1"),
                     ("game/menu/menu_middle_r59_8006E798_middle.c", "GC/2.0", None),
                     ("game/menu/menu_middle_r59_8006E9A4_o1.c", "GC/1.3", "-O1"),
-                    ("game/menu/menu_middle_r59_8006F284_prefix.c", "GC/2.0", None),
+                    ("game/menu/menu_middle_r59_8006F284_prefix.c", "GC/2.0", "-O0"),
                     ("game/menu/menu_middle_r59_8006F720_o1.c", "GC/2.0", "-O1"),
                     ("game/menu/menu_middle_r59_8006FBFC_suffix.c", "GC/2.0", None),
                 ]
@@ -8016,7 +8044,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/menu/menu_middle_candidate_8006C7D4.c",
-                mw_version="GC/1.3",
+                mw_version="GC/2.0",
                 cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=[
                     "-use_lmw_stmw on",
@@ -8454,7 +8482,7 @@ config.libs = [
                 CodeCandidate,
                 "game/gs_npc_event_candidate_80031B4C_o3.c",
                 mw_version="GC/1.3",
-                cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -8736,10 +8764,12 @@ config.libs = [
                 mw_version="GC/1.3",
                 progress_category="hsd",
             ),
+            Object(CodeCandidate, "hsd/hsd_initialize_r60_8019C7B8_prefix.c", mw_version="GC/1.3", progress_category="hsd"),
             Object(
                 CodeCandidate,
-                "hsd/hsd_initialize_candidate_8019C7B8.c",
+                "hsd/hsd_initialize_r60_8019CB70_lmw_on.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
                 progress_category="hsd",
             ),
             Object(
@@ -9129,14 +9159,20 @@ config.libs = [
                 CodeCandidate,
                 "game/menuNameEntry_r56_800268F0_gc20p1_o4s.c",
                 mw_version="GC/2.0p1",
-                extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=[
+                    "-O4,s",
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-inline deferred",
+                ],
                 progress_category="game",
             ),
             Object(
                 CodeCandidate,
                 "game/menuNameEntry_candidate_80026B44_gc20.c",
                 mw_version="GC/2.0",
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8", "-inline deferred"],
                 progress_category="game",
             ),
             Object(
@@ -9187,7 +9223,12 @@ config.libs = [
                 "game/menuPokemonChange_r51_8002DD24_o4s.c",
                 mw_version="GC/1.3",
                 cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
-                extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
+                extra_cflags=[
+                    "-use_lmw_stmw on",
+                    "-sdata 8",
+                    "-sdata2 8",
+                    "-schedule on",
+                ],
                 progress_category="game",
             ),
             Object(
@@ -9229,7 +9270,11 @@ config.libs = [
                 Object(
                     status,
                     path,
-                    mw_version="GC/1.3",
+                    mw_version=(
+                        "GC/2.0"
+                        if path == "game/gs_title_candidate_80020EA4.c"
+                        else "GC/1.3"
+                    ),
                     extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8", "-opt nopeephole"],
                     progress_category="game",
                 )
@@ -9576,7 +9621,7 @@ config.libs = [
                 CodeCandidate,
                 "game/menuPokemon_r50_8001C7B8_prefix.c",
                 mw_version="GC/2.0",
-                cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -9606,7 +9651,7 @@ config.libs = [
                 CodeCandidate,
                 "game/menuSub_r54_8001DACC_gc13_o1.c",
                 mw_version="GC/1.3",
-                cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
+                cflags=["-O0" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -10038,13 +10083,20 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "hsd/hsd_shadow.c"),
                     (Matching, "hsd/hsd_shadow_exact_801B03A0.c"),
-                    (CodeCandidate, "hsd/hsd_shadow_candidate_801B0408.c"),
                     (Matching, "hsd/hsd_shadow_exact_801B06D4.c"),
                     (CodeCandidate, "hsd/hsd_shadow_r52_801B0A98_middle.c"),
                     (CodeCandidate, "hsd/hsd_shadow_r52_801B0EB8_middle.c"),
                     (Matching, "hsd/hsd_shadow_exact_801B16C0.c"),
                 ]
             ],
+            Object(
+                CodeCandidate,
+                "hsd/hsd_shadow_r60_801B0408_lmw_on.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-use_lmw_stmw on"],
+                progress_category="hsd",
+            ),
+            Object(CodeCandidate, "hsd/hsd_shadow_r60_801B04E0_suffix.c", mw_version="GC/1.3", progress_category="hsd"),
             *[
                 Object(
                     CodeCandidate,

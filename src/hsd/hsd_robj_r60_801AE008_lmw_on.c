@@ -1,2 +1,2 @@
 /* Score instrumentation only; not evidence of a retail TU boundary. */
-#include "src/game/menu/menu_middle_range_8006B9B8.c"
+#include "src/hsd/hsd_robj_range_801AE008.c"
