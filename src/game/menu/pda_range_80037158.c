@@ -1593,7 +1593,7 @@ extern u32 fn_801EE750();
 extern u8 fn_801EE8F4();
 extern u8 fn_801EEAD0();
 extern u8 fn_801EEC74();
-extern void fn_801EED88(u16);
+extern u8 fn_801EED88(u16);
 extern u16 fn_801EEFAC();
 extern u32 fn_801FCC7C();
 extern u32 fn_801FCCC4();
@@ -8562,5 +8562,154 @@ void fn_8003C7C0(void)
         }
         lbl_8047A4D4 = NULL;
     }
+}
+#pragma peephole reset
+
+extern f32 lbl_8047BAF8;
+extern f32 lbl_8047BAFC;
+extern f32 lbl_8047BB00;
+extern void* fightTrainerDataBiosGetPtr(u16 id);
+extern void* fightTrainerPokemonDataBiosGetPtr(void* data);
+extern void* fightTrainerPokemonDataBiosGetNickname(void* entry);
+extern u8 fightTrainerPokemonDataBiosGetDarkPokemonFlag(void* entry);
+
+/* Draw one row per party entry: nickname, owner and battle caption. */
+#pragma peephole off
+void fn_8003C2B8(PdaSprite* alphaSprite, PdaEvent* event)
+{
+    u8* slot;
+    void* entry;
+    u32 name;
+    u32 owner;
+    u32 caption;
+    u32 msg;
+    u32 tint;
+    u16 id;
+    u16 kind;
+    s32 i;
+    s32 off;
+    s32 mode;
+    s32 y;
+    u8 special;
+    f32 rowY;
+    f32 firstX;
+    f32 firstY;
+    f32 shifted;
+    f32 stride;
+
+    alphaSprite->alphaByte =
+        lbl_8047BAC0 * *(f32*)((u8*)&lbl_803A6748 + 0x44);
+    fn_800FE38C(*(s16*)(lbl_802EF0A8 + 0x4fa2) -
+                    *(s16*)(lbl_802EF0A8 + event->messageId * 0x1c + 2),
+                *(s16*)(lbl_802EF0A8 + 0x4fa4) -
+                    *(s16*)(lbl_802EF0A8 + event->messageId * 0x1c + 4),
+                *(s16*)(lbl_802EF0A8 + 0x4fa6),
+                *(s16*)(lbl_802EF0A8 + 0x4fa8));
+    slot = (u8*)&lbl_803A6748 + 0x94;
+    firstX = *(f32*)((u8*)&lbl_803A6748 + 0x14);
+    firstY = *(f32*)((u8*)&lbl_803A6748 + 0x18);
+    i = 0;
+    off = 0;
+    shifted = lbl_8047BAC8 + (firstX - lbl_8047BAF8 - lbl_8047BAFC);
+    rowY = firstY;
+    stride = lbl_8047BAD8;
+    for (i = 0; i < (s32)lbl_8047A4DC; i++) {
+        if (i >= *(s32*)((u8*)&lbl_803A6748 + 0x8) - 1 &&
+            i <= *(s32*)((u8*)&lbl_803A6748 + 0xc) + 1) {
+            id = *(u16*)((u8*)lbl_8047A4D4 + off + 2);
+            if (fn_801EEFAC(id, 0) == 9) {
+                entry = pokemonDataBiosGetPtr(fn_801EE248(id));
+                if (entry != NULL) {
+                    name = GSmsgGetGSchar(
+                        (u32)pokemonDataBiosGetName(entry));
+                }
+            } else {
+                entry = fightTrainerPokemonDataBiosGetPtr(
+                    (void*)fn_801FCC3C(fightTrainerDataBiosGetPtr(id)));
+                name = GSmsgGetGSchar(
+                    (u32)fightTrainerPokemonDataBiosGetNickname(entry));
+                while (id != fightTrainerPokemonDataBiosGetDarkPokemonFlag(
+                                 entry)) {
+                    entry = (u8*)entry + 0x50;
+                }
+                if (fightTrainerPokemonDataBiosGetNickname(entry) != NULL) {
+                    name = GSmsgGetGSchar(
+                        (u32)fightTrainerPokemonDataBiosGetNickname(entry));
+                }
+            }
+            msg = name;
+            if (name == 0) {
+                msg = GSmsgGetGSchar(1);
+            }
+            special = 0;
+            owner = 0;
+            if (lbl_8047A4D0 != 0) {
+                kind = *(u16*)((u8*)lbl_8047A4D4 + off + 2);
+                caption = fn_801EE544(kind, slot);
+                if (*(s8*)slot == 0) {
+                    caption = 0x371f;
+                } else if (*(s8*)slot > 0 && *(s8*)slot < 3) {
+                    if (kind == 0x43) {
+                        caption = 0x12b0;
+                    } else if (fn_801EEFAC(kind, 0) == 9) {
+                        fn_801EE328(kind);
+                        special = 1;
+                    } else {
+                        caption = fn_801FCC7C(fightTrainerDataBiosGetPtr(kind));
+                    }
+                }
+                if (special == 0) {
+                    owner = GSmsgGetGSchar(caption);
+                }
+            }
+            if (owner == 0) {
+                owner = GSmsgGetGSchar(1);
+            }
+            caption = fn_8003CE1C(i);
+            if (caption == 0) {
+                caption = GSmsgGetGSchar(1);
+            }
+            id = lbl_8047A4D4[(u16)i].battleId;
+            fn_801EE614(id);
+            fn_801EE8F4(id);
+            if (fn_801EEAD0(id) != 0) {
+                if (fn_801EEC74(id) != 0) {
+                    mode = 1;
+                } else {
+                    mode = 0;
+                }
+            } else {
+                mode = 2;
+            }
+            switch (mode) {
+            case 0:
+                windowDrawSprite((s16)(s32)shifted,
+                                 (s16)(s32)(rowY - lbl_8047BB00),
+                                 alphaSprite, 0x161, 0);
+                break;
+            case 1:
+                windowDrawSprite((s16)(s32)(firstX - lbl_8047BAF8),
+                                 (s16)(s32)rowY, alphaSprite, 0x160, 0);
+                break;
+            default:
+                break;
+            }
+            if (fn_801EED88(*(u16*)((u8*)lbl_8047A4D4 + off + 2)) != 0) {
+                tint = 0xe0e01800;
+            } else {
+                tint = -0x100;
+            }
+            msgctrlSetValue(0x37, msg);
+            y = (s32)rowY;
+            fn_800FB680(0, y, tint | alphaSprite->alphaByte, (void*)0xe7);
+            msgctrlSetValue(0x37, owner);
+            fn_800FB680(0x89, y, tint | alphaSprite->alphaByte, (void*)0xe7);
+            msgctrlSetValue(0x37, caption);
+            fn_800FB680(0x13d, y, tint | alphaSprite->alphaByte, (void*)0xe7);
+        }
+        rowY = rowY + stride;
+        off += 4;
+    }
+    fn_800FE35C();
 }
 #pragma peephole reset
