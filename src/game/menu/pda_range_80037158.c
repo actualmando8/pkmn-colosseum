@@ -7445,7 +7445,7 @@ extern u32 lbl_802E61D8[];
 extern u32 heroGetStatus(s32 a, s32 b, s32 c);
 extern void menuSpriteBiosGetPtr(s32 id);
 extern u32 menuGetCursorItemID(s32 menu);
-extern void fn_8004A7A8(void* work);
+extern void fn_8004A7A8(void* work, PdaSprite* sprite);
 
 /* Per-widget update for the mail screen's sprites and captions. */
 #pragma peephole off
@@ -7465,7 +7465,7 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
     u32 value;
     u32 status;
 
-    fn_8004A7A8(work);
+    fn_8004A7A8(work, sprite);
     switch (sprite->eventId) {
     case 0x6e1:
         icon[0] = lbl_8047BD70;
@@ -7749,5 +7749,321 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
         break;
     }
     return 0;
+}
+#pragma peephole reset
+
+extern f32 lbl_8047BDD0;
+extern f32 lbl_8047BDD4;
+extern f32 lbl_804788D8;
+
+/* Backdrop alpha ramp and the staggered caption pulses on the mail screen. */
+#pragma peephole off
+void fn_8004A7A8(void* work, PdaSprite* sprite)
+{
+    extern f64 sin(f64 x);
+    s32 fade;
+    f32 pulse;
+
+    switch (sprite->eventId) {
+    case 0x432:
+    case 0x433:
+    case 0x434:
+    case 0x435:
+    case 0x436:
+    case 0x6dd:
+        sprite->field_52 =
+            (s16)(*(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 4) +
+                  (s32)*(f32*)(lbl_803A6A60 + 0x34));
+        break;
+    case 0x437:
+    case 0x438:
+    case 0x439:
+    case 0x43a:
+    case 0x777:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        break;
+    case 0x6e0:
+    case 0x6e2:
+    case 0x751:
+    case 0x752:
+    case 0x753:
+    case 0x754:
+    case 0x755:
+    case 0x756:
+    case 0x757:
+    case 0x758:
+        sprite->field_50 =
+            (s16)(*(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 2) +
+                  (s32)*(f32*)(lbl_803A6A60 + 0x30));
+        spriteSetEnv(fn_800FE6D0(
+            (s16)(*(s16*)((u8*)work + 0x84) + sprite->field_50),
+            (s16)(*(s16*)((u8*)work + 0x86) + sprite->field_52)));
+        break;
+    case 0x6ea:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDAC) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6eb:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDA0) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6ec:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDCC) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6ed:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDD4) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6ee:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDB8) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6ef:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDAC) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6f0:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDA0) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6f1:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDCC) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6f2:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDD4) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6f3:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        pulse = ((f32)sin(lbl_8047BDC8 *
+                              (lbl_8047BDCC * *(f32*)(lbl_803A6A60 + 0x40)) +
+                          lbl_804788D8 * lbl_8047BDB8) +
+                 lbl_8047BDA0) *
+                lbl_8047BDA8 * lbl_8047BDD0;
+        if (pulse > lbl_8047BDB0) {
+            pulse = lbl_8047BDB0;
+        }
+        if (pulse < lbl_8047BDAC) {
+            pulse = lbl_8047BDAC;
+        }
+        sprite->alpha = (u8)(s32)pulse;
+        sprite->colorR = (u8)(s32)pulse;
+        sprite->colorG = (u8)(s32)pulse;
+        sprite->colorB = (u8)(s32)pulse;
+        break;
+    case 0x6e7:
+    case 0x6e8:
+    case 0x6e9:
+    case 0x6f4:
+    case 0x6f5:
+    case 0x6f6:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        break;
+    case 0x6e3:
+    case 0x6e4:
+    case 0x6e5:
+    case 0x6e6:
+        if (*(f32*)(lbl_803A6A60 + 0x30) > lbl_8047BDB0) {
+            fade = 0xff;
+        } else {
+            fade = (s32)*(f32*)(lbl_803A6A60 + 0x30);
+        }
+        sprite->alpha = 0xff - fade;
+        break;
+    case 0x6f7:
+    case 0x6f8:
+        sprite->flags &= ~2;
+        break;
+    default:
+        break;
+    }
 }
 #pragma peephole reset
