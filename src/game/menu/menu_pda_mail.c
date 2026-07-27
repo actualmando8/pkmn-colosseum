@@ -1745,56 +1745,47 @@ extern const s32 lbl_80267250[10];
 extern const s32 lbl_80267228[10];
 extern const s32 lbl_80267200[10];
 
-static inline s32 pdaMailFindTableEntry(const s32* table, s32 value)
-{
-    if (value == table[0]) {
-        return 0;
-    } else if (value == table[1]) {
-        return 1;
-    } else if (value == table[2]) {
-        return 2;
-    } else if (value == table[3]) {
-        return 3;
-    } else if (value == table[4]) {
-        return 4;
-    } else if (value == table[5]) {
-        return 5;
-    } else if (value == table[6]) {
-        return 6;
-    } else if (value == table[7]) {
-        return 7;
-    } else if (value == table[8]) {
-        return 8;
-    } else if (value == table[9]) {
-        return 9;
-    }
-    return 10;
-}
+typedef struct PdaMailRowTable {
+    s32 values[10];
+} PdaMailRowTable;
 
+typedef union PdaMailRowCursor {
+    u32 storage;
+    u16 packed;
+    struct {
+        s8 page;
+        s8 row;
+    } position;
+} PdaMailRowCursor;
+
+#pragma peephole off
 u32 fn_8004C6C0(u8* context, u8* object)
 {
-    s32 table[10];
+    PdaMailRowTable table;
+    PdaMailRowCursor cursors[2];
     s32 index;
     s32 mailId;
     s32 value;
     u32 message;
-    u16 page;
-    u32 i;
+    void* gschar;
 
-    for (i = 0; i < 10; i++) {
-        table[i] = lbl_802672A0[i];
-    }
-    page = fn_80103E68(10) >> 16;
+    table = *(const PdaMailRowTable*)lbl_802672A0;
+    cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
     value = *(s16*)(object + 6);
-    index = pdaMailFindTableEntry(table, value);
+    for (index = 0; index < 10; index++) {
+        if (value == table.values[index]) {
+            break;
+        }
+    }
     if (index >= 10) {
         return 0;
     }
-    index += (s8)(page >> 8) * 10;
+    index += cursors[1].position.page * 10;
     mailId = pdaMailGetMailID(index);
     message = mailGetSenderName(mailId);
     if (message != 0) {
-        msgctrlSetValue(0x37, GSmsgGetGSchar(message));
+        gschar = GSmsgGetGSchar(message);
+        msgctrlSetValue(0x37, gschar);
         *(u32*)(object + 0x4C) = 0xE7;
     } else {
         *(u32*)(object + 0x4C) = 0;
@@ -1816,28 +1807,31 @@ u32 fn_8004C6C0(u8* context, u8* object)
 
 u32 fn_8004C8AC(u8* context, u8* object)
 {
-    s32 table[10];
+    PdaMailRowTable table;
+    PdaMailRowCursor cursors[2];
     s32 index;
     s32 mailId;
     s32 value;
     u32 message;
-    u16 page;
-    u32 i;
+    void* gschar;
 
-    for (i = 0; i < 10; i++) {
-        table[i] = lbl_80267278[i];
-    }
-    page = fn_80103E68(10) >> 16;
+    table = *(const PdaMailRowTable*)lbl_80267278;
+    cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
     value = *(s16*)(object + 6);
-    index = pdaMailFindTableEntry(table, value);
+    for (index = 0; index < 10; index++) {
+        if (value == table.values[index]) {
+            break;
+        }
+    }
     if (index >= 10) {
         return 0;
     }
-    index += (s8)(page >> 8) * 10;
+    index += cursors[1].position.page * 10;
     mailId = pdaMailGetMailID(index);
     message = mailGetSubject(mailId);
     if (message != 0) {
-        msgctrlSetValue(0x37, GSmsgGetGSchar(message));
+        gschar = GSmsgGetGSchar(message);
+        msgctrlSetValue(0x37, gschar);
         *(u32*)(object + 0x4C) = 0xE7;
     } else {
         *(u32*)(object + 0x4C) = 0;
@@ -1859,29 +1853,34 @@ u32 fn_8004C8AC(u8* context, u8* object)
 
 u32 fn_8004CA98(u8* context, u8* object)
 {
-    s32 table[10];
+    PdaMailRowTable table;
+    PdaMailRowCursor cursors[2];
     s32 index;
     s32 mailId;
     s32 value;
-    u16 page;
-    u32 i;
     u8 visible;
 
-    for (i = 0; i < 10; i++) {
-        table[i] = lbl_80267250[i];
-    }
-    page = fn_80103E68(10) >> 16;
+    table = *(const PdaMailRowTable*)lbl_80267250;
+    cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
     value = *(s16*)(object + 6);
-    index = pdaMailFindTableEntry(table, value);
+    for (index = 0; index < 10; index++) {
+        if (value == table.values[index]) {
+            break;
+        }
+    }
     if (index >= 10) {
         return 0;
     }
-    index += (s8)(page >> 8) * 10;
+    index += cursors[1].position.page * 10;
     mailId = pdaMailGetMailID(index);
-    if (mailId < 0) {
-        visible = 0;
+    if (mailId >= 0) {
+        if (mailGetAttachFileGroup(mailId) != 0) {
+            visible = 1;
+        } else {
+            visible = 0;
+        }
     } else {
-        visible = mailGetAttachFileGroup(mailId) != 0;
+        visible = 0;
     }
     winSpriteSetDisp(object, visible);
     return 0;
@@ -1889,29 +1888,34 @@ u32 fn_8004CA98(u8* context, u8* object)
 
 u32 fn_8004CC38(u8* context, u8* object)
 {
-    s32 table[10];
+    PdaMailRowTable table;
+    PdaMailRowCursor cursors[2];
     s32 index;
     s32 mailId;
     s32 value;
-    u16 page;
-    u32 i;
     u8 visible;
 
-    for (i = 0; i < 10; i++) {
-        table[i] = lbl_80267228[i];
-    }
-    page = fn_80103E68(10) >> 16;
+    table = *(const PdaMailRowTable*)lbl_80267228;
+    cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
     value = *(s16*)(object + 6);
-    index = pdaMailFindTableEntry(table, value);
+    for (index = 0; index < 10; index++) {
+        if (value == table.values[index]) {
+            break;
+        }
+    }
     if (index >= 10) {
         return 0;
     }
-    index += (s8)(page >> 8) * 10;
+    index += cursors[1].position.page * 10;
     mailId = pdaMailGetMailID(index);
-    if (mailId < 0) {
-        visible = 0;
+    if (mailId >= 0) {
+        if (fn_801D1B78(mailId) != 0) {
+            visible = 1;
+        } else {
+            visible = 0;
+        }
     } else {
-        visible = fn_801D1B78(mailId) != 0;
+        visible = 0;
     }
     winSpriteSetDisp(object, visible);
     return 0;
@@ -1919,33 +1923,40 @@ u32 fn_8004CC38(u8* context, u8* object)
 
 u32 fn_8004CDD8(u8* context, u8* object)
 {
-    s32 table[10];
+    PdaMailRowTable table;
+    PdaMailRowCursor cursors[2];
     s32 index;
     s32 mailId;
     s32 value;
-    u16 page;
-    u32 i;
     u8 visible;
 
-    for (i = 0; i < 10; i++) {
-        table[i] = lbl_80267200[i];
-    }
-    page = fn_80103E68(10) >> 16;
+    table = *(const PdaMailRowTable*)lbl_80267200;
+    cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
     value = *(s16*)(object + 6);
-    index = pdaMailFindTableEntry(table, value);
+    for (index = 0; index < 10; index++) {
+        if (value == table.values[index]) {
+            break;
+        }
+    }
     if (index >= 10) {
         return 0;
     }
-    index += (s8)(page >> 8) * 10;
+    index += cursors[1].position.page * 10;
     mailId = pdaMailGetMailID(index);
-    if (mailId < 0) {
-        visible = 0;
+    if (mailId >= 0) {
+        if (fn_801D1B78(mailId) == 0) {
+            visible = 1;
+        } else {
+            visible = 0;
+        }
     } else {
-        visible = fn_801D1B78(mailId) == 0;
+        visible = 0;
     }
     winSpriteSetDisp(object, visible);
     return 0;
 }
+
+#pragma peephole reset
 
 extern u8* fn_80105624(void);
 extern u32 fn_801D1650(u32 index);
