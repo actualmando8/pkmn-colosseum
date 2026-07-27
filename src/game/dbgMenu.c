@@ -208,10 +208,12 @@ u32 dbgMenuGSmemOptimize(void) {
 
 
 /* 0x80133250 | 0x2C -- fn_800E0E14(1, 1), return 0 */
+#pragma scheduling on
 u32 dbgMenuGSmemDispMap(void) {
     fn_800E0E14(1, 1);
     return 0;
 }
+#pragma scheduling off
 
 #if 0
 asm void dbgMenuGSmemCheck(void) {
