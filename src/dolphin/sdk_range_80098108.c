@@ -792,6 +792,7 @@ BOOL fn_800993D0(s32 chan) {
  * so their bodies are repeated rather than called.
  */
 s32 fn_80099400(s32 chan, u32 dev, u32* id) {
+    extern u32 fn_800986A0(s32 chan, s32 exi, s32 tc, s32 ext);
     EXIControl* exi = &lbl_803FB3C8[chan];
     int err;
     u32 cmd;

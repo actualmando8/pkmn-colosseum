@@ -14,6 +14,12 @@ does not. Call targets are normalised to addresses first, so `menuOpen` and
 The fix is usually a block-scope `extern` of the callee inside the caller,
 which defeats CW's auto-inline for that call site only.
 
+Candidates are further filtered to the ones MWCC could actually have inlined:
+the callee must be defined in the SAME source file, BEFORE the caller. Without
+that filter roughly three quarters of the hits are impossible cases -- a
+cross-file callee, or one defined after the call site -- where the missing call
+means something else entirely (usually that we simply have not written it).
+
 usage: find_inlined_calls.py [min_fuzzy] [min_size]
 """
 import collections
@@ -96,12 +102,46 @@ with ThreadPoolExecutor(max_workers=8) as ex:
         rows.extend(out)
 rows.sort(reverse=True)
 
+# Keep only what CW could actually have inlined: callee defined in the same
+# file, ahead of the caller.
+SRCS = [os.path.join(r, f) for r, _, fs in os.walk('src')
+        for f in fs if f.endswith('.c')]
+
+
+def _defre(n):
+    return re.compile(r'^[A-Za-z_][A-Za-z0-9_ \*]*?\b' + re.escape(n) +
+                      r'\s*\([^;]*?\)\s*\{', re.M | re.S)
+
+
+def _locate(n):
+    rx = _defre(n)
+    for path in SRCS:
+        text = open(path, errors='ignore').read()
+        m = rx.search(text)
+        if m and not text[m.start():m.start() + 7].startswith('extern'):
+            return path, m.start()
+    return None, None
+
+
+def _inlinable(caller, missing):
+    cpath, coff = _locate(caller)
+    if cpath is None:
+        return False
+    for a in missing:
+        name = nm(a)
+        path, off = _locate(name)
+        if path == cpath and off is not None and off < coff:
+            return True
+    return False
+
 
 def nm(a):
     return a[1] if isinstance(a, tuple) else rev.get(a, 'fn_%08X' % a)
 
 
-print('%d candidates (fuzzy >= %.0f, size >= %d)' % (len(rows), MIN_FUZZY, MIN_SIZE))
+rows = [r for r in rows if _inlinable(r[3], r[5])]
+print('%d inlinable candidates (fuzzy >= %.0f, size >= %d)'
+      % (len(rows), MIN_FUZZY, MIN_SIZE))
 for gap, pct, size, fn, unit, missing, n_extra in rows:
     miss = ', '.join('%s x%d' % (nm(a), c) for a, c in list(missing.items())[:4])
     print('gap%7.0f %7.2f%% %6d  %-36s extra=%3d  missing: %s'
