@@ -6890,3 +6890,208 @@ void fn_80040308(void* menu)
     }
 }
 #pragma peephole reset
+
+typedef struct PdaCryTrail {
+    void* data;
+    f32 speed;
+    u32 voice;
+    f32 field_0c;
+    s32 offset;
+    f32 field_14;
+    s32 active;
+    f32 alpha;
+    f32 field_20;
+} PdaCryTrail;
+
+extern u32 lbl_8047A4EC;
+extern f32 lbl_8047BD1C;
+extern u16 pokemonDataBiosGetVoice(void* data);
+extern void* pokemonNakigoeDataBiosGetDataAddress(void* data);
+extern s32 fn_801666BC(u32 voice);
+extern u32 fn_800F7AF0(s32 chan);
+extern s32 menuOpen(s32 id, s32 flag);
+
+/* Cry voice of the highlighted entry, 0xffff when it cannot be resolved. */
+static inline u16 pdaCurrentVoice(void)
+{
+    u32 work = pdaLoadPokemon(lbl_803A6818.currentIndex);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonDataBiosGetVoice(data);
+        }
+        return 0xffff;
+    }
+    return 0xffff;
+}
+
+/* Cry sample of the highlighted entry, NULL when it cannot be resolved. */
+static inline void* pdaCurrentCry(void)
+{
+    u32 work = pdaLoadPokemon(lbl_803A6818.currentIndex);
+    void* data;
+
+    if (work != 0) {
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(work));
+        if (data != NULL) {
+            return pokemonNakigoeDataBiosGetDataAddress(data);
+        }
+        return NULL;
+    }
+    return NULL;
+}
+
+/* Push a cry onto the ring of trails and age every older entry. */
+static inline void pdaPushCry(void* data, u32 voice)
+{
+    PdaCryTrail* t = (PdaCryTrail*)lbl_802E52C8;
+    s32 i;
+    s32 j;
+
+    lbl_8047A4EC = lbl_8047A4EC + 1;
+    if (lbl_8047A4EC >= 8) {
+        lbl_8047A4EC = 0;
+    }
+    i = lbl_8047A4EC;
+    t[i].data = data;
+    t[i].voice = voice;
+    t[i].field_0c = lbl_8047BC94;
+    t[i].field_14 = lbl_8047BC94;
+    t[i].offset = 0;
+    t[i].active = 1;
+    t[i].alpha = lbl_8047BCA0;
+    t[i].field_20 = lbl_8047BD18;
+    for (j = i - 1; j >= 0; j--) {
+        t[j].offset = (s32)((f32)t[j].offset + t[j].speed);
+        t[j].field_20 = t[j].field_20 + lbl_8047BD1C;
+    }
+    for (j = 7; j > (s32)lbl_8047A4EC; j--) {
+        t[j].offset = (s32)((f32)t[j].offset + t[j].speed);
+        t[j].field_20 = t[j].field_20 + lbl_8047BD1C;
+    }
+}
+
+/* Cry-playback thread for the PDA's Pokemon entry. */
+#pragma peephole off
+void fn_80046168(void)
+{
+    extern void _threadSwitch(void);
+    extern f64 atan2(f64 y, f64 x);
+    u8* S;
+    PdaCryTrail* t;
+    s32 running;
+    s32 k;
+    s32 i;
+    s32 playing;
+    u8 cancel;
+    u16 voice;
+    s8 x;
+    s8 y;
+    f32 ang;
+
+    running = 1;
+    for (k = 0; k < 8; k++) {
+        pdaPushCry(NULL, 0);
+    }
+    S = (u8*)&lbl_803A6818;
+    while (1) {
+        switch (*(s32*)(S + 0x20)) {
+        case 0:
+            menuOpen(0x3c, 0);
+            menuOpen(0x3f, 0);
+            menuOpen(0x3d, 0);
+            menuOpen(0x9f, 0);
+            menuOpen(0x96, 0);
+            if (menuOpen(0xa2, 1) >= 0) {
+                if (pdaEntrySeen() != 0) {
+                    menuOpen(0x3e, 0);
+                    voice = pdaCurrentVoice();
+                    fn_80166AB8(voice, 0, 0);
+                    pdaPushCry(pdaCurrentCry(), voice);
+                    *(s32*)(S + 0x20) = 1;
+                }
+            } else {
+                if (*(s32*)(S + 0x1c) == 2) {
+                    *(s32*)(S + 0x1c) = 8;
+                    *(f32*)(S + 0x50) = lbl_8047BC94;
+                    *(f32*)(S + 0x58) = lbl_8047BCBC;
+                }
+                *(s32*)(S + 0x14) = 0;
+                running = 0;
+            }
+            break;
+        case 1:
+            t = (PdaCryTrail*)lbl_802E52C8;
+            playing = 0;
+            for (i = 0; i < 8; i++) {
+                if (t[i].data != NULL) {
+                    switch (fn_801666BC(t[i].voice)) {
+                    case 0:
+                        break;
+                    case 2:
+                        playing = 1;
+                        break;
+                    case 4:
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                t++;
+            }
+            if ((u8)playing == 0) {
+                cancel = 1;
+            } else if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x8) != 0) {
+                cancel = 1;
+            } else if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x4) != 0) {
+                cancel = 1;
+            } else {
+                x = fn_800F7A08(1, 0);
+                y = fn_800F7A7C(1, 0);
+                if ((y < 0 ? -y : y) > 0x20 || (x < 0 ? -x : x) > 0x20) {
+                    ang = atan2((f64)y, (f64)x);
+                    if (pdaFabs(ang) < lbl_8047BCFC) {
+                        cancel = 1;
+                    } else if (pdaFabs(ang) > lbl_8047BD00) {
+                        cancel = 1;
+                    } else {
+                        cancel = 0;
+                    }
+                } else {
+                    cancel = 0;
+                }
+            }
+            if (cancel == 1) {
+                menuCloseCustom(0x3e, 0, 1);
+                *(s32*)(S + 0x20) = 0;
+            } else {
+                if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x100) != 0) {
+                    voice = pdaCurrentVoice();
+                    fn_80166AB8(voice, 0, 0);
+                    pdaPushCry(pdaCurrentCry(), voice);
+                }
+                if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x200) != 0) {
+                    if (*(s32*)(S + 0x1c) == 2) {
+                        *(s32*)(S + 0x1c) = 8;
+                        menuCloseCustom(0x3e, 0, 1);
+                        menuCloseCustom(0x3c, 0, 1);
+                        *(f32*)(S + 0x50) = lbl_8047BC94;
+                        *(f32*)(S + 0x58) = lbl_8047BCBC;
+                    }
+                    running = 0;
+                }
+            }
+            _threadSwitch();
+            break;
+        default:
+            break;
+        }
+        if (running == 0) {
+            break;
+        }
+    }
+    *(s32*)(S + 0x20) = 0;
+}
+#pragma peephole reset
