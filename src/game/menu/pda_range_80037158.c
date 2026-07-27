@@ -760,8 +760,7 @@ s32 fn_8003956C(void* window, void* sprite)
 {
     extern u16 pcboxGetNbItemSlot(s32 box);
     extern void* pcboxGetItem(s32 box, s16 slot);
-    extern u8 fn_801429E8(void* item);
-    s32 count;
+        s32 count;
     s32 slot;
     s32 slotCount;
     u16 boundedSlotCount;
@@ -8745,6 +8744,115 @@ s32 fn_80038E74(void* work, PdaSprite* sprite)
             sprite->colorG = 0x8f;
             sprite->colorB = 0xb4;
         }
+    }
+    return 0;
+}
+#pragma peephole reset
+
+extern u16 pcboxGetNbItemSlot(s32 box);
+extern void* pcboxGetItem(s32 box, s16 slot);
+extern u16 itemBiosGetItemDataId(void* item);
+extern void* itemDataBiosGetPtr(u16 id);
+extern void* itemDataBiosGetName(void* data);
+extern u8 itemDataBiosGetKind(void* data);
+extern u16 itemBiosGetNum(void* item);
+
+/* Draw the visible page of the PC item list. */
+#pragma peephole off
+s32 fn_80039644(void* work, PdaSprite* sprite)
+{
+    s32 start;
+    s32 rows;
+    s32 yAdj;
+    s32 total;
+    s32 slots;
+    s32 i;
+    s32 j;
+    s32 index;
+    s32 found;
+    s32 rowY;
+    s32 nameX;
+    s32 y;
+    s32 width;
+    u16 itemId;
+    u16 count;
+    void* item;
+    void* name;
+
+    (void)work;
+    start = 0;
+    rows = 8;
+    yAdj = 0;
+    total = 0;
+    slots = pcboxGetNbItemSlot(0);
+    for (i = 0; i < slots; i++) {
+        if ((u8)fn_801429E8(pcboxGetItem(0, (s16)i)) != 0) {
+            total++;
+        }
+    }
+    index = lbl_8047A4A8;
+    msgctrlSetValue(0x34, 0x3e7);
+    width = (s16)(GSmsgGetRect(0xca) >> 16) +
+            (s16)(GSmsgGetRect(0x12e) >> 16);
+    if (lbl_8047BAB0 != lbl_8047A4C0 && lbl_8047A4BC != 0) {
+        if (lbl_8047A4C0 < lbl_8047BAB0) {
+            index--;
+            start = -1;
+        } else {
+            rows = 9;
+        }
+        yAdj = (s32)lbl_8047A4C0;
+    }
+    rowY = start * 0x1f;
+    i = start;
+    nameX = 0x11a - width;
+    for (; i < rows && index < total; i++, rowY += 0x1f, index++) {
+        if (index < 0) {
+            continue;
+        }
+        y = rowY - yAdj;
+        slots = pcboxGetNbItemSlot(0);
+        found = -1;
+        for (j = 0; j < slots; j++) {
+            item = pcboxGetItem(0, (s16)j);
+            if ((u8)fn_801429E8(item) != 0) {
+                found++;
+                if (found >= index) {
+                    itemId = itemBiosGetItemDataId(item);
+                    goto haveItem;
+                }
+            }
+        }
+        itemId = 0;
+    haveItem:
+        name = itemDataBiosGetName(itemDataBiosGetPtr(itemId));
+        if (name != NULL) {
+            fn_800FB680(0, y, (s32)sprite, name);
+        }
+        if (itemDataBiosGetKind(itemDataBiosGetPtr(itemId)) == 5) {
+            continue;
+        }
+        fn_800FB680(nameX, y, (s32)sprite, (void*)0x12e);
+        slots = pcboxGetNbItemSlot(0);
+        found = -1;
+        for (j = 0; j < slots; j++) {
+            item = pcboxGetItem(0, (s16)j);
+            if ((u8)fn_801429E8(item) != 0) {
+                found++;
+                if (found >= index) {
+                    count = itemBiosGetNum(item);
+                    goto haveCount;
+                }
+            }
+        }
+        count = 0;
+    haveCount:
+        msgctrlSetValue(0x34, count);
+        fn_800FB680(0x11a - (s16)(GSmsgGetRect(0xca) >> 16), y, (s32)sprite,
+                    (void*)0xca);
+    }
+    if (i < rows) {
+        fn_800FB680(0, i * 0x1f - yAdj, (s32)sprite, (void*)0x1b67);
     }
     return 0;
 }
