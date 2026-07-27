@@ -118,7 +118,8 @@ typedef struct PdaSelectionWork {
 } PdaSelectionWork;
 
 typedef struct PdaKeyInfo {
-    u8 pad00[6];
+    u8 pad00[4];
+    u16 trigger;
     u16 buttons;
 } PdaKeyInfo;
 
@@ -956,6 +957,185 @@ s32 fn_80039A50(PdaSprite* sprite)
     return 0;
 }
 #pragma scheduling reset
+
+/* PC item list: cursor/page input, item swapping, and caption refresh. */
+#pragma peephole off
+s32 fn_80039A84(void)
+{
+    extern PdaKeyInfo* windowGetKeyInfo(void);
+    extern u16 pcboxGetNbItemSlot(s32 box);
+    extern void* pcboxGetItem(s32 box, s16 slot);
+    extern u16 itemBiosGetItemDataId(void* item);
+    extern void* itemDataBiosGetPtr(u16 id);
+    extern s32 itemDataBiosGetDoc(void* data);
+    extern void pcboxSwapItemSlot(s32 box, s16 from, s16 to);
+    extern void fn_80166A50(s32 id, s32 a, s32 b, s32 c);
+    extern f32 lbl_8047BAB4;
+    extern f32 lbl_8047BAB8;
+    PdaKeyInfo* keyInfo;
+    s32 slots;
+    s32 found;
+    s32 i;
+    s32 total;
+    s32 target;
+    s32 max;
+    s32 cursor;
+    s32 top;
+    s32 message;
+    u16 keys;
+    u16 itemId;
+    u8 moved;
+    void* item;
+
+    keyInfo = windowGetKeyInfo();
+    moved = 0;
+    if (lbl_8047BAB0 != lbl_8047A4C0) {
+        return 0;
+    }
+    slots = pcboxGetNbItemSlot(0);
+    for (i = 0; i < slots; i++) {
+        fn_801429E8(pcboxGetItem(0, (s16)i));
+    }
+    target = lbl_8047A4A8 + lbl_8047A4AC;
+    if (lbl_8047A4B8 < 0) {
+        if ((keyInfo->trigger & 0xc0) != 0) {
+            slots = pcboxGetNbItemSlot(0);
+            found = -1;
+            for (i = 0; i < slots; i++) {
+                item = pcboxGetItem(0, (s16)i);
+                if ((u8)fn_801429E8(item) != 0) {
+                    found++;
+                    if (found >= target) {
+                        itemId = itemBiosGetItemDataId(item);
+                        goto haveHeld;
+                    }
+                }
+            }
+            itemId = 0;
+        haveHeld:
+            if (itemId != 0) {
+                lbl_8047A4B8 = target;
+                fn_80166A50(0x3c6, 0, 0xff, 0);
+            }
+        }
+    } else {
+        keys = keyInfo->trigger;
+        if ((keys & 0xd0) != 0) {
+            slots = pcboxGetNbItemSlot(0);
+            found = -1;
+            for (i = 0; i < slots; i++) {
+                item = pcboxGetItem(0, (s16)i);
+                if ((u8)fn_801429E8(item) != 0) {
+                    found++;
+                    if (found >= target) {
+                        itemId = itemBiosGetItemDataId(item);
+                        goto haveSwap;
+                    }
+                }
+            }
+            itemId = 0;
+        haveSwap:
+            if (itemId != 0) {
+                pcboxSwapItemSlot(0, (s16)lbl_8047A4B8, (s16)target);
+                fn_80166A50(0x3c6, 0, 0xff, 0);
+            } else {
+                fn_80166A50(0x3c7, 0, 0xff, 0);
+            }
+            lbl_8047A4B8 = -1;
+        } else if ((keys & 0x20) != 0) {
+            lbl_8047A4B8 = -1;
+            fn_80166A50(0x3c7, 0, 0xff, 0);
+        }
+    }
+    total = 0;
+    slots = pcboxGetNbItemSlot(0);
+    for (i = 0; i < slots; i++) {
+        if ((u8)fn_801429E8(pcboxGetItem(0, (s16)i)) != 0) {
+            total++;
+        }
+    }
+    max = total + 1;
+    if ((keyInfo->buttons & 2) != 0) {
+        cursor = lbl_8047A4AC + 1;
+        top = lbl_8047A4A8;
+        lbl_8047A4AC = cursor;
+        if (top + cursor >= max) {
+            lbl_8047A4AC = cursor - 1;
+        } else {
+            if (cursor >= 8) {
+                lbl_8047A4A8 = top + 1;
+                lbl_8047A4AC = cursor - 1;
+                lbl_8047A4BC = 1;
+            } else {
+                lbl_8047A4BC = 0;
+            }
+            lbl_8047A4C0 = lbl_8047BAB4;
+            moved = 1;
+            fn_80166A50(0x3c5, 0, 0xff, 0);
+        }
+    }
+    if ((keyInfo->buttons & 1) != 0 && moved == 0) {
+        if (lbl_8047A4AC > 0 || lbl_8047A4A8 > 0) {
+            cursor = lbl_8047A4AC - 1;
+            lbl_8047A4AC = cursor;
+            if (cursor < 0) {
+                lbl_8047A4AC = 0;
+                lbl_8047A4A8 = lbl_8047A4A8 - 1;
+                lbl_8047A4BC = 1;
+            } else {
+                lbl_8047A4BC = 0;
+            }
+            lbl_8047A4C0 = lbl_8047BAB8;
+            moved = 1;
+            fn_80166A50(0x3c5, 0, 0xff, 0);
+        }
+    }
+    if ((keyInfo->buttons & 8) != 0 && moved == 0) {
+        top = lbl_8047A4A8 + 8;
+        if (top < max) {
+            lbl_8047A4A8 = top;
+            if (top + lbl_8047A4AC >= max) {
+                lbl_8047A4AC = max - top - 1;
+            }
+            moved = 1;
+            fn_80166A50(0x3c5, 0, 0xff, 0);
+        }
+    }
+    if ((keyInfo->buttons & 4) != 0 && moved == 0) {
+        top = lbl_8047A4A8 - 8;
+        if (top >= 0) {
+            lbl_8047A4A8 = top;
+            fn_80166A50(0x3c5, 0, 0xff, 0);
+        }
+    }
+    if (lbl_8047A4B8 >= 0) {
+        message = 0x1b69;
+    } else {
+        target = lbl_8047A4A8 + lbl_8047A4AC;
+        slots = pcboxGetNbItemSlot(0);
+        found = -1;
+        for (i = 0; i < slots; i++) {
+            item = pcboxGetItem(0, (s16)i);
+            if ((u8)fn_801429E8(item) != 0) {
+                found++;
+                if (found >= target) {
+                    itemId = itemBiosGetItemDataId(item);
+                    goto haveDoc;
+                }
+            }
+        }
+        itemId = 0;
+    haveDoc:
+        if (itemId != 0) {
+            message = itemDataBiosGetDoc(itemDataBiosGetPtr(itemId));
+        } else {
+            message = 0x1b68;
+        }
+    }
+    lbl_8047A4B4 = message;
+    return 0;
+}
+#pragma peephole reset
 
 void fn_80039F44(void* button)
 {
