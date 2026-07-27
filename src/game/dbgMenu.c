@@ -294,6 +294,7 @@ asm void dbgMenuColisionDisp(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuColisionDisp(s32 arg) {
     extern void* GSresGetResource(u32, u32);
     u8* ptr;
@@ -317,6 +318,7 @@ u32 dbgMenuColisionDisp(s32 arg) {
     }
     return 0;
 }
+#pragma scheduling off
 #endif
 
 
