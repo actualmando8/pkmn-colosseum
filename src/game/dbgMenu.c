@@ -195,18 +195,25 @@ u32 fn_801330C8(void) {
 
 
 /* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
+/* 0x80133218 | 0x38 -- fn_800E1544() then print result, return 0 */
+#pragma push
+#pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuGSmemOptimize(void) {
     u32 val = fn_800E1544();
     GSlogWrite(lbl_80272AB8, val);
     return 0;
 }
+#pragma pop
 
 
 /* 0x80133250 | 0x2C -- fn_800E0E14(1, 1), return 0 */
+#pragma scheduling on
 u32 dbgMenuGSmemDispMap(void) {
     fn_800E0E14(1, 1);
     return 0;
 }
+#pragma scheduling off
 
 #if 0
 asm void dbgMenuGSmemCheck(void) {
@@ -249,10 +256,14 @@ u32 dbgMenuFrameRate30(void) {
 
 
 /* 0x80133328 | 36 bytes | call_return_const2 */
+/* 0x80133328 | 36 bytes | call_return_const2 */
+#pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuSendAllMail(void) {
     mailMainSendAllMail();
     return 0;
 }
+#pragma scheduling off
 
 #if 0
 asm void dbgMenuSendMail(void) {
@@ -285,6 +296,7 @@ asm void dbgMenuColisionDisp(void) {
 }
 #else
 #pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuColisionDisp(s32 arg) {
     extern void* GSresGetResource(u32, u32);
     u8* ptr;
@@ -308,6 +320,7 @@ u32 dbgMenuColisionDisp(s32 arg) {
     }
     return 0;
 }
+#pragma scheduling off
 #endif
 
 
@@ -317,6 +330,8 @@ asm void debugMenuColorBarDisp(void) {
 #include "src/game/effect/effect_util_fn_80133450.inc"
 }
 #else
+#pragma optimization_level 4
+#pragma scheduling on
 u32 debugMenuColorBarDisp(void) {
     *(u8*)&lbl_80478820 = 0;
     menuOpenCustom(5, 0, 0, 0, 1, 0);
@@ -324,10 +339,14 @@ u32 debugMenuColorBarDisp(void) {
     *(u8*)&lbl_80478820 = 1;
     return 0;
 }
+#pragma scheduling off
 #endif
 
 
 /* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call GSmodelSetShadowDebug */
+/* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call GSmodelSetShadowDebug */
+#pragma optimization_level 4
+#pragma scheduling on
 u32 debugMenuShadowBorderDisp(void) {
     u32 clz = __cntlzw(lbl_8047AED9);
     u8 val = (u8)((clz >> 5) & 0xFF);
@@ -335,6 +354,7 @@ u32 debugMenuShadowBorderDisp(void) {
     GSmodelSetShadowDebug(val);
     return 0;
 }
+#pragma scheduling off
 
 
 /* 0x801334DC | 0x34 -- toggle lbl_8047AED8 (cntlzw/extrwi), call fn_800D4610 */
