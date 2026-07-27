@@ -1419,6 +1419,7 @@ asm void fn_8004BFB0(void) {
  * callee-saved register (r28) not present in target) + a redundant
  * clrlwi mask before each halfword store that the target elides.
  * Best reached 76.4% after 3 source-shape attempts. */
+#pragma peephole off
 void fn_8004BFB0(void)
 {
     extern s32 mailGetNbMailInMailbox(void);
@@ -1461,6 +1462,7 @@ void fn_8004BFB0(void)
     }
     }
 }
+#pragma peephole reset
 #endif
 
 #if 0
@@ -1971,6 +1973,7 @@ extern u8 lbl_8047A524;
 extern u32 lbl_8047A528;
 extern u32 lbl_8047A52C;
 
+#pragma peephole off
 u32 fn_8004DDC0(u8* context)
 {
     u8* input;
@@ -2023,6 +2026,7 @@ u32 fn_8004DDC0(u8* context)
     }
     return 0;
 }
+#pragma peephole reset
 
 extern u32 fn_8016557C(void);
 extern u32 fn_800F9418(u32 size, u32 align, u32 arg2, u32 group, u32 arg4);
@@ -2033,6 +2037,7 @@ extern s32 fn_801026A4(u32 menuId, ...);
 extern u32 fn_801046B8(void);
 extern void fn_80102510(u32 menuId);
 
+#pragma peephole off
 u8 fn_8004DFCC(u8 initialSelection)
 {
     u32 selection;
@@ -2076,6 +2081,7 @@ u8 fn_8004DFCC(u8 initialSelection)
     fn_80165548(state);
     return result;
 }
+#pragma peephole reset
 
 extern u32 mailGetAttachFileGroup(s32 index);
 extern s32 fn_8017B2CC(u32 fileHandle);
@@ -2106,6 +2112,7 @@ static inline s32 pdaMailCountAttachmentEntries(u32 fileHandle)
     return count;
 }
 
+#pragma peephole off
 s32 fn_8004E180(u8* context, u8* object)
 {
     u8* attachmentState;
@@ -2141,7 +2148,9 @@ s32 fn_8004E180(u8* context, u8* object)
     }
     return 0;
 }
+#pragma peephole reset
 
+#pragma peephole off
 s32 fn_8004E2E0(u8* context, u8* object)
 {
     u8* attachmentState;
@@ -2165,6 +2174,7 @@ s32 fn_8004E2E0(u8* context, u8* object)
     }
     return 0;
 }
+#pragma peephole reset
 
 extern u8 fn_8017B07C(u32 fileHandle, u32 entry);
 extern void fn_800D88DC(u32 mask);
@@ -2179,6 +2189,7 @@ extern void fn_800D6728(void);
 extern f32 lbl_8047BE48;
 extern f32 lbl_8047BE4C;
 
+#pragma peephole off
 s32 fn_8004E510(u8* context, u8* object)
 {
     u8* attachmentState;
@@ -2260,7 +2271,9 @@ s32 fn_8004E510(u8* context, u8* object)
     fn_800D6728();
     return 0;
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_8004C120(void)
 {
     extern u16 _toolentryAlloc__FUl(u32);
@@ -2326,3 +2339,4 @@ void fn_8004C120(void)
         fn_800E209C(allocation);
     }
 }
+#pragma peephole reset
