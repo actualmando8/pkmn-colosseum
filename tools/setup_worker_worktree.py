@@ -67,8 +67,24 @@ def ensure_orig_link(worktree: Path, orig_sys: Path, replace: bool) -> None:
         else:
             sys.exit(f"refusing to replace non-symlink path: {link}")
 
-    link.symlink_to(orig_sys, target_is_directory=True)
-    print(f"created orig link: {link} -> {orig_sys}")
+    try:
+        link.symlink_to(orig_sys, target_is_directory=True)
+        print(f"created orig link: {link} -> {orig_sys}")
+    except OSError as exc:
+        # Windows refuses symlinks without Administrator or Developer Mode
+        # (WinError 1314). The tree is ~4 MB across 6 files, so copying is a
+        # perfectly good fallback and needs no elevated privileges.
+        if getattr(exc, "winerror", None) != 1314:
+            raise
+        import shutil
+
+        print(
+            f"symlink not permitted ({exc.strerror}); copying instead. "
+            "Enable Developer Mode to get symlinks."
+        )
+        link.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(orig_sys, link)
+        print(f"copied orig files: {orig_sys} -> {link}")
 
 
 def git_ref_exists(ref: str) -> bool:
