@@ -340,6 +340,9 @@ u32 debugMenuColorBarDisp(void) {
 
 
 /* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call GSmodelSetShadowDebug */
+/* 0x801334A8 | 0x34 -- toggle lbl_8047AED9 (cntlzw/extrwi), call GSmodelSetShadowDebug */
+#pragma optimization_level 4
+#pragma scheduling on
 u32 debugMenuShadowBorderDisp(void) {
     u32 clz = __cntlzw(lbl_8047AED9);
     u8 val = (u8)((clz >> 5) & 0xFF);
@@ -347,6 +350,7 @@ u32 debugMenuShadowBorderDisp(void) {
     GSmodelSetShadowDebug(val);
     return 0;
 }
+#pragma scheduling off
 
 
 /* 0x801334DC | 0x34 -- toggle lbl_8047AED8 (cntlzw/extrwi), call fn_800D4610 */
