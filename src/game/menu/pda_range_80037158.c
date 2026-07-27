@@ -560,33 +560,41 @@ static inline void pdaUpdateOrbitSprite(PdaSprite* sprite, f32 baseAngle,
         (s16)(lbl_8047BA6C * (f32)cos(angle) + lbl_8047BA70);
 }
 
+#pragma peephole off
 void fn_800379E8(void* window, PdaSprite* sprite)
 {
     extern f32 lbl_802E52B8[4];
     (void)window;
     pdaUpdateOrbitSprite(sprite, lbl_802E52B8[3], 0);
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_80037BB0(void* window, PdaSprite* sprite)
 {
     extern f32 lbl_802E52B8[4];
     (void)window;
     pdaUpdateOrbitSprite(sprite, lbl_802E52B8[2], 0);
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_80037D78(void* window, PdaSprite* sprite)
 {
     extern f32 lbl_802E52B8[4];
     (void)window;
     pdaUpdateOrbitSprite(sprite, lbl_802E52B8[1], 0);
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_80037F40(void* window, PdaSprite* sprite)
 {
     extern f32 lbl_802E52B8[4];
     (void)window;
     pdaUpdateOrbitSprite(sprite, lbl_802E52B8[0], 1);
 }
+#pragma peephole reset
 
 /* The redundant expressions preserve MWCC's exact register/scheduling shape. */
 void fn_80038138(void* window, PdaSprite* sprite)
@@ -2349,6 +2357,7 @@ extern void menuCloseSync(s32, s32);
 extern u32 fn_80018F54();
 extern u32 fn_800F915C();
 
+#pragma peephole off
 void fn_8003AFDC(u8* context, PdaSprite* sprite)
 {
     u16 battleId;
@@ -2419,7 +2428,9 @@ void fn_8003AFDC(u8* context, PdaSprite* sprite)
         break;
     }
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_800492CC(u8* context, PdaSprite* sprite)
 {
     u32 firstTexture;
@@ -2492,7 +2503,9 @@ void fn_800492CC(u8* context, PdaSprite* sprite)
         fn_800D6728();
     }
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_80040018(u8* menu)
 {
     u8* scene;
@@ -2610,6 +2623,7 @@ void fn_80040018(u8* menu)
         }
     }
 }
+#pragma peephole reset
 
 void fn_80044378(u8* context, PdaSprite* sprite)
 {
@@ -2682,6 +2696,7 @@ void fn_80044378(u8* context, PdaSprite* sprite)
     fn_800FE35C();
 }
 
+#pragma peephole off
 void fn_8003B478(u8* context)
 {
     u8* window;
@@ -2738,6 +2753,7 @@ void fn_8003B478(u8* context)
     }
     fn_800FB680(0, 0, (s8)context[0x8B], (void*)0xCF);
 }
+#pragma peephole reset
 
 #pragma peephole off
 void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
@@ -2904,6 +2920,7 @@ void fn_8003CF38(void)
     lbl_8047A4D8 = 0;
 }
 
+#pragma peephole off
 u32 fn_80043728(u32 unused, s32 mode, u16 buttons)
 {
     u8* scene;
@@ -2973,6 +2990,7 @@ u32 fn_80043728(u32 unused, s32 mode, u16 buttons)
     }
     return 0;
 }
+#pragma peephole reset
 
 void fn_8003A520(void)
 {
@@ -3022,6 +3040,7 @@ void fn_8003A520(void)
     }
 }
 
+#pragma peephole off
 void fn_8003B2D8(u8* context)
 {
     u8* window;
@@ -3070,7 +3089,9 @@ void fn_8003B2D8(u8* context)
     fn_80132A38(0x37, message);
     fn_800FB680(0xB4, 0, (s8)context[0x8B], (void*)0xE7);
 }
+#pragma peephole reset
 /* Readable ports reconstructed from the PDA callback state machines. */
+#pragma peephole off
 void fn_80037180(u32 unused, u8* p) {
     u32 result;
     if (*(s16*)(p + 6) == 0x36c) {
@@ -3104,7 +3125,9 @@ void fn_80037180(u32 unused, u8* p) {
         }
     }
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_80039F70(u8* ctx) {
     s8 state;
     void* entry;
@@ -3181,7 +3204,9 @@ void fn_80039F70(u8* ctx) {
         break;
     }
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_8003B6D0(u8* ctx) {
     u8* base;
     u32 battleId;
@@ -3218,7 +3243,9 @@ void fn_8003B6D0(u8* ctx) {
     fn_80132A38(0x37, message);
     fn_800FB680(0, 0, (s32)ctx[0x8b] | -0x100, (void*)0xcf);
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_8003F040(void) {
     u8 tmp[0x1a];
     u8* base;
@@ -3324,7 +3351,9 @@ void fn_8003F040(void) {
         }
     }
 }
+#pragma peephole reset
 
+#pragma peephole off
 void fn_8003F2DC(u8* arr, s32 count, s32 dir) {
     s32 gap;
     s32 i;
@@ -3371,8 +3400,10 @@ void fn_8003F2DC(u8* arr, s32 count, s32 dir) {
         }
     }
 }
+#pragma peephole reset
 
 /* Main summary-screen state machine. */
+#pragma peephole off
 void fn_80044630(void) {
     extern void  _threadSwitch(void);
     extern u32   fn_80102568(u32 a, u32 b, u32 c);
@@ -4730,6 +4761,7 @@ void fn_80044630(void) {
     }
     lbl_8047A4E4 = 0;
 }
+#pragma peephole reset
 
 extern u32 gamedataGetStatus(s32 a, s32 b);
 extern void pokemonCreate(u32 work, u16 species, s32 level, u32 trainer);
