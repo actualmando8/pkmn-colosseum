@@ -90,7 +90,9 @@ def scan(item):
         sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
         moved = sum(max(i2 - i1, j2 - j1)
                     for tag, i1, i2, j1, j2 in sm.get_opcodes() if tag != 'equal')
-        rows.append((size * (100 - pct) / 100, pct, size, fn, unit, moved, len(a)))
+        gap = size * (100 - pct) / 100
+        frac = moved / max(len(a), 1)
+        rows.append((gap * frac, gap, pct, size, fn, unit, moved, len(a)))
     return rows
 
 
@@ -98,9 +100,13 @@ rows = []
 with ThreadPoolExecutor(max_workers=8) as ex:
     for out in ex.map(scan, units):
         rows.extend(out)
+# Rank by expected value, not raw gap: a 4000-byte gap with 2 of 330 calls
+# displaced is almost entirely some other problem, and reordering wins little.
 rows.sort(reverse=True)
 print('%d functions with retail-matching call multiset but different order'
       % len(rows))
-for gap, pct, size, fn, unit, moved, ncalls in rows:
-    print('gap%7.0f %7.2f%% %6d  %-40s moved=%3d of %3d calls'
-          % (gap, pct, size, fn, moved, ncalls))
+print('%8s %8s %8s %6s  %-40s %s'
+      % ('est', 'gap', 'fuzzy', 'size', 'fn', 'displaced'))
+for est, gap, pct, size, fn, unit, moved, ncalls in rows:
+    print('%8.0f %8.0f %7.2f%% %6d  %-40s %3d of %3d calls'
+          % (est, gap, pct, size, fn, moved, ncalls))

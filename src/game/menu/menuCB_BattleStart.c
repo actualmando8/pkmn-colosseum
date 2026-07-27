@@ -1315,10 +1315,10 @@ u8 fn_80061D34(
     s32 mode = fn_8025DA88();
     s32 valid = 1;
 
-    if (lbl_803A9A60.status == 1) {
-        selection = fn_8025D808(player);
-    } else {
+    if (lbl_803A9A60.status != 1) {
         selection = fn_8025D89C(player);
+    } else {
+        selection = fn_8025D808(player);
     }
     if (lbl_803A9A60.status == 0) {
         if (kind == 2) {
