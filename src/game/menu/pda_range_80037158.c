@@ -148,7 +148,7 @@ extern PdaSceneWork lbl_803A6818;
 extern void fn_8003B85C(void* window, s32 enabled);
 extern void fn_8003C2B8(PdaSprite* sprite, PdaEvent* event);
 extern s32 fn_80041E48(void* work, s32 mode);
-extern void fn_80042658(void* work, s32 mode);
+extern s32 fn_80042658(void* work, s32 mode);
 extern void fn_800439BC(void* scene);
 extern void GSscene_SetMode(s32 mode);
 extern void menuButtonNormal(void* button);
@@ -6073,6 +6073,296 @@ s32 fn_80041E48(void* work, s32 mode)
             *(f32*)(S + 0x1d8) = *(f32*)(S + 0x1d8) + lbl_8047BCAC;
             *(s8*)(S + 0x1c8) = *(s8*)(S + 0x1c8) - 1;
             *(s8*)(S + 0x1c9) = *(s8*)(S + 0x1c9) - 1;
+        }
+    }
+    return 0;
+}
+#pragma peephole reset
+
+extern f32 lbl_8047BCE0;
+extern f32 lbl_8047BCE4;
+extern f32 lbl_8047BCE8;
+extern f32 lbl_8047BCEC;
+extern f32 lbl_8047BCF0;
+extern s8 fn_800F7994(s32 chan, s32 index);
+extern s8 fn_800F7920(s32 chan, s32 index);
+extern void GSvecAdd(void* dst, void* a, void* b);
+extern u8 fn_8010A210(void* work, u32 pokemon);
+extern void menuModelFree(void* work);
+extern void fn_80109C88(void* work, u32 pokemon);
+extern void GSmodelDestroyLinkedParticles(void* model);
+
+/* Step the page down one level, tearing the current model's particles down. */
+static inline void pdaPopLevel(u8* S)
+{
+    void* model;
+
+    *(f32*)(S + 0x6c) = lbl_8047BC94;
+    *(f32*)(S + 0x70) = lbl_8047BC94;
+    *(f32*)(S + 0x74) = lbl_8047BC94;
+    *(f32*)(S + 0x64) = lbl_8047BCF0;
+    switch (*(s32*)(S + 0x28)) {
+    case 0:
+        *(s32*)(S + 0x1c) = 0xd;
+        *(s32*)(S + 0x24) = 2;
+        *(f32*)(S + 0x60) = lbl_8047BC94;
+        model = fn_801DAC3C(*(void**)(S + 0xa0));
+        if (model != NULL) {
+            GSmodelDestroyLinkedParticles(model);
+        }
+        break;
+    case 1:
+        *(s32*)(S + 0x1c) = 0xd;
+        *(s32*)(S + 0x24) = 4;
+        *(f32*)(S + 0x60) = lbl_8047BC94;
+        model = fn_801DAC3C(*(void**)(S + 0xa0));
+        if (model != NULL) {
+            GSmodelDestroyLinkedParticles(model);
+        }
+        *(f32*)(S + 0x64) = lbl_8047BCA8;
+        break;
+    case 2:
+        *(s32*)(S + 0x1c) = 0xd;
+        *(s32*)(S + 0x24) = 5;
+        *(f32*)(S + 0x60) = lbl_8047BC94;
+        model = fn_801DAC3C(*(void**)(S + 0xa0));
+        if (model != NULL) {
+            GSmodelDestroyLinkedParticles(model);
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+/* Close the windows belonging to the level we are leaving. */
+static inline void pdaCloseLevelWindows(u8* S)
+{
+    switch (*(s32*)(S + 0x28)) {
+    case 0:
+        menuCloseCustom(0x3c, 0, 0);
+        menuCloseCustom(0x96, 0, 0);
+        break;
+    case 1:
+        menuCloseCustom(0xa1, 0, 0);
+        menuCloseCustom(0x96, 0, 0);
+        break;
+    case 2:
+        menuCloseCustom(0x96, 0, 0);
+        break;
+    default:
+        break;
+    }
+}
+
+/* Per-frame scene update for the PDA's model page. */
+#pragma peephole off
+s32 fn_80042658(void* work, s32 mode)
+{
+    extern u32 fn_800D3088(void);
+    extern s32 fn_800D37CC(void);
+    u8* S = (u8*)&lbl_803A6818;
+    u8* K = lbl_803A67FC;
+    PdaVec3 spin;
+    PdaVec3 pos;
+    u16 keys;
+    s32 held;
+    s32 prevIndex;
+    f32 dt;
+    f32 delta;
+    f32 moved;
+    f32 rest;
+    void* model;
+    u32 pokemon;
+    f32* rot;
+
+    held = 0;
+    prevIndex = *(s32*)S;
+    if (*(s8*)(S + 0x48) == 1) {
+        keys = *(u16*)(K + 6);
+        lbl_804788C4 = 3;
+    } else if (*(s8*)(S + 0x48) == 2) {
+        keys = *(u16*)(K + 6);
+        lbl_804788C4 = 2;
+    } else {
+        keys = *(u16*)(K + 6);
+        lbl_804788C4 = 5;
+    }
+    if ((*(u16*)K & 3) != 0) {
+        held = 1;
+    }
+    dt = (f32)fn_800D3088() / (f32)fn_800D37CC();
+    *(f32*)(S + 0x3c) = dt;
+    *(f32*)(S + 0x40) = *(f32*)(S + 0x40) + dt;
+    if (*(f32*)(S + 0x40) >= lbl_8047BCBC) {
+        *(f32*)(S + 0x40) = lbl_8047BC94;
+    }
+    pdaEase((f32*)((u8*)&lbl_803A6818 + 0x2c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x34));
+    pdaEase((f32*)((u8*)&lbl_803A6818 + 0x30),
+            *(f32*)((u8*)&lbl_803A6818 + 0x38));
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x4c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x50), lbl_8047BCB8);
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x54),
+            *(f32*)((u8*)&lbl_803A6818 + 0x58), lbl_8047BCB8);
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x5c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x60), lbl_8047BCC0);
+
+    if (*(f32*)((u8*)&lbl_803A6818 + 0x1dc) !=
+        *(f32*)((u8*)&lbl_803A6818 + 0x1e0)) {
+        delta = *(f32*)((u8*)&lbl_803A6818 + 0x1e0) -
+                *(f32*)((u8*)&lbl_803A6818 + 0x1dc);
+        moved = lbl_8047BCC4 * delta * *(f32*)(S + 0x3c);
+        if (moved > lbl_8047BC98) {
+            moved = lbl_8047BC98;
+        }
+        if (moved <= lbl_8047BCC8) {
+            moved = lbl_8047BCC8;
+        }
+        *(f32*)((u8*)&lbl_803A6818 + 0x1dc) =
+            *(f32*)((u8*)&lbl_803A6818 + 0x1dc) + moved;
+        rest = *(f32*)((u8*)&lbl_803A6818 + 0x1e0) -
+               *(f32*)((u8*)&lbl_803A6818 + 0x1dc);
+        if (moved > lbl_8047BC94) {
+        } else {
+            moved = -moved;
+        }
+        if (pdaFabs(rest) <= moved) {
+            *(f32*)((u8*)&lbl_803A6818 + 0x1dc) =
+                *(f32*)((u8*)&lbl_803A6818 + 0x1e0);
+        } else {
+            if (rest > lbl_8047BC94) {
+            } else {
+                rest = -rest;
+            }
+            if (rest < lbl_8047BCBC) {
+                *(f32*)((u8*)&lbl_803A6818 + 0x1dc) =
+                    *(f32*)((u8*)&lbl_803A6818 + 0x1e0);
+            }
+        }
+    }
+
+    switch (*(s32*)(S + 0x1c)) {
+    case 1:
+    case 2:
+    case 3:
+        S[0x214] = fn_80047CC0(S + 0x7c);
+        fn_80043728((u32)work, mode, keys);
+        break;
+    case 4:
+        S[0x214] = fn_800484A4(S + 0x7c);
+        spin.x = lbl_8047BC94;
+        spin.y = lbl_8047BC94;
+        spin.z = lbl_8047BC94;
+        model = fn_801DAC3C(*(void**)(S + 0x7c + 0x24));
+        if (model == NULL) {
+            break;
+        }
+        GSmodelGetBound(model);
+        rot = (f32*)(S + 0x6c);
+        spin.x = *(f32*)(S + 0x3c) *
+                 (lbl_8047BCA4 * (f32)fn_800F7920(1, 1) * lbl_8047BCE0);
+        spin.y = *(f32*)(S + 0x3c) *
+                 (lbl_8047BCA4 * (f32)fn_800F7994(1, 1) * lbl_8047BCE0);
+        GSvecAdd(rot, rot, &spin);
+        if (*rot >= lbl_8047BCE4) {
+            *rot = lbl_8047BCE4 - spin.x;
+        }
+        if (*rot <= lbl_8047BCE8) {
+            *rot = lbl_8047BCE8 - spin.x;
+        }
+        GSmodelGetPosition(model, &pos);
+        pos.x = lbl_8047BC94;
+        GSmodelSetPosition(model, &pos);
+        if ((fn_800F7BC4(1) & 0x40) != 0) {
+            if (*(f32*)(S + 0x64) <= lbl_8047BCEC) {
+                *(f32*)(S + 0x64) = *(f32*)(S + 0x64) + *(f32*)(S + 0x3c);
+            }
+        } else if ((fn_800F7BC4(1) & 0x20) != 0) {
+            if (*(f32*)(S + 0x64) > lbl_8047BCBC) {
+                *(f32*)(S + 0x64) = *(f32*)(S + 0x64) - *(f32*)(S + 0x3c);
+            }
+        }
+        break;
+    case 5:
+        S[0x214] = fn_800478B4(S + 0x7c, S + 0xc4);
+        S[0x214] = fn_8003D1FC_setup(S + 0xc4);
+        break;
+    default:
+        break;
+    }
+
+    if (held != 0) {
+        if (*(s8*)(S + 0x48) < 2) {
+            *(f32*)(S + 0x44) = *(f32*)(S + 0x44) + *(f32*)(S + 0x3c);
+            if (*(f32*)(S + 0x44) >= lbl_8047BCBC) {
+                *(s8*)(S + 0x48) = 1;
+            }
+            if (*(f32*)(S + 0x44) >= lbl_8047BCA8) {
+                *(s8*)(S + 0x48) = 2;
+            }
+        }
+    } else {
+        *(f32*)(S + 0x44) = lbl_8047BC94;
+        *(s8*)(S + 0x48) = 0;
+    }
+
+    if (mode != 0) {
+        if (*(f32*)((u8*)&lbl_803A6818 + 0x58) ==
+            *(f32*)((u8*)&lbl_803A6818 + 0x54)) {
+            if ((*(u16*)(K + 6) & 0x4) != 0) {
+                if (*(s32*)((u8*)&lbl_803A6818 + 0x28) > 0) {
+                    pdaCloseLevelWindows((u8*)&lbl_803A6818);
+                    *(s32*)((u8*)&lbl_803A6818 + 0x28) =
+                        *(s32*)((u8*)&lbl_803A6818 + 0x28) - 1;
+                    fn_80166AB8(0x23, 0, 0);
+                    pdaPopLevel((u8*)&lbl_803A6818);
+                }
+            }
+            if ((*(u16*)(K + 6) & 0x8) != 0) {
+                if (*(s32*)((u8*)&lbl_803A6818 + 0x28) < 2 &&
+                    pdaEntrySeen() != 0 &&
+                    *(s32*)((u8*)&lbl_803A6818 + 0x20) != 1) {
+                    pdaCloseLevelWindows((u8*)&lbl_803A6818);
+                    *(s32*)((u8*)&lbl_803A6818 + 0x28) =
+                        *(s32*)((u8*)&lbl_803A6818 + 0x28) + 1;
+                    fn_80166AB8(0x23, 0, 0);
+                    pdaPopLevel((u8*)&lbl_803A6818);
+                }
+            }
+            *(f32*)((u8*)&lbl_803A6818 + 0x30) =
+                *(f32*)((u8*)&lbl_803A6818 + 0x38);
+        }
+    }
+
+    if (prevIndex != lbl_803A6818.currentIndex && lbl_804788C0 != 0) {
+        pokemon = pdaLoadPokemon(lbl_803A6818.currentIndex);
+        if (fn_8010A210((u8*)&lbl_803A6818 + 0x7c, pokemon) == 0) {
+            menuModelFree((u8*)&lbl_803A6818 + 0x7c);
+            fn_80109C88((u8*)&lbl_803A6818 + 0x7c, pokemon);
+        }
+        *((u8*)&lbl_803A6818 + 0x214) = 0;
+        switch (*(s32*)(S + 0x1c)) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 6:
+        case 7:
+        case 8:
+        case 0xb:
+        case 0xc:
+            *((u8*)&lbl_803A6818 + 0x214) =
+                fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
+            break;
+        case 5:
+            *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4(
+                (u8*)&lbl_803A6818 + 0x7c, (u8*)&lbl_803A6818 + 0xc4);
+            *((u8*)&lbl_803A6818 + 0x214) =
+                fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
+            break;
+        default:
+            break;
         }
     }
     return 0;
