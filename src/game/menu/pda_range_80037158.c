@@ -6619,6 +6619,7 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
     extern void fn_800FB8C8(s32 x, s32 y, s16 w, s16 h, void* color, s32 msg);
     extern void fn_800FBB34(s32 x, s32 y, s16 w, s16 h, void* color, s32 msg);
     PdaSprite* sprite = (PdaSprite*)event;
+    u8* layout;
     u32 name;
     u16 tokusei0;
     u16 tokusei1;
@@ -6628,6 +6629,7 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
     s32 i;
     s32 digits;
 
+    layout = lbl_802EF0A8;
     name = pdaCurrentNameMsg();
     if (name == 0) {
         name = GSmsgGetGSchar(1);
@@ -6640,12 +6642,12 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
         msgctrlSetValue(0x37,
                         GSmsgGetGSchar((u32)pokemonTokuseiDataBiosGetName(
                             pokemonTokuseiDataBiosGetPtr(tokusei0))));
-        fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x5a5a) - sprite->field_50 + 4,
-                    *(s16*)(lbl_802EF0A8 + 0x5a5c) - sprite->field_52,
+        fn_800FB680(*(s16*)(layout + 0x5a5a) - sprite->field_50 + 4,
+                    *(s16*)(layout + 0x5a5c) - sprite->field_52,
                     alphaSprite->alphaByte | -0x100, (void*)0xe7);
     } else {
-        fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x5a5a) - sprite->field_50 + 4,
-                    *(s16*)(lbl_802EF0A8 + 0x5a5c) - sprite->field_52,
+        fn_800FB680(*(s16*)(layout + 0x5a5a) - sprite->field_50 + 4,
+                    *(s16*)(layout + 0x5a5c) - sprite->field_52,
                     alphaSprite->alphaByte | -0x100, (void*)0x3721);
     }
 
@@ -6655,13 +6657,13 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
             msgctrlSetValue(0x37,
                             GSmsgGetGSchar((u32)pokemonTokuseiDataBiosGetName(
                                 pokemonTokuseiDataBiosGetPtr(tokusei1))));
-            fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x20b42) - sprite->field_50 + 4,
-                        *(s16*)(lbl_802EF0A8 + 0x20b44) - sprite->field_52,
+            fn_800FB680(*(s16*)(layout + 0x20b42) - sprite->field_50 + 4,
+                        *(s16*)(layout + 0x20b44) - sprite->field_52,
                         alphaSprite->alphaByte | -0x100, (void*)0xe7);
         }
     } else {
-        fn_800FB680(*(s16*)(lbl_802EF0A8 + 0x5a5a) - sprite->field_50 + 4,
-                    *(s16*)(lbl_802EF0A8 + 0x5a5c) - sprite->field_52,
+        fn_800FB680(*(s16*)(layout + 0x5a5a) - sprite->field_50 + 4,
+                    *(s16*)(layout + 0x5a5c) - sprite->field_52,
                     alphaSprite->alphaByte | -0x100, (void*)0x3721);
     }
 
@@ -6673,8 +6675,8 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
         lbl_803A67E8[7] = 0x27;
         digits = 3;
         for (;;) {
-            digit = height % 10;
-            height = height / 10;
+            digit = (u32)height % 10;
+            height = (u32)height / 10;
             if (digits > 0) {
                 digits--;
             } else if (digit == 0) {
@@ -6687,17 +6689,17 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
         }
         msgctrlSetValue(0x37, (u32)&lbl_803A67E8[i]);
         fn_800FB8C8(lbl_8047A4F0 +
-                        (*(s16*)(lbl_802EF0A8 + 0x5a76) - sprite->field_50),
-                    *(s16*)(lbl_802EF0A8 + 0x5a78) - sprite->field_52,
-                    *(s16*)(lbl_802EF0A8 + 0x5a7a),
-                    *(s16*)(lbl_802EF0A8 + 0x5a7c),
+                        (*(s16*)(layout + 0x5a76) - sprite->field_50),
+                    *(s16*)(layout + 0x5a78) - sprite->field_52,
+                    *(s16*)(layout + 0x5a7a),
+                    *(s16*)(layout + 0x5a7c),
                     (void*)(alphaSprite->alphaByte | -0x100), 0xcf);
     } else {
         fn_800FBB34(lbl_8047A4F0 +
-                        (*(s16*)(lbl_802EF0A8 + 0x5a76) - sprite->field_50),
-                    *(s16*)(lbl_802EF0A8 + 0x5a78) - sprite->field_52,
-                    *(s16*)(lbl_802EF0A8 + 0x5a7a),
-                    *(s16*)(lbl_802EF0A8 + 0x5a7c),
+                        (*(s16*)(layout + 0x5a76) - sprite->field_50),
+                    *(s16*)(layout + 0x5a78) - sprite->field_52,
+                    *(s16*)(layout + 0x5a7a),
+                    *(s16*)(layout + 0x5a7c),
                     (void*)(alphaSprite->alphaByte | -0x100), 0x371b);
     }
 
@@ -6706,17 +6708,17 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
         msgctrlSetValue(0x34, weight / 10);
         msgctrlSetValue(0x35, weight - weight / 10 * 10);
         fn_800FBB34(lbl_8047A4F0 +
-                        (*(s16*)(lbl_802EF0A8 + 0x5a92) - sprite->field_50),
-                    *(s16*)(lbl_802EF0A8 + 0x5a94) - sprite->field_52,
-                    *(s16*)(lbl_802EF0A8 + 0x5a96),
-                    *(s16*)(lbl_802EF0A8 + 0x5a98),
+                        (*(s16*)(layout + 0x5a92) - sprite->field_50),
+                    *(s16*)(layout + 0x5a94) - sprite->field_52,
+                    *(s16*)(layout + 0x5a96),
+                    *(s16*)(layout + 0x5a98),
                     (void*)(alphaSprite->alphaByte | -0x100), 0x189c);
     } else {
         fn_800FBB34(lbl_8047A4F0 +
-                        (*(s16*)(lbl_802EF0A8 + 0x5a92) - sprite->field_50),
-                    *(s16*)(lbl_802EF0A8 + 0x5a94) - sprite->field_52,
-                    *(s16*)(lbl_802EF0A8 + 0x5a96),
-                    *(s16*)(lbl_802EF0A8 + 0x5a98),
+                        (*(s16*)(layout + 0x5a92) - sprite->field_50),
+                    *(s16*)(layout + 0x5a94) - sprite->field_52,
+                    *(s16*)(layout + 0x5a96),
+                    *(s16*)(layout + 0x5a98),
                     (void*)(alphaSprite->alphaByte | -0x100), 0x371a);
     }
 
@@ -6726,10 +6728,10 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
         msgctrlSetValue(0x31, 0x371c);
     }
     fn_800FBB34(lbl_8047A4F0 +
-                    (*(s16*)(lbl_802EF0A8 + 0x5a22) - sprite->field_50),
-                *(s16*)(lbl_802EF0A8 + 0x5a24) - sprite->field_52,
-                *(s16*)(lbl_802EF0A8 + 0x5a26),
-                *(s16*)(lbl_802EF0A8 + 0x5a28),
+                    (*(s16*)(layout + 0x5a22) - sprite->field_50),
+                *(s16*)(layout + 0x5a24) - sprite->field_52,
+                *(s16*)(layout + 0x5a26),
+                *(s16*)(layout + 0x5a28),
                 (void*)(alphaSprite->alphaByte | -0x100), 0x371e);
 }
 #pragma peephole reset
