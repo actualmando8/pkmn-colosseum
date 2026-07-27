@@ -2554,14 +2554,17 @@ void fn_8011A0A8(u8* dst, u8* src, u16 type)
     u8* dst_entry;
     u8* src_entry;
     u8 index;
+    u8 table;
+    u32 mask;
 
     if (type == 0) {
         return;
     }
 
     index = fn_80119E90(type);
-    dst_entry = statusGetStatus(fn_80119F10(type), dst, 0,
-                                fn_80119ED0(type), 0);
+    table = fn_80119F10(type);
+    mask = fn_80119ED0(type);
+    dst_entry = statusGetStatus(table, dst, 0, mask, 0);
     if (dst_entry != NULL) {
         dst_entry += index * 16;
     }
@@ -2570,8 +2573,9 @@ void fn_8011A0A8(u8* dst, u8* src, u16 type)
     }
 
     index = fn_80119E90(type);
-    src_entry = statusGetStatus(fn_80119F10(type), src, 0,
-                                fn_80119ED0(type), 0);
+    table = fn_80119F10(type);
+    mask = fn_80119ED0(type);
+    src_entry = statusGetStatus(table, src, 0, mask, 0);
     if (src_entry != NULL) {
         src_entry += index * 16;
     }
@@ -2581,8 +2585,9 @@ void fn_8011A0A8(u8* dst, u8* src, u16 type)
     }
 
     index = fn_80119E90(type);
-    src_entry = statusGetStatus(fn_80119F10(type), src, 0,
-                                fn_80119ED0(type), 0);
+    table = fn_80119F10(type);
+    mask = fn_80119ED0(type);
+    src_entry = statusGetStatus(table, src, 0, mask, 0);
     if (src_entry != NULL) {
         src_entry += index * 16;
     }
