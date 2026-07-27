@@ -254,10 +254,14 @@ u32 dbgMenuFrameRate30(void) {
 
 
 /* 0x80133328 | 36 bytes | call_return_const2 */
+/* 0x80133328 | 36 bytes | call_return_const2 */
+#pragma optimization_level 4
+#pragma scheduling on
 u32 dbgMenuSendAllMail(void) {
     mailMainSendAllMail();
     return 0;
 }
+#pragma scheduling off
 
 #if 0
 asm void dbgMenuSendMail(void) {
