@@ -7095,3 +7095,130 @@ void fn_80046168(void)
     *(s32*)(S + 0x20) = 0;
 }
 #pragma peephole reset
+
+extern f32 lbl_8047BDA0;
+extern f32 lbl_8047BDA4;
+extern f32 lbl_8047BDA8;
+extern f32 lbl_8047BDB0;
+extern f32 lbl_8047BDB4;
+extern f32 lbl_8047BDB8;
+
+/* Mail-list backdrop: fade panel, scanlines, and the sheared page edge. */
+#pragma peephole off
+s32 fn_800495C8(void* work, PdaSprite* sprite)
+{
+    extern u8 lbl_80314E08[];
+    extern void fn_800D5648(f32 width);
+    extern void fn_800D5BA0(s32 index, u32 color);
+    u8* G = lbl_803A6A60;
+    u8* data;
+    f32 kOne;
+    f32 kAlpha;
+    f32 top;
+    f32 kMin;
+    f32 kScale;
+    f32 kMul;
+    f32 kDiv;
+    f32 y;
+    s32 i;
+    s32 j;
+    s32 alpha;
+    s32 row;
+    u32 color;
+    f32 step;
+
+    data = *(u8**)((u8*)work + 0x60);
+    if (*(f32*)(G + 0x2c) != *(f32*)(G + 0x28)) {
+        step = *(f32*)(G + 8) / lbl_8047BDA8;
+        if (*(f32*)(G + 0x2c) > *(f32*)(G + 0x28)) {
+            *(f32*)(G + 0x28) = *(f32*)(G + 0x28) + step;
+            if (*(f32*)(G + 0x28) > lbl_8047BDA0) {
+                *(f32*)(G + 0x28) = lbl_8047BDA0;
+            }
+        } else {
+            *(f32*)(G + 0x28) = *(f32*)(G + 0x28) - step;
+            if (*(f32*)(G + 0x28) < lbl_8047BDAC) {
+                *(f32*)(G + 0x28) = lbl_8047BDAC;
+            }
+        }
+    }
+    fn_800411EC();
+    if (*(s8*)(lbl_803A6A60 + 0) == 1) {
+        if (lbl_803A6A60[0x49] != 0 && lbl_803A6A60[0x4a] == 0) {
+            menuOffScreenSetDisp(0);
+            lbl_803A6A60[0x49] = 0;
+        }
+        if (*(s8*)(lbl_803A6A60 + 1) >= 1) {
+            *(f32*)(G + 0x2c) = lbl_8047BDAC;
+            return 0;
+        }
+        *(f32*)(G + 0x2c) = lbl_8047BDA0;
+    } else {
+        if (lbl_803A6A60[0x49] != 1) {
+            menuOffScreenSetDisp(1);
+            lbl_803A6A60[0x49] = 1;
+        }
+        *(f32*)(G + 0x2c) = lbl_8047BDA0;
+    }
+
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D7820(lbl_80314E08);
+    fn_800D6A00(4);
+    fn_800D67BC(4);
+    alpha = (s32)(lbl_8047BDB0 * *(f32*)(G + 0x28));
+    fn_800D61E4(0, 0);
+    color = (u8)alpha | 0x03140e00;
+    fn_800D5BA0(0, color);
+    fn_800D61E4(sprite->x, 0);
+    fn_800D5BA0(0, color);
+    fn_800D61E4(0, sprite->y);
+    fn_800D5BA0(0, color);
+    fn_800D61E4(sprite->x, sprite->y);
+    fn_800D5BA0(0, color);
+    fn_800D6728();
+
+    for (i = 0; i < 0x1e0; i += 4) {
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D7820(lbl_80314E08);
+        fn_800D6A00(1);
+        fn_800D5648(lbl_8047BDA0);
+        fn_800D67BC(2);
+        fn_800D61E4(0, (s16)i);
+        fn_800D5BA0(0, 0x00800080);
+        fn_800D61E4(sprite->x, (s16)i);
+        fn_800D5BA0(0, 0x00800080);
+        fn_800D6728();
+    }
+
+    top = **(f32**)(data + 8);
+    kAlpha = lbl_8047BDB0;
+    kOne = lbl_8047BDA0;
+    kDiv = lbl_8047BDB4;
+    kMul = lbl_8047BDB8;
+    kScale = lbl_8047BDA4;
+    kMin = lbl_8047BDAC;
+    for (j = 0; j < 12; j++) {
+        alpha = (s32)(kAlpha * (kOne - (f32)j / kDiv));
+        y = top - kMul * (f32)j / kScale;
+        if (y < kMin) {
+            y = y + kOne;
+        }
+        row = (s32)(kScale * y);
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D7820(lbl_80314E08);
+        fn_800D6A00(1);
+        fn_800D5648(lbl_8047BDA0);
+        fn_800D67BC(2);
+        fn_800D61E4(0, row);
+        color = (u8)alpha | 0x00800000;
+        fn_800D5BA0(0, color);
+        fn_800D61E4(sprite->x, row);
+        fn_800D5BA0(0, color);
+        fn_800D6728();
+    }
+    return 0;
+}
+#pragma peephole reset
