@@ -7243,7 +7243,6 @@ extern void fn_8010A010(void* work, u32 id);
 #pragma peephole off
 void fn_80048918(void)
 {
-    u8* S = (u8*)&lbl_803A6818;
     const PdaCamBlock* tbl = (const PdaCamBlock*)lbl_80267150;
     PdaVec3 rot;
     PdaCamBlock blk;
@@ -7258,57 +7257,59 @@ void fn_80048918(void)
     void* anim;
     u32 pokemon;
     u16 total;
+    u8* saved;
     f32 cf0;
     f32 cbc;
     f32 c94;
 
     menuOffScreenSetDisp(0);
-    *(s32*)(S + 0x110) = 0;
-    *(s32*)(S + 0x114) = 0;
-    *(s32*)(S + 0x10c) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x110) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x114) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x10c) = 0;
     fn_801CB954(NULL, 0);
     res = GSresGetResource((u32)fn_80113F48(), 0);
     if (res != NULL) {
         GSmodelSetVisibility(res, 0);
     }
     fn_801CB9D8(NULL);
-    *(f32*)(S + 0x6c) = c94;
-    *(f32*)(S + 0x70) = c94;
-    *(f32*)(S + 0x74) = c94;
-    *(f32*)(S + 0x64) = cf0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x6c) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x70) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x74) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x64) = cf0;
     anim = fn_801CBA0C(0xd171000);
-    *(void**)(S + 0x10c) = anim;
+    *(void**)((u8*)&lbl_803A6818 + 0x10c) = anim;
     res = GSresGetResource((u32)fn_80113F48(), (u32)anim);
-    *(void**)(S + 0x110) = res;
+    *(void**)((u8*)&lbl_803A6818 + 0x110) = res;
     GSmodelSetAnimRate(res, lbl_8047BD18);
     blk = *tbl;
     cam = GSresGetResource(0x17, 0xd731800);
-    *(void**)(S + 0x114) = cam;
+    *(void**)((u8*)&lbl_803A6818 + 0x114) = cam;
     GScameraGetPosition(cam, &blk.v[3]);
     GScameraGetRotation(cam, &rot);
     blk.v[0] = *(f32*)((u8*)cam + 0x100);
     blk.v[1] = *(f32*)((u8*)cam + 0x104);
     blk.v[2] = *(f32*)((u8*)cam + 0x108);
     GScameraGetPerspective(cam, &persp0, &persp1, &persp2, &persp3);
-    GSvecCopy(S + 0x218, &blk.v[3]);
-    GSvecCopy(S + 0x224, &blk.v[0]);
-    *(f32*)(S + 0x230) = persp0;
-    *(f32*)(S + 0x234) = persp1;
-    *(f32*)(S + 0x238) = persp2;
-    *(f32*)(S + 0x23c) = persp3;
+    saved = (u8*)&lbl_803A6818 + 0x218;
+    GSvecCopy(saved, &blk.v[3]);
+    GSvecCopy(saved + 0xc, &blk.v[0]);
+    *(f32*)(saved + 0x18) = persp0;
+    *(f32*)(saved + 0x1c) = persp1;
+    *(f32*)(saved + 0x20) = persp2;
+    *(f32*)(saved + 0x24) = persp3;
     GScameraSetPerspective(cam, persp0, persp1, persp2, persp3);
-    GSvecCopy(S + 0x118, &blk.v[3]);
-    GSvecCopy(S + 0x124, &rot);
-    GSvecCopy(S + 0x130, &blk.v[0]);
-    *(f32*)(S + 0x13c) = persp0;
-    *(f32*)(S + 0x140) = persp1;
-    *(f32*)(S + 0x144) = persp2;
-    *(f32*)(S + 0x148) = persp3;
+    GSvecCopy((u8*)&lbl_803A6818 + 0x118, &blk.v[3]);
+    GSvecCopy((u8*)&lbl_803A6818 + 0x124, &rot);
+    GSvecCopy((u8*)&lbl_803A6818 + 0x130, &blk.v[0]);
+    *(f32*)((u8*)&lbl_803A6818 + 0x13c) = persp0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x140) = persp1;
+    *(f32*)((u8*)&lbl_803A6818 + 0x144) = persp2;
+    *(f32*)((u8*)&lbl_803A6818 + 0x148) = persp3;
     cameraPlayAnime(0x17, 0xd731800, 0, 1);
     GSscene_SetMode(4);
-    *(s32*)(S + 0x78) = 0;
-    menuModelInit(S + 0x7c, 0x280, 0x1e0);
-    menuModelInit(S + 0xc4, 0x280, 0x1e0);
+    *(s32*)((u8*)&lbl_803A6818 + 0x78) = 0;
+    menuModelInit((u8*)&lbl_803A6818 + 0x7c, 0x280, 0x1e0);
+    menuModelInit((u8*)&lbl_803A6818 + 0xc4, 0x280, 0x1e0);
     lbl_8047A4E0 = 0;
     lbl_8047A4E0 = (u32)pdaAlloc(0x140, 0x20);
     lbl_804788C0 = memoDataGetCount(0);
@@ -7316,61 +7317,61 @@ void fn_80048918(void)
     cf0 = lbl_8047BCF0;
     c94 = lbl_8047BC94;
     cbc = lbl_8047BCBC;
-    *(f32*)(S + 0x2c) = c94;
-    *(f32*)(S + 0x30) = c94;
-    *(f32*)(S + 0x34) = c94;
-    *(f32*)(S + 0x38) = c94;
-    *(s32*)(S + 0x0) = 0;
-    *(s32*)(S + 0x28) = 0;
-    *(s32*)(S + 0x14) = 0;
-    *(s32*)(S + 0x4) = 0;
-    *(s32*)(S + 0x20) = 0;
-    *(f32*)(S + 0x44) = c94;
-    *(s8*)(S + 0x48) = 0;
-    *(f32*)(S + 0x64) = cf0;
-    *(f32*)(S + 0x68) = cf0;
-    *(f32*)(S + 0x6c) = c94;
-    *(f32*)(S + 0x70) = c94;
-    *(f32*)(S + 0x74) = c94;
-    *(f32*)(S + 0x64) = cf0;
-    *(s32*)(S + 0x1c) = 0;
-    *(f32*)(S + 0x4c) = c94;
-    *(f32*)(S + 0x50) = cbc;
-    *(f32*)(S + 0x58) = c94;
-    *(f32*)(S + 0x54) = cbc;
-    *(f32*)(S + 0x5c) = cbc;
-    *(f32*)(S + 0x60) = cbc;
+    *(f32*)((u8*)&lbl_803A6818 + 0x2c) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x30) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x34) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x38) = c94;
+    *(s32*)((u8*)&lbl_803A6818 + 0x0) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x28) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x14) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x4) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x20) = 0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x44) = c94;
+    *(s8*)((u8*)&lbl_803A6818 + 0x48) = 0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x64) = cf0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x68) = cf0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x6c) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x70) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x74) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x64) = cf0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x1c) = 0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x4c) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x50) = cbc;
+    *(f32*)((u8*)&lbl_803A6818 + 0x58) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x54) = cbc;
+    *(f32*)((u8*)&lbl_803A6818 + 0x5c) = cbc;
+    *(f32*)((u8*)&lbl_803A6818 + 0x60) = cbc;
     lbl_804788C4 = 5;
-    *(s8*)(S + 0x158) = 0;
-    *(s8*)(S + 0x159) = 0;
-    *(s8*)(S + 0x15b) = 0;
-    *(s8*)(S + 0x15a) = 0;
-    *(s8*)(S + 0x15c) = 0;
-    *(s8*)(S + 0x15d) = 0;
-    *(s8*)(S + 0x15f) = 0;
-    *(s8*)(S + 0x15e) = 0;
-    *(s32*)(S + 0x154) = 0;
-    *(f32*)(S + 0x1e0) = lbl_8047BCCC;
-    *(f32*)(S + 0x1dc) = lbl_8047BCCC;
-    *(f32*)(S + 0x1cc) = c94;
-    *(f32*)(S + 0x1d0) = c94;
-    *(f32*)(S + 0x1d4) = c94;
-    *(f32*)(S + 0x1d8) = c94;
-    *(s8*)(S + 0x164) = 0;
-    *(s8*)(S + 0x178) = 0;
-    *(s8*)(S + 0x18c) = 0;
-    *(s8*)(S + 0x1a0) = 0;
-    *(s8*)(S + 0x1b4) = 0;
-    *(s32*)(S + 0x1e4) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x158) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x159) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x15b) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x15a) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x15c) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x15d) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x15f) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x15e) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x154) = 0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x1e0) = lbl_8047BCCC;
+    *(f32*)((u8*)&lbl_803A6818 + 0x1dc) = lbl_8047BCCC;
+    *(f32*)((u8*)&lbl_803A6818 + 0x1cc) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x1d0) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x1d4) = c94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x1d8) = c94;
+    *(s8*)((u8*)&lbl_803A6818 + 0x164) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x178) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x18c) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x1a0) = 0;
+    *(s8*)((u8*)&lbl_803A6818 + 0x1b4) = 0;
+    *(s32*)((u8*)&lbl_803A6818 + 0x1e4) = 0;
     fn_8003D4C8();
     if (lbl_804788C0 != 0) {
         pokemon = pdaLoadPokemon(lbl_803A6818.currentIndex);
-        if (fn_8010A210(S + 0x7c, pokemon) == 0) {
-            menuModelFree(S + 0x7c);
-            fn_80109C88(S + 0x7c, pokemon);
+        if (fn_8010A210((u8*)&lbl_803A6818 + 0x7c, pokemon) == 0) {
+            menuModelFree((u8*)&lbl_803A6818 + 0x7c);
+            fn_80109C88((u8*)&lbl_803A6818 + 0x7c, pokemon);
         }
         *((u8*)&lbl_803A6818 + 0x214) = 0;
-        switch (*(s32*)(S + 0x1c)) {
+        switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
         case 0:
         case 1:
         case 2:
@@ -7380,18 +7381,18 @@ void fn_80048918(void)
         case 8:
         case 0xb:
         case 0xc:
-            *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0(S + 0x7c);
+            *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
             break;
         case 5:
-            *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4(S + 0x7c, S + 0xc4);
-            *((u8*)&lbl_803A6818 + 0x214) = fn_8003D1FC_setup(S + 0xc4);
+            *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4((u8*)&lbl_803A6818 + 0x7c, (u8*)&lbl_803A6818 + 0xc4);
+            *((u8*)&lbl_803A6818 + 0x214) = fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
             break;
         default:
             break;
         }
     }
-    fn_8010A010(S + 0xc4, 0xf70400);
-    switch (*(s32*)(S + 0x1c)) {
+    fn_8010A010((u8*)&lbl_803A6818 + 0xc4, 0xf70400);
+    switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
     case 0:
     case 1:
     case 2:
@@ -7401,17 +7402,17 @@ void fn_80048918(void)
     case 8:
     case 0xb:
     case 0xc:
-        *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0(S + 0x7c);
+        *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
         break;
     case 5:
-        *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4(S + 0x7c, S + 0xc4);
-        *((u8*)&lbl_803A6818 + 0x214) = fn_8003D1FC_setup(S + 0xc4);
+        *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4((u8*)&lbl_803A6818 + 0x7c, (u8*)&lbl_803A6818 + 0xc4);
+        *((u8*)&lbl_803A6818 + 0x214) = fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
         break;
     default:
         break;
     }
     fn_8018F4C8(peopleInfoBiosGetPtr(0xf70400), 1, &motion, &out8);
-    menuModelSetMotion(S + 0xc4, motion);
+    menuModelSetMotion((u8*)&lbl_803A6818 + 0xc4, motion);
     total = lbl_8047A4E8;
     *(f32*)((u8*)&lbl_803A6818 + 0x40) = c94;
     *(s32*)((u8*)&lbl_803A6818 + 0x8) = -5;
