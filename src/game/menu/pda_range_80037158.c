@@ -6757,6 +6757,7 @@ static inline void pdaRamp(f32* cur, f32 dst, f32 rate)
 
 /* Per-frame scene animation and D-pad handling for the PDA summary page. */
 #pragma peephole off
+#pragma peephole on
 s32 fn_80041E48(void* work, s32 mode)
 {
     extern u32 fn_800D3088(void);
@@ -6876,6 +6877,7 @@ s32 fn_80041E48(void* work, s32 mode)
     }
     return 0;
 }
+#pragma peephole off
 #pragma peephole reset
 
 extern f32 lbl_8047BCE0;
