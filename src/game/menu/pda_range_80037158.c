@@ -145,7 +145,7 @@ extern PdaModelWindow lbl_803A6748;
 extern u8 lbl_803A67FC[];
 extern PdaSceneWork lbl_803A6818;
 
-extern void fn_8003B85C(void* window, s32 enabled);
+extern s32 fn_8003B85C(void* window, s32 enabled);
 extern void fn_8003C2B8(PdaSprite* sprite, PdaEvent* event);
 extern s32 fn_80041E48(void* work, s32 mode);
 extern s32 fn_80042658(void* work, s32 mode);
@@ -8078,5 +8078,246 @@ void fn_8004A7A8(void* work, PdaSprite* sprite)
     default:
         break;
     }
+}
+#pragma peephole reset
+
+extern f32 lbl_8047BACC;
+extern f32 lbl_8047BAD0;
+extern f32 lbl_8047BAD4;
+extern f32 lbl_8047BAD8;
+extern u32 lbl_8047A4D0;
+extern u32 lbl_8047A4DC;
+extern void fn_801EEDEC(u16 id, s32 flag);
+extern void pokemonBiosSetDarkpokemonDataId(u32 work, s32 id);
+extern void pokemonBiosSetDp(u32 work, s32 dp);
+
+/* Party-list scroll, cursor movement and the selected Pokemon preview. */
+#pragma peephole off
+s32 fn_8003B85C(void* window, s32 enabled)
+{
+    extern u32 fn_800D3088(void);
+    extern s32 fn_800D37CC(void);
+    u16* keys;
+    s32 prevIndex;
+    s32 held;
+    s32 idx;
+    u16 code;
+    u16 species;
+    u16 entry;
+    u16 rndId;
+    s32 mode;
+    u32 rnd;
+    f32 rate;
+    f32 moved;
+    f32 rest;
+    f32 step;
+    f32 dt;
+
+    keys = windowGetKeyInfo(window);
+    held = 0;
+    prevIndex = *(s32*)&lbl_803A6748;
+    dt = (f32)fn_800D3088() / (f32)fn_800D37CC();
+    *(f32*)((u8*)&lbl_803A6748 + 0x24) = dt;
+    *(f32*)((u8*)&lbl_803A6748 + 0x28) = *(f32*)((u8*)&lbl_803A6748 + 0x28) + dt;
+    if (*(f32*)((u8*)&lbl_803A6748 + 0x28) >= lbl_8047BAC8) {
+        *(f32*)((u8*)&lbl_803A6748 + 0x28) = lbl_8047BAC4;
+    }
+    if (*(f32*)((u8*)&lbl_803A6748 + 0x14) != *(f32*)((u8*)&lbl_803A6748 + 0x1c)) {
+        rate = lbl_8047BACC * *(f32*)((u8*)&lbl_803A6748 + 0x24);
+        if (*(s8*)((u8*)&lbl_803A6748 + 0x40) != 0) {
+            rate = lbl_8047BAD0 * rate;
+        }
+        moved = (*(f32*)((u8*)&lbl_803A6748 + 0x1c) - *(f32*)((u8*)&lbl_803A6748 + 0x14)) * rate;
+        *(f32*)((u8*)&lbl_803A6748 + 0x14) = *(f32*)((u8*)&lbl_803A6748 + 0x14) + moved;
+        rest = *(f32*)((u8*)&lbl_803A6748 + 0x1c) - *(f32*)((u8*)&lbl_803A6748 + 0x14);
+        if (moved > lbl_8047BAC4) {
+        } else {
+            moved = -moved;
+        }
+        if (rest > lbl_8047BAC4) {
+        } else {
+            rest = -rest;
+        }
+        if (rest <= moved) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x14) = *(f32*)((u8*)&lbl_803A6748 + 0x1c);
+        }
+    }
+    if (*(f32*)((u8*)&lbl_803A6748 + 0x18) != *(f32*)((u8*)&lbl_803A6748 + 0x20)) {
+        rate = lbl_8047BACC * *(f32*)((u8*)&lbl_803A6748 + 0x24);
+        if (*(s8*)((u8*)&lbl_803A6748 + 0x40) != 0) {
+            rate = lbl_8047BAD0 * rate;
+        }
+        moved = (*(f32*)((u8*)&lbl_803A6748 + 0x20) - *(f32*)((u8*)&lbl_803A6748 + 0x18)) * rate;
+        *(f32*)((u8*)&lbl_803A6748 + 0x18) = *(f32*)((u8*)&lbl_803A6748 + 0x18) + moved;
+        rest = *(f32*)((u8*)&lbl_803A6748 + 0x20) - *(f32*)((u8*)&lbl_803A6748 + 0x18);
+        if (moved > lbl_8047BAC4) {
+        } else {
+            moved = -moved;
+        }
+        if (rest > lbl_8047BAC4) {
+        } else {
+            rest = -rest;
+        }
+        if (rest <= moved) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x18) = *(f32*)((u8*)&lbl_803A6748 + 0x20);
+        }
+    }
+    if (*(f32*)((u8*)&lbl_803A6748 + 0x2c) != *(f32*)((u8*)&lbl_803A6748 + 0x34)) {
+        rate = lbl_8047BACC * *(f32*)((u8*)&lbl_803A6748 + 0x24);
+        if (*(s8*)((u8*)&lbl_803A6748 + 0x40) != 0) {
+            rate = lbl_8047BAD0 * rate;
+        }
+        moved = (*(f32*)((u8*)&lbl_803A6748 + 0x34) - *(f32*)((u8*)&lbl_803A6748 + 0x2c)) * rate;
+        *(f32*)((u8*)&lbl_803A6748 + 0x2c) = *(f32*)((u8*)&lbl_803A6748 + 0x2c) + moved;
+        rest = *(f32*)((u8*)&lbl_803A6748 + 0x34) - *(f32*)((u8*)&lbl_803A6748 + 0x2c);
+        if (moved > lbl_8047BAC4) {
+        } else {
+            moved = -moved;
+        }
+        if (rest > lbl_8047BAC4) {
+        } else {
+            rest = -rest;
+        }
+        if (rest <= moved) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x2c) = *(f32*)((u8*)&lbl_803A6748 + 0x34);
+        }
+    }
+    if (*(f32*)((u8*)&lbl_803A6748 + 0x30) != *(f32*)((u8*)&lbl_803A6748 + 0x38)) {
+        rate = lbl_8047BACC * *(f32*)((u8*)&lbl_803A6748 + 0x24);
+        if (*(s8*)((u8*)&lbl_803A6748 + 0x40) != 0) {
+            rate = lbl_8047BAD0 * rate;
+        }
+        moved = (*(f32*)((u8*)&lbl_803A6748 + 0x38) - *(f32*)((u8*)&lbl_803A6748 + 0x30)) * rate;
+        *(f32*)((u8*)&lbl_803A6748 + 0x30) = *(f32*)((u8*)&lbl_803A6748 + 0x30) + moved;
+        rest = *(f32*)((u8*)&lbl_803A6748 + 0x38) - *(f32*)((u8*)&lbl_803A6748 + 0x30);
+        if (moved > lbl_8047BAC4) {
+        } else {
+            moved = -moved;
+        }
+        if (rest > lbl_8047BAC4) {
+        } else {
+            rest = -rest;
+        }
+        if (rest <= moved) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x30) = *(f32*)((u8*)&lbl_803A6748 + 0x38);
+        }
+    }
+
+    if (*(f32*)((u8*)&lbl_803A6748 + 0x48) != *(f32*)((u8*)&lbl_803A6748 + 0x44)) {
+        step = *(f32*)((u8*)&lbl_803A6748 + 0x24) / lbl_8047BAD4;
+        if (*(f32*)((u8*)&lbl_803A6748 + 0x48) > *(f32*)((u8*)&lbl_803A6748 + 0x44)) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x44) = *(f32*)((u8*)&lbl_803A6748 + 0x44) + step;
+            if (*(f32*)((u8*)&lbl_803A6748 + 0x44) > lbl_8047BAC8) {
+                *(f32*)((u8*)&lbl_803A6748 + 0x44) = lbl_8047BAC8;
+            }
+        } else {
+            *(f32*)((u8*)&lbl_803A6748 + 0x44) = *(f32*)((u8*)&lbl_803A6748 + 0x44) - step;
+            if (*(f32*)((u8*)&lbl_803A6748 + 0x44) < lbl_8047BAC4) {
+                *(f32*)((u8*)&lbl_803A6748 + 0x44) = lbl_8047BAC4;
+            }
+        }
+    }
+
+    if (*(s8*)((u8*)&lbl_803A6748 + 0x40) != 0) {
+        code = keys[0];
+    } else {
+        code = keys[3];
+    }
+    if ((keys[0] & 3) != 0) {
+        held = 1;
+    }
+    if ((code & 2) != 0) {
+        if (lbl_8047A4DC != 0) {
+            if (*(s32*)&lbl_803A6748 < (s32)lbl_8047A4DC - 1) {
+                if (enabled != 0) {
+                    fn_801EEDEC(lbl_8047A4D4[*(s32*)&lbl_803A6748].battleId, 0);
+                }
+                *(s32*)&lbl_803A6748 = *(s32*)&lbl_803A6748 + 1;
+                fn_80166AB8(0x23, 0, 0);
+            }
+            if (*(s32*)&lbl_803A6748 >= *(s32*)((u8*)&lbl_803A6748 + 0xc)) {
+                *(f32*)((u8*)&lbl_803A6748 + 0x20) = *(f32*)((u8*)&lbl_803A6748 + 0x20) - lbl_8047BAD8;
+                *(s32*)((u8*)&lbl_803A6748 + 0xc) = *(s32*)((u8*)&lbl_803A6748 + 0xc) + 1;
+                *(s32*)((u8*)&lbl_803A6748 + 0x8) = *(s32*)((u8*)&lbl_803A6748 + 0x8) + 1;
+            }
+        }
+    }
+    if ((code & 1) != 0) {
+        if (*(s32*)&lbl_803A6748 > 0) {
+            if (enabled != 0) {
+                fn_801EEDEC(lbl_8047A4D4[*(s32*)&lbl_803A6748].battleId, 0);
+            }
+            *(s32*)&lbl_803A6748 = *(s32*)&lbl_803A6748 - 1;
+            fn_80166AB8(0x23, 0, 0);
+        }
+        if (*(s32*)&lbl_803A6748 < *(s32*)((u8*)&lbl_803A6748 + 0x8)) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x20) = *(f32*)((u8*)&lbl_803A6748 + 0x20) + lbl_8047BAD8;
+            *(s32*)((u8*)&lbl_803A6748 + 0x8) = *(s32*)((u8*)&lbl_803A6748 + 0x8) - 1;
+            *(s32*)((u8*)&lbl_803A6748 + 0xc) = *(s32*)((u8*)&lbl_803A6748 + 0xc) - 1;
+        }
+    }
+
+    if (held != 0) {
+        if (*(f32*)((u8*)&lbl_803A6748 + 0x3c) < lbl_8047BAC8) {
+            *(f32*)((u8*)&lbl_803A6748 + 0x3c) = *(f32*)((u8*)&lbl_803A6748 + 0x3c) + *(f32*)((u8*)&lbl_803A6748 + 0x24);
+            if (*(f32*)((u8*)&lbl_803A6748 + 0x3c) >= lbl_8047BAC8) {
+                *(s8*)((u8*)&lbl_803A6748 + 0x40) = 1;
+            }
+        }
+    } else {
+        *(f32*)((u8*)&lbl_803A6748 + 0x3c) = lbl_8047BAC4;
+        *(s8*)((u8*)&lbl_803A6748 + 0x40) = 0;
+    }
+
+    if (enabled != 0) {
+        if (prevIndex != *(s32*)&lbl_803A6748) {
+            if (fn_801EE8F4(lbl_8047A4D4[*(s32*)&lbl_803A6748].battleId) != 0) {
+                idx = *(s32*)&lbl_803A6748;
+                species = lbl_8047A4D4[idx].field_00;
+                entry = lbl_8047A4D4[(u16)idx].battleId;
+                rndId = lbl_8047A4D4[idx].battleId;
+                fn_801EE614(entry);
+                fn_801EE8F4(entry);
+                if (fn_801EEAD0(entry) != 0) {
+                    if (fn_801EEC74(entry) != 0) {
+                        mode = 1;
+                    } else {
+                        mode = 0;
+                    }
+                } else {
+                    mode = 2;
+                }
+                pokemonCreate(lbl_8047A4D0, species, 10,
+                              gamedataGetStatus(0, 1));
+                rnd = *(u32*)((u8*)&lbl_803A6748 + 0x98);
+                fn_801EE750(rndId);
+                pokemonBiosSetRnd(lbl_8047A4D0, rnd);
+                switch (mode) {
+                case 0:
+                case 2:
+                    pokemonBiosSetDarkpokemonDataId(lbl_8047A4D0, 1);
+                    pokemonBiosSetDp(lbl_8047A4D0, 10);
+                    break;
+                case 1:
+                    pokemonBiosSetDarkpokemonDataId(lbl_8047A4D0, 0);
+                    pokemonBiosSetDp(lbl_8047A4D0, 0);
+                    break;
+                default:
+                    break;
+                }
+                fn_80109C88((u8*)&lbl_803A6748 + 0x4c, lbl_8047A4D0);
+            }
+        }
+        *(f32*)((u8*)&lbl_803A6748 + 0x18) = *(f32*)((u8*)&lbl_803A6748 + 0x20);
+        idx = *(s32*)&lbl_803A6748 - *(s32*)((u8*)&lbl_803A6748 + 0x8);
+        if (idx >= 10) {
+            idx = 9;
+        }
+        *(f32*)((u8*)&lbl_803A6748 + 0x38) =
+            (f32)(*(s16*)(lbl_802EF0A8 + 0x50a0) + idx * 0x18);
+        *(f32*)((u8*)&lbl_803A6748 + 0x30) =
+            (f32)(*(s16*)(lbl_802EF0A8 + 0x50a0) + idx * 0x18);
+    }
+    return 0;
 }
 #pragma peephole reset
