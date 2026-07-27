@@ -1113,7 +1113,7 @@ s32 fn_80038A0C(void)
 s32 fn_80039004(PdaSprite* context, PdaSprite* sprite)
 {
     extern f32 lbl_803A65B0[][3];
-    s32 index;
+    s8 index;
 
     index = context->selectedIndex;
     if (index < 0 || index >= 8) {
@@ -1435,7 +1435,7 @@ s32 fn_8003A6C0(PdaDrawWork* work, PdaSprite* sprite)
     extern s32 lbl_8047A4C8;
     extern void fn_800FB8C8(s32, s32, s16, s16, void*, s32);
     extern void msgctrlSetValue(s32 id, s32 value);
-    s32 index;
+    s8 index;
     s32 divisor;
     s32 i;
 
@@ -1463,6 +1463,124 @@ s32 fn_8003A6C0(PdaDrawWork* work, PdaSprite* sprite)
 }
 
 #pragma peephole off
+typedef struct PdaNumberRange {
+    s32 max;
+    s32 min;
+} PdaNumberRange;
+
+typedef struct PdaNumberWork {
+    u8 pad00[0x60];
+    PdaNumberRange* range;
+    u8 pad64[0x31];
+    s8 digitIndex;
+} PdaNumberWork;
+
+/* Digit-wise spinner for the PDA's numeric entry field: left/right step the
+   selected digit with wraparound inside the field's range, up/down move
+   between digits. */
+#pragma peephole off
+s32 fn_8003A7F0(PdaNumberWork* work)
+{
+    extern PdaKeyInfo* windowGetKeyInfo(void);
+    extern s32 lbl_8047A4C8;
+    extern void fn_80166A50(s32 id, s32 a, s32 b, s32 c);
+    PdaKeyInfo* keyInfo;
+    PdaNumberRange* range;
+    s32 step;
+    s32 i;
+    s32 cur;
+    s32 digit;
+    s32 base;
+    s32 limit;
+    s32 value;
+    s8 index;
+
+    range = work->range;
+    keyInfo = windowGetKeyInfo();
+    if ((keyInfo->buttons & 0xf) != 0) {
+        step = 1;
+        for (i = 0; i < work->digitIndex; i++) {
+            step *= 10;
+        }
+        if ((keyInfo->buttons & 1) != 0 && range->max != range->min) {
+            if (step < 10) {
+                value = lbl_8047A4C8 + step;
+                lbl_8047A4C8 = value;
+                if (value > range->max) {
+                    lbl_8047A4C8 = range->min;
+                }
+                fn_80166A50(0x3c5, 0, 0xff, 0);
+            } else {
+                cur = lbl_8047A4C8;
+                digit = (cur / step) % 10;
+                base = cur - digit * step;
+                for (limit = 9; limit >= 0; limit--) {
+                    if (base + limit * step <= range->max) {
+                        break;
+                    }
+                }
+                digit++;
+                if (digit > limit) {
+                    digit = 0;
+                }
+                value = base + digit * step;
+                lbl_8047A4C8 = value;
+                if (value < range->min) {
+                    lbl_8047A4C8 = range->min;
+                } else {
+                    fn_80166A50(0x3c5, 0, 0xff, 0);
+                }
+            }
+        }
+        if ((keyInfo->buttons & 2) != 0 && range->max != range->min) {
+            if (step < 10) {
+                value = lbl_8047A4C8 - step;
+                lbl_8047A4C8 = value;
+                if (value < range->min) {
+                    lbl_8047A4C8 = range->max;
+                }
+                fn_80166A50(0x3c5, 0, 0xff, 0);
+            } else {
+                cur = lbl_8047A4C8;
+                digit = (cur / step) % 10;
+                base = cur - digit * step;
+                for (limit = 9; limit >= 0; limit--) {
+                    if (base + limit * step <= range->max) {
+                        break;
+                    }
+                }
+                digit--;
+                if (digit < 0) {
+                    digit = limit;
+                }
+                value = base + digit * step;
+                lbl_8047A4C8 = value;
+                if (value < range->min) {
+                    lbl_8047A4C8 = range->min;
+                } else {
+                    fn_80166A50(0x3c5, 0, 0xff, 0);
+                }
+            }
+        }
+        if ((keyInfo->buttons & 8) != 0) {
+            index = work->digitIndex - 1;
+            work->digitIndex = index;
+            if (index < 0) {
+                work->digitIndex = 0;
+            }
+        }
+        if ((keyInfo->buttons & 4) != 0) {
+            index = work->digitIndex + 1;
+            work->digitIndex = index;
+            if (index >= 3) {
+                work->digitIndex = 2;
+            }
+        }
+    }
+    return 0;
+}
+#pragma peephole reset
+
 s32 fn_8003AC50(PdaMenuState* state)
 {
     extern void winSeqSetMenu(s32 sequence, s32 menu);
@@ -9235,7 +9353,7 @@ s32 fn_80039644(void* work, PdaSprite* sprite)
     s32 slots;
     s32 i;
     s32 j;
-    s32 index;
+    s8 index;
     s32 found;
     s32 rowY;
     s32 nameX;
