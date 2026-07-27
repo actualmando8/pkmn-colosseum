@@ -2789,9 +2789,8 @@ void fn_8003B478(u8* context)
     }
     fn_80132A38(0x37, msg);
     {
-        s32 colorMask = -0x100;
         u32 alpha = context[0x8B];
-        s32 color = alpha | colorMask;
+        s32 color = alpha | -0x100LL;
 
         fn_800FB680(0, 0, color, (void*)0xCF);
     }
@@ -3137,17 +3136,15 @@ void fn_8003B2D8(u8* context)
     }
     fn_80132A38(0x37, caption);
     {
-        s32 colorMask = -0x100;
         u32 alpha = context[0x8B];
 
-        fn_800FB680(0, 0, alpha | colorMask, (void*)0xE7);
+        fn_800FB680(0, 0, alpha | -0x100LL, (void*)0xE7);
     }
     fn_80132A38(0x37, message);
     {
-        s32 colorMask = -0x100;
         u32 alpha = context[0x8B];
 
-        fn_800FB680(0xB4, 0, alpha | colorMask, (void*)0xE7);
+        fn_800FB680(0xB4, 0, alpha | -0x100LL, (void*)0xE7);
     }
 }
 #pragma peephole reset
@@ -8457,7 +8454,7 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
             idx -= 0xd;
             msgctrlSetValue(0x34, value % 10);
             value = value / 10;
-            fn_800FB680(idx + 0x24, 0, sprite->alpha | -0x100, (void*)0xca);
+            fn_800FB680(idx + 0x24, 0, sprite->alpha | -0x100LL, (void*)0xca);
         }
         break;
     case 0x777:
