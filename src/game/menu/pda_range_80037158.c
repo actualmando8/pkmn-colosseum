@@ -7897,38 +7897,40 @@ void fn_80046168(void)
                 }
                 t++;
             }
-            if ((u8)playing == 0) {
-                cancel = 1;
-            } else if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x8) != 0) {
-                cancel = 1;
-            } else if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x4) != 0) {
-                cancel = 1;
-            } else {
-                x = fn_800F7A08(1, 0);
-                y = fn_800F7A7C(1, 0);
-                if ((y < 0 ? -y : y) > 0x20 || (x < 0 ? -x : x) > 0x20) {
-                    ang = atan2((f64)y, (f64)x);
-                    if (pdaFabs(ang) < lbl_8047BCFC) {
-                        cancel = 1;
-                    } else if (pdaFabs(ang) > lbl_8047BD00) {
-                        cancel = 1;
+            if ((u8)playing != 0) {
+                if ((fn_800F7BC4(1) & fn_800F7AF0(1) & 0x8) != 0) {
+                    cancel = 1;
+                } else if ((fn_800F7BC4(1) & fn_800F7AF0(1) & 0x4) != 0) {
+                    cancel = 1;
+                } else {
+                    x = fn_800F7A08(1, 0);
+                    y = fn_800F7A7C(1, 0);
+                    if ((y < 0 ? -y : y) > 0x20 || (x < 0 ? -x : x) > 0x20) {
+                        ang = atan2((f64)y, (f64)x);
+                        if (pdaFabs(ang) < lbl_8047BCFC) {
+                            cancel = 1;
+                        } else if (pdaFabs(ang) > lbl_8047BD00) {
+                            cancel = 1;
+                        } else {
+                            cancel = 0;
+                        }
                     } else {
                         cancel = 0;
                     }
-                } else {
-                    cancel = 0;
                 }
+            } else {
+                cancel = 1;
             }
             if (cancel == 1) {
                 menuCloseCustom(0x3e, 0, 1);
                 *(s32*)(S + 0x20) = 0;
             } else {
-                if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x100) != 0) {
+                if ((fn_800F7BC4(1) & fn_800F7AF0(1) & 0x100) != 0) {
                     voice = pdaCurrentVoice();
                     fn_80166AB8(voice, 0, 0);
                     pdaPushCry(pdaCurrentCry(), voice);
                 }
-                if ((fn_800F7AF0(1) & fn_800F7BC4(1) & 0x200) != 0) {
+                if ((fn_800F7BC4(1) & fn_800F7AF0(1) & 0x200) != 0) {
                     if (*(s32*)(S + 0x1c) == 2) {
                         *(s32*)(S + 0x1c) = 8;
                         menuCloseCustom(0x3e, 0, 1);
@@ -8428,6 +8430,9 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
     case 0x75d:
     case 0x75e:
     case 0x75f:
+    case 0x439:
+        *(s32*)(lbl_803A6A60 + 0x20) = GSmsgGetRect(sprite->messageId) >> 16;
+        break;
     case 0x760:
     case 0x761:
     case 0x762:
@@ -8435,9 +8440,6 @@ s32 fn_800499BC(void* work, PdaSprite* sprite)
     case 0x764:
     case 0x765:
         fn_8004B598((s32)work, sprite, sprite->eventId);
-        break;
-    case 0x439:
-        *(s32*)(lbl_803A6A60 + 0x20) = GSmsgGetRect(sprite->messageId) >> 16;
         break;
     case 0x754:
         msgctrlSetValue(0x4c, fn_80005748());
