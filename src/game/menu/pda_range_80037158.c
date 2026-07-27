@@ -1992,13 +1992,16 @@ void fn_8003B478(u8* context)
     fn_800FB680(0, 0, (s8)context[0x8B], (void*)0xCF);
 }
 
+#pragma peephole off
 void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
 {
     u32 periods[3];
+    u8 raw;
+    u8 sel;
     s8 selection;
     f32* angles;
     s16* layout;
-    u32 active;
+    f32 step;
 
     periods[0] = ((u32*)lbl_80267190)[0];
     periods[1] = ((u32*)lbl_80267190)[1];
@@ -2024,25 +2027,30 @@ void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
         break;
     }
 
-    selection = (s8)lbl_803A6A60[0];
-    if (selection < 0) {
-        selection = (s8)lbl_803A6A60[0x48];
+    raw = lbl_803A6A60[0];
+    if ((s8)raw < 0) {
+        sel = lbl_803A6A60[0x48];
     } else {
-        lbl_803A6A60[0x48] = selection;
+        sel = raw;
+        lbl_803A6A60[0x48] = raw;
     }
-    active = *(u32*)(lbl_803A6A60 + 0x44);
+    selection = (s8)sel;
     switch (selection) {
     case 0:
-        layout = (s16*)(lbl_802EF0A8 + (active + 0x6E7) * 0x1C);
+        layout = (s16*)(lbl_802EF0A8 +
+                        (*(u32*)(lbl_803A6A60 + 0x44) + 0x6E7) * 0x1C);
         break;
     case 1:
-        layout = (s16*)(lbl_802EF0A8 + (active + 0x75D) * 0x1C);
+        layout = (s16*)(lbl_802EF0A8 +
+                        (*(u32*)(lbl_803A6A60 + 0x44) + 0x75D) * 0x1C);
         break;
     case 2:
-        layout = (s16*)(lbl_802EF0A8 + (active + 0x760) * 0x1C);
+        layout = (s16*)(lbl_802EF0A8 +
+                        (*(u32*)(lbl_803A6A60 + 0x44) + 0x760) * 0x1C);
         break;
     case 3:
-        layout = (s16*)(lbl_802EF0A8 + (active + 0x763) * 0x1C);
+        layout = (s16*)(lbl_802EF0A8 +
+                        (*(u32*)(lbl_803A6A60 + 0x44) + 0x763) * 0x1C);
         break;
     default:
         layout = (s16*)(lbl_802EF0A8 + 0xC144);
@@ -2050,18 +2058,23 @@ void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
     }
 
     angles = (f32*)(lbl_803A6A60 + 0xC);
-    angles[active] += *(f32*)(lbl_803A6A60 + 8) *
-                      (lbl_8047BDF0 / *(f32*)&periods[active]);
-    if (angles[active] > lbl_8047BDF0) {
-        angles[active] -= lbl_8047BDF0;
+    step = *(f32*)(lbl_803A6A60 + 8) *
+           (lbl_8047BDF0 / *(f32*)&periods[*(u32*)(lbl_803A6A60 + 0x44)]);
+    angles[*(u32*)(lbl_803A6A60 + 0x44)] =
+        angles[*(u32*)(lbl_803A6A60 + 0x44)] + step;
+    if (angles[*(u32*)(lbl_803A6A60 + 0x44)] > lbl_8047BDF0) {
+        angles[*(u32*)(lbl_803A6A60 + 0x44)] =
+            angles[*(u32*)(lbl_803A6A60 + 0x44)] - lbl_8047BDF0;
     }
-    if (angles[active] < lbl_8047BDAC) {
-        angles[active] += lbl_8047BDF0;
+    if (angles[*(u32*)(lbl_803A6A60 + 0x44)] < lbl_8047BDAC) {
+        angles[*(u32*)(lbl_803A6A60 + 0x44)] =
+            angles[*(u32*)(lbl_803A6A60 + 0x44)] + lbl_8047BDF0;
     }
-    sprite->value = angles[active];
+    sprite->value = angles[*(u32*)(lbl_803A6A60 + 0x44)];
     sprite->field_50 = layout[1];
     sprite->field_52 = layout[2];
 }
+#pragma peephole reset
 
 void fn_8003CF38(void)
 {
