@@ -1320,7 +1320,6 @@ s32 fn_8004E8E0(PdaMailWindowA* window)
  * modal list-menu open/poll/close idiom -- same call skeleton as the
  * gs_event_exec.c item-quantity-picker (menu_id, input-state,
  * &config, 0, 1, 1, &out), open by id, close by id. */
-extern u32 windowGetActiveID(void);
 extern s32 menuOpenCustom(s32 menuId, ...);
 extern void menuClose(s32 menuId);
 extern void menuCloseSync(s32 menuId, s32 flag);
@@ -1734,7 +1733,6 @@ void fn_8004E9C0(s32 mailId)
 }
 
 extern u32 fn_80103E68(u32 id);
-extern s32 fn_8004BE40(s32 index);
 extern s32 fn_801D1A88(s32 id);
 extern s32 fn_801D1ACC(s32 id);
 extern s32 fn_801D16F0(s32 id);
@@ -2029,12 +2027,11 @@ u32 fn_8004DDC0(u8* context)
 #pragma peephole reset
 
 extern u32 fn_8016557C(void);
-extern u32 fn_800F9418(u32 size, u32 align, u32 arg2, u32 group, u32 arg4);
-extern void fn_800F9378(u32 buffer, u32 arg1, u32 group, u32 arg3);
+extern u32 GSresAllocResourceAlign(u32 size, u32 align, u32 arg2, u32 group, u32 arg4);
+extern void GSresRegisterResource(u32 buffer, u32 arg1, u32 group, u32 arg3);
 extern void fn_800F9210(u32 arg0, u32 group);
 extern void fn_80165548(u32 state);
 extern s32 fn_801026A4(u32 menuId, ...);
-extern u32 fn_801046B8(void);
 extern void fn_80102510(u32 menuId);
 
 #pragma peephole off
@@ -2047,8 +2044,8 @@ u8 fn_8004DFCC(u8 initialSelection)
 
     selection = initialSelection;
     state = fn_8016557C();
-    lbl_8047A52C = fn_800F9418(0x10000, 0x20, 0, 0x408, 0);
-    fn_800F9378(lbl_8047A52C, 0, 0x408, 0);
+    lbl_8047A52C = GSresAllocResourceAlign(0x10000, 0x20, 0, 0x408, 0);
+    GSresRegisterResource(lbl_8047A52C, 0, 0x408, 0);
     lbl_8047A524 = initialSelection;
     soundId = fn_801D1650(initialSelection);
     if (soundId != 0) {
@@ -2058,7 +2055,7 @@ u8 fn_8004DFCC(u8 initialSelection)
         lbl_8047A528 = 0;
     }
 
-    result = fn_801026A4(0x76, fn_801046B8(), &selection, 0, 1, 0);
+    result = fn_801026A4(0x76, windowGetActiveID(), &selection, 0, 1, 0);
     if (result < 0 || result >= fn_801D1618()) {
         result = 0xFF;
     }

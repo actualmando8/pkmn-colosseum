@@ -33,7 +33,7 @@ extern s32 lbl_8047A4BC;
 extern f32 lbl_8047A4C0;
 extern u8 lbl_803A6498[];
 extern u8 lbl_80314F98[];
-extern void* fn_80134768(void*, s16);
+extern void* pcboxGetItem(void*, s16);
 
 extern f32 lbl_8047BA58;
 extern f32 lbl_8047BA5C;
@@ -681,7 +681,6 @@ s32 fn_80038250(PdaMenuState* state)
 #pragma peephole off
 s32 fn_800382E8(PdaMenuState* state)
 {
-    extern void winSeqSetMenu(s32 sequence, s32 menu);
 
     switch (state->mode) {
     case 0:
@@ -866,7 +865,6 @@ void fn_8003842C(void)
     extern u8 lbl_802E51C8[];
     extern u8 lbl_802EF0A8[];
     extern s32 menuOpen(s32 menu, s32 mode);
-    extern void menuCloseCustom(s32 slot, s32 arg1, s32 arg2);
     extern void fn_801661D0(s32 a, s32 b, s32 c, s32 d);
     extern void fn_801660D8(s32 a, s32 b, s32 c);
     extern void fn_800FF660(void);
@@ -1001,7 +999,6 @@ s32 fn_80038A0C(void)
 {
     extern u8 lbl_802E51C8[];
     extern s32 menuOpen(s32 menu, s32 mode);
-    extern void menuCloseCustom(s32 slot, s32 arg1, s32 arg2);
     extern s8 menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);
     extern u32 fn_80005748(void);
     extern void fn_800056EC(f32 seconds);
@@ -1257,7 +1254,6 @@ s32 fn_80039A84(void)
 {
     extern PdaKeyInfo* windowGetKeyInfo(void);
     extern u16 pcboxGetNbItemSlot(s32 box);
-    extern void* pcboxGetItem(s32 box, s16 slot);
     extern u16 itemBiosGetItemDataId(void* item);
     extern void* itemDataBiosGetPtr(u16 id);
     extern s32 itemDataBiosGetDoc(void* data);
@@ -1446,7 +1442,6 @@ void fn_8003A10C(s32 mode)
     extern void menuClose(s32 menu);
     extern void menuCloseSync(s32 menu, s32 sync);
     extern u16 pcboxGetNbItemSlot(s32 box);
-    extern void* pcboxGetItem(s32 box, s16 slot);
     extern s32 itemBiosGetItemDataId(void* item);
     extern s32 itemBiosGetNum(void* item);
     extern void* itemDataBiosGetPtr(s32 id);
@@ -1758,7 +1753,6 @@ s32 fn_8003A7F0(PdaNumberWork* work)
 
 s32 fn_8003AC50(PdaMenuState* state)
 {
-    extern void winSeqSetMenu(s32 sequence, s32 menu);
 
     switch (state->mode) {
     case 0:
@@ -2338,12 +2332,12 @@ extern u32 fn_80102510();
 extern u32 fn_8010264C();
 extern u32 fn_801040F0();
 extern u8* fn_80105624();
-extern u32 fn_80109934();
+extern u32 menuModelRender();
 extern u32 fn_80109B90();
 extern u32 fn_8011D8D8();
 extern u32 fn_8011D8F4();
 extern u32 fn_8011DFE0();
-extern u32 fn_801231A4();
+extern u32 pokemonGetSex();
 extern u32 fn_801240C4();
 extern u32 fn_80132A38();
 extern u32 fn_80166AB8(u32, u32, u32);
@@ -2361,7 +2355,7 @@ extern u8 fn_801EEC74();
 extern u8 fn_801EED88(u16);
 extern u16 fn_801EEFAC();
 extern u32 fn_801FCC7C();
-extern u32 fn_801FCCC4();
+extern u32 fightTrainerDataBiosGetPtr();
 extern u32 gamedataGetStatus();
 extern void menuCloseSync(s32, s32);
 extern u32 fn_80018F54();
@@ -2387,7 +2381,7 @@ void fn_8003AFDC(u8* context, PdaSprite* sprite)
         battleId = lbl_8047A4D4[lbl_803A6748.field_08].battleId;
         if (fn_801EE8F4(battleId) != 0 &&
             fn_80109B90((u8*)&lbl_803A6748 + 0x4C, 0) == 0) {
-            texture = fn_80109934((u8*)&lbl_803A6748 + 0x4C);
+            texture = menuModelRender((u8*)&lbl_803A6748 + 0x4C);
             if (texture != 0) {
                 fn_800D88DC(3);
                 fn_800D888C(4);
@@ -2472,9 +2466,9 @@ void fn_800492CC(u8* context, PdaSprite* sprite)
         break;
     }
     if (*((u8*)&lbl_803A6818 + 0x214) != 0) {
-        firstTexture = fn_80109934((u8*)&lbl_803A6818 + 0x7C);
+        firstTexture = menuModelRender((u8*)&lbl_803A6818 + 0x7C);
         if (mode == 5) {
-            secondTexture = fn_80109934((u8*)&lbl_803A6818 + 0xC4);
+            secondTexture = menuModelRender((u8*)&lbl_803A6818 + 0xC4);
         }
     } else {
         firstTexture = 0;
@@ -2665,7 +2659,7 @@ void fn_80044378(u8* context, PdaSprite* sprite)
         }
         return;
     case 0x76D:
-        fn_80132A38(0x34, fn_8025FEE4(0));
+        fn_80132A38(0x34, memoDataGetCount(0));
         return;
     }
 
@@ -2744,7 +2738,7 @@ void fn_8003B478(u8* context)
         message = 0x80;
     } else if (fn_801EE8F4(battleId) != 0) {
         fn_8011DFE0(model, fn_801EE750(battleId));
-        message = fn_801231A4(model);
+        message = pokemonGetSex(model);
         fn_8011DFE0(model, *(u32*)(window + 0x98));
     } else {
         message = 2;
@@ -3081,7 +3075,7 @@ void fn_8003B2D8(u8* context)
                 message = fn_801EE328(battleId);
                 secondary = 1;
             } else {
-                fn_801FCCC4();
+                fightTrainerDataBiosGetPtr();
                 message = fn_801FCC7C();
             }
         }
@@ -3116,7 +3110,7 @@ void fn_80037180(u32 unused, u8* p) {
         fn_80132A38(0x4c, result);
         fn_80132A38(0x2f, fn_801EF274());
         fn_80132A38(0x30, fn_801EF214());
-        if ((result = fn_80109934(lbl_803A6498)) != 0) {
+        if ((result = menuModelRender(lbl_803A6498)) != 0) {
             fn_800D88DC(3);
             fn_800D888C(4);
             fn_800D6A00(7);
@@ -3158,13 +3152,13 @@ void fn_80039F70(u8* ctx) {
         if ((s8)ctx[2] != 0) {
             return;
         }
-        fn_801080CC(0x25, 0xb4);
+        winSeqSetMenu(0x25, 0xb4);
         target = lbl_8047A4A8 + lbl_8047A4AC;
         count = (u16)fn_801347D0(0);
         seen = (u32)-1;
         entry = (void*)0;
         for (index = 0; index < (u32)count; index++) {
-            entry = fn_80134768((void*)0, (s16)index);
+            entry = pcboxGetItem((void*)0, (s16)index);
             if ((u8)fn_801429E8(entry) != 0) {
                 seen++;
                 if (seen >= target) {
@@ -3178,7 +3172,7 @@ void fn_80039F70(u8* ctx) {
             message = 0;
         }
         if (message != 0) {
-            message = fn_80143F84((void*)fn_801440A0(message));
+            message = itemDataBiosGetDoc((void*)fn_801440A0(message));
         } else {
             message = 0x1b68;
         }
@@ -3210,7 +3204,7 @@ void fn_80039F70(u8* ctx) {
         break;
     case 3:
         if ((s8)ctx[2] == 0) {
-            fn_801080CC(0x25, 0xb8);
+            winSeqSetMenu(0x25, 0xb8);
             ctx[2] = 1;
         }
         break;
@@ -3237,7 +3231,7 @@ void fn_8003B6D0(u8* ctx) {
             message = fn_800FA280(fn_8011E760());
         }
     } else {
-        record = fn_801FCA2C(fn_801FCC3C(fn_801FCCC4()));
+        record = fn_801FCA2C(fn_801FCC3C(fightTrainerDataBiosGetPtr()));
         message = fn_800FA280(fn_801FCA14(record));
         while (1) {
             value = (u32)(u8)fn_801FC964(record);
@@ -3418,9 +3412,9 @@ void fn_8003F2DC(u8* arr, s32 count, s32 dir) {
 #pragma peephole off
 void fn_80044630(void) {
     extern void  _threadSwitch(void);
-    extern u32   fn_80102568(u32 a, u32 b, u32 c);
+    extern u32   menuCloseCustom(u32 a, u32 b, u32 c);
     extern u32   fn_8010264C(u32 a, u32 b);
-    extern void  fn_800E01D0(void* dst, void* src);
+    extern void  GSvecCopy(void* dst, void* src);
     extern void  GSscene_SetMode(u32 mode);
     extern void  GScameraSetPerspective(void* cam, f32 a, f32 b, f32 c, f32 d);
     extern const f32 lbl_80267150[];
@@ -3436,19 +3430,19 @@ void fn_80044630(void) {
     extern void  fn_80046168(void);
     extern void  fn_8004BDB8(s32 a, s32 b);
     extern void* fn_801CBA0C(u32 id);
-    extern void* fn_800F9318();
+    extern void* GSresGetResource();
     extern void* fn_80113F48(void);
     extern void  fn_801CB9D8(void* h);
     extern void  fn_801CB954(void* h, s32 b);
-    extern void  fn_800E4014(void* a, s32 b);
-    extern void  fn_800EC9DC(f32 v);
-    extern void  fn_800EC160(void* h, s32 b);
-    extern void  fn_800E3C94(void* h, s32 b);
-    extern void  fn_800E3BC0(void);
+    extern void  GSmodelSetVisibility(void* a, s32 b);
+    extern void  GSmodelSetAnimRate(f32 v);
+    extern void  GSmodelSet60fpsAnimFlag(void* h, s32 b);
+    extern void  GSmodelSetBoundCheck(void* h, s32 b);
+    extern void  GSmodelDestroyLinkedParticles(void);
     extern void* fn_801DAC3C(void* h);
-    extern void  fn_80176E0C(u32 a, u32 id, u32 c, u32 d);
+    extern void  cameraPlayAnime(u32 a, u32 id, u32 c, u32 d);
     extern void  fn_8010A420(void* subobj);
-    extern void  fn_801096F8(s32 a);
+    extern void  menuOffScreenSetDisp(s32 a);
     extern u32   fn_800E202C(u32 flag);
     extern void  fn_800E24B0(void);
     extern void  fn_800E209C(u32 h);
@@ -3569,7 +3563,7 @@ void fn_80044630(void) {
                 *(s32*)(S + 0x1c) = 0xc;
                 *(f32*)(S + 0x50) = lbl_8047BC94;
                 *(f32*)(S + 0x58) = lbl_8047BCBC;
-                fn_80102568(0xce, 0, 0);
+                menuCloseCustom(0xce, 0, 0);
             }
             *(s32*)(S + 0x14) = 0;
         } break;
@@ -3673,13 +3667,13 @@ void fn_80044630(void) {
                 continue;
             }
             *(s32*)(S + 0x14) = 1;
-            fn_80102568(0x35, 0, 1);
+            menuCloseCustom(0x35, 0, 1);
             h = *(void**)(S + 0x10C);
             fn_801CB954(h, 0);
             {
-                void* rv = fn_800F9318(fn_80113F48(), h);
+                void* rv = GSresGetResource(fn_80113F48(), h);
                 if (rv != 0)
-                    fn_800E4014(rv, 0);
+                    GSmodelSetVisibility(rv, 0);
             }
         {
                 void* cam;
@@ -3700,10 +3694,10 @@ void fn_80044630(void) {
 
                 cam = fn_801CBA0C(0x0D181000);
                 *(void**)(S + 0x10C) = cam;
-                *(void**)(S + 0x110) = fn_800F9318(fn_80113F48(), cam);
-                fn_800EC9DC(lbl_8047BD18);
-                fn_800EC160(*(void**)(S + 0x110), 1);
-                fn_800E3C94(*(void**)(S + 0x110), 0);
+                *(void**)(S + 0x110) = GSresGetResource(fn_80113F48(), cam);
+                GSmodelSetAnimRate(lbl_8047BD18);
+                GSmodelSet60fpsAnimFlag(*(void**)(S + 0x110), 1);
+                GSmodelSetBoundCheck(*(void**)(S + 0x110), 0);
 
                 ((u32*)mtx)[0] = ((const u32*)tbl)[6];
                 ((u32*)mtx)[1] = ((const u32*)tbl)[7];
@@ -3711,7 +3705,7 @@ void fn_80044630(void) {
                 ((u32*)pos)[0] = ((const u32*)tbl)[9];
                 ((u32*)pos)[1] = ((const u32*)tbl)[10];
                 ((u32*)pos)[2] = ((const u32*)tbl)[11];
-                cam = fn_800F9318(0x17, 0x0D741800);
+                cam = GSresGetResource(0x17, 0x0D741800);
                 *(void**)(S + 0x114) = cam;
                 GScameraGetPosition(cam, pos);
                 GScameraGetRotation(cam, rot);
@@ -3720,16 +3714,16 @@ void fn_80044630(void) {
                 mtx[2] = *(f32*)((u8*)cam + 0x108);
                 GScameraGetPerspective(cam, &persp0, &persp1, &persp2, &persp3);
                 GScameraSetPerspective(cam, persp0, persp1, persp2, persp3);
-                fn_800E01D0(S118, pos);
-                fn_800E01D0(S124, rot);
-                fn_800E01D0(S130, mtx);
+                GSvecCopy(S118, pos);
+                GSvecCopy(S124, rot);
+                GSvecCopy(S130, mtx);
 
                 *(f32*)(S + 0x13C) = persp0;
                 *(f32*)(S + 0x140) = persp1;
                 *(f32*)(S + 0x144) = persp2;
                 *(f32*)(S + 0x148) = persp3;
 
-                fn_80176E0C(0x17, 0x0D741800, 0, 1);
+                cameraPlayAnime(0x17, 0x0D741800, 0, 1);
                 GSscene_SetMode(4);
 
                 *(s32*)(S + 0x78) = 1;
@@ -3747,7 +3741,7 @@ void fn_80044630(void) {
                         *(s32*)(S + 0x24) = 4;
                         *(f32*)(S + 0x60) = lbl_8047BC94;
                         if (fn_801DAC3C(*(void**)(S + 0xA0)) != 0)
-                            fn_800E3BC0();
+                            GSmodelDestroyLinkedParticles();
                         *(f32*)(S + 0x64) = lbl_8047BCA8;
                         break;
                     case 2:
@@ -3755,14 +3749,14 @@ void fn_80044630(void) {
                         *(s32*)(S + 0x24) = 5;
                         *(f32*)(S + 0x60) = lbl_8047BC94;
                         if (fn_801DAC3C(*(void**)(S + 0xA0)) != 0)
-                            fn_800E3BC0();
+                            GSmodelDestroyLinkedParticles();
                         break;
                     case 0:
                         *(s32*)(S + 0x1C) = 0xD;
                         *(s32*)(S + 0x24) = 2;
                         *(f32*)(S + 0x60) = lbl_8047BC94;
                         if (fn_801DAC3C(*(void**)(S + 0xA0)) != 0)
-                            fn_800E3BC0();
+                            GSmodelDestroyLinkedParticles();
                         break;
                     default:
                         break;
@@ -3888,16 +3882,16 @@ void fn_80044630(void) {
                 _threadSwitch();
             } else {
                 *(s32*)(S + 0x1C) = 0;
-                fn_80102568(0x3C, 0, 1);
-                fn_80102568(0x96, 0, 1);
-                fn_80102568(0xA2, 0, 1);
+                menuCloseCustom(0x3C, 0, 1);
+                menuCloseCustom(0x96, 0, 1);
+                menuCloseCustom(0xA2, 0, 1);
 
                 h = *(void**)(S + 0x10C);
                 fn_801CB954(h, 0);
                 {
-                    void* rv = fn_800F9318(fn_80113F48(), h);
+                    void* rv = GSresGetResource(fn_80113F48(), h);
                     if (rv != 0)
-                        fn_800E4014(rv, 0);
+                        GSmodelSetVisibility(rv, 0);
                 }
                 fn_801CB9D8(h);
 
@@ -3908,8 +3902,8 @@ void fn_80044630(void) {
 
                 h = fn_801CBA0C(0x0D171000);
                 *(void**)(S + 0x10C) = h;
-                *(void**)(S + 0x110) = fn_800F9318(fn_80113F48(), h);
-                fn_800EC9DC(lbl_8047BD18);
+                *(void**)(S + 0x110) = GSresGetResource(fn_80113F48(), h);
+                GSmodelSetAnimRate(lbl_8047BD18);
 
                 ((u32*)mtx)[0] = ((const u32*)tbl)[0];
                 ((u32*)mtx)[1] = ((const u32*)tbl)[1];
@@ -3917,7 +3911,7 @@ void fn_80044630(void) {
                 ((u32*)pos)[0] = ((const u32*)tbl)[3];
                 ((u32*)pos)[1] = ((const u32*)tbl)[4];
                 ((u32*)pos)[2] = ((const u32*)tbl)[5];
-                h = fn_800F9318(0x17, 0x0D731800);
+                h = GSresGetResource(0x17, 0x0D731800);
                 *(void**)(S + 0x114) = h;
 
                 GScameraGetPosition(h, pos);
@@ -3928,24 +3922,24 @@ void fn_80044630(void) {
                 mtx[2] = *(f32*)((u8*)h + 0x108);
                 GScameraGetPerspective(h, &staging0, &staging1, &staging2, &staging3);
 
-                fn_800E01D0(S218, pos);
-                fn_800E01D0(S218 + 0xC, mtx);
+                GSvecCopy(S218, pos);
+                GSvecCopy(S218 + 0xC, mtx);
                 *(f32*)(S218 + 0x18) = staging0;
                 *(f32*)(S218 + 0x1C) = staging1;
                 *(f32*)(S218 + 0x20) = staging2;
                 *(f32*)(S218 + 0x24) = staging3;
                 GScameraSetPerspective(h, staging0, staging1, staging2, staging3);
 
-                fn_800E01D0(S118, pos);
-                fn_800E01D0(S124, rot);
-                fn_800E01D0(S130, mtx);
+                GSvecCopy(S118, pos);
+                GSvecCopy(S124, rot);
+                GSvecCopy(S130, mtx);
 
                 *(f32*)(S + 0x13C) = staging0;
                 *(f32*)(S + 0x140) = staging1;
                 *(f32*)(S + 0x144) = staging2;
                 *(f32*)(S + 0x148) = staging3;
 
-                fn_80176E0C(0x17, 0x0D731800, 0, 1);
+                cameraPlayAnime(0x17, 0x0D731800, 0, 1);
                 GSscene_SetMode(4);
 
                 *(s32*)(S + 0x78) = 0;
@@ -4066,16 +4060,16 @@ void fn_80044630(void) {
             }
 
             *(s32*)(S + 0x1C) = 0;
-            fn_80102568(0xa1, 0, 1);
-            fn_80102568(0x96, 0, 1);
-            fn_80102568(0xa2, 0, 1);
+            menuCloseCustom(0xa1, 0, 1);
+            menuCloseCustom(0x96, 0, 1);
+            menuCloseCustom(0xa2, 0, 1);
 
             h = *(void**)(S + 0x10C);
             fn_801CB954(h, 0);
             {
-                void* rv = fn_800F9318(fn_80113F48(), h);
+                void* rv = GSresGetResource(fn_80113F48(), h);
                 if (rv != 0)
-                    fn_800E4014(rv, 0);
+                    GSmodelSetVisibility(rv, 0);
             }
 
             /* .L_800453AC camera-setup */
@@ -4087,8 +4081,8 @@ void fn_80044630(void) {
 
             h = fn_801CBA0C(0x0D171000);
             *(void**)(S + 0x10C) = h;
-            *(void**)(S + 0x110) = fn_800F9318(fn_80113F48(), h);
-            fn_800EC9DC(lbl_8047BD18);
+            *(void**)(S + 0x110) = GSresGetResource(fn_80113F48(), h);
+            GSmodelSetAnimRate(lbl_8047BD18);
 
             ((u32*)mtx)[0] = ((const u32*)tbl)[0];
             ((u32*)mtx)[1] = ((const u32*)tbl)[1];
@@ -4096,7 +4090,7 @@ void fn_80044630(void) {
             ((u32*)pos)[0] = ((const u32*)tbl)[3];
             ((u32*)pos)[1] = ((const u32*)tbl)[4];
             ((u32*)pos)[2] = ((const u32*)tbl)[5];
-            h = fn_800F9318(0x17, 0x0D731800);
+            h = GSresGetResource(0x17, 0x0D731800);
             *(void**)(S + 0x114) = h;
 
             GScameraGetPosition(h, pos);
@@ -4107,8 +4101,8 @@ void fn_80044630(void) {
             mtx[2] = *(f32*)((u8*)h + 0x108);
             GScameraGetPerspective(h, &px0, &px1, &px2, &px3);
 
-            fn_800E01D0(S218, pos);
-            fn_800E01D0(S218 + 0xC, mtx);
+            GSvecCopy(S218, pos);
+            GSvecCopy(S218 + 0xC, mtx);
 
             *(f32*)(S218 + 0x18) = px0;
             *(f32*)(S218 + 0x1C) = px1;
@@ -4116,16 +4110,16 @@ void fn_80044630(void) {
             *(f32*)(S218 + 0x24) = px3;
             GScameraSetPerspective(h, px0, px1, px2, px3);
 
-            fn_800E01D0(S118, pos);
-            fn_800E01D0(S124, rot);
-            fn_800E01D0(S130, mtx);
+            GSvecCopy(S118, pos);
+            GSvecCopy(S124, rot);
+            GSvecCopy(S130, mtx);
 
             *(f32*)(S + 0x13C) = px0;
             *(f32*)(S + 0x140) = px1;
             *(f32*)(S + 0x144) = px2;
             *(f32*)(S + 0x148) = px3;
 
-            fn_80176E0C(0x17, 0x0D731800, 0, 1);
+            cameraPlayAnime(0x17, 0x0D731800, 0, 1);
             GSscene_SetMode(4);
 
             *(s32*)(S + 0x78) = 0;
@@ -4239,14 +4233,14 @@ void fn_80044630(void) {
             }
 
             *(s32*)(S + 0x1C) = 0;
-            fn_80102568(0x96, 0, 1);
-            fn_80102568(0xA2, 0, 1);
+            menuCloseCustom(0x96, 0, 1);
+            menuCloseCustom(0xA2, 0, 1);
             h = *(void**)(S + 0x10C);
             fn_801CB954(h, 0);
             {
-                void* rv = fn_800F9318(fn_80113F48(), h);
+                void* rv = GSresGetResource(fn_80113F48(), h);
                 if (rv != 0)
-                    fn_800E4014(rv, 0);
+                    GSmodelSetVisibility(rv, 0);
             }
         {
                 f32 p3;
@@ -4267,8 +4261,8 @@ void fn_80044630(void) {
                 h = fn_801CBA0C(0x0D171000);
                 *(void**)(S + 0x10C) = h;
 
-                *(void**)(S + 0x110) = fn_800F9318(fn_80113F48(), h);
-                fn_800EC9DC(lbl_8047BD18);
+                *(void**)(S + 0x110) = GSresGetResource(fn_80113F48(), h);
+                GSmodelSetAnimRate(lbl_8047BD18);
 
                 ((u32*)mtx)[0] = ((const u32*)tbl)[0];
                 ((u32*)mtx)[1] = ((const u32*)tbl)[1];
@@ -4276,7 +4270,7 @@ void fn_80044630(void) {
                 ((u32*)pos)[0] = ((const u32*)tbl)[3];
                 ((u32*)pos)[1] = ((const u32*)tbl)[4];
                 ((u32*)pos)[2] = ((const u32*)tbl)[5];
-                h = fn_800F9318(0x17, 0x0D731800);
+                h = GSresGetResource(0x17, 0x0D731800);
                 *(void**)(S + 0x114) = h;
 
                 GScameraGetPosition(h, pos);
@@ -4287,8 +4281,8 @@ void fn_80044630(void) {
                 mtx[2] = *(f32*)((u8*)h + 0x108);
                 GScameraGetPerspective(h, &p0, &p1, &p2, &p3);
 
-                fn_800E01D0(S218, pos);
-                fn_800E01D0(S218 + 0x0C, mtx);
+                GSvecCopy(S218, pos);
+                GSvecCopy(S218 + 0x0C, mtx);
 
                 *(f32*)(S218 + 0x18) = p0;
                 *(f32*)(S218 + 0x1C) = p1;
@@ -4296,15 +4290,15 @@ void fn_80044630(void) {
                 *(f32*)(S218 + 0x24) = p3;
                 GScameraSetPerspective(h, p0, p1, p2, p3);
 
-                fn_800E01D0(S118, pos);
-                fn_800E01D0(S124, rotbuf);
-                fn_800E01D0(S130, mtx);
+                GSvecCopy(S118, pos);
+                GSvecCopy(S124, rotbuf);
+                GSvecCopy(S130, mtx);
 
                 *(f32*)(S + 0x13C) = p0;
                 *(f32*)(S + 0x140) = p1;
                 *(f32*)(S + 0x144) = p2;
                 *(f32*)(S + 0x148) = p3;
-                fn_80176E0C(0x17, 0x0D731800, 0, 1);
+                cameraPlayAnime(0x17, 0x0D731800, 0, 1);
                 GSscene_SetMode(4);
 
                 *(s32*)(S + 0x78) = 0;
@@ -4419,7 +4413,7 @@ void fn_80044630(void) {
 
             /* settle test */
             if (*(f32*)(S + 0x50) == *(f32*)(S + 0x4C)) {
-                fn_80102568(0x35, 0, 1);
+                menuCloseCustom(0x35, 0, 1);
                 *(s32*)(S + 0x1C) = 3;
                 *(f32*)(S + 0x50) = lbl_8047BCBC;
                 *(f32*)(S + 0x58) = lbl_8047BC94;
@@ -4532,8 +4526,8 @@ void fn_80044630(void) {
             /* converge */
             if (*(f32*)(S + 0x50) == *(f32*)(S + 0x4C)) {
                 *(s32*)(S + 0x1C) = 0;
-                fn_80102568(0x96, 0, 1);
-                fn_80102568(0xA2, 0, 1);
+                menuCloseCustom(0x96, 0, 1);
+                menuCloseCustom(0xA2, 0, 1);
                 *(s32*)(S + 0x14) = 0;
                 *(f32*)(S + 0x50) = lbl_8047BCBC;
                 *(f32*)(S + 0x58) = lbl_8047BC94;
@@ -4721,7 +4715,7 @@ void fn_80044630(void) {
         } break;
 
         case 0x64: { /* .L_80046040 */
-            fn_80102568(0x35, 0, 1);
+            menuCloseCustom(0x35, 0, 1);
             running = 0;
         } break;
 
@@ -4738,18 +4732,18 @@ void fn_80044630(void) {
     h = *(void**)(S + 0x10C);
     fn_801CB954(h, 0);
     {
-        void* rv = fn_800F9318(fn_80113F48(), h);
+        void* rv = GSresGetResource(fn_80113F48(), h);
         if (rv != 0)
-            fn_800E4014(rv, 0);
+            GSmodelSetVisibility(rv, 0);
     }
     fn_801CB9D8(h);
 
         h = *(void**)((u8*)&lbl_803A6818 + 0x150);
     fn_801CB954(h, 0);
     {
-        void* rv = fn_800F9318(fn_80113F48(), h);
+        void* rv = GSresGetResource(fn_80113F48(), h);
         if (rv != 0)
-            fn_800E4014(rv, 0);
+            GSmodelSetVisibility(rv, 0);
     }
     fn_801CB9D8(h);
 
@@ -4762,7 +4756,7 @@ void fn_80044630(void) {
         lbl_8047A4E0 = 0;
     }
 
-    fn_801096F8(1);
+    menuOffScreenSetDisp(1);
         fn_8010A420((u8*)&lbl_803A6818 + 0x7c);
         fn_8010A420((u8*)&lbl_803A6818 + 0xc4);
 
@@ -9361,7 +9355,6 @@ void fn_8003C7C0(void)
 extern f32 lbl_8047BAF8;
 extern f32 lbl_8047BAFC;
 extern f32 lbl_8047BB00;
-extern void* fightTrainerDataBiosGetPtr(u16 id);
 extern void* fightTrainerPokemonDataBiosGetPtr(void* data);
 extern void* fightTrainerPokemonDataBiosGetNickname(void* entry);
 extern u8 fightTrainerPokemonDataBiosGetDarkPokemonFlag(void* entry);
@@ -9544,7 +9537,6 @@ s32 fn_80038E74(void* work, PdaSprite* sprite)
 #pragma peephole reset
 
 extern u16 pcboxGetNbItemSlot(s32 box);
-extern void* pcboxGetItem(s32 box, s16 slot);
 extern u16 itemBiosGetItemDataId(void* item);
 extern void* itemDataBiosGetPtr(u16 id);
 extern void* itemDataBiosGetName(void* data);
