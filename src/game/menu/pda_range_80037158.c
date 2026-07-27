@@ -2428,7 +2428,7 @@ void fn_8003AFDC(u8* context, PdaSprite* sprite)
         } else {
             messageId = 0x36E7;
         }
-        fn_800FB680(0, 0, (s8)context[0x8B], (void*)messageId);
+        fn_800FB680(0, 0, context[0x8B] | -0x100, (void*)messageId);
         break;
     }
 }
