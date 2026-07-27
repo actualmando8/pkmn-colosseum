@@ -1429,6 +1429,171 @@ void fn_80039F44(void* button)
     }
 }
 
+/* PC item transfer loop: run the box list and move the highlighted stack
+   between the bag (mode 0) and the PC (mode 1) until the list is closed. */
+#pragma peephole off
+void fn_8003A10C(s32 mode)
+{
+    extern s32 menuOpen(s32 menu, s32 mode);
+    extern void menuClose(s32 menu);
+    extern void menuCloseSync(s32 menu, s32 sync);
+    extern u16 pcboxGetNbItemSlot(s32 box);
+    extern void* pcboxGetItem(s32 box, s16 slot);
+    extern s32 itemBiosGetItemDataId(void* item);
+    extern s32 itemBiosGetNum(void* item);
+    extern void* itemDataBiosGetPtr(s32 id);
+    extern u8 itemDataBiosGetKind(void* data);
+    extern s32 heroItemCheckAddItemDataId(s32 bag, s32 id);
+    extern void heroItemAddItemDataId(s32 bag, s32 id, u16 count, s32 slot);
+    extern void pcboxAddItem(s32 box, s32 id, u16 count);
+    extern void msgctrlSetValue(s32 id, s32 value);
+    extern void winMsgOpen(s32 a, s32 message, s32 b, s32 c);
+    extern void winMsgClose(s32 a);
+    extern s32 fn_8003AE84(void);
+    extern s32 fn_8003ACE8(s32 a, s32 b, s32 c);
+    s32 target;
+    s32 found;
+    s32 slots;
+    void* item;
+    s32 i;
+    s32 itemId;
+    s32 num;
+    s32 count;
+    s32 shortId;
+
+    lbl_8047A4B0 = mode;
+    while (1) {
+        if (menuOpen(0x25, 1) == -1) {
+            break;
+        }
+        target = lbl_8047A4A8 + lbl_8047A4AC;
+        slots = pcboxGetNbItemSlot(0);
+        found = -1;
+        for (i = 0; i < slots; i++) {
+            item = pcboxGetItem(0, (s16)i);
+            if ((u8)fn_801429E8(item) != 0) {
+                found++;
+                if (found >= target) {
+                    itemId = itemBiosGetItemDataId(item);
+                    goto haveSelected;
+                }
+            }
+        }
+        itemId = 0;
+    haveSelected:
+        if ((u16)itemId == 0) {
+            break;
+        }
+        switch (mode) {
+        case 0:
+            slots = pcboxGetNbItemSlot(0);
+            found = -1;
+            for (i = 0; i < slots; i++) {
+                item = pcboxGetItem(0, (s16)i);
+                if ((u8)fn_801429E8(item) != 0) {
+                    found++;
+                    if (found >= target) {
+                        itemId = itemBiosGetItemDataId(item);
+                        goto haveTake;
+                    }
+                }
+            }
+            itemId = 0;
+        haveTake:
+            lbl_8047A4B4 = 0x1b6a;
+            if (itemDataBiosGetKind(itemDataBiosGetPtr(itemId)) != 5) {
+                slots = pcboxGetNbItemSlot(0);
+                found = -1;
+                for (i = 0; i < slots; i++) {
+                    item = pcboxGetItem(0, (s16)i);
+                    if ((u8)fn_801429E8(item) != 0) {
+                        found++;
+                        if (found >= target) {
+                            num = itemBiosGetNum(item);
+                            goto haveTakeNum;
+                        }
+                    }
+                }
+                num = 0;
+            haveTakeNum:
+                count = fn_8003ACE8(1, 1, (u16)num);
+            } else {
+                count = 1;
+            }
+            if (count <= 0) {
+                break;
+            }
+            if (heroItemCheckAddItemDataId(0, itemId) < count) {
+                winMsgOpen(2, 0x1b6f, 1, 0);
+                winMsgClose(1);
+                break;
+            }
+            heroItemAddItemDataId(0, itemId, (u16)count, -1);
+            pcboxAddItem(0, itemId, (u16)count);
+            msgctrlSetValue(0x2d, (u16)itemId);
+            msgctrlSetValue(0x2f, count);
+            winMsgOpen(2, 0x1b70, 1, 0);
+            winMsgClose(1);
+            break;
+        case 1:
+            slots = pcboxGetNbItemSlot(0);
+            found = -1;
+            for (i = 0; i < slots; i++) {
+                item = pcboxGetItem(0, (s16)i);
+                if ((u8)fn_801429E8(item) != 0) {
+                    found++;
+                    if (found >= target) {
+                        itemId = itemBiosGetItemDataId(item);
+                        goto havePut;
+                    }
+                }
+            }
+            itemId = 0;
+        havePut:
+            if (itemDataBiosGetKind(itemDataBiosGetPtr(itemId)) == 5) {
+                winMsgOpen(2, 0x1b72, 1, 0);
+                winMsgClose(1);
+                break;
+            }
+            lbl_8047A4B4 = 0x1b6b;
+            slots = pcboxGetNbItemSlot(0);
+            found = -1;
+            for (i = 0; i < slots; i++) {
+                item = pcboxGetItem(0, (s16)i);
+                if ((u8)fn_801429E8(item) != 0) {
+                    found++;
+                    if (found >= target) {
+                        num = itemBiosGetNum(item);
+                        goto havePutNum;
+                    }
+                }
+            }
+            num = 0;
+        havePutNum:
+            count = fn_8003ACE8(1, 1, (u16)num);
+            if (count <= 0) {
+                break;
+            }
+            shortId = (u16)itemId;
+            msgctrlSetValue(0x2d, shortId);
+            msgctrlSetValue(0x2f, count);
+            lbl_8047A4B4 = 0x1b6c;
+            if (fn_8003AE84() == 0) {
+                break;
+            }
+            pcboxAddItem(0, itemId, (u16)count);
+            msgctrlSetValue(0x2d, shortId);
+            msgctrlSetValue(0x2f, count);
+            winMsgOpen(2, 0x1b71, 1, 0);
+            winMsgClose(1);
+            break;
+        }
+    }
+    menuClose(0x25);
+    menuCloseSync(0x25, 1);
+}
+#pragma peephole reset
+
 s32 fn_8003A6C0(PdaDrawWork* work, PdaSprite* sprite)
 {
     extern const s32 lbl_80267130[3];
