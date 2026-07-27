@@ -147,7 +147,7 @@ extern PdaSceneWork lbl_803A6818;
 
 extern void fn_8003B85C(void* window, s32 enabled);
 extern void fn_8003C2B8(PdaSprite* sprite, PdaEvent* event);
-extern void fn_80041E48(void* work, s32 mode);
+extern s32 fn_80041E48(void* work, s32 mode);
 extern void fn_80042658(void* work, s32 mode);
 extern void fn_800439BC(void* scene);
 extern void GSscene_SetMode(s32 mode);
@@ -5886,5 +5886,195 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                 *(s16*)(lbl_802EF0A8 + 0x5a26),
                 *(s16*)(lbl_802EF0A8 + 0x5a28),
                 (void*)(alphaSprite->alphaByte | -0x100), 0x371e);
+}
+#pragma peephole reset
+
+extern f32 lbl_8047BCB8;
+extern f32 lbl_8047BCD0;
+extern f32 lbl_8047BCD4;
+
+/* Ease a value toward its target, snapping once a step would overshoot. */
+static inline void pdaEase(f32* cur, f32 dst)
+{
+    f32 delta;
+    f32 rate;
+    f32 moved;
+    f32 rest;
+    s8 mode;
+
+    if (*cur == dst) {
+        return;
+    }
+    delta = dst - *cur;
+    rate = lbl_8047BCC4 * *(f32*)((u8*)&lbl_803A6818 + 0x3c);
+    if (pdaFabs(delta) >= lbl_8047BCD0) {
+        *cur = dst;
+        return;
+    }
+    mode = *(s8*)((u8*)&lbl_803A6818 + 0x48);
+    if (mode == 1) {
+        rate = rate * (lbl_8047BCD4 / (f32)(s8)lbl_804788C4);
+    }
+    if (mode == 2) {
+        rate = rate * (lbl_8047BCD4 / (f32)(s8)lbl_804788C4);
+    }
+    moved = delta * rate;
+    *cur = *cur + moved;
+    rest = dst - *cur;
+    if (moved > lbl_8047BC94) {
+    } else {
+        moved = -moved;
+    }
+    if (rest > lbl_8047BC94) {
+    } else {
+        rest = -rest;
+    }
+    if (rest <= moved) {
+        *cur = dst;
+    }
+}
+
+/* Ramp a 0..1 fade toward its target at a fixed rate. */
+static inline void pdaRamp(f32* cur, f32 dst, f32 rate)
+{
+    f32 step;
+
+    if (*cur == dst) {
+        return;
+    }
+    step = *(f32*)((u8*)&lbl_803A6818 + 0x3c) / rate;
+    if (dst > *cur) {
+        *cur = *cur + step;
+        if (*cur > lbl_8047BCBC) {
+            *cur = lbl_8047BCBC;
+        }
+    } else {
+        *cur = *cur - step;
+        if (*cur < lbl_8047BC94) {
+            *cur = lbl_8047BC94;
+        }
+    }
+}
+
+/* Per-frame scene animation and D-pad handling for the PDA summary page. */
+#pragma peephole off
+s32 fn_80041E48(void* work, s32 mode)
+{
+    extern u32 fn_800D3088(void);
+    extern s32 fn_800D37CC(void);
+    u16 keys;
+    u8* S = (u8*)&lbl_803A6818;
+    f32 dt;
+    f32 delta;
+    f32 moved;
+    f32 rest;
+
+    (void)work;
+    (void)mode;
+    keys = *(u16*)(lbl_803A67FC + 6);
+    dt = (f32)fn_800D3088() / (f32)fn_800D37CC();
+    *(f32*)(S + 0x3c) = dt;
+    *(f32*)(S + 0x40) = *(f32*)(S + 0x40) + dt;
+    if (*(f32*)(S + 0x40) >= lbl_8047BCBC) {
+        *(f32*)(S + 0x40) = lbl_8047BC94;
+    }
+    pdaEase((f32*)((u8*)&lbl_803A6818 + 0x2c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x34));
+    pdaEase((f32*)((u8*)&lbl_803A6818 + 0x30),
+            *(f32*)((u8*)&lbl_803A6818 + 0x38));
+    pdaEase((f32*)((u8*)&lbl_803A6818 + 0x1d0),
+            *(f32*)((u8*)&lbl_803A6818 + 0x1d8));
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x4c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x50), lbl_8047BCB8);
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x54),
+            *(f32*)((u8*)&lbl_803A6818 + 0x58), lbl_8047BCB8);
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x5c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x60), lbl_8047BCC0);
+
+    if (*(f32*)(S + 0x1dc) != *(f32*)(S + 0x1e0)) {
+        delta = *(f32*)(S + 0x1e0) - *(f32*)(S + 0x1dc);
+        moved = lbl_8047BCC4 * delta * *(f32*)(S + 0x3c);
+        if (moved > lbl_8047BC98) {
+            moved = lbl_8047BC98;
+        }
+        if (moved <= lbl_8047BCC8) {
+            moved = lbl_8047BCC8;
+        }
+        *(f32*)(S + 0x1dc) = *(f32*)(S + 0x1dc) + moved;
+        rest = *(f32*)(S + 0x1e0) - *(f32*)(S + 0x1dc);
+        if (moved > lbl_8047BC94) {
+        } else {
+            moved = -moved;
+        }
+        if (pdaFabs(rest) <= moved) {
+            *(f32*)(S + 0x1dc) = *(f32*)(S + 0x1e0);
+        } else {
+            if (rest > lbl_8047BC94) {
+            } else {
+                rest = -rest;
+            }
+            if (rest < lbl_8047BCBC) {
+                *(f32*)(S + 0x1dc) = *(f32*)(S + 0x1e0);
+            }
+        }
+    }
+
+    if (*(s32*)(S + 0x154) == 0) {
+        if (*(s32*)(S + 0x1e4) != 0) {
+            return 0;
+        }
+        if (*(s8*)(S + 0x15d) == 2) {
+            if ((keys & 0x4) != 0) {
+                if (*(s8*)(S + 0x15e) != 0) {
+                    fn_80166AB8(0x23, 0, 0);
+                }
+                *(s8*)(S + 0x15e) = 0;
+            } else if ((keys & 0x8) != 0) {
+                if (*(s8*)(S + 0x15e) == 0) {
+                    fn_80166AB8(0x23, 0, 0);
+                }
+                *(s8*)(S + 0x15e) = 1;
+            }
+        } else {
+            *(s8*)(S + 0x15e) = 0;
+        }
+        if ((keys & 0x2) != 0) {
+            if (*(s8*)(S + 0x15d) >= 4) {
+                return 0;
+            }
+            *(s8*)(S + 0x15d) = *(s8*)(S + 0x15d) + 1;
+            fn_80166AB8(0x23, 0, 0);
+        } else if ((keys & 0x1) != 0) {
+            if (*(s8*)(S + 0x15d) <= 0) {
+                return 0;
+            }
+            *(s8*)(S + 0x15d) = *(s8*)(S + 0x15d) - 1;
+            fn_80166AB8(0x23, 0, 0);
+        }
+        return 0;
+    }
+
+    if ((keys & 0x2) != 0) {
+        if (*(s8*)(S + 0x15f) < *(s8*)(S + 0x160) - 1) {
+            *(s8*)(S + 0x15f) = *(s8*)(S + 0x15f) + 1;
+            fn_80166AB8(0x23, 0, 0);
+        }
+        if (*(s8*)(S + 0x15f) >= *(s8*)(S + 0x1c9)) {
+            *(f32*)(S + 0x1d8) = *(f32*)(S + 0x1d8) - lbl_8047BCAC;
+            *(s8*)(S + 0x1c9) = *(s8*)(S + 0x1c9) + 1;
+            *(s8*)(S + 0x1c8) = *(s8*)(S + 0x1c8) + 1;
+        }
+    } else if ((keys & 0x1) != 0) {
+        if (*(s8*)(S + 0x15f) > 0) {
+            *(s8*)(S + 0x15f) = *(s8*)(S + 0x15f) - 1;
+            fn_80166AB8(0x23, 0, 0);
+        }
+        if (*(s8*)(S + 0x15f) < *(s8*)(S + 0x1c8)) {
+            *(f32*)(S + 0x1d8) = *(f32*)(S + 0x1d8) + lbl_8047BCAC;
+            *(s8*)(S + 0x1c8) = *(s8*)(S + 0x1c8) - 1;
+            *(s8*)(S + 0x1c9) = *(s8*)(S + 0x1c9) - 1;
+        }
+    }
+    return 0;
 }
 #pragma peephole reset
