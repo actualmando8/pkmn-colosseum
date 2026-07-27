@@ -965,6 +965,117 @@ s32 fn_8004CF78(u8* window)
 #pragma peephole reset
 #pragma scheduling reset
 
+/* Mailbox list menu: seed the cursor from the caller's flat index, run the
+ * modal list until it is dismissed, and hand back the packed page/row
+ * selection (row 10 is the sort button, row 11 the handle picker). */
+#pragma peephole off
+s32 fn_8004D34C(s32 index)
+{
+    typedef union PdaMailCursorPosition {
+        u32 storage;
+        u16 packed;
+        struct {
+            s8 page;
+            s8 row;
+        } position;
+    } PdaMailCursorPosition;
+    extern s32 mailGetNbMailInMailbox(void);
+    extern s32 mailGetSortMode(void);
+    extern s32 fn_8004DC18(s32 mode);
+    extern void fn_8004BFB0(void);
+    extern u8 fn_8004DFCC(u8 initialSelection);
+    extern u8 fn_801D16C4(void);
+    extern void fn_801D167C(u8 handle);
+    extern void fn_801D1B10(s32 handle);
+    extern s32 lbl_804788E0;
+    extern s32 lbl_8047A508;
+    extern s32 lbl_8047A50C;
+    extern f32 lbl_8047A510;
+    extern const f32 lbl_8047BE20;
+    extern u8 lbl_802EF0A8[];
+    s32 args[3];
+    PdaMailCursorPosition cursor;
+    PdaMailCursorPosition seed;
+    PdaMailCursorPosition reset;
+    PdaMailCursorPosition live;
+    s32 choice;
+    s32 remaining;
+    s32 row;
+    s32 page;
+    u8 handle;
+
+    if (lbl_804788E0 != 0) {
+        lbl_804788E0 = 0;
+        lbl_8047A50C = *(s16*)(lbl_802EF0A8 + 0x7772);
+        lbl_8047A508 = *(s16*)(lbl_802EF0A8 + 0x7756);
+    }
+    page = index / 10;
+    row = index % 10;
+    remaining = mailGetNbMailInMailbox() - page * 10;
+    if (remaining > 10) {
+        remaining = 10;
+    } else if (remaining < 0) {
+        remaining = 0;
+    }
+    if (row >= remaining) {
+        row = 10;
+    }
+    cursor.position.page = (s8)page;
+    cursor.position.row = (s8)row;
+    seed.packed = cursor.packed;
+    cursorBiosSetPos(10, &seed.packed);
+    while (1) {
+        lbl_8047A510 = lbl_8047BE20;
+        args[0] = (s32)&lbl_8047A510;
+        args[1] = lbl_8047A50C;
+        args[2] = lbl_8047A508;
+        choice = menuOpenCustom(0x73, windowGetActiveID(), 0, 0, 1, 1, args);
+        live.packed = (u16)(cursorBiosGetPos(10) >> 16);
+        cursor.packed = live.packed;
+        if (choice == -1) {
+            break;
+        }
+        if (cursor.position.row < 10) {
+            break;
+        }
+        switch (cursor.position.row) {
+        case 10:
+            if (fn_8004DC18(mailGetSortMode()) >= 0) {
+                fn_801D1B10(0);
+                fn_8004BFB0();
+                row = 0;
+                remaining = mailGetNbMailInMailbox();
+                if (remaining > 10) {
+                    remaining = 10;
+                } else if (remaining < 0) {
+                    remaining = 0;
+                }
+                if (remaining <= 0) {
+                    row = 10;
+                }
+                cursor.position.page = 0;
+                cursor.position.row = (s8)row;
+                reset.packed = cursor.packed;
+                cursorBiosSetPos(10, &reset.packed);
+            }
+            break;
+        case 11:
+            handle = fn_8004DFCC(fn_801D16C4());
+            if (handle != 0xff) {
+                fn_801D167C(handle);
+            }
+            break;
+        }
+    }
+    menuClose(0x73);
+    menuCloseSync(0x73, 1);
+    if (choice == -1) {
+        return -1;
+    }
+    return cursor.position.row + cursor.position.page * 10;
+}
+#pragma peephole reset
+
 /* mailGetReceiveNumber (XD-named, same address/size): returns the
  * receive-order slot for a given mail ID, or -1 if not found. */
 extern s32 mailGetReceiveNumber(s32 mailId);
