@@ -6364,7 +6364,7 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
                 if (i >= *(s8*)(S + 0x1c8) - 1 &&
                     i <= *(s8*)(S + 0x1c9) + 1) {
                     fn_800FB680(0, (s32)pos,
-                                pdaTint(alphaSprite, -0x100),
+                                (alphaSprite->alphaByte | -0x100LL),
                                 (void*)*(u32*)((u8*)*(u32**)(T + 0x24c +
                                                              *(s8*)(S + 0x15d) *
                                                                  4) +
@@ -6378,46 +6378,46 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
         break;
     case 0xd79:
         fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x36ed) >> 16)) / 2), -2,
-                    pdaTint(alphaSprite, -0x100), (void*)0x36ed);
+                    (alphaSprite->alphaByte | -0x100LL), (void*)0x36ed);
         break;
     case 0xd7a:
         fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x36ec) >> 16)) / 2), -2,
-                    pdaTint(alphaSprite, -0x100), (void*)0x36ec);
+                    (alphaSprite->alphaByte | -0x100LL), (void*)0x36ec);
         break;
     case 0xd7b:
         fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x36eb) >> 16)) / 2), -2,
-                    pdaTint(alphaSprite, -0x100), (void*)0x36eb);
+                    (alphaSprite->alphaByte | -0x100LL), (void*)0x36eb);
         break;
     case 0xd7c:
         fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x36ea) >> 16)) / 2), -2,
-                    pdaTint(alphaSprite, -0x100), (void*)0x36ea);
+                    (alphaSprite->alphaByte | -0x100LL), (void*)0x36ea);
         break;
     case 0xd7d:
         fn_800FB680((s16)((sprite->x - (s16)(GSmsgGetRect(0x36e9) >> 16)) / 2), -2,
-                    pdaTint(alphaSprite, -0x100), (void*)0x36e9);
+                    (alphaSprite->alphaByte | -0x100LL), (void*)0x36e9);
         break;
     case 0xd74:
-        fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
+        fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL),
                     (void*)(*(u32**)(T + 0x258))[*(s8*)(S + 0x15c)]);
         break;
     case 0xd75:
         msgctrlSetValue(
             0x37,
             GSmsgGetGSchar((*(u32**)(T + 0x254))[*(s8*)(S + 0x15b)]));
-        fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100), (void*)0xe7);
+        fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL), (void*)0xe7);
         break;
     case 0xd76:
         msgctrlSetValue(
             0x37,
             GSmsgGetGSchar((*(u32**)(T + 0x254))[*(s8*)(S + 0x15a)]));
-        fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100), (void*)0xe7);
+        fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL), (void*)0xe7);
         break;
     case 0xd77:
-        fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
+        fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL),
                     (void*)(*(u32**)(T + 0x250))[*(s8*)(S + 0x159)]);
         break;
     case 0xd78:
-        fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
+        fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL),
                     (void*)(*(u32**)(T + 0x24c))[*(s8*)(S + 0x158)]);
         break;
     case 0xd54:
@@ -6472,11 +6472,11 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
             } else {
                 msg = ((u32*)(T + 0x270))[*(s8*)(S + 0x15d)];
             }
-            fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100), (void*)msg);
+            fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL), (void*)msg);
             break;
         case 1:
             if (*(s8*)(S + 0x15d) == 3) {
-                fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
+                fn_800FB680(0, 0, (alphaSprite->alphaByte | -0x100LL),
                             (void*)((u32*)(T + 0x25c))[*(s8*)(S + 0x15f)]);
             }
             break;
@@ -6635,7 +6635,7 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
         name = GSmsgGetGSchar(1);
     }
     msgctrlSetValue(0x37, name);
-    fn_800FB680(0, 0, alphaSprite->alphaByte | -0x100, (void*)0xce);
+    fn_800FB680(0, 0, alphaSprite->alphaByte | -0x100LL, (void*)0xce);
 
     if (pdaEntrySeen() != 0) {
         tokusei0 = pokemonDataBiosGetTokuseiDataId(pdaCurrentData(), 0);
@@ -6644,11 +6644,11 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                             pokemonTokuseiDataBiosGetPtr(tokusei0))));
         fn_800FB680(*(s16*)(layout + 0x5a5a) - sprite->field_50 + 4,
                     *(s16*)(layout + 0x5a5c) - sprite->field_52,
-                    alphaSprite->alphaByte | -0x100, (void*)0xe7);
+                    alphaSprite->alphaByte | -0x100LL, (void*)0xe7);
     } else {
         fn_800FB680(*(s16*)(layout + 0x5a5a) - sprite->field_50 + 4,
                     *(s16*)(layout + 0x5a5c) - sprite->field_52,
-                    alphaSprite->alphaByte | -0x100, (void*)0x3721);
+                    alphaSprite->alphaByte | -0x100LL, (void*)0x3721);
     }
 
     if (pdaEntrySeen() != 0) {
@@ -6659,12 +6659,12 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                                 pokemonTokuseiDataBiosGetPtr(tokusei1))));
             fn_800FB680(*(s16*)(layout + 0x20b42) - sprite->field_50 + 4,
                         *(s16*)(layout + 0x20b44) - sprite->field_52,
-                        alphaSprite->alphaByte | -0x100, (void*)0xe7);
+                        alphaSprite->alphaByte | -0x100LL, (void*)0xe7);
         }
     } else {
         fn_800FB680(*(s16*)(layout + 0x5a5a) - sprite->field_50 + 4,
                     *(s16*)(layout + 0x5a5c) - sprite->field_52,
-                    alphaSprite->alphaByte | -0x100, (void*)0x3721);
+                    alphaSprite->alphaByte | -0x100LL, (void*)0x3721);
     }
 
     if (pdaEntrySeen() != 0) {
@@ -6693,14 +6693,14 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                     *(s16*)(layout + 0x5a78) - sprite->field_52,
                     *(s16*)(layout + 0x5a7a),
                     *(s16*)(layout + 0x5a7c),
-                    (void*)(alphaSprite->alphaByte | -0x100), 0xcf);
+                    (void*)(alphaSprite->alphaByte | -0x100LL), 0xcf);
     } else {
         fn_800FBB34(lbl_8047A4F0 +
                         (*(s16*)(layout + 0x5a76) - sprite->field_50),
                     *(s16*)(layout + 0x5a78) - sprite->field_52,
                     *(s16*)(layout + 0x5a7a),
                     *(s16*)(layout + 0x5a7c),
-                    (void*)(alphaSprite->alphaByte | -0x100), 0x371b);
+                    (void*)(alphaSprite->alphaByte | -0x100LL), 0x371b);
     }
 
     if (pdaEntrySeen() != 0) {
@@ -6712,14 +6712,14 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                     *(s16*)(layout + 0x5a94) - sprite->field_52,
                     *(s16*)(layout + 0x5a96),
                     *(s16*)(layout + 0x5a98),
-                    (void*)(alphaSprite->alphaByte | -0x100), 0x189c);
+                    (void*)(alphaSprite->alphaByte | -0x100LL), 0x189c);
     } else {
         fn_800FBB34(lbl_8047A4F0 +
                         (*(s16*)(layout + 0x5a92) - sprite->field_50),
                     *(s16*)(layout + 0x5a94) - sprite->field_52,
                     *(s16*)(layout + 0x5a96),
                     *(s16*)(layout + 0x5a98),
-                    (void*)(alphaSprite->alphaByte | -0x100), 0x371a);
+                    (void*)(alphaSprite->alphaByte | -0x100LL), 0x371a);
     }
 
     if (pdaEntrySeen() != 0) {
@@ -6732,7 +6732,7 @@ void fn_800411FC(PdaSprite* alphaSprite, PdaEvent* event)
                 *(s16*)(layout + 0x5a24) - sprite->field_52,
                 *(s16*)(layout + 0x5a26),
                 *(s16*)(layout + 0x5a28),
-                (void*)(alphaSprite->alphaByte | -0x100), 0x371e);
+                (void*)(alphaSprite->alphaByte | -0x100LL), 0x371e);
 }
 #pragma peephole reset
 
