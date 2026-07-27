@@ -7008,7 +7008,6 @@ s32 fn_80042658(void* work, s32 mode)
 {
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
-    u8* S = (u8*)&lbl_803A6818;
     u8* K = lbl_803A67FC;
     PdaVec3 spin;
     PdaVec3 pos;
@@ -7024,11 +7023,11 @@ s32 fn_80042658(void* work, s32 mode)
     f32* rot;
 
     held = 0;
-    prevIndex = *(s32*)S;
-    if (*(s8*)(S + 0x48) == 1) {
+    prevIndex = *(s32*)&lbl_803A6818;
+    if (*(s8*)((u8*)&lbl_803A6818 + 0x48) == 1) {
         keys = *(u16*)(K + 6);
         lbl_804788C4 = 3;
-    } else if (*(s8*)(S + 0x48) == 2) {
+    } else if (*(s8*)((u8*)&lbl_803A6818 + 0x48) == 2) {
         keys = *(u16*)(K + 6);
         lbl_804788C4 = 2;
     } else {
@@ -7039,10 +7038,10 @@ s32 fn_80042658(void* work, s32 mode)
         held = 1;
     }
     dt = (f32)fn_800D3088() / (f32)fn_800D37CC();
-    *(f32*)(S + 0x3c) = dt;
-    *(f32*)(S + 0x40) = *(f32*)(S + 0x40) + dt;
-    if (*(f32*)(S + 0x40) >= lbl_8047BCBC) {
-        *(f32*)(S + 0x40) = lbl_8047BC94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x3c) = dt;
+    *(f32*)((u8*)&lbl_803A6818 + 0x40) = *(f32*)((u8*)&lbl_803A6818 + 0x40) + dt;
+    if (*(f32*)((u8*)&lbl_803A6818 + 0x40) >= lbl_8047BCBC) {
+        *(f32*)((u8*)&lbl_803A6818 + 0x40) = lbl_8047BC94;
     }
     pdaEase((f32*)((u8*)&lbl_803A6818 + 0x2c),
             *(f32*)((u8*)&lbl_803A6818 + 0x34));
@@ -7059,7 +7058,7 @@ s32 fn_80042658(void* work, s32 mode)
         *(f32*)((u8*)&lbl_803A6818 + 0x1e0)) {
         delta = *(f32*)((u8*)&lbl_803A6818 + 0x1e0) -
                 *(f32*)((u8*)&lbl_803A6818 + 0x1dc);
-        moved = lbl_8047BCC4 * delta * *(f32*)(S + 0x3c);
+        moved = lbl_8047BCC4 * delta * *(f32*)((u8*)&lbl_803A6818 + 0x3c);
         if (moved > lbl_8047BC98) {
             moved = lbl_8047BC98;
         }
@@ -7089,27 +7088,27 @@ s32 fn_80042658(void* work, s32 mode)
         }
     }
 
-    switch (*(s32*)(S + 0x1c)) {
+    switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
     case 1:
     case 2:
     case 3:
-        S[0x214] = fn_80047CC0(S + 0x7c);
+        ((u8*)&lbl_803A6818)[0x214] = fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
         fn_80043728((u32)work, mode, keys);
         break;
     case 4:
-        S[0x214] = fn_800484A4(S + 0x7c);
+        ((u8*)&lbl_803A6818)[0x214] = fn_800484A4((u8*)&lbl_803A6818 + 0x7c);
         spin.x = lbl_8047BC94;
         spin.y = lbl_8047BC94;
         spin.z = lbl_8047BC94;
-        model = fn_801DAC3C(*(void**)(S + 0x7c + 0x24));
+        model = fn_801DAC3C(*(void**)((u8*)&lbl_803A6818 + 0x7c + 0x24));
         if (model == NULL) {
             break;
         }
         GSmodelGetBound(model);
-        rot = (f32*)(S + 0x6c);
-        spin.x = *(f32*)(S + 0x3c) *
+        rot = (f32*)((u8*)&lbl_803A6818 + 0x6c);
+        spin.x = *(f32*)((u8*)&lbl_803A6818 + 0x3c) *
                  (lbl_8047BCA4 * (f32)fn_800F7920(1, 1) * lbl_8047BCE0);
-        spin.y = *(f32*)(S + 0x3c) *
+        spin.y = *(f32*)((u8*)&lbl_803A6818 + 0x3c) *
                  (lbl_8047BCA4 * (f32)fn_800F7994(1, 1) * lbl_8047BCE0);
         GSvecAdd(rot, rot, &spin);
         if (*rot >= lbl_8047BCE4) {
@@ -7122,36 +7121,36 @@ s32 fn_80042658(void* work, s32 mode)
         pos.x = lbl_8047BC94;
         GSmodelSetPosition(model, &pos);
         if ((fn_800F7BC4(1) & 0x40) != 0) {
-            if (*(f32*)(S + 0x64) <= lbl_8047BCEC) {
-                *(f32*)(S + 0x64) = *(f32*)(S + 0x64) + *(f32*)(S + 0x3c);
+            if (*(f32*)((u8*)&lbl_803A6818 + 0x64) <= lbl_8047BCEC) {
+                *(f32*)((u8*)&lbl_803A6818 + 0x64) = *(f32*)((u8*)&lbl_803A6818 + 0x64) + *(f32*)((u8*)&lbl_803A6818 + 0x3c);
             }
         } else if ((fn_800F7BC4(1) & 0x20) != 0) {
-            if (*(f32*)(S + 0x64) > lbl_8047BCBC) {
-                *(f32*)(S + 0x64) = *(f32*)(S + 0x64) - *(f32*)(S + 0x3c);
+            if (*(f32*)((u8*)&lbl_803A6818 + 0x64) > lbl_8047BCBC) {
+                *(f32*)((u8*)&lbl_803A6818 + 0x64) = *(f32*)((u8*)&lbl_803A6818 + 0x64) - *(f32*)((u8*)&lbl_803A6818 + 0x3c);
             }
         }
         break;
     case 5:
-        S[0x214] = fn_800478B4(S + 0x7c, S + 0xc4);
-        S[0x214] = fn_8003D1FC_setup(S + 0xc4);
+        ((u8*)&lbl_803A6818)[0x214] = fn_800478B4((u8*)&lbl_803A6818 + 0x7c, (u8*)&lbl_803A6818 + 0xc4);
+        ((u8*)&lbl_803A6818)[0x214] = fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
         break;
     default:
         break;
     }
 
     if (held != 0) {
-        if (*(s8*)(S + 0x48) < 2) {
-            *(f32*)(S + 0x44) = *(f32*)(S + 0x44) + *(f32*)(S + 0x3c);
-            if (*(f32*)(S + 0x44) >= lbl_8047BCBC) {
-                *(s8*)(S + 0x48) = 1;
+        if (*(s8*)((u8*)&lbl_803A6818 + 0x48) < 2) {
+            *(f32*)((u8*)&lbl_803A6818 + 0x44) = *(f32*)((u8*)&lbl_803A6818 + 0x44) + *(f32*)((u8*)&lbl_803A6818 + 0x3c);
+            if (*(f32*)((u8*)&lbl_803A6818 + 0x44) >= lbl_8047BCBC) {
+                *(s8*)((u8*)&lbl_803A6818 + 0x48) = 1;
             }
-            if (*(f32*)(S + 0x44) >= lbl_8047BCA8) {
-                *(s8*)(S + 0x48) = 2;
+            if (*(f32*)((u8*)&lbl_803A6818 + 0x44) >= lbl_8047BCA8) {
+                *(s8*)((u8*)&lbl_803A6818 + 0x48) = 2;
             }
         }
     } else {
-        *(f32*)(S + 0x44) = lbl_8047BC94;
-        *(s8*)(S + 0x48) = 0;
+        *(f32*)((u8*)&lbl_803A6818 + 0x44) = lbl_8047BC94;
+        *(s8*)((u8*)&lbl_803A6818 + 0x48) = 0;
     }
 
     if (mode != 0) {
@@ -7189,7 +7188,7 @@ s32 fn_80042658(void* work, s32 mode)
             fn_80109C88((u8*)&lbl_803A6818 + 0x7c, pokemon);
         }
         *((u8*)&lbl_803A6818 + 0x214) = 0;
-        switch (*(s32*)(S + 0x1c)) {
+        switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
         case 0:
         case 1:
         case 2:
@@ -8089,7 +8088,6 @@ s32 fn_8004B278(u8* work)
 {
     extern u32 fn_800D3088(void);
     extern s32 fn_800D37CC(void);
-    u8* G = lbl_803A6A60;
     u8* data;
     f32 delta;
     f32 moved;
@@ -8097,21 +8095,21 @@ s32 fn_8004B278(u8* work)
     f32* p;
 
     data = *(u8**)(work + 0x60);
-    *(f32*)(G + 8) = (f32)fn_800D3088() / (f32)fn_800D37CC();
+    *(f32*)((u8*)&lbl_803A6A60 + 8) = (f32)fn_800D3088() / (f32)fn_800D37CC();
     if (fn_801902E0(0x3f0) != 0) {
         menuItemBiosSetSelectFlag(0x438, 1);
     } else {
         menuItemBiosSetSelectFlag(0x438, 0);
     }
     *(f32*)(lbl_803A6A60 + 0x40) =
-        lbl_8047BDA8 * *(f32*)(G + 8) + *(f32*)(lbl_803A6A60 + 0x40);
+        lbl_8047BDA8 * *(f32*)((u8*)&lbl_803A6A60 + 8) + *(f32*)(lbl_803A6A60 + 0x40);
     if (*(f32*)(lbl_803A6A60 + 0x40) > lbl_8047BDA0) {
         *(f32*)(lbl_803A6A60 + 0x40) = lbl_8047BDAC;
     }
 
     if (*(f32*)(lbl_803A6A60 + 0x30) != *(f32*)(lbl_803A6A60 + 0x38)) {
         delta = *(f32*)(lbl_803A6A60 + 0x38) - *(f32*)(lbl_803A6A60 + 0x30);
-        moved = lbl_8047BDD8 * delta * *(f32*)(G + 8);
+        moved = lbl_8047BDD8 * delta * *(f32*)((u8*)&lbl_803A6A60 + 8);
         if (moved > lbl_8047BDDC) {
             moved = lbl_8047BDDC;
         }
@@ -8139,7 +8137,7 @@ s32 fn_8004B278(u8* work)
 
     if (*(f32*)(lbl_803A6A60 + 0x34) != *(f32*)(lbl_803A6A60 + 0x3c)) {
         delta = *(f32*)(lbl_803A6A60 + 0x3c) - *(f32*)(lbl_803A6A60 + 0x34);
-        moved = lbl_8047BDD8 * delta * *(f32*)(G + 8);
+        moved = lbl_8047BDD8 * delta * *(f32*)((u8*)&lbl_803A6A60 + 8);
         if (moved > lbl_8047BDDC) {
             moved = lbl_8047BDDC;
         }
