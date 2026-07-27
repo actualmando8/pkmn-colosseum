@@ -54,7 +54,9 @@ PY
   echo "[$ts] shipping $n units from $SRC"
   (cd "$SRC" && tar -cf - -T "$tmp/ok.txt") | ssh "$HOST" "cd $WIN_ROOT/units && tar -xf -" || return 1
 
-  # merge manifests: remote entries win for units we are not re-shipping
+  # merge manifests: freshly shipped units go to the FRONT (farm.py walks the
+  # manifest in order, so appending them leaves them queued behind every older
+  # unit -- at --budget 5400 that is hours before they are first touched)
   ssh "$HOST" "cmd /c type ${WIN_ROOT//\//\\}\\units\\manifest.json" 2>/dev/null > "$tmp/remote.json" || :
   python3 - "$SRC/manifest.json" "$tmp/remote.json" > "$tmp/merged.json" <<'PY' || return 1
 import json, sys
@@ -64,10 +66,10 @@ try:
 except Exception:
     old = []
 fresh = {e["fn"] for e in new}
-merged = [e for e in old if e.get("status") == "ok" and e["fn"] not in fresh] + new
+merged = new + [e for e in old if e.get("status") == "ok" and e["fn"] not in fresh]
 json.dump(merged, sys.stdout, indent=1)
 print(f"merged manifest: {len(merged)} units "
-      f"({len(merged) - len(new)} kept + {len(new)} shipped)", file=sys.stderr)
+      f"({len(new)} shipped first + {len(merged) - len(new)} kept)", file=sys.stderr)
 PY
   scp -q "$tmp/merged.json" "$HOST:$WIN_ROOT/units/manifest.json" || return 1
 
