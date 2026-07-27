@@ -962,6 +962,153 @@ void fn_8003842C(void)
 }
 #pragma peephole reset
 
+/* Prime the save-overwrite prompt with the current play time and the two
+   hero-name message slots. */
+static inline void pdaFillSavePrompt(void)
+{
+    extern u32 fn_80005748(void);
+    extern u32 fn_801EF214(void);
+    extern u32 fn_801EF274(void);
+    extern void msgctrlSetValue(s32 id, u32 value);
+    u32 playTime;
+
+    playTime = fn_80005748();
+    if (lbl_8047A498 != 0) {
+        playTime = lbl_8047A498;
+    }
+    lbl_8047A49C = fn_801EF214();
+    lbl_8047A4A0 = fn_801EF274();
+    msgctrlSetValue(0x4c, playTime);
+    msgctrlSetValue(0x2f, fn_801EF274());
+    msgctrlSetValue(0x30, fn_801EF214());
+}
+
+typedef struct PdaSaveImage {
+    u8 bytes[0x1dfd0];
+} PdaSaveImage;
+
+/* Save-and-quit flow reached from the People screen's model preview. */
+#pragma peephole off
+s32 fn_80038A0C(void)
+{
+    extern u8 lbl_802E51C8[];
+    extern s32 menuOpen(s32 menu, s32 mode);
+    extern void menuCloseCustom(s32 slot, s32 arg1, s32 arg2);
+    extern s8 menuSubOpenYesNo(s32 a, s32 b, s32 c, s32 d);
+    extern u32 fn_80005748(void);
+    extern void fn_800056EC(f32 seconds);
+    extern void* fn_801D036C(void);
+    extern void fn_801D0314(void* buffer);
+    extern s32 fn_801D0748(s32 a, s32 b, s32 c);
+    extern void* savedataGetStatus(void* buffer, s32 kind);
+    extern u32 gamedatasaveGetStatus(void* buffer, s32 kind);
+    extern u32 heroGetStatus(void* data, s32 a, s32 b);
+    extern void heroSetStatus(s32 a, s32 b, u8 value);
+    extern u8 heroMoveIsMember(s32 index);
+    extern void* gamedatasaveBiosGetPtr(void* data);
+    extern s32 gamedatasaveBiosGetFloorid(void* data);
+    extern s32 gamedatasaveBiosGetPrevfloorid(void* data);
+    extern u8 gamedatasaveBiosGetFloorposindex(void* data);
+    extern void gamedatasaveBiosSetFloorid(void* data, s32 value);
+    extern void gamedatasaveBiosSetPrevfloorid(void* data, s32 value);
+    extern void gamedatasaveBiosSetFloorposindex(void* data, u8 value);
+    extern void fn_8011418C(s32* floorId, s32* prevFloorId, u8* posIndex);
+    u8* base;
+    u8* tbl;
+    void* backup;
+    u8* slot;
+    u8 saved;
+    s32 result;
+    s32 running;
+    s32 state;
+    void* data;
+    s8 answer;
+    s32 prevFloorId;
+    s32 floorId;
+    u8 posIndex;
+
+    base = lbl_803A6498;
+    state = 0;
+    tbl = lbl_802E51C8;
+    running = 1;
+    slot = base + 0x48;
+    do {
+        switch (state) {
+        case 0:
+            lbl_8047A480 = (void*)0x3c01;
+            menuOpen(0x28, 0);
+            state = 1;
+            break;
+        case 1:
+            pdaFillSavePrompt();
+            answer = menuSubOpenYesNo(0, 0x3c, 0x118, 0);
+            if (answer == 0) {
+                state = 2;
+            } else if (answer == 1) {
+                state = 0x64;
+                result = 1;
+            } else {
+                state = 0x64;
+                result = 1;
+            }
+            break;
+        case 2:
+            saved = 1;
+            backup = fn_801D036C();
+            *(PdaSaveImage*)backup = *(PdaSaveImage*)savedataGetStatus(0, 0);
+            if (fn_801D0748(3, 2, 0) == 3 &&
+                gamedatasaveGetStatus(0, 4) != 0) {
+                if (heroGetStatus(0, 2, 0) ==
+                        heroGetStatus(savedataGetStatus(backup, 2), 2, 0) ||
+                    gamedatasaveGetStatus(backup, 4) == 0) {
+                    lbl_8047A498 = fn_80005748();
+                    pdaFillSavePrompt();
+                    lbl_8047A480 = (void*)0x1b60;
+                    answer = menuSubOpenYesNo(0, 0x3c, 0x118, 1);
+                    if (answer != 0) {
+                        saved = 0;
+                    } else {
+                        saved = 1;
+                    }
+                    lbl_8047A498 = fn_80005748() - lbl_8047A498;
+                }
+            }
+            *(PdaSaveImage*)savedataGetStatus(0, 0) = *(PdaSaveImage*)backup;
+            fn_800056EC((f32)(lbl_8047A498 + fn_80005748()));
+            lbl_8047A498 = 0;
+            fn_801D0314(backup);
+            if (saved) {
+                state = 4;
+                result = 1;
+            } else {
+                state = 0;
+            }
+            break;
+        case 4:
+            heroSetStatus(0, 0x18, (u8)(heroMoveIsMember(1) ? 1 : 0));
+            savedataGetStatus(0, 0);
+            data = gamedatasaveBiosGetPtr(savedataGetStatus(0, 1));
+            *(s32*)&base[0x48] = gamedatasaveBiosGetFloorid(data);
+            *(s32*)&slot[4] = gamedatasaveBiosGetPrevfloorid(data);
+            slot[8] = gamedatasaveBiosGetFloorposindex(data);
+            fn_8011418C(&floorId, &prevFloorId, &posIndex);
+            gamedatasaveBiosSetFloorid(data, floorId);
+            gamedatasaveBiosSetPrevfloorid(data, prevFloorId);
+            gamedatasaveBiosSetFloorposindex(data, posIndex);
+            fn_801D0748(4, 2, 0);
+            state = 0x64;
+            break;
+        case 0x64:
+            menuCloseCustom(0x28, 0, 1);
+            running = 0;
+            break;
+        }
+    } while (running);
+    pdaResetPeopleTables(base, tbl);
+    return result;
+}
+#pragma peephole reset
+
 #pragma peephole off
 s32 fn_80039004(PdaSprite* context, PdaSprite* sprite)
 {
