@@ -824,6 +824,144 @@ void fn_80038A00(void)
     lbl_8047A484 = lbl_8047BA58;
 }
 
+/* Re-seed the People screen's two 4-entry widget tables and reset the
+   carousel angle back to the table's rest value. */
+static inline void pdaResetPeopleTables(u8* base, u8* tbl)
+{
+    extern void* memcpy(void* dst, const void* src, u32 size);
+    u8* dst;
+    u8* src;
+    s32 i;
+
+    lbl_8047A480 = (void*)0x1b5a;
+    src = tbl + 0;
+    dst = base + 0xb4;
+    for (i = 0; i < 4; i++, dst += 0x18, src += 0x18) {
+        memcpy(dst, src, 0x18);
+    }
+    src = tbl + 0x60;
+    dst = base + 0x54;
+    for (i = 0; i < 4; i++, dst += 0x18, src += 0x18) {
+        memcpy(dst, src, 0x18);
+    }
+    lbl_8047A47C = 0;
+    lbl_8047A488 = *(f32*)(tbl + 0xe0);
+    lbl_8047A484 = *(f32*)(tbl + 0xe0);
+    lbl_8047A47D = 0;
+}
+
+/* People screen driver: run the top-level menu, dispatch the four entries,
+   and tear the menu down on exit. */
+#pragma peephole off
+void fn_8003842C(void)
+{
+    extern u8 lbl_802E51C8[];
+    extern u8 lbl_802EF0A8[];
+    extern s32 menuOpen(s32 menu, s32 mode);
+    extern void menuCloseCustom(s32 slot, s32 arg1, s32 arg2);
+    extern void fn_801661D0(s32 a, s32 b, s32 c, s32 d);
+    extern void fn_801660D8(s32 a, s32 b, s32 c);
+    extern void fn_800FF660(void);
+    extern void fn_80058150(void);
+    extern void fn_8003A520(void);
+    extern s32 fn_80038A0C(void);
+    extern void menuModelInit(u8* model, s16 a, s16 b);
+    extern void menuModelSetMotion(u8* model, s32 motion);
+    extern void fn_8010A010(u8* model, s32 id);
+    extern void fn_8010A420(u8* model);
+    extern void* peopleInfoBiosGetPtr(s32 id);
+    extern void fn_8018F4C8(void* info, s32 kind, s32* out0, s32* out1);
+    u8* tbl;
+    u8* base;
+    s32 state;
+    s32 running;
+    s32 choice;
+    s32 motion;
+    s32 scratch;
+
+    base = lbl_803A6498;
+    tbl = lbl_802E51C8;
+    state = 0;
+    running = 1;
+    fn_801661D0(0x55, 0x1f4, 1, 1);
+    do {
+        switch (state) {
+        case 0:
+            pdaResetPeopleTables(base, tbl);
+            menuOpen(0x18, 0);
+            menuOpen(0x1e, 0);
+            menuOpen(0x1f, 0);
+            menuOpen(0x1a, 0);
+            menuOpen(0x1b, 0);
+            menuOpen(0x19, 0);
+            state = 1;
+            break;
+        case 1:
+            lbl_8047A490 = -1;
+            menuOpen(0x20, 0);
+            menuOpen(0x21, 0);
+            menuOpen(0x22, 0);
+            menuOpen(0x23, 0);
+            choice = menuOpen(0x1d, 1);
+            if (choice >= 0) {
+                lbl_8047A490 = (s8)choice;
+                switch (choice) {
+                case 0:
+                    menuCloseCustom(0x20, 0, 1);
+                    pdaResetPeopleTables(base, tbl);
+                    state = 0xa;
+                    break;
+                case 1:
+                    menuCloseCustom(0x20, 0, 1);
+                    pdaResetPeopleTables(base, tbl);
+                    state = 0x14;
+                    break;
+                case 2:
+                    menuCloseCustom(0x20, 0, 1);
+                    pdaResetPeopleTables(base, tbl);
+                    state = 0x1e;
+                    break;
+                case 3:
+                    state = 0x3e8;
+                    break;
+                }
+            } else {
+                state = 0x3e8;
+            }
+            break;
+        case 0xa:
+            fn_80058150();
+            state = 1;
+            break;
+        case 0x14:
+            lbl_8047A480 = (void*)0x1b61;
+            fn_8003A520();
+            lbl_8047A480 = (void*)0x1b5a;
+            state = 1;
+            break;
+        case 0x1e:
+            menuModelInit(base, (s16)(*(s16*)(lbl_802EF0A8 + 0x5fd6) + 0xa),
+                          *(s16*)(lbl_802EF0A8 + 0x5fd8));
+            fn_8010A010(base, 0xf70400);
+            fn_8018F4C8(peopleInfoBiosGetPtr(0xf70400), 1, &motion, &scratch);
+            menuModelSetMotion(base, motion);
+            state = fn_80038A0C();
+            fn_8010A420(base);
+            break;
+        case 0x28:
+            state = 0x3e8;
+            break;
+        case 0x3e8:
+            menuCloseCustom(0x1d, 0, 1);
+            running = 0;
+            break;
+        }
+    } while (running);
+    fn_801660D8(0x3e8, 1, 1);
+    fn_800FF660();
+}
+#pragma peephole reset
+
 #pragma peephole off
 s32 fn_80039004(PdaSprite* context, PdaSprite* sprite)
 {
@@ -8512,6 +8650,8 @@ void fn_8003C7C0(void)
 {
     extern void _threadSwitch(void);
     u8* model;
+    u8* tbl;
+    u8* base;
     s32 state;
     s32 running;
     s32 idx;
