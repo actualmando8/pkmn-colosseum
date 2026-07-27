@@ -7222,3 +7222,119 @@ s32 fn_800495C8(void* work, PdaSprite* sprite)
     return 0;
 }
 #pragma peephole reset
+
+extern f32 lbl_8047BDD8;
+extern f32 lbl_8047BDDC;
+extern f32 lbl_8047BDE0;
+extern f32 lbl_8047BDE4;
+extern u8 fn_801902E0(s32 id);
+extern void menuItemBiosSetSelectFlag(s32 id, s32 flag);
+
+/* Per-frame timing, scroll easing and page-flip for the mail list. */
+#pragma peephole off
+s32 fn_8004B278(u8* work)
+{
+    extern u32 fn_800D3088(void);
+    extern s32 fn_800D37CC(void);
+    u8* G = lbl_803A6A60;
+    u8* data;
+    f32 delta;
+    f32 moved;
+    f32 rest;
+    f32* p;
+
+    data = *(u8**)(work + 0x60);
+    *(f32*)(G + 8) = (f32)fn_800D3088() / (f32)fn_800D37CC();
+    if (fn_801902E0(0x3f0) != 0) {
+        menuItemBiosSetSelectFlag(0x438, 1);
+    } else {
+        menuItemBiosSetSelectFlag(0x438, 0);
+    }
+    *(f32*)(lbl_803A6A60 + 0x40) =
+        lbl_8047BDA8 * *(f32*)(G + 8) + *(f32*)(lbl_803A6A60 + 0x40);
+    if (*(f32*)(lbl_803A6A60 + 0x40) > lbl_8047BDA0) {
+        *(f32*)(lbl_803A6A60 + 0x40) = lbl_8047BDAC;
+    }
+
+    if (*(f32*)(lbl_803A6A60 + 0x30) != *(f32*)(lbl_803A6A60 + 0x38)) {
+        delta = *(f32*)(lbl_803A6A60 + 0x38) - *(f32*)(lbl_803A6A60 + 0x30);
+        moved = lbl_8047BDD8 * delta * *(f32*)(G + 8);
+        if (moved > lbl_8047BDDC) {
+            moved = lbl_8047BDDC;
+        }
+        if (moved <= lbl_8047BDE0) {
+            moved = lbl_8047BDE0;
+        }
+        *(f32*)(lbl_803A6A60 + 0x30) = *(f32*)(lbl_803A6A60 + 0x30) + moved;
+        rest = *(f32*)(lbl_803A6A60 + 0x38) - *(f32*)(lbl_803A6A60 + 0x30);
+        if (moved > lbl_8047BDAC) {
+        } else {
+            moved = -moved;
+        }
+        if ((rest > lbl_8047BDAC ? rest : -rest) <= moved) {
+            *(f32*)(lbl_803A6A60 + 0x30) = *(f32*)(lbl_803A6A60 + 0x38);
+        } else {
+            if (rest > lbl_8047BDAC) {
+            } else {
+                rest = -rest;
+            }
+            if (rest < lbl_8047BDA0) {
+                *(f32*)(lbl_803A6A60 + 0x30) = *(f32*)(lbl_803A6A60 + 0x38);
+            }
+        }
+    }
+
+    if (*(f32*)(lbl_803A6A60 + 0x34) != *(f32*)(lbl_803A6A60 + 0x3c)) {
+        delta = *(f32*)(lbl_803A6A60 + 0x3c) - *(f32*)(lbl_803A6A60 + 0x34);
+        moved = lbl_8047BDD8 * delta * *(f32*)(G + 8);
+        if (moved > lbl_8047BDDC) {
+            moved = lbl_8047BDDC;
+        }
+        if (moved <= lbl_8047BDE0) {
+            moved = lbl_8047BDE0;
+        }
+        *(f32*)(lbl_803A6A60 + 0x34) = *(f32*)(lbl_803A6A60 + 0x34) + moved;
+        rest = *(f32*)(lbl_803A6A60 + 0x3c) - *(f32*)(lbl_803A6A60 + 0x34);
+        if (moved > lbl_8047BDAC) {
+        } else {
+            moved = -moved;
+        }
+        if ((rest > lbl_8047BDAC ? rest : -rest) <= moved) {
+            *(f32*)(lbl_803A6A60 + 0x34) = *(f32*)(lbl_803A6A60 + 0x3c);
+        } else {
+            if (rest > lbl_8047BDAC) {
+            } else {
+                rest = -rest;
+            }
+            if (rest < lbl_8047BDA0) {
+                *(f32*)(lbl_803A6A60 + 0x34) = *(f32*)(lbl_803A6A60 + 0x3c);
+            }
+        }
+    }
+
+    switch (*(s8*)(work + 1)) {
+    case 0:
+        if (*(s8*)(work + 2) == 0) {
+            **(f32**)(data + 8) = lbl_8047BDAC;
+            work[2] = 1;
+        }
+        break;
+    case 2:
+        p = *(f32**)(data + 8);
+        *p = *p + lbl_8047BDE4;
+        if (*p >= lbl_8047BDA0) {
+            p = *(f32**)(data + 8);
+            *p = *p - lbl_8047BDA0;
+        }
+        break;
+    case 3:
+        if (*(s8*)(work + 2) == 0) {
+            work[2] = 1;
+        }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+#pragma peephole reset
