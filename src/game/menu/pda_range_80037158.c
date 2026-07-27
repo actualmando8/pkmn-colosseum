@@ -8857,3 +8857,55 @@ s32 fn_80039644(void* work, PdaSprite* sprite)
     return 0;
 }
 #pragma peephole reset
+
+extern f32 lbl_8047BA90;
+extern f32 lbl_8047BA94;
+extern f32 lbl_8047BA98;
+extern f32 lbl_8047BAA8;
+
+/* Seed and then advance the main-menu button slide-in animation. */
+#pragma peephole off
+s32 fn_80039128(u8* work)
+{
+    s32 i;
+
+    switch (*(s8*)(work + 1)) {
+    case 0:
+        if (*(s8*)(work + 2) == 0) {
+            for (i = 0; i < 8; i++) {
+                *(f32*)(lbl_803A65B0 + i * 0xc) =
+                    (f32)*(s32*)(lbl_80267060 + i * 0x18 + 4);
+                *(f32*)(lbl_803A65B0 + i * 0xc + 4) =
+                    (f32)*(s32*)(lbl_80267060 + i * 0x18 + 8);
+                *(f32*)(lbl_803A65B0 + i * 0xc + 8) = lbl_8047BAA8;
+            }
+            work[2] = 1;
+        }
+        break;
+    case 2:
+        for (i = 0; i < 8; i++) {
+            *(f32*)(lbl_803A65B0 + i * 0xc) =
+                *(f32*)(lbl_803A65B0 + i * 0xc) + lbl_8047BA90;
+            if (*(f32*)(lbl_803A65B0 + i * 0xc) >
+                (f32)*(s32*)(lbl_80267060 + i * 0x18 + 0xc)) {
+                *(f32*)(lbl_803A65B0 + i * 0xc) =
+                    (f32)*(s32*)(lbl_80267060 + i * 0x18 + 0xc);
+            }
+            *(f32*)(lbl_803A65B0 + i * 0xc + 8) =
+                *(f32*)(lbl_803A65B0 + i * 0xc + 8) + lbl_8047BA94;
+            if (*(f32*)(lbl_803A65B0 + i * 0xc + 8) > lbl_8047BA98) {
+                *(f32*)(lbl_803A65B0 + i * 0xc + 8) = lbl_8047BA98;
+            }
+        }
+        break;
+    case 3:
+        if (*(s8*)(work + 2) == 0) {
+            work[2] = 1;
+        }
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
+#pragma peephole reset
