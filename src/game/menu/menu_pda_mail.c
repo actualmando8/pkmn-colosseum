@@ -2234,6 +2234,7 @@ s32 fn_8004E510(u8* context, u8* object)
         return 0;
     }
 
+    fileHandle = mailGetAttachFileGroup(*(u32*)(attachmentState + 4));
     entry = -1;
     count = 0;
     for (index = 0; index < total; index++) {
@@ -2278,6 +2279,7 @@ void fn_8004C120(void)
     extern void fn_800E24B0(u16);
     extern void fn_800E209C(u16);
     extern s32 fn_8004D34C(s32);
+    extern s32 fn_8004D9C0(s32);
     s32 selection = 0;
     s32 count = mailGetNbMailInMailbox();
     u16 allocation = 0;

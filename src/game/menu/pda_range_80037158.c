@@ -3040,6 +3040,7 @@ u32 fn_80043728(u32 unused, s32 mode, u16 buttons)
 
 void fn_8003A520(void)
 {
+    extern s32 fn_80039498(s32 value);
     s32 result;
 
     result = 0;
