@@ -6368,3 +6368,206 @@ s32 fn_80042658(void* work, s32 mode)
     return 0;
 }
 #pragma peephole reset
+
+typedef struct PdaCamBlock {
+    f32 v[6];
+} PdaCamBlock;
+
+extern f32 lbl_8047BCCC;
+extern const f32 lbl_80267150[];
+extern void menuOffScreenSetDisp(s32 disp);
+extern void fn_801CB954(void* h, s32 b);
+extern void fn_801CB9D8(void* h);
+extern void* fn_801CBA0C(u32 id);
+extern void* fn_80113F48(void);
+extern void* GSresGetResource(u32 group, u32 id);
+extern void GSmodelSetVisibility(void* model, s32 vis);
+extern void GSmodelSetAnimRate(void* model, f32 rate);
+extern void GScameraGetPosition(void* cam, void* out);
+extern void GScameraGetRotation(void* cam, void* out);
+extern void cameraPlayAnime(u32 group, u32 id, s32 c, s32 d);
+extern void menuModelInit(void* work, s32 w, s32 h);
+extern void* peopleInfoBiosGetPtr(u32 id);
+extern void fn_8018F4C8(void* info, s32 index, s32* motion, s32* out);
+extern void menuModelSetMotion(void* work, s32 motion);
+extern void fn_8010A010(void* work, u32 id);
+
+/* Build the PDA scene: camera rig, both model slots and the memo index. */
+#pragma peephole off
+void fn_80048918(void)
+{
+    u8* S = (u8*)&lbl_803A6818;
+    const PdaCamBlock* tbl = (const PdaCamBlock*)lbl_80267150;
+    PdaVec3 rot;
+    PdaCamBlock blk;
+    s32 motion;
+    f32 persp3;
+    f32 persp2;
+    f32 persp1;
+    f32 persp0;
+    s32 out8;
+    void* res;
+    void* cam;
+    void* anim;
+    u32 pokemon;
+    u16 total;
+
+    menuOffScreenSetDisp(0);
+    *(s32*)(S + 0x110) = 0;
+    *(s32*)(S + 0x114) = 0;
+    *(s32*)(S + 0x10c) = 0;
+    fn_801CB954(NULL, 0);
+    res = GSresGetResource((u32)fn_80113F48(), 0);
+    if (res != NULL) {
+        GSmodelSetVisibility(res, 0);
+    }
+    fn_801CB9D8(NULL);
+    *(f32*)(S + 0x6c) = lbl_8047BC94;
+    *(f32*)(S + 0x70) = lbl_8047BC94;
+    *(f32*)(S + 0x74) = lbl_8047BC94;
+    *(f32*)(S + 0x64) = lbl_8047BCF0;
+    anim = fn_801CBA0C(0xd171000);
+    *(void**)(S + 0x10c) = anim;
+    res = GSresGetResource((u32)fn_80113F48(), (u32)anim);
+    *(void**)(S + 0x110) = res;
+    GSmodelSetAnimRate(res, lbl_8047BD18);
+    blk = *tbl;
+    cam = GSresGetResource(0x17, 0xd731800);
+    *(void**)(S + 0x114) = cam;
+    GScameraGetPosition(cam, &blk.v[3]);
+    GScameraGetRotation(cam, &rot);
+    blk.v[0] = *(f32*)((u8*)cam + 0x100);
+    blk.v[1] = *(f32*)((u8*)cam + 0x104);
+    blk.v[2] = *(f32*)((u8*)cam + 0x108);
+    GScameraGetPerspective(cam, &persp0, &persp1, &persp2, &persp3);
+    GSvecCopy(S + 0x218, &blk.v[3]);
+    GSvecCopy(S + 0x224, &blk.v[0]);
+    *(f32*)(S + 0x230) = persp0;
+    *(f32*)(S + 0x234) = persp1;
+    *(f32*)(S + 0x238) = persp2;
+    *(f32*)(S + 0x23c) = persp3;
+    GScameraSetPerspective(cam, persp0, persp1, persp2, persp3);
+    GSvecCopy(S + 0x118, &blk.v[3]);
+    GSvecCopy(S + 0x124, &rot);
+    GSvecCopy(S + 0x130, &blk.v[0]);
+    *(f32*)(S + 0x13c) = persp0;
+    *(f32*)(S + 0x140) = persp1;
+    *(f32*)(S + 0x144) = persp2;
+    *(f32*)(S + 0x148) = persp3;
+    cameraPlayAnime(0x17, 0xd731800, 0, 1);
+    GSscene_SetMode(4);
+    *(s32*)(S + 0x78) = 0;
+    menuModelInit(S + 0x7c, 0x280, 0x1e0);
+    menuModelInit(S + 0xc4, 0x280, 0x1e0);
+    lbl_8047A4E0 = 0;
+    lbl_8047A4E0 = (u32)pdaAlloc(0x140, 0x20);
+    lbl_804788C0 = memoDataGetCount(0);
+    lbl_8047A4E4 = (u16*)pdaAlloc(0x400, 0x20);
+    *(f32*)(S + 0x2c) = lbl_8047BC94;
+    *(f32*)(S + 0x30) = lbl_8047BC94;
+    *(f32*)(S + 0x34) = lbl_8047BC94;
+    *(f32*)(S + 0x38) = lbl_8047BC94;
+    *(s32*)(S + 0x0) = 0;
+    *(s32*)(S + 0x28) = 0;
+    *(s32*)(S + 0x14) = 0;
+    *(s32*)(S + 0x4) = 0;
+    *(s32*)(S + 0x20) = 0;
+    *(f32*)(S + 0x44) = lbl_8047BC94;
+    *(s8*)(S + 0x48) = 0;
+    *(f32*)(S + 0x64) = lbl_8047BCF0;
+    *(f32*)(S + 0x68) = lbl_8047BCF0;
+    *(f32*)(S + 0x6c) = lbl_8047BC94;
+    *(f32*)(S + 0x70) = lbl_8047BC94;
+    *(f32*)(S + 0x74) = lbl_8047BC94;
+    *(f32*)(S + 0x64) = lbl_8047BCF0;
+    *(s32*)(S + 0x1c) = 0;
+    *(f32*)(S + 0x4c) = lbl_8047BC94;
+    *(f32*)(S + 0x50) = lbl_8047BCBC;
+    *(f32*)(S + 0x58) = lbl_8047BC94;
+    *(f32*)(S + 0x54) = lbl_8047BCBC;
+    *(f32*)(S + 0x5c) = lbl_8047BCBC;
+    *(f32*)(S + 0x60) = lbl_8047BCBC;
+    lbl_804788C4 = 5;
+    *(s8*)(S + 0x158) = 0;
+    *(s8*)(S + 0x159) = 0;
+    *(s8*)(S + 0x15b) = 0;
+    *(s8*)(S + 0x15a) = 0;
+    *(s8*)(S + 0x15c) = 0;
+    *(s8*)(S + 0x15d) = 0;
+    *(s8*)(S + 0x15f) = 0;
+    *(s8*)(S + 0x15e) = 0;
+    *(s32*)(S + 0x154) = 0;
+    *(f32*)(S + 0x1e0) = lbl_8047BCCC;
+    *(f32*)(S + 0x1dc) = lbl_8047BCCC;
+    *(f32*)(S + 0x1cc) = lbl_8047BC94;
+    *(f32*)(S + 0x1d0) = lbl_8047BC94;
+    *(f32*)(S + 0x1d4) = lbl_8047BC94;
+    *(f32*)(S + 0x1d8) = lbl_8047BC94;
+    *(s8*)(S + 0x164) = 0;
+    *(s8*)(S + 0x178) = 0;
+    *(s8*)(S + 0x18c) = 0;
+    *(s8*)(S + 0x1a0) = 0;
+    *(s8*)(S + 0x1b4) = 0;
+    *(s32*)(S + 0x1e4) = 0;
+    fn_8003D4C8();
+    if (lbl_804788C0 != 0) {
+        pokemon = pdaLoadPokemon(lbl_803A6818.currentIndex);
+        if (fn_8010A210(S + 0x7c, pokemon) == 0) {
+            menuModelFree(S + 0x7c);
+            fn_80109C88(S + 0x7c, pokemon);
+        }
+        *((u8*)&lbl_803A6818 + 0x214) = 0;
+        switch (*(s32*)(S + 0x1c)) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 6:
+        case 7:
+        case 8:
+        case 0xb:
+        case 0xc:
+            *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0(S + 0x7c);
+            break;
+        case 5:
+            *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4(S + 0x7c, S + 0xc4);
+            *((u8*)&lbl_803A6818 + 0x214) = fn_8003D1FC_setup(S + 0xc4);
+            break;
+        default:
+            break;
+        }
+    }
+    fn_8010A010(S + 0xc4, 0xf70400);
+    switch (*(s32*)(S + 0x1c)) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 6:
+    case 7:
+    case 8:
+    case 0xb:
+    case 0xc:
+        *((u8*)&lbl_803A6818 + 0x214) = fn_80047CC0(S + 0x7c);
+        break;
+    case 5:
+        *((u8*)&lbl_803A6818 + 0x214) = fn_800478B4(S + 0x7c, S + 0xc4);
+        *((u8*)&lbl_803A6818 + 0x214) = fn_8003D1FC_setup(S + 0xc4);
+        break;
+    default:
+        break;
+    }
+    fn_8018F4C8(peopleInfoBiosGetPtr(0xf70400), 1, &motion, &out8);
+    menuModelSetMotion(S + 0xc4, motion);
+    total = lbl_8047A4E8;
+    *(f32*)((u8*)&lbl_803A6818 + 0x40) = lbl_8047BC94;
+    *(s32*)((u8*)&lbl_803A6818 + 0x8) = -5;
+    if (total >= 5) {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = 5;
+    } else {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = total;
+    }
+    *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+    *(s32*)((u8*)&lbl_803A6818 + 0x14c) = 0;
+}
+#pragma peephole reset
