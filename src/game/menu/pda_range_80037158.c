@@ -4199,7 +4199,7 @@ s32 fn_8003D1FC(void)
 
 /* Rebuild the memo index table, optionally filtered by the active color tab. */
 #pragma peephole off
-void fn_8003D4C8(void)
+u16 fn_8003D4C8(void)
 {
     extern u16 memoDataGetCount(s32 a);
     extern u16 memoDataGetPokemonID(s32 a, u16 index);
@@ -4247,6 +4247,7 @@ void fn_8003D4C8(void)
     }
     *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
     *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+    return total;
 }
 #pragma peephole reset
 
@@ -6569,5 +6570,323 @@ void fn_80048918(void)
     }
     *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
     *(s32*)((u8*)&lbl_803A6818 + 0x14c) = 0;
+}
+#pragma peephole reset
+
+extern s8 lbl_804788D4[];
+extern void* menuDataBiosGetPtr(s32 id);
+extern void* windowGetKeyInfo(void* window);
+extern void menuPlaySe(s32 id, s32 se);
+
+/* Which saved-view slot the current page/sub-page pair uses. */
+static inline s32 pdaViewSlot(u8* L)
+{
+    s32 slot = 0;
+
+    switch (*(s8*)(L + 9)) {
+    case 0:
+        break;
+    case 1:
+        slot = 1;
+        break;
+    case 2:
+        if (*(s8*)(L + 0xa) == 0) {
+            slot = 2;
+        } else {
+            slot = 3;
+        }
+        break;
+    case 3:
+        slot = 4;
+        break;
+    default:
+        break;
+    }
+    return slot;
+}
+
+/* Reset the carousel to the top of a freshly rebuilt memo list. */
+static inline void pdaResetCarousel(u16 total)
+{
+    *(s32*)((u8*)&lbl_803A6818 + 0x0) = 0;
+    *(f32*)((u8*)&lbl_803A6818 + 0x2c) = lbl_8047BC94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x30) = lbl_8047BC94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x34) = lbl_8047BC94;
+    *(f32*)((u8*)&lbl_803A6818 + 0x38) = lbl_8047BC94;
+    *(s32*)((u8*)&lbl_803A6818 + 0x8) = -5;
+    if (total >= 5) {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = 5;
+    } else {
+        *(s32*)((u8*)&lbl_803A6818 + 0xc) = total;
+    }
+    *(s32*)((u8*)&lbl_803A6818 + 0x10) = total;
+}
+
+/* Confirm / cancel handling for the PDA's filter and sort menus. */
+#pragma peephole off
+void fn_80040308(void* menu)
+{
+    u8* S = (u8*)&lbl_803A6818;
+    u8* L = (u8*)&lbl_803A6818 + 0x154;
+    u16 keys;
+    u16 total;
+    s32 page;
+    s32 slot;
+    u8* view;
+    f32 delta;
+    f32 moved;
+    f32 rest;
+
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x4c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x50), lbl_8047BCB8);
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x54),
+            *(f32*)((u8*)&lbl_803A6818 + 0x58), lbl_8047BCB8);
+    pdaRamp((f32*)((u8*)&lbl_803A6818 + 0x5c),
+            *(f32*)((u8*)&lbl_803A6818 + 0x60), lbl_8047BCC0);
+    if (*(f32*)(L + 0x88) != *(f32*)(L + 0x8c)) {
+        delta = *(f32*)(L + 0x8c) - *(f32*)(L + 0x88);
+        moved = lbl_8047BCC4 * delta * *(f32*)((u8*)&lbl_803A6818 + 0x3c);
+        if (moved > lbl_8047BC98) {
+            moved = lbl_8047BC98;
+        }
+        if (moved <= lbl_8047BCC8) {
+            moved = lbl_8047BCC8;
+        }
+        *(f32*)(L + 0x88) = *(f32*)(L + 0x88) + moved;
+        rest = *(f32*)(L + 0x8c) - *(f32*)(L + 0x88);
+        if (moved > lbl_8047BC94) {
+        } else {
+            moved = -moved;
+        }
+        if (pdaFabs(rest) <= moved) {
+            *(f32*)(L + 0x88) = *(f32*)(L + 0x8c);
+        } else {
+            if (rest > lbl_8047BC94) {
+            } else {
+                rest = -rest;
+            }
+            if (rest < lbl_8047BCBC) {
+                *(f32*)(L + 0x88) = *(f32*)(L + 0x8c);
+            }
+        }
+    }
+    if (*(f32*)(S + 0x50) != *(f32*)(S + 0x4c)) {
+        return;
+    }
+    if (menu == NULL) {
+        return;
+    }
+    keys = *(u16*)((u8*)windowGetKeyInfo(
+                       menuDataBiosGetPtr(*(s32*)((u8*)menu + 4))) +
+                   4);
+    if ((keys & 0x10) != 0) {
+        fn_80166AB8(0x24, 0, 0);
+        page = *(s8*)(L + 9);
+        if (page == 4) {
+            switch (*(s32*)(L + 0x90)) {
+            case 0:
+                if (fn_8003D4C8() != 0) {
+                    total = lbl_8047A4E8;
+                    *(s32*)(L + 0x90) = 1;
+                    pdaResetCarousel(total);
+                } else {
+                    *(s32*)(L + 0x90) = 2;
+                }
+                break;
+            case 1:
+                *(s8*)((u8*)menu + 0x98) = 1;
+                *(s8*)((u8*)menu + 0x99) = 1;
+                if (lbl_804788C0 != 0) {
+                    {
+                        u32 pokemon =
+                            pdaLoadPokemon(lbl_803A6818.currentIndex);
+                        if (fn_8010A210((u8*)&lbl_803A6818 + 0x7c, pokemon) ==
+                            0) {
+                            menuModelFree((u8*)&lbl_803A6818 + 0x7c);
+                            fn_80109C88((u8*)&lbl_803A6818 + 0x7c, pokemon);
+                        }
+                        *((u8*)&lbl_803A6818 + 0x214) = 0;
+                        switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 0xb:
+                        case 0xc:
+                            *((u8*)&lbl_803A6818 + 0x214) =
+                                fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
+                            break;
+                        case 5:
+                            *((u8*)&lbl_803A6818 + 0x214) =
+                                fn_800478B4((u8*)&lbl_803A6818 + 0x7c,
+                                            (u8*)&lbl_803A6818 + 0xc4);
+                            *((u8*)&lbl_803A6818 + 0x214) =
+                                fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+                break;
+            case 2:
+                *(s32*)(L + 0x90) = 0;
+                break;
+            default:
+                break;
+            }
+        } else {
+            switch (*(s32*)L) {
+            case 0:
+                if (lbl_8047BCCC == *(f32*)(L + 0x88)) {
+                    *(s8*)(L + 0xc) = lbl_804788D4[page];
+                    *(s32*)L = 1;
+                    *(f32*)(L + 0x8c) = lbl_8047BC94;
+                    switch (page) {
+                    case 0:
+                        L[0xb] = L[4];
+                        break;
+                    case 1:
+                        L[0xb] = L[5];
+                        break;
+                    case 2:
+                        L[0xb] = *(u8*)(L + *(s8*)(L + 0xa) + 6);
+                        break;
+                    case 3:
+                        L[0xb] = L[8];
+                        break;
+                    default:
+                        break;
+                    }
+                    if (*(s8*)(L + 0xc) >= 10) {
+                        if ((s8)(L[0xb] - 9) < 0) {
+                            L[0x74] = 0;
+                        }
+                        L[0x75] = 10;
+                        L[0x75] = (s8)(L[0x74] + 10);
+                        *(f32*)(L + 0x7c) = (f32)(*(s8*)(L + 0x74) * -0x1d);
+                        *(f32*)(L + 0x84) = (f32)(*(s8*)(L + 0x74) * -0x1d);
+                    } else {
+                        L[0x74] = 0;
+                        L[0x75] = L[0xc];
+                        *(f32*)(L + 0x7c) = lbl_8047BC94;
+                        *(f32*)(L + 0x84) = lbl_8047BC94;
+                    }
+                    slot = pdaViewSlot(L);
+                    view = L + slot * 0x14 + 0x10;
+                    if (*(s8*)view != 0) {
+                        L[0x74] = view[1];
+                        L[0x75] = view[2];
+                        *(f32*)(L + 0x78) = *(f32*)(view + 4);
+                        *(f32*)(L + 0x7c) = *(f32*)(view + 8);
+                        *(f32*)(L + 0x80) = *(f32*)(view + 0xc);
+                        *(f32*)(L + 0x84) = *(f32*)(view + 0x10);
+                    }
+                    menuPlaySe(*(s32*)((u8*)menu + 4), 2);
+                }
+                break;
+            case 1:
+                if (lbl_8047BC94 == *(f32*)(L + 0x88)) {
+                    switch (page) {
+                    case 0:
+                        L[4] = L[0xb];
+                        break;
+                    case 1:
+                        L[5] = L[0xb];
+                        break;
+                    case 2:
+                        *(u8*)(L + *(s8*)(L + 0xa) + 6) = L[0xb];
+                        break;
+                    case 3:
+                        L[8] = L[0xb];
+                        break;
+                    default:
+                        break;
+                    }
+                    slot = pdaViewSlot(L);
+                    view = L + slot * 0x14 + 0x10;
+                    view[0] = 1;
+                    view[1] = L[0x74];
+                    view[2] = L[0x75];
+                    *(f32*)(view + 4) = *(f32*)(L + 0x78);
+                    *(f32*)(view + 8) = *(f32*)(L + 0x7c);
+                    *(f32*)(view + 0xc) = *(f32*)(L + 0x80);
+                    *(f32*)(view + 0x10) = *(f32*)(L + 0x84);
+                    *(s32*)L = 0;
+                    *(f32*)(L + 0x8c) = lbl_8047BCCC;
+                    menuPlaySe(*(s32*)((u8*)menu + 4), 2);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    if ((keys & 0x20) != 0) {
+        fn_80166AB8(0x25, 0, 0);
+        switch (*(s32*)L) {
+        case 0:
+            if (lbl_8047BCCC == *(f32*)(L + 0x88)) {
+                if (*(s32*)(L + 0x90) != 1) {
+                    fn_8003D818();
+                    total = lbl_8047A4E8;
+                    pdaResetCarousel(total);
+                    if (lbl_804788C0 != 0) {
+                        {
+                        u32 pokemon =
+                            pdaLoadPokemon(lbl_803A6818.currentIndex);
+                        if (fn_8010A210((u8*)&lbl_803A6818 + 0x7c, pokemon) ==
+                            0) {
+                            menuModelFree((u8*)&lbl_803A6818 + 0x7c);
+                            fn_80109C88((u8*)&lbl_803A6818 + 0x7c, pokemon);
+                        }
+                        *((u8*)&lbl_803A6818 + 0x214) = 0;
+                        switch (*(s32*)((u8*)&lbl_803A6818 + 0x1c)) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 0xb:
+                        case 0xc:
+                            *((u8*)&lbl_803A6818 + 0x214) =
+                                fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
+                            break;
+                        case 5:
+                            *((u8*)&lbl_803A6818 + 0x214) =
+                                fn_800478B4((u8*)&lbl_803A6818 + 0x7c,
+                                            (u8*)&lbl_803A6818 + 0xc4);
+                            *((u8*)&lbl_803A6818 + 0x214) =
+                                fn_8003D1FC_setup((u8*)&lbl_803A6818 + 0xc4);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                    }
+                    *((u8*)&lbl_803A6818 + 0x214) =
+                        fn_80047CC0((u8*)&lbl_803A6818 + 0x7c);
+                    *(s8*)((u8*)menu + 0x98) = 1;
+                    *(s8*)((u8*)menu + 0x99) = 1;
+                    menuPlaySe(*(s32*)((u8*)menu + 4), 3);
+                }
+            }
+            break;
+        case 1:
+            if (lbl_8047BC94 == *(f32*)(L + 0x88)) {
+                *(s32*)L = 0;
+                *(f32*)(L + 0x8c) = lbl_8047BCCC;
+                menuPlaySe(*(s32*)((u8*)menu + 4), 2);
+            }
+            break;
+        default:
+            break;
+        }
+    }
 }
 #pragma peephole reset
