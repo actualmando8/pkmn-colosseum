@@ -39,7 +39,8 @@ Reject a result when exactness depends on any of the following:
 - dummy/self assignments, uninitialized reads, volatile added only to color
   registers, artificial structs/unions, pointer aliases, or integer aliases;
 - invented inline helpers, comma expressions, labels/gotos, or temporaries used
-  only to manipulate allocation or scheduling;
+  only to manipulate allocation or scheduling (see "Reconstructed inline
+  helpers" below for the admissible case);
 - changed null, range, signedness, overflow, evaluation-order, or side-effect
   behavior;
 - a text-only match whose constants, jump tables, data alignment, relocations,
@@ -49,6 +50,44 @@ Reject a result when exactness depends on any of the following:
 
 Legacy candidate wrappers can remain research evidence, but a promoted
 `Matching` source file must stand on its own without forbidden shaping.
+
+### Reconstructed inline helpers
+
+The reject above is aimed at *invented* helpers — a one-use function wrapped
+around an expression so MWCC colours a register differently. It is not a ban on
+recovering a helper the original source actually had. Admit a `static inline`
+helper when the target itself proves one existed:
+
+- **Repeated expansion.** The same instruction sequence appears at two or more
+  call sites in the target, with the same call order and constants. One
+  occurrence is not evidence.
+- **Inline fingerprints.** The expansion carries artifacts only inlining
+  produces: a branch on a stale condition register (the helper's guard, tested
+  again after CSE folded the first test), a return value routed through a temp
+  and copied to its home register, or a helper's `return 0` merged into the
+  caller's own return-0 block.
+- **Semantics unchanged.** The helper is plain program logic with a name that
+  describes what it does, and inlining it by hand would leave the source
+  meaning identical.
+
+Such a helper must still pay its way on the normal gates: it may not appear as
+its own symbol in the object, and the full-TU build, relocations, link, and
+section checks all still apply. If the helper survives as a standalone symbol,
+it was not what the target inlined — reject it.
+
+Evidence (2026-07-26, `src/game/menu/pda_range_80037158.c`): the PDA range's
+memo-entry loader is expanded up to three times inside single functions, twice
+carrying a dead `beq` on a stale CR from the folded duplicate guard. Recovering
+it as two `static inline` variants — one taking a table index, one taking an
+entry ID — moved `fn_8003DC54` 91.2 → 96.2%, `fn_8003D4C8` 95.1 → 96.4%, and
+`fn_8003D8CC` 93.8 → 96.4%, with no other change. Declaration-only stubs cannot
+reproduce those objects at all.
+
+Note the farm cost: `gen_workunits.py` prunes sibling function bodies, so a
+helper reduced to a declaration changes the isolated target's code and the unit
+fails its own fidelity gate. The generator therefore keeps `static inline`
+bodies; the single-symbol gate stays honest because a helper that did not
+actually inline emits a symbol and the unit is rejected.
 
 ## Resume checklist
 
