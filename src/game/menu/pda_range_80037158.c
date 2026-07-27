@@ -8713,3 +8713,39 @@ void fn_8003C2B8(PdaSprite* alphaSprite, PdaEvent* event)
     fn_800FE35C();
 }
 #pragma peephole reset
+
+extern u8 lbl_80267060[];
+extern u8 lbl_803A65B0[];
+
+/* Position and tint one of the PDA's eight main menu buttons. */
+#pragma peephole off
+s32 fn_80038E74(void* work, PdaSprite* sprite)
+{
+    s32 i;
+
+    (void)work;
+    for (i = 0; i < 8; i++) {
+        if (sprite->eventId == *(s32*)(lbl_80267060 + i * 0x18)) {
+            break;
+        }
+    }
+    if (i >= 8) {
+        return 0;
+    }
+    sprite->field_50 = (s32)*(f32*)(lbl_803A65B0 + i * 0xc);
+    sprite->field_52 = (s32)*(f32*)(lbl_803A65B0 + i * 0xc + 4);
+    sprite->alpha = (s32)*(f32*)(lbl_803A65B0 + i * 0xc + 8);
+    if (lbl_80267060[i * 0x18 + 0x14] != 0) {
+        if (sprite->eventId == (s32)menuGetCursorItemID(0x24)) {
+            sprite->colorR = 0xff;
+            sprite->colorG = 0xff;
+            sprite->colorB = 0xff;
+        } else {
+            sprite->colorR = 0x46;
+            sprite->colorG = 0x8f;
+            sprite->colorB = 0xb4;
+        }
+    }
+    return 0;
+}
+#pragma peephole reset
