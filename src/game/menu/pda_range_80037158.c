@@ -6420,35 +6420,6 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
         fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
                     (void*)(*(u32**)(T + 0x24c))[*(s8*)(S + 0x158)]);
         break;
-    case 0xd73:
-        switch (*(s32*)(S + 0x154)) {
-        case 0:
-            if (*(s8*)(S + 0x15d) == 4) {
-                slot = *(s32*)(S + 0x1e4);
-                if (slot == 0) {
-                    msg = ((u32*)(T + 0x270))[*(s8*)(S + 0x15d)];
-                }
-                if (slot == 2) {
-                    msg = 0x3712;
-                }
-                if (slot == 1) {
-                    msg = 0x3714;
-                }
-            } else {
-                msg = ((u32*)(T + 0x270))[*(s8*)(S + 0x15d)];
-            }
-            fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100), (void*)msg);
-            break;
-        case 1:
-            if (*(s8*)(S + 0x15d) == 3) {
-                fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
-                            (void*)((u32*)(T + 0x25c))[*(s8*)(S + 0x15f)]);
-            }
-            break;
-        default:
-            break;
-        }
-        break;
     case 0xd54:
         if (*(s8*)(S + 0x15d) == 0) {
             sprite->flags |= 2;
@@ -6482,6 +6453,35 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
             sprite->flags |= 2;
         } else {
             sprite->flags &= ~2;
+        }
+        break;
+    case 0xd73:
+        switch (*(s32*)(S + 0x154)) {
+        case 0:
+            if (*(s8*)(S + 0x15d) == 4) {
+                slot = *(s32*)(S + 0x1e4);
+                if (slot == 0) {
+                    msg = ((u32*)(T + 0x270))[*(s8*)(S + 0x15d)];
+                }
+                if (slot == 2) {
+                    msg = 0x3712;
+                }
+                if (slot == 1) {
+                    msg = 0x3714;
+                }
+            } else {
+                msg = ((u32*)(T + 0x270))[*(s8*)(S + 0x15d)];
+            }
+            fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100), (void*)msg);
+            break;
+        case 1:
+            if (*(s8*)(S + 0x15d) == 3) {
+                fn_800FB680(0, 0, pdaTint(alphaSprite, -0x100),
+                            (void*)((u32*)(T + 0x25c))[*(s8*)(S + 0x15f)]);
+            }
+            break;
+        default:
+            break;
         }
         break;
     case 0xd59:
