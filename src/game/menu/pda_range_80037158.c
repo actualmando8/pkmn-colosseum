@@ -3091,7 +3091,8 @@ void fn_8003B2D8(u8* context)
     u8* window;
     u16 battleId;
     u32 message;
-    u32 secondary;
+    u8 secondary;
+    u32 caption;
     s32 variant;
 
     extern s32 fn_801EE544(u16, s8*);
@@ -3099,15 +3100,16 @@ void fn_8003B2D8(u8* context)
     window = (u8*)&lbl_803A6748;
     context[0x8B] = lbl_8047BAC0 * *(f32*)(window + 0x44);
     secondary = 0;
-    if (lbl_8047A4D0 == 0) {
-        message = 0;
-    } else {
+    if (lbl_8047A4D0 != 0) {
         battleId = lbl_8047A4D4[(u16)*(u32*)window].battleId;
         message = fn_801EE544(battleId, (s8*)(window + 0x94));
         variant = *(u8*)(window + 0x94);
-        if (variant == 0) {
+        switch (variant) {
+        case 0:
             message = 0x371F;
-        } else if (variant < 3) {
+            break;
+        case 1:
+        case 2:
             if (battleId == 0x43) {
                 message = 0x12B0;
             } else if (fn_801EEFAC(battleId, 0) == 9) {
@@ -3117,22 +3119,35 @@ void fn_8003B2D8(u8* context)
                 fightTrainerDataBiosGetPtr();
                 message = fn_801FCC7C();
             }
+            break;
         }
         if (secondary == 0) {
             message = fn_800FA280(message);
         }
+    } else {
+        message = secondary;
     }
     if (message == 0) {
         message = fn_800FA280(1);
     }
-    secondary = fn_8003CE1C(*(u32*)window);
-    if (secondary == 0) {
-        secondary = fn_800FA280(1);
+    caption = fn_8003CE1C(*(u32*)window);
+    if (caption == 0) {
+        caption = fn_800FA280(1);
     }
-    fn_80132A38(0x37, secondary);
-    fn_800FB680(0, 0, (s8)context[0x8B], (void*)0xE7);
+    fn_80132A38(0x37, caption);
+    {
+        s32 colorMask = -0x100;
+        u32 alpha = context[0x8B];
+
+        fn_800FB680(0, 0, alpha | colorMask, (void*)0xE7);
+    }
     fn_80132A38(0x37, message);
-    fn_800FB680(0xB4, 0, (s8)context[0x8B], (void*)0xE7);
+    {
+        s32 colorMask = -0x100;
+        u32 alpha = context[0x8B];
+
+        fn_800FB680(0xB4, 0, alpha | colorMask, (void*)0xE7);
+    }
 }
 #pragma peephole reset
 /* Readable ports reconstructed from the PDA callback state machines. */
