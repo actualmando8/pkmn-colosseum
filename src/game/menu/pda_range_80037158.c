@@ -1602,6 +1602,7 @@ void fn_8003A10C(s32 mode)
 }
 #pragma peephole reset
 
+#pragma peephole off
 s32 fn_8003A6C0(PdaDrawWork* work, PdaSprite* sprite)
 {
     extern const s32 lbl_80267130[3];
@@ -1634,6 +1635,7 @@ s32 fn_8003A6C0(PdaDrawWork* work, PdaSprite* sprite)
     fn_800FB8C8(0, 0, sprite->x, sprite->y, work->drawData, 0xC9);
     return 0;
 }
+#pragma peephole reset
 
 #pragma peephole off
 typedef struct PdaNumberRange {
@@ -1803,6 +1805,7 @@ s32 fn_8003ACE8(s32 arg0, s32 arg1, s32 arg2)
 }
 #pragma peephole reset
 
+#pragma peephole off
 s32 fn_8003AD6C(PdaSelectionWork* work, PdaSprite* sprite)
 {
     extern const s32 lbl_80267140[4];
@@ -1835,6 +1838,7 @@ s32 fn_8003AD6C(PdaSelectionWork* work, PdaSprite* sprite)
     winSpriteSetDisp(sprite, group == work->selectedIndex);
     return 0;
 }
+#pragma peephole reset
 
 #pragma peephole off
 s32 fn_8003AE84(void)
@@ -2032,6 +2036,7 @@ void fn_8003C728(PdaSprite* alphaSprite, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+#pragma peephole off
 s32 fn_8003CE1C(s32 index)
 {
     extern u32 lbl_8047A4D0;
@@ -2085,6 +2090,7 @@ s32 fn_8003CE1C(s32 index)
     }
     return GSmsgGetGSchar(message);
 }
+#pragma peephole reset
 
 #pragma peephole off
 void fn_8003D818(void)
@@ -2189,6 +2195,7 @@ void fn_80043CD8(PdaSprite* alphaSprite, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+#pragma peephole off
 void fn_80043DC0(PdaSprite* alphaSprite, PdaSprite* sprite)
 {
     extern u8 lbl_802EF0A8[];
@@ -2216,6 +2223,7 @@ void fn_80043DC0(PdaSprite* alphaSprite, PdaSprite* sprite)
     }
     sprite->flags &= ~2;
 }
+#pragma peephole reset
 
 #pragma peephole off
 void fn_80043EC8(PdaSprite* alphaSprite, PdaSprite* sprite)
@@ -2247,6 +2255,7 @@ void fn_80043EC8(PdaSprite* alphaSprite, PdaSprite* sprite)
 }
 #pragma peephole reset
 
+#pragma peephole off
 void fn_800472CC(PdaSprite* alphaSprite)
 {
     extern PdaOrbitPoint lbl_802E52C8[8];
@@ -2275,6 +2284,7 @@ void fn_800472CC(PdaSprite* alphaSprite)
         }
     }
 }
+#pragma peephole reset
 
 extern u8 lbl_802EF0A8[];
 extern u8 lbl_80314F98[];
@@ -2839,6 +2849,7 @@ void fn_8004B598(s32 unused, PdaSprite* sprite, s32 messageId)
 }
 #pragma peephole reset
 
+#pragma peephole off
 void fn_8003CF38(void)
 {
     u8 temporary[8];
@@ -2919,6 +2930,7 @@ void fn_8003CF38(void)
     }
     lbl_8047A4D8 = 0;
 }
+#pragma peephole reset
 
 #pragma peephole off
 u32 fn_80043728(u32 unused, s32 mode, u16 buttons)
