@@ -6349,10 +6349,10 @@ void fn_8003F464(PdaSprite* alphaSprite, PdaSprite* sprite)
     case 0xd6f:
         pdaPlaceSprite(alphaSprite, sprite);
         fn_800FE38C(
-            (s16)(*(s16*)(lbl_802EF0A8 + 0x17b52) -
-                  *(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 2)),
-            (s16)(*(s16*)(lbl_802EF0A8 + 0x17b54) -
-                  *(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 4)),
+            *(s16*)(lbl_802EF0A8 + 0x17b52) -
+                *(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 2),
+            *(s16*)(lbl_802EF0A8 + 0x17b54) -
+                *(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 4),
             *(s16*)(lbl_802EF0A8 + 0x17b56),
             *(s16*)(lbl_802EF0A8 + 0x17b58));
         if (*(s8*)(S + 0x15d) != 4) {
