@@ -549,6 +549,7 @@ u32 _expRecover__FP7PokemonUl(u32 r3,u32 r4)
 void preReliveMain(void)
 
 {
+    extern void fn_8025DCBC(int *param);
     extern u32 _DAT_804782bc;
     extern u32 _DAT_804782c0;
     extern u32 _DAT_804782c4;
