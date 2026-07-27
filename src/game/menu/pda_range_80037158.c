@@ -768,7 +768,8 @@ s32 fn_8003956C(void* window, void* sprite)
 {
     extern u16 pcboxGetNbItemSlot(s32 box);
     extern void* pcboxGetItem(s32 box, s16 slot);
-        s32 count;
+    extern u8 fn_801429E8(void* item);
+    s32 count;
     s32 slot;
     s32 slotCount;
     u16 boundedSlotCount;
@@ -1118,7 +1119,7 @@ s32 fn_80038A0C(void)
 s32 fn_80039004(PdaSprite* context, PdaSprite* sprite)
 {
     extern f32 lbl_803A65B0[][3];
-    s8 index;
+    s32 index;
 
     index = context->selectedIndex;
     if (index < 0 || index >= 8) {
