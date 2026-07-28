@@ -2642,10 +2642,12 @@ void fn_80044378(u8* context, PdaSprite* sprite)
     u32 model;
 
     scene = (u8*)&lbl_803A6818;
-    if (sprite->messageId == 0x12B2) {
-        context[0x8B] = lbl_8047BCA0 * *(f32*)(scene + 0x54);
-    } else {
+    /* retail reads the s16 eventId at +6 here, not messageId at +0x4c;
+       0x12B2 is an eventId value -- it appears as a case in the switch below */
+    if (sprite->eventId != 0x12B2) {
         context[0x8B] = lbl_8047BCA0 * *(f32*)(scene + 0x4C);
+    } else {
+        context[0x8B] = lbl_8047BCA0 * *(f32*)(scene + 0x54);
     }
     messageId = sprite->eventId;
     switch (messageId) {

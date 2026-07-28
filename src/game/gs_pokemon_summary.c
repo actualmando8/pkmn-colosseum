@@ -554,7 +554,7 @@ s32 fn_800155B0(s32 x, s32 pageIndex, u16* packedRange) {
             msgctrlSetValue(0x34, level);
             fn_800FB680(textX, y, -1, 0xCA);
             textX += (s32)(u16)(GSmsgGetRect(0xCA) >> 16);
-            itemDataBiosGetPtr((u16)species);
+            itemDataBiosGetPtr(species);
             textId = itemDataBiosGetName();
             fn_800FB680(textX + 9, y, -1, textId);
 
@@ -2004,8 +2004,13 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
     u32 selectedValue;
     u32 menuArg[5];
 
-    itemDataBiosGetPtr(species);
-    if ((u8)fn_80143F9C() == 0) {
+    /* (u16) is a no-op on a u16 param, but it is what makes MWCC emit
+       retail's clrlwi here; the same cast at the inner call site does not. */
+    itemDataBiosGetPtr((u16)species);
+    /* retail masks to u8 then compares *signed*; an inline (u8)x == 0 gives
+       cmplwi instead. */
+    result = (u8)fn_80143F9C();
+    if (result == 0) {
         msgctrlSetValue(0x2D, species);
         winMsgOpen(2, 0x426C, 1, 0);
         winMsgClose(1);
