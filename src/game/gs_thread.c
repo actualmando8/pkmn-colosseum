@@ -7637,26 +7637,37 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
     u32 i;
     u32 lowId;
     u32 attempts;
+    const char *msgs;
 
-    mgr = (u8 *)lbl_80478B00;
-    count = *(u16 *)mgr;
-    for (i = 0; i < count; i++) {
-        candidate = (u8 *)*(u32 *)(mgr + 0x0C) + i * 0x16C;
-        if (candidate[4] == 4 || candidate[4] == 3) {
-            candidate[4] = 0;
+    msgs = (const char *)lbl_80271068;
+    {
+        u32 off = 0;
+        for (i = 0; i < *(u16 *)(mgr = (u8 *)lbl_80478B00); i++) {
+            candidate = (u8 *)*(u32 *)(mgr + 0x0C) + off;
+            if (candidate[4] == 4) {
+                candidate[4] = 0;
+            }
+            if (candidate[4] == 3) {
+                candidate[4] = 0;
+            }
+            off += 0x16C;
         }
     }
+    count = *(u16 *)mgr;
 
     entry = NULL;
-    for (i = 0; i < count; i++) {
-        candidate = (u8 *)*(u32 *)(mgr + 0x0C) + i * 0x16C;
-        if (candidate[4] == 0) {
-            entry = candidate;
-            break;
+    {
+        u32 off = 0;
+        for (i = 0; i < count; i++) {
+            entry = (u8 *)*(u32 *)(mgr + 0x0C) + off;
+            if (entry[4] == 0) {
+                break;
+            }
+            off += 0x16C;
         }
     }
-    if (entry == NULL) {
-        GSlogWritef((const char *)lbl_80271068 + 0x178, (u16)arg0);
+    if (i == count) {
+        GSlogWritef(msgs + 0x178, (u16)arg0);
         return NULL;
     }
 
@@ -7671,10 +7682,11 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
         bank = (u8 *)*(u32 *)(bank + 0x14);
     }
     if (bank == NULL) {
-        GSlogWritef((const char *)lbl_80271068 + 0x1B4, (u16)arg0);
+        GSlogWritef(msgs + 0x1B4, (u16)arg0);
         return NULL;
     }
 
+    mgr = (u8 *)lbl_80478B00;
     oldKey = *(u16 *)(mgr + 0x04);
     key = oldKey;
     for (attempts = 0; attempts < 0x10000; attempts++) {
@@ -7700,13 +7712,13 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
         }
     }
     if (attempts == 0x10000 || key == oldKey) {
-        GSlogWritef((const char *)lbl_80271068 + 0x1F0, (u16)arg0);
+        GSlogWritef(msgs + 0x1F0, (u16)arg0);
         return NULL;
     }
 
     lowId = arg0 & 0xFFFF;
     if (lowId >= *(u16 *)(bank + 0x04)) {
-        GSlogWritef((const char *)lbl_80271068 + 0xF4);
+        GSlogWritef(msgs + 0xF4);
     } else {
         *(u32 *)(entry + 0x14) = (u32)(bank + *(s32 *)(bank + 0x18 + lowId * 4));
     }
