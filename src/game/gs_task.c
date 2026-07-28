@@ -882,7 +882,7 @@ s32 dbgMenuFightStopHostWin(void) {
 #endif
 
 /* dbgMenuFightFightPokemonSelect5 - 0x80007154 | size: 0x58 | SYMBOL-NAME WALL 95.45%: bl menuFightPokemonSelectSub vs bl menuFightPokemonSelectSub (same addr) */
-extern s32  menuFightPokemonSelectSub(void);
+extern s32  menuFightPokemonSelectSub();
 extern u32  fightTrainerGetValidFightPokemonPtr(u32 ptr, s32 slot);
 extern u32  lbl_8047A278;
 extern u32  lbl_8047A27C;
@@ -975,7 +975,7 @@ extern u8   fightOutPokemonIsUseHensinBuff(void);
 extern void fightOutPokemonGetTokuseiDataId(void* ptr);
 extern void fightOutPokemonGetZokuseiDataId(void* ptr, s32 a);
 extern s32  fn_800096B4(void* ptr, s32 a, u8* b, u8* c, u8* d, u8* e);
-extern u16  pokemonGetStatus(s32 a, u16 b, s32 c, s32 d);
+extern u32  pokemonGetStatus(void* ptr, u16 b, s32 c, s32 d);
 extern void fn_8010B01C(void* ptr, s32 a, s32 b);
 extern void _threadSwitch(void);
 extern void fn_8010BBB8(void* ptr);
@@ -988,12 +988,110 @@ extern void fn_801DB100(void* ptr);
 extern void fn_801DA4E8(void* ptr, s32 a);
 extern void fightOutPokemonWriteJoutaiDataId(void* ptr, s32 a);
 extern void fightMenuFightOutPokemonRenewStatusMenu(void* ptr, u16 a, s32 b);
-extern void pokemonSetSequenceStatus(void* a, u16 b);
+extern void pokemonSetSequenceStatus(void* a, u32 b);
 extern void* pokemonGetTokuseiDataId(void* ptr);
 extern void fightOutPokemonSetTokuseiDataId(void* ptr, void* a);
 extern void fightOutPokemonSetZokuseiDataId(void* ptr, u8 a, u16 b);
 extern void fightMenuFightTrainerRenewStatusMenu(void* ptr, u16 a);
-/* menuFightPokemonSelectSub remains a residual with no admitted pure-C candidate. */
+s32 menuFightPokemonSelectSub(u32 ctx) {
+    s32 result;
+    u8 prevLevel;
+    u16 savedId;
+    void* encounter;
+    void* archive;
+    void* scene;
+    u16 itemId;
+    u32 subItem;
+    u8 sp_b;
+    u8 sp_a;
+    u8 sp_9;
+    u8 sp_8;
+    u16 loopIdx;
+
+    sp_b = 0;
+    sp_a = 0;
+    sp_9 = 0;
+    sp_8 = 0;
+
+    savedId = (u16)(u32)fightFloorGetStatus(0, 0, 0x14, 0);
+    scene = fightPokemonGetPokemonPtr(ctx);
+    if (scene == 0) {
+        return -1;
+    }
+
+    archive = fightFloorGetFightPokemonPtrToFightTrainerPtr(0, ctx);
+    if (archive == 0) {
+        return -1;
+    }
+
+    prevLevel = figthPokemonGetLevel(ctx);
+
+    if (fightTrainerCheckCanIrekaeFightPokemon(archive, ctx) == 2) {
+        encounter = fightTrainerGetFightPokemonPtrToFightOutPokemonPtr(archive, ctx);
+        if (fightOutPokemonIsUseHensinBuff() == 1) {
+            return -1;
+        }
+
+        if (encounter != 0) {
+            fightOutPokemonGetTokuseiDataId(encounter);
+            for (loopIdx = 0; (u16)loopIdx < 2; loopIdx++) {
+                fightOutPokemonGetZokuseiDataId(encounter, 0);
+            }
+        }
+
+        result = fn_800096B4(scene, 1, &sp_b, &sp_a, &sp_9, &sp_8);
+        if (result == 1) {
+            itemId = pokemonGetStatus(scene, 0, 0x6e, 0);
+            if (encounter != 0) {
+                subItem = pokemonGetStatus(encounter, 0, 0xee, 0);
+                if (subItem != 0) {
+                    void* animPtr;
+
+                    fn_8010B01C(scene, 0, 0);
+                    while ((fn_8010BBB8(scene), fn_8010BCE4()) == 0) {
+                        _threadSwitch();
+                    }
+                    animPtr = pokemonCreateSequence(scene);
+                    battleGridReplacePokemon((void*)(u32)subItem, animPtr);
+                    battleGridUpdate();
+                    pokemonSetStatus(encounter, 0, 0xee, 0, (s32)animPtr);
+                    fn_801DB100((void*)(u32)subItem);
+                    fn_801DA4E8(animPtr, 1);
+                    fightOutPokemonWriteJoutaiDataId(encounter, 0x14);
+                }
+                {
+                    u16 newId;
+
+                    newId = (u16)(u32)fightFloorGetStatus(0, 0, 0x14, 0);
+                    fightMenuFightOutPokemonRenewStatusMenu(encounter, newId, 1);
+                }
+                pokemonSetSequenceStatus(
+                    scene, pokemonGetStatus(encounter, 0, 0xee, 0));
+                fightOutPokemonSetTokuseiDataId(
+                    encounter, pokemonGetTokuseiDataId(scene));
+                {
+                    u32 i;
+
+                    for (i = 0; (u16)i < 2; i++) {
+                        u16 val;
+
+                        val = pokemonGetStatus(0, itemId, 0x16, i);
+                        fightOutPokemonSetZokuseiDataId(encounter, (u8)i, val);
+                    }
+                }
+            }
+        }
+    } else {
+        result = fn_800096B4(scene, 1, 0, 0, 0, 0);
+    }
+
+    if ((u8)figthPokemonGetLevel(ctx) > (u8)prevLevel) {
+        pokemonSetStatus((void*)ctx, 0, 0xd0, 0, 1);
+    }
+
+    fightMenuFightTrainerRenewStatusMenu(archive, savedId);
+    return result;
+}
 
 #if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_EXACT_8000765C)
 /* dbgMenuFightFightTrainerPokemonPartDataEdit - 0x8000765C | size: 0xac */
