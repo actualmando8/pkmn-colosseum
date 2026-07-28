@@ -1063,6 +1063,35 @@ BOOL fn_801E40F8(s32 frame, u8 flag, s32 audioTrack)
     }
     return FALSE;
 }
+void fn_801E24B0(void)
+{
+    extern void fn_800B884C(u32);
+    extern void fn_800BA6B0(u32);
+    extern void fn_800BC114(u32, u32);
+    extern void fn_800BC52C(u32, u32, u32);
+    extern void fn_800BC580(u32, u32, u32, u32, u32);
+    extern void fn_800BC6F0(u32, u32, u32, u32);
+    extern void fn_800BC8C8(u32);
+    extern void fn_800BCDDC(u32, u32, u32, u32);
+    extern void fn_800BCE88(u32, u32, u32);
+
+    fn_800BCE88(1, 7, 0);
+    fn_800BCDDC(0, 1, 0, 0xF);
+    fn_800B884C(1);
+    fn_800BA6B0(0);
+    fn_800BC8C8(1);
+    fn_800BC6F0(0, 0, 0, 0xFF);
+    fn_800BC114(0, 3);
+    fn_800BC52C(0, 0, 0);
+    fn_800BC52C(1, 0, 0);
+    fn_800BC52C(2, 0, 0);
+    fn_800BC52C(3, 0, 0);
+    fn_800BC580(0, 0, 1, 2, 3);
+    fn_800BC580(1, 0, 0, 0, 3);
+    fn_800BC580(2, 1, 1, 1, 3);
+    fn_800BC580(3, 2, 2, 2, 3);
+}
+
 s32 fn_801E25C8(void)
 {
     void *p;
