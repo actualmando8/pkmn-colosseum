@@ -149,7 +149,7 @@ extern u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr);
 extern void pokemonGetDarkPokemonLevel(void);
 extern u32 pokemonDataCheckValid(u32 a, u16 key);
 extern u8 fn_80121ADC(u8* ptr, u32 slot);
-extern void pokemonSetWazaStatus(void);
+extern s32 pokemonSetWazaStatus(u8*, u32, u8);
 extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
 extern void pokemonInit(u8* ptr);
 extern void pokemonEvolutionCreateAddPokemon();
@@ -1531,7 +1531,7 @@ extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* 0x801236F8 | 0xC0 */
 /* 0x801237B8 | 0x3A4 */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonSetWazaStatus(void);
+s32 pokemonSetWazaStatus(u8*, u32, u8);
 /* 0x80123B5C | 0xF8 */
 /* 0x80 | pokemonWazaReplace | generic */
 /* 0x80123CD4 | 0x84 */
@@ -3445,6 +3445,118 @@ u16 pokemonGetOboeWazaDataId(u8* ptr, u8 arg2, u8* counter_ptr) {
 #endif /* POKEMON_RANGE_EXACT_801229F4 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_801237B8)
+s32 pokemonSetWazaStatus(u8* obj, u32 id, u8 replace) {
+    extern u32 pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 index);
+    extern void pokemonSetStatus(u8* obj, u32 param, u16 selector, u32 index,
+                                 u32 value);
+    extern u32* pokemonBiosGetPokemonWazaPtr(void* obj, u32 index, u32 mode);
+    s8 i;
+    s8 found;
+    s32 ext_slot;
+    u16 target_id;
+    u8 valid;
+    s8 j;
+    u16 slot2;
+    u16 move_id;
+    u8 max_pp;
+    u32* dst;
+    u32* src;
+
+    if (obj == NULL) {
+        return -2;
+    }
+
+    if (obj == NULL) {
+        found = -1;
+        goto search_done;
+    } else {
+        target_id = (u16)id;
+        for (found = 0; (s8)found < 4; found++) {
+            ext_slot = (s8)found;
+            if (obj == NULL) {
+                valid = 0;
+            } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, ext_slot) == 0) {
+                valid = 0;
+            } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, ext_slot) == 0x163) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+            if ((u8)valid != 0) {
+                if ((s32)pokemonGetStatus(obj, 0, 0x7F, ext_slot) ==
+                    (s32)target_id) {
+                    goto search_done;
+                }
+            }
+        }
+        found = -1;
+    }
+search_done:
+    if ((s8)found >= 0) {
+        return -2;
+    }
+
+    for (j = 0; (s8)j < 4; j++) {
+        if (obj == NULL) {
+            valid = 0;
+        } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, (s8)j) == 0) {
+            valid = 0;
+        } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, (s8)j) == 0x163) {
+            valid = 0;
+        } else {
+            valid = 1;
+        }
+        if ((u8)valid == 0) {
+            if (obj == NULL) {
+                return (s32)(u8)j;
+            }
+            pokemonSetStatus(obj, 0, 0x7F, (s8)j, 0);
+            pokemonSetStatus(obj, 0, 0x80, (s8)j, 0);
+            pokemonSetStatus(obj, 0, 0x81, (s8)j, 0);
+            pokemonSetStatus(obj, 0, 0x7F, (s8)j, (u16)id);
+            if (obj != NULL) {
+                slot2 = (u16)((s8)j + 4);
+                move_id = (u16)pokemonGetStatus(obj, 0, 0x7F, slot2);
+                max_pp = wazaGetMaxPP(
+                    move_id, (u8)pokemonGetStatus(obj, 0, 0x81, slot2));
+            } else {
+                max_pp = 0;
+            }
+            pokemonSetStatus(obj, 0, 0x80, (s8)j, (u8)max_pp);
+            return (s32)(u8)j;
+        }
+    }
+
+    if (replace == 0) {
+        return -1;
+    }
+
+    for (i = 1; (s8)i < 4; i++) {
+        if (obj != NULL) {
+            dst = pokemonBiosGetPokemonWazaPtr(obj, (u16)((s8)i - 1), 0);
+            src = pokemonBiosGetPokemonWazaPtr(obj, (u32)(s8)i, 0);
+            pokemonWazaBiosCopy(dst, src);
+        }
+    }
+
+    if (obj != NULL) {
+        pokemonSetStatus(obj, 0, 0x7F, 3, 0);
+        pokemonSetStatus(obj, 0, 0x80, 3, 0);
+        pokemonSetStatus(obj, 0, 0x81, 3, 0);
+    }
+    pokemonSetStatus(obj, 0, 0x7F, 3, (u16)id);
+    if (obj != NULL) {
+        move_id = (u16)pokemonGetStatus(obj, 0, 0x7F, 7);
+        max_pp = wazaGetMaxPP(
+            move_id, (u8)pokemonGetStatus(obj, 0, 0x81, 7));
+    } else {
+        max_pp = 0;
+    }
+    pokemonSetStatus(obj, 0, 0x80, 3, (u8)max_pp);
+
+    return 3;
+}
+
 s32 pokemonSearchWazaDataId(u8* ptr, u16 target) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     s8 i;
