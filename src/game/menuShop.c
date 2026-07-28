@@ -3221,21 +3221,20 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
     s8   yesNo;
     u32  ctx;
     s32  menuRet;
-    u8   fmtBuf[0x20];      /* scratch buffer filled by fn_8002A0B8 */
+    u8   fmtBuf[0x770];     /* scratch buffer filled by fn_8002A0B8 */
 
     for (;;) {
         /* (1) refresh the 5-entry stat mirror when flagged dirty */
-        if (lbl_804788A8 != 0) {
+        if ((s32)lbl_804788A8 != 0) {
             struct StatMirror* m = &(*(struct StatMirror*)lbl_802E4F68);
-            u32 i0 = m->src0, i1 = m->src1, i2 = m->src2, i3 = m->src3, i4 = m->src4;
             lbl_804788A8 = 0;
             /* each record is 0x1c bytes; field at +4 (s16). ((s16*)lbl_802EF0A8) is s16[]
                so record i's +4 field is element index i*(0x1c/2) + 2 == i*14 + 2 */
-            m->dst0 = (u16)((s16*)lbl_802EF0A8)[i0 * 14 + 2];   /* ENDIAN-QA */
-            m->dst1 = (u16)((s16*)lbl_802EF0A8)[i1 * 14 + 2];   /* ENDIAN-QA */
-            m->dst2 = (u16)((s16*)lbl_802EF0A8)[i2 * 14 + 2];   /* ENDIAN-QA */
-            m->dst3 = (u16)((s16*)lbl_802EF0A8)[i3 * 14 + 2];   /* ENDIAN-QA */
-            m->dst4 = (u16)((s16*)lbl_802EF0A8)[i4 * 14 + 2];   /* ENDIAN-QA */
+            m->dst0 = (u16)((s16*)lbl_802EF0A8)[m->src0 * 14 + 2];   /* ENDIAN-QA */
+            m->dst1 = (u16)((s16*)lbl_802EF0A8)[m->src1 * 14 + 2];   /* ENDIAN-QA */
+            m->dst2 = (u16)((s16*)lbl_802EF0A8)[m->src2 * 14 + 2];   /* ENDIAN-QA */
+            m->dst3 = (u16)((s16*)lbl_802EF0A8)[m->src3 * 14 + 2];   /* ENDIAN-QA */
+            m->dst4 = (u16)((s16*)lbl_802EF0A8)[m->src4 * 14 + 2];   /* ENDIAN-QA */
         }
 
         /* (2) build the destination/shop list and open the item menu */
@@ -3573,6 +3572,7 @@ void fn_8002D91C(u32 arg0)
     extern u32  lbl_8047A3DC;  /* GSmem pointer for arrival scratch    */
     extern u32  lbl_8047A3FC;  /* persisted arg0 for this session      */
     extern u32  lbl_8047A400;  /* word at lbl_8047A3FC+4, flag checked at tail */
+    u32* base;
 
     extern s32  menuOpen(u32 sceneId, u32 p1);  /* scene/menu query */
     extern void menuClose(u32 sceneId);           /* scene unload     */
@@ -3618,8 +3618,9 @@ void fn_8002D91C(u32 arg0)
 
     /* --------------------------------------------------------------------- */
     /* Save arg0 for this dialog session and clear the flag word that follows */
-    lbl_8047A3FC = arg0;
-    lbl_8047A400 = 0;  /* *(r30+4) = 0 */
+    base = &lbl_8047A3FC;   /* retail caches this sda21 address in r30 */
+    base[0] = arg0;
+    base[1] = 0;                 /* lbl_8047A400 == *(r30+4) */
 
     /* Read the type byte from the location table:
      * table base = *(u32*)lbl_80478E54, entry at arg0*4, byte offset 1      */
@@ -3777,7 +3778,7 @@ void fn_8002D91C(u32 arg0)
      * COMMON TAIL: if the flag word at lbl_8047A3FC+4 is non-zero,
      * run the global exit sequence.
      * ================================================================ */
-    if (lbl_8047A400 != 0) {
+    if (base[1] != 0) {
         fn_800FF660();
         floorSetFadeScript(0, 0);
     }
