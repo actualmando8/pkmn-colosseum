@@ -2637,7 +2637,10 @@ void fn_8006C018(void* menu) {
 
     value = button->state;
     value = (s8)value;
-    if ((s32)value != 2) {
+    switch ((s32)value) {
+    case 2:
+        break;
+    default:
         return;
     }
 
@@ -2651,19 +2654,25 @@ void fn_8006C018(void* menu) {
     case 0x9FA:
     case 0x9FB:
         value = keyInfo->flags4 & 0x10;
-        if ((s32)value == 0) {
+        switch ((s32)value) {
+        case 0:
             break;
+        default:
+            return;
         }
-        return;
+        break;
     case 0xA0C:
     case 0xA0D:
     case 0xE33:
     case 0xE34:
         value = keyInfo->flags4 & 0x30;
-        if ((s32)value == 0) {
+        switch ((s32)value) {
+        case 0:
             break;
+        default:
+            return;
         }
-        return;
+        break;
     }
 
     menuButtonNormal(button);
