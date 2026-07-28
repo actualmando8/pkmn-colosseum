@@ -898,9 +898,9 @@ s32 fn_8002AB00(void* r3, u8* r4) {
     u8 v;
     s32 off;
     ctx = *(void**)((u8*)r3 + 0x60);
+    base = lbl_80266E70;
     v = ((u8*)ctx)[0x1c];
     off = (s32)v * 3;
-    base = lbl_80266E70;
     r4[0x64] = base[off];
     base = base + off;
     r4[0x65] = base[1];
