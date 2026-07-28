@@ -585,7 +585,8 @@ u32 fn_800F9C04(void* outbuf, u8* src, u32 count, u32 mode) {
     out = (u16*)outbuf;
     total = 0;
 
-    if (mode == 1) {
+    switch (mode) {
+    case 1:
         if (src == NULL) {
             if (out != NULL) *out = 0;
             return total;
@@ -601,7 +602,10 @@ u32 fn_800F9C04(void* outbuf, u8* src, u32 count, u32 mode) {
             count--;
         }
         if (out != NULL) *out = 0;
-    } else {
+        break;
+    case 7:
+    case 9:
+    default:
         if (src == NULL) {
             if (out != NULL) *out = 0;
             return total;
@@ -617,6 +621,7 @@ u32 fn_800F9C04(void* outbuf, u8* src, u32 count, u32 mode) {
             count--;
         }
         if (out != NULL) *out = 0;
+        break;
     }
     return total;
 }
