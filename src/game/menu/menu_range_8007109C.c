@@ -913,6 +913,161 @@ selected_valid_for_mode3:
     return 0;
 }
 
+/* Check the whole party against the selected party rule. */
+u8 fn_80076F2C(void* hero, const u8* rule, s32 mode)
+{
+    extern s32 pokemonGetStatus();
+    extern u8 pokemonBiosGetTamagoFlag();
+    extern u8 pokemonCheckValid();
+    extern u8 pokemonBiosGetLevel();
+    extern u16 pokemonBiosGetItemDataId();
+    extern u16 pokemonBiosGetPokemonDataId();
+    s32 level_total;
+    u8 unique_species;
+    u8 unique_items;
+    u32 i;
+    u32 j;
+    s32 inner_rejected, inner_invalid, inner_present;
+    s32 outer_rejected, outer_invalid, outer_present;
+    void* pokemon;
+    void* other;
+
+    level_total = 0;
+    unique_species = 1;
+    unique_items = 1;
+    for (i = 0; i < 6; i++) {
+        u8 result;
+
+        pokemon = heroBiosGetPokemonPtr(hero, (u16)i);
+
+        outer_invalid = 0;
+        outer_present = pokemon == 0;
+        if ((s32)outer_present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto pokemon_present;
+            }
+        }
+        outer_invalid = 1;
+pokemon_present:
+        if ((s32)outer_invalid != 0) {
+            continue;
+        }
+
+        outer_rejected = 0;
+        if ((s32)outer_present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto pokemon_valid;
+            }
+        }
+        outer_rejected = 1;
+pokemon_valid:
+        if ((s32)outer_rejected != 0) {
+            result = 0;
+        } else {
+            outer_rejected = 0;
+            if (pokemonBiosGetTamagoFlag(pokemon) == 0) {
+                if (pokemonCheckValid(pokemon) != 0) {
+                    goto pokemon_rejected;
+                }
+            }
+            outer_rejected = 1;
+pokemon_rejected:
+            result = (u8)outer_rejected;
+        }
+        if ((u8)result != 0) {
+            continue;
+        }
+
+        level_total += pokemonBiosGetLevel(pokemon);
+        for (j = i + 1; j < 6; j++) {
+            u8 other_result;
+
+            other = heroBiosGetPokemonPtr(hero, (u16)j);
+
+            inner_present = other == 0;
+            inner_invalid = 0;
+            if ((s32)inner_present == 0) {
+                if (pokemonGetStatus(other, 0, 0x6E, 0) != 0) {
+                    goto other_present;
+                }
+            }
+            inner_invalid = 1;
+other_present:
+            if ((s32)inner_invalid != 0) {
+                continue;
+            }
+
+            inner_rejected = 0;
+            if ((s32)inner_present == 0) {
+                if (pokemonGetStatus(other, 0, 0x6E, 0) != 0) {
+                    goto other_valid;
+                }
+            }
+            inner_rejected = 1;
+other_valid:
+            if ((s32)inner_rejected != 0) {
+                other_result = 0;
+            } else {
+                inner_rejected = 0;
+                if (pokemonBiosGetTamagoFlag(other) == 0) {
+                    if (pokemonCheckValid(other) != 0) {
+                        goto other_rejected;
+                    }
+                }
+                inner_rejected = 1;
+other_rejected:
+                other_result = (u8)inner_rejected;
+            }
+            if ((u8)other_result != 0) {
+                continue;
+            }
+
+            if (pokemonBiosGetItemDataId(pokemon) != 0) {
+                unique_items &= pokemonBiosGetItemDataId(pokemon) !=
+                                pokemonBiosGetItemDataId(other);
+            }
+            unique_species &= pokemonBiosGetPokemonDataId(pokemon) !=
+                              pokemonBiosGetPokemonDataId(other);
+        }
+    }
+
+    switch (mode) {
+    case 0:
+        return level_total <= *(const s16*)(rule + 4);
+    case 1:
+        return rule[0xC] != 0 || unique_species != 0;
+    case 2:
+        return rule[0xD] != 0 || unique_items != 0;
+    case 3:
+    {
+        extern void* heroBiosGetPokemonPtr();
+        s32 count;
+        s32 index;
+        s32 slot_invalid;
+
+        count = 0;
+        index = 0;
+        while ((u16)index < 6) {
+            pokemon = heroBiosGetPokemonPtr(hero, index);
+            slot_invalid = 0;
+            if (pokemon != 0) {
+                if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                    goto count_present;
+                }
+            }
+            slot_invalid = 1;
+count_present:
+            if (slot_invalid == 0) {
+                count++;
+            }
+            index++;
+        }
+        return *(const s16*)(rule + 6) <= (u16)count;
+    }
+    }
+
+    return 0;
+}
 
 #pragma push
 #pragma scheduling off
