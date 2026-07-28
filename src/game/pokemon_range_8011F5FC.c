@@ -449,7 +449,7 @@ extern u32 lbl_80478F90; /* obj header ptr (SDA) */
 extern void fn_80135530(void);
 void pokemonGetFriendFormPokemonFriendFilterId(u8* obj, u16 item_id, u32 filter_id);
 extern u8 lbl_80272948[];
-void pokemonGetEffortFromPokemon(void);
+void pokemonGetEffortFromPokemon(u8*, u32, u32, u32);
 extern void fn_80008154(void);
 extern void fn_80142CF4(void);
 extern u32 sexGetPokemonSexRaitoKotei(u32);
@@ -2972,6 +2972,121 @@ validity_done:
 #endif /* POKEMON_RANGE_EXACT_80122040 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_801226D0)
+typedef struct PokemonEffortEntry {
+    u16 effort_status;
+    u16 species_status;
+    u16 value;
+} PokemonEffortEntry;
+
+typedef struct PokemonEffortTable {
+    PokemonEffortEntry entry[6];
+} PokemonEffortTable;
+
+void pokemonGetEffortFromPokemon(u8* obj, u32 item_id, u32 double_effort,
+                                 u32 defeated_species)
+{
+    extern u32 gamedataAttestCheckValid(u32 value);
+    u16 effort[6][3];
+    u16 species;
+    u8 valid;
+    u16 total;
+    u8 multiplier;
+    u16 original_item;
+    u8 i;
+    u16 gain;
+    u16* entry;
+
+    *(PokemonEffortTable*)effort = *(PokemonEffortTable*)lbl_80272948;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    if (obj == NULL) {
+        valid = 0;
+    } else {
+        species = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+        if (species == 0) {
+            valid = 0;
+        } else {
+            if (species == 0) {
+                valid = 0;
+            } else if (pokemonGetStatus(NULL, species, 1, 0) == 0) {
+                valid = 0;
+            } else if ((u32)species >= *(u32*)lbl_80478F90) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+            if (valid == 0) {
+                valid = 0;
+            } else if ((u8)gamedataAttestCheckValid(
+                           pokemonGetStatus(obj, 0, 0x70, 0)) == 0) {
+                valid = 0;
+            } else if ((u8)pokemonGetStatus(obj, 0, 0xB8, 0) == 1) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+        }
+    }
+
+    if (valid == 0) {
+        valid = 0;
+    } else if ((s32)pokemonGetStatus(obj, 0, 0x6E, 0) == 0x19C) {
+        valid = 0;
+    } else if ((u8)pokemonGetStatus(obj, 0, 0xB6, 0) == 1) {
+        valid = 0;
+    } else if ((u8)pokemonGetStatus(obj, 0, 0x7B, 0) == 1) {
+        valid = 0;
+    } else {
+        valid = 1;
+    }
+    if (valid == 0) {
+        return;
+    }
+
+    multiplier = 1;
+    total = 0;
+    i = 0;
+    while (i < 6) {
+        entry = effort[i];
+        entry[2] = (u16)pokemonGetStatus(obj, 0, entry[0], 0);
+        total += entry[2];
+        i++;
+    }
+
+    if ((u8)double_effort == 1) {
+        multiplier = 2;
+    }
+
+    original_item = (u16)item_id;
+    i = 0;
+    while (i < 6) {
+        if (total >= 510) {
+            return;
+        }
+
+        entry = effort[i];
+        gain = (u16)(multiplier * (u16)pokemonGetStatus(
+            NULL, defeated_species, entry[1], 0));
+        if (original_item == 0x18) {
+            gain = (u16)(gain * 2);
+        }
+        if (total + gain > 510) {
+            gain = (u16)(gain - (total + gain - 510));
+        }
+        if (entry[2] + gain > 255) {
+            gain = (u16)(gain - (entry[2] + gain - 255));
+        }
+
+        entry[2] += gain;
+        total += gain;
+        pokemonSetStatus(obj, 0, entry[0], 0, entry[2]);
+        i++;
+    }
+}
+
 #endif /* POKEMON_RANGE_RESIDUAL_801226D0 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_EXACT_801229F4)
