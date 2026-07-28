@@ -1719,7 +1719,6 @@ void fn_80092498(u32 ctx) {
     u32 cameraElapsed;
     u32 cameraWaitFrames;
     GSmaterialEntry *material;
-    u32 particleBank;
 
     lbl_8047A690 = GSresGetResource(ctx, 0x0B631602);
     lbl_8047A694 = GSresGetResource(ctx, 0x0B631002);
@@ -1743,8 +1742,8 @@ void fn_80092498(u32 ctx) {
     fn_80118874(material->texture, 1);
     material->texture = NULL;
 
-    particleBank = GSresGetResource(ctx, 0x112B1400);
-    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0B631000), particleBank);
+    GSmodelLinkToGSparticleBank(GSresGetResource(ctx, 0x0B631000),
+                               GSresGetResource(ctx, 0x112B1400));
     GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, 0x0B631000), 4);
 
     cameraPlayAnime(ctx, 0x0B831800, 0, 0);
