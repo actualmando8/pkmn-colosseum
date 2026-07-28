@@ -12,6 +12,7 @@
 typedef void OSArenaAddress;
 
 extern OSArenaAddress* __OSArenaLo;
+volatile u16 AudioDSPRegs[32] : 0xCC005000;
 
 void* OSAllocFromArenaLo(u32 size, u32 align) {
     u32 am1 = align - 1;
@@ -26,38 +27,37 @@ void* OSAllocFromArenaLo(u32 size, u32 align) {
 }
 
 void __OSStopAudioSystem(void) {
-    volatile u16* regs = (volatile u16*)0xCC005000;
-    volatile u16* dmaRegs = regs;
-    s32 start;
-    u16 status;
+    u16 reg16;
+    u32 start;
 
     extern u32 OSGetTick(void);
 
-    regs[5] = 0x804;
-    dmaRegs[27] &= ~0x8000;
+    AudioDSPRegs[5] = 0x804;
+    reg16 = AudioDSPRegs[27];
+    AudioDSPRegs[27] = reg16 & ~0x8000;
 
-    status = *(regs += 5);
-    while (status & 0x400) {
-        status = *regs;
+    reg16 = AudioDSPRegs[5];
+    while (reg16 & 0x400) {
+        reg16 = AudioDSPRegs[5];
     }
-    status = *regs;
-    while (status & 0x200) {
-        status = *regs;
+    reg16 = AudioDSPRegs[5];
+    while (reg16 & 0x200) {
+        reg16 = AudioDSPRegs[5];
     }
 
-    dmaRegs = (volatile u16*)0xCC005000;
-    *regs = 0x8AC;
-    dmaRegs[0] = 0;
-    while ((((u32)dmaRegs[2] << 16) | dmaRegs[3]) & 0x80000000) {
+    AudioDSPRegs[5] = 0x8AC;
+    AudioDSPRegs[0] = 0;
+    while ((((u32)AudioDSPRegs[2] << 16) | AudioDSPRegs[3]) & 0x80000000) {
     }
 
     start = OSGetTick();
     while ((s32)(OSGetTick() - start) < 44) {
     }
 
-    *regs |= 1;
-    status = *regs;
-    while (status & 1) {
-        status = *regs;
+    reg16 = AudioDSPRegs[5];
+    AudioDSPRegs[5] = reg16 | 1;
+    reg16 = AudioDSPRegs[5];
+    while (reg16 & 1) {
+        reg16 = AudioDSPRegs[5];
     }
 }
