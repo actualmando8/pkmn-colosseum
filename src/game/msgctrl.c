@@ -1068,7 +1068,7 @@ asm void msgctrlWait(void) {
 #pragma peephole off
 s32 msgctrlWait(EffectUtilCommandObj* obj) {
     u8* stream;
-    s16 counter;
+    s32 counter;
     if (obj->activeFlag != 0) {
         goto doneIncrement;
     }
@@ -1077,7 +1077,7 @@ s32 msgctrlWait(EffectUtilCommandObj* obj) {
         obj->waitCounter = (s16)((s16)stream[0] + 1);
     }
     counter = obj->waitCounter;
-    counter = (s16)(counter - 1);
+    counter = counter - 1;
     obj->waitCounter = counter;
     if (counter <= 0) {
         obj->waitCounter = 0;
