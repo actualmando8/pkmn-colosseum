@@ -773,7 +773,7 @@ u32 fn_801C5F6C(u32 arg0, void* texture, f32 arg2, f32 arg3, f32 arg4, f32 arg5)
     f32 arg3Local = arg3;
     f32 arg4Local = arg4;
     f32 arg5Local = arg5;
-    void* tex = texture;
+    void* const tex = texture;
 
     if (tex == NULL) {
         return arg0Local;
