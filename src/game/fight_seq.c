@@ -333,12 +333,20 @@ void fightSeqFightActionCreateAndFlowFifo(
   
   result = fightActionCreate(&action, motoAction, actorTarget, kind, buff,
                              actionData);
-  if (result == 1) {
+  switch (result) {
+  case 1:
     fightActionBiosSetBuffDataPtr(&action, buffData);
     result = 1;
+    break;
+  default:
+    break;
   }
-  if (result == 1) {
+  switch (result) {
+  case 1:
     fightActionFlowFifo(&action);
+    break;
+  default:
+    break;
   }
   return;
 }
