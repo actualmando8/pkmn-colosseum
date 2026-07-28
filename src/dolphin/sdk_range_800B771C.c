@@ -30,8 +30,15 @@ extern const u8 lbl_80478A68[];
 extern const u8 lbl_80478A6C[];
 extern const u8 lbl_80478A70[];
 
-#define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
-#define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
+typedef union GXWGPipe_800B771C {
+    u8 u8;
+    u32 u32;
+} GXWGPipe_800B771C;
+
+volatile GXWGPipe_800B771C GXWGFifo_800B771C : 0xCC008000;
+
+#define GX_FIFO_U8  GXWGFifo_800B771C.u8
+#define GX_FIFO_U32 GXWGFifo_800B771C.u32
 
 typedef struct GXVtxAttrFmtList_800B771C {
     s32 attr;
