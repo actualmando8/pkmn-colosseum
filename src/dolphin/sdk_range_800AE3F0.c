@@ -262,6 +262,7 @@ typedef struct GXData {
 } GXData;
 
 #define DSP_REGS    ((volatile DSPRegisters*)0xCC005000)
+volatile u16 __DSPRegs[32] : 0xCC005000;
 #define AI_REGS     ((volatile AIRegisters*)0xCC006C00)
 #define GET_REG_FIELD(reg, size, shift) \
     ((int)((reg) >> (shift)) & ((1 << (size)) - 1))
@@ -1596,9 +1597,9 @@ void __DSPHandler(__OSInterrupt interrupt, OSContext* context)
     u16 control;
     u32 mail;
 
-    control = DSP_REGS->dmaControl;
+    control = __DSPRegs[5];
     control = (control & ~0x28) | 0x80;
-    DSP_REGS->dmaControl = control;
+    __DSPRegs[5] = control;
     OSClearContext(&exception_context);
     OSSetCurrentContext(&exception_context);
 
