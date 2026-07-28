@@ -390,12 +390,13 @@ u32 scriptGetDarkPointZeroPokemonNum(void)
 u32 scriptGetDarkPokemonNum(void)
 {
     void* status;
-    u16 count = 0;
+    void* mon;
     u16 i;
+    u16 count = 0;
 
     status = savedataGetStatus(0, 2);
     for (i = 0; i < 6; i++) {
-        void* mon = heroBiosGetPokemonPtr(status, i);
+        mon = heroBiosGetPokemonPtr(status, i);
         if ((u8)pokemonCheckValid(mon) != 0 &&
             (u8)pokemonBiosGetDarkFlag(mon) != 0) {
             count++;
@@ -407,8 +408,8 @@ u32 scriptGetDarkPokemonNum(void)
 u32 scriptGetPokemonNum(void)
 {
     void* status;
-    u16 count = 0;
     u16 i;
+    u16 count = 0;
 
     status = savedataGetStatus(0, 2);
     for (i = 0; i < 6; i++) {
