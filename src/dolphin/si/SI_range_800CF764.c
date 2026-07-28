@@ -31,7 +31,7 @@ volatile SICommandQueueEntry __SIChannelRegs[4] : 0xCC006400;
 #pragma peephole reset
 #pragma pop
 
-#define __SIRegs ((volatile u32*)0xCC006400)
+volatile u32 __SIRegs[15] : 0xCC006400;
 #define SI_COMCSR_IDX (0x34 / 4)
 #define SI_STATUS_IDX (0x38 / 4)
 #define SI_POLL_IDX (0x30 / 4)
