@@ -9,6 +9,34 @@
  */
 #include "dolphin/types.h"
 
+/* fn_800345A4 - 0x800345A4 | size: 0x164 */
+void fn_800345A4(void* unused, u8* sprite) {
+    extern u32 lbl_802E61D8[];
+    extern void winSpriteSetDisp(u8*, s32);
+    extern u32 fn_8012A5B0(s32, s32, s32);
+    u32 value;
+    s32 visible;
+    s16 id;
+
+    value = fn_8012A5B0(0, 0xE, 0);
+    id = *(s16*)(sprite + 6);
+    if (id == 0x7BC || id == 0x7F1) {
+        visible = value < lbl_802E61D8[3];
+    } else if (id == 0x7F0 || id == 0x805) {
+        visible = value >= lbl_802E61D8[2]
+               && value < lbl_802E61D8[3];
+    } else if (id == 0x7EF || id == 0x804) {
+        visible = value >= lbl_802E61D8[1]
+               && value < lbl_802E61D8[2];
+    } else if (id == 0x7EE || id == 0x803) {
+        visible = value >= lbl_802E61D8[0]
+               && value < lbl_802E61D8[1];
+    } else {
+        return;
+    }
+    winSpriteSetDisp(sprite, visible);
+}
+
 /* fn_80034708 - 0x80034708 | size: 0xB0 */
 void fn_80034708(void* unused, u8* sprite) {
     extern u32 lbl_8047A458;
