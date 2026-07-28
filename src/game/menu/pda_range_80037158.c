@@ -8628,16 +8628,6 @@ void fn_8004A7A8(void* work, PdaSprite* sprite)
     f32 pulse;
 
     switch (sprite->eventId) {
-    case 0x432:
-    case 0x433:
-    case 0x434:
-    case 0x435:
-    case 0x436:
-    case 0x6dd:
-        sprite->field_52 =
-            (s16)(*(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 4) +
-                  (s32)*(f32*)(lbl_803A6A60 + 0x34));
-        break;
     case 0x6e0:
     case 0x6e2:
     case 0x751:
@@ -8654,6 +8644,16 @@ void fn_8004A7A8(void* work, PdaSprite* sprite)
         spriteSetEnv(fn_800FE6D0(
             (s16)(*(s16*)((u8*)work + 0x84) + sprite->field_50),
             (s16)(*(s16*)((u8*)work + 0x86) + sprite->field_52)));
+        break;
+    case 0x432:
+    case 0x433:
+    case 0x434:
+    case 0x435:
+    case 0x436:
+    case 0x6dd:
+        sprite->field_52 =
+            (s16)(*(s16*)(lbl_802EF0A8 + sprite->eventId * 0x1c + 4) +
+                  (s32)*(f32*)(lbl_803A6A60 + 0x34));
         break;
     case 0x437:
     case 0x438:
