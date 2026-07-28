@@ -2105,6 +2105,197 @@ u8 menuCBRule_CheckPokemonErrorAll(void* pokemon) {
 }
 #pragma pop
 
+/* Validate every party member against the active battle rule. */
+u8 fn_800776E4(void* hero) {
+    extern u8* fn_8006B420(void);
+    extern u8 fn_80076F2C(void* hero, const u8* rule, s32 mode);
+    extern void* heroBiosGetPokemonPtr();
+    extern u8 pokemonCheckValid(void* pokemon);
+    extern u8 pokemonBiosGetLevel(void* pokemon);
+    extern u16 pokemonBiosGetItemDataId(void* pokemon);
+    extern s32 pokemonGetStatus(void* pokemon, s32 index, s32 field, s32 subindex);
+    extern u8 fn_80142984(u16 item);
+    extern void __assert(const char* file, s32 line, const char* condition);
+    extern u8 lbl_80268A48[];
+    extern u8 lbl_80268A58[];
+    extern u16 lbl_802EE458[];
+    extern u32 lbl_80478928;
+    s32 is_null;
+    void* party_pokemon;
+    s32 count;
+    s32 party_slot;
+    u8* rule;
+    u8 result;
+    s32 final_result;
+    s32 mode;
+
+    {
+        void* pokemon;
+        s32 slot;
+        s32 check;
+
+        slot = 0;
+        while ((u16)slot < 6) {
+            pokemon = heroBiosGetPokemonPtr(hero, slot);
+            check = 0;
+            do {
+                if (fn_80076398(pokemon, check) == 0) {
+                    result = 0;
+                    goto pokemon_error_done;
+                }
+                check++;
+            } while (check < 6);
+            result = 1;
+
+pokemon_error_done:
+            if (result == 0) {
+                result = 0;
+                goto party_error_done;
+            }
+            slot++;
+        }
+        result = 1;
+    }
+
+party_error_done:
+    final_result = result != 0;
+    if (final_result == 0) {
+        goto done;
+    }
+
+    rule = fn_8006B420();
+    count = 0;
+    mode = count;
+    do {
+        if (fn_80076F2C(hero, rule, mode) == 0) {
+            result = 0;
+            goto trainer_rule_done;
+        }
+        mode++;
+    } while (mode < 4);
+    result = 1;
+
+trainer_rule_done:
+    if (result == 0) {
+        result = 0;
+        goto regulation_done;
+    } else {
+        party_slot = 0;
+        do {
+            party_pokemon = heroBiosGetPokemonPtr(hero, (u16)party_slot);
+            if (party_pokemon != 0) {
+                if (pokemonCheckValid(party_pokemon) != 0) {
+                    s32 check;
+
+                    is_null = party_pokemon == 0;
+                    check = 0;
+                    do {
+                        s32 blank;
+
+                        blank = 0;
+                        if (is_null == 0) {
+                            if (pokemonGetStatus(party_pokemon, 0, 0x6E, 0) != 0) {
+                                goto pokemon_present;
+                            }
+                        }
+                        blank = 1;
+
+pokemon_present:
+                        if (blank != 0) {
+                            result = 1;
+                        } else {
+                            switch (check) {
+                            case 0:
+                                result = pokemonBiosGetLevel(party_pokemon) >=
+                                         *(s16*)(rule + 0);
+                                break;
+                            case 1:
+                                result = pokemonBiosGetLevel(party_pokemon) <=
+                                         *(s16*)(rule + 2);
+                                break;
+                            case 2:
+                            {
+                                u8* item_rule;
+                                u16 item;
+                                u8 valid_item;
+                                s32 i;
+
+                                item = pokemonBiosGetItemDataId(party_pokemon);
+                                item_rule = fn_8006B420();
+                                switch (item) {
+                                case 0:
+                                    valid_item = 1;
+                                    break;
+                                case 0xAF:
+                                    valid_item = 0;
+                                    break;
+                                default:
+                                    valid_item = fn_80142984(item);
+                                    break;
+                                }
+                                if (valid_item == 0) {
+                                    result = 0;
+                                    break;
+                                }
+
+                                switch (*(s32*)(item_rule + 8)) {
+                                case 0:
+                                    result = 1;
+                                    break;
+                                case 1:
+                                    result = item == 0;
+                                    break;
+                                case 2:
+                                    for (i = 0; (u32)i < lbl_80478928; i++) {
+                                        if (item == lbl_802EE458[i]) {
+                                            result = item_rule[i + 0x18] == 0;
+                                            goto item_rule_done;
+                                        }
+                                    }
+                                    result = 1;
+                                    break;
+                                default:
+                                    result = 0;
+                                    break;
+                                }
+item_rule_done:
+                                break;
+                            }
+                            default:
+                                __assert((const char*)lbl_80268A48, 0xFB,
+                                         (const char*)lbl_80268A58);
+                                result = 0;
+                                break;
+                            }
+                        }
+
+                        if (result == 0) {
+                            result = 0;
+                            goto pokemon_rules_done;
+                        }
+                        check++;
+                    } while (check < 3);
+                    result = 1;
+
+pokemon_rules_done:
+                    if (result == 0) {
+                        result = 0;
+                        goto regulation_done;
+                    }
+                    count++;
+                }
+            }
+            party_slot++;
+        } while (party_slot < 6);
+        result = count > 0;
+    }
+
+regulation_done:
+    final_result = result != 0;
+done:
+    return (u8)final_result;
+}
+
 /* fn_80077A5C (0x80077A5C): accept an empty slot or a zero species value. */
 #pragma push
 #pragma peephole off
