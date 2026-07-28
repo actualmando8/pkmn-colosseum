@@ -3800,6 +3800,7 @@ asm u32 fn_8013F80C(void* ptr, u32 delta) {
 #else
 u32 fn_8013F80C(void* ptr, u32 delta) {
     DistortionState* s = ptr;
+    u32 remaining;
     void* part;
     f32 progress;
     f32 threshold;
@@ -3834,7 +3835,9 @@ u32 fn_8013F80C(void* ptr, u32 delta) {
     }
     s->unk_20 = s->unk_24 * (one - progress);
     s->frame += delta;
-    return ((u32)(s->frame - s->duration)) >> 31;
+    remaining = s->frame;
+    remaining -= s->duration;
+    return remaining >> 31;
 }
 #endif
 extern void fn_800D7BF8(void);
