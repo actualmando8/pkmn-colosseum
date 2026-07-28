@@ -2697,26 +2697,34 @@ void fn_8006C0DC(void* menu) {
 
     value = button->state;
     value = (s8)value;
-    if ((s32)value != 2) {
+    switch ((s32)value) {
+    case 2:
+        break;
+    default:
         return;
     }
 
     keyInfo = windowGetKeyInfo();
     itemId = menuGetCursorItemID(button->menuId);
 
-    do {
-        if (itemId >= 0x9D2) {
-            break;
-        }
-        if (itemId < 0x9CA) {
-            break;
-        }
+    switch (itemId) {
+    case 0x9CA:
+    case 0x9CB:
+    case 0x9CC:
+    case 0x9CD:
+    case 0x9CE:
+    case 0x9CF:
+    case 0x9D0:
+    case 0x9D1:
         value = keyInfo->flags4 & 0x10;
-        if ((s32)value == 0) {
+        switch ((s32)value) {
+        case 0:
             break;
+        default:
+            return;
         }
-        return;
-    } while (0);
+        break;
+    }
 
     menuButtonNormal(button);
 }
