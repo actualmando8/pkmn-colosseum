@@ -519,6 +519,180 @@ void menuCB_InitMenu(s32 id) {
 }
 #pragma pop
 
+static inline s32 fn_80071AE4_poll_read(s32 chan, u32* response, u8* length,
+                                        u8* status) {
+    extern s32 GBARead(s32 chan, void* destination, u8* status);
+    extern s32 GBAGetStatus(s32 chan, u8* status);
+    u32 timeout;
+    u32 start;
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 1;
+        }
+        if (GBAGetStatus(chan, status) != 0) {
+            return 2;
+        }
+        if ((*status & 0xA) == 8) {
+            break;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+    if (GBARead(chan, response, length) != 0) {
+        return 3;
+    }
+    return 0;
+}
+
+static inline u32 fn_80071AE4_swap_word(u32 value) {
+    u32 result;
+
+    result = value >> 24;
+    result |= (value >> 8) & 0x0000FF00;
+    result |= (value << 8) & 0x00FF0000;
+    result |= value << 24;
+    return result;
+}
+
+/* Send a variable-sized data block to one GBA channel. */
+s32 fn_80071AE4(s32 chan, const u32* data) {
+    u32 response;
+    u32 command;
+    u32 send_word;
+    u8 length;
+    u8 send_status;
+    u8 status;
+    s32 key_channel;
+    s32 result;
+    u32 outer_timeout;
+    u32 outer_start;
+    u32 timeout;
+    u32 start;
+    s32 offset;
+    s32 total_size;
+    s32 outer_expired;
+    const u32* data_ptr;
+    u32 packed;
+    u16 extra_size;
+    u16 word_count;
+
+    key_channel = chan + 1;
+    gbaCommandSetKeyState(key_channel, 2);
+    outer_timeout = OSMillisecondsToTicks(100);
+    outer_start = OSGetTick();
+    packed = fn_80071AE4_swap_word(data[3]);
+    extra_size = packed >> 16;
+    word_count = packed;
+
+    do {
+        outer_expired = OSGetTick() - outer_start > outer_timeout;
+
+        {
+            s32 setup_result;
+
+            setup_result = fn_80073C38(chan);
+            if (setup_result != 0) {
+                result = setup_result;
+                goto transfer_done;
+            }
+        }
+
+        command = 0x22;
+        if (GBAWrite(chan, &command, &length) != 0) {
+            result = 0xB;
+            goto header_done;
+        }
+
+        {
+            s32 poll_result;
+
+            poll_result = fn_80071AE4_poll_read(chan, &response, &length,
+                                                &status);
+            result = poll_result != 0 ? poll_result + 0xB : 0;
+        }
+
+header_done:
+        switch (result) {
+        case 0:
+            if ((response >> 24) != 0x22) {
+                result = 0xF;
+                goto transfer_done;
+            }
+
+            total_size = word_count;
+            total_size = total_size * 4 + 0x10;
+            if (extra_size != 0) {
+                total_size += 0x70;
+            }
+
+            data_ptr = data;
+            for (offset = 0; offset < total_size;
+                 offset += 4, data_ptr++) {
+                send_word = *data_ptr;
+                if (GBAWrite(chan, &send_word, &send_status) != 0) {
+                    result = 0x10;
+                    goto data_done;
+                }
+
+                timeout = OSMillisecondsToTicks(100);
+                start = OSGetTick();
+                for (;;) {
+                    if (OSGetTick() - start > timeout) {
+                        result = 0x11;
+                        goto data_done;
+                    }
+                    if (GBAGetStatus(chan, &send_status) != 0) {
+                        result = 0x12;
+                        goto data_done;
+                    }
+                    if ((send_status & 2) == 0) {
+                        break;
+                    }
+                    if (lbl_803B6E18[chan].func != NULL) {
+                        lbl_803B6E18[chan].func(
+                            chan, lbl_803B6E18[chan].arg);
+                    }
+                    if (lbl_803B6E08[chan] == 0) {
+                        continue;
+                    }
+                    result = 0x3E8;
+                    goto data_done;
+                }
+                if (lbl_803B6E08[chan] != 0) {
+                    result = 0x3E8;
+                    goto data_done;
+                }
+            }
+            result = 0;
+
+data_done:
+            switch (result) {
+            case 0:
+                result = 0;
+                break;
+            default:
+                goto transfer_done;
+            }
+            break;
+        default:
+            goto transfer_done;
+        }
+
+transfer_done:
+        ;
+    } while (result == 1 && outer_expired == 0);
+
+    gbaCommandSetKeyState(key_channel, result != 0 ? 1 : 3);
+    return result;
+}
+
 #pragma push
 #pragma peephole off
 s32 fn_80071E34(s32 chan, void* data) {
