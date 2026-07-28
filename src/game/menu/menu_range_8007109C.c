@@ -1481,6 +1481,138 @@ transfer_done:
 }
 #pragma pop
 
+/* fn_80072D58 (0x80072D58): send a variable-size data block to one GBA
+ * channel. */
+s32 fn_80072D58(s32 chan, const u32* data, s32 size) {
+    extern s32 GBAWrite(s32 chan, void* source, u8* status);
+    extern s32 GBARead(s32 chan, void* destination, u8* status);
+    extern s32 GBAGetStatus(s32 chan, u8* status);
+    u32 response;
+    u32 command;
+    u32 send_word;
+    u8 length;
+    u8 send_status;
+    u8 status;
+    s32 key_channel;
+    s32 result;
+    u32 outer_timeout;
+    u32 outer_start;
+    u32 start;
+    s32 offset;
+    u32 send_timeout;
+    u32 timeout;
+    s32 outer_expired;
+
+    key_channel = chan + 1;
+    gbaCommandSetKeyState(key_channel, 2);
+    outer_timeout = OSMillisecondsToTicks(100);
+    outer_start = OSGetTick();
+    do {
+        outer_expired = OSGetTick() - outer_start > outer_timeout;
+
+        {
+            s32 setup_result;
+
+            setup_result = fn_80073C38(chan);
+            if (setup_result != 0) {
+                result = setup_result;
+                goto transfer_done;
+            }
+        }
+
+        command = 0x66;
+        if (GBAWrite(chan, &command, &length) != 0) {
+            result = 0xB;
+            goto header_done;
+        }
+
+        {
+            s32 poll_result;
+
+            timeout = OSMillisecondsToTicks(100);
+            start = OSGetTick();
+            for (;;) {
+                if (OSGetTick() - start > timeout) {
+                    poll_result = 1;
+                    goto poll_done;
+                }
+                if (GBAGetStatus(chan, &status) != 0) {
+                    poll_result = 2;
+                    goto poll_done;
+                }
+                if ((status & 0xA) == 8) {
+                    break;
+                }
+                if (lbl_803B6E18[chan].func != NULL) {
+                    lbl_803B6E18[chan].func(chan,
+                                           lbl_803B6E18[chan].arg);
+                }
+                if (lbl_803B6E08[chan] != 0) {
+                    poll_result = 0x3E8;
+                    goto poll_done;
+                }
+            }
+            if (GBARead(chan, &response, &length) != 0) {
+                poll_result = 3;
+            } else {
+                poll_result = 0;
+            }
+poll_done:
+            result = poll_result != 0 ? poll_result + 0xB : 0;
+        }
+
+header_done:
+        switch (result) {
+        case 0:
+            if ((response >> 24) != 0x66) {
+                result = 0xF;
+                goto transfer_done;
+            }
+
+            {
+                const u32* data_ptr = data;
+
+                for (offset = 0; offset < size;
+                     offset += 4, data_ptr++) {
+                    send_word = *data_ptr;
+                    if (GBAWrite(chan, &send_word, &send_status) != 0) {
+                        result = 0x10;
+                        goto transfer_done;
+                    }
+
+                    send_timeout = OSMillisecondsToTicks(100);
+                    start = OSGetTick();
+                    for (;;) {
+                        if (OSGetTick() - start > send_timeout) {
+                            result = 0x11;
+                            goto transfer_done;
+                        }
+                        if (GBAGetStatus(chan, &send_status) != 0) {
+                            result = 0x12;
+                            goto transfer_done;
+                        }
+                        if ((send_status & 2) == 0) {
+                            break;
+                        }
+                    }
+                    if ((offset % 0x40) == 0) {
+                        _threadSwitch();
+                    }
+                }
+            }
+            result = 0;
+            break;
+        default:
+            goto transfer_done;
+        }
+transfer_done:
+        ;
+    } while (result == 1 && outer_expired == 0);
+
+    gbaCommandSetKeyState(key_channel, result != 0 ? 1 : 3);
+    return result;
+}
+
 /* fn_80073E84 (0x80073E84): constant-1 accessor. */
 s32 fn_80073E84(void) {
     return 1;
