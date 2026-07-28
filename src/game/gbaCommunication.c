@@ -32,6 +32,7 @@ extern u8 lbl_8026F5A8[];
 extern u8 lbl_8026F5C0[];
 extern u8 lbl_80314F98[];
 extern u16 lbl_802EED28[];
+extern s32 lbl_802EEFC4[5];
 
 /* Common callees needed by the ported bodies below that are not already
  * declared with a full prototype at the point of use. */
@@ -3265,7 +3266,129 @@ void fn_80096FA0(u8* menu)
 }
 #pragma pop
 
+/* Select and synchronize the Pokemon-status submenu for the current page. */
+s32 fn_800973EC(u8* menu)
+{
+    typedef struct MenuStatusPage {
+        s8 group;
+        s8 page;
+    } MenuStatusPage;
 
+    extern u8 menuIsCheck(s32 menuId);
+    extern void menuOpen(s32 menuId, s32 arg1);
+    extern void menuClose(s32 menuId);
+    switch ((s8)menu[1]) {
+    case 0: {
+        MenuStatusPage page;
+        u32 pokemon;
+        s32 menuId;
+        u32 index;
+        s32* entry;
+
+        *(s8*)(menu + 0x97) = -1;
+        lbl_803FB380[1] = 0;
+        lbl_803FB380[2] = menu[0x95];
+        *(s8*)(lbl_803FB380 + 3) = -1;
+        *(s8*)(lbl_803FB380 + 0x1A) = -1;
+        if (lbl_803FB380[0] & 4) {
+            menu[0x95] = 0;
+            lbl_803FB380[1] = 1;
+        } else {
+            menu[0x95] = 1;
+            lbl_803FB380[1] = 7;
+        }
+
+        page = *(MenuStatusPage*)(menu + 0x94);
+        menuId = 0;
+        pokemon = *(u32*)(lbl_803FB380 + 0x0C);
+        if (pokemon == 0) {
+            break;
+        }
+
+        switch (page.page) {
+        case 0:
+            if ((s32)pokemonGetStatus(pokemon, 0, 0xC2, 0) != 0) {
+                menuId = 0x55;
+            } else {
+                menuId = 0x54;
+            }
+            break;
+        case 1:
+            if (*(u16*)(lbl_803FB380 + 0x18) != 0) {
+                menuId = 0x56;
+            } else {
+                menuId = 0x57;
+            }
+            break;
+        case 2:
+            menuId = 0x58;
+            break;
+        }
+
+        entry = lbl_802EEFC4;
+        for (index = 0; index < 5; entry++, index++) {
+            if (menuId == *entry) {
+                if (menuIsCheck(menuId) == 0) {
+                    menuOpen(menuId, 0);
+                }
+            } else if (menuIsCheck(*entry) != 0) {
+                menuClose(*entry);
+            }
+        }
+        break;
+    }
+    case 1:
+        break;
+    case 2: {
+        MenuStatusPage page;
+        u32 pokemon;
+        s32* entry;
+        s32 menuId;
+        u32 index;
+
+        page = *(MenuStatusPage*)(menu + 0x94);
+        menuId = 0;
+        pokemon = *(u32*)(lbl_803FB380 + 0x0C);
+        if (pokemon == 0) {
+            break;
+        }
+
+        switch (page.page) {
+        case 0:
+            if ((s32)pokemonGetStatus(pokemon, 0, 0xC2, 0) != 0) {
+                menuId = 0x55;
+            } else {
+                menuId = 0x54;
+            }
+            break;
+        case 1:
+            if (*(u16*)(lbl_803FB380 + 0x18) != 0) {
+                menuId = 0x56;
+            } else {
+                menuId = 0x57;
+            }
+            break;
+        case 2:
+            menuId = 0x58;
+            break;
+        }
+
+        entry = lbl_802EEFC4;
+        for (index = 0; index < 5; entry++, index++) {
+            if (menuId == *entry) {
+                if (menuIsCheck(menuId) == 0) {
+                    menuOpen(menuId, 0);
+                }
+            } else if (menuIsCheck(*entry) != 0) {
+                menuClose(*entry);
+            }
+        }
+        break;
+    }
+    }
+
+    return 0;
+}
 /* 0x80097BBC | size: 0x114 */
 #pragma peephole off
 s32 fn_80097BBC(u8 chan) {
