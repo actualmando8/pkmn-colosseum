@@ -437,18 +437,125 @@ extern u8 lbl_8047A286;
 
 /* 0x80008868 | 0x3D8 */
 extern u32 menuDataBiosGetType(u32);
-extern void fn_8001EA98(void);
-extern void fn_8001E4B4(void);
-extern void sprintf(void);
-extern void fn_800FAEF8(void);
-extern void fn_801906A0(void);
+extern void fn_8001EA98(s32, s32, s32, s32);
+extern void fn_8001E4B4(s32, s32, s32, s32, s32, s32);
+extern s32 sprintf(char*, const char*, ...);
+extern s32 fn_800FAEF8(s32, s32, s32, ...);
+extern u32 fn_801906A0(u32);
 extern u32 lbl_80478F98;
 extern u8 lbl_80478838[8];
 extern u8 lbl_803A19C8[];
 extern u8 lbl_80266688[];
 extern u32 lbl_80478F9C;
 extern u8 lbl_8047B6C8[3];
-/* fn_80008868 remains a residual with no admitted pure-C candidate. */
+typedef struct GsTaskFlagConfig {
+    u32 count;
+    s16 first;
+} GsTaskFlagConfig;
+
+typedef struct GsTaskFlagDef {
+    u8 fields[6];
+    s16 next;
+} GsTaskFlagDef;
+
+void fn_80008868(u8* window)
+{
+    s32 width;
+    s32 pageSize;
+    s32 visibleCount;
+    s32 rowHeight;
+    s32 row;
+    s32 rowY;
+    s32 color;
+    s32 flagIndex;
+    s32 linkIndex;
+    s32 flagCount;
+    s32 center;
+    s32 right;
+    s16 flagId;
+    GsTaskFlagConfig* config;
+    GsTaskFlagDef* flags;
+    u32 menuId;
+
+    menuId = *(u32*)(window + 4);
+    rowY = 40;
+    pageSize = (u8)menuDataBiosGetType(menuId);
+    width = 480;
+    config = (GsTaskFlagConfig*)lbl_80478F98;
+    flagCount = config->count;
+    visibleCount = flagCount;
+    if (flagCount > pageSize) {
+        visibleCount = pageSize;
+    }
+
+    rowHeight = visibleCount * 13;
+    fn_8001EA98(30, 40, width + 25, rowHeight);
+
+    if (*(s16*)lbl_80478838 > 0) {
+        center = width / 2;
+        fn_8001E4B4(center + 20, 33, center + 40, 33, center + 30, 23);
+    }
+
+    config = (GsTaskFlagConfig*)lbl_80478F98;
+    if ((s32)config->count - *(s16*)lbl_80478838 > pageSize) {
+        center = width / 2;
+        fn_8001E4B4(center + 20, rowHeight + 47, center + 40,
+                    rowHeight + 47, center + 30, rowHeight + 57);
+    }
+
+    row = 0;
+    right = width;
+    while (row < visibleCount) {
+        if (*(s16*)(lbl_80478838 + 2) == row) {
+            color = 0xFF0000FF;
+        } else {
+            color = -1;
+        }
+
+        flagIndex = row + *(s16*)lbl_80478838;
+        if (flagIndex < 0) {
+            flagId = 0;
+        } else {
+            config = (GsTaskFlagConfig*)lbl_80478F98;
+            if ((u32)flagIndex >= config->count) {
+                flagId = 0;
+            } else {
+                flagId = config->first;
+                flags = (GsTaskFlagDef*)lbl_80478F9C;
+                linkIndex = 0;
+                for (; linkIndex < flagIndex; linkIndex++) {
+                    flagId = flags[flagId].next;
+                }
+            }
+        }
+
+        sprintf((char*)lbl_803A19C8, (const char*)lbl_80266688, flagIndex,
+                (u16)flagId);
+        fn_800FAEF8(30, rowY, color, lbl_803A19C8);
+
+        flagIndex = row + *(s16*)lbl_80478838;
+        if (flagIndex < 0) {
+            flagId = 0;
+        } else {
+            config = (GsTaskFlagConfig*)lbl_80478F98;
+            if ((u32)flagIndex >= config->count) {
+                flagId = 0;
+            } else {
+                flagId = config->first;
+                flags = (GsTaskFlagDef*)lbl_80478F9C;
+                linkIndex = 0;
+                for (; linkIndex < flagIndex; linkIndex++) {
+                    flagId = flags[flagId].next;
+                }
+            }
+        }
+
+        fn_800FAEF8(right + 30, rowY, color, lbl_8047B6C8,
+                    fn_801906A0((u16)flagId));
+        rowY += 13;
+        row++;
+    }
+}
 
 /* 0x80008C40 | 0x538 */
 extern u8* windowGetKeyInfo(void);
