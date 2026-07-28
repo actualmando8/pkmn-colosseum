@@ -530,7 +530,7 @@ s32 fn_80053ED8(MenuCBPane* pane, MenuCBPane* sprite) {
     drawFallback = TRUE;
 
     for (index = 0; index < 17; index++) {
-        if (sprite->y == lbl_802E61E8[index].itemId) {
+        if (sprite->itemId == lbl_802E61E8[index].itemId) {
             break;
         }
     }
@@ -545,17 +545,17 @@ s32 fn_80053ED8(MenuCBPane* pane, MenuCBPane* sprite) {
 
     texture = NULL;
     partySlot = 0;
-    if (sprite->y != (s32)lbl_80267320[0]) {
+    if (sprite->itemId != (s32)lbl_80267320[0]) {
         partySlot = 1;
-        if (sprite->y != (s32)lbl_80267320[1]) {
+        if (sprite->itemId != (s32)lbl_80267320[1]) {
             partySlot = 2;
-            if (sprite->y != (s32)lbl_80267320[2]) {
+            if (sprite->itemId != (s32)lbl_80267320[2]) {
                 partySlot = 3;
-                if (sprite->y != (s32)lbl_80267320[3]) {
+                if (sprite->itemId != (s32)lbl_80267320[3]) {
                     partySlot = 4;
-                    if (sprite->y != (s32)lbl_80267320[4]) {
+                    if (sprite->itemId != (s32)lbl_80267320[4]) {
                         partySlot = 5;
-                        if (sprite->y != (s32)lbl_80267320[5]) {
+                        if (sprite->itemId != (s32)lbl_80267320[5]) {
                             partySlot = 6;
                         }
                     }
