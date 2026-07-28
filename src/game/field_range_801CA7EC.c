@@ -290,11 +290,12 @@ void scriptStoreTemochiPokemon(u8* arg)
 u32 scriptGetEarthRibbon(void)
 {
     void* status = savedataGetStatus(0, 2);
+    void* mon;
     u16 i;
 
     for (i = 0; i < 6; i++) {
-        void* mon = heroBiosGetPokemonPtr(status, i);
-        if (pokemonCheckValid(mon) != 0) {
+        mon = heroBiosGetPokemonPtr(status, i);
+        if ((u8)pokemonCheckValid(mon) != 0) {
             exribbonSetEarthRibbon(mon);
         }
     }
