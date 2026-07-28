@@ -822,7 +822,7 @@ u32 fightActionFlowKaisiPre(void* action)
     extern u16 lbl_8047B5F8;
     extern f32 lbl_8047E520;
   u32 bVar1;
-  u32 bVar2;
+  volatile u8 bVar2;
 
   u16 uVar12;
   u32 uVar3;
