@@ -683,7 +683,7 @@ void stateFunctionExChangeMain(void)
 
     /* --- Set up field model and audio, yield one VBlank --- */
     handle = fn_80113F48();
-    cameraPlayAnime((s32)handle, 0x10b71800, 0, 0);
+    cameraPlayAnime((s32)handle, 0x10b61800, 0, 0);
 
     _threadSwitch();   /* vsync yield */
 

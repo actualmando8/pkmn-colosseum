@@ -301,7 +301,9 @@ void fn_80063AD4(u8* context, UICmdMsg* msg)
     fn_800D5648(lbl_8047BFD0);
     fn_800D6A00(1);
     fn_800D7820(lbl_80314E08);
-    white.value = 0xFFFFFF00;
+    white.channel.red = 0xFF;
+    white.channel.green = 0xFF;
+    white.channel.blue = 0xFF;
     white.channel.alpha =
         (u8)(s32)(lbl_8047BFD4 * opacity);
     for (y = 0; y < msg->s56; y += 4) {

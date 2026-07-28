@@ -1349,7 +1349,7 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
             msgctrlSetValue(0x17, pokemonName);
         }
     } else if (mode == 1) {
-        if ((trainerCount < 2) && (1 < fightOutCount)) {
+        if ((trainerCount <= 1) && (1 < fightOutCount)) {
             if ((playerFlag & 0xff) == 1) {
                 pokemonName = 0x7674;
             } else if ((isHero & 0xff) == 1) {

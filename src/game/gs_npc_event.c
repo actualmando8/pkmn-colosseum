@@ -251,21 +251,28 @@ void fn_80031404(u8* arg0, u8* arg1) {
     }
 
     obj = 0;
-    if (kind == 1) {
+    switch (kind) {
+    case 1:
         obj = (void*)heroGetStatus(0, 3, (u16)arg);
-    } else if (kind == 2) {
+        break;
+    case 2:
         obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
+        break;
     }
 
     if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
         ((u8 (*)(void))menuCBRule_CheckPokemonEventFlag)() == 1) {
         msg = ((u8 (*)(void*))menuSubGetPokemonSexForDisp)(obj);
-        if (msg == 0) {
+        switch (msg) {
+        case 0:
             msg = 0xD67;
-        } else if (msg == 1) {
+            break;
+        case 1:
             msg = 0xD68;
-        } else {
+            break;
+        default:
             msg = 0;
+            break;
         }
         if (((u8 (*)(void*))pokemonBiosGetTamagoFlag)(obj) == 1) {
             msg = 0;
