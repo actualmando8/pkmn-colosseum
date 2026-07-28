@@ -36,7 +36,7 @@ typedef struct BattleGridCameraWork {
 } BattleGridCameraWork;
 
 void* fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b);
-void fadeSet(u16 mode, f32 value);
+void fadeSet(s32 mode, f32 value);
 void* fadeSetFunction__FPFv_vbUsf(void (*callback)(void), s32 mode, u32 arg,
                                   f32 value);
 
@@ -121,7 +121,7 @@ void* fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
  * Initializes the battle camera to the default overhead view
  * and configures the camera animation system.
  */
-void fadeSet(u16 mode, f32 value) {
+void fadeSet(s32 mode, f32 value) {
     extern BattleGridTransitionState lbl_80466E30;
     extern const f32 lbl_8047DFB8;
     volatile BattleGridTransitionState* state = &lbl_80466E30;
