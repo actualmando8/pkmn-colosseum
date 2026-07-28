@@ -435,7 +435,7 @@ extern void GScharCpy();
 extern u16 fn_8010BBB8();
 extern void fn_8001D994(void);
 void pokemonToMenuPokemonStatus();
-extern void GSmsgGetGSchar(void);
+extern u32 GSmsgGetGSchar();
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 extern u32 fn_800E0C54(void);
@@ -456,8 +456,8 @@ extern u32 sexGetPokemonSexRaitoKotei(u32);
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
 u32 pokemonCheckFightOut(u8* ptr);
-extern void gamedataAttestBiosCopy(void);
-void pokemonCreate(void);
+extern void gamedataAttestBiosCopy(void* dst, const void* src);
+void pokemonCreate(u8* ptr, u32 pokemon_data_id, u32 level, const void* attest);
 u32 pokemonCreateRndFit(u8*, s32, s32, s32, u32);
 extern void fadeSet(f32 duration, u32 mode);
 extern void fadeCheck(u32 wait);
@@ -3457,6 +3457,100 @@ u8 pokemonCheckValid(u8* ptr) {
 #endif /* POKEMON_RANGE_EXACT_80123E70 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_801240C4)
+void pokemonCreate(u8* ptr, u32 pokemon_data_id, u32 level, const void* attest) {
+    u16 random;
+    u32 personality_high;
+    u32 experience;
+    u32 friendship;
+    u32 max_level;
+    void* grow_data;
+    u32 learn_level;
+    u8 learn_counter;
+    u8 current_level;
+    u8 grow_id;
+    u8 valid;
+
+    if (ptr == NULL) {
+        return;
+    }
+    if ((u16)pokemon_data_id == 0) {
+        valid = 0;
+    } else if (pokemonGetStatus(NULL, pokemon_data_id, 1, 0) == 0) {
+        valid = 0;
+    } else if ((u16)pokemon_data_id >= *(u32*)(u32)lbl_80478F90) {
+        valid = 0;
+    } else {
+        valid = 1;
+    }
+    if (valid == 0) {
+        return;
+    }
+    if (attest == NULL) {
+        return;
+    }
+
+    pokemonInit(ptr);
+    pokemonSetStatus(ptr, 0, 0x6E, 0, (u16)pokemon_data_id);
+
+    personality_high = fn_800E0C54() << 16;
+    pokemonSetStatus(ptr, 0, 0x6F, 0,
+                     personality_high | (fn_800E0C54() & 0xFFFF));
+
+    gamedataAttestBiosCopy((void*)pokemonGetStatus(ptr, 0, 0x70, 0), attest);
+    pokemonSetStatus(ptr, 0, 0x77, 0,
+                     GSmsgGetGSchar(pokemonGetStatus(NULL, pokemon_data_id, 1, 0)));
+    pokemonSetStatus(ptr, 0, 0x7A, 0, (u8)level);
+
+    random = (u16)fn_800E0C54();
+    pokemonSetStatus(ptr, 0, 0x93, 0, random & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x94, 0, (random >> 5) & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x95, 0, (random >> 10) & 0x1F);
+
+    random = (u16)fn_800E0C54();
+    pokemonSetStatus(ptr, 0, 0x98, 0, random & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x96, 0, (random >> 5) & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x97, 0, (random >> 10) & 0x1F);
+
+    grow_id = (u8)pokemonGetStatus(
+        NULL, (u16)pokemonGetStatus(ptr, 0, 0x6E, 0), 0x11, 0);
+    current_level = (u8)pokemonGetStatus(ptr, 0, 0x7A, 0);
+    grow_data = pokemonGrowDataBiosGetPtr(grow_id);
+    if (grow_data == NULL) {
+        experience = 0;
+    } else {
+        experience = pokemonGrowDataBiosGetExp(grow_data, current_level);
+    }
+    pokemonSetStatus(ptr, 0, 0x79, 0, experience);
+    friendship = pokemonGetStatus(NULL, pokemon_data_id, 0x14, 0);
+    pokemonSetStatus(ptr, 0, 0x99, 0, friendship);
+    if (fn_800E0C54() & 1) {
+        u32 ability_flag = 1;
+        u16 species;
+
+        if (ptr != NULL) {
+            species = (u16)pokemonGetStatus(ptr, 0, 0x6E, 0);
+            if ((s32)pokemonGetStatus(NULL, species, 0x17, 1) == 0) {
+                ability_flag = 0;
+            }
+            pokemonSetStatus(ptr, 0, 0xB7, 0, (u8)ability_flag);
+        }
+    }
+
+    max_level = (u8)level;
+    for (learn_level = 1; learn_level <= max_level; learn_level++) {
+        learn_counter = 0;
+        for (;;) {
+            if ((s8)pokemonOboeWaza(ptr, (u8)learn_level, (u8*)1,
+                                    &learn_counter) == -3) {
+                break;
+            }
+            learn_counter++;
+        }
+    }
+
+    pokemonResetBasisStatus(ptr);
+}
+
 static u32 pokemonCreateRndFitRand32(void) {
     u32 hi;
     u32 lo;
