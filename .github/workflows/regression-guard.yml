@@ -35,3 +35,8 @@ jobs:
           cp build/${{ matrix.version }}/report.json /tmp/head_report.json
       - name: Fail on any per-function regression
         run: python3 .github/scripts/check_regression.py /tmp/base_report.json /tmp/head_report.json
+      # src/ is ~41% one-line #include shims (the sanctioned split-by-address
+      # technique). That is exactly the shape that would hide double counting,
+      # so assert the metric still measures the game exactly once.
+      - name: Fail if the metric double-counts or drifts off the DOL
+        run: python3 .github/scripts/check_metric_integrity.py /tmp/head_report.json orig/${{ matrix.version }}/sys/main.dol

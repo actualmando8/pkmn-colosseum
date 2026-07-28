@@ -19,3 +19,8 @@ jobs:
       - name: Scan added lines for asm-wrappers / .inc includes
         run: |
           python3 .github/scripts/quality_scan.py '${{ github.event.pull_request.base.sha }}' '${{ github.sha }}'
+      # quality_scan.py only sees the PR diff, so it cannot catch a wrapper
+      # re-activated by flipping `#if 0` to `#if 1` -- that adds no #include
+      # line. This walks the whole tree instead.
+      - name: Fail on any live .inc asm wrapper
+        run: python3 .github/scripts/check_asm_wrappers.py src
