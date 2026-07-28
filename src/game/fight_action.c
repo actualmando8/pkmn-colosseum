@@ -672,9 +672,7 @@ u32 fightActionFlowAllFightTrainerSelectFightAction(void* action) {
     void* entry;
 
     checkResult = fn_80008174();
-    if (checkResult != 1) {
-        fightFloorLoopValidFightTrainer(0, (u32)_fightActionFlowFightTrainerSelectFightAction__FPvUsPv, 0, 1);
-    } else {
+    if (checkResult == 1) {
         partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
         slotCount = fightFloorGetStatus(0, 0, 0x16, 0);
         for (i = 0; i < 2; i++) {
@@ -689,6 +687,8 @@ u32 fightActionFlowAllFightTrainerSelectFightAction(void* action) {
                 break;
             }
         }
+    } else {
+        fightFloorLoopValidFightTrainer(0, (u32)_fightActionFlowFightTrainerSelectFightAction__FPvUsPv, 0, 1);
     }
     return 1;
 }

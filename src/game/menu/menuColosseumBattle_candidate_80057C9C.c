@@ -21,15 +21,18 @@ extern s32 fn_80097D94(void*, void*, s32*);
 
 static inline s32 getConnectJobState(void)
 {
-    if (lbl_803A9A08.running == 0) {
-        return 2;
+    if (lbl_803A9A08.running != 0) {
+        if (lbl_803A9A08.ready != 0) {
+            return 1;
+        }
+        return 0;
     }
-    return lbl_803A9A08.ready != 0;
+    return 2;
 }
 
 s32 fn_80057C9C(void* pokemon, void* callback, s32* navigation)
 {
-    s32 ownsRequest = 0;
+    u8 ownsRequest = 0;
     s32 status;
 
     if (getConnectJobState() != 2) {
@@ -51,12 +54,9 @@ s32 fn_80057C9C(void* pokemon, void* callback, s32* navigation)
     fn_8017B1CC(0x66F);
     fn_800F915C(0x66F);
     fn_8017B3E4(0x70B);
-    do {
-        status = fn_8017B2CC(0x70B);
-        if (status == 1) {
-            _threadSwitch();
-        }
-    } while (status == 1);
+    while (status = fn_8017B2CC(0x70B), status == 1) {
+        _threadSwitch();
+    }
 
     if (ownsRequest) {
         lbl_803A9A08.request = 0;
