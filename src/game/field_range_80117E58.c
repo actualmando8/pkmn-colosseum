@@ -1672,7 +1672,6 @@ void fn_80117E58(void* arg) {
 }
 #pragma pop
 /* 0x48 | fn_80118020 | single_call_straight */
-extern void fn_800FF4D4(void);
 extern u32 lbl_802727C8[];
 #pragma peephole off
 void fn_80118020(void) {
@@ -1725,8 +1724,6 @@ void fn_80118070(void) {
 void fn_80118100(void) {
 }
 /* 0x80118104 | 0xAC */
-extern void psSetBillboardCamera();
-extern void fn_8016AB94();
 #pragma optimization_level 4
 void fn_80118104(u32 a, u8 b) {
     void* result;
@@ -1754,8 +1751,6 @@ void fn_80118104(u32 a, u8 b) {
     }
 }
 /* 0x801181B0 | 0x23C */
-extern void GSmodelSet60fpsAnimFlag();
-extern void psKillGenerator();
 extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 void fn_801181B0(void) {
@@ -1854,13 +1849,6 @@ void fn_801181B0(void) {
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_801183EC_80118874)
 /* 0x801183EC | 0x488 */
-extern void fn_800E06EC(void*, void*);
-extern void GSvecTransformQuat(void);
-extern void fn_800E0108(void*, void*, void*);
-extern void psInterpretParticles(u32);
-extern void psExecGenerator(u32);
-extern s32 fn_800057A0(void);
-extern void jumptable_8035BB88();
 extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
 extern u8 lbl_8047ADB0;
@@ -2103,7 +2091,6 @@ s32 fn_80118DA8(u8* ptr) {
     return psGetGeneratorChildMaxLife((PSGeneratorState*)node.typed->generator);
 }
 /* 0x80118DE0 | 0xAC */
-extern void psSetGeneratorAngleRadiusScale(void);
 void fn_80118DE0(u8* arg1, f32* arg2, u32 arg3, u32 arg4) {
     extern void GSvecCopy();
     extern void psSetGeneratorAngleRadiusScale();
@@ -2189,8 +2176,6 @@ void fn_80118FB0(u8* obj, GSpart* part, u32 state, u32 byte5,
     }
 }
 /* 0x801190DC | 0x2E0 */
-void* psCreateGeneratorID(u32 use_alt, u8 texture_type, u32 selector);
-void* fn_800D3094(void);
 extern u32 lbl_8047ADAC;
 extern u32 lbl_8047ADA8;
 static inline u8* fn_801190DC_findFreeNode(void) {
@@ -2351,8 +2336,6 @@ void fn_801193BC(FieldParticleBank* bank) {
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_801195AC_80119824)
 /* 0x801195AC | 0x278 */
-extern void psInitDataBank(void);
-extern void DCFlushRange();
 extern u8 lbl_802727D8[];
 extern FieldParticleBank* lbl_8047AD9C;
 extern u32 lbl_8047ADA0;
@@ -2391,12 +2374,6 @@ void* fn_801195AC(void* resource)
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_EXACT_80119824_80119BD0)
 /* 0x80119824 | 0x10C */
-extern void fn_8016A01C(void);
-extern void psInitGenerator(void);
-extern void fn_8016AAF4(void);
-extern void fn_8019733C(void);
-extern void fn_8019D618(void);
-extern void fn_8019D610(void);
 extern u32 lbl_8047ADA0;
 extern u16 lbl_8047AD98;
 extern FieldParticleBank* lbl_8047AD9C;
@@ -2470,13 +2447,6 @@ void fn_80119930(FieldParticleInstanceList* list) {
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_80119BD0_80119D90)
 /* 0x80119BD0 | 0x1C0 */
-extern struct GSmodel* GSmodelSearchModelList(void* jobj);
-extern void* GSmodelGetLinkedGSparticleBank(struct GSmodel* model);
-extern u32 GSmodelIsRootNullAdded(struct GSmodel* model);
-extern u32 GSpartGetJObjIndex(void* jobj, void* root);
-extern u32 fn_800E3CBC(struct GSmodel* model);
-extern u32 GSmodelGetGSparticleLinkAttachMode(struct GSmodel* model);
-extern u32 GSmodelGetVisibility(struct GSmodel* model);
 extern f32 lbl_8047CFE8;
 extern f32 lbl_8047CFEC;
 void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
@@ -2548,7 +2518,6 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_8011A0A8_8011A280)
 /* 0x8011A0A8 | 0x1D8 */
-extern void fn_80135E44(void);
 void fn_8011A0A8(u8* dst, u8* src, u16 type)
 {
     u8* dst_entry;
@@ -3265,7 +3234,6 @@ p2_check:
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_CANDIDATE_8011B2C0_8011B444)
 /* 0x8011B2C0 | 0x184 */
-extern s32 kaisuuGetKaisuu(u32);
 void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     extern u8 fn_80119D90(u16 idx);
     extern u8 fn_80119DD0(u16 idx);
@@ -3553,7 +3521,6 @@ void fn_8011B950(u8* base, u16 count) {
 #endif
 
 #if !defined(FIELD_BANK_ACTIVE) || defined(FIELD_EXACT_80119D90_8011A0A8)
-extern void GSvecSquareDistance(void);
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
 extern f32 lbl_8047CFD0;

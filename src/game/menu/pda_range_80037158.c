@@ -5553,7 +5553,6 @@ extern f32 lbl_8047BD4C;
 extern f32 lbl_8047BD68;
 extern u8 lbl_802E540C[];
 extern u8 lbl_802E5418[];
-extern u32 pokemonBiosGetPokemonDataId(u32 work);
 extern void memoGetScaleAngle(u32 id, f32* scale, f32* angle);
 extern u8 menuModelCheck(void* work, s32 index);
 extern void GSmodelCenterNull(void* model);

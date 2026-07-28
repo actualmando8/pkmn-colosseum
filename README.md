@@ -34,11 +34,23 @@ uv run --with matplotlib tools/plot_progress.py -o /tmp/progress.png
 | Function match | 76.52% (6,583 / 8,603 functions) |
 | Code match | 39.81% (993,224 / 2,495,108 matched code bytes) |
 | Data match | 97.29% (2,136,513 / 2,196,100 matched data bytes) |
-| Linked into DOL | 1,030 / 2,266 units (26.04% of code) |
+| Linked into DOL | 1,030 / 2,266 scoring units (26.04% of code) |
 
 These numbers come from the canonical dtk/objdiff report generated at
 `build/GC6E01/report.json`. Old campaign metrics and helper reports are archived
 under `archive/previous_campaign/` and are not used for the published progress.
+
+**"Scoring units" are not translation units.** Where one retail source region
+needs different compiler flags than its neighbours, the address range is split
+and each piece becomes its own scoring unit, compiled from the *same* `.c` file
+through a one-line `#include` shim — the `_o2`, `_o4p` and `_gc20` suffixes name
+the flag variant. 890 of the 2,266 units are such shims, so the units are backed
+by roughly 1,376 distinct source files. This does not double-count: every unit
+owns a disjoint address range (all 8,603 functions resolve to 8,603 distinct
+addresses, none claimed twice), and the 2,495,108-byte code denominator matches
+the real `main.dol` text across its seven sections, 2,503,264 bytes, to within
+0.3%. The percentages are measured against the whole game exactly once.
+
 After rebuilding the report, refresh the table with:
 
 ```bash

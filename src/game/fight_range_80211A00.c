@@ -1514,7 +1514,6 @@ extern u8   lbl_80379249[];
 /* "0x13-field" sequence handler: clear field 0x13 unless status is 0x63. */
 #define fn_80205224 fightOutPokemonGetMotoWazaDataId
 #define fn_80202810 fightOutPokemonWriteJoutaiDataId
-u8 fn_8022FE20(void* ctx);
 /* body moved to fight_range_exact_8022FE20.c: fn_8022FE20 */
 #undef fn_80202810
 #undef fn_80205224
@@ -9843,10 +9842,7 @@ u32 fn_8023793C(u32 ctx, u32 poke, u16 waza, s32 val) {
 extern u8 fn_80235714();
 extern u32 fn_802367CC();
 extern u32 fightFloorGetFightTrainerFightOutPokemonPtrAry();
-extern u32 fightOutPokemonGetPokemonPtr();
 extern u32 fn_80239984();
-extern u8 fn_80239EE8();
-extern u8 fn_80239CCC();
 extern s32 fightTrainerAiAddValue();
 
 #pragma dont_inline on

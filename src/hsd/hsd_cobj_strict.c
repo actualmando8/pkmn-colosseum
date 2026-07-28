@@ -399,7 +399,6 @@ int CObjInit(HSD_CObj* cobj) {
 
 /* 0x80193F44 | 0xCC */
 extern HSD_ClassInfo* fn_80193748(const char*);
-extern void* fn_80193828(void*);
 #if 1
 HSD_CObj* HSD_CObjLoadDesc(HSD_CObjDesc* desc) {
     extern HSD_ClassInfo* lbl_8047B230;
@@ -863,7 +862,6 @@ void HSD_CObjSetFov(HSD_CObj* cobj, f32 val)
 /* HSD_CObjGetEyePosition / HSD_CObjGetInterest are defined here, ahead of the
  * up-vector cluster, because roll2upvec / upvec2roll / HSD_CObjSetUpVector
  * inline them. */
-extern void __assert(const char*, u32, const char*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
 extern void HSD_WObjGetPosition(HSD_WObj* wobj, Vec* position);
@@ -998,8 +996,6 @@ extern int vec_normalize_check(Vec* src, Vec* dst);
 #endif
 extern int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll);
 extern f32 upvec2roll(HSD_CObj* cobj, Vec* up);
-extern void HSD_CObjSetUpVector(HSD_CObj* cobj, Vec* up);
-extern void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll);
 
 typedef union CObjFloatShape {
     f32 value;
@@ -1103,7 +1099,6 @@ extern void fn_801C2670(void);
 extern void fn_801C27F4(void*, void*, void*);
 extern void fn_801C29C4(void*, f32);
 /* WP-0061 forward declarations (defined later in same TU) */
-extern void __assert(const char*, u32, const char*);
 
 /* 0x80194CC4 | 0x30 */
 #if !defined(HSD_COBJ_SPLIT) || defined(HSD_COBJ_EXACT_80194CC4)
@@ -1214,7 +1209,6 @@ int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll)
 
 /* 0x80195590 | 0x204 */
 #if !defined(HSD_COBJ_SPLIT) || defined(HSD_COBJ_CANDIDATE_80194DA4)
-extern void __assert(const char*, u32, const char*);
 extern f64 atan2();
 extern f32 lbl_8047D9B0; /* 1.0f      */
 extern f32 lbl_8047D9B4; /*  PI/2     */
@@ -1373,12 +1367,7 @@ void fn_80195A48(void) { fn_801975FC(); fn_801974A8(); }
 
 /* 0x80195A6C | 0x4A0 */
 #if !defined(HSD_COBJ_SPLIT) || defined(HSD_COBJ_CANDIDATE_80195A6C)
-extern void fn_800A3874(f32*, f32, f32, f32, f32, f32, f32);
 extern void fn_800A3910(void);
-extern void fn_800A39E0(f32*, f32, f32, f32, f32, f32, f32);
-extern void fn_800BD2E0(f32*, int);
-extern void fn_800BD7A0(int, int, int, int);
-extern int fn_800C46B0(f32);
 extern int setupBottomHalfCamera(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
 extern int setupTopHalfCamera(HSD_CObj*);   /* wrk7: was `void (void)`; typed-C returns int, takes HSD_CObj* */
 extern void HSD_Panic(const char*, u32, const char*);
@@ -1554,7 +1543,6 @@ int HSD_CObjSetCurrent(HSD_CObj* cobj)
 /* 0x80195F0C | 0x1B8 */
 #if !defined(HSD_COBJ_SPLIT) || defined(HSD_COBJ_CANDIDATE_80195A6C)
 extern int HSD_CObjGetUpVector(HSD_CObj* cobj, Vec* up);
-extern void __assert(const char*, u32, const char*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
 #if 1
@@ -1845,7 +1833,6 @@ int setupTopHalfCamera(HSD_CObj* cobj)
 
 /* 0x80196698 | 0x64 */
 #if !defined(HSD_COBJ_SPLIT) || defined(HSD_COBJ_CANDIDATE_80195A6C)
-extern void fn_801C29C4(void*, f32);
 #if 1
 void HSD_CObjReqAnim(HSD_CObj* cobj, f32 frame)
 {
@@ -1976,7 +1963,6 @@ void CObjUpdateFunc(HSD_CObj* cobj, u32 type, f32* value)
 #endif
 
 /* 0x80196B10 | 0xA8 */
-extern void fn_801C2670(void);
 #if 1
 void HSD_CObjAddAnim(HSD_CObj* cobj_arg, HSD_CameraAnim* aobj_info_arg) {
     extern void fn_801C25E4(u32);
@@ -2076,7 +2062,6 @@ void fn_80196CE0(void) {
 #if !defined(HSD_COBJ_SPLIT) || defined(HSD_COBJ_CANDIDATE_80196C54)
 extern void fn_800060F0(const char*, u32, const char*, ...);
 extern void fn_80196CE0(void);
-extern void OSReport(const char* fmt, ...);
 extern char lbl_802746A0[];
 extern char lbl_80465080[];
 #if 1

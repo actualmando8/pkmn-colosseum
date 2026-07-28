@@ -290,7 +290,6 @@ extern void fightOutPokemonCheckFightOut();
 extern void fightMenuGetFightOutPokemonPtrToStatusMenuId();
 extern u32 menuPokemonCheckPokemonChange();
 extern void menuFightOpenTarget();
-extern s32 menuOpenCustom(s32, ...);
 #if 0
 asm void menuFightOpenPokemon(void) {
 #include "src/game/gs_npc_interact_fn_800114A4.inc"
@@ -495,7 +494,6 @@ s32 menuFightCloseWaza(s32 arg) {
 #endif
 
 /* 0x800117BC | 0x1EC */
-extern u32 _menuFightIsUse__FP16MENU_WAZA_STATUSUs();
 extern void winMsgOpenFight();
 extern void winMsgCloseFight();
 #if 0
@@ -1817,7 +1815,6 @@ void menuFightDrawSecretSelect(u8* ctx, u8* npc) {
 
 /* menuFightDrawSecretWazaDoc - 0x8000F400 | size: 0x368 */
 extern u32 fightOutPokemonGetPokemonPtr();
-extern u32 wazaGetStatus();
 extern void fn_800FB8C8(void);
 extern void jumptable_802E4CA8();
 #if 0

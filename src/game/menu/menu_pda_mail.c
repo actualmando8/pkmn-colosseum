@@ -812,8 +812,6 @@ void fn_8004D8BC(PdaMailWindowA* window)
  * (gs_field_colquery.c, GSfield_IsTransitioning): floor resource-alloc
  * helper; _threadSwitch: cooperative thread yield. */
 extern void fn_800FF730(s32 floorId);
-extern void floorSetFadeScript(s32 a, u32 b);
-extern void _threadSwitch(void);
 
 #if 0
 asm void menuPdaOpen(void) {
@@ -1320,9 +1318,6 @@ s32 fn_8004E8E0(PdaMailWindowA* window)
  * modal list-menu open/poll/close idiom -- same call skeleton as the
  * gs_event_exec.c item-quantity-picker (menu_id, input-state,
  * &config, 0, 1, 1, &out), open by id, close by id. */
-extern s32 menuOpenCustom(s32 menuId, ...);
-extern void menuClose(s32 menuId);
-extern void menuCloseSync(s32 menuId, s32 flag);
 
 /* mailGetSortMode (battle_waza.c): Waza party mailbox-sort-mode byte
  * getter (0=default/none, 1=ascending, 2=ascending+recent-sort,

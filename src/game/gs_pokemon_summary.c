@@ -1653,7 +1653,6 @@ s32 fn_80017028(u8* ctx) {
 extern void menuButtonNormal(void);
 extern u32 lbl_8047A2E8;
 extern u32 lbl_8047A2E8;
-extern void menuButtonNormal(void);
 
 void fn_80017764(void) {
     if ((s32)lbl_8047A2E8 < 0) {

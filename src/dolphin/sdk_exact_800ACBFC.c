@@ -17,7 +17,6 @@
 
 typedef void (*CARDCallback)(s32 chan, s32 result);
 
-typedef void (*CARDCallback)(s32 chan, s32 result);
 
 typedef struct AIDmaRegisters {
     /* 0x00 */ u16 startHi;

@@ -1588,15 +1588,12 @@ void floorUpdateFieldCamera_Pseudocode(void) {
 extern u8 lbl_804083D0[0x30];
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
-extern void fn_801ED674(void);
 /* Forward declarations for functions called before definition */
-void fn_801193BC(void);
 /* Forward declarations for converted functions */
 s32 pokemonWazaGetMaxPP(u8* ptr, u16 idx);
 void wazaGetStatus(void);
 void pokemonBiosGetPokemonWazaPtr(void);
 void pokemonResetBasisStatus(void*);
-void pokemonSetLevelBasisStatus(void);
 void heroItemGetItemKindToItemAryPtr(void);
 void heroSetStatus();
 void heroGetStatus(void);
@@ -1705,7 +1702,6 @@ void* floorReadMapPreFunc(void* owner, u32 param, u32 alloc_size) {
 }
 #pragma pop
 /* 0x80114D6C | 0xA0 */
-extern u8 fn_800FF548(void);
 extern u32 _unloadScript__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadFont__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
 extern u32 _unloadMsg__FPvUlUl();  /* K&R: asm void wrapper, used as function pointer */
@@ -1785,7 +1781,6 @@ u32 _unloadColsys__FPvUlUl(void) {
 }
 #pragma pop
 /* 0x8011522C | 36 bytes | call_return_const */
-extern void GStextureFree(void);
 #pragma push
 #pragma scheduling off
 u32 _unloadTexture__FPvUlUl(void) {
@@ -1809,8 +1804,6 @@ u32 floorReadMakeLightResID(u32 val) {
 u32 floorReadMakeModelResID(u32 val) {
     return (val & 0x7FFF0000U) | 0x1000;
 }
-extern void fn_800F76E4();
-extern void fn_80112700(void);
 #if 0
 asm void floorReadScriptPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114D18.inc"
@@ -1830,7 +1823,6 @@ void* floorReadScriptPostFunc(u32 a, u32 b) {
 }
 #pragma peephole reset
 #endif
-extern void GSmsgFontOpen();
 #if 0
 asm void floorReadFontPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114E0C.inc"
@@ -1853,7 +1845,6 @@ void* floorReadFontPostFunc(u32 a, u32 b) {
 }
 #pragma pop
 #endif
-extern void GSmsgOpen();
 #if 0
 asm void floorReadMsgPostFunc(void) {
 #include "src/game/gs_field_world_fn_80114F18.inc"
@@ -1895,8 +1886,6 @@ void* floorReadNormalPreFunc(u32 a, u32 b, u32 size) {
 }
 #pragma pop
 #endif
-extern u8 fn_800FF554(void);
-extern void fn_800F760C();
 #if 0
 asm void _unloadScript__FPvUlUl(void) {
 #include "src/game/gs_field_world_fn_80115124.inc"
@@ -1914,7 +1903,6 @@ u32 _unloadScript__FPvUlUl(void* ptr) {
 }
 #pragma pop
 #endif
-extern void fn_800FC2A8();
 #if 0
 asm void _unloadFont__FPvUlUl(void) {
 #include "src/game/gs_field_world_fn_80115170.inc"
@@ -1932,7 +1920,6 @@ u32 _unloadFont__FPvUlUl(void* ptr) {
 }
 #pragma pop
 #endif
-extern void GSmsgClose();
 #if 0
 asm void _unloadMsg__FPvUlUl(void) {
 #include "src/game/gs_field_world_fn_801151BC.inc"

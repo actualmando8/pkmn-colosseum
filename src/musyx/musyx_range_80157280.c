@@ -2318,8 +2318,6 @@ extern u32  salExitAi(void);
 extern u32  fn_80164148(u32 d);
 extern u32  fn_80164204(void);
 extern void fn_80164324(void);
-extern void hwEnableIrq(void);
-extern void hwDisableIrq(void);
 extern void hwInitIrq(void);
 extern u32 salGetStartDelay(void);
 extern u32  fn_801643D8(u32 size);
@@ -6833,7 +6831,6 @@ u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last_vol, u
 }
 extern void fn_8015AD1C(DSPstudioinfo* stp, DSPvoice* dsp_vptr); /* HandleDepopVoice */
 extern void DCStoreRangeNoSync(void* addr, u32 nBytes);
-extern void DCFlushRangeNoSync(void* addr, u32 nBytes);
 
 /* Ensure `n` more u16 slots fit before dspCmdMaxPtr; if not, chain onto a
  * fresh command buffer (MORE). Written as a macro (not a helper function)

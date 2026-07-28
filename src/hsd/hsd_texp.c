@@ -2262,7 +2262,6 @@ ColTExpNode* fn_801B707C(ColTExpNode** list) {
 }
 
 extern char lbl_8047DEA0;
-void fn_801B750C(ColTExpNode* texp, u8 sel);
 
 static inline void ColTExpFree(ColTExpNode* texp)
 {
@@ -3922,7 +3921,6 @@ s32 fn_801BB4C4(ColTExpNode* tev)
 #undef TEXP_REF
 
 /* 0x801B1854 | 0x30 */
-extern void HSD_ObjAllocInit(void* list, u32 size, u32 alignment);
 void fn_801B1854(void) {
     HSD_ObjAllocInit(&lbl_804656E0, 0x28, 4);
 }

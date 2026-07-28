@@ -247,8 +247,6 @@ extern s32 fn_801044D0(s32 param, u16* val);
 extern void windowGetCursor(void);
 void windowCheckCursor(void* p, u32 flags);
 extern u32 windowGetActiveID(void);
-extern void* windowSearchItemID(void* head, s32 key);
-void* windowSearchID();
 extern void windowCloseMain(void* obj);
 extern void windowClose(void* ptr, u32 flags);
 extern void _windowCreateItemSprite__FP14tagWINDOW_WORK(void);
@@ -269,7 +267,6 @@ extern void* windowOpen(s32* cursor_out, void* menu_id, u32 parent_id,
 extern void _winCalcWindowSize__FlPC13MENU_ITEM_dd_PsPs(void);
 extern void windowInit(u16 count);
 extern void* windowGetPortKeyInfo(u8 ports);
-extern void* windowGetKeyInfo(void);
 extern void fn_80105634(void);
 extern void winMsgDraw(void);
 extern void winMsgCtrl(void);

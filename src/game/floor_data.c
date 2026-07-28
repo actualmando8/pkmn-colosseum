@@ -1566,80 +1566,12 @@ extern u32 lbl_80478FBC;
 extern u8 lbl_802726D4[];
 extern u8 lbl_8035B8A0[];
 /* Forward declarations for self-referencing asm blocks */
-extern void* floorDataBiosGetFieldCameraListPtr();
-extern u32 floorDataBiosGetGroupID();
-extern void* floorDataBiosGetPtr(u32 key);
-extern void fn_8011791C(void);
-extern void fn_80119930(void);
-extern void fn_80119BD0();
-extern u8 fn_80119D90(u16 idx);
-extern u8 fn_80119DD0(u16 idx);
-extern u16 fn_80119E10(u16 idx);
-extern u8 fn_80119E50(u16 idx);
-extern u8 fn_80119E90(u16 idx);
-extern u16 fn_80119ED0(u16 idx);
-extern u8 fn_80119F10(u16 idx);
-extern u32 fn_80119F50(u16 idx);
-extern void wazaDataBiosSetFightWazaWzxVariationFuncPtr(u8* ptr, u32 val);
-extern void wazaDataBiosSetFightWazaWzxTypeFuncPtr(u8* ptr, u32 val);
-extern u32 wazaDataBiosGetFightWazaWzxVariationFuncPtr(u8* ptr);
-extern u8 wazaDataBiosGetTypeId(u8* ptr, u16 idx);
-extern u32 wazaDataBiosGetFightWazaWzxTypeFuncPtr(u8* ptr);
-extern void wazaDataBiosSetFightTrainerAiWazaDamageFuncPtr(u8* ptr, u32 val);
-extern void wazaDataBiosSetFightTrainerAiWazaHitFuncPtr(u8* ptr, u32 val);
-extern void wazaDataBiosSetFightTrainerAiWazaValueFuncPtr(u8* ptr, u32 val);
-extern void wazaDataBiosSetTypeId(u8* ptr, u16 idx, u8 val);
-extern u32 wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(u8* ptr);
-extern u32 wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(u8* ptr);
-extern u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr);
-extern void pokemonGetDarkPokemonLevel(void);
 extern u32  pokemonDataCheckValid(u32 a, u16 key);
-extern u8 fn_80121ADC(u8* ptr, u32 slot);
-extern void pokemonSetWazaStatus(void);
-extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
-extern void pokemonInit(u8* ptr);
-extern void pokemonEvolutionCreateAddPokemon(void);
-extern void pokemonEvolution(void);
-extern void savedataInit(void);
-extern void heroAddPokedoru(u8* ptr, u32 offset);
-extern s32 heroItemAddItemDataId(u8* ptr, u32 arg2, u32 arg3, u32 arg4);
-extern u32 heroAddPokemon(u8* ptr, void* arg2);
-extern void heroCreate(u8* ptr, u32 arg2, u8 arg3);
-extern void heroInit();
 extern void heroBiosSetPokecouponAll();  /* K&R: typed impl or conflict */
 extern void heroBiosSetPokecoupon();  /* K&R: typed impl or conflict */
 extern void heroBiosSetPokedoru();  /* K&R: typed impl or conflict */
 extern void heroBiosSetHizukiNamePtr();  /* K&R: typed impl or conflict */
 extern void heroBiosSetNamePtr();  /* K&R: typed impl or conflict */
-extern void heroMoveTermEvent(void);
-extern void heroMoveInitEvent(void);
-extern void fn_8012CA84();
-extern void heroPokemonGetEifie(u32 arg1);
-extern void heroPokemonGetBlacky(u32 arg1);
-extern s32 psGetGeneratorChildMaxLife(u32);
-extern void* wazaDataBiosGetPtr(u16 idx);
-extern u32 pokemonGetStatus();
-extern void pokemonSetStatus();
-extern void wazaGetStatus(void);
-extern u16 pokemonDataBiosGetSinkaPokemonDataId(u8* ptr, u16 idx);
-extern u16 pokemonDataBiosGetSinkaBuff(u8* ptr, u16 idx);
-extern u8 pokemonDataBiosGetSinkaKind(u8* ptr, u16 idx);
-extern void pokemonBiosGetPokemonWazaPtr(void);
-extern void heroItemGetItemKindToItemAryPtr(void);
-extern u8 floorUpdateFieldCamera();
-extern void heroSetStatus();
-extern void heroGetStatus(void);
-extern void updateAnimation__Ff15HEROMOVE_MEMBER(void);
-extern void* heroBiosGetPokemonPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetHizukiNamePtr(void* ptr);
-extern void* heroBiosGetHizukiItemPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetItemKoronPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetItemSeedPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetItemSkillPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetItemBallPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetExtraItemPtr(u8* ptr, u16 idx);
-extern void* heroBiosGetItemNormalPtr(u8* ptr, u16 idx);
-extern u32 heroBiosGetNamePtr(void* ptr);
 
 #if 0
 asm void floorDataBiosGetCurrentPtr(void) {
@@ -1963,7 +1895,6 @@ u32 floorDataBiosGetGroupID(u8* ptr) {
 }
 #pragma pop
 #endif
-extern u16 fn_801EF624();
 extern u8 lbl_8035B8E8[];
 #if 0
 asm void floorDataBiosGetFloorKind(void) {

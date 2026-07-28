@@ -1681,7 +1681,6 @@ s32 fn_80186620(u32 groupId, u32 index, u8 mode, f32 x0, f32 z0,
 /* 0x80186B5C | 0x58C */
 extern s8 fn_800F7A7C(s32, s32);
 extern s8 fn_800F7A08(s32, s32);
-extern u32 fn_800F7BC4(s32);
 extern f32 cameraGetRotY(void);
 extern u8 lbl_80273FB4[];
 extern u32 lbl_8047D7C8;

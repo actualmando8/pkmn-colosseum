@@ -164,70 +164,7 @@ extern void GSmathInitCosTable(void);
  * de-duplicated by identifier from the whole original TU so any
  * cross-segment call/reference resolves regardless of which segment
  * the callee's real definition ended up in). ===== */
-extern void* memcpy(void* dst, const void* src, u32 n);
-extern void* memset(void* dst, int val, u32 size);
-extern void DCFlushRange(void* addr, u32 size);
-extern u64 OSGetTime(void);
-extern void fn_800D3EC4(s32, f32, f32, f32, f32, f32, f32);
-extern void fn_800D4F98(u32, u32, ...);
-extern void fn_800D67BC(u16);
-extern void fn_800D892C(u32);
 extern u8 lbl_8047AA91;
-extern void fn_800D6B00(void);
-extern void fn_800D724C(u32 idx);
-extern void fn_800D7268(u32 idx);
-extern void fn_800D72A4(u32 idx);
-extern void fn_800D72C4(u32 idx);
-extern void fn_800D72E4(u32 idx);
-extern void fn_800D7304(u32 idx);
-extern void fn_800D7328(u32 idx);
-extern void fn_800D7344(u32 idx);
-extern void fn_800D7360(u32 idx);
-extern void fn_800D737C(u32 idx);
-extern void fn_800D7398(u32 idx);
-extern void fn_800D73C4(u32 idx);
-extern void fn_800D73F8(void);
-extern void fn_800D740C(void);
-extern void fn_800D7420(void);
-extern void fn_800D7444(void);
-extern void fn_800D7468(void);
-extern void fn_800D748C(void);
-extern void fn_800D74A0(void);
-extern void fn_800D74B4(void);
-extern void fn_800D74D0(void);
-extern void fn_800D74EC(void);
-extern void fn_800D7508(void);
-extern void fn_800D7524(void);
-extern void fn_800D7540(void);
-extern void fn_800D7564(void);
-extern void fn_800D7588(void);
-extern void fn_800D75AC(void);
-extern void fn_800D7650(u8*);
-extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
-extern void fn_800D7940(u32, u16);
-extern void fn_800D7A70(u32);
-extern void fn_800DB098(void);
-extern void fn_800DB758(u16);
-extern void lightGetFrameCount__FP9_HSD_AObj(u8*);
-extern void fn_800DE09C(void);
-extern void fn_800DE128(void);
-extern void fn_800E09E8(void*, void*, u32);
-extern u8 fn_800E0E14(u32, u32);
-extern u32 _matGSmatObjMakeTExp(void*, void*, void*, void*, void*);
-extern void _matGSmatEnableEnvMapExt(u8*);
-extern s32 _matGSmatObjLoad(u8*);
-extern void fn_800E0290(void*, void*, void*);
-extern void fn_800E02C4(void*);
-extern void fn_800E02E8(void*, f32);
-extern void fn_800E032C(void*, f32);
-extern void fn_800E0370(void*, f32);
-extern void fn_800E03E8(void*, f32, f32, f32);
-extern void fn_800E0628(void*, void*);
-extern void fn_800E064C(void*);
-extern void GSmtx44Perspective(u8*);
-extern void GSmtx44Ortho(void*, f32, f32, f32, f32, f32, f32);
-extern void fn_800E0C78(void);
-extern void GSmathInitCosTable(void);
 extern u32 lbl_8047AA80;
 extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
@@ -767,7 +704,6 @@ extern void fn_800D5AB0(u32, u16);
 extern void fn_800D5B28(u32, u16);
 extern void fn_800D5BA0(u32, u32);
 extern void fn_800D5C18(u32, u8, u8, u8);
-extern void fn_800D5CB8(u32, u8, u8, u8, u8);
 extern void fn_800D5D6C(u8);
 extern void fn_800D5DD0(u16);
 extern void fn_800D5E34(s8, s8, s8);
@@ -783,12 +719,8 @@ extern void fn_800D631C(f32, f32);
 extern void fn_800D63B0(s8, s8, s8);
 extern void fn_800D6464(u8, u8, u8);
 extern void fn_800D6518(s16, s16, s16);
-extern void fn_800D65CC(u16, u16, u16);
 extern void fn_800D6680(f32, f32, f32);
-extern void fn_800D6728(void);
-extern void fn_800D6A00(u32);
 extern void fn_800D76A8(u32, u16);
-extern void fn_800D7820(u32);
 extern void fn_800D7C74(void);
 extern void fn_800D7D10(u8, u32);
 extern void fn_800D7D90(u8, void*);
@@ -802,22 +734,14 @@ extern void fn_800D8284(f32, f32, f32);
 extern void fn_800D834C(void);
 extern void fn_800D848C(u32, u32, u32, void*);
 extern void fn_800D85D4(u32, u32);
-extern void fn_800D888C(u32);
-extern void fn_800D88DC(u32);
 extern void GSgfxDLDraw(u32);
-extern void fn_800D9B58(f32, f32, f32, f32);
 extern void fn_800D9BD0(f32, f32, f32, f32);
 extern void fn_800D9C24(u16, u16, u16, u16);
 extern void fn_800D9D68(u16, u16, u16, u16);
 extern void fn_800D9E4C(u32);
 extern void fn_800D9ED8(u32);
 extern void fn_800D9F40(u32);
-extern void fn_800D9FB4(u32);
-extern void fn_800DA028(u32);
 extern void fn_800DA08C(u32);
-extern void fn_800DA100(u32, u32, u8, u32, u32, u8);
-extern void fn_800DA1E8(u32, u32, u32);
-extern void fn_800DA2BC(u32, u32, u32);
 extern void fn_800DA3B0(u32, u8);
 extern void fn_800DA428(u32);
 extern void fn_800DA4C4(u32, u32, u32);
@@ -1236,7 +1160,6 @@ void fn_800D5504(u32 size) {
 
 #if !defined(GS_GFX_RANGE_SPLIT) || \
     defined(GS_GFX_RANGE_800D55D0_800D56C0)
-extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
 extern f32 lbl_8047CA34;
 extern f32 lbl_8047CA38;
@@ -1262,7 +1185,6 @@ void fn_800D55D0(f32 val) {
 }
 #endif
 
-extern void fn_800B9404(u32, u32);
 extern f32 lbl_8047CA30;
 extern f32 lbl_8047CA34;
 extern f32 lbl_8047CA38;
@@ -1285,7 +1207,6 @@ void fn_800D5648(f32 val) {
 
 #if !defined(GS_GFX_RANGE_SPLIT) || \
     defined(GS_GFX_RANGE_800D56C0_800D67BC)
-extern void fn_800D7230(void);
 #if 0
 asm void fn_800D56C0(void) {
 #include "src/game/gs_render_fn_800D56C0.inc"
@@ -1813,7 +1734,6 @@ void fn_800D65CC(u16 a, u16 b, u16 c) {
 }
 #endif
 
-extern void fn_800D75D0(void);
 #if 0
 asm void fn_800D6680(void) {
 #include "src/game/gs_render_fn_800D6680.inc"
@@ -1864,10 +1784,8 @@ void fn_800D6728(void) {
 
 #if !defined(GS_GFX_RANGE_SPLIT) || \
     defined(GS_GFX_RANGE_800D67BC_800D6A00)
-extern void fn_800B928C(u32, u32, u16);
 extern u8 lbl_80314350[];
 extern u8 lbl_804001F0[];
-extern void fn_800D6A80(u16, s32, u32*, u32*);
 #if 0
 asm void fn_800D67BC(void) {
 #include "src/game/gs_render_fn_800D67BC.inc"

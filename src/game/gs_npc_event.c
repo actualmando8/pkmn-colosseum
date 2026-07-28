@@ -1025,8 +1025,6 @@ void fn_80032564(void) {
 /* 0x8003258C | 0x270 */
 extern void fn_80166AB8(s32, s32, s32);
 extern void heroAddPokecoupon(s32, s32);
-extern void winMsgOpen(s32, s32, s32, s32);
-extern void winMsgClose(s32);
 extern void jumptable_802E4FE0();
 extern u32 lbl_8047A450;
 extern u32 lbl_8047A458;
@@ -1129,7 +1127,6 @@ extern void GScharCpy(void* dst, const void* src);
 extern u32 pokemonGetStatus(void*, u32, u32, u32);
 extern void fn_80082EA4(u32, s32, u8, u8);
 extern u32 menuIsCheck(u32);
-extern void _threadSwitch(void);
 extern s32 fn_800D37CC(void);
 extern u32 fn_800D3088(void);
 extern u8 lbl_8047A44A;

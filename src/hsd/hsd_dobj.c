@@ -1178,7 +1178,6 @@ void HSD_FObjReqAnimAll(HSD_FObj* fobj, f32 startframe)
 #pragma optimization_level 0
 #pragma optimizewithasm off
 extern void HSD_FObjFree(HSD_FObj* data);
-extern void HSD_ObjFree(void* list, void* data);
 extern void HSD_FObjRemove(HSD_FObj* data);
 extern u8 lbl_80465378[];
 extern u8 lbl_802747AC[];

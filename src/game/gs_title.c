@@ -2638,7 +2638,6 @@ void fn_80020B8C(void* r3, u8* r4) {
 
 /* fn_80020BA0 - 0x80020BA0 | size: 0xfc */
 extern void windowDrawSprite(s32, s32, void*, s32, s32);
-extern s32 gamedatasaveGetStatus(s32, s32);
 extern u8 lbl_802EF0A8[];
 #if 0
 asm void fn_80020BA0(void) {
@@ -2882,15 +2881,12 @@ extern void menuModelInit(void);
 extern void fn_8010A010(void);
 extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F4C8(void);
-extern void menuModelSetMotion(void);
 extern void fn_80005748(void);
 extern void fn_801EF274(void);
 extern void fn_80113FE8(void);
 extern u32 lbl_8047A35C;
 extern u32 lbl_8047B898;
 extern u32 lbl_8047A358;
-extern void menuModelSetMotion(void);
-extern u8 menuSubOpenYesNo(s32, s32, s32, s32);
 #if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_800210F0)
 #if 0
 asm void fn_800210F0(void) {
@@ -3044,8 +3040,6 @@ void fn_800216E8(void* arg0, s32 arg1, u8* arg2, s16 arg3, s32 arg4) {
 /* fn_800218BC - 0x800218BC | size: 0x1e0 */
 extern void fn_80014118(s32, void*, void*);
 extern s32 pokemonCheckValid(s32);
-extern u8 pokemonIsDarkPokemon(s32);
-extern f32 pokemonGetDp(void*);
 extern s32 fn_800141BC(void*, s32);
 extern void fn_80014198(s32);
 extern u8 lbl_803A1B90[];
@@ -3183,7 +3177,6 @@ extern s32 pcboxGetNbPokemonBox(void);
 extern s32 fn_801347E8(s32, s8);
 extern void fn_800140FC(s32*, s32*);
 extern s32 fightTrainerIsSelectedItemBall(s32);
-extern void fn_80023968(void);
 #if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80022050)
 #if 0
 asm void fn_80022050(void) {
@@ -3369,8 +3362,6 @@ s32 fn_80022478(u32 arg0, u32* arg1) {
  * syntax, scheduling pragmas).
  */
 extern u8 lbl_80266C54[];
-extern s32 fn_80023068(u32, u32*);
-extern void fn_800232F0(void);
 #if 0
 asm void fn_80022720(void) {
 #include "src/game/gs_title_fn_80022720.inc"
@@ -3404,7 +3395,6 @@ s32 fn_80022720(u32 arg0, u32* arg1) {
 #endif
 
 /* fn_80022834 - 0x80022834 | size: 0x308 */
-extern void fn_800232F0(void);
 extern void itemDataBiosGetPtr(void);
 extern void itemDataBiosGetWazaMachineNo(void);
 extern void itemDataBiosGetWazaIDByWazaMachineNo(void);

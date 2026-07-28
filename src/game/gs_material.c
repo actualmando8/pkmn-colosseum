@@ -119,70 +119,7 @@ extern void GSmathInitCosTable(void);
  * de-duplicated by identifier from the whole original TU so any
  * cross-segment call/reference resolves regardless of which segment
  * the callee's real definition ended up in). ===== */
-extern void* memcpy(void* dst, const void* src, u32 n);
-extern void* memset(void* dst, int val, u32 size);
-extern void DCFlushRange(void* addr, u32 size);
-extern u64 OSGetTime(void);
-extern void fn_800D3EC4(s32, f32, f32, f32, f32, f32, f32);
-extern void fn_800D4F98(u32, ...);
-extern void fn_800D67BC(u16);
-extern void fn_800D892C(u32);
 extern u8 lbl_8047AA91;
-extern void fn_800D6B00(void);
-extern void fn_800D724C(u32 idx);
-extern void fn_800D7268(u32 idx);
-extern void fn_800D72A4(u32 idx);
-extern void fn_800D72C4(u32 idx);
-extern void fn_800D72E4(u32 idx);
-extern void fn_800D7304(u32 idx);
-extern void fn_800D7328(u32 idx);
-extern void fn_800D7344(u32 idx);
-extern void fn_800D7360(u32 idx);
-extern void fn_800D737C(u32 idx);
-extern void fn_800D7398(u32 idx);
-extern void fn_800D73C4(u32 idx);
-extern void fn_800D73F8(void);
-extern void fn_800D740C(void);
-extern void fn_800D7420(void);
-extern void fn_800D7444(void);
-extern void fn_800D7468(void);
-extern void fn_800D748C(void);
-extern void fn_800D74A0(void);
-extern void fn_800D74B4(void);
-extern void fn_800D74D0(void);
-extern void fn_800D74EC(void);
-extern void fn_800D7508(void);
-extern void fn_800D7524(void);
-extern void fn_800D7540(void);
-extern void fn_800D7564(void);
-extern void fn_800D7588(void);
-extern void fn_800D75AC(void);
-extern void fn_800D7650(u8*);
-extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
-extern void fn_800D7940(u32, u16);
-extern void fn_800D7A70(u32);
-extern void fn_800DB098(void);
-extern void fn_800DB758(u16);
-extern void lightGetFrameCount__FP9_HSD_AObj(u8*);
-extern void fn_800DE09C(void);
-extern void fn_800DE128(void);
-extern void fn_800E09E8(void*, void*, u32);
-extern u8 fn_800E0E14(u32, u32);
-extern u32 _matGSmatObjMakeTExp(void*, void*, void*, void*, void*);
-extern void _matGSmatEnableEnvMapExt(u8*);
-extern s32 _matGSmatObjLoad(u8*);
-extern void fn_800E0290(void*, void*, void*);
-extern void fn_800E02C4(void*);
-extern void fn_800E02E8(void*, f32);
-extern void fn_800E032C(void*, f32);
-extern void fn_800E0370(void*, f32);
-extern void fn_800E03E8(void*, f32, f32, f32);
-extern void fn_800E0628(void*, void*);
-extern void fn_800E064C(void*);
-extern void GSmtx44Perspective(u8*);
-extern void GSmtx44Ortho(void*, f32, f32, f32, f32, f32, f32);
-extern void fn_800E0C78(void);
-extern void GSmathInitCosTable(void);
 extern u32 lbl_8047AA80;
 extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
@@ -471,11 +408,6 @@ extern u32 lbl_8047CB50;
 extern u32 lbl_8047CB48;
 extern u32 lbl_8047AB3C;
 
-extern void* HSD_ImageDescAlloc(void);
-extern u16 GStextureGetXsize(void*);
-extern u16 GStextureGetYsize(void*);
-extern void* GStextureGetGXformat(void*, u32);
-extern u8 GStextureGetMiplevels(void*);
 extern f32 lbl_8047CAC8;
 #if 0
 asm void GSmaterialSetTexture(void) {
@@ -518,7 +450,6 @@ asm void GSmaterialGetModulate(void) {
 void GSmaterialGetModulate(u8* src, u8* dst) { dst[0] = src[0xc]; dst[1] = src[0xd]; dst[2] = src[0xe]; dst[3] = src[0xf]; }
 #endif
 
-extern void HSD_MObjSetAlpha(u32, ...);
 extern f64 lbl_8047CAD0;
 extern f32 lbl_8047CACC;
 #if 0
@@ -594,8 +525,6 @@ asm void GSmaterialGetEnabledExtensions(void) {
 u16 GSmaterialGetEnabledExtensions(u8* obj) { return *(u16*)((u8*)obj + 0x2); }
 #endif
 
-extern void HSD_TObjRemove(void*);
-extern void HSD_MObjCompileTev(void*);
 #if 0
 asm void GSmaterialDisableExtension(void) {
 #include "src/game/gs_render_GSmaterialDisableExtension.inc"
@@ -680,7 +609,6 @@ void GSmaterialEnableExtension(u8* obj, u32 flags) {
 }
 #endif
 
-extern u32 HSD_MObjGetFlags(void*);
 #if 0
 asm void GSmaterialGetFlags(void) {
 #include "src/game/gs_render_fn_800DF3F0.inc"
@@ -729,8 +657,6 @@ void GSmaterialSetPEdescr(u8* obj, u32 new_val) {
 }
 #endif
 
-extern void HSD_MObjClearFlags(void*, u32);
-extern void HSD_MObjSetFlags(void*, void*);
 #if 0
 asm void GSmaterialResetFlags(void) {
 #include "src/game/gs_render_fn_800DF504.inc"
@@ -842,7 +768,6 @@ u8* GSmaterialCreate(void) {
 }
 #endif
 
-extern void HSD_MObjSetDefaultClass(void*);
 extern u32 lbl_8047AB20;
 extern u16 lbl_8047AB18;
 extern u32 lbl_8047AB1C;
@@ -872,7 +797,6 @@ void GSmaterialInit(u32 count) {
 }
 #endif
 
-extern void hsdInitClassInfo(void*, void*, void*, void*, u32, u32);
 extern u8 lbl_8036CB30[];
 #if 0
 asm void _GSmaterialObjInit_800EF33C(void) {
@@ -887,14 +811,6 @@ void _GSmaterialObjInit_800EF33C(void) {
 }
 #endif
 
-extern void HSD_TExpGetType();
-extern void fn_801B6DC0();
-extern void HSD_TExpCnst();
-extern void fn_801B707C();
-extern void fn_801B6E74();
-extern void fn_801B64EC();
-extern void fn_801B6CD8();
-extern void fn_801B5F08();
 #if 0
 asm void _matGSmatObjMakeTExp(void) {
 #include "src/game/gs_render__matGSmatObjMakeTExp.inc"
@@ -927,11 +843,6 @@ u32 _matGSmatObjMakeTExp(void* obj, void* a, void* b, void* c, void* d) {
 }
 #endif
 
-extern void HSD_ImageDescRemove(void);
-extern void HSD_TObjLoadDesc(void);
-extern void HSD_MObjGetTObj(void);
-extern void HSD_MObjAddTObjNext(void);
-extern void fn_801A6DA0(void);
 extern u8 lbl_803154E4[];
 extern f32 lbl_8047CAC8;
 #if 0

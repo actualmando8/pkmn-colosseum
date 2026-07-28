@@ -1011,7 +1011,6 @@ void HSD_CObjSetFov(HSD_CObj* cobj, f32 val)
 /* HSD_CObjGetEyePosition / HSD_CObjGetInterest are defined here, ahead of the
  * up-vector cluster, because roll2upvec / upvec2roll / HSD_CObjSetUpVector
  * inline them. */
-extern void __assert(const char*, u32, const char*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
 extern void HSD_WObjGetPosition(HSD_WObj* wobj, Vec* position);
@@ -1079,8 +1078,6 @@ extern void HSD_CObjGetInterest(HSD_CObj*, Vec*);
 extern int vec_normalize_check(Vec* src, Vec* dst);
 extern int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll);
 extern f32 upvec2roll(HSD_CObj* cobj, Vec* up);
-extern void HSD_CObjSetUpVector(HSD_CObj* cobj, Vec* up);
-extern void HSD_CObjSetRoll(HSD_CObj* cobj, f32 roll);
 
 typedef union CObjFloatShape {
     f32 value;
@@ -1186,7 +1183,6 @@ extern void fn_801C2670(void);
 extern void fn_801C27F4(void*, void*, void*);
 extern void fn_801C29C4(void*, f32);
 /* WP-0061 forward declarations (defined later in same TU) */
-extern void __assert(const char*, u32, const char*);
 
 /* 0x80194CC4 | 0x30 */
 #pragma push
@@ -1340,7 +1336,6 @@ int roll2upvec(HSD_CObj* cobj, Vec* up, f32 roll)
 #pragma push
 #pragma optimization_level 1
 #pragma optimizewithasm off
-extern void __assert(const char*, u32, const char*);
 extern f64 atan2();
 extern f32 lbl_8047D9B0; /* 1.0f      */
 extern f32 lbl_8047D9B4; /*  PI/2     */
@@ -1739,7 +1734,6 @@ int HSD_CObjSetCurrent(HSD_CObj* cobj)
 #pragma optimization_level 1
 #pragma optimizewithasm off
 extern int HSD_CObjGetUpVector(HSD_CObj* cobj, Vec* up);
-extern void __assert(const char*, u32, const char*);
 extern char lbl_8047D958;
 extern char lbl_8047D960;
 #if 0
@@ -2050,7 +2044,6 @@ int setupTopHalfCamera(HSD_CObj* cobj)
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void fn_801C29C4(void*, f32);
 #if 1
 void HSD_CObjReqAnim(HSD_CObj* cobj, f32 frame)
 {
@@ -2201,7 +2194,6 @@ void CObjUpdateFunc(HSD_CObj* cobj, u32 type, f32* value)
 #pragma push
 #pragma optimization_level 4
 #pragma optimizewithasm off
-extern void fn_801C2670(void);
 #if 0
 asm void HSD_CObjAddAnim(void) {
 #include "src/hsd/hsd_cobj_HSD_CObjAddAnim.inc"
@@ -2330,7 +2322,6 @@ void fn_80196CE0(void) {
 #pragma optimizewithasm off
 extern void fn_800060F0(const char*, u32, const char*, ...);
 extern void fn_80196CE0(void);
-extern void OSReport(const char* fmt, ...);
 extern char lbl_802746A0[];
 extern char lbl_80465080[];
 #if 0

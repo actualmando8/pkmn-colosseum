@@ -736,13 +736,11 @@ s32 fn_80068738(void)
 #endif
 
 #if defined(MENUCB_RANGE_RESIDUAL_80068794_ONLY)
-extern s32 toolentryTaisengetEtnryPokemonOrderNum(s32);
 extern void* toolentryTaisenGetHeroPtr(s32);
 extern void* toolentryTaisenGetPokemonPtr(s32, u16);
 extern void* heroBiosGetNamePtr(void*);
 extern void* GSmsgGetGSchar(u32);
 extern void msgctrlSetValue();
-extern s32 fn_8025D9CC(void);
 extern void fn_800FB680(s32, s32, u32, u32);
 extern u16 pokemonGetSoubiItemDataId(void*);
 extern u8 pokemonCheckValid(void*);
