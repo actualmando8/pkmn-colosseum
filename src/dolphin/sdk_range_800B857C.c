@@ -462,27 +462,13 @@ void fn_800B8C58(u16 token) {
 }
 
 void GXSetDrawDone(void) {
-    GXData_800B857C* p;
+    u32 reg;
     BOOL enabled;
-    u8 cmd = 0x61;
 
     enabled = OSDisableInterrupts();
-    p = gx;
-    GX_FIFO_U8 = cmd;
-    GX_FIFO_U32 = 0x45000002;
-    if (p->dirtyState != 0) {
-        fn_800B91EC();
-    }
-
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    PPCSync();
+    reg = 0x45000002;
+    GX_BP_REG(reg);
+    GXFlush();
     lbl_8047A9C8 = 0;
     OSRestoreInterrupts(enabled);
 }
