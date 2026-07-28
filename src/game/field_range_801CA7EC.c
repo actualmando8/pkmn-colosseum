@@ -270,17 +270,18 @@ void scriptStoreTemochiPokemon(u8* arg)
 {
     TemochiEntry* entry = lbl_804670B4;
     s32 i;
+    u16 nakigoe;
+    void* mon;
+    u32 pid;
 
     for (i = 0; i < 6; i++) {
         entry[i].field_4 = 0;
-        {
-            void* mon = heroGetStatus(arg, 3, i);
-            if (mon != NULL && pokemonCheckValid(mon) != 0) {
-                u16 nakigoe = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
-                u32 pid = pokemonGetStatus(mon, 0, 0x6f, 0);
-                entry[i].field_4 = nakigoe;
-                entry[i].field_0 = pid;
-            }
+        mon = heroGetStatus(arg, 3, i);
+        if (mon != NULL && pokemonCheckValid(mon) != 0) {
+            nakigoe = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
+            pid = pokemonGetStatus(mon, 0, 0x6f, 0);
+            entry[i].field_4 = nakigoe;
+            entry[i].field_0 = pid;
         }
     }
 }
@@ -290,11 +291,12 @@ void scriptStoreTemochiPokemon(u8* arg)
 u32 scriptGetEarthRibbon(void)
 {
     void* status = savedataGetStatus(0, 2);
+    void* mon;
     u16 i;
 
     for (i = 0; i < 6; i++) {
-        void* mon = heroBiosGetPokemonPtr(status, i);
-        if (pokemonCheckValid(mon) != 0) {
+        mon = heroBiosGetPokemonPtr(status, i);
+        if ((u8)pokemonCheckValid(mon) != 0) {
             exribbonSetEarthRibbon(mon);
         }
     }
@@ -388,12 +390,13 @@ u32 scriptGetDarkPointZeroPokemonNum(void)
 u32 scriptGetDarkPokemonNum(void)
 {
     void* status;
-    u16 count = 0;
+    void* mon;
     u16 i;
+    u16 count = 0;
 
     status = savedataGetStatus(0, 2);
     for (i = 0; i < 6; i++) {
-        void* mon = heroBiosGetPokemonPtr(status, i);
+        mon = heroBiosGetPokemonPtr(status, i);
         if ((u8)pokemonCheckValid(mon) != 0 &&
             (u8)pokemonBiosGetDarkFlag(mon) != 0) {
             count++;
@@ -405,8 +408,8 @@ u32 scriptGetDarkPokemonNum(void)
 u32 scriptGetPokemonNum(void)
 {
     void* status;
-    u16 count = 0;
     u16 i;
+    u16 count = 0;
 
     status = savedataGetStatus(0, 2);
     for (i = 0; i < 6; i++) {

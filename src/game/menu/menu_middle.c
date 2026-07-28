@@ -1335,10 +1335,7 @@ u8* fn_8006ACCC(s32 id) {
         goto search;
     }
 
-    if (id < 0) {
-        return 0;
-    }
-    if (id > 1) {
+    if (id < 0 || id > 1) {
         return 0;
     }
     status = savedataGetStatus(0, 0xE);
@@ -2637,7 +2634,10 @@ void fn_8006C018(void* menu) {
 
     value = button->state;
     value = (s8)value;
-    if ((s32)value != 2) {
+    switch ((s32)value) {
+    case 2:
+        break;
+    default:
         return;
     }
 
@@ -2651,19 +2651,25 @@ void fn_8006C018(void* menu) {
     case 0x9FA:
     case 0x9FB:
         value = keyInfo->flags4 & 0x10;
-        if ((s32)value == 0) {
+        switch ((s32)value) {
+        case 0:
             break;
+        default:
+            return;
         }
-        return;
+        break;
     case 0xA0C:
     case 0xA0D:
     case 0xE33:
     case 0xE34:
         value = keyInfo->flags4 & 0x30;
-        if ((s32)value == 0) {
+        switch ((s32)value) {
+        case 0:
             break;
+        default:
+            return;
         }
-        return;
+        break;
     }
 
     menuButtonNormal(button);
@@ -2688,26 +2694,34 @@ void fn_8006C0DC(void* menu) {
 
     value = button->state;
     value = (s8)value;
-    if ((s32)value != 2) {
+    switch ((s32)value) {
+    case 2:
+        break;
+    default:
         return;
     }
 
     keyInfo = windowGetKeyInfo();
     itemId = menuGetCursorItemID(button->menuId);
 
-    do {
-        if (itemId >= 0x9D2) {
-            break;
-        }
-        if (itemId < 0x9CA) {
-            break;
-        }
+    switch (itemId) {
+    case 0x9CA:
+    case 0x9CB:
+    case 0x9CC:
+    case 0x9CD:
+    case 0x9CE:
+    case 0x9CF:
+    case 0x9D0:
+    case 0x9D1:
         value = keyInfo->flags4 & 0x10;
-        if ((s32)value == 0) {
+        switch ((s32)value) {
+        case 0:
             break;
+        default:
+            return;
         }
-        return;
-    } while (0);
+        break;
+    }
 
     menuButtonNormal(button);
 }
@@ -4767,13 +4781,15 @@ void fn_8006E18C(void* menu) {
 
     flags = MENU_MIDDLE_U8_0001(menu)->unk_0001;
     flags = (s8)flags;
-    if (flags == 2) {
+    switch (flags) {
+    case 2:
         if (fn_80071160() != 0) {
             fn_80107F38(MENU_MIDDLE_U32_0004(menu)->unk_0004, 0x1CE);
             MENU_MIDDLE_U8_0098(menu)->unk_0098 = 1;
             MENU_MIDDLE_U8_0099(menu)->unk_0099 = 1;
             return;
         }
+        break;
     }
 
     fn_80070D84(menu, 0, 0);

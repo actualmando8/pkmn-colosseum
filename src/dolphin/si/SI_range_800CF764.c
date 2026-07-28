@@ -26,11 +26,12 @@ typedef struct {
     u32 unk4;
     u32 unk8;
 } SICommandQueueEntry;
+volatile SICommandQueueEntry __SIChannelRegs[4] : 0xCC006400;
 #pragma scheduling reset
 #pragma peephole reset
 #pragma pop
 
-#define __SIRegs ((volatile u32*)0xCC006400)
+volatile u32 __SIRegs[15] : 0xCC006400;
 #define SI_COMCSR_IDX (0x34 / 4)
 #define SI_STATUS_IDX (0x38 / 4)
 #define SI_POLL_IDX (0x30 / 4)
@@ -515,8 +516,8 @@ BOOL SIGetResponseRaw(s32 chan) {
     OSRestoreInterrupts(enabled);
 
     if (sr & 0x20) {
-        InputBuffer[chan][0] = ((volatile SICommandQueueEntry*)0xCC006400)[chan].unk4;
-        InputBuffer[chan][1] = ((volatile SICommandQueueEntry*)0xCC006400)[chan].unk8;
+        InputBuffer[chan][0] = __SIChannelRegs[chan].unk4;
+        InputBuffer[chan][1] = __SIChannelRegs[chan].unk8;
         InputBufferValid[chan] = TRUE;
         return TRUE;
     }
@@ -530,8 +531,8 @@ BOOL SIGetResponse(s32 chan, void* data) {
     enabled = OSDisableInterrupts();
 
     if (SIGetStatus(chan) & 0x20) {
-        InputBuffer[chan][0] = ((volatile SICommandQueueEntry*)0xCC006400)[chan].unk4;
-        InputBuffer[chan][1] = ((volatile SICommandQueueEntry*)0xCC006400)[chan].unk8;
+        InputBuffer[chan][0] = __SIChannelRegs[chan].unk4;
+        InputBuffer[chan][1] = __SIChannelRegs[chan].unk8;
         InputBufferValid[chan] = TRUE;
     }
 

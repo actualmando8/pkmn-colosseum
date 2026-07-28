@@ -485,7 +485,7 @@ void fn_800DC6D8(u32 delta) {
                 break;
             case 2:
                 if (*(f32*)(obj + 0x68) >= limit) {
-                    obj[0x71] = (u8)-1;
+                    *(s8*)(obj + 0x71) = -1;
                 } else if (*(f32*)(obj + 0x68) <= lbl_8047CA78) {
                     obj[0x71] = 1;
                 }

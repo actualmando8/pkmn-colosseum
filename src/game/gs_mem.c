@@ -148,12 +148,14 @@ static inline GSmemEntry* GSmemGrowEntryTable(void)
 u16 fn_800E202C(void* ptr)
 {
     GSmemEntry* entry;
+    GSmemEntry* end;
 
     if (lbl_8047AB28 == 1) {
         ptr = (u8*)ptr - 4;
     }
     entry = lbl_8047AB34;
-    while (entry >= lbl_8047AB38) {
+    end = lbl_8047AB38;
+    while (entry >= end) {
         if (entry->handle != 0 && entry->data == ptr) {
             goto found;
         }

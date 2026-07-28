@@ -165,8 +165,8 @@ u16 fightSideGetHikaeFightPokemonNum(u32 param_1, u32 param_2, u32 param_3, u32 
     u32 uVar3;
 
     uVar4 = param_2;
-    uVar2 = 0;
     uVar1 = 0;
+    uVar2 = 0;
     for (; (uVar2 & 0xFFFF) < (uVar4 & 0xFFFF); uVar2 = uVar2 + 1) {
         if (param_1 == 0) {
             uVar5 = 0;

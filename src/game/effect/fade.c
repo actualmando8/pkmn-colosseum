@@ -124,24 +124,23 @@ void* fadeSetEX(s32 mode, void* callback, s32 flags, f32 a, f32 b) {
 void fadeSet(s32 mode, f32 value) {
     extern BattleGridTransitionState lbl_80466E30;
     extern const f32 lbl_8047DFB8;
-    volatile BattleGridTransitionState* state = &lbl_80466E30;
 
-    state->pending = 1;
-    state->arg = mode;
-    state->startValue = value;
-    state->endValue = lbl_8047DFB8;
+    lbl_80466E30.pending = 1;
+    lbl_80466E30.arg = mode;
+    lbl_80466E30.startValue = value;
+    lbl_80466E30.endValue = lbl_8047DFB8;
 
     if (mode & 8) {
         if (mode & 1) {
-            state->mode = 4;
+            lbl_80466E30.mode = 4;
         } else {
-            state->mode = 3;
+            lbl_80466E30.mode = 3;
         }
     } else {
         if (mode & 1) {
-            state->mode = 2;
+            lbl_80466E30.mode = 2;
         } else {
-            state->mode = 1;
+            lbl_80466E30.mode = 1;
         }
     }
 }

@@ -71,9 +71,17 @@ extern u32 __cvt_fp2unsigned(f32 value);
 extern void __GetImageTileCount(s32 format, u16 width, u16 height,
                                 u32* rowTiles, u32* columnTiles, u32* planes);
 
-#define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
-#define GX_FIFO_U16 (*(volatile u16*)0xCC008000)
-#define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
+typedef union GXWGPipe_800B857C {
+    u8 u8;
+    u16 u16;
+    u32 u32;
+} GXWGPipe_800B857C;
+
+volatile GXWGPipe_800B857C GXWGFifo_800B857C : 0xCC008000;
+
+#define GX_FIFO_U8  GXWGFifo_800B857C.u8
+#define GX_FIFO_U16 GXWGFifo_800B857C.u16
+#define GX_FIFO_U32 GXWGFifo_800B857C.u32
 #define GX_GET_MEM_REG(offset) (*(volatile u16*)((volatile u16*)__memReg + (offset)))
 
 volatile u32 __PIRegs[12] : 0xCC003000;
@@ -454,27 +462,13 @@ void fn_800B8C58(u16 token) {
 }
 
 void GXSetDrawDone(void) {
+    u32 reg;
     BOOL enabled;
-    u8 cmd = 0x61;
-    GXData_800B857C* p;
 
     enabled = OSDisableInterrupts();
-    p = gx;
-    GX_FIFO_U8 = cmd;
-    GX_FIFO_U32 = 0x45000002;
-    if (p->dirtyState != 0) {
-        fn_800B91EC();
-    }
-
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    GX_FIFO_U32 = 0;
-    PPCSync();
+    reg = 0x45000002;
+    GX_BP_REG(reg);
+    GXFlush();
     lbl_8047A9C8 = 0;
     OSRestoreInterrupts(enabled);
 }

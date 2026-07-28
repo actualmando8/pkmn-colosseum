@@ -181,19 +181,12 @@ typedef union PPCWGPipe_800BB30C {
     f32 f32;
 } PPCWGPipe_800BB30C;
 
-#if defined(SDK_800BC618_SUFFIX_ACTIVE)
 volatile PPCWGPipe_800BB30C GXWGFifo_800BB30C : 0xCC008000;
 
 #define GX_FIFO_U8  GXWGFifo_800BB30C.u8
 #define GX_FIFO_U16 GXWGFifo_800BB30C.u16
 #define GX_FIFO_U32 GXWGFifo_800BB30C.u32
 #define GX_FIFO_F32 GXWGFifo_800BB30C.f32
-#else
-#define GX_FIFO_U8  (*(volatile u8*)0xCC008000)
-#define GX_FIFO_U16 (*(volatile u16*)0xCC008000)
-#define GX_FIFO_U32 (*(volatile u32*)0xCC008000)
-#define GX_FIFO_F32 (*(volatile f32*)0xCC008000)
-#endif
 
 #define GX_BP_REG(reg)       \
     do {                     \
@@ -598,11 +591,15 @@ void fn_800BC36C(u32 id, GXColorS10_800BC36C color) {
     reg1 = (reg1 & ~0x7FFU) | (color.b & 0x7FF);
     reg1 = (reg1 & ~0x7FF000U) | ((color.g << 12) & 0x7FF000U);
 
-    GX_BP_REG(reg0);
+    *(volatile u8*)0xCC008000 = 0x61;
+    *(volatile u32*)0xCC008000 = reg0;
     reg1 = (reg1 & 0xFFFFFFU) | ((id * 2 + 0xE1) << 24);
-    GX_BP_REG(reg1);
-    GX_BP_REG(reg1);
-    GX_BP_REG(reg1);
+    *(volatile u8*)0xCC008000 = 0x61;
+    *(volatile u32*)0xCC008000 = reg1;
+    *(volatile u8*)0xCC008000 = 0x61;
+    *(volatile u32*)0xCC008000 = reg1;
+    *(volatile u8*)0xCC008000 = 0x61;
+    *(volatile u32*)0xCC008000 = reg1;
     p->field_002 = 0;
 }
 
@@ -1012,13 +1009,12 @@ void fn_800BD7A0(u32 xOrigin, u32 yOrigin, u32 width, u32 height) {
 }
 
 void __GXSetMatrixIndex(s32 value) {
-    GXData_800BB30C* p = gx;
     u32 matrixIndex;
 
     if (value < 5) {
         GX_FIFO_U8 = 8;
         GX_FIFO_U8 = 0x30;
-        matrixIndex = p->mtxIdx0;
+        matrixIndex = gx->mtxIdx0;
         GX_FIFO_U32 = matrixIndex;
         GX_FIFO_U8 = 0x10;
         GX_FIFO_U32 = 0x1018;
@@ -1026,7 +1022,7 @@ void __GXSetMatrixIndex(s32 value) {
     } else {
         GX_FIFO_U8 = 8;
         GX_FIFO_U8 = 0x40;
-        matrixIndex = p->mtxIdx1;
+        matrixIndex = gx->mtxIdx1;
         GX_FIFO_U32 = matrixIndex;
         GX_FIFO_U8 = 0x10;
         GX_FIFO_U32 = 0x1019;

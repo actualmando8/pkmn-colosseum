@@ -1469,8 +1469,8 @@ void fn_801858C4(PeopleEntry* entry) {
     if (entry == NULL) {
         return;
     }
-    transform = peopleGetTransform(entry);
     position = fn_8018FCBC(entry);
+    transform = peopleGetTransform(entry);
     fn_800E0168(&delta, position, transform);
     if (__fabs(delta.x) < lbl_8047D828 &&
         __fabs(delta.y) < lbl_8047D828 &&

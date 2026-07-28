@@ -222,7 +222,7 @@ u32 GSscratchStore(void *dest, void *src, u32 len)
         return 1;
     }
     if (((u32)src & 0x1F) != 0) {
-        return 2;
+        goto invalid;
     }
     if (((u32)dest & 0x1F) != 0) {
         return 2;
@@ -234,4 +234,7 @@ u32 GSscratchStore(void *dest, void *src, u32 len)
     queued = LCStoreData(dest, src, len);
     lbl_8047ABDC += queued;
     return 0;
+
+invalid:
+    return 2;
 }
