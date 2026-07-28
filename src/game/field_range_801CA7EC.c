@@ -209,6 +209,11 @@ u32 scriptGetItem(s32 a, s32 b)
 u32 scriptCheckTemochiPokemon(u8* arg)
 {
     u8 used[6];
+    u8* usedBase;
+    u8* usedEntry;
+    TemochiEntry* wanted;
+    u32* wantedSpecies;
+    void* mon;
     s32 i, j;
 
     used[0] = 0;
@@ -218,33 +223,41 @@ u32 scriptCheckTemochiPokemon(u8* arg)
     used[4] = 0;
     used[5] = 0;
 
-    for (i = 0; i < 6; i++) {
-        if (lbl_804670B4[i].field_4 != 0) {
-            for (j = 0; j < 6; j++) {
-                if (used[j]) {
+    usedBase = used;
+    wanted = lbl_804670B4;
+    for (i = 0; i < 6; i++, wanted++) {
+        if (wanted->field_4 != 0) {
+            usedEntry = usedBase;
+            wantedSpecies = &wanted->field_4;
+            for (j = 0; j < 6; j++, usedEntry++) {
+                if (*usedEntry) {
                     continue;
                 }
-                {
-                    void* mon = heroGetStatus(arg, 3, j);
-                    if (mon != NULL && pokemonCheckValid(mon) != 0) {
-                        u16 v1 = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
-                        u32 v2 = pokemonGetStatus(mon, 0, 0x6f, 0);
-                        if (v1 == lbl_804670B4[i].field_4 && v2 == lbl_804670B4[i].field_0) {
-                            used[j] = 1;
-                            break;
-                        }
+                mon = heroGetStatus(arg, 3, j);
+                if (mon != NULL && pokemonCheckValid(mon) != 0) {
+                    u16 v1 = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
+                    u32 v2 = pokemonGetStatus(mon, 0, 0x6f, 0);
+                    if (v1 == *wantedSpecies && v2 == wantedSpecies[-1]) {
+                        goto matched_temochi;
                     }
                 }
             }
             if (j == 6) {
                 return 1;
             }
+            goto next_temochi;
+
+matched_temochi:
+            *usedEntry = 1;
         }
+next_temochi:
+        ;
     }
 
-    for (i = 0; i < 6; i++) {
-        if (!used[i]) {
-            void* mon = heroGetStatus(arg, 3, i);
+    usedEntry = usedBase;
+    for (i = 0; i < 6; i++, usedEntry++) {
+        if (!*usedEntry) {
+            mon = heroGetStatus(arg, 3, i);
             if (mon != NULL && pokemonCheckValid(mon) != 0) {
                 return 1;
             }
