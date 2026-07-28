@@ -3136,11 +3136,19 @@ u32 heroMoveSetNeckMode(s32 idx, s32 state)
     }
 
     entry = lbl_80426BD0 + idx * 0x20;
-    if (*(s32*)(entry + 0xC) == 1) {
+    switch (*(s32*)(entry + 0xC)) {
+    case 1:
         fn_80188AF4(0, value);
+        break;
+    default:
+        break;
     }
-    if (state == 1) {
+    switch (state) {
+    case 1:
         fn_80188F78(0, value);
+        break;
+    default:
+        break;
     }
     *(u32*)(entry + 0xC) = state;
     return 1;
