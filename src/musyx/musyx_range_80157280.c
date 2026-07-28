@@ -914,9 +914,9 @@ u32 fn_80159EF0(void* project, u16 group, void* samples,
         while (entry->nextOffset != 0xFFFFFFFF) {
             if (entry->id == group) {
                 lbl_80447860[lbl_8047AFE8].group = entry;
+                lbl_80447860[lbl_8047AFE8].project = project;
                 lbl_80447860[lbl_8047AFE8].sampleDirectory =
                     sampleDirectory;
-                lbl_80447860[lbl_8047AFE8].project = project;
 
                 samples = fn_80162FAC(samples);
                 if (fn_80151770(sampleDirectory, samples) != 0) {
