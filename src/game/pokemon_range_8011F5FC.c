@@ -3533,7 +3533,7 @@ static s32 pokemonCreateRndFitCurrentGroup(u8* ptr) {
 }
 
 static u8 pokemonCreateRndFitGroupOrRandom(u8* ptr, u32 value) {
-    s32 group;
+    s8 group;
     u16 species;
     u16 threshold;
 
@@ -3558,32 +3558,22 @@ static u8 pokemonCreateRndFitSeedHit(u32 value, u32 seed_xor) {
 }
 
 u32 pokemonCreateRndFit(u8* ptr, s32 group_arg, s32 mod_arg, s32 seed_mode_arg, u32 seed) {
-    s8 group_filter;
-    s8 mod_filter;
-    s8 seed_filter;
-    u32 seed_xor;
-
     if (ptr == NULL) {
         return pokemonCreateRndFitRand32();
     }
-
-    group_filter = (s8)group_arg;
-    mod_filter = (s8)mod_arg;
-    seed_filter = (s8)seed_mode_arg;
-    seed_xor = (seed >> 16) ^ (seed & 0xFFFF);
 
     for (;;) {
         u32 value;
 
         value = pokemonCreateRndFitRand32();
 
-        if (group_filter >= 0) {
+        if ((s8)group_arg >= 0) {
             s32 group;
 
             group = pokemonCreateRndFitCurrentGroup(ptr);
             if (group < 0) {
-                if (group_filter != 2) {
-                    if ((u8)group_filter != pokemonCreateRndFitGroupOrRandom(ptr, value)) {
+                if ((s8)group_arg != 2) {
+                    if ((u8)(s8)group_arg != pokemonCreateRndFitGroupOrRandom(ptr, value)) {
                         continue;
                     }
                 } else {
@@ -3601,15 +3591,15 @@ u32 pokemonCreateRndFit(u8* ptr, s32 group_arg, s32 mod_arg, s32 seed_mode_arg, 
             }
         }
 
-        if (mod_filter >= 0 && (u8)mod_filter != (u8)(value % 25)) {
+        if ((s8)mod_arg >= 0 && (u8)(s8)mod_arg != (u8)(value % 25)) {
             continue;
         }
 
-        if (seed_filter >= 0) {
+        if ((s8)seed_mode_arg >= 0) {
             u8 hit;
 
-            hit = pokemonCreateRndFitSeedHit(value, seed_xor);
-            if (seed_filter != 0) {
+            hit = pokemonCreateRndFitSeedHit(value, (seed >> 16) ^ (seed & 0xFFFF));
+            if ((s8)seed_mode_arg != 0) {
                 if (hit == 0) {
                     continue;
                 }

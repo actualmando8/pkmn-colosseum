@@ -75,6 +75,7 @@ extern f32 PSVECMag(void*);
 extern void PSVECCrossProduct(void*, void*, void*);
 extern const DisplayFuncVec lbl_802746D0; /* { 0.0f, 0.0f, 1.0f } */
 extern f32 lbl_80478ACC;
+extern const f32 lbl_8047DA14;   /* 1.0f in sdata2 */
 
 #define DISPLAYFUNC_FLAG_2000 0x2000
 #define DISPLAYFUNC_MTX(mtx, row, col) (((f32*) (mtx))[(row) * 4 + (col)])
@@ -237,7 +238,7 @@ void fn_801985E0(HSD_JObj* jobj, Mtx src, Mtx dst)
     x.y = src[1][0];
     x.z = src[2][0];
     magnitude = PSVECMag(&x);
-    PSVECScale(&x, &x_unit, 1.0F / (lbl_80478ACC + magnitude));
+    PSVECScale(&x, &x_unit, lbl_8047DA14 / (lbl_80478ACC + magnitude));
     sy = displayfuncMtxColMag(src, 1);
     sz = displayfuncMtxColMag(src, 2);
 
@@ -254,7 +255,7 @@ void fn_801985E0(HSD_JObj* jobj, Mtx src, Mtx dst)
         PSVECNormalize(&y, &y);
     } else {
         y.x = 0.0F;
-        y.y = 1.0F;
+        y.y = lbl_8047DA14;
         y.z = 0.0F;
     }
 
