@@ -724,11 +724,12 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
     void* obj = (void*)lbl_8047AA74;
     GSRenderCamera* c = (GSRenderCamera*)obj;
     void* jobj;
+    f32 x, z, h;
+    volatile f32 w;
     if (obj == 0) {
         return;
     }
     if (c->isAnimating != 0) {
-        f32 x, z, w, h;
         jobj = c->cobj;
         if (jobj == 0) {
             __assert(lbl_8047C9C4, 0x1ae, lbl_8047C9CC);
@@ -747,13 +748,7 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
         return;
     }
     jobj = c->cobj;
-    if (*(u8*)((u8*)jobj + 0x50) != 1) {
-        f32 a, b, c2, d;
-        HSD_CObjGetOrtho(jobj, &b, &d, &a, &c2);
-        fn_800D9B58(b, d, a, c2);
-        fn_800D834C();
-        return;
-    }
+    if (*(u8*)((u8*)jobj + 0x50) != 1) goto lab_ortho;
     if (c->dirty != 0) {
         if (c->isAnimating != 0) {
             fn_800E0628(c->viewMtx, HSD_CObjGetViewingMtxPtr(c->cobj));
@@ -795,7 +790,6 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
         c->dirty = 0;
     }
     {
-        f32 x, z, w, h;
         jobj = c->cobj;
         if (jobj == 0) {
             __assert(lbl_8047C9C4, 0x1a2, lbl_8047C9CC);
@@ -808,6 +802,15 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
         fn_800D9BD0(x, z, w, h);
         fn_800D834C();
         fn_800D7FE4(c->viewMtx);
+    }
+    return;
+
+lab_ortho:
+    {
+        f32 a, b, c2, d;
+        HSD_CObjGetOrtho(jobj, &b, &d, &a, &c2);
+        fn_800D9B58(b, d, a, c2);
+        fn_800D834C();
     }
 }
 

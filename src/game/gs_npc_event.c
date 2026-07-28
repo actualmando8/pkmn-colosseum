@@ -315,11 +315,17 @@ void fn_80031648(u8* arg0, u8* arg1) {
     }
 
     obj = 0;
-    if (group == 1) {
-        obj = (void*)heroGetStatus(0, 3, (u16)arg);
-    } else if (group == 2) {
-        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
-    }
+    if (group == 2) goto grp2;
+    if (group >= 2) goto grp_done;
+    if (group >= 1) goto grp1;
+    goto grp_done;
+grp1:
+    obj = (void*)heroGetStatus(0, 3, (u16)arg);
+    goto grp_done;
+grp2:
+    obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
+grp_done:
+    ;
 
     if (((u8 (*)(void*))pokemonBiosGetFuseiFlag)(obj) != 0) {
         msgctrlSetValue(0x37, ((s32 (*)(s32))GSmsgGetGSchar)(0x56C));
@@ -1818,47 +1824,42 @@ void fn_80030574(u8* arg0, u8* arg1) {
     slot = 0;
     key = *(s16*)(arg1 + 0x6);
 
-    if (key == *(u16*)(table + 0x8)) {
-        group = *(u16*)(table + 0x0);
-        slot = 0;
-    }
-    if (key == *(u16*)(table + 0xA)) {
-        group = *(u16*)(table + 0x0);
-        slot = 1;
-    }
-    if (key == *(u16*)(table + 0xC)) {
-        group = *(u16*)(table + 0x0);
-        slot = 2;
-    }
-    if (key == *(u16*)(table + 0xE)) {
-        group = *(u16*)(table + 0x0);
-        slot = 3;
-    }
-
-    table += 0x14;
-    if (key == *(u16*)(table + 0x8)) {
-        group = *(u16*)(table + 0x0);
-        slot = 0;
-    }
-    if (key == *(u16*)(table + 0xA)) {
-        group = *(u16*)(table + 0x0);
-        slot = 1;
-    }
-    if (key == *(u16*)(table + 0xC)) {
-        group = *(u16*)(table + 0x0);
-        slot = 2;
-    }
-    if (key == *(u16*)(table + 0xE)) {
-        group = *(u16*)(table + 0x0);
-        slot = 3;
+    {
+        s32 i;
+        for (i = 0; i < 2; i++) {
+            key = *(s16*)(arg1 + 0x6);
+            if (key == *(u16*)(table + 0x8)) {
+                group = *(u16*)(table + 0x0);
+                slot = 0;
+            }
+            if (key == *(u16*)(table + 0xA)) {
+                group = *(u16*)(table + 0x0);
+                slot = 1;
+            }
+            if (key == *(u16*)(table + 0xC)) {
+                group = *(u16*)(table + 0x0);
+                slot = 2;
+            }
+            if (key == *(u16*)(table + 0xE)) {
+                group = *(u16*)(table + 0x0);
+                slot = 3;
+            }
+            table += 0x14;
+        }
     }
 
     obj = 0;
-    if (group == 1) {
-        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
-    } else if (group == 2) {
-        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
-    }
+    if (group == 2) goto grp2;
+    if (group >= 2) goto grp_done;
+    if (group >= 1) goto grp1;
+    goto grp_done;
+grp1:
+    obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
+    goto grp_done;
+grp2:
+    obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
+grp_done:
+    ;
 
     if (obj == 0) {
         winSpriteSetDisp(arg1, 0);
@@ -2022,11 +2023,17 @@ void fn_80030A44(u8* arg0, u8* arg1) {
     }
 
     obj = 0;
-    if (group == 1) {
-        obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
-    } else if (group == 2) {
-        obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
-    }
+    if (group == 2) goto grp2;
+    if (group >= 2) goto grp_done;
+    if (group >= 1) goto grp1;
+    goto grp_done;
+grp1:
+    obj = (void*)heroGetStatus(0, 3, (u16)lbl_8047A424);
+    goto grp_done;
+grp2:
+    obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)lbl_8047A420);
+grp_done:
+    ;
 
     if (obj == 0) {
         winSpriteSetDisp(arg1, 0);
