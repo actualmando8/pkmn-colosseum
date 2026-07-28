@@ -98,6 +98,10 @@ typedef struct MemcardFileStatus {
     u32 data_offset;
 } MemcardFileStatus;
 
+typedef struct SavedataPayload {
+    u8 bytes[0x1DFD0];
+} SavedataPayload;
+
 extern u8 lbl_8047B3C8;
 extern u8 lbl_8047B3D0;
 extern MemcardTaskState* lbl_8047B3D4;
@@ -200,7 +204,9 @@ extern s32 fn_800B5BE4();
 void* savedataGetStatus(void* data, s32 index);
 s32 gamedatasaveGetStatus(void* data, s32 index);
 void gamedatasaveSetStatus(void* data, s32 index, s32 value);
+void savedataCreate(void* data, s32 index);
 void* gamedatasaveBiosGetPtr(void* data);
+u64 gamedatasaveBiosGetMemcardID(u32* data);
 void gamedatasaveBiosSetMemcardID(void* data, u64 memcard_id);
 u16 fn_8006A718(void* data);
 void fn_8006AF44(void* data, void* value);
@@ -1817,6 +1823,152 @@ s32 fn_801CF7E4(void)
     sum += header[4] + header[5] + header[6] + header[7];
     header[3] = -sum;
     return 0x1F;
+}
+
+s32 fn_801CF9C8(void)
+{
+    u32 checksum;
+    u32* header;
+    s32 offset = 0x1E000;
+    s32 header_count;
+    s32 valid;
+    s32 newest_count = 0;
+    s32 newest_index = -1;
+    s32 i;
+    u64 current_id;
+    u64 card_id;
+
+    for (i = 0; i < 3; i++) {
+        header = (u32*)((u8*)lbl_8047B3D4->work_buffer + offset);
+        checksum = header[0];
+        checksum += header[1];
+        checksum += header[2];
+        checksum += header[3];
+        checksum += header[4];
+        checksum += header[5];
+        checksum += header[6];
+        checksum += header[7];
+        if (checksum != 0) {
+            lbl_8047B3D4->error_code = 0x11;
+            return 0x2B;
+        }
+
+        valid = 0;
+        if (((u8*)header)[0] == 1) {
+            if (((u8*)header)[1] == 1) {
+                valid = 1;
+            }
+        }
+        if (valid == 0) {
+            lbl_8047B3D4->error_code = 0x13;
+            return 0x2B;
+        }
+
+        header_count = ((s32*)header)[1];
+        if (header_count > newest_count) {
+            newest_count = header_count;
+            newest_index = i;
+            if (header_count > (s32)lbl_8047B3D4->serial_hi) {
+                lbl_8047B3D4->serial_hi = header_count;
+            }
+        }
+        offset += 0x200;
+    }
+
+    lbl_8047B3D4->field_20 = newest_index;
+
+    switch (lbl_8047B3D4->task_kind) {
+    case 10:
+    case 11: {
+        void* work_buffer = lbl_8047B3D4->work_buffer;
+
+        *(SavedataPayload*)((u8*)work_buffer + 8) =
+            *(SavedataPayload*)savedataGetStatus(0, 0);
+        lbl_8047B3D4->field_2c = lbl_8047B3D4->serial_hi;
+        return 0x25;
+    }
+
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
+    case 13:
+        if (newest_index == -1) {
+            if ((s32)lbl_8047B3D4->serial_hi > 0) {
+                switch (lbl_8047B3D4->task_kind) {
+                case 9:
+                    return 0xB;
+                case 3:
+                    break;
+                default:
+                    lbl_8047B3D4->error_code = 0x11;
+                    return 0x2B;
+                }
+            }
+
+            switch (lbl_8047B3D4->task_kind) {
+            case 1:
+            case 2:
+            case 3:
+                lbl_8047B3D4->error_code = 0xC;
+                lbl_8047B3D4->task_result = 1;
+                if (lbl_8047B3D4->format_requested != 0) {
+                    return 0x11;
+                }
+                return 0x2C;
+            default:
+                break;
+            }
+
+            memset(lbl_8047B3D4->work_buffer, 0, 0x1E000);
+            savedataCreate((u8*)lbl_8047B3D4->work_buffer + 8, 0);
+            lbl_8047B3D4->field_2c = 0;
+            lbl_8047B3D4->field_20 = -1;
+            return 0x24;
+        }
+        return 0x20;
+
+    case 4:
+    case 6:
+    case 8:
+        if (newest_index != -1) {
+            if (newest_count <= lbl_8047B3D4->field_2c) {
+                {
+                    u32* selected_header =
+                        (u32*)((u8*)lbl_8047B3D4->work_buffer + 0x20000 +
+                               newest_index * 0x200);
+                    header = selected_header;
+                }
+                current_id = gamedatasaveBiosGetMemcardID(
+                    gamedatasaveBiosGetPtr((void*)savedataGetStatus(0, 1)));
+                card_id = gamedatasaveBiosGetMemcardID(
+                    gamedatasaveBiosGetPtr(
+                        (void*)savedataGetStatus((u8*)header - 0x1FF8, 1)));
+                if (current_id == card_id) {
+                    if (lbl_8047B3D4->task_kind == 6) {
+                        lbl_8047B3D4->field_20 = newest_index;
+                        return 0x20;
+                    }
+
+                    {
+                        void* work_buffer = lbl_8047B3D4->work_buffer;
+                        SavedataPayload* destination =
+                            (SavedataPayload*)((u8*)work_buffer + 8);
+
+                        *destination = *(SavedataPayload*)savedataGetStatus(0, 0);
+                    }
+                    return 0x25;
+                }
+            }
+        }
+        /* fall through */
+
+    default:
+        lbl_8047B3D4->error_code = 0x13;
+        return 0x2B;
+    }
 }
 
 s32 fn_801CFD08(void)
