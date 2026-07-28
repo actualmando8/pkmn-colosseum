@@ -26,7 +26,7 @@ extern u32 fn_801DE190();
 extern void fn_801DDD28();
 extern void fn_801DA4E8();
 extern void fn_801DA9E8();
-extern s8 fn_801DA94C();
+extern u8 fn_801DA94C();
 extern void floorSetFadeScript();
 
 /* Address: 0x80265EC4 | Size: 0x50 */
@@ -74,7 +74,7 @@ void fn_80265F94(int r3)
 {
     extern s8 winMsgCheck();
     extern u16 pokemonDataBiosGetVoice();
-    extern int pokemonDataBiosGetPtr();
+    extern void* pokemonDataBiosGetPtr();
     extern int fn_801666BC();
     extern int fn_80166A28();
     extern u16 lbl_8047E6F8;
@@ -82,15 +82,17 @@ void fn_80265F94(int r3)
   u16 uVar1;
   u32 uVar2;
 
-  int sVar6;
-  int sVar7;
+  u16 sVar6;
+  u16 sVar7;
   u32 uVar3;
   s8 cVar9;
+  u8 effectStatus;
   int iVar4;
+  void* pokemonData;
   u16 uVar8;
   u32 uVar5;
 
-  sVar6 = (int)pokemonGetStatus(0,0xfa,0x66,0);
+  sVar6 = (u16)(int)pokemonGetStatus(0,0xfa,0x66,0);
   sVar7 = 0xFFFF;
   if ((u16)sVar6 != 0) {
     sVar7 = sVar6;
@@ -103,14 +105,14 @@ void fn_80265F94(int r3)
   fadeSet((double)lbl_8047E6FC,2);
   while (cVar9 = fadeCheck(0), cVar9 != '\0') {
     fn_801DB088();
-    cVar9 = fn_801DA94C(uVar3,uVar1,4);
-    if (cVar9 == '\0') {
+    effectStatus = fn_801DA94C(uVar3,uVar1,4);
+    if (effectStatus == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
     _threadSwitch();
   }
-  iVar4 = pokemonDataBiosGetPtr(0xfa);
-  if (iVar4 == 0) {
+  pokemonData = pokemonDataBiosGetPtr(0xfa);
+  if (pokemonData == 0) {
     uVar8 = 0;
   }
   else {
@@ -119,44 +121,42 @@ void fn_80265F94(int r3)
   }
   while (iVar4 = fn_801666BC(uVar8), iVar4 == 2) {
     fn_801DB088();
-    cVar9 = fn_801DA94C(uVar3,uVar1,4);
-    if (cVar9 == '\0') {
+    effectStatus = fn_801DA94C(uVar3,uVar1,4);
+    if (effectStatus == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
     _threadSwitch();
   }
   winMsgOpenField(0x44ba,0,0);
-  while (1) {
-    cVar9 = winMsgCheck();
-    uVar2 = __cntlzw(1 - cVar9);
-    if ((uVar2 >> 5 & 0xff) == 0) break;
+  while (cVar9 = winMsgCheck(), uVar2 = __cntlzw(1 - cVar9),
+         (uVar2 >> 5 & 0xff) != 0) {
     fn_801DB088();
-    cVar9 = fn_801DA94C(uVar3,uVar1,4);
-    if (cVar9 == '\0') {
+    effectStatus = fn_801DA94C(uVar3,uVar1,4);
+    if (effectStatus == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
     _threadSwitch();
   }
   winMsgCloseField(1);
-  if (r3 == 1) {
-    msgctrlSetValue(0x5d,0x3d2);
-    uVar5 = 0x44bb;
-  }
-  else if ((r3 < 1) && (-1 < r3)) {
+  switch (r3) {
+  case 0:
     msgctrlSetValue(0x5d,0x3d2);
     uVar5 = 0x44bc;
-  }
-  else {
+    break;
+  case 1:
+    msgctrlSetValue(0x5d,0x3d2);
+    uVar5 = 0x44bb;
+    break;
+  default:
     uVar5 = 0x44b9;
+    break;
   }
   winMsgOpenField(uVar5,0,0);
-  while (1) {
-    cVar9 = winMsgCheck();
-    uVar2 = __cntlzw(1 - cVar9);
-    if ((uVar2 >> 5 & 0xff) == 0) break;
+  while (cVar9 = winMsgCheck(), uVar2 = __cntlzw(1 - cVar9),
+         (uVar2 >> 5 & 0xff) != 0) {
     fn_801DB088();
-    cVar9 = fn_801DA94C(uVar3,uVar1,4);
-    if (cVar9 == '\0') {
+    effectStatus = fn_801DA94C(uVar3,uVar1,4);
+    if (effectStatus == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
     _threadSwitch();
@@ -165,8 +165,8 @@ void fn_80265F94(int r3)
   fadeSet((double)lbl_8047E6FC,3);
   while (cVar9 = fadeCheck(0), cVar9 != '\0') {
     fn_801DB088();
-    cVar9 = fn_801DA94C(uVar3,uVar1,4);
-    if (cVar9 == '\0') {
+    effectStatus = fn_801DA94C(uVar3,uVar1,4);
+    if (effectStatus == '\0') {
       fn_801DA9E8(uVar3,uVar1,4);
     }
     _threadSwitch();

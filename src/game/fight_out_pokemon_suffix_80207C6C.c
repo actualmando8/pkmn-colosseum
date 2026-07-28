@@ -677,22 +677,22 @@ void fightOutPokemonDasuEffect(void* r3, u8 r4)
     extern u8 fn_801DA94C();
     extern void fn_801DA9E8();
     extern void fn_801DDD28();
-  int iVar1;
+  void* iVar1;
   u8 uVar6;
   u16 uVar4;
   u16 uVar5;
   u8 cVar7;
   u32 uVar2;
-  int iVar3;
+  void* iVar3;
   u32 uVar8;
 
-  iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
+  iVar1 = pokemonGetStatus(r3,0,0xee,0);
   if (iVar1 != 0) {
     if (r3 == 0) {
       uVar8 = 0;
     }
     else {
-      iVar3 = (int)pokemonGetStatus(r3,0,0xd6,0);
+      iVar3 = pokemonGetStatus(r3,0,0xd6,0);
       if (iVar3 == 0) {
         uVar8 = 0;
       }
@@ -712,7 +712,9 @@ void fightOutPokemonDasuEffect(void* r3, u8 r4)
       fn_801DA9E8(iVar1,uVar4,4);
     }
     else if (r4 == 2) {
-      while (cVar7 = fn_801DA94C(iVar1,uVar4,4), cVar7 != 0) {
+      while (1) {
+        cVar7 = fn_801DA94C(iVar1,uVar4,4);
+        if (cVar7 == 0) break;
         _threadSwitch();
       }
     }
@@ -720,14 +722,16 @@ void fightOutPokemonDasuEffect(void* r3, u8 r4)
       fn_801DA9E8(iVar1,uVar5,4);
     }
     else if (r4 == 4) {
-      while (cVar7 = fn_801DA5C4(0), cVar7 != 1) {
+      while (1) {
+        cVar7 = fn_801DA5C4(0);
+        if (cVar7 == 1) break;
         _threadSwitch();
       }
       if (r3 == 0) {
         uVar2 = 0;
       }
       else {
-        iVar3 = (int)pokemonGetStatus(r3,0,0xd6,0);
+        iVar3 = pokemonGetStatus(r3,0,0xd6,0);
         if (iVar3 == 0) {
           uVar2 = 0;
         }
@@ -738,13 +742,17 @@ void fightOutPokemonDasuEffect(void* r3, u8 r4)
       uVar4 = (int)pokemonGetStatus(uVar2,0,0x6e,0);
       uVar4 = (int)pokemonGetStatus(0,uVar4,0x61,0);
       fn_80166A50(uVar4,0,0xff,0);
-      while (cVar7 = fn_801DA94C(iVar1,uVar5,4), cVar7 != 0) {
+      while (1) {
+        cVar7 = fn_801DA94C(iVar1,uVar5,4);
+        if (cVar7 == 0) break;
         _threadSwitch();
       }
       cVar7 = pokemonCheckRare(uVar8);
       if (cVar7 == 1) {
         fn_801DA9E8(iVar1,0x67,4);
-        while (cVar7 = fn_801DA94C(iVar1,0x67,4), cVar7 != 0) {
+        while (1) {
+          cVar7 = fn_801DA94C(iVar1,0x67,4);
+          if (cVar7 == 0) break;
           _threadSwitch();
         }
       }
