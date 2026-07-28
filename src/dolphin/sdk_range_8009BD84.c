@@ -598,7 +598,7 @@ void fn_8009CD38(GXColor fg, GXColor bg, const char* msg) {
 }
 
 /** EXI channel register file; [3] is the channel-0 control register. */
-#define __EXIRegs ((volatile u32*)0xCC006800)
+volatile u32 __EXIRegs[15] : 0xCC006800;
 
 /**
  * Halt: OSFatal's fiber entry point. Copies the message into the fresh arena,
