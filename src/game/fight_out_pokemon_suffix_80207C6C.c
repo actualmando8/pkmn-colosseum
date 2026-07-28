@@ -527,30 +527,29 @@ void fightOutPokemonHokakuEffect(void* r3, u8 r4, u32 r5, u8 r6, u8* r7)
     extern void fn_801DA2C4();
     extern u32 fn_801DA354();
     extern void fn_801DA4E8();
-    extern void fn_801DA8C4();
-    extern u8 fn_801DA94C();
-    extern void fn_801DA9E8();
+    extern void fn_801DA8C4(void*, u16, u16);
+    extern u8 fn_801DA94C(void*, u16, u16);
+    extern void fn_801DA9E8(void*, u16, u16);
     extern void fn_801DB100();
-    extern void fn_801DDD28();
+    extern void fn_801DDD28(void*, u16, u16, u32);
     extern void fightFloorLoopValidFightOutPokemon();
     extern u32 fightFloorGetStatus();
     extern void fn_8026532C();
-  int iVar1;
-  u16 uVar4;
-  u16 uVar5;
-  u16 uVar6;
-  u16 uVar7;
-  u16 uVar8;
+  void* iVar1;
+  u32 uVar4;
+  u32 uVar5;
+  u32 uVar6;
+  u32 uVar7;
+  u32 uVar8;
   u8 uVar9;
   u8 cVar10;
   u32 uVar2;
-  int iVar3;
-  u8 bVar11;
-  void* local_38;
-  int local_34;
-  u32 local_30;
+  void* iVar3;
+  u32 itemStatus;
+  u32 bVar11;
+  u32 callbackState[3];
 
-  iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
+  iVar1 = pokemonGetStatus(r3,0,0xee,0);
   if (iVar1 != 0) {
     uVar4 = itemGetStatus(0,r5,0x17,0);
     uVar5 = itemGetStatus(0,r5,0x13,0);
@@ -591,7 +590,7 @@ void fightOutPokemonHokakuEffect(void* r3, u8 r4, u32 r5, u8 r6, u8* r7)
           _threadSwitch();
         }
         bVar11 = bVar11 + 1;
-      } while ((bVar11 < 3) && (bVar11 < r4));
+      } while (((u8)bVar11 < 3) && ((u8)bVar11 < r4));
       if (r4 < 4) {
         fn_801DA9E8(iVar1,uVar7,4);
         while (1) {
@@ -624,17 +623,12 @@ void fightOutPokemonHokakuEffect(void* r3, u8 r4, u32 r5, u8 r6, u8* r7)
       fn_801DA8C4(iVar1,uVar6,4);
       fn_801DA8C4(iVar1,uVar7,4);
       fn_801DA8C4(iVar1,uVar8,4);
-      if (r4 < 4) {
-        if (r7 != (void *)0) {
-          fn_801DA224(iVar1,*r7);
-        }
-      }
-      else {
+      if (r4 >= 4) {
         if (r3 == 0) {
           uVar2 = 0;
         }
         else {
-          iVar1 = (int)pokemonGetStatus(r3,0,0xd6,0);
+          iVar1 = pokemonGetStatus(r3,0,0xd6,0);
           if (iVar1 == 0) {
             uVar2 = 0;
           }
@@ -643,16 +637,17 @@ void fightOutPokemonHokakuEffect(void* r3, u8 r4, u32 r5, u8 r6, u8* r7)
           }
         }
         uVar9 = (int)pokemonGetStatus(uVar2,0,0x73,0);
-        iVar1 = itemGetStatus(0,uVar9,0x10,0);
-        if (iVar1 != 0) {
-          local_30 = 0;
-          local_38 = r3;
-          local_34 = iVar1;
-          fightFloorLoopValidFightOutPokemon(0,0x80207f5c,&local_38,0);
+        itemStatus = itemGetStatus(0,uVar9,0x10,0);
+        if (itemStatus != 0) {
+          callbackState[0] = (u32)r3;
+          callbackState[1] = itemStatus;
+          callbackState[2] = 0;
+          fightFloorLoopValidFightOutPokemon(
+              0, _fightOutPokemonRegWzxFreeSub__FPvUsPv, callbackState, 0);
         }
-        iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
+        iVar1 = pokemonGetStatus(r3,0,0xee,0);
         if (iVar1 != 0) {
-          iVar3 = (int)pokemonGetStatus(r3,0,0xee,0);
+          iVar3 = pokemonGetStatus(r3,0,0xee,0);
           if (iVar3 != 0) {
             fn_801DA4E8(iVar3,0);
           }
@@ -660,8 +655,10 @@ void fightOutPokemonHokakuEffect(void* r3, u8 r4, u32 r5, u8 r6, u8* r7)
           battleGridRemovePokemon(iVar1);
           fn_801DB100(iVar1);
         }
-        uVar4 = fightFloorGetStatus(0,0,0x14,0);
-        fn_8026532C(r3,uVar4,1);
+        fn_8026532C(r3,(u16)fightFloorGetStatus(0,0,0x14,0),1);
+      }
+      else if (r7 != (void *)0) {
+        fn_801DA224(iVar1,*r7);
       }
     }
   }
