@@ -1252,7 +1252,7 @@ u32 _fightFloorIsIrekaeFightOutPokemonSub__FPvUsPv(void *param_1, u32 r4_unused,
                 /* nonzero: skip */
             } else if (outptr != NULL) {
                 if (*outptr != 2) {
-                    if (fightTrainerIsGcHero(pkmn) & 0xFF) {
+                    if ((fightTrainerIsGcHero(pkmn) & 0xFF) == 1) {
                         *outptr = 2;
                     } else {
                         *outptr = 1;
