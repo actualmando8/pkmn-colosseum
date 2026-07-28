@@ -1286,7 +1286,7 @@ u32 msgctrlCR(void* obj) {
     u8* p = (u8*)obj;
     f32 diff;
     *(f32*)(p + 0x0C) = *(f32*)(p + 0x04);
-    diff = (f32)((s32)(s8)p[0x42] + (s32)(u8)p[0x23]);
+    diff = (f32)((s32)(u8)p[0x23] + (s32)(s8)p[0x42]);
     *(f32*)(p + 0x10) += *(f32*)(p + 0x64) * diff;
     return 0;
 }
