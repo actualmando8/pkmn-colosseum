@@ -91,6 +91,54 @@ s32 fn_8017F794(u32 a, u32 b, u32 c)
     return 0;
 }
 
+typedef struct GsRangeCacheNode {
+    void* task;
+    struct GsRangeCacheNode* link4;
+    struct GsRangeCacheNode* link8;
+    s32 value;
+    u32 fileHandle;
+    u32 key1;
+    u32 key2;
+    u32 active;
+} GsRangeCacheNode;
+
+void fn_8017F800(u32 fileHandle)
+{
+    extern void fn_8017FB08(void*);
+    GsRangeCacheNode** list = (GsRangeCacheNode**)lbl_80454038;
+    GsRangeCacheNode* node = list[0];
+    GsRangeCacheNode* link4;
+    GsRangeCacheNode* link8;
+
+    while (node != NULL) {
+        if (node->active != 0 && node->fileHandle == fileHandle) {
+            link8 = node->link8;
+            link4 = node->link4;
+            if (link8 != NULL) {
+                link8->link4 = node->link4;
+            }
+            if (link4 != NULL) {
+                link4->link8 = node->link8;
+            }
+            ((u32*)lbl_80454038)[3]--;
+            node->value = 0;
+            node->fileHandle = 0;
+            node->key1 = 0;
+            node->key2 = 0;
+            if (node->task != NULL) {
+                fn_8017FB08(node->task);
+                node->task = NULL;
+            }
+            node->active = 0;
+            if (list[1] == node) {
+                node->link8 = NULL;
+                list[1] = node->link4;
+            }
+        }
+        node = node->link8;
+    }
+}
+
 typedef struct GsRangeMemNode {
     struct GsRangeMemNode* next;
     s32 size;
