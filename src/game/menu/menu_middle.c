@@ -4767,13 +4767,15 @@ void fn_8006E18C(void* menu) {
 
     flags = MENU_MIDDLE_U8_0001(menu)->unk_0001;
     flags = (s8)flags;
-    if (flags == 2) {
+    switch (flags) {
+    case 2:
         if (fn_80071160() != 0) {
             fn_80107F38(MENU_MIDDLE_U32_0004(menu)->unk_0004, 0x1CE);
             MENU_MIDDLE_U8_0098(menu)->unk_0098 = 1;
             MENU_MIDDLE_U8_0099(menu)->unk_0099 = 1;
             return;
         }
+        break;
     }
 
     fn_80070D84(menu, 0, 0);
