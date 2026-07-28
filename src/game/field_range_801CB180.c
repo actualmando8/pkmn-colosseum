@@ -2048,7 +2048,7 @@ s32 fn_801D0090(s32 error)
         message = 0x4423;
         break;
     case 19:
-        message = 0x3C30;
+        message = 0x3C5D;
         break;
     case -3:
         message = 0x3C32;

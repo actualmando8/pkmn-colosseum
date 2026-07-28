@@ -251,21 +251,28 @@ void fn_80031404(u8* arg0, u8* arg1) {
     }
 
     obj = 0;
-    if (kind == 1) {
+    switch (kind) {
+    case 1:
         obj = (void*)heroGetStatus(0, 3, (u16)arg);
-    } else if (kind == 2) {
+        break;
+    case 2:
         obj = (void*)heroGetStatus(lbl_803A2688, 3, (u16)arg);
+        break;
     }
 
     if (((u8 (*)(void*))pokemonCheckValid)(obj) != 0 &&
         ((u8 (*)(void))menuCBRule_CheckPokemonEventFlag)() == 1) {
         msg = ((u8 (*)(void*))menuSubGetPokemonSexForDisp)(obj);
-        if (msg == 0) {
+        switch (msg) {
+        case 0:
             msg = 0xD67;
-        } else if (msg == 1) {
+            break;
+        case 1:
             msg = 0xD68;
-        } else {
+            break;
+        default:
             msg = 0;
+            break;
         }
         if (((u8 (*)(void*))pokemonBiosGetTamagoFlag)(obj) == 1) {
             msg = 0;
@@ -1862,8 +1869,7 @@ grp_done:
     ;
 
     if (obj == 0) {
-        winSpriteSetDisp(arg1, 0);
-        return;
+        goto no_object;
     }
 
     value = ((u16 (*)(void*, s32, s32, s32))pokemonGetStatus)(obj, 0, 0x7F, (u16)slot);
@@ -1872,12 +1878,18 @@ grp_done:
     }
 
     value = (u16)value;
-    if (value == 0xFFFF) {
+    switch (value) {
+    case 0xFFFF:
         value = 0x933;
-    } else if (value == 0xFFFE) {
+        break;
+    case 0xFFFE:
         value = 0x934;
-    } else if (value != 0) {
+        break;
+    case 0:
+        break;
+    default:
         value = ((u32 (*)(s32, u32, s32, s32))wazaGetStatus)(0, value, 1, 0);
+        break;
     }
 
     if (value != 0) {
@@ -1887,6 +1899,10 @@ grp_done:
     } else {
         winSpriteSetDisp(arg1, 0);
     }
+    return;
+
+no_object:
+    winSpriteSetDisp(arg1, 0);
 }
 #pragma pop
 #endif
@@ -2036,8 +2052,7 @@ grp_done:
     ;
 
     if (obj == 0) {
-        winSpriteSetDisp(arg1, 0);
-        return;
+        goto no_object_30A44;
     }
 
     msgctrlSetValue(0x37, ((s32 (*)(void*))pokemonBiosGetNicknamePtr)(obj));
@@ -2064,6 +2079,10 @@ grp_done:
             fn_800FB680((u16)x + 2, 0, combined, 0xCF);
         }
     }
+    return;
+
+no_object_30A44:
+    winSpriteSetDisp(arg1, 0);
 }
 #pragma pop
 #endif

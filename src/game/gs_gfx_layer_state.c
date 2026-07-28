@@ -1811,9 +1811,16 @@ void fn_800D85D4(s32 slot, void* model) {
     if (obj[0x7] != 0) {
         fn_800BAE34(obj + 0x54, ((u32*)lbl_80314530)[*(u32*)(obj + 0x10)],
                     ((u32*)lbl_80314530)[*(u32*)(obj + 0x14)]);
-        mode = *(s32*)(obj + 0x20) * 2;
-        if (*(s32*)(obj + 0x18) == 2) {
-            mode += 1;
+        switch (*(s32*)(obj + 0x20)) {
+        case 0:
+            mode = (*(s32*)(obj + 0x18) == 2) ? 1 : 0;
+            break;
+        case 1:
+            mode = (*(s32*)(obj + 0x18) == 2) ? 3 : 2;
+            break;
+        case 2:
+            mode = (*(s32*)(obj + 0x18) == 2) ? 5 : 4;
+            break;
         }
         fn_800BACA0(obj + 0x54, mode, (*(u32*)(obj + 0x1c) == 2),
                     *(f32*)&lbl_8047CA40, (f32)(obj[0x5] - 1),

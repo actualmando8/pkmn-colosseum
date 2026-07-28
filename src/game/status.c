@@ -80,7 +80,7 @@ u32 statusGetStatus(u32 kind, u32 arg1, u32 arg2, u32 arg3, u32 arg4) {
     case 0:
         return 0;
     case 1:
-        return gamedataGetStatus((void*)arg1, (u16)arg3);
+        return gamedataGetStatus((void*)arg1, arg3);
     case 2:
         return pcboxGetStatus(arg1, arg3, arg4);
     case 3:

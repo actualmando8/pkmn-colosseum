@@ -312,8 +312,8 @@ void _partFindIndexCB__FP9_HSD_JObjPPvi(void* jobj)
         return;
     }
     if (lbl_8047ABD0 == jobj) {
-        lbl_8047ABC4 = 1;
         lbl_8047ABCC = lbl_8047ABC8;
+        lbl_8047ABC4 = 1;
     }
     lbl_8047ABC8++;
 }

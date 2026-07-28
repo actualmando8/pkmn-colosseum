@@ -579,8 +579,6 @@ u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(vo
     extern void fightFloorInitFightTarget();
     extern int fightFloorGetStatus();
     extern u8 fightOutPokemonCheckFightOut();
-  u32 *puVar1;
-  u32 uVar2;
   int iVar3;
   u8 cVar7;
   int iVar4;
@@ -589,14 +587,9 @@ u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(vo
   u32 *puVar8;
   u32 *puVar9;
   u32 uVar10;
-  u32 uStack_4c;
-  u32 local_48 [13];
+  u32 local_48[12];
   
-  uVar10 = 0;
-  do {
-    if (7 < (uVar10 & 0xffff)) {
-      return 1;
-    }
+  for (uVar10 = 0; (uVar10 & 0xffff) < 8; uVar10++) {
     iVar3 = fightFloorGetStatus(fightFloor,0,0x59,uVar10);
     if (iVar3 != 0) {
       cVar7 = fightOutPokemonCheckFightOut();
@@ -620,16 +613,14 @@ LAB_00208d8c:
               iVar5 = (int)pokemonGetStatus(iVar3,0,0x112,0);
               if (iVar5 != 1) {
                 pokemonSetStatus(iVar3,0,0x112,0,1);
-                puVar9 = &uStack_4c;
-                puVar8 = (u32 *)(iVar4 + -4);
+                puVar9 = local_48;
+                puVar8 = (u32 *)iVar4;
                 iVar3 = 6;
                 do {
-                  puVar1 = puVar8 + 1;
-                  puVar8 = puVar8 + 2;
-                  uVar2 = *puVar8;
-                  puVar9[1] = *puVar1;
-                  puVar9 = puVar9 + 2;
-                  *puVar9 = uVar2;
+                  puVar9[0] = puVar8[0];
+                  puVar9[1] = puVar8[1];
+                  puVar8 += 2;
+                  puVar9 += 2;
                   iVar3 = iVar3 + -1;
                 } while (iVar3 != 0);
                 fightActionFlowFifo(local_48);
@@ -650,8 +641,8 @@ LAB_00208d8c:
         }
       }
     }
-    uVar10 = uVar10 + 1;
-  } while (1);
+  }
+  return 1;
 }
 
 /* 0x8020BE38 | size: 0x108 */
@@ -672,9 +663,7 @@ u32 fightActionFlowAllFightTrainerSelectFightAction(void* action) {
     void* entry;
 
     checkResult = fn_80008174();
-    if (checkResult != 1) {
-        fightFloorLoopValidFightTrainer(0, (u32)_fightActionFlowFightTrainerSelectFightAction__FPvUsPv, 0, 1);
-    } else {
+    if (checkResult == 1) {
         partyCount = fightFloorGetStatus(0, 0, 0x14, 0);
         slotCount = fightFloorGetStatus(0, 0, 0x16, 0);
         for (i = 0; i < 2; i++) {
@@ -689,6 +678,8 @@ u32 fightActionFlowAllFightTrainerSelectFightAction(void* action) {
                 break;
             }
         }
+    } else {
+        fightFloorLoopValidFightTrainer(0, (u32)_fightActionFlowFightTrainerSelectFightAction__FPvUsPv, 0, 1);
     }
     return 1;
 }
@@ -1358,7 +1349,7 @@ void _fightActionFlowKaisiNyuujouPokemonSubAppearMsg__FP13FIGHT_TRAINERP15FightO
             msgctrlSetValue(0x17, pokemonName);
         }
     } else if (mode == 1) {
-        if ((trainerCount < 2) && (1 < fightOutCount)) {
+        if ((trainerCount <= 1) && (1 < fightOutCount)) {
             if ((playerFlag & 0xff) == 1) {
                 pokemonName = 0x7674;
             } else if ((isHero & 0xff) == 1) {

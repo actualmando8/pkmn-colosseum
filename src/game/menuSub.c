@@ -91,7 +91,7 @@ extern void windowGetActiveID();
 extern void menuSetPosition(void);
 extern void windowCheckCursor(void);
 extern void windowGetValue(void);
-u32 menuSubOpenSelect(u8 selection, u32 text, u32 value, s16 x, s16 y, u32 flags) {
+u32 menuSubOpenSelect(u8 selection, u32 text, u32 value, s32 x, s32 y, u32 flags) {
     extern u32 windowGetActiveID(void);
     extern void menuOpenCustom(u32, u32, void*, u32, u32, u32, u32, u32, ...);
     extern void menuSetPosition(u32, s16, s16);

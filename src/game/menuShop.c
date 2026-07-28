@@ -721,9 +721,8 @@ s32 fn_8002A5B0(void* r3, u8* r4) {
     idx = (s8)((u8*)r3)[0x95];
     if (idx < 0 || idx >= 2) { return 0; }
     val = *(s16*)(r4 + 0x6);
-    if (*(s32*)(lbl_80266E58 + (s32)idx * 0xc + 0x4) == val) {
-        r4[0x67] = 0xff;
-    } else if (*(s32*)(lbl_80266E58 + (s32)idx * 0xc + 0x8) == val) {
+    if (*(s32*)(lbl_80266E58 + (s32)idx * 0xc + 0x4) == val ||
+        *(s32*)(lbl_80266E58 + (s32)idx * 0xc + 0x8) == val) {
         r4[0x67] = 0xff;
     } else {
         r4[0x67] = 0;

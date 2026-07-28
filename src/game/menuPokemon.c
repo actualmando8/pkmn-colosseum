@@ -2699,10 +2699,20 @@ void fn_80019938(u8* a, u8* b) {
     base = windowGetAllocPtr();
     r0 = *(s16*)(b + 0x6);
     r4 = 0x0;
-    if (r0 == (s16)0xe93) r4 = 0x0;
-    else if (r0 == (s16)0xe94) r4 = 0x1;
-    else if (r0 == (s16)0xe95) r4 = 0x2;
-    else if (r0 == (s16)0xe96) r4 = 0x3;
+    switch (r0) {
+    case (s16)0xe93:
+        r4 = 0;
+        break;
+    case (s16)0xe94:
+        r4 = 1;
+        break;
+    case (s16)0xe95:
+        r4 = 2;
+        break;
+    case (s16)0xe96:
+        r4 = 3;
+        break;
+    }
     base = base + r4 * 0xc;
     r4v = *(u32*)(base + 0x4);
     if (r4v == 0) return;

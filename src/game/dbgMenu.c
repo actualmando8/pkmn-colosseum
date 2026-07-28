@@ -395,7 +395,7 @@ u32 fn_8013356C(u32 arg1, s32 arg2) {
     extern u32 heroMoveIsMember(s32);
     extern void heroMoveDismissMember(s32);
     extern void fn_8012F1FC(s32);
-    s32 r31 = (arg2 == 0) ? 1 : -1;
+    s32 r31 = (arg2 != 0) ? -1 : 1;
     if (r31 >= 0) {
         if (heroMoveIsMember(r31) & 0xFF) {
             heroMoveDismissMember(r31);

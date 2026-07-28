@@ -179,12 +179,15 @@ void mailMainReceiveStart(s32 seqHandle, s32 slot, s32 boneIdx) {
     extern u32 fn_801654E0(u32, void*, u32);
     extern u32 fn_80166B3C(u32, u32, u32);
     extern u32 fn_80166A50(u32, u32, u32, u32);
-    u32 soundId;
     u32 workId;
+    u32 soundId;
     void* buffer;
 
-    if (lbl_80467390[0] != 0) {
-        return;
+    {
+        s32* state = lbl_80467390;
+        if (state[0] != 0) {
+            return;
+        }
     }
     soundId = fn_801D1650(fn_801D16C4());
     if (soundId != 0) {
@@ -196,10 +199,13 @@ void mailMainReceiveStart(s32 seqHandle, s32 slot, s32 boneIdx) {
     } else {
         workId = 0;
     }
-    lbl_80467390[0] = 1;
-    lbl_80467390[1] = 0;
-    lbl_80467390[2] = soundId;
-    lbl_80467390[3] = workId;
+    {
+        s32* state = lbl_80467390;
+        state[0] = 1;
+        state[1] = 0;
+        state[2] = soundId;
+        state[3] = workId;
+    }
 }
 
 /**
