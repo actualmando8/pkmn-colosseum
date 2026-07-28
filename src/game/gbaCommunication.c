@@ -2729,7 +2729,6 @@ void fn_800965C8(void* window, u8* sprite) {
     register s32 color;
     register void* pokemon;
     void* bios;
-    s16 id;
     s32 state;
     s32 value;
     u32 msg;
@@ -2744,11 +2743,10 @@ void fn_800965C8(void* window, u8* sprite) {
         return;
     }
 
-    id = *(s16*)(sprite + 0x06);
     color = (s32)((u8*)window)[0x8B] | -0x100;
     state = (s8)((u8*)window)[0x95];
 
-    switch (id) {
+    switch (*(s16*)(sprite + 0x06)) {
     case 0xE7: {
         void* texture = menuModelRender(lbl_803FB338);
         if (texture == NULL) {
@@ -2775,7 +2773,7 @@ void fn_800965C8(void* window, u8* sprite) {
     case 0x10A: {
         u32 mask = 0;
         value = (u8)pokemonGetStatus(pokemon, 0, 0xBB, 0);
-        switch (id) {
+        switch (*(s16*)(sprite + 0x06)) {
         case 0x107:
             mask = 8;
             break;
