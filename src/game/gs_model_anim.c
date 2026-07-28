@@ -380,12 +380,16 @@ void GSmodelSetTexAnimIndex(GSmodel* model, u32 index)
     }
 
     flags = model->flags;
-    jobj = model->jobj;
-    if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
-        jobj = jobj->child;
+    {
+        /* retail loads tex_anim_type here, before the jobj block, and stores
+           it back after -- written adjacently MWCC elides the pair */
+        u32 texType = model->tex_anim_type;
+        jobj = model->jobj;
+        if (flags & MODEL_FLAG_USE_JOBJ_CHILD) {
+            jobj = jobj->child;
+        }
+        model->tex_anim_type = texType;
     }
-
-    model->tex_anim_type = model->tex_anim_type;
     switch (model->tex_anim_type) {
     case 0:
         HSD_ForeachAnim(jobj, 6, 0x64DB,
