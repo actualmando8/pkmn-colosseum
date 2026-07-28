@@ -270,17 +270,18 @@ void scriptStoreTemochiPokemon(u8* arg)
 {
     TemochiEntry* entry = lbl_804670B4;
     s32 i;
+    u16 nakigoe;
+    void* mon;
+    u32 pid;
 
     for (i = 0; i < 6; i++) {
         entry[i].field_4 = 0;
-        {
-            void* mon = heroGetStatus(arg, 3, i);
-            if (mon != NULL && pokemonCheckValid(mon) != 0) {
-                u16 nakigoe = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
-                u32 pid = pokemonGetStatus(mon, 0, 0x6f, 0);
-                entry[i].field_4 = nakigoe;
-                entry[i].field_0 = pid;
-            }
+        mon = heroGetStatus(arg, 3, i);
+        if (mon != NULL && pokemonCheckValid(mon) != 0) {
+            nakigoe = (u16)pokemonGetStatus(mon, 0, 0x6e, 0);
+            pid = pokemonGetStatus(mon, 0, 0x6f, 0);
+            entry[i].field_4 = nakigoe;
+            entry[i].field_0 = pid;
         }
     }
 }
