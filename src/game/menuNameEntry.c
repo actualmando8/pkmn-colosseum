@@ -2110,18 +2110,88 @@ s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
     } else {
         /* r27 >= 0xf: derive action purely from the phase counter */
         r31 = 0; /* r31 not used by these action codes */
-        if (r5 == 0)
-            action = 3;
-        else if (r5 == 3)
-            action = 5;
-        else
-            action = 4; /* r5 == 1, 2, or > 3 */
+        if (r5 == 3) goto act5;
+        if (r5 >= 3) goto act4;
+        if (r5 == 0) goto act3;
+        goto act4;
+act3:
+        action = 3;
+        goto act_done;
+act5:
+        action = 5;
+        goto act_done;
+act4:
+        action = 4;
+act_done:
+        ;
     }
 
     /* ---------------------------------------------------------------
      * Execute action
      * --------------------------------------------------------------- */
     switch (action) {
+    case 1:
+    case 2: {
+        /* Advance to the previous entry in the travel list (wrap around). */
+        u32** count_ptr;
+        s32   cur_count;
+        s32   idx;
+        u16*  array;
+        u16   candidate;
+
+        count_ptr = *(u32***)(self + 0x34);
+        cur_count = *(s32*)count_ptr;
+        idx = cur_count - 1;
+        if (idx >= 0) {
+            array     = *(u16**)(self + 0x18);
+            candidate = array[idx];                     /* lhzx r3, r29, r28 */
+            candidate = exchangeDakuon__FUs11DAKUON_MODE(candidate, 1);      /* look up alternate mapping */
+            if ((u16)candidate != 0) {
+                array[idx] = candidate;
+            }
+        }
+        r29 = 0x24u;
+        break;
+    }
+    case 4: {
+        /* Remove the last entry from the travel list. */
+        u32** count_ptr;
+        s32   cur_count;
+        u8    did_remove;
+
+        count_ptr = *(u32***)(self + 0x34);
+        cur_count = *(s32*)count_ptr;
+        if (cur_count > 0) {
+            s32   new_count  = cur_count - 1;
+            u16*  array      = *(u16**)(self + 0x18);
+            array[new_count] = 0;                       /* zero the slot */
+            *(u32*)count_ptr = (u32)new_count;
+            did_remove = 1;
+        } else {
+            did_remove = 0;
+        }
+        /* clrlwi r0, r0, 24 -- mask to u8 */
+        if ((u8)did_remove != 0)
+            r29 = 0x25u;
+        break;
+    }
+    case 5:
+        /* Signal "next scene / done". */
+        r30 = 1;
+        break;
+    case 3: {
+        /* Toggle sub-state (0→1→0). */
+        u8**  sub_ptr;
+        s32   cur;
+        sub_ptr = (u8**)(self + 0x24);
+        cur = *(s32*)*sub_ptr;
+        cur++;
+        if (cur >= 2)
+            cur = 0;
+        *(s32*)*sub_ptr = cur;
+        r29 = 0x27u;
+        break;
+    }
     case 0: {
         /* action 0: also used as the fall-through entry for case 6.
          * Load the default target ID then fall into the append logic. */
@@ -2167,69 +2237,6 @@ s32 selectLetter__FP14NAME_ENTRY_ARG(void* r3) {
         r29 = 0x24u;
         break;
     }
-    case 1:
-    case 2: {
-        /* Advance to the previous entry in the travel list (wrap around). */
-        u32** count_ptr;
-        s32   cur_count;
-        s32   idx;
-        u16*  array;
-        u16   candidate;
-
-        count_ptr = *(u32***)(self + 0x34);
-        cur_count = *(s32*)count_ptr;
-        idx = cur_count - 1;
-        if (idx >= 0) {
-            s32 byte_off = (s32)((u32)idx * 2u);
-            array     = *(u16**)(self + 0x18);
-            candidate = array[byte_off / 2];            /* lhzx r3, r29, r28 */
-            candidate = exchangeDakuon__FUs11DAKUON_MODE(candidate, 1);      /* look up alternate mapping */
-            if ((u16)candidate != 0) {
-                array[byte_off / 2] = candidate;
-            }
-        }
-        r29 = 0x24u;
-        break;
-    }
-    case 3: {
-        /* Toggle sub-state (0→1→0). */
-        u8**  sub_ptr;
-        s32   cur;
-        sub_ptr = (u8**)(self + 0x24);
-        cur = *(s32*)*sub_ptr;
-        cur++;
-        if (cur >= 2)
-            cur = 0;
-        *(s32*)*sub_ptr = cur;
-        r29 = 0x27u;
-        break;
-    }
-    case 4: {
-        /* Remove the last entry from the travel list. */
-        u32** count_ptr;
-        s32   cur_count;
-        u8    did_remove;
-
-        count_ptr = *(u32***)(self + 0x34);
-        cur_count = *(s32*)count_ptr;
-        if (cur_count > 0) {
-            s32   new_count  = cur_count - 1;
-            u16*  array      = *(u16**)(self + 0x18);
-            array[new_count] = 0;                       /* zero the slot */
-            *(u32*)count_ptr = (u32)new_count;
-            did_remove = 1;
-        } else {
-            did_remove = 0;
-        }
-        /* clrlwi r0, r0, 24 -- mask to u8 */
-        if ((u8)did_remove != 0)
-            r29 = 0x25u;
-        break;
-    }
-    case 5:
-        /* Signal "next scene / done". */
-        r30 = 1;
-        break;
     }
 
     /* Fire the scheduler/sound event if a code was set. */
