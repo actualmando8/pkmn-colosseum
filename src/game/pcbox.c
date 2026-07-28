@@ -107,9 +107,9 @@ asm void pcboxAddItem(void) {
 #else
 #pragma scheduling on
 u16 pcboxAddItem(void* base, u16 effect_id, u16 r5) {
-    extern u8 itemDataBiosGetPtr(u16);
+    extern void* itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 itemGetStatus(void*, u32, u32, u32);
+    extern u32 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)savedataGetStatus(0, 3); }
@@ -137,9 +137,9 @@ asm void pcboxDelItem(void) {
 #else
 #pragma scheduling on
 u16 pcboxDelItem(void* base, u16 effect_id, u16 r5) {
-    extern u8 itemDataBiosGetPtr(u16);
+    extern void* itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 itemGetStatus(void*, u32, u32, u32);
+    extern u32 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
     void* cur; s16 idx; s32 i;
     if (base == 0) { base = (void*)savedataGetStatus(0, 3); }
