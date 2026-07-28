@@ -1547,11 +1547,6 @@ void fn_80117164(void) {
 }
 #endif
 /* 0x801171C8 | 0x168 */
-extern u8 GSscene_GetMode(void);
-extern void cameraSetHeight(f32);
-extern void cameraSetDistance(f32);
-extern void cameraSetRotY(f32);
-extern void GSscene_GetCameraPositionVector(void*);
 extern u8 lbl_8047AD71;
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
@@ -1635,20 +1630,6 @@ void fn_801171C8(void) {
 #endif
 #pragma pop
 /* 0x80117330 | 0x194 */
-extern void* GSresGetResource();
-extern void GSmodelGetPosition(void*, void*);
-extern void GSscene_GetCameraViewVector(void*);
-extern f32 cameraGetHeight(void);
-extern f32 cameraGetDistance(void);
-extern f32 cameraGetRotY(void);
-extern void set__5GSvecFfff(void* obj, f32 f1, f32 f2, f32 f3);
-extern void GSmtxMakeYRotation(void*, f32);
-extern void GSvecTransform(void*, void*, void*);
-extern void GSvecAdd(void*, void*, void*);
-extern f64 atan2(f32, f32);
-extern void cameraMoveTargetPos(u32, void*, f32);
-extern void cameraMovePosition(u32, void*, f32);
-extern void cameraMoveRotation(u32, void*, f32);
 extern u8 lbl_8047AD71;
 extern u32 lbl_8047AD68;
 extern u32 lbl_8047AD6C;
@@ -1745,8 +1726,6 @@ void fn_80117500(void) {
 }
 #endif
 /* 0x801176C8 | 0x254 */
-extern void GSgappTerminate(void* application);
-extern void GSgappCreate(void);
 extern u8 lbl_804083D0[0x30];
 typedef struct GSFieldWorldResourceState {
     void* callbackData;
@@ -1794,8 +1773,6 @@ void fn_801176C8(u32 floorId)
     /* Resource allocation and camera-list setup continue in the target. */
 }
 /* 0x8011791C | 0x1B8 */
-extern void* GScameraGetActiveCamera();
-extern void GSvecCopy();
 extern u8 lbl_804083D0[0x30];
 extern u8 lbl_802727B8[];
 extern void fn_80177A38(void);  /* referenced by asm .inc wrappers (fn_801171C8/80117330/8011791C/8012E388/8012EBD4); was undefined -> broke the TU parse */
@@ -1832,14 +1809,6 @@ u32 fn_80117AD4(void) {
     return ((GSFieldWorldResourceState*)lbl_804083D0)->floorId;
 }
 /* 0x80117AE4 | 0x1A0 */
-extern void GSmodelResetTextureChange(void);
-extern void GStextureFree(void);
-extern void GSmodelFree(void);
-extern void GStextureCreate(void);
-extern void floorOpenModel(void);
-extern void GSmodelSetVisibility(void);
-extern void GSmodelLinkTexAnimToAnim(void);
-extern void GSmodelSetTextureChange(void);
 extern u32 lbl_80478B40;
 extern u32 lbl_8047AD88;
 extern u32 lbl_8047AD8C;
@@ -1961,18 +1930,6 @@ void fn_80117C84(void) {
 #pragma peephole on
 #endif
 /* 0x80117D14 | 0x144 */
-extern void fn_800EC134(u32);
-extern void fn_800D4604();
-extern void fn_800D377C();
-extern void fn_800D3410();
-extern void fn_800D9B24();
-extern void fn_800D9AF0();
-extern void fn_800D258C();
-extern void fn_800D9D68();
-extern void fn_800D9C24();
-extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void);
-extern void GSmodelDrawModel();
-extern void fn_800D3190(void);
 extern u32 lbl_8047AD88;
 extern u32 lbl_8047AD90;
 extern u32 lbl_8047AD8C;

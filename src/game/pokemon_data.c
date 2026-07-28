@@ -1485,8 +1485,6 @@ extern u32 lbl_80478E60;
 extern u32 lbl_80478E64;
 extern u32 lbl_80478B60;
 extern u8 lbl_8035E940[];
-extern void _flagSet(u32);
-extern void* fn_801906A0(u32);
 extern u32 lbl_80478F90;
 extern u32 lbl_80478F94;
 extern u8 lbl_80478B58[4];

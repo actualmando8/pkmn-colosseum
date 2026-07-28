@@ -732,9 +732,7 @@ u32 fn_80138B74(void* ptr) {
 extern void GSmodelSetVisibility(void* a, u32 b);
 extern void GSmodelFree(void* entry);
 extern u32 fn_800EE0E8(void* entry);
-extern void* GSmodelGetPart(void* model, u32 mode);
 extern s32 GSpartGetMaterialCount(void* outerP);
-extern void* GSpartGetMaterial(void* handle, u32 idx);
 extern void GSmaterialSetAlpha(void* obj, f32 val);
 extern void fn_800DF608(void* handle);
 extern void GSpartFree(void* handle);
@@ -2776,7 +2774,6 @@ u32 fn_8013D7CC(void* ptr) {
     return 1;
 }
 #endif
-extern void* GStextureCreate(u32 a, u32 b, u32 size, u32 d, u32 e);
 extern u32 lbl_8047AEE0;
 extern u8 lbl_80466BC0[];
 extern u16 lbl_8047AEE4;
@@ -2850,10 +2847,8 @@ log:
 
 #if !defined(EFFECT_VISUAL_BANK_ACTIVE)
 extern s32 fn_800E3B3C(void);
-extern void fn_800D4604(u32 mode);
 extern void fn_800D377C(u32 a);
 extern void fn_800D3410(void* texture, u32 a);
-extern void* fn_800E3B08(u32 index);
 extern u32 fn_800E3C64(void* model);
 extern void GSmodelDrawModel(void* obj, u32 flags);
 extern void fn_800D3190(void);

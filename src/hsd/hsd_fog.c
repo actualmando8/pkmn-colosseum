@@ -220,7 +220,6 @@ void FogUpdateFunc(HSD_Fog* fog, s32 type, f32* value)
 #pragma optimizewithasm off
 extern void* fn_80193828(HSD_ClassInfo* info);   /* inferred glm6: == hsdNew */
 extern void fn_800BD768(void* dst);              /* inferred glm6: writes viewport/projection scratch */
-extern void* memset(void* dst, int val, u32 n);
 extern char lbl_8047DA74;   /* "fog.c" */
 extern u8 lbl_8047DA80[4];   /* "fog"  */
 extern u8 lbl_8047DA7C[4];   /* "adj"  */

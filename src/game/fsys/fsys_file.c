@@ -174,7 +174,6 @@ s32 fn_8017B07C(u32 fileHandle, u32 nameHash) {
  * @param requestID   Resource name hash to load
  * @return            1 on success, 0 if no slot available
  * =================================================================== */
-extern FSYSSlot* fn_8017D410(u32 fileHandle, u32 mode);
 
 #pragma push
 #pragma optimization_level 0
@@ -710,7 +709,6 @@ u32 fn_8017D400(void) { return 1; }
 u32 fn_8017D408(void) { return 1; }
 
 /* WP-0054: restored asm wrappers */
-extern void fn_80167E34(void);
 extern void fn_80167E34(void);
 extern u32 lbl_8047B1B4;
 extern FSYSManager lbl_80453FEC;
@@ -1255,7 +1253,6 @@ u32 fn_8017B5A4(u32 val) {
 
 /* 0x8017B5C0 | 0xF8 */
 extern void fn_8017BD34();
-extern u32 fn_8017F794();
 extern u32 fn_8017F728();
 extern void fn_8017A814(void);
 extern void* fn_80180584();
@@ -1307,8 +1304,6 @@ void fn_8017B5C0(FSYSSlot* slot, FSYSFileEntry* entry, u32 index) {
 
 /* 0x8017B6B8 | 0x4C8 */
 extern void fn_8017F25C();
-extern void fn_8017F108(void);
-extern void fn_80167E98();
 extern u32 lbl_80478C48;
 extern u8 lbl_8036C2A0[];
 #if 0
@@ -1762,7 +1757,6 @@ s32 fn_8017C8C8(u32 arg) {
 #pragma pop
 
 /* 0x8017C8FC | 0x580 */
-extern void fn_80179FA4();
 #if 0
 asm void fn_8017C8FC(void) {
 #include "src/game/fsys/fsys_file_fn_8017C8FC.inc"
@@ -1888,8 +1882,6 @@ u32 fn_8017CE7C(FSYSSlot* slot) {
 #endif
 
 /* 0x8017CED8 | 0x4C8 */
-extern FSYSFileHandle* fn_8017D68C(FSYSSlot*);
-extern u32 fn_8017FA5C(void);
 extern void fn_8017F800(u32);
 extern void* fn_80180450();
 extern u32 lbl_8047B1B8;
@@ -2116,7 +2108,6 @@ void fn_8017D800(void) {
 #endif
 
 /* 0x8017D8F8 | 0x34 */
-extern void fn_8017D960();
 #if 0
 asm void fn_8017D8F8(void) {
 #include "src/game/fsys/fsys_file_fn_8017D8F8.inc"
@@ -2131,7 +2122,6 @@ void fn_8017D8F8(FSYSSlot* slot) {
 #endif
 
 /* 0x8017D92C | 0x34 */
-extern void fn_8017D960();
 #if 0
 asm void fn_8017D92C(void) {
 #include "src/game/fsys/fsys_file_fn_8017D92C.inc"

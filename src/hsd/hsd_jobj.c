@@ -549,15 +549,10 @@ extern void HSD_Panic(void* file, u32 line, void* msg);
 extern u8 lbl_80274AA0[];
 extern char lbl_8047DB20;
 extern char lbl_8047DB28;
-extern f32 sqrtf(f32 x);
 extern f64 acos(f64 x);
-extern f32 PSVECDotProduct(Vec* a, Vec* b);
-extern void PSVECScale(Vec* src, Vec* dst, f32 scale);
-extern void PSVECAdd(Vec* a, Vec* b, Vec* dst);
 extern void PSVECSubtract(Vec* a, Vec* b, Vec* dst);
 extern void PSVECCrossProduct(Vec* a, Vec* b, Vec* dst);
 extern void PSMTXRotAxisRad(f32 mtx[3][4], Vec* axis, f32 angle);
-extern HSD_RObj* HSD_RObjGetByType(HSD_RObj* robj, u32 type, u32 subtype);
 extern void fn_801AED88(HSD_RObj* robj, HSD_JObj* jobj,
                         HSD_ObjUpdateFunc update_func);
 extern s32 fn_801AFCAC(HSD_RObj* robj, u32 type, Vec* out);
@@ -2055,7 +2050,6 @@ void HSD_JObjUnrefThis(void* obj) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-extern void __assert();
 extern void HSD_DObjResolveRefsAll(HSD_DObj* dobj, HSD_DObjDesc* desc);
 extern void fn_80196E10(void* file, u32 line, void* expr);
 extern void fn_801991F8(HSD_DObj* dobj, HSD_DObjDesc* desc);

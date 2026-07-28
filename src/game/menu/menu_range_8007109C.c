@@ -651,7 +651,6 @@ s32 fn_80073990(s32 chan) {
  */
 extern s32 fn_80190528(s32);
 extern s32 fn_801902E0(s32);
-extern s32 fadeCheck(s32);
 extern s32 menuClose(s32);
 extern s32 fn_801906A0(s32);
 extern void _flagSet();
@@ -1578,7 +1577,6 @@ s32 fn_80073E8C(void* pathA, void* pathB) {
 s32 fn_80075638(void) { return menuIsCheck(0xd8); }
 #pragma pop
 
-extern void fn_801CB9D8(u32);
 extern u8 lbl_8047A5D0;
 /* fn_800757F0 (0x800757F0): release and clear the handle at lbl_8047A5D0. */
 void fn_800757F0(void) {
@@ -1590,8 +1588,6 @@ void fn_800757F0(void) {
 void fn_80075D98(void) {
 }
 
-extern s32 fadeCheck(s32);
-extern s32 menuClose(s32);
 /* fn_80075D9C (0x80075D9C): tail-call wrapper. */
 #pragma push
 #pragma scheduling off
@@ -2043,13 +2039,9 @@ void fn_8007926C(void) {
 }
 #pragma pop
 
-extern void _threadSwitch(void);
 extern s32 fn_800D37CC(void);
 extern u32 fn_800D3088(void);
 extern s32 menuOpen(s32, s32);
-extern void winMsgOpenField(s32, s32, s32);
-extern void winMsgOpen(s32, s32, s32, s32);
-extern void winMsgClose(s32);
 extern s32 fn_8001E184(void);
 
 extern u32 lbl_804788F0;

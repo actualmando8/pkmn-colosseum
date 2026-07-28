@@ -69,7 +69,6 @@ extern void* memcpy();
 
 /* Forward declarations for converted functions */
 u32 evolutionWazaLearn();
-u32 evolutionWazaLearn();
 int fightTrainerAiWazaValueKuroikiri(void* ctx, u32 param1, u32 param2, u32 param3);
 void fightTrainerAiWazaValueHimitunotikara(void* ctx, u32 param1, u32 param2, u32 param3);
 s32 fightTrainerAiSelectIrekaeDasuFightPokemon(void* ctx, u32 param1, u32 param2, u32 param3);

@@ -121,70 +121,7 @@ extern void GSmathInitCosTable(void);
  * de-duplicated by identifier from the whole original TU so any
  * cross-segment call/reference resolves regardless of which segment
  * the callee's real definition ended up in). ===== */
-extern void* memcpy(void* dst, const void* src, u32 n);
-extern void* memset(void* dst, int val, u32 size);
-extern void DCFlushRange(void* addr, u32 size);
-extern u64 OSGetTime(void);
-extern void fn_800D3EC4(s32, f32, f32, f32, f32, f32, f32);
-extern void fn_800D4F98(u32, ...);
-extern void fn_800D67BC(u16);
-extern void fn_800D892C(u32);
 extern u8 lbl_8047AA91;
-extern void fn_800D6B00(void);
-extern void fn_800D724C(u32 idx);
-extern void fn_800D7268(u32 idx);
-extern void fn_800D72A4(u32 idx);
-extern void fn_800D72C4(u32 idx);
-extern void fn_800D72E4(u32 idx);
-extern void fn_800D7304(u32 idx);
-extern void fn_800D7328(u32 idx);
-extern void fn_800D7344(u32 idx);
-extern void fn_800D7360(u32 idx);
-extern void fn_800D737C(u32 idx);
-extern void fn_800D7398(u32 idx);
-extern void fn_800D73C4(u32 idx);
-extern void fn_800D73F8(void);
-extern void fn_800D740C(void);
-extern void fn_800D7420(void);
-extern void fn_800D7444(void);
-extern void fn_800D7468(void);
-extern void fn_800D748C(void);
-extern void fn_800D74A0(void);
-extern void fn_800D74B4(void);
-extern void fn_800D74D0(void);
-extern void fn_800D74EC(void);
-extern void fn_800D7508(void);
-extern void fn_800D7524(void);
-extern void fn_800D7540(void);
-extern void fn_800D7564(void);
-extern void fn_800D7588(void);
-extern void fn_800D75AC(void);
-extern void fn_800D7650(u8*);
-extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
-extern void fn_800D7940(u32, u16);
-extern void fn_800D7A70(u32);
-extern void fn_800DB098(void);
-extern void fn_800DB758(u16);
-extern void lightGetFrameCount__FP9_HSD_AObj(u8*);
-extern void fn_800DE09C(void);
-extern void fn_800DE128(void);
-extern void fn_800E09E8(void*, void*, u32);
-extern u8 fn_800E0E14(u32, u32);
-extern u32 _matGSmatObjMakeTExp(void*, void*, void*, void*, void*);
-extern void _matGSmatEnableEnvMapExt(u8*);
-extern s32 _matGSmatObjLoad(u8*);
-extern void fn_800E0290(void*, void*, void*);
-extern void fn_800E02C4(void*);
-extern void fn_800E02E8(void*, f32);
-extern void fn_800E032C(void*, f32);
-extern void fn_800E0370(void*, f32);
-extern void fn_800E03E8(void*, f32, f32, f32);
-extern void fn_800E0628(void*, void*);
-extern void fn_800E064C(void*);
-extern void GSmtx44Perspective(u8*);
-extern void GSmtx44Ortho(void*, f32, f32, f32, f32, f32, f32);
-extern void fn_800E0C78(void);
-extern void GSmathInitCosTable(void);
 extern u32 lbl_8047AA80;
 extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
@@ -490,7 +427,6 @@ asm void fn_800D9B24(void) {
 void fn_800D9B24(u16* a, u16* b, u16* c, u16* d) { *a = *(u16*)(lbl_8047AA80 + 0x46e); *b = *(u16*)(lbl_8047AA80 + 0x470); *c = *(u16*)(lbl_8047AA80 + 0x472); *d = *(u16*)(lbl_8047AA80 + 0x474); }
 #endif
 
-extern void fn_800BD2E0(void*, u32);
 extern f32 lbl_8047CA50;
 extern f32 lbl_8047CA54;
 #if 0
@@ -520,7 +456,6 @@ void fn_800D9BD0(f32 a, f32 b, f32 c, f32 d) {
 }
 #endif
 
-extern void GScameraSetViewport(void*, u32, u32, u32, u32);
 extern u32 lbl_8047CA60;
 extern u32 lbl_8047CA68;
 #if 0

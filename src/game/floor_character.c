@@ -1431,48 +1431,12 @@ extern void heroMoveGetHeroPos(u32 param);
 extern u32 heroMoveGetResID(u32* out_zero, u32* out_val, s32 index);
 
 /* 0x80115E6C | 0x2F8 */
-extern void fn_801653CC(void);
-extern void msgctrlSetValue(void);
-extern void winMsgOpen(void);
-extern void winMsgClose(void);
-extern void pcboxDelItem(void);
-extern void fn_8001E184(void);
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void floorEventGetTresure(void);
 /* 0x80116164 | 0x30C */
-extern void fn_8018B76C(void);
-extern void fn_8018C7C8(void);
-extern void fn_801902E0(void);
-extern void fn_80166A28(void);
-extern void peopleWaitSyncMotion(void);
-extern void fn_80190528(void);
 extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void floorEventCtrlTresure(void);
 /* 0x80116470 | 0x4E8 */
-extern void floorGetResource(void);
-extern void GSmodelSetAnimIndex(void);
-extern void GSmodelSetAnimFrame(void);
-extern void GSmodelSetAnimRate(void);
-extern void GSmodelSetAnimType(void);
-extern void GSmodelStartAnimation(void);
-extern void _threadSwitch(void);
-extern void GSmodelIsAnimating(void);
-extern void GSmodelGetPart(void);
-extern void GSpartGetTransform(void);
-extern void GSpartFree();
-extern void fn_8018AACC(void);
-extern void peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag);
-extern void fn_8018805C(void);
-extern void fn_80184470(void);
-extern void fn_8018C0A8(void);
-extern void fn_801669BC(void);
-extern void GSmodelCanAnimate(void);
-extern void fn_801845E4(void);
-extern void fn_801860F8(void);
-extern void GSmodelGetFrameCount(void);
-extern void fn_800D37CC(void);
 extern f32 lbl_8047CFA0;
 extern u32 lbl_80478EC8;
 extern u32 lbl_80478ECC;
@@ -1483,23 +1447,14 @@ extern f64 lbl_8047CFB8;
 extern f32 lbl_8047CFB4;
 extern f32 lbl_8047CFB0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void floorEventCtrlElevator(void);
 /* 0x80116958 | 0x3D8 */
-extern void scriptSetCol(void);
-extern void fn_801903B0(void);
-extern void fn_8018C558(void);
-extern void fn_8018C8F4(void);
 extern f32 lbl_8047CFA0;
 extern u32 lbl_80478EC8;
 extern u32 lbl_80478ECC;
 extern f32 lbl_8047CFAC;
 extern f32 lbl_8047CFA4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void floorEventCtrlDoor(void);
 /* 0x80116D30 | 0x13C */
-extern void EvlogSet__FScUl();
-extern void scriptSetEventColID();
-extern void fn_800F7434(u32 callback, u32 arg, ...);
 extern u8 lbl_80272708[];
 extern u32 lbl_80478EC4;
 extern u32 lbl_80478EC0;
@@ -1608,7 +1563,6 @@ u32 floorCharacterBiosGetVisibility(u8* ptr) {
     return (ptr != NULL) ? (u32)((ptr[0] >> 7) & 1) : 0;
 }
 /* 0x80117070 | 0x34 */
-extern void* peopleInfoBiosGetPtrFromIndex(u16);
 #pragma push
 #pragma scheduling off
 void* floorCharacterBiosGetPeopleInfoPtr(u8* ptr) {

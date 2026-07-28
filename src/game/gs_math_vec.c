@@ -126,70 +126,7 @@ extern void GSmathInitCosTable(void);
  * de-duplicated by identifier from the whole original TU so any
  * cross-segment call/reference resolves regardless of which segment
  * the callee's real definition ended up in). ===== */
-extern void* memcpy(void* dst, const void* src, u32 n);
-extern void* memset(void* dst, int val, u32 size);
-extern void DCFlushRange(void* addr, u32 size);
-extern u64 OSGetTime(void);
-extern void fn_800D3EC4(s32, f32, f32, f32, f32, f32, f32);
-extern void fn_800D4F98(u32, ...);
-extern void fn_800D67BC(u16);
-extern void fn_800D892C(u32);
 extern u8 lbl_8047AA91;
-extern void fn_800D6B00(void);
-extern void fn_800D724C(u32 idx);
-extern void fn_800D7268(u32 idx);
-extern void fn_800D72A4(u32 idx);
-extern void fn_800D72C4(u32 idx);
-extern void fn_800D72E4(u32 idx);
-extern void fn_800D7304(u32 idx);
-extern void fn_800D7328(u32 idx);
-extern void fn_800D7344(u32 idx);
-extern void fn_800D7360(u32 idx);
-extern void fn_800D737C(u32 idx);
-extern void fn_800D7398(u32 idx);
-extern void fn_800D73C4(u32 idx);
-extern void fn_800D73F8(void);
-extern void fn_800D740C(void);
-extern void fn_800D7420(void);
-extern void fn_800D7444(void);
-extern void fn_800D7468(void);
-extern void fn_800D748C(void);
-extern void fn_800D74A0(void);
-extern void fn_800D74B4(void);
-extern void fn_800D74D0(void);
-extern void fn_800D74EC(void);
-extern void fn_800D7508(void);
-extern void fn_800D7524(void);
-extern void fn_800D7540(void);
-extern void fn_800D7564(void);
-extern void fn_800D7588(void);
-extern void fn_800D75AC(void);
-extern void fn_800D7650(u8*);
-extern void fn_800D7868(u8*, u32, u32, u32, u32, u8, u32, u8);
-extern void fn_800D7940(u32, u16);
-extern void fn_800D7A70(u32);
-extern void fn_800DB098(void);
-extern void fn_800DB758(u16);
-extern void lightGetFrameCount__FP9_HSD_AObj(u8*);
-extern void fn_800DE09C(void);
-extern void fn_800DE128(void);
-extern void fn_800E09E8(void*, void*, u32);
-extern u8 fn_800E0E14(u32, u32);
-extern u32 _matGSmatObjMakeTExp(void*, void*, void*, void*, void*);
-extern void _matGSmatEnableEnvMapExt(u8*);
-extern s32 _matGSmatObjLoad(u8*);
-extern void fn_800E0290(void*, void*, void*);
-extern void fn_800E02C4(void*);
-extern void fn_800E02E8(void*, f32);
-extern void fn_800E032C(void*, f32);
-extern void fn_800E0370(void*, f32);
-extern void fn_800E03E8(void*, f32, f32, f32);
-extern void fn_800E0628(void*, void*);
-extern void fn_800E064C(void*);
-extern void GSmtx44Perspective(u8*);
-extern void GSmtx44Ortho(void*, f32, f32, f32, f32, f32, f32);
-extern void fn_800E0C78(void);
-extern void GSmathInitCosTable(void);
 extern u32 lbl_8047AA80;
 extern void fn_800B944C(u32, u32);
 extern f32 lbl_8047CA30;
@@ -534,7 +471,6 @@ void GSvecTransformQuat(f32* r3, f32* r4, f32* r5) {
 #pragma pop
 #endif
 
-extern void PSMTXMultVec(void*, void*, void*);
 #if 0
 asm void GSvecTransform(void) {
 #include "src/game/gs_render_GSvecTransform.inc"
@@ -543,7 +479,6 @@ asm void GSvecTransform(void) {
 void GSvecTransform(void* a, void* b, void* c) { PSMTXMultVec(b, c, a); }
 #endif
 
-extern void PSVECCrossProduct(void*, void*, void*);
 #if 0
 asm void fn_800DFFCC(void) {
 #include "src/game/gs_render_fn_800DFFCC.inc"
@@ -552,7 +487,6 @@ asm void fn_800DFFCC(void) {
 void fn_800DFFCC(void* a, void* b, void* c) { PSVECCrossProduct(b, c, a); }
 #endif
 
-extern void PSVECDotProduct(void);
 #if 0
 asm void fn_800E0000(void) {
 #include "src/game/gs_render_fn_800E0000.inc"
@@ -561,7 +495,6 @@ asm void fn_800E0000(void) {
 void fn_800E0000(void) { PSVECDotProduct(); }
 #endif
 
-extern void PSVECSquareDistance(void);
 #if 0
 asm void GSvecSquareDistance(void) {
 #include "src/game/gs_render_GSvecSquareDistance.inc"
@@ -570,7 +503,6 @@ asm void GSvecSquareDistance(void) {
 void GSvecSquareDistance(void) { PSVECSquareDistance(); }
 #endif
 
-extern void PSVECDistance(void);
 #if 0
 asm void GSvecDistance(void) {
 #include "src/game/gs_render_fn_800E0040.inc"
@@ -579,7 +511,6 @@ asm void GSvecDistance(void) {
 void GSvecDistance(void) { PSVECDistance(); }
 #endif
 
-extern void PSVECNormalize(void*, void*);
 #if 0
 asm void fn_800E0060(void) {
 #include "src/game/gs_render_fn_800E0060.inc"
@@ -588,7 +519,6 @@ asm void fn_800E0060(void) {
 void fn_800E0060(void* a, void* b) { PSVECNormalize(b, a); }
 #endif
 
-extern void PSVECMag(void);
 #if 0
 asm void fn_800E008C(void) {
 #include "src/game/gs_render_fn_800E008C.inc"
@@ -597,7 +527,6 @@ asm void fn_800E008C(void) {
 void fn_800E008C(void) { PSVECMag(); }
 #endif
 
-extern void PSVECScale(void*, void*, f32);
 extern const f32 lbl_8047CAD8;
 #if 0
 asm void fn_800E00AC(void) {
@@ -637,7 +566,6 @@ asm void fn_800E013C(void* a, void* b, f32 c) {
 void fn_800E013C(void* a, void* b, f32 c) { PSVECScale(b, a, c); }
 #endif
 
-extern void PSVECSubtract(void*, void*, void*);
 #if 0
 asm void fn_800E0168(void) {
 #include "src/game/gs_render_fn_800E0168.inc"
@@ -646,7 +574,6 @@ asm void fn_800E0168(void) {
 void fn_800E0168(void* a, void* b, void* c) { PSVECSubtract(b, c, a); }
 #endif
 
-extern void PSVECAdd(void*, void*, void*);
 #if 0
 asm void GSvecAdd(void) {
 #include "src/game/gs_render_GSvecAdd.inc"

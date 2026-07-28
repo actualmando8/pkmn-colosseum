@@ -455,7 +455,6 @@ extern void fn_80142CF4(void);
 extern u32 sexGetPokemonSexRaitoKotei(u32);
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
-extern void memoDataSet();
 u32 pokemonCheckFightOut(u8* ptr);
 extern void gamedataAttestBiosCopy(void);
 void pokemonCreate(void);
@@ -1454,9 +1453,6 @@ extern f32 lbl_8047D004;
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
 void pokemonGetDarkPokemonLevel(void);
 /* 0x8011F910 | 0x2BC */
-extern u8* itemDataBiosGetPtr(u16 itemDataId);
-extern u8 itemDataBiosGetKind(u8* ptr);
-extern u32 itemDataBiosGetBuff(u8* ptr);
 extern f64 lbl_8047D008;
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
@@ -1470,21 +1466,15 @@ extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 /* 0x8011FC74 | 0x30 */
 /* 0x8011FCA4 | 0x124 */
-extern u16 fn_801EEEB8();
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonSetDarkPokemonStatus(u8*, u16);
 /* 0x8011FDC8 | 0x504 */
-extern void GScharCpy();
-extern u16 fn_8010BBB8();
-extern void fn_8001D994(void);
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
 extern f64 lbl_8047D008;
 extern f32 lbl_8047CFF4;
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonToMenuPokemonStatus();
 /* 0x801202CC | 0x1DC */
 extern f64 lbl_8047D010;
 extern f32 lbl_8047CFF0;
@@ -1493,17 +1483,11 @@ extern f32 lbl_8047CFF4;
 
 
 /* 0x801204A8 | 0x1CC */
-extern void GSmsgGetGSchar(void);
-extern void fn_8010C4D4(void);
-extern void fn_8010C46C(void);
 /* 0x80120674 | 0x1F8 */
-extern u32 fn_800E0C54(void);
 extern u8 lbl_8027296C[];
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonCheckSetMonohiroi(void);
 /* 0x8012086C | 0x294 */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonAllKaihuku(void);
 /* 0x80120B00 | 0x16C */
 /* 0x80120CDC | 0x90 */
 /* 0x80120DD0 | 0x210 */
@@ -1520,35 +1504,24 @@ void pokemonAllKaihuku(void);
 /* 0x64 | pokemonReplace | generic -- depends on pokemonBiosCopy signature */
 /* 0x8011F5FC | 0x38 */
 /* 0x80121C18 | 0x428 */
-extern u32 fn_801DE190(u32 idx, u32 base, u32 flag);
-extern void fn_801DA3CC(void);
-extern void fn_801DA36C(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* 0x80122040 | 0x2F4 */
 /* 0x80122370 | 0x360 */
-extern void fn_80135530(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* 0x801226D0 | 0x324 */
 extern u8 lbl_80272948[];
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonGetEffortFromPokemon(void);
 /* 0x80122BC0 | 0xA4 */
 #pragma optimization_level 4
 /* 0x80122C64 | 0x178 */
 /* 0x80122DDC | 0x218 */
 /* 0x80122FF4 | 0x9C */
-extern void fn_80008154(void);
-extern void fn_80142CF4(void);
 /* 0x801230E0 | 0x30 */
 /* 0x80123110 | 0x94 */
 /* 0x801231A4 | 0x13C */
-extern u32 sexGetPokemonSexRaitoKotei(u32);
 /* 0x801232E0 | 0x88 */
-extern void fn_801EE958(void);
-extern void fn_801EEB34(void);
 /* 0x80123368 | 0x8C */
-extern void memoDataSet();
 /* 0x801233F4 | 0x190 */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 
@@ -1567,13 +1540,10 @@ void pokemonSetWazaStatus(void);
 /* 0x80123FBC | 0x108 */
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* 0x801240C4 | 0x34C */
-extern void gamedataAttestBiosCopy(void);
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonCreate(void);
 /* 0x80124410 | 0x4B4 */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-u32 pokemonCreateRndFit(u8*, s32, s32, s32, u32);
 /* 0x801248C4 | 0xB4 */
 
 
@@ -1601,8 +1571,6 @@ extern u8 pokemonSeikakuDataBiosGetPhyDefRateDataId();
 extern u8 pokemonSeikakuDataBiosGetNimblenessRateDataId();
 extern u8 pokemonSeikakuDataBiosGetSpeAtkRateDataId();
 extern u8 pokemonSeikakuDataBiosGetSpeDefRateDataId();
-extern void* pokemonSeikakuDataBiosGetPtr(u8 idx);
-extern void* pokemonSeikakuRateDataBiosGetPtr(u8 idx);
 extern u8 pokemonSeikakuRateDataBiosGetKake();
 extern u8 pokemonSeikakuRateDataBiosGetWaru();
 
@@ -1804,9 +1772,6 @@ void pokemonSetLevelBasisStatus(u8* obj, u32 level) {
 }
 #undef POKEMON_LEVEL_STAT
 /* 0x8012805C | 0x2A4 */
-extern void fadeSet(f32 duration, u32 mode);
-extern void fadeCheck(u32 wait);
-extern s32 evolutionOpen();
 extern f32 lbl_8047D020;
 /* Preserve retail cross-TU helper calls after source consolidation. */
 #pragma dont_inline on
@@ -1900,17 +1865,12 @@ extern u8 lbl_80272998[];
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
 void pokemonEvolutionCreateAddPokemon();
 /* 0x80128524 | 0x1A4 */
-extern void fn_800F9EE4(void);
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
 s32 pokemonEvolution();
 /* 0x801286C8 | 0x39C */
-extern void jumptable_80363468();
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void getEvoPokemonLevelUp(void);
 /* 0x80128A64 | 0x25C */
-extern void itemDataBiosGetItemSoubiDataId(void);
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonEvolutionCheck(void);
 /* 0x80128CC0 | 0x1C */
 void* fn_80128CC0(void* ptr) {
     if (ptr == NULL) { return NULL; }
@@ -1989,8 +1949,6 @@ void* fn_80128E2C(void) {
 extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* returns (obj-header[0] > key) after a pokemonGetStatus lookup; the obj-header ptr lbl_80478F90
  * is re-read via volatile cast. byte-match verified via objdiff. */
-extern void* tasteDataGetPtr(void* ptr);
-extern void tasteDataGetAisyou(void* ptr, u8 val);
 #pragma optimization_level 4
 #pragma optimization_level 4
 #pragma optimization_level 4
@@ -3616,7 +3574,6 @@ u32 pokemonCreateRndFit(u8* ptr, s32 group_arg, s32 mod_arg, s32 seed_mode_arg, 
 
 void pokemonSetTokuseiFlag(u8* ptr, u32 arg2);
 /* body moved to pokemon_range_exact_801248C4.c: pokemonSetTokuseiFlag */
-extern void fn_80135708(void);
 void pokemonInit(u8* ptr);
 /* body moved to pokemon_range_exact_801248C4.c: pokemonInit */
 

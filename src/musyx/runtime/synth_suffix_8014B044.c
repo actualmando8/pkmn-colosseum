@@ -366,7 +366,6 @@ extern const f32 lbl_8047D3A8;
  * (later address ranges, not yet decompiled -- slice 3 territory) or
  * later in this same file (defined after this block). Signatures follow
  * AxioDL/musyx headers (voice.h/macros.h/adsr.h/hardware.h/snd.h/seq.h). */
-extern void* memset(void* dst, int val, u32 size);
 extern s32 sndSin(u32 angle);
 extern u32 sndGetPitch(u8 key, u32 sInfo);
 extern s32 sndPitchUpOne(u16 note);

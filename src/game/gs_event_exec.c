@@ -1021,7 +1021,6 @@ void fn_80014118(s32 arg, s32* out1, s32* out2) {
 
 /* fn_80014198 - 0x80014198 | size: 0x24 */
 extern u32 lbl_8047A2EC;
-extern void menuPokemonClose(void);
 void fn_80014198(u32 val) {
     lbl_8047A2EC = val;
     menuPokemonClose();

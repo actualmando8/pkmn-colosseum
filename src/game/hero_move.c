@@ -1562,18 +1562,10 @@ void cbTsureFriend__Fl15FootStepCounterl(void) {
 }
 #endif
 /* 0x8012AD50 | 0x434 */
-extern void fadeEffectDokuStart(void);
-extern void fn_8018C69C(void);
-extern void fn_8018CA20(void);
-extern void winMsgOpenField(void);
-extern void winMsgCloseField(void);
-extern void fn_801D0AFC(void);
-extern void fn_80113FE8(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void cbPoison__Fl15FootStepCounterl(void);
 extern f32 lbl_8047D038;
 void cbPoison__Fl15FootStepCounterl(void) {
     extern u32 heroGetStatus(u8* a, u32 b, u32 c);
@@ -1721,14 +1713,6 @@ void heroMoveSetLockFrame(s32 val) {
     *(u32*)(lbl_80426BD0 + 0x188) = (u32)val;
 }
 /* 0x8012B19C | 0x448 */
-extern u32 fn_8018D998();
-extern u32 peopleSearchID();
-extern void peopleInfoBiosGetPtr(void);
-extern void fn_8018F5E4(void);
-extern void fn_8010F320(void);
-extern void PSVECScale(void);
-extern void PSVECAdd(void);
-extern void GScolsys2HumanCollision(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D03C;
@@ -1740,7 +1724,6 @@ extern f64 lbl_8047D058;
 extern u8 lbl_80478AC0[4];
 extern f32 lbl_8047D060;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-u32 fn_8012B19C(s32 member, f32* start, f32* target, f32 extraRadius);
 /* 0x8012B5E4 | 0x4EC */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -1751,7 +1734,6 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D060;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-u32 heroMoveChkHinderClear(s32 member);
 extern f32 lbl_8047D060;
 u32 fn_8012B19C(s32 member, f32* start, f32* target, f32 extraRadius) {
     extern void* GSresGetResource(u32 group, u32 handle);
@@ -2192,7 +2174,6 @@ s32 heroMoveAddStepCallback(void (*callback)(void), s32 count) {
 #pragma pop
 #endif
 /* 0x8012BEB4 | 0x200 */
-extern void fn_800D3088(void);
 extern f64 lbl_8047D068;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D040;
@@ -2222,23 +2203,6 @@ void getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK(
     }
 }
 /* 0x8012C0B4 | 0x48C */
-extern u32 fn_8018CD08();
-extern u32 fn_8018FCBC();
-extern void fn_8018FC50(void);
-extern void fn_800CE148(void);
-extern void fn_800CDBE0(void);
-extern s32 GScolsys2CheckGetEventID();
-extern void fn_8018790C(void);
-extern void fn_800F7D38(void);
-extern void fn_800F7C8C(void);
-extern void fn_8018BA04(void);
-extern void fn_80187D48(void);
-extern u8 fn_8018D7D0();
-extern void fn_80183730(void);
-extern u32 fn_8018397C();
-extern void fn_801812E8(void);
-extern void fn_80189490(void);
-extern void fn_80183688(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D070;
@@ -2248,7 +2212,6 @@ extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-u32 updateChat__F15HEROMOVE_MEMBER(s32 player);
 /* 0x8012C540 | 0x120 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -2278,11 +2241,6 @@ s32 heroMoveCheckEvent(void* event)
     return -1;
 }
 /* 0x8012C660 | 0x424 */
-extern void fn_8018F4C8(void);
-extern void GSmodelGetAnimIndex(void);
-extern void GSmodelGetAnimFrame(void);
-extern void GSmodelSetAnimBlend(void);
-extern void GSmodelSetBlendFactor(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D084;
@@ -2293,7 +2251,6 @@ extern f32 lbl_8047D08C;
 extern f32 lbl_8047D040;
 extern f32 lbl_8047D090;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-extern s32 updateAnimation__Ff15HEROMOVE_MEMBER();
 /* 0x8012D39C | 0x454 */
 extern f32 lbl_8047D0A8;
 extern f32 lbl_8047D038;
@@ -2302,7 +2259,6 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-extern s32 fn_8012D39C(void*, void*, void*, void*, void*, f32);
 /* 0x8012D7F0 | 0x6A4 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -2315,9 +2271,7 @@ extern f32 lbl_8047D060;
 extern f32 lbl_8047D0AC;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012D7F0(s32, void*, void*);
 /* 0x8012DE94 | 0x4F4 */
-extern void fn_800E3C64(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
@@ -2326,13 +2280,7 @@ extern f64 lbl_8047D048;
 extern f64 lbl_8047D050;
 extern f32 lbl_8047D0B0;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012DE94(u32 playerIndex);
 /* 0x8012E388 | 0x430 */
-extern void fn_800F7A7C(void);
-extern void fn_800F7A08(void);
-extern void fn_800F7BC4(void);
-extern void fn_80188214(void);
-extern void fn_80166458(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f64 lbl_8047D0C8;
@@ -2348,11 +2296,7 @@ extern f32 lbl_8047D078;
 extern f32 lbl_8047D0C0;
 extern f32 lbl_8047D0C4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012E388(s32, f32*);
 /* 0x8012E7B8 | 0x41C */
-extern void fn_800F7AF0(void);
-extern void fn_801887D8(void);
-extern void PSVECDistance(void);
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -2364,21 +2308,13 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-f32 moveLeader__F15HEROMOVE_MEMBER();
 /* 0x8012EBD4 | 0x3E4 */
-extern void dbgMenuIsOpen(void);
-extern void menuIsCheck(void);
-extern void fn_8018C424(void);
-extern void fn_8000D710(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern u8 lbl_80272A38[];
 extern f32 lbl_8047D064;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroMoveMain(void);
 /* 0x8012F008 | 0x114 */
-extern void fn_80188AF4(u32, u32);
-extern void fn_80188F78(u32, u32);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 s32 updateAnimation__Ff15HEROMOVE_MEMBER(model, member, amount)
@@ -2509,7 +2445,6 @@ extern f64 lbl_8047D050;
 extern f64 lbl_8047D058;
 extern f32 lbl_8047D080;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-extern s32 fn_8012D39C(void*, void*, void*, void*, void*, f32);
 /* 0x8012D7F0 | 0x6A4 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -2771,7 +2706,6 @@ void fn_8012D7F0(s32 playerIndex, void* velocityOut_, void* resultOut_)
     *resultOut = step;
 }
 /* 0x8012DE94 | 0x4F4 */
-extern void fn_800E3C64(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
@@ -2914,11 +2848,6 @@ void fn_8012DE94(u32 playerIndex)
     }
 }
 /* 0x8012E388 | 0x430 */
-extern void fn_800F7A7C(void);
-extern void fn_800F7A08(void);
-extern void fn_800F7BC4(void);
-extern void fn_80188214(void);
-extern void fn_80166458(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f64 lbl_8047D0C8;
@@ -3035,9 +2964,6 @@ void fn_8012E388(s32 playerIndex, f32* magnitudeOut)
     fn_80166458(GSresGetResource(0, 0x7D0), scratch);
 }
 /* 0x8012E7B8 | 0x41C */
-extern void fn_800F7AF0(void);
-extern void fn_801887D8(void);
-extern void PSVECDistance(void);
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
@@ -3259,10 +3185,6 @@ s32 heroMoveDismissMember(s32 idx) {
     return 1;
 }
 #endif
-extern void fn_801885C4(void);
-extern void PSVECDotProduct(void);
-extern void fn_8018F678(void);
-extern void fn_8018F658(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f64 lbl_8047D068;

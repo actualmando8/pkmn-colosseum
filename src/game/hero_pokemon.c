@@ -1436,18 +1436,13 @@ extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012F1FC(void);
 /* 0x8012F40C | 0x204 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8012F40C(void);
 /* 0x8012F610 | 0x4C8 */
-extern void GSmodelGetRotation(void);
-extern void fn_8010E138(void);
-extern void GSmodelSetRotation(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D0AC;
@@ -1455,42 +1450,28 @@ extern f32 lbl_8047D0D8;
 extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void initFloor__Fv(void);
 /* 0x8012FAD8 | 0x1FC */
-extern void floorGetNextFloorID(void);
-extern void fn_8006AE18(void);
 extern u8 lbl_802729C0[];
 extern u8 lbl_80272A10[];
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroMoveGetKenObjID(void);
 /* 0x8012FCD4 | 0x380 */
-extern void fn_8018E050(void);
-extern void GSmodelEnableAnimBlend(void);
-extern void fn_8018CB5C(void);
-extern void fn_80189328(void);
-extern void fn_8018BF24(void);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroMoveInit(void);
 /* 0x80130054 | 0x1F8 */
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void heroMoveSyncWithHero(void);
 /* 0x8013024C | 0x414 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern f32 lbl_8047D038;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
-void fn_8013024C(void);
 /* 0x80130660 | 0x110 */
-extern void gamedataGetStatus(void);
-extern void gamedataAttestCreate(void);
 #if 0
 asm void heroPokemonGetCelebi(void) {
 #include "src/game/gs_field_world_fn_80130660.inc"

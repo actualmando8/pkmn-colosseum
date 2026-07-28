@@ -3254,7 +3254,6 @@ extern void menuModelInit(void);
 extern void fn_8010A010(void);
 extern void peopleInfoBiosGetPtr(void);
 extern void fn_8018F4C8(void);
-extern void menuModelSetMotion(void);
 extern void fn_80109C88(void);
 extern void menuModelCheck(void);
 extern void fadeSet(void);
@@ -3645,7 +3644,6 @@ void menuNameEntryGetLastName(void* r3) {
 /* menuNameEntryOpenNoFade - 0x80029660 | size: 0x100 */
 extern void fn_800FF730(s32);
 extern void _threadSwitch(void);
-extern void floorSetFadeScript(s32, u32);
 #if 0
 asm void menuNameEntryOpenNoFade(void) {
 #include "src/game/gs_worldmap_fn_80029660.inc"

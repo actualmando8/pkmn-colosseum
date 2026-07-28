@@ -252,7 +252,6 @@ static void MakeColorGenTExp(u32 lightmap, HSD_TObj* tobj, HSD_TExp** c,
                              HSD_TExp** a, HSD_TExp** list, int repeat);
 static void TObjMakeTExp(HSD_TObj* tobj, u32 lightmap, u32 lightmap_done,
                          HSD_TExp** c, HSD_TExp** a, HSD_TExp** list);
-static void TObjSetupMtx(HSD_TObj* tobj);
 
 /** TObjInit - the class `init` method (0x801BBCE0). */
 int fn_801BBCE0(HSD_TObj* tobj);
