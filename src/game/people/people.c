@@ -1458,6 +1458,8 @@ asm void fn_801858C4(void) {
 #else
 void fn_801858C4(PeopleEntry* entry) {
     PeopleEntry* linked;
+    void* position;
+    void* transform;
     GSvec delta;
 
     if (fn_80185AAC(entry) == 0) {
@@ -1467,7 +1469,9 @@ void fn_801858C4(PeopleEntry* entry) {
     if (entry == NULL) {
         return;
     }
-    fn_800E0168(&delta, fn_8018FCBC(entry), peopleGetTransform(entry));
+    transform = peopleGetTransform(entry);
+    position = fn_8018FCBC(entry);
+    fn_800E0168(&delta, position, transform);
     if (__fabs(delta.x) < lbl_8047D828 &&
         __fabs(delta.y) < lbl_8047D828 &&
         __fabs(delta.z) < lbl_8047D828) {
