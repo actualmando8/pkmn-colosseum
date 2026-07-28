@@ -2324,7 +2324,10 @@ void fn_8004C120(void)
         lbl_8047A500 = NULL;
     }
 
-    while (fn_8004D34C(selection) >= 0) {
+    while (1) {
+        if (fn_8004D34C(selection) < 0) {
+            break;
+        }
         selection = fn_8004D9C0(selection);
     }
 
