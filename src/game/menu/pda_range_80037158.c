@@ -3156,7 +3156,8 @@ void fn_8003B2D8(u8* context)
 #pragma peephole off
 void fn_80037180(u32 unused, u8* p) {
     u32 result;
-    if (*(s16*)(p + 6) == 0x36c) {
+    switch (*(s16*)(p + 6)) {
+    case 0x36c:
         result = fn_80005748();
         if (lbl_8047A498 != 0) {
             result = lbl_8047A498;
@@ -3181,10 +3182,12 @@ void fn_80037180(u32 unused, u8* p) {
             fn_800D59B8(0, lbl_8047BA5C, lbl_8047BA5C);
             fn_800D6728();
         }
-    } else {
+        break;
+    default:
         if ((s32)lbl_8047A49C == 0) {
             *(s8*)(p + 4) = (s8)(p[4] & ~2);
         }
+        break;
     }
 }
 #pragma peephole reset
