@@ -1012,13 +1012,12 @@ void fn_800BD7A0(u32 xOrigin, u32 yOrigin, u32 width, u32 height) {
 }
 
 void __GXSetMatrixIndex(s32 value) {
-    GXData_800BB30C* p = gx;
     u32 matrixIndex;
 
     if (value < 5) {
         GX_FIFO_U8 = 8;
         GX_FIFO_U8 = 0x30;
-        matrixIndex = p->mtxIdx0;
+        matrixIndex = gx->mtxIdx0;
         GX_FIFO_U32 = matrixIndex;
         GX_FIFO_U8 = 0x10;
         GX_FIFO_U32 = 0x1018;
@@ -1026,7 +1025,7 @@ void __GXSetMatrixIndex(s32 value) {
     } else {
         GX_FIFO_U8 = 8;
         GX_FIFO_U8 = 0x40;
-        matrixIndex = p->mtxIdx1;
+        matrixIndex = gx->mtxIdx1;
         GX_FIFO_U32 = matrixIndex;
         GX_FIFO_U8 = 0x10;
         GX_FIFO_U32 = 0x1019;
