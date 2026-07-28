@@ -82,8 +82,8 @@ void fn_80265F94(int r3)
   u16 uVar1;
   u32 uVar2;
 
-  short sVar6;
-  short sVar7;
+  int sVar6;
+  int sVar7;
   u32 uVar3;
   s8 cVar9;
   int iVar4;
@@ -91,8 +91,8 @@ void fn_80265F94(int r3)
   u32 uVar5;
 
   sVar6 = (int)pokemonGetStatus(0,0xfa,0x66,0);
-  sVar7 = -1;
-  if (sVar6 != 0) {
+  sVar7 = 0xFFFF;
+  if ((u16)sVar6 != 0) {
     sVar7 = sVar6;
   }
   uVar3 = fn_801DE190(sVar7,0,0);
