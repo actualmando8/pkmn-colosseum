@@ -156,7 +156,14 @@ void* fightOutPokemonGetSoubiItemDataId(void) {
     }
     if ((u16)(u32)fn_80119ED0(0x3D) == 0x7C ||
         (u16)(u32)fn_80119ED0(0x3D) == 0xC8) {
-        r0 = fn_80121ADC(alloc1 ? pokemonGetStatus(alloc1, 0, 0xCC, 0) : 0, 0x3D);
+        void* data;
+
+        if (alloc1 == NULL) {
+            data = NULL;
+        } else {
+            data = pokemonGetStatus(alloc1, 0, 0xCC, 0);
+        }
+        r0 = fn_80121ADC(data, 0x3D);
     } else {
         r0 = fn_80119ED0(0x3D);
         if ((u16)r0 != 0xCD) {
