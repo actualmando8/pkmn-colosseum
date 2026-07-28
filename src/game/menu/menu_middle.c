@@ -1335,10 +1335,7 @@ u8* fn_8006ACCC(s32 id) {
         goto search;
     }
 
-    if (id < 0) {
-        return 0;
-    }
-    if (id > 1) {
+    if (id < 0 || id > 1) {
         return 0;
     }
     status = savedataGetStatus(0, 0xE);
