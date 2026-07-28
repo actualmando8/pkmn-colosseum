@@ -73,11 +73,22 @@ u16 figthOutPokemonGetSoubiItemBuff(void* ctx) {
     u8 result;
 
     d6Data = pokemonGetStatus(ctx, 0, 0xD6, 0);
-    ccData = !d6Data ? NULL : pokemonGetStatus(d6Data, 0, 0xCC, 0);
+    if (d6Data == NULL) {
+        ccData = NULL;
+    } else {
+        ccData = pokemonGetStatus(d6Data, 0, 0xCC, 0);
+    }
     if (ccData == NULL) { return 0; }
     typeId = fn_80119ED0(0x3D);
     if (typeId == 0x7C || typeId == 0xC8) {
-        result = fn_80121ADC(!d6Data ? NULL : pokemonGetStatus(d6Data, 0, 0xCC, 0), 0x3D);
+        void* data;
+
+        if (d6Data == NULL) {
+            data = NULL;
+        } else {
+            data = pokemonGetStatus(d6Data, 0, 0xCC, 0);
+        }
+        result = fn_80121ADC(data, 0x3D);
     } else if (fn_80119ED0(0x3D) == 0xCD) {
         result = fn_8011B67C(d6Data, 0x3D);
     } else {
@@ -99,11 +110,22 @@ u32 fightOutPokemonGetSoubiItemSoubiDataId(void* ctx) {
     u8 result;
 
     d6Data = pokemonGetStatus(ctx, 0, 0xD6, 0);
-    ccData = !d6Data ? NULL : pokemonGetStatus(d6Data, 0, 0xCC, 0);
+    if (d6Data == NULL) {
+        ccData = NULL;
+    } else {
+        ccData = pokemonGetStatus(d6Data, 0, 0xCC, 0);
+    }
     if (ccData == NULL) { return 0; }
     typeId = fn_80119ED0(0x3D);
     if (typeId == 0x7C || typeId == 0xC8) {
-        result = fn_80121ADC(!d6Data ? NULL : pokemonGetStatus(d6Data, 0, 0xCC, 0), 0x3D);
+        void* data;
+
+        if (d6Data == NULL) {
+            data = NULL;
+        } else {
+            data = pokemonGetStatus(d6Data, 0, 0xCC, 0);
+        }
+        result = fn_80121ADC(data, 0x3D);
     } else if (fn_80119ED0(0x3D) == 0xCD) {
         result = fn_8011B67C(d6Data, 0x3D);
     } else {
