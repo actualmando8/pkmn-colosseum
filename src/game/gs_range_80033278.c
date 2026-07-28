@@ -156,7 +156,6 @@ void fn_80034EF0(u8* arg0, u8* arg1) {
 
 /* fn_80034F84 - 0x80034F84 | size: 0x2C */
 #pragma push
-#pragma scheduling off
 #pragma optimize_for_size on
 void fn_80034F84(void) {
     extern void msgctrlSetValue();
