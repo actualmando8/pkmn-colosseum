@@ -852,8 +852,8 @@ void _fadeEffectFunction_UDLR_FirstInit__FP9GStextureUs(void* texture, u16 mode)
     camera->unk0C = mode;
     camera->unk0E = 0;
     camera->step = lbl_8047E08C;
-    camera->value = lbl_8047DFE0;
     camera->target = lbl_8047E014;
+    camera->value = lbl_8047DFE0;
 
     if (fn_801C6908(2) == 0) {
         camera->step *= lbl_8047E090;
