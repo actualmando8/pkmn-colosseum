@@ -51,6 +51,14 @@ extern void cursorBiosSetPos(s32 cursor, const CursorPos* pos);
 extern void fn_8000D710(s32);
 extern s32 fn_80075638(void);
 extern void fn_8007565C(void);
+extern void fn_80189990(s32, s32, s32);
+extern s8 fn_8001E184(void);
+extern void GBAInit(void);
+extern void gbaCommandSetKeyState(s32, s32);
+extern void fn_8007B090(s32);
+extern s32 fn_8007AB10(s32, s32*);
+extern s32 fn_8007AAA8(void);
+extern void fn_80189490(s32, s32);
 extern void menuSubOpenSelect(s32, s32, s32, s32, s32, s32);
 extern u8 heroMoveGetResID(s32* floorId, s32* resId, s32 member);
 extern void heroMoveChkHinderClear(s32 member);
@@ -76,6 +84,7 @@ extern f32 fn_8025D0A8(void* status);
 extern void fn_8006ADB4(s32 value);
 
 extern const char lbl_802758AC[];
+extern const f32 lbl_8047E100;
 extern const f32 lbl_8047E108;
 extern const f32 lbl_8047E114;
 extern const f64 lbl_8047E120;
@@ -182,6 +191,141 @@ void fn_801C8804(void)
     if (ready != 0) {
         fn_8007565C();
     }
+}
+
+s32 fn_801C89F8(s32 arg0, s32 arg1)
+{
+    s32 linkState;
+    s32 linkWork;
+    s32 result;
+    u8 repeat;
+    s32 answer;
+    f32 elapsed;
+
+    fn_80189990(arg0, arg1, 0x3B61);
+    if (fn_8001E184() == 0) {
+        GBAInit();
+        gbaCommandSetKeyState(2, 0);
+        fn_8007B090(1);
+        fn_80189990(arg0, arg1, 0x3B62);
+
+        linkWork = 0;
+        linkState = 1;
+        repeat = 0;
+        for (;;) {
+            result = fn_8007AB10(linkState, &linkWork);
+            if (repeat != 0 && result == 0) {
+                continue;
+            }
+
+            repeat = 0;
+            if (result != 0) {
+                linkState = result;
+            }
+
+            switch (linkState) {
+            case 2:
+                fn_80189990(arg0, arg1, 0x3B63);
+                if (fn_8001E184() != 0) {
+                    linkState = 29;
+                } else {
+                    linkState = 4;
+                }
+                break;
+            case 4:
+                fn_80189990(arg0, arg1, 0x3B64);
+                if (fn_8001E184() != 0) {
+                    linkState = 9;
+                } else {
+                    linkState = 5;
+                }
+                break;
+            case 5:
+                fn_80189990(arg0, arg1, 0x3B66);
+                if (fn_8001E184() != 0) {
+                    linkState = 29;
+                } else {
+                    linkState = 6;
+                }
+                break;
+            case 7:
+                fn_80189990(arg0, arg1, 0x3B82);
+                if (fn_8001E184() != 0) {
+                    linkState = 29;
+                } else {
+                    linkState = 8;
+                }
+                fn_8007AB10(7, &linkWork);
+                break;
+            case 9:
+                fn_80189990(arg0, arg1, 0x3B6C);
+                if (fn_8001E184() != 0) {
+                    linkState = 29;
+                } else {
+                    linkState = 10;
+                }
+                fn_8007AB10(9, &linkWork);
+                break;
+            case 11:
+                fn_80189990(arg0, arg1, 0x3B82);
+                answer = (s8)fn_8001E184();
+                fn_8007AB10(9, &linkWork);
+                if (answer != 0) {
+                    linkState = 29;
+                } else {
+                    linkState = 12;
+                }
+                fn_8007AB10(11, &linkWork);
+                break;
+            case 14:
+                fn_80189990(arg0, arg1, 0x3B6F);
+                repeat = 1;
+                break;
+            case 15:
+                fn_80189990(arg0, arg1, 0x3B80);
+                repeat = 1;
+                break;
+            case 16:
+                if (linkWork != 0) {
+                    fn_8007AAA8();
+                }
+                fn_80189990(arg0, arg1, 0x3B81);
+                fn_80189990(arg0, arg1, 0x3B6A);
+                fn_80189490(arg0, arg1);
+                return 1;
+            case 17:
+                fn_80189990(arg0, arg1, 0x3B68);
+                elapsed = lbl_8047E114;
+                while (elapsed < lbl_8047E100) {
+                    _threadSwitch();
+                    elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+                }
+                linkState = 16;
+                break;
+            case 19:
+                fn_80189990(arg0, arg1, 0x3B82);
+                if (fn_8001E184() != 0) {
+                    linkState = 29;
+                } else {
+                    linkState = 1;
+                }
+                fn_8007AB10(19, &linkWork);
+                break;
+            }
+
+            if (linkState == 29) {
+                break;
+            }
+        }
+
+        if (linkWork != 0) {
+            fn_8007AAA8();
+        }
+    }
+
+    fn_80189990(arg0, arg1, 0x3B83);
+    fn_80189490(arg0, arg1);
+    return 0;
 }
 
 void fn_801C8DD0(s32 a, s32 b, s32 c, s32 d, s32 e)
