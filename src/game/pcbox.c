@@ -111,11 +111,12 @@ u16 pcboxAddItem(void* base, u16 effect_id, u16 r5) {
     extern u8 fn_801429E8(void*);
     extern u32 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
-    void* cur; s16 idx; s32 i;
-    if (base == 0) { base = (void*)savedataGetStatus(0, 3); }
+    void* status; void* cur; s16 idx; s32 i;
+    status = base;
+    if (status == 0) { status = (void*)savedataGetStatus(0, 3); }
     if (r5 == 0) return r5;
     if (!itemDataBiosGetPtr(effect_id)) return r5;
-    cur = (u8*)base;
+    cur = status;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
             if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
@@ -123,7 +124,7 @@ u16 pcboxAddItem(void* base, u16 effect_id, u16 r5) {
     }
     idx = (i < 0xeb) ? (s16)i : -1;
     if (idx < 0) return r5;
-    return (u16)fn_80140ACC((u8*)base + 0x6dec, 0xeb, effect_id, r5, idx, 0x3e7, 0);
+    return (u16)fn_80140ACC((u8*)status + 0x6dec, 0xeb, effect_id, r5, idx, 0x3e7, 0);
 }
 #pragma scheduling off
 #endif
@@ -141,18 +142,19 @@ u16 pcboxDelItem(void* base, u16 effect_id, u16 r5) {
     extern u8 fn_801429E8(void*);
     extern u32 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
-    void* cur; s16 idx; s32 i;
-    if (base == 0) { base = (void*)savedataGetStatus(0, 3); }
+    void* status; void* cur; s16 idx; s32 i;
+    status = base;
+    if (status == 0) { status = (void*)savedataGetStatus(0, 3); }
     if (r5 == 0) return r5;
     if (!itemDataBiosGetPtr(effect_id)) return r5;
-    cur = (u8*)base;
+    cur = status;
     for (i = 0; i < 0xeb; i++, cur = (u8*)cur + 4) {
         if (fn_801429E8((u8*)cur + 0x6dec)) {
             if (itemGetStatus((u8*)cur + 0x6dec, 0, 0x1b, 0) == effect_id) break;
         }
     }
     idx = (i < 0xeb) ? (s16)i : -1;
-    return (u16)fn_80141308((u8*)base + 0x6dec, 0xeb, effect_id, r5, idx, 0x3e7, 0, 0);
+    return (u16)fn_80141308((u8*)status + 0x6dec, 0xeb, effect_id, r5, idx, 0x3e7, 0, 0);
 }
 #pragma scheduling off
 #endif
