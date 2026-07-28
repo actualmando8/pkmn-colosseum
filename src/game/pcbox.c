@@ -542,13 +542,16 @@ void pcboxInit(void* base) {
     extern void fn_800F96E4(void*, u32, u32);
     extern void pokemonInitAry(void*, u32);
     extern void fn_80142A88(void*, u32);
-    u8* cur;
+    u8* status;
     s32 i;
-    if (base == 0) {
-        base = (void*)savedataGetStatus(0, 3);
+    u8* cur;
+
+    status = base;
+    if (status == 0) {
+        status = (u8*)savedataGetStatus(0, 3);
     }
     i = 0;
-    cur = (u8*)base;
+    cur = status;
     do {
         msgctrlSetValue(0x34, i + 1);
         fn_800F96E4(cur, 9, 0x32c9);
@@ -556,7 +559,7 @@ void pcboxInit(void* base) {
         i++;
         cur += 0x24a4;
     } while (i < 3);
-    fn_80142A88((u8*)base + 0x6dec, 0xeb);
+    fn_80142A88(status + 0x6dec, 0xeb);
 }
 #pragma scheduling off
 #endif
