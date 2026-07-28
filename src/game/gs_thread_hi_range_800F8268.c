@@ -271,7 +271,7 @@ asm void fn_800F8268(void) {
 #else
 #pragma optimization_level 2
 void fn_800F8268(void) {
-    u8 pad[0x50];
+    u8 pad[0x38];
     u8* r31;
     u8* r30;
     u8* r28;
@@ -282,7 +282,8 @@ void fn_800F8268(void) {
     fn_800AB150(pad);
     r31 = (u8*)&lbl_80401C10;
     r30 = pad;
-    for (r29 = 0; r29 < 4; r29++) {
+    r29 = 0;
+    do {
         s32 target = r29 + 1;
         if (*(s32*)r31 == target) {
             r28 = r31;
@@ -300,16 +301,8 @@ void fn_800F8268(void) {
         }
         if (r28 == NULL) goto next;
         ax = (s8)r30[0xA];
-        if (ax == -1) {
-            btnState = fn_800D0F44((u32)r29);
-            if (btnState == 8) {
-                *(u32*)(r28 + 0xC) = 3;
-            } else if (btnState == 0x40) {
-                *(u32*)(r28 + 0xC) = 4;
-            }
-            memset(r28 + 0x18, 0, 0xC);
-            lbl_8047AC4C = lbl_8047AC4C | ((u32)0x80000000 >> (u32)r29);
-        } else if (ax >= 0 && ax < 1) {
+        if (ax != -1) {
+            if (ax >= -1 && ax < 1) {
             if (*(u32*)(r28 + 0xC) == 3) {
                 btnState = fn_800D0F44((u32)r29);
                 if (btnState == 0x00900000) {
@@ -323,10 +316,21 @@ void fn_800F8268(void) {
             r30[0x5] = (u8)(-(s8)r30[0x5]);
             memcpy(r28 + 0x18, r30, 0xC);
             lbl_8047AC4C = lbl_8047AC4C & ~((u32)0x80000000 >> (u32)r29);
+            }
+        } else {
+            btnState = fn_800D0F44((u32)r29);
+            if (btnState == 8) {
+                *(u32*)(r28 + 0xC) = 3;
+            } else if (btnState == 0x40) {
+                *(u32*)(r28 + 0xC) = 4;
+            }
+            memset(r28 + 0x18, 0, 0xC);
+            lbl_8047AC4C = lbl_8047AC4C | ((u32)0x80000000 >> (u32)r29);
         }
 next:
         r30 += 0xC;
-    }
+        r29++;
+    } while (r29 < 4);
     fn_800F8428();
     lbl_8047AC48++;
 }
