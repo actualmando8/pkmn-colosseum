@@ -265,8 +265,8 @@ void fn_801C53BC(void* texture)
     camera->unk0C = 0;
     camera->unk0E = 0;
     camera->step = lbl_8047E01C;
-    camera->value = lbl_8047DFE0;
     camera->target = lbl_8047E020;
+    camera->value = lbl_8047DFE0;
     GSgfxBeginBackFBCapture(texture, fn_801C63B8, 0);
 
     lbl_8047B3B4 = fn_800D7894();
@@ -535,8 +535,8 @@ void fn_801C5748(void)
     camera->unk0C = 0;
     camera->unk0E = 0;
     camera->step = lbl_8047E024;
-    camera->value = lbl_8047DFE0;
     camera->target = lbl_8047E028;
+    camera->value = lbl_8047DFE0;
 
     fadeFluidInit(40, 30, lbl_8047DFE4, lbl_8047DFE4, lbl_8047E02C,
                   lbl_8047E030);
@@ -547,15 +547,19 @@ void fn_801C5748(void)
     fadeFluidSetShock(&position, lbl_8047E020);
     position.x = lbl_8047E03C;
     position.y = lbl_8047E03C;
+    position.z = lbl_8047DFE0;
     fadeFluidSetShock(&position, lbl_8047E040);
     position.x = lbl_8047E044;
     position.y = lbl_8047E048;
+    position.z = lbl_8047DFE0;
     fadeFluidSetShock(&position, lbl_8047E040);
     position.x = lbl_8047E044;
     position.y = lbl_8047E03C;
+    position.z = lbl_8047DFE0;
     fadeFluidSetShock(&position, lbl_8047E040);
     position.x = lbl_8047E03C;
     position.y = lbl_8047E048;
+    position.z = lbl_8047DFE0;
     fadeFluidSetShock(&position, lbl_8047E040);
     _fadeEffect_AdjustParms__Fv();
 }
