@@ -164,7 +164,15 @@ typedef struct FSYSSlot {
     /* 0x0FC */ u32  fileIndex;         /* file index within parent */
     /* 0x100 */ u32  padding100;
     /* 0x104 */ u32  requestID;         /* requested resource name hash */
-    /* 0x108 */ u8   padding108[0x2C];
+    /* 0x108 */ u8   padding108[0x08];
+    /* 0x110 */ u32  dmaChunkSize;      /* size of current chunked DVD transfer */
+    /* 0x114 */ s32  dmaBytesRemaining; /* bytes left in the chunked transfer */
+    /* 0x118 */ u32  dmaSrcOffset;      /* accumulating DVD source offset */
+    /* 0x11C */ u32  dmaDstOffset;      /* accumulating destination offset */
+    /* 0x120 */ u8   padding120[0x04];
+    /* 0x124 */ void* dmaAsyncRequest;  /* handle polled via fn_801808B4 */
+    /* 0x128 */ void* dmaCopyDst;       /* destination pointer for fn_801807A8 */
+    /* 0x12C */ u8   padding12C[0x08];
     /* 0x134 */ u32  callbackA;         /* completion callback A */
     /* 0x138 */ u32  callbackB;         /* completion callback B */
     /* 0x13C */ u32  callbackC;         /* completion callback C */
