@@ -333,6 +333,44 @@ void fn_801C8DD0(s32 a, s32 b, s32 c, s32 d, s32 e)
     menuSubOpenSelect(1, a, b, c, d, e);
 }
 
+extern s32 fn_801C8E14(s32 floorDataId, u32 actorIndex, s16 mode,
+                       u8 direction);
+extern u8 fn_801C9910(void);
+extern void floorEventCtrlElevator(s32 arg0, s32 arg1, u16 arg2,
+                                   u8 arg3, s32 speed);
+extern u8 lbl_8047B3C4;
+
+void fn_801C9B6C(s32 arg0, s32 arg1, u16 arg2, u8 arg3)
+{
+    s32 floorId;
+    s32 resId;
+    u8 found;
+
+    if (arg3 >= 2 && arg3 <= 5) {
+        fn_801C8E14(arg0, arg1, arg2, arg3);
+        return;
+    }
+
+    if (arg2 & 1) {
+        found = heroMoveGetResID(&floorId, &resId, 1);
+        if (found && (arg3 != 0 || !fn_801C9910())) {
+            lbl_8047B3C4 = 1;
+        } else {
+            lbl_8047B3C4 = 0;
+        }
+    }
+
+    if (arg3 == 1 && heroMoveGetResID(&floorId, &resId, 1)) {
+        lbl_8047B3C4 = 1;
+    }
+
+    if (lbl_8047B3C4) {
+        fn_801C8E14(arg0, arg1, arg2, arg3);
+    } else {
+        floorEventCtrlElevator(arg0, arg1, arg2, 0, 100);
+    }
+}
+
 void fn_801C9C9C(void)
 {
     s32 floorId;

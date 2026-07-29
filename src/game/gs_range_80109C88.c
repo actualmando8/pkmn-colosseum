@@ -9,6 +9,35 @@
  */
 #include "dolphin/types.h"
 
+extern u8 pokemonCheckValid(void* pokemon);
+extern u8 pokemonBiosGetTamagoFlag(void* pokemon);
+extern u16 pokemonGetStatus(void* pokemon, u32 index, u32 field, u32 rare);
+extern u32 pokemonBiosGetRnd(void* pokemon);
+extern u8 pokemonGetAnnonKatati(u32 personality);
+extern u8 pokemonCheckRare(void* pokemon);
+extern u16 lbl_8035B478[][2];
+
+u16 fn_8010BBB8(void* pokemon)
+{
+    u16 species;
+    u8 form;
+
+    if (pokemon == NULL) {
+        return 0;
+    }
+    if (!pokemonCheckValid(pokemon) || pokemonBiosGetTamagoFlag(pokemon)) {
+        return 0x33D;
+    }
+
+    species = pokemonGetStatus(pokemon, 0, 0x6E, 0);
+    if (species == 0xC9) {
+        form = pokemonGetAnnonKatati(pokemonBiosGetRnd(pokemon));
+        return lbl_8035B478[form][pokemonCheckRare(pokemon) != 0];
+    }
+    return pokemonGetStatus(NULL, species, 0x5B,
+                            pokemonCheckRare(pokemon) != 0);
+}
+
 u32 fn_8010B560(void) {
     typedef struct Entry {
         void* data;

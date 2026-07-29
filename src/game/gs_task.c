@@ -436,6 +436,7 @@ extern u8 lbl_8047A285;
 extern u8 lbl_8047A286;
 
 /* 0x80008868 | 0x3D8 */
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_RESIDUAL_80008868)
 extern u32 menuDataBiosGetType(u32);
 extern void fn_8001EA98(s32, s32, s32, s32);
 extern void fn_8001E4B4(s32, s32, s32, s32, s32, s32);
@@ -563,7 +564,6 @@ extern void fn_80190528(u32);
 extern void fn_801903B0(u32);
 extern u32 lbl_80478F98;
 extern u32 lbl_80478F9C;
-#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_RESIDUAL_80008868)
 static u16 GStaskGetLinkedEntryId(s32 index) {
     u8* list;
     s16 node;
@@ -1100,6 +1100,7 @@ extern void* pokemonGetTokuseiDataId(void* ptr);
 extern void fightOutPokemonSetTokuseiDataId(void* ptr, void* a);
 extern void fightOutPokemonSetZokuseiDataId(void* ptr, u8 a, u16 b);
 extern void fightMenuFightTrainerRenewStatusMenu(void* ptr, u16 a);
+#if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_RESIDUAL_80007364)
 s32 menuFightPokemonSelectSub(u32 ctx) {
     s32 result;
     u8 prevLevel;
@@ -1199,6 +1200,7 @@ s32 menuFightPokemonSelectSub(u32 ctx) {
     fightMenuFightTrainerRenewStatusMenu(archive, savedId);
     return result;
 }
+#endif /* GS_TASK_RANGE_RESIDUAL_80007364 */
 
 #if !defined(GS_TASK_RANGE_SPLIT) || defined(GS_TASK_RANGE_EXACT_8000765C)
 /* dbgMenuFightFightTrainerPokemonPartDataEdit - 0x8000765C | size: 0xac */

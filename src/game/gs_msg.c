@@ -656,7 +656,7 @@ asm void fn_800F9D24(void) {
 #pragma push
 #pragma peephole off
 #pragma optimization_level 2
-void* fn_800F9D24(u16* dst, u16* src, s32 maxlen) {
+void* GScharLenCpy(u16* dst, u16* src, s32 maxlen) {
     s32 r;
     s32 i;
 
