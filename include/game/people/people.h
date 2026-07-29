@@ -201,7 +201,9 @@ typedef struct PeopleEntry {
     f32  targetZ;           /* 0xB0 */
     u32  field_B4;          /* 0xB4 */
     u32  field_B8;          /* 0xB8 */
-    u8   spawnData[0x0C];   /* 0xBC - 0xC7 */
+    u32  field_BC;          /* 0xBC */
+    u32  walkPathId;        /* 0xC0 */
+    u32  walkPathParam;     /* 0xC4 */
     s32  walkNodeA;         /* 0xC8 */
     s32  walkNodeB;         /* 0xCC */
     s32  walkNodeC;         /* 0xD0 */

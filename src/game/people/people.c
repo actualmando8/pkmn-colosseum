@@ -88,7 +88,7 @@ void fn_8018F30C(void);
 void fn_8018ECEC(PeopleEntry* entry, f32 step);
 s32 fn_80185AAC(PeopleEntry* entry);
 void* peopleInfoBiosGetPtr(void* scriptObj);
-u8 fn_80188214();
+u8 fn_80188214(u32 groupId, u32 index, f32 distance);
 void fn_8018E9B4(PeopleEntry* entry, void* position, void* transform);
 void fn_8018DCA8(PeopleEntry*, u8);
 void fn_8018AACC(u32, u32, u8, GSvec*);
@@ -567,8 +567,8 @@ asm void fn_8018A44C(void) {
 void fn_8018A44C(u32 groupId, u32 index, f32 amount) {
     PeopleEntry* entry;
     GSvec rotation;
-    f32 oldSpeed;
     f32 angle;
+    f32 oldSpeed;
     s32 revolutions;
 
     entry = peopleFindBySelf(peopleFindSelf(groupId, index));
@@ -593,7 +593,7 @@ void fn_8018A44C(u32 groupId, u32 index, f32 amount) {
 extern f32 fn_800E008C(void* param);
 extern void fn_800E013C(void*, void*, f32);
 extern void GSvecAdd(void*, void*, void*);
-extern u32 lbl_8047D800;
+extern f32 lbl_8047D800;
 extern f32 lbl_8047D7A0;
 extern f32 lbl_8047D79C;
 #if 0
@@ -601,8 +601,44 @@ asm void fn_8018A700(void) {
 #include "src/game/people/people_fn_8018A700.inc"
 }
 #else
-void fn_8018A700(void) {
-    /* TODO: match -- 972 bytes at 0x8018A700 */
+void fn_8018A700(u32 groupId, u32 index, u32 targetGroupId,
+                 u32 targetIndex, u8 keepFacing, f32 distance) {
+    PeopleEntry* entry;
+    GSvec position;
+    GSvec targetPosition;
+    GSvec delta;
+    f32 length;
+    f32 scale;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry != NULL) {
+        fn_8018FC98(entry, &position);
+    }
+
+    entry = peopleFindBySelf(peopleFindSelf(targetGroupId, targetIndex));
+    if (entry != NULL) {
+        fn_8018FC98(entry, &targetPosition);
+    }
+
+    fn_800E0168(&delta, &position, &targetPosition);
+    length = fn_800E008C(&delta);
+    if (length == lbl_8047D7A0) {
+        scale = lbl_8047D79C;
+    } else {
+        scale = (lbl_8047D800 * distance) / length;
+    }
+
+    if (scale >= lbl_8047D79C) {
+        entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+        if (entry != NULL) {
+            entry->state = PEOPLE_STATE_IDLE;
+            entry->pad22 = 0;
+        }
+    } else {
+        fn_800E013C(&delta, &delta, scale);
+        GSvecAdd(&targetPosition, &targetPosition, &delta);
+        fn_8018AACC(groupId, index, keepFacing, &targetPosition);
+    }
 }
 #endif
 
@@ -720,7 +756,7 @@ void fn_8018B368(u32 groupId, u32 index, s32 animIndex, s32 frame,
 /* 0x8018B558 | 0x214 */
 extern void GSmodelSetAnimBlend(void*, s32, s32);
 extern void GSmodelSetBlendFactor(void*, f32);
-extern void GSmodelGetFrameCount(void*, f32*, s32);
+extern void GSmodelGetFrameCount(void*, f32*, f32*);
 extern void GSmodelSetBlendAnimFrameForce(void*, f32, f32);
 extern u32 lbl_8047D7D0;
 extern f32 lbl_8047D79C;
@@ -924,7 +960,7 @@ extern void fn_8010E138(void);
 extern u32 lbl_8047D890;
 extern const f32 lbl_8047D7EC;
 extern u32 lbl_8047D894;
-extern u32 lbl_8047D800;
+extern f32 lbl_8047D800;
 extern f32 lbl_8047D7A0;
 /* renamed symbols referenced by asm incs (symbolmap port) */
 extern void heroMoveSetEventList();
@@ -1313,7 +1349,7 @@ extern f64 lbl_8047D7A8;
 extern u32 lbl_8047D7FC;
 extern f32 lbl_8047D7C0;
 extern u32 lbl_8047D804;
-extern u32 lbl_8047D800;
+extern f32 lbl_8047D800;
 extern u32 lbl_8047D808;
 extern u32 lbl_8047D810;
 extern f32 lbl_8047D814;
@@ -1525,7 +1561,7 @@ void fn_8018E9B4(PeopleEntry* entry, void* position, void* transform) {
 extern f32 lbl_8047D7A0;
 extern u32 lbl_8047D7D0;
 extern f32 lbl_8047D79C;
-extern u32 lbl_8047D830;
+extern f32 lbl_8047D830;
 extern f32 lbl_8047D834;
 extern f32 lbl_8047D7A4;
 #if 0
@@ -1583,7 +1619,7 @@ void peopleGazeHeroCheck(u32 a, u32 b) {
 /* 0x80186284 | 0x39C */
 extern void fn_8010F188(void);
 extern f32 lbl_8047D83C;
-extern u32 lbl_8047D800;
+extern f32 lbl_8047D800;
 extern f64 lbl_8047D7F0;
 extern f64 lbl_8047D7A8;
 extern f64 lbl_8047D820;
@@ -1700,10 +1736,10 @@ extern u32 lbl_8047D86C;
 extern f32 lbl_8047D7E8;
 extern u32 lbl_8047D870;
 extern u32 lbl_8047D818;
-extern u32 lbl_8047D830;
+extern f32 lbl_8047D830;
 extern f32 lbl_8047D7A4;
 extern f32 lbl_8047D79C;
-extern u32 lbl_8047D874;
+extern f32 lbl_8047D874;
 extern u32 lbl_8047D7D0;
 #if 0
 asm void fn_80186B5C(void) {
@@ -1797,40 +1833,9 @@ void fn_80187A60(void) { /* TODO: match -- 744 bytes at 0x80187A60 */ }
  * converged or if the entry isn't found; returns 1 immediately if not
  * converged and flag == 0 (caller opted out of waiting). */
 BOOL fn_80188984(u32 groupId, u32 index, u8 flag) {
-    s32 i;
-    s32 j;
-    void* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
     if (entry == NULL) {
         return 0;
     }
@@ -2164,40 +2169,9 @@ void fn_801812C4(PeopleEntry* entry) {
  * by (groupId, index) and toggle it in/out of the "interacting" state
  * (saving/restoring the previous state around states 4-5). */
 s32 fn_801812E8(u32 groupId, u32 index, u8 doInteract) {
-    s32 i;
-    s32 j;
-    void* found;
     PeopleEntry* entry;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
     if (entry == NULL) {
         return 0;
     }
@@ -2376,8 +2350,64 @@ void fn_8018805C(u32 groupId, u32 index, f32 rotationOffset, f32 value) {
     }
 }
 
-/* fn_80188214 -- not recovered, gap in archive campaign (size 0x3B0) */
-u8 fn_80188214() {
+/* Advance a person along its facing direction by a distance-scaled step. */
+extern f32 lbl_8047D878;
+u8 fn_80188214(u32 groupId, u32 index, f32 distance) {
+    PeopleEntry* entry;
+    void* model;
+    f32 frameStart;
+    f32 frameEnd;
+    GSvec position;
+    GSvec localStep;
+    GSvec worldStep;
+    u8 quaternion[16];
+    f32 step;
+    f32 base;
+    f32 ticks;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return 0;
+    }
+    base = entry->field_40;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return 0;
+    }
+    model = peopleGetModel(entry);
+    if (model == NULL) {
+        return 0;
+    }
+
+    fn_8018FC98(entry, &position);
+    GSmodelGetFrameCount(model, &frameStart, &frameEnd);
+    if (fn_800D37CC() == 50) {
+        distance *= lbl_8047D878;
+    }
+
+    if (distance <= lbl_8047D830) {
+        step = (distance / lbl_8047D830) *
+               (entry->field_34 * lbl_8047D7A4);
+    } else if (distance <= lbl_8047D79C) {
+        base = entry->field_34;
+        step = ((distance - lbl_8047D830) / lbl_8047D874) *
+                   (base - base * lbl_8047D7A4) +
+               base * lbl_8047D7A4;
+    } else {
+        step = (distance - lbl_8047D79C) *
+                   (entry->field_38 - entry->field_34) +
+               entry->field_34;
+    }
+
+    fn_800E0718(quaternion, lbl_8031554C, base);
+    set__5GSvecFfff(&localStep, lbl_8047D7A0, lbl_8047D7A0, step);
+    GSvecTransformQuat(&worldStep, quaternion, &localStep);
+    ticks = (f32)fn_800D3088();
+    position.x += worldStep.x * ticks;
+    position.z += worldStep.z * ticks;
+    fn_8018E9B4(entry, &position, entry->transform);
+    return 1;
 }
 
 extern f32 lbl_80273FA8[];
@@ -2419,46 +2449,14 @@ void fn_801885C4(u32 groupId, u32 index, GSvec* offset, u8 faceOffset) {
  * animation blend ratio against entry->field_34/field_38 (float time range)
  * for a caller-supplied time-source object (param3, fed to fn_800E008C). */
 f32 fn_801887D8(u32 groupId, u32 index, void* param3) {
-    s32 i;
-    s32 j;
-    void* found;
     PeopleEntry* entry;
     f32 result;
     f32 t;
-    f32 startTime;
     f32 endTime;
+    f32 startTime;
 
     result = lbl_8047D7A0;
-
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
     if (entry == NULL) {
         return lbl_8047D7A0;
     }
@@ -2469,10 +2467,10 @@ found_entry:
     } else {
         startTime = entry->field_34;
         if (startTime <= t) {
-            if (endTime != lbl_8047D7A0) {
+            if (lbl_8047D7A0 != endTime) {
                 result = lbl_8047D79C + (t - startTime) / (endTime - startTime);
             }
-        } else if (startTime != lbl_8047D7A0) {
+        } else if (lbl_8047D7A0 != startTime) {
             result = t / startTime;
         }
     }
@@ -2539,10 +2537,10 @@ void fn_80188CA0(u32 groupId, u32 index, u32 targetX, u32 targetY,
                 part = GSmodelGetPart(model, partIndex);
                 GSpartRegisterRotation(part, &entry->field_0C, 3);
                 GSpartFree(part);
-                original->moveType = 2;
             }
         }
     }
+    original->moveType = 2;
 }
 
 /* fn_80188F78 -- not recovered, gap in archive campaign (size 0x28) */
@@ -2550,50 +2548,57 @@ void fn_80188F78(u32 groupId, u32 index) {
     fn_80188FA0(groupId, index, 0, 100);
 }
 
-/* fn_80188FA0 = fn_80188FA0 (see people.h) -- not recovered, gap in archive campaign */
+/* Start one person's path-following movement toward another person. */
 void fn_80188FA0(u32 groupId, u32 index, u32 pathId, u32 pathParam) {
+    PeopleEntry* original;
+    PeopleEntry* target;
+    PeopleEntry* source;
+    PeopleInfoBiosEntry* info;
+    void* model;
+    void* part;
+    s8 partIndex;
 
+    original = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (original == NULL) {
+        return;
+    }
+
+    target = peopleFindBySelf(peopleFindSelf(pathId, pathParam));
+    if (target == NULL) {
+        return;
+    }
+
+    original->threadHandle = fn_8018FCBC(target);
+
+    source = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (source != NULL) {
+        model = peopleGetModel(source);
+        if (model != NULL) {
+            info = peopleInfoBiosGetPtr(source->scriptRef);
+            if (info != NULL) {
+                partIndex = (s8)fn_8018F698(info);
+                if (partIndex >= 0) {
+                    part = GSmodelGetPart(model, partIndex);
+                    GSpartRegisterRotation(part, &source->field_0C, 3);
+                    GSpartFree(part);
+                }
+            }
+        }
+    }
+
+    original->moveType = PEOPLE_MOVE_WALK_PATH;
+    original->walkPathId = pathId;
+    original->walkPathParam = pathParam;
 }
 
 /* fn_80189328 -- find a people entry by (groupId, index); read its current
  * PEOPLE_FLAG_TALKABLE state, set or clear that flag per 'enable', and
  * return the *previous* state. Returns 0 if the entry isn't found. */
 BOOL fn_80189328(u32 groupId, u32 index, u8 enable) {
-    s32 i;
-    s32 j;
-    void* found;
     PeopleEntry* entry;
     BOOL wasTalkable;
 
-    for (i = 0; i < peopleGetMaxCount(); i++) {
-        entry = peopleGetEntry(i);
-        if (!entry->active) continue;
-        if (entry->groupId != groupId) continue;
-        if (entry->index != index) continue;
-        found = entry->selfPtr;
-        goto loop3;
-    }
-
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->index != index) continue;
-        GSlogWrite((const char*)lbl_80273FD8, groupId, index);
-        found = entry->selfPtr;
-        goto loop3;
-    }
-    found = NULL;
-
-loop3:
-    for (j = 0; j < peopleGetMaxCount(); j++) {
-        entry = peopleGetEntry(j);
-        if (!entry->active) continue;
-        if (entry->selfPtr != found) continue;
-        goto found_entry;
-    }
-    entry = NULL;
-
-found_entry:
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
     if (entry == NULL) {
         return 0;
     }
@@ -2740,8 +2745,8 @@ void fn_8018AACC(u32 groupId, u32 index, u8 keepFacing, GSvec* target) {
     PeopleEntry* entry;
     GSvec delta;
     GSvec rotation;
-    f32 angle;
     f32 oldSpeed;
+    f32 angle;
     s32 revolutions;
 
     original = peopleFindBySelf(peopleFindSelf(groupId, index));
