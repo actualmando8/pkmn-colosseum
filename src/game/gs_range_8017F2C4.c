@@ -41,6 +41,85 @@ typedef struct GsRangeResource {
     void (*release)(struct GsRangeResource* self);
 } GsRangeResource;
 
+typedef struct GsRangeReloadResource {
+    u8 _pad_0[0x1c];
+    u32 version;
+    u32 bssSize;
+    u8 _pad_24[0x10];
+    void (*prolog)(void);
+    u8 _pad_38[0x10];
+    u32 fixSize;
+} GsRangeReloadResource;
+
+void* fn_8017F484(u32 group, u32 handle, u32 size)
+{
+    extern u16 fn_800E2B00(u32 size, u32 align);
+    extern void* fn_800E27B0(u16 handle);
+    extern void fn_800F9210(u32 group, u32 handle);
+    extern BOOL fn_8009ED4C(void* module, void* bss);
+    extern u16 fn_800E202C(void* ptr);
+    extern s32 fn_800E24B0(u16 handle);
+    extern s32 fn_800E209C(u16 handle);
+    extern void DCFlushRange(void* addr, u32 nBytes);
+    extern s32 fn_8017F6B4(void* unused, u32 group, u32 handle);
+
+    GsRangeReloadResource* res = (GsRangeReloadResource*)GSresGetResource(group, handle);
+    GsRangeReloadResource* newRes;
+    void* buf;
+    u16 bufHandle;
+    u32 alignedSize;
+    u32 alignedExtra;
+    u16 h;
+
+    if (res->version < 3) {
+        fn_8009ED4C(res, NULL);
+        newRes = res;
+        buf = NULL;
+    } else if (res->bssSize != 0) {
+        alignedSize = (size + 0x1f) & ~0x1f;
+        alignedExtra = (res->bssSize + 0x1f) & ~0x1f;
+        bufHandle = fn_800E2B00(alignedSize, 0x20);
+        if ((bufHandle & 0xffff) != 0) {
+            buf = fn_800E27B0(bufHandle);
+        } else {
+            buf = NULL;
+        }
+        memcpy(buf, res, size);
+        fn_800F9210(group, handle);
+        newRes = (GsRangeReloadResource*)GSresAllocResourceAlign(
+            alignedSize + alignedExtra, 0x20, group, handle, fn_8017F6B4);
+        memcpy(newRes, buf, alignedSize);
+        fn_8009ED4C(newRes, (u8*)newRes + alignedSize);
+    } else {
+        alignedSize = (size + 0x1f) & ~0x1f;
+        bufHandle = fn_800E2B00(alignedSize, 0x20);
+        if ((bufHandle & 0xffff) != 0) {
+            buf = fn_800E27B0(bufHandle);
+        } else {
+            buf = NULL;
+        }
+        memcpy(buf, res, size);
+        fn_800F9210(group, handle);
+        newRes = (GsRangeReloadResource*)GSresAllocResourceAlign(
+            alignedSize, 0x20, group, handle, fn_8017F6B4);
+        DCFlushRange(newRes, alignedSize);
+        memcpy(newRes, buf, alignedSize);
+        fn_8009ED4C(newRes, (u8*)newRes + ((alignedSize + newRes->fixSize + 0x1f) & ~0x1f));
+    }
+
+    if (newRes->prolog != NULL) {
+        newRes->prolog();
+    }
+    if (buf != NULL) {
+        h = fn_800E202C(buf);
+        if ((h & 0xffff) != 0) {
+            fn_800E24B0(h);
+            fn_800E209C(h);
+        }
+    }
+    return newRes;
+}
+
 extern void fn_8009EFE4(void* res);
 
 s32 fn_8017F6B4(void* unused, u32 group, u32 handle)
@@ -137,6 +216,44 @@ void fn_8017F800(u32 fileHandle)
         }
         node = node->link8;
     }
+}
+
+extern void* fn_8017FDB0(u32 size);
+
+s32 fn_8017F928(s32 size, u32 fileHandle, u32 key1, u32 key2)
+{
+    GsRangeCacheNode** list = (GsRangeCacheNode**)lbl_80454038;
+    GsRangeCacheNode* pool = list[0];
+    s32 count = ((s32*)lbl_80454038)[2];
+    GsRangeCacheNode* node;
+    GsRangeCacheNode* tail;
+    void* buf;
+    s32 i;
+
+    for (i = 1; i < count; i++) {
+        node = &pool[i];
+        if (node->active == 0) {
+            node->link8 = NULL;
+            node->link4 = list[1];
+            buf = fn_8017FDB0((size + 0x1f) & ~0x1f);
+            node->task = buf;
+            if (buf != NULL) {
+                node->value = size;
+                node->fileHandle = fileHandle;
+                node->key1 = key1;
+                node->key2 = key2;
+                tail = list[1];
+                if (tail != NULL) {
+                    tail->link8 = node;
+                }
+                list[1] = node;
+                ((s32*)lbl_80454038)[3]++;
+                node->active = 1;
+            }
+            return (s32)node->task;
+        }
+    }
+    return 0;
 }
 
 typedef struct GsRangeMemNode {
