@@ -61,7 +61,7 @@ extern s32 fn_8007AAA8(void);
 extern void fn_80189490(s32, s32);
 extern void menuSubOpenSelect(s32, s32, s32, s32, s32, s32);
 extern u8 heroMoveGetResID(s32* floorId, s32* resId, s32 member);
-extern void heroMoveChkHinderClear(s32 member);
+extern u32 heroMoveChkHinderClear(s32 member);
 extern void* fn_800F92D4(s32 lightId);
 extern void GSlogWrite(const char* fmt, ...);
 extern u8 GSlightHasAnimationEnded(void* light);
@@ -184,6 +184,56 @@ void fn_801C8628(void)
     fn_8000D710(1);
 }
 
+extern u32 fn_800884BC(u32 arg0, u32 arg1, u32 arg2);
+
+u8 fn_801C8688(u16 arg0, u16 arg1, u16 arg2)
+{
+    u32 v0;
+    u32 v1;
+    u32 v2;
+
+    switch (arg0) {
+    case 0x200: case 0x201: v0 = 0x99; break;
+    case 0x202: case 0x203: v0 = 0x9c; break;
+    case 0x204: case 0x205: v0 = 0x9f; break;
+    case 0x206: case 0x207: v0 = 0xb9; break;
+    case 0x208: case 0x209: v0 = 0xc8; break;
+    case 0x20a: case 0x20b: v0 = 0x11f; break;
+    case 0x20c: case 0x20d: v0 = 0xf3; break;
+    case 0x20e: case 0x20f: v0 = 0xf4; break;
+    case 0x210: case 0x211: v0 = 0xf5; break;
+    default: v0 = 0; break;
+    }
+
+    switch (arg1) {
+    case 0x200: case 0x201: v1 = 0x99; break;
+    case 0x202: case 0x203: v1 = 0x9c; break;
+    case 0x204: case 0x205: v1 = 0x9f; break;
+    case 0x206: case 0x207: v1 = 0xb9; break;
+    case 0x208: case 0x209: v1 = 0xc8; break;
+    case 0x20a: case 0x20b: v1 = 0x11f; break;
+    case 0x20c: case 0x20d: v1 = 0xf3; break;
+    case 0x20e: case 0x20f: v1 = 0xf4; break;
+    case 0x210: case 0x211: v1 = 0xf5; break;
+    default: v1 = 0; break;
+    }
+
+    switch (arg2) {
+    case 0x200: case 0x201: v2 = 0x99; break;
+    case 0x202: case 0x203: v2 = 0x9c; break;
+    case 0x204: case 0x205: v2 = 0x9f; break;
+    case 0x206: case 0x207: v2 = 0xb9; break;
+    case 0x208: case 0x209: v2 = 0xc8; break;
+    case 0x20a: case 0x20b: v2 = 0x11f; break;
+    case 0x20c: case 0x20d: v2 = 0xf3; break;
+    case 0x20e: case 0x20f: v2 = 0xf4; break;
+    case 0x210: case 0x211: v2 = 0xf5; break;
+    default: v2 = 0; break;
+    }
+
+    return fn_800884BC(v0, v1, v2) == 0;
+}
+
 void fn_801C8804(void)
 {
     u32 ready = (u8)fn_80075638();
@@ -191,6 +241,53 @@ void fn_801C8804(void)
     if (ready != 0) {
         fn_8007565C();
     }
+}
+
+extern u32 fn_800756C8(s32 pokemonId);
+extern s32 heroItemAddItemDataId(u8* ptr, u32 itemId, u32 count, u32 arg4);
+extern s32 heroItemDecItemDataId(u8* ptr, u32 itemId, u32 count, u32 arg4);
+
+s32 fn_801C8834(u16 arg0)
+{
+    u16 v31;
+    u16 v30;
+
+    switch (arg0) {
+    case 0x200: case 0x201: v31 = 0x99; break;
+    case 0x202: case 0x203: v31 = 0x9c; break;
+    case 0x204: case 0x205: v31 = 0x9f; break;
+    case 0x206: case 0x207: v31 = 0xb9; break;
+    case 0x208: case 0x209: v31 = 0xc8; break;
+    case 0x20a: case 0x20b: v31 = 0x11f; break;
+    case 0x20c: case 0x20d: v31 = 0xf3; break;
+    case 0x20e: case 0x20f: v31 = 0xf4; break;
+    case 0x210: case 0x211: v31 = 0xf5; break;
+    default: v31 = 0; break;
+    }
+
+    if (v31 != 0) {
+        fn_800756C8(v31);
+
+        switch (arg0) {
+        case 0x200: v30 = 0x201; break;
+        case 0x202: v30 = 0x203; break;
+        case 0x204: v30 = 0x205; break;
+        case 0x206: v30 = 0x207; break;
+        case 0x208: v30 = 0x209; break;
+        case 0x20a: v30 = 0x20b; break;
+        case 0x20c: v30 = 0x20d; break;
+        case 0x20e: v30 = 0x20f; break;
+        case 0x210: v30 = 0x211; break;
+        default: v30 = 0; break;
+        }
+
+        if (v30 != 0) {
+            heroItemDecItemDataId((u8*)0, arg0, 1, -1);
+            heroItemAddItemDataId((u8*)0, v30, 1, -1);
+        }
+    }
+
+    return v31;
 }
 
 s32 fn_801C89F8(s32 arg0, s32 arg1)
@@ -340,6 +437,79 @@ extern void floorEventCtrlElevator(s32 arg0, s32 arg1, u16 arg2,
                                    u8 arg3, s32 speed);
 extern u8 lbl_8047B3C4;
 
+u8 fn_801C9910(void)
+{
+    extern u8 fn_8012B19C(s32 arg0, s32 arg1, Vec3* pos);
+    extern void fn_8018BDF4(s32 arg0, s32 arg1, Vec3* out);
+    extern f32 PSVECDistance(const Vec3* a, const Vec3* b);
+    extern void PSVECSubtract(const Vec3* a, const Vec3* b, Vec3* out);
+    extern void PSVECScale(f32 scale, const Vec3* src, Vec3* dst);
+    extern void PSVECAdd(const Vec3* a, const Vec3* b, Vec3* out);
+    extern void PSVECNormalize(const Vec3* src, Vec3* dst);
+    extern s32 lbl_8047B3C0;
+    extern Vec3 lbl_80467090[];
+    extern const f32 lbl_8047E100;
+    extern const f32 lbl_8047E108;
+    extern const f32 lbl_8047E114;
+    extern const f32 lbl_8047E13C;
+
+    Vec3 vA;
+    Vec3 vB;
+    Vec3 diff;
+    Vec3 scaled;
+    Vec3 sum;
+    Vec3 dir;
+    Vec3 offset;
+    Vec3 candidate;
+    s32 i;
+    f32 speed;
+
+    if (heroMoveChkHinderClear(1)) {
+        lbl_8047B3C0 = 0;
+        return 1;
+    }
+
+    fn_8018BDF4(0, 0x65, &vA);
+    fn_8018BDF4(0, 0x64, &vB);
+
+    if (fn_8012B19C(1, 0, &vB)) {
+        lbl_80467090[0] = vB;
+        lbl_8047B3C0 = 1;
+        return 1;
+    }
+
+    PSVECDistance(&vA, &vB);
+    PSVECSubtract(&vB, &vA, &diff);
+    PSVECScale(lbl_8047E108, &diff, &scaled);
+    PSVECAdd(&vA, &scaled, &sum);
+
+    dir.y = lbl_8047E114;
+    if (vB.x > vA.x) {
+        dir.x = lbl_8047E13C * -diff.z;
+        dir.z = lbl_8047E13C * diff.x;
+    } else {
+        dir.x = lbl_8047E13C * diff.z;
+        dir.z = lbl_8047E13C * -diff.x;
+    }
+    PSVECNormalize(&dir, &dir);
+
+    speed = lbl_8047E100;
+    for (i = 0; i < 10; i++, speed += lbl_8047E100) {
+        PSVECScale(speed, &dir, &offset);
+        PSVECAdd(&sum, &offset, &candidate);
+        if (fn_8012B19C(1, 0, &candidate)) {
+            lbl_80467090[0] = candidate;
+            if (fn_8012B19C(1, 0, &vB)) {
+                lbl_80467090[1] = vB;
+                lbl_8047B3C0 = 2;
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 void fn_801C9B6C(s32 arg0, s32 arg1, u16 arg2, u8 arg3)
 {
     s32 floorId;
@@ -464,6 +634,114 @@ void fn_801C9F00(s32 active)
     }
 }
 
+extern u8 fn_801CA358(void);
+
+u8 fn_801C9F5C(void)
+{
+    extern void heroMoveInitEvent(void);
+    extern void heroMoveTermEvent(void);
+    extern s32 winMsgOpenFieldWithSE(u32 message, u32 wait, u8 pause, u8 sound);
+    extern void winMsgCloseField(u32 wait);
+    extern u8 fn_801EEAD0(u16 id);
+    extern const f32 lbl_8047E11C;
+
+    f32 elapsed;
+    u32 mode;
+
+    heroMoveInitEvent();
+
+    if (fn_801EEAD0(0x43)) {
+        mode = 4;
+    } else if (fn_801902E0(0xADA)) {
+        fn_80190528(0xA0F);
+        fn_80117AE4(0xC);
+
+        elapsed = lbl_8047E114;
+        while (elapsed < lbl_8047E11C) {
+            _threadSwitch();
+            elapsed += (f32)(u32)fn_800D3088() / (f32)fn_800D37CC();
+        }
+
+        winMsgOpenFieldWithSE(0x439F, 1, 0, 5);
+        winMsgCloseField(1);
+        fn_80117AE4(0xF);
+        winMsgOpenFieldWithSE(0x43A0, 1, 0, 5);
+        winMsgCloseField(1);
+        fn_801CA358();
+        heroMoveTermEvent();
+        return 1;
+    } else if (fn_801902E0(0xADB)) {
+        fn_80190528(0x483);
+        fn_80117AE4(0xC);
+
+        elapsed = lbl_8047E114;
+        while (elapsed < lbl_8047E11C) {
+            _threadSwitch();
+            elapsed += (f32)(u32)fn_800D3088() / (f32)fn_800D37CC();
+        }
+
+        winMsgOpenFieldWithSE(0x439D, 1, 0, 5);
+        winMsgCloseField(1);
+        fn_80117AE4(0xE);
+        winMsgOpenFieldWithSE(0x439E, 1, 0, 5);
+        winMsgCloseField(1);
+        fn_801CA358();
+        heroMoveTermEvent();
+        return 1;
+    } else if (fn_801902E0(0x42C)) {
+        fn_80190528(0x42D);
+        mode = 4;
+    } else if (fn_801902E0(0xAD3)) {
+        fn_80190528(0xA08);
+        mode = 3;
+    } else if (fn_801902E0(0xAD0)) {
+        fn_80190528(0xA07);
+        mode = 2;
+    } else if (fn_801902E0(0xACF)) {
+        fn_80190528(0xA06);
+        mode = 1;
+    } else {
+        fn_80190528(0xA05);
+        mode = 0;
+    }
+
+    fn_801CA358();
+
+    elapsed = lbl_8047E114;
+    while (elapsed < lbl_8047E11C) {
+        _threadSwitch();
+        elapsed += (f32)(u32)fn_800D3088() / (f32)fn_800D37CC();
+    }
+
+    switch (mode) {
+    case 0:
+        winMsgOpenFieldWithSE(0x426E, 1, 0, 5);
+        winMsgCloseField(1);
+        break;
+    case 1:
+        winMsgOpenFieldWithSE(0x426F, 1, 0, 5);
+        winMsgCloseField(1);
+        break;
+    case 2:
+        winMsgOpenFieldWithSE(0x4270, 1, 0, 5);
+        winMsgCloseField(1);
+        break;
+    case 3:
+        winMsgOpenFieldWithSE(0x4271, 1, 0, 5);
+        winMsgCloseField(1);
+        break;
+    case 4:
+        winMsgOpenFieldWithSE(0x4272, 1, 0, 5);
+        winMsgCloseField(1);
+        break;
+    default:
+        break;
+    }
+
+    heroMoveTermEvent();
+    return 1;
+}
+
 u8 fn_801CA358(void)
 {
     u32 cameraMode;
@@ -528,6 +806,66 @@ void fn_801CA4F8(f32 frames)
     }
 }
 
+u16 fn_801CA5C4(u16 arg0, u8 arg1, s32 arg2)
+{
+    extern void fn_80112700(void);
+    extern void fn_801903B0(u32 flagId);
+    extern void* fightEncountDataBiosGetPtr(u16 index);
+    extern u16 fn_8006A65C(void);
+    extern void fn_801CBA90(s32 value);
+    extern void floorSetFadeScript(s32 a, s32 b);
+    extern u32 fn_8020DAD0(u32 arg0);
+    extern u8 fightEncountDataBiosGetZenmetuFlag(void* ptr);
+    extern u16 fn_801EF634(void);
+    extern u32 fightFloorIsGcHeroWin(u32 obj, u32 side);
+    extern int fadeSet();
+    extern const f32 lbl_8047E108;
+
+    u32 done = 0;
+    u32 result;
+    u32 old;
+    u16 input;
+
+    fn_801903B0(0xE05);
+    result = (u32)fightEncountDataBiosGetPtr(arg0);
+
+    if (fn_801906A0(0x8AE)) {
+        fn_801903B0(0xE05);
+        result = fn_8006A65C();
+
+        if (fn_801906A0(0x8AE)) {
+            fn_80112700();
+        } else {
+            fn_801CBA90(0);
+            floorSetFadeScript(0, 0x5960008);
+        }
+    } else {
+        if (arg1 != 0 || arg2 != 0) {
+            fn_80190528(0xE05);
+        }
+
+        old = result;
+        result = fn_8020DAD0(arg0);
+
+        if (fightEncountDataBiosGetZenmetuFlag((void*)old)) {
+            input = fn_801EF634();
+            if (!fightFloorIsGcHeroWin(0, input)) {
+                _threadSwitch();
+                _threadSwitch();
+                _threadSwitch();
+                done = 1;
+            }
+        }
+
+        if (arg2 == 0 && !done && arg1 != 0) {
+            fadeSet(lbl_8047E108, 2);
+        }
+    }
+
+    fn_801903B0(0xE05);
+    return (u16)result;
+}
+
 void fn_801CA708(void)
 {
     fn_8025D164();
@@ -563,7 +901,7 @@ s32 fn_801C7730(s32 side, s32 slot)
     extern const Vec3 lbl_802758A0;
     extern const f32 lbl_8047E100, lbl_8047E104, lbl_8047E10C;
     extern const f32 lbl_8047E110, lbl_8047E118, lbl_8047E11C;
-    extern u8 fn_8018BDF4();
+    extern void fn_8018BDF4(s32 arg0, s32 arg1, Vec3* out);
     extern u32 fn_8018D998();
     extern void* peopleSearchID();
     extern void* peopleInfoBiosGetPtr();
