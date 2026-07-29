@@ -1950,7 +1950,11 @@ s32 fn_80017CB8(u8* outEntries, s32 maxEntries, s32 pageIndex, s32 selectedIndex
     }
 
     itemDataBiosGetPtr((u16)species);
-    hasRibbonState = (itemDataBiosGetBattleUseFunc() != 0);
+    if (itemDataBiosGetBattleUseFunc() != 0) {
+        hasRibbonState = 1;
+    } else {
+        hasRibbonState = 0;
+    }
     speciesIsNotEgg = ((u16)species != 0x219);
 
     sourceEntries = *(u8**)(entry + 0x24 + (s32)lbl_8047A2E0 * 8);

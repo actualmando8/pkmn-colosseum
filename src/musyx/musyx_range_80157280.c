@@ -880,11 +880,16 @@ extern u8 lbl_8047AF18;
 extern s16 lbl_8047AFE8;
 extern SDataStackEntry lbl_80447860[128];
 extern void* fn_80162FAC(void* address); /* hwTransAddr */
-extern u32 fn_80151770(void* sampleDirectory, void* samples); /* dataInsertSDir */
-extern void fn_80151A68(u16 group, void* effects, u16 count); /* dataInsertFX */
+extern u32 dataInsertSDir(void* sampleDirectory, void* samples);
+extern void dataInsertFX(u16 group, void* effects, u16 count);
 extern void fn_80159C54(u16 id, MusyxPoolData* data, u8 type,
                         u32 remove); /* InsertData */
 extern void fn_80163188(void); /* hwSyncSampleMem */
+extern void hwDisableIrq(void);
+extern void hwEnableIrq(void);
+extern u32 fn_801463C4(void* normalPage, void* drumPage, void* midiSetup,
+                       void* arrangement, void* parameters, u8 studio,
+                       u16 group);
 
 static inline void sdataScanIDList(u16* reference, MusyxPoolData* data,
                                    u8 type) {
@@ -908,6 +913,7 @@ u32 fn_80159EF0(void* project, u16 group, void* samples,
                 void* sampleDirectory,
                 MusyxPoolData* pool) { /* sndPushGroup */
     SDataGroup* entry;
+    u16* sampleReference;
 
     if (lbl_8047AF18 != 0 && lbl_8047AFE8 < 128) {
         entry = project;
@@ -918,10 +924,11 @@ u32 fn_80159EF0(void* project, u16 group, void* samples,
                 lbl_80447860[lbl_8047AFE8].sampleDirectory =
                     sampleDirectory;
 
-                samples = fn_80162FAC(samples);
-                if (fn_80151770(sampleDirectory, samples) != 0) {
-                    sdataScanIDList((u16*)((u8*)project +
-                                          entry->sampleOffset),
+                sampleReference =
+                    (u16*)((u8*)project + entry->sampleOffset);
+                if (dataInsertSDir(sampleDirectory,
+                                   fn_80162FAC(samples)) != 0) {
+                    sdataScanIDList(sampleReference,
                                     (MusyxPoolData*)sampleDirectory, 1);
                 }
                 sdataScanIDList((u16*)((u8*)project + entry->macroOffset),
@@ -936,8 +943,7 @@ u32 fn_80159EF0(void* project, u16 group, void* samples,
                 if (entry->type == 1) {
                     u8* effectData =
                         (u8*)project + entry->normalPageOffset;
-                    fn_80151A68(group, effectData + 4,
-                                *(u16*)effectData);
+                    dataInsertFX(group, effectData + 4, *(u16*)effectData);
                 }
                 fn_80163188();
                 lbl_8047AFE8++;
@@ -947,6 +953,105 @@ u32 fn_80159EF0(void* project, u16 group, void* samples,
         }
     }
     return 0;
+}
+
+typedef struct SDataMidiSetup {
+    u16 song;
+    u8 _02[0x52];
+} SDataMidiSetup;
+
+u32 fn_8015A21C(u16 group, u16 song, void* arrangement, void* parameters,
+                u8 irqCall, u8 studio) {
+    s32 i;
+    SDataGroup* data;
+    void* normalPage;
+    void* drumPage;
+    SDataMidiSetup* midiSetup;
+    u32 sequence;
+    void* project;
+
+    for (i = 0; i < lbl_8047AFE8; i++) {
+        if (lbl_80447860[i].group->id != group) {
+            continue;
+        }
+
+        if (lbl_80447860[i].group->type == 0) {
+            data = lbl_80447860[i].group;
+            project = lbl_80447860[i].project;
+            normalPage = (u8*)project + data->normalPageOffset;
+            drumPage = (u8*)project + *(u32*)((u8*)data + 0x20);
+            midiSetup =
+                (SDataMidiSetup*)((u8*)project +
+                                 *(u32*)((u8*)data + 0x24));
+            while (midiSetup->song != 0xFFFF) {
+                if (midiSetup->song == song) {
+                    if (irqCall != 0) {
+                        sequence = fn_801463C4(
+                            normalPage, drumPage, midiSetup, arrangement,
+                            parameters, studio, group);
+                    } else {
+                        hwDisableIrq();
+                        sequence = fn_801463C4(
+                            normalPage, drumPage, midiSetup, arrangement,
+                            parameters, studio, group);
+                        hwEnableIrq();
+                    }
+                    return sequence;
+                }
+                midiSetup++;
+            }
+            return -1;
+        } else {
+            return -1;
+        }
+    }
+    return -1;
+}
+
+u32 fn_8015A368(u16 group, u16 song, void* arrangement, void* parameters,
+                u8 studio) {
+    s32 i;
+    SDataGroup* data;
+    SDataMidiSetup* midiSetup;
+    void* drumPage;
+    void* normalPage;
+    u32 sequence;
+    void* project;
+
+    for (i = 0; i < lbl_8047AFE8; i++) {
+        if (lbl_80447860[i].group->id != group) {
+            continue;
+        }
+
+        if (lbl_80447860[i].group->type == 0) {
+            data = lbl_80447860[i].group;
+            project = lbl_80447860[i].project;
+            normalPage = (u8*)project + data->normalPageOffset;
+            drumPage = (u8*)project + *(u32*)((u8*)data + 0x20);
+            midiSetup =
+                (SDataMidiSetup*)((u8*)project +
+                                 *(u32*)((u8*)data + 0x24));
+            while (midiSetup->song != 0xFFFF) {
+                if (midiSetup->song == song) {
+                    hwDisableIrq();
+                    sequence = fn_801463C4(
+                        normalPage, drumPage, midiSetup, arrangement,
+                        parameters, studio, group);
+                    hwEnableIrq();
+                    goto done;
+                }
+                midiSetup++;
+            }
+            sequence = -1;
+            goto done;
+        } else {
+            sequence = -1;
+            goto done;
+        }
+    }
+    sequence = -1;
+done:
+    return sequence;
 }
 
 /* snd_service: periodically advances active sound emitters and publishes
@@ -1107,8 +1212,6 @@ extern u32 synthFXSetCtrl14(u32 handle, u8 ctrl, u16 value);
 extern u32 sndFXCheck(u32 handle);
 extern void fn_8014DD98(u8 studio, void* update);
 extern void fn_8014DDB8(u8 studio, void* update);
-extern void hwDisableIrq(void);
-extern void hwEnableIrq(void);
 extern void salCrossProduct(f32* result, const f32* first,
                             const f32* second);
 extern void salInvertMatrix(SndFMatrix* result, const SndFMatrix* matrix);
@@ -1175,7 +1278,7 @@ u32 fn_8015ED00(SndListener* listener, SndVec3* position,
             }
             listener->room = room;
             if (room != 0) {
-                s3dAddListenerToRoom(room);
+                s3dAddListenerToRoom(listener->room);
             }
         }
         hwEnableIrq();
@@ -2087,7 +2190,7 @@ inline void inpSetMidiCtrl14(u8 ctrl, u8 channel, u8 set, u16 value) {
         fn_801603C0(ctrl, channel, set, value >> 7);
     }
 }
-extern u32  salInitDspCtrl(u8 a, u8 b, u8 c);
+extern u32  salInitDspCtrl(u8 a, u8 b, u32 c);
 u32 salExitDspCtrl(void);
 #pragma push
 #pragma optimization_level 4
@@ -2130,13 +2233,10 @@ u16 inpGetExCtrl(u8* obj, u8 ctrl) {
 #pragma pop
 void inpSetExCtrl(u8* obj, u8 ctrl, s16 value) {
     u8 code;
-    u8 raw;
-    u8 channel;
 
     value = value < 0 ? 0 : value > 0x3FFF ? 0x3FFF : value;
     code = ctrl;
-    raw = ctrl;
-    switch (raw) {
+    switch (code) {
     case 0x80: code = 0x80; break;
     case 0x81: code = 0x82; break;
     case 0x82: code = 0xA0; break;
@@ -2152,9 +2252,8 @@ void inpSetExCtrl(u8* obj, u8 ctrl, s16 value) {
     case 0xA1:
         break;
     default:
-        channel = obj[0x121];
-        if (channel != 0xFF) {
-            inpSetMidiCtrl14(raw, channel, obj[0x122], value);
+        if (obj[0x121] != 0xFF) {
+            inpSetMidiCtrl14(ctrl, obj[0x121], obj[0x122], value);
         }
         break;
     }
@@ -2262,8 +2361,9 @@ extern f64 pow(f64 base, f64 exp); /* MSL pow(double,double); Colosseum's
                                              * (double) not lfs, and result is
                                              * frsp'd down to single afterward. */
 extern void fn_8015B250(u32, u32);
-extern u32 ReverbHICreate(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
-extern u32 ReverbHIModify(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+typedef struct _SND_REVHI_WORK _SND_REVHI_WORK;
+extern u32 ReverbHICreate(_SND_REVHI_WORK* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
+extern u32 ReverbHIModify(_SND_REVHI_WORK* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
 extern void ReverbHICallback(u32 a, u32 b, u32 c, u8* d);
 extern void DCStoreRange(void* addr, u32 nBytes);
 extern void AIRegisterDMACallback(u32 a);
@@ -2307,7 +2407,7 @@ extern void fn_80163490(void);
 extern void fn_801634A8(u32 size);
 extern void fn_80163794(void);
 extern void aramSetUploadCallback(u8* ptr, u32 size);
-extern u32  fn_80163810(u32 ptr, u32 size);
+extern u32  fn_80163810(void* ptr, u32 size);
 extern void fn_80163BCC(u8* a, u32 b);
 extern u8   fn_80163CA8();
 extern u32  aramGetStreamBufferAddress(u32 idx, u32 *out);
@@ -2448,7 +2548,7 @@ u32 hwInit(u32 a, u16 b, u32 c, u32 d) {
     lbl_8047B05E = 0;
     lbl_8047B028 = 0;
     if (salInitAi(snd_handle_irq, d, a) != 0
-     && salInitDspCtrl(b, c, (u32)(d & 1)) != 0
+     && salInitDspCtrl(b, c, (u8)(d & 1)) != 0
      && fn_80164148(d) != 0) {
         hwEnableIrq();
         fn_801640C4();
@@ -2787,7 +2887,7 @@ asm void fn_80162878(void) {
 #include "src/game/people/people_field_fn_80162878.inc"
 }
 #else
-u8 fn_80162878(u32 index) {
+u32 fn_80162878(u32 index) {
     PeopleFieldMoveSlot* entries = (*(PeopleFieldMoveSlot* volatile*)&lbl_8047B024);
 
     return entries[index].field_9C;
@@ -3378,7 +3478,7 @@ typedef struct PeopleFieldMoveCommand {
 } PeopleFieldMoveCommand;
 
 void fn_80163050(u32** src, u32* out) {
-    extern u32 fn_80163810(u32 a, u32 b);
+    extern u32 fn_80163810(void* a, u32 b);
     PeopleFieldMoveCommand* command = (PeopleFieldMoveCommand*)*src;
     u32 val = command->packedSizeWord;
     u32 type = val >> 24;
@@ -3391,7 +3491,7 @@ void fn_80163050(u32** src, u32* out) {
             payload = payload << 1;
             break;
     }
-    *out = fn_80163810(*out, payload);
+    *out = fn_80163810((void*)*out, payload);
 }
 #endif
 #pragma pop
@@ -3511,17 +3611,21 @@ asm void fn_80163214(void) {
 #else
 extern u8 lbl_8044FB90[];
 extern u8 lbl_8044FE14[];
-typedef struct PFAramQueueEntry {
-    u32 request;       /* 0x00 */
-    u32 command;       /* 0x04 */
-    u32 zero;          /* 0x08 */
+typedef struct PFArqRequest {
+    u32 next;          /* 0x00 */
+    u32 owner;         /* 0x04 */
+    u32 type;          /* 0x08 */
     u32 priority;      /* 0x0C */
-    u8* dst;           /* 0x10 */
-    u8* src;           /* 0x14 */
-    u32 size;          /* 0x18 */
-    void (*callback)(void*); /* 0x1C */
-    u32 callbackArg0;  /* 0x20 */
-    u32 callbackArg1;  /* 0x24 */
+    u32 source;        /* 0x10 */
+    u32 dest;          /* 0x14 */
+    u32 length;        /* 0x18 */
+    void (*callback)(u32); /* 0x1C */
+} PFArqRequest;
+
+typedef struct PFAramQueueEntry {
+    PFArqRequest arq;  /* 0x00 */
+    void (*callback)(u32); /* 0x20 */
+    u32 user;          /* 0x24 */
 } PFAramQueueEntry;
 
 typedef struct PFAramQueue {
@@ -3530,24 +3634,25 @@ typedef struct PFAramQueue {
     u8 count;                     /* 0x281 */
 } PFAramQueue;
 
-void aramQueueCallback(void *arg) {
-    u8 *tbl;
+void aramQueueCallback(u32 ptr) {
+    PFArqRequest* arq;
+    PFAramQueue* queue;
     u32 i;
-    if (*(u32*)((u8*)arg + 0xc) == 1) {
-        tbl = lbl_8044FE14;
+
+    arq = (PFArqRequest*)ptr;
+    if (arq->priority == 1) {
+        queue = (PFAramQueue*)lbl_8044FE14;
     } else {
-        tbl = lbl_8044FB90;
+        queue = (PFAramQueue*)lbl_8044FB90;
     }
+
     for (i = 0; i < 16; i++) {
-        u8 *entry = tbl + i * 0x28;
-        if (arg == (void*)entry) {
-            void (*fn)(void*) = *(void(**)(void*))(entry + 0x20);
-            if (fn != 0) {
-                fn(*(void**)(entry + 0x24));
-            }
+        if (arq == &queue->entries[i].arq &&
+            queue->entries[i].callback != 0) {
+            queue->entries[i].callback(queue->entries[i].user);
         }
     }
-    tbl[0x281]--;
+    --queue->count;
 }
 #endif
 #pragma pop
@@ -3567,26 +3672,25 @@ void aramUploadData(void* mram, u32 aram, u32 size, u32 highPriority,
     for (;;) {
         old = OSDisableInterrupts();
         if (queue->count < 16) {
-            queue->entries[queue->writeIndex].command = 42;
-            queue->entries[queue->writeIndex].zero = 0;
-            queue->entries[queue->writeIndex].priority =
+            queue->entries[queue->writeIndex].arq.owner = 42;
+            queue->entries[queue->writeIndex].arq.type = 0;
+            queue->entries[queue->writeIndex].arq.priority =
                 highPriority != 0 ? 1 : 0;
-            queue->entries[queue->writeIndex].dst = mram;
-            queue->entries[queue->writeIndex].src = (u8*)aram;
-            queue->entries[queue->writeIndex].size = size;
-            queue->entries[queue->writeIndex].callback =
-                (void (*)(void*))aramQueueCallback;
-            queue->entries[queue->writeIndex].callbackArg0 = (u32)callback;
-            queue->entries[queue->writeIndex].callbackArg1 = user;
+            queue->entries[queue->writeIndex].arq.source = (u32)mram;
+            queue->entries[queue->writeIndex].arq.dest = aram;
+            queue->entries[queue->writeIndex].arq.length = size;
+            queue->entries[queue->writeIndex].arq.callback = aramQueueCallback;
+            queue->entries[queue->writeIndex].callback = callback;
+            queue->entries[queue->writeIndex].user = user;
             ARQPostRequest(
-                &queue->entries[queue->writeIndex],
-                queue->entries[queue->writeIndex].command,
-                queue->entries[queue->writeIndex].zero,
-                queue->entries[queue->writeIndex].priority,
-                queue->entries[queue->writeIndex].dst,
-                queue->entries[queue->writeIndex].src,
-                queue->entries[queue->writeIndex].size,
-                queue->entries[queue->writeIndex].callback);
+                &queue->entries[queue->writeIndex].arq,
+                queue->entries[queue->writeIndex].arq.owner,
+                queue->entries[queue->writeIndex].arq.type,
+                queue->entries[queue->writeIndex].arq.priority,
+                queue->entries[queue->writeIndex].arq.source,
+                queue->entries[queue->writeIndex].arq.dest,
+                queue->entries[queue->writeIndex].arq.length,
+                queue->entries[queue->writeIndex].arq.callback);
             ++queue->count;
             queue->writeIndex = (queue->writeIndex + 1) % 16;
             OSRestoreInterrupts(old);
@@ -3629,12 +3733,10 @@ void fn_801634A8(u32 size) {
 
     base = ARGetBaseAddress();
     temporary = (s16*)fn_801643D8(0x500);
-    if (temporary != NULL) {
-        for (i = 0; i < 640; ++i) {
-            temporary[i] = 0;
-        }
-        DCFlushRange(temporary, 0x500);
+    for (i = 0; i < 640; ++i) {
+        temporary[i] = 0;
     }
+    DCFlushRange(temporary, 0x500);
 
     lowQueue = (PFAramQueue*)lbl_8044FB90;
     highQueue = (PFAramQueue*)lbl_8044FE14;
@@ -3643,11 +3745,9 @@ void fn_801634A8(u32 size) {
     highQueue->writeIndex = 0;
     highQueue->count = 0;
 
-    if (temporary != NULL) {
-        aramUploadData(temporary, base, 0x500, 0, 0, 0);
-        fn_80163490();
-        fn_80164400((u32)temporary);
-    }
+    aramUploadData(temporary, base, 0x500, 0, 0, 0);
+    fn_80163490();
+    fn_80164400((u32)temporary);
 
     lbl_8047B07C = base + size;
     end = ARGetSize();
@@ -3709,7 +3809,7 @@ asm void fn_80163810(void) {
 #include "src/game/people/people_field_fn_80163810.inc"
 }
 #else
-u32 fn_80163810(u32 ptr, u32 size) {
+u32 fn_80163810(void* ptr, u32 size) {
     u32 address;
     void* buffer;
     u32 blockSize;
@@ -3717,8 +3817,8 @@ u32 fn_80163810(u32 ptr, u32 size) {
     size = (size + 31) & ~31;
     address = lbl_8047B078;
     if (lbl_8047B070 == 0) {
-        DCFlushRange((void*)ptr, size);
-        aramUploadData((void*)ptr, lbl_8047B078, size, 0, 0, 0);
+        DCFlushRange(ptr, size);
+        aramUploadData(ptr, lbl_8047B078, size, 0, 0, 0);
         lbl_8047B078 += size;
         return address;
     }
@@ -3726,12 +3826,13 @@ u32 fn_80163810(u32 ptr, u32 size) {
     while (size != 0) {
         blockSize =
             size >= lbl_8047B06C ? lbl_8047B06C : size;
-        buffer = ((void* (*)(u32, u32))lbl_8047B070)(ptr, blockSize);
+        buffer = ((void* (*)(u32, u32))lbl_8047B070)((u32)ptr,
+                                                      blockSize);
         DCFlushRange(buffer, blockSize);
         aramUploadData(buffer, lbl_8047B078, blockSize, 0, 0, 0);
         size -= blockSize;
         lbl_8047B078 += blockSize;
-        ptr += blockSize;
+        ptr = (void*)((u32)ptr + blockSize);
     }
 
     return address;
@@ -4298,10 +4399,9 @@ void sndAuxCallbackReverbHI(u8 type, u32* data, u8* obj) {
 #endif
 #pragma pop
 u32 sndAuxCallbackUpdateSettingsReverbHI(u8* ptr) {
-    extern u32 ReverbHIModify(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 1;
     ReverbHIModify(
-        ptr,
+        (_SND_REVHI_WORK*)ptr,
         *(f32*)(ptr + 0x1C8),
         *(f32*)(ptr + 0x1D0),
         *(f32*)(ptr + 0x1CC),
@@ -4321,10 +4421,9 @@ asm void sndAuxCallbackPrepareReverbHI(void) {
 }
 #else
 void sndAuxCallbackPrepareReverbHI(u8* ptr) {
-    extern u32 ReverbHICreate(u8* obj, f32 f1, f32 f2, f32 f3, f32 f4, f32 f5, f32 f6);
     ptr[0x1C4] = 0;
     ReverbHICreate(
-        ptr,
+        (_SND_REVHI_WORK*)ptr,
         *(f32*)(ptr + 0x1C8),
         *(f32*)(ptr + 0x1D0),
         *(f32*)(ptr + 0x1CC),
@@ -4385,9 +4484,8 @@ static inline void DLdelete(_SND_REVHI_DELAYLINE* delayline) {
     fn_80164400((u32)delayline->inputs);
 }
 
-u32 ReverbHICreate(u8* obj, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay,
+u32 ReverbHICreate(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay,
                    f32 crosstalk) {
-    _SND_REVHI_WORK* rev = (_SND_REVHI_WORK*)obj;
     const s32* lens;
     u8 i;
     u8 k;
@@ -4453,9 +4551,8 @@ asm void ReverbHIModify(void) {
 #include "src/game/people/people_field_fn_80164A2C.inc"
 }
 #else
-u32 ReverbHIModify(u8* obj, f32 coloration, f32 time, f32 mix, f32 damping,
+u32 ReverbHIModify(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32 damping,
                    f32 preDelay, f32 crosstalk) {
-    _SND_REVHI_WORK* rev = (_SND_REVHI_WORK*)obj;
     u8 i;
 
     if (coloration < 0.f || coloration > 1.f || time < 0.01f ||
@@ -4489,7 +4586,7 @@ u32 ReverbHIModify(u8* obj, f32 coloration, f32 time, f32 mix, f32 damping,
         }
     }
 
-    return ReverbHICreate(obj, coloration, time, mix, damping, preDelay,
+    return ReverbHICreate(rev, coloration, time, mix, damping, preDelay,
                           crosstalk);
 }
 #endif
@@ -4864,7 +4961,7 @@ u32 fn_801576C4(SynthVoiceMini* svoice, u32 isMaster) {
         return 0xFFFFFFFF;
     }
 
-    if ((lbl_8047AFD0 = vl->next) != NULL) {
+    if ((lbl_8047AFD0 = lbl_8047AFD0->next) != NULL) {
         lbl_8047AFD0->prev = NULL;
     }
 
@@ -5863,30 +5960,32 @@ void vsInit(void) {
 }
 #pragma pop
 
-static u16 vsNewInstanceID(MusyxVirtualSamples* vs) {
+#define vs (*(MusyxVirtualSamples*)lbl_80446F10)
+
+static u16 vsNewInstanceID(void) {
     u8 i;
     u16 instID;
 
     do {
-        instID = vs->nextInstID++;
-        for (i = 0; i < vs->numBuffers; ++i) {
-            if (vs->streamBuffer[i].state != 0 &&
-                vs->streamBuffer[i].info.instID == instID) {
+        instID = vs.nextInstID++;
+        for (i = 0; i < vs.numBuffers; ++i) {
+            if (vs.streamBuffer[i].state != 0 &&
+                vs.streamBuffer[i].info.instID == instID) {
                 break;
             }
         }
-    } while (i != vs->numBuffers);
+    } while (i != vs.numBuffers);
 
     return instID;
 }
 
-static u8 vsAllocateBuffer(MusyxVirtualSamples* vs) {
+static u8 vsAllocateBuffer(void) {
     u8 i;
 
-    for (i = 0; i < vs->numBuffers; ++i) {
-        if (vs->streamBuffer[i].state == 0) {
-            vs->streamBuffer[i].state = 1;
-            vs->streamBuffer[i].last = 0;
+    for (i = 0; i < vs.numBuffers; ++i) {
+        if (vs.streamBuffer[i].state == 0) {
+            vs.streamBuffer[i].state = 1;
+            vs.streamBuffer[i].last = 0;
             return i;
         }
     }
@@ -5894,36 +5993,35 @@ static u8 vsAllocateBuffer(MusyxVirtualSamples* vs) {
     return 0xFF;
 }
 
-static void vsFreeBuffer(MusyxVirtualSamples* vs, u8 bufferIndex) {
-    vs->streamBuffer[bufferIndex].state = 0;
-    vs->voices[vs->streamBuffer[bufferIndex].voice] = 0xFF;
+static void vsFreeBuffer(u8 bufferIndex) {
+    vs.streamBuffer[bufferIndex].state = 0;
+    vs.voices[vs.streamBuffer[bufferIndex].voice] = 0xFF;
 }
 
 u32 fn_80159550(u8 voice) {
-    MusyxVirtualSamples* vs = (MusyxVirtualSamples*)lbl_80446F10;
     u8 sb;
     u8 i;
     u32 address;
 
-    for (i = 0; i < vs->numBuffers; ++i) {
-        if (vs->streamBuffer[i].state != 0 &&
-            vs->streamBuffer[i].voice == voice) {
-            vsFreeBuffer(vs, i);
+    for (i = 0; i < vs.numBuffers; ++i) {
+        if (vs.streamBuffer[i].state != 0 &&
+            vs.streamBuffer[i].voice == voice) {
+            vsFreeBuffer(i);
         }
     }
 
-    sb = vs->voices[voice] = vsAllocateBuffer(vs);
+    sb = vs.voices[voice] = vsAllocateBuffer();
     if (sb != 0xFF) {
-        address = aramGetStreamBufferAddress(vs->voices[voice], 0);
+        address = aramGetStreamBufferAddress(vs.voices[voice], 0);
         hwSetVirtualSampleLoopBuffer(voice, (void*)address,
-                                     vs->bufferLength);
-        vs->streamBuffer[sb].info.smpID = hwGetSampleID(voice);
-        vs->streamBuffer[sb].info.instID = vsNewInstanceID(vs);
-        vs->streamBuffer[sb].smpType = hwGetSampleType(voice);
-        vs->streamBuffer[sb].voice = voice;
-        if (vs->callback != NULL) {
-            vs->callback(0, &vs->streamBuffer[sb].info);
-            return (vs->streamBuffer[sb].info.instID << 8) | voice;
+                                     vs.bufferLength);
+        vs.streamBuffer[sb].info.smpID = hwGetSampleID(voice);
+        vs.streamBuffer[sb].info.instID = vsNewInstanceID();
+        vs.streamBuffer[sb].smpType = hwGetSampleType(voice);
+        vs.streamBuffer[sb].voice = voice;
+        if (vs.callback != NULL) {
+            vs.callback(0, &vs.streamBuffer[sb].info);
+            return (vs.streamBuffer[sb].info.instID << 8) | voice;
         }
         hwSetVirtualSampleLoopBuffer(voice, NULL, 0);
     } else {
@@ -5933,8 +6031,10 @@ u32 fn_80159550(u8 voice) {
     return 0xFFFFFFFF;
 }
 
+#undef vs
+
 void fn_80159840(MusyxVirtualSampleBuffer* sb, u32 cpos) {
-    MusyxVirtualSamples* vs = (MusyxVirtualSamples*)lbl_80446F10;
+#define vs (*(MusyxVirtualSamples*)lbl_80446F10)
     u32 len;
 
     if (sb->last == cpos) {
@@ -5942,37 +6042,52 @@ void fn_80159840(MusyxVirtualSampleBuffer* sb, u32 cpos) {
     }
 
     if ((s32)sb->last < cpos) {
-        if (sb->smpType == 5) {
+        switch (sb->smpType) {
+        case 5: {
             sb->info.data.update.off1 = (sb->last / 14) * 8;
             sb->info.data.update.len1 = cpos - sb->last;
             sb->info.data.update.off2 = 0;
             sb->info.data.update.len2 = 0;
-            if ((len = vs->callback(1, &sb->info)) != 0) {
-                sb->last = (sb->last + len) % vs->bufferLength;
+            if ((len = vs.callback(1, &sb->info)) != 0) {
+                sb->last = (sb->last + len) % vs.bufferLength;
             }
+        } break;
+        default:
+            break;
         }
     } else if (cpos == 0) {
-        if (sb->smpType == 5) {
+        switch (sb->smpType) {
+        case 5: {
             sb->info.data.update.off1 = (sb->last / 14) * 8;
-            sb->info.data.update.len1 = vs->bufferLength - sb->last;
+            sb->info.data.update.len1 = vs.bufferLength - sb->last;
             sb->info.data.update.off2 = 0;
             sb->info.data.update.len2 = 0;
-            if ((len = vs->callback(1, &sb->info)) != 0) {
-                sb->last = (sb->last + len) % vs->bufferLength;
+            if ((len = vs.callback(1, &sb->info)) != 0) {
+                sb->last = (sb->last + len) % vs.bufferLength;
             }
+        } break;
+        default:
+            break;
         }
-    } else if (sb->smpType == 5) {
-        sb->info.data.update.off1 = (sb->last / 14) * 8;
-        sb->info.data.update.len1 = vs->bufferLength - sb->last;
-        sb->info.data.update.off2 = 0;
-        sb->info.data.update.len2 = cpos;
-        if ((len = vs->callback(1, &sb->info)) != 0) {
-            sb->last = (sb->last + len) % vs->bufferLength;
+    } else {
+        switch (sb->smpType) {
+        case 5: {
+            sb->info.data.update.off1 = (sb->last / 14) * 8;
+            sb->info.data.update.len1 = vs.bufferLength - sb->last;
+            sb->info.data.update.off2 = 0;
+            sb->info.data.update.len2 = cpos;
+            if ((len = vs.callback(1, &sb->info)) != 0) {
+                sb->last = (sb->last + len) % vs.bufferLength;
+            }
+        } break;
+        default:
+            break;
         }
     }
+#undef vs
 }
 
-extern u8 fn_80162878(u32 voice); /* hwGetVirtualSampleState */
+extern u32 fn_80162878(u32 voice); /* hwGetVirtualSampleState */
 extern u32 fn_80162E14(u32 voice); /* hwGetPos */
 extern u32 hwGetVirtualSampleID(u32 voice);
 extern u32 fn_801631F4(u32 voice); /* hwVoiceInStartup */
@@ -5980,27 +6095,27 @@ extern void macSampleEndNotify(SynthVoiceMini* voice);
 
 void vsSampleUpdates(void) {
     extern void fn_80159840(MusyxVirtualSampleBuffer* buffer, u32 position);
-    extern u8 fn_80162878(u32 voice);
+    extern u32 fn_80162878(u32 voice);
     extern u32 fn_80162E14(u32 voice);
     extern u32 hwGetVirtualSampleID(u32 voice);
     extern u32 fn_801631F4(u32 voice);
     extern void hwBreak(u32 voice);
     extern void macSampleEndNotify(SynthVoiceMini* voice);
     extern void voiceKill(u32 voice);
-    MusyxVirtualSamples* vs = (MusyxVirtualSamples*)lbl_80446F10;
+#define vs (*(MusyxVirtualSamples*)lbl_80446F10)
     u32 i;
     u32 cpos;
     u32 realCPos;
     MusyxVirtualSampleBuffer* buffer;
     u32 nextSamples;
 
-    if (vs->callback == NULL) {
+    if (vs.callback == NULL) {
         return;
     }
 
     for (i = 0; i < 64; i++) {
-        if (vs->voices[i] != 0xFF && fn_80162878(i) != 0) {
-            buffer = &vs->streamBuffer[vs->voices[i]];
+        if (vs.voices[i] != 0xFF && fn_80162878(i) != 0) {
+            buffer = &vs.streamBuffer[vs.voices[i]];
             realCPos = fn_80162E14(i);
             if (buffer->smpType == 5) {
                 cpos = (realCPos / 14) * 14;
@@ -6022,7 +6137,7 @@ void vsSampleUpdates(void) {
                             realCPos - buffer->finalLast;
                     } else {
                         buffer->finalGoodSamples -=
-                            vs->bufferLength -
+                            vs.bufferLength -
                             (buffer->finalLast - realCPos);
                     }
                     buffer->finalLast = realCPos;
@@ -6042,16 +6157,17 @@ void vsSampleUpdates(void) {
                             }
                         }
                         buffer->state = 0;
-                        vs->voices[buffer->voice] = 0xFF;
+                        vs.voices[buffer->voice] = 0xFF;
                     }
                 } else {
                     buffer->state = 0;
-                    vs->voices[buffer->voice] = 0xFF;
+                    vs.voices[buffer->voice] = 0xFF;
                 }
                 break;
             }
         }
     }
+#undef vs
 }
 
 /* ===== hw_dspctrl.c: salBuildCommandList, 0x8015B250 =====
@@ -6478,7 +6594,7 @@ void salInitHRTFBuffer(void) {
     DCFlushRangeNoSync((void*)lbl_8047B018, 0x100);
 }
 
-u32 salInitDspCtrl(u8 numVoices, u8 numStudios, u8 defaultStudioDPL2) {
+u32 salInitDspCtrl(u8 numVoices, u8 numStudios, u32 defaultStudioDPL2) {
     extern u32 fn_80163798(void);
     extern void DCInvalidateRange(void* addr, u32 nBytes);
     extern void DCStoreRangeNoSync(void* addr, u32 nBytes);
@@ -7950,6 +8066,7 @@ s32 fn_8015FE88(u8 voicesArg, u8 music, u8 sfx, u8 studios, u32 flags,
                 u32 aramSize) {
     extern u32 hwInit(u32 mixFrq, u16 numVoices, u32 numStudios, u32 flags);
     extern void fn_80159C48(void);
+    extern void fn_8014DDD8(void);
     extern void vsInit(void);
     extern void fn_8015FE4C(u32 flags);
     s32 ret;
@@ -7972,18 +8089,20 @@ s32 fn_8015FE88(u8 voicesArg, u8 music, u8 sfx, u8 studios, u32 flags,
     synthInfo.maxSFX = sfx;
     mixFrq = 32000;
     ret = hwInit((u32)&mixFrq, synthInfo.voiceNum, synthInfo.studioNum, flags);
-    if (ret == 0) {
-        fn_80159C48();
-        dataInit(0, aramSize);
-        seqInit();
-        synthIdleWaitActive = 0;
-        synthInit(32000, synthInfo.voiceNum);
-        vsInit();
-        fn_8015FE4C(flags);
-        lbl_8047AF18 = 1;
+    if (ret != 0) {
+        return ret;
     }
 
-    return ret;
+    fn_80159C48();
+    dataInit(0, aramSize);
+    seqInit();
+    synthIdleWaitActive = 0;
+    synthInit(32000, synthInfo.voiceNum);
+    fn_8014DDD8();
+    vsInit();
+    fn_8015FE4C(flags);
+    lbl_8047AF18 = 1;
+    return 0;
 }
 
 #pragma dont_inline on

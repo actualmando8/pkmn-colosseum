@@ -112,7 +112,30 @@ extern void hwEnableIrq(void);
 typedef struct { void* data; u16 id; u16 refCount; } DataTabT;               /* keymap/curve entry, 8 bytes */
 typedef struct { void* data; u16 id; u16 num; u16 refCount; } LayerTabT;     /* layer entry, 12 bytes */
 typedef struct { void* data; void* base; u16 numSmp; } SdirTabT;             /* sample-dir directory entry, 12 bytes */
-typedef struct { u16 id; u16 refCount; u32 offset; void* addr; u8 header[0x14]; } SdirDataT; /* sample-dir data entry, 0x20 bytes */
+typedef struct {
+    u32 info;
+    u32 length;
+    u32 loopOffset;
+    u32 loopLength;
+    u32 extraData;
+} SdirHeaderT;
+typedef struct {
+    u16 id;
+    u16 refCount;
+    u32 offset;
+    void* addr;
+    SdirHeaderT header;
+} SdirDataT; /* sample-dir data entry, 0x20 bytes */
+typedef struct {
+    u32 info;
+    void* addr;
+    void* extraData;
+    u32 offset;
+    u32 length;
+    u32 loop;
+    u32 loopLength;
+    u8 compType;
+} SampleInfoT;
 typedef struct { u8 pad[9]; u8 vGroup; } FxEntryT;                            /* individual FX_TAB entry, 0xA bytes (only vGroup@9 used here) */
 typedef struct { u16 gid; u16 fxNum; void* fxTab; } FxGroupT;                 /* FX group cluster entry, 8 bytes */
 typedef struct { u16 num; u16 subTabIndex; } MacMainEntryT;                   /* macro main-table entry, 4 bytes */
@@ -478,11 +501,11 @@ s32 dataInsertFX(u16 gid, FxEntryT* fx, u16 fxNum) {
 #if defined(MUSYX_SYNTHDATA_ALL) || \
     defined(MUSYX_SYNTHDATA_CANDIDATE_80151B84_8015210C)
 s32 dataInsertMacro(u16 mid, void* macroaddr) {
-    extern u8 lbl_8043D6F8[];
-    extern u8 lbl_8043DEF8[];
+    extern MacMainEntryT lbl_8043D6F8[];
+    extern MacSubEntryT lbl_8043DEF8[];
     extern u16 lbl_8047AFA2;
-#define mainTab ((MacMainEntryT*)lbl_8043D6F8)
-#define subTab ((MacSubEntryT*)lbl_8043DEF8)
+#define mainTab (lbl_8043D6F8)
+#define subTab (lbl_8043DEF8)
     s32 main;
     s32 base;
     s32 pos;
@@ -532,11 +555,11 @@ s32 dataInsertMacro(u16 mid, void* macroaddr) {
 }
 
 s32 dataRemoveMacro(u16 mid) {
-    extern u8 lbl_8043D6F8[];
-    extern u8 lbl_8043DEF8[];
+    extern MacMainEntryT lbl_8043D6F8[];
+    extern MacSubEntryT lbl_8043DEF8[];
     extern u16 lbl_8047AFA2;
-#define mainTab ((MacMainEntryT*)lbl_8043D6F8)
-#define subTab ((MacSubEntryT*)lbl_8043DEF8)
+#define mainTab (lbl_8043D6F8)
+#define subTab (lbl_8043DEF8)
     s32 main;
     s32 base;
     s32 i;
@@ -659,33 +682,39 @@ asm void dataGetSample(void) {
 #else
 /* Resolve a sample directory entry and copy its header fields into the
  * caller's SAMPLE_INFO-compatible output record. */
-u32 dataGetSample(u16 key, u32* out) {
-    void* result;
-    u8* header;
-    u8* table;
-    u32 i;
+u32 dataGetSample(u16 sid, u32* out) {
+#define key (*(SdirDataT*)lbl_80445EF8)
+#define result (*(SdirDataT**)&lbl_8047AF88)
+#define sheader (*(SdirHeaderT**)&lbl_8047AF84)
+#define directories ((SdirTabT*)lbl_8043CCF8)
+    SampleInfoT* newsmp = (SampleInfoT*)out;
+    s32 i;
 
-    *(u16*)lbl_80445EF8 = key;
+    key.id = sid;
     for (i = 0; i < lbl_8047AFAA; i++) {
-        table = lbl_8043CCF8 + i * 0xC;
-        result = sndBSearch(lbl_80445EF8, *(u8**)table, *(u16*)(table + 8), 0x20, (PeopleCmpFn)smpcmp);
-        lbl_8047AF88 = (u32)result;
-        if (result != NULL && *(u16*)((u8*)result + 2) != 0xFFFF) {
-            header = (u8*)result + 0xC;
-            lbl_8047AF84 = (u32)header;
-            out[0] = *(u32*)header;
-            out[1] = *(u32*)((u8*)result + 8);
-            out[3] = 0;
-            out[5] = *(u32*)(header + 8);
-            out[4] = *(u32*)(header + 4) & 0x00FFFFFF;
-            out[6] = *(u32*)(header + 0xC);
-            *(u8*)((u8*)out + 0x1C) = (u8)(*(u32*)(header + 4) >> 24);
-            if (*(u32*)(header + 0x10) != 0) {
-                out[2] = *(u32*)table + *(u32*)(header + 0x10);
+        result = sndBSearch((u8*)&key, (u8*)directories[i].data,
+                            directories[i].numSmp, sizeof(SdirDataT),
+                            (PeopleCmpFn)smpcmp);
+        if (result != NULL && result->refCount != 0xFFFF) {
+            sheader = &result->header;
+            newsmp->info = sheader->info;
+            newsmp->addr = result->addr;
+            newsmp->offset = 0;
+            newsmp->loop = sheader->loopOffset;
+            newsmp->length = sheader->length & 0xFFFFFF;
+            newsmp->loopLength = sheader->loopLength;
+            newsmp->compType = sheader->length >> 24;
+            if (result->header.extraData != 0) {
+                newsmp->extraData = (void*)(result->header.extraData +
+                                             (u32)directories[i].data);
             }
             return 0;
         }
     }
+#undef key
+#undef result
+#undef sheader
+#undef directories
     return (u32)-1;
 }
 #endif

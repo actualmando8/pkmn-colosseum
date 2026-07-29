@@ -30,8 +30,9 @@ void __fstLoad(void)
     FSTBootInfo* bootInfo;
     DVDDiskID* id;
     u8 idTmpBuffer[sizeof(DVDDiskID) + 31];
+    void* arenaHi;
 
-    OSGetArenaHi();
+    arenaHi = OSGetArenaHi();
     bootInfo = (FSTBootInfo*)0x80000000;
     idTmp_8047A840 =
         (DVDDiskID*)(((u32)idTmpBuffer + 31) & ~31);

@@ -132,7 +132,11 @@ void fn_800895A4(u8* hero, u8* source) {
     u32 i;
     void* pokemon;
 
-    heroBiosSetHomePlace(hero, (source[0] & 4) != 0 ? 2 : 1);
+    if ((source[0] & 4) != 0) {
+        heroBiosSetHomePlace(hero, 2);
+    } else {
+        heroBiosSetHomePlace(hero, 1);
+    }
     fn_800F9C04(name, source + 4, 7, fn_80135938(0, 5));
     heroBiosSetNamePtr(hero, name);
     heroBiosSetSexDataId(hero, source[0xC]);

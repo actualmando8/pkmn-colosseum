@@ -2811,7 +2811,11 @@ void fn_800965C8(void* window, u8* sprite) {
         windowDrawSprite(0, 0, window, (u16)fn_8001D624(pokemon, 1), 0);
         break;
     case 0x10E:
-        winSpriteSetDisp(sprite, pokemonGetSoubiItemDataId(pokemon) != 0);
+        if (pokemonGetSoubiItemDataId(pokemon) != 0) {
+            winSpriteSetDisp(sprite, 1);
+        } else {
+            winSpriteSetDisp(sprite, 0);
+        }
         break;
     case 0x551:
         value = pokemonGetSoubiItemDataId(pokemon);

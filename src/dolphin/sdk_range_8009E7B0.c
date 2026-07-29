@@ -219,7 +219,6 @@ BOOL Link(OSModuleInfo* newModule, void* bss, BOOL fixed)
         } else if (si->size != 0) {
             moduleHeader->bssSection = i;
             si->offset = (u32)bss;
-            bss = (void*)((u32)bss + si->size);
         }
     }
     for (imp = (OSImportInfo*)moduleHeader->impOffset;

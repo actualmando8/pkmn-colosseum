@@ -421,10 +421,8 @@ void fn_800BC024(void) {
 #pragma dont_inline on
 #pragma peephole off
 void __GXFlushTextureState(void) {
-    GXData_800BB30C* p = gx;
-
-    GX_BP_REG(p->field_124);
-    p->field_002 = 0;
+    GX_BP_REG(gx->field_124);
+    gx->field_002 = 0;
 }
 #pragma peephole on
 #pragma dont_inline reset
@@ -637,7 +635,7 @@ void fn_800BC454(s32 stage, u32 value) {
     }
 
     GX_BP_REG(*reg);
-    p->field_002 = 0;
+    gx->field_002 = 0;
 }
 
 void fn_800BC4C0(s32 stage, u32 value) {
@@ -651,7 +649,7 @@ void fn_800BC4C0(s32 stage, u32 value) {
     }
 
     GX_BP_REG(*reg);
-    p->field_002 = 0;
+    gx->field_002 = 0;
 }
 
 void fn_800BC52C(u32 stage, u32 rasSel, u32 texSel) {

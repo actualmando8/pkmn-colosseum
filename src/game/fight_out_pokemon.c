@@ -189,7 +189,10 @@ u32 fightPokemonGetSoubiItemSoubiDataId(void* param_1) {
     void* item;
     u8 result;
 
-    item = param_1 == NULL ? NULL : pokemonGetStatus(param_1, 0, 0xCC, 0);
+    item = NULL;
+    if (param_1 != NULL) {
+        item = pokemonGetStatus(param_1, 0, 0xCC, 0);
+    }
     if (item == NULL) {
         value = 0;
     } else {

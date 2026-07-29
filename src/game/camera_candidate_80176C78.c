@@ -39,7 +39,11 @@ void cameraPlayOffsetAnime(u32 groupId, u32 animationId, s32 frame, u8 loop) {
         return;
     }
     GScameraSetAnimIndex(animation, 0);
-    fn_800D1858(animation, loop != 0);
+    if (loop != 0) {
+        fn_800D1858(animation, 1);
+    } else {
+        fn_800D1858(animation, 0);
+    }
     GScameraSetAnimRate(animation, lbl_8047D730);
     GScameraSetAnimFrame(animation, (f32)frame);
     GScameraStartAnimation(animation);
@@ -82,7 +86,11 @@ void cameraPlayAnime(u32 groupId, u32 animationId, s32 frame, u8 loop) {
         return;
     }
     GScameraSetAnimIndex(animation, 0);
-    fn_800D1858(animation, loop != 0);
+    if (loop != 0) {
+        fn_800D1858(animation, 1);
+    } else {
+        fn_800D1858(animation, 0);
+    }
     GScameraSetAnimRate(animation, lbl_8047D730);
     GScameraSetAnimFrame(animation, (f32)frame);
     GScameraStartAnimation(animation);

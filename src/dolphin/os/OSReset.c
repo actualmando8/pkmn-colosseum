@@ -303,7 +303,7 @@ void __OSDoHotReset(u32 resetCode) {
 
 #pragma push
 #pragma peephole off
-void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu) {
+void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     BOOL padcal;
 
     OSDisableScheduler();

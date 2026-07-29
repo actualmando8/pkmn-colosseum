@@ -718,7 +718,11 @@ void fn_801093C8(void) {
     alpha = (s32)(lbl_8047CE48 -
         (lbl_8047CE48 * progress) / lbl_8047CE4C);
 
-    fn_800D9ED8(lbl_8047AD23 != 0);
+    if (lbl_8047AD23 != 0) {
+        fn_800D9ED8(1);
+    } else {
+        fn_800D9ED8(0);
+    }
     fn_800D88DC(3);
     fn_800D888C(4);
     fn_800D9B58(lbl_8047CE50, lbl_8047CE50,

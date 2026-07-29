@@ -806,7 +806,11 @@ void* fn_8007FDBC(void* window, const void* title) {
         qsort(list, count, 4, menuCardE_CompareEntryPtrs);
     }
 
-    CARDE_CTX_U32(ctx, 0xA4) = count != 0 ? 0 : -1;
+    if (count != 0) {
+        CARDE_CTX_U32(ctx, 0xA4) = 0;
+    } else {
+        CARDE_CTX_U32(ctx, 0xA4) = -1;
+    }
 
     menuCardE_SetItem(ctx, 0x118, window, 0x79B);
     menuCardE_SetItem(ctx, 0x11C, window, 0x79C);

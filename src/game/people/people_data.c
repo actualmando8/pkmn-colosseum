@@ -1118,7 +1118,11 @@ void itemParamConvertOrigFormat(u8* dst, u8* src) {
             }
             decoded = (u8)((srcByte & maskByte) >> bit);
             if (type == 0) {
-                flag = decoded != 0;
+                if (decoded != 0) {
+                    flag = 1;
+                } else {
+                    flag = 0;
+                }
             }
         }
 
