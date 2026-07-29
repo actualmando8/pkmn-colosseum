@@ -85,3 +85,72 @@ found:
         }
     }
 }
+
+extern GSFloorResource* lbl_8047ACB0;
+extern u32 lbl_8047ACB4;
+extern u32 lbl_8047ACB8;
+extern u32 lbl_8047ACBC;
+extern GSFloorResource* lbl_8047ACCC;
+
+#define DEFINE_RESOURCE_REQUEST(name, activeValue, startIndex, poolCount)       \
+    void name(u8 priority, u32 floorId, void* callback)                        \
+    {                                                                           \
+        GSFloorResource* resource;                                              \
+        GSFloorResource* current;                                               \
+        GSFloorResource* next;                                                  \
+        u32 i;                                                                  \
+                                                                                \
+        resource = lbl_8047ACB0 + (startIndex);                                 \
+        for (i = (poolCount); i > 0; i--, resource++) {                         \
+            if (resource->active == 0) {                                        \
+                break;                                                          \
+            }                                                                   \
+        }                                                                       \
+        if (i == 0) {                                                           \
+            return;                                                             \
+        }                                                                       \
+        resource->prev = NULL;                                                  \
+        resource->next = NULL;                                                  \
+        resource->active = (activeValue);                                       \
+        resource->status = 1;                                                   \
+        resource->floorId = floorId;                                            \
+        resource->priority = priority;                                          \
+        resource->pending = 0;                                                  \
+        resource->callback = callback;                                          \
+        resource->textureHandle = 0;                                            \
+        resource->modelHandle = NULL;                                           \
+                                                                                \
+        current = lbl_8047ACCC;                                                 \
+        if (current == NULL) {                                                  \
+            lbl_8047ACCC = resource;                                            \
+            return;                                                             \
+        }                                                                       \
+        for (;;) {                                                              \
+            next = current->next;                                               \
+            if (next == NULL || current->priority >= resource->priority) {      \
+                break;                                                          \
+            }                                                                   \
+            current = next;                                                     \
+        }                                                                       \
+        if (next == NULL && current->priority < resource->priority) {           \
+            resource->prev = current;                                           \
+            current->next = resource;                                           \
+            return;                                                             \
+        }                                                                       \
+        if (current->prev != NULL) {                                            \
+            current->prev->next = resource;                                     \
+        }                                                                       \
+        resource->prev = current->prev;                                         \
+        resource->next = current;                                               \
+        current->prev = resource;                                               \
+        if (lbl_8047ACCC == current) {                                          \
+            lbl_8047ACCC = resource;                                            \
+        }                                                                       \
+    }
+
+DEFINE_RESOURCE_REQUEST(fn_800FED3C, 5, lbl_8047ACB4 + lbl_8047ACB8,
+                        lbl_8047ACBC)
+DEFINE_RESOURCE_REQUEST(fn_800FEE68, 3, lbl_8047ACB4, lbl_8047ACB8)
+DEFINE_RESOURCE_REQUEST(fn_800FEF8C, 1, 0, lbl_8047ACB4)
+
+#undef DEFINE_RESOURCE_REQUEST

@@ -249,6 +249,7 @@ extern BOOL OSCreateThread(OSThread *thread, void *(*func)(void *), void *param,
                             u32 stackSize, s32 priority, u16 attr);
 extern s32 OSResumeThread(OSThread *thread);
 extern void *memcpy(void *dst, const void *src, u32 n);
+extern s32 DVDRead(void *fileInfo, void *addr, s32 length, s32 offset, s32 prio);
 
 void fn_801E1C1C(void);
 void *fn_801E4B38(void *arg);
@@ -256,6 +257,7 @@ void *fn_801E4C80(void *arg);
 void *fn_801E4F64(void *arg);
 void *fn_801E5154(void *arg);
 BOOL fn_801E4F34(u32 msg);
+void fn_801E3A50(void);
 
 /* ---- Thread A: DVD read thread ---- */
 u8 lbl_80469040[0x1390]; /* stack(0x1000) + OSThread(0x318) + 3 msg arrays (0x28 each) */
@@ -314,7 +316,6 @@ u32 fn_801E1BE8(void)
 
 void fn_801E1C1C(void)
 {
-    extern s32 DVDRead(void *fileInfo, void *addr, s32 length, s32 offset, s32 prio);
     extern s32 OSSuspendThread(OSThread *thread);
     extern BOOL fn_801E446C(u32 msg);
     u8 *base;
@@ -884,6 +885,213 @@ BOOL fn_801E4058(void)
     return FALSE;
 }
 
+typedef struct THPPreparePlayer {
+    u8 fileInfo[0x3C];
+    u8 headerPrefix[0x14];
+    u32 numFrames;
+    u32 firstFrameSize;
+    u32 movieDataSize;
+    u32 componentDataOffset;
+    u32 offsetDataOffsets;
+    u32 movieDataOffsets;
+    u8 componentInfo[0x18];
+    u8 videoInfo[0xC];
+    u8 audioInfoPrefix[0xC];
+    u32 audioTrackCount;
+    void *work;
+    BOOL open;
+    u8 state;
+    u8 internalState;
+    u8 playFlag;
+    u8 audioExist;
+    s32 dvdError;
+    s32 videoError;
+    BOOL onMemory;
+    u8 *movieData;
+    s32 initOffset;
+    s32 initReadSize;
+    s32 initReadFrame;
+    u8 timingState[0x14];
+    s32 videoDecodeCount;
+    s32 curAudioTrack;
+    s32 curVideoNumber;
+    s32 curAudioNumber;
+    void *dispTextureSet;
+    void *playAudioBuffer;
+    u8 readBuffer[10][0xC];
+    u8 textureSet[3][0x10];
+    u8 audioBuffer[3][0xC];
+} THPPreparePlayer;
+
+typedef struct THPPrepareStatics {
+    u8 prefix[0x74];
+    u8 prepareQueue[0x20];
+    u8 pad94[0xC];
+    s16 workBuffer[0x3C0];
+    THPPreparePlayer player;
+} THPPrepareStatics;
+
+extern u32 lbl_8047B478[2];
+extern u8 lbl_8046A440[];
+extern void (*lbl_8047B46C)(void);
+extern void (*fn_800A8850(void (*callback)(void)))(void);
+
+BOOL fn_801E40F8(s32 frame, u8 flag, s32 audioTrack)
+{
+    THPPrepareStatics *globals = (THPPrepareStatics *)&lbl_8046A440;
+    THPPreparePlayer *player = &globals->player;
+    THPPreparePlayer *setupPlayer;
+    THPPreparePlayer *queuePlayer;
+    u8 *threadData;
+    s32 message1;
+    s32 message0;
+    s32 i;
+    BOOL ready;
+
+    if (player->open && player->state == 0) {
+        if (frame > 0) {
+            if (player->offsetDataOffsets == 0) {
+                return FALSE;
+            }
+            if (player->numFrames > frame) {
+                if (DVDRead(player, globals->workBuffer, 0x20,
+                            player->offsetDataOffsets + (frame - 1) * 4, 2) < 0) {
+                    return FALSE;
+                }
+                {
+                    s16 *offsets = globals->workBuffer;
+                    player->initOffset = player->movieDataOffsets + offsets[0];
+                    player->initReadFrame = frame;
+                    player->initReadSize = offsets[1] - offsets[0];
+                }
+            } else {
+                return FALSE;
+            }
+        } else {
+            player->initOffset = player->movieDataOffsets;
+            player->initReadSize = player->firstFrameSize;
+            player->initReadFrame = frame;
+        }
+
+        if (globals->player.audioExist) {
+            if (audioTrack < 0 || audioTrack >= globals->player.audioTrackCount) {
+                return FALSE;
+            }
+            globals->player.curAudioTrack = audioTrack;
+        }
+
+        setupPlayer = &globals->player;
+        setupPlayer->playFlag = flag & 1;
+        setupPlayer->videoDecodeCount = 0;
+        if (setupPlayer->onMemory) {
+            if (DVDRead(setupPlayer, setupPlayer->movieData,
+                        setupPlayer->movieDataSize,
+                        setupPlayer->movieDataOffsets, 2) < 0) {
+                return FALSE;
+            }
+            threadData = setupPlayer->movieData + setupPlayer->initOffset -
+                         setupPlayer->movieDataOffsets;
+            fn_801E5470(20, (u32)threadData);
+            if (globals->player.audioExist) {
+                fn_801E4E1C(12, (u32)threadData);
+            }
+        } else {
+            fn_801E5470(20, 0);
+            if (globals->player.audioExist) {
+                fn_801E4E1C(12, 0);
+            }
+            fn_801E1D7C(8);
+        }
+
+        if (!setupPlayer->onMemory) {
+            queuePlayer = &globals->player;
+            for (i = 0; i < 10; i++) {
+                fn_801E1BB8(queuePlayer->readBuffer[i]);
+            }
+        }
+        queuePlayer = &globals->player;
+        for (i = 0; i < 3; i++) {
+            fn_801E4F34((u32)queuePlayer->textureSet[i]);
+        }
+        if (globals->player.audioExist) {
+            queuePlayer = &globals->player;
+            for (i = 0; i < 3; i++) {
+                fn_801E4B08((u32)queuePlayer->audioBuffer[i]);
+            }
+        }
+        fn_8009F1D0(globals->prepareQueue, (u32)lbl_8047B478, 2);
+
+        fn_801E543C();
+        if (globals->player.audioExist) {
+            fn_801E4DE8();
+        }
+        if (!setupPlayer->onMemory) {
+            fn_801E1D48();
+        }
+
+        if (globals->player.audioExist) {
+            fn_8009F2F8(globals->prepareQueue, (u32 *)&message0, 1);
+            fn_8009F2F8(globals->prepareQueue, (u32 *)&message1, 1);
+            if (message0 != 0 && message1 != 0) {
+                ready = TRUE;
+            } else {
+                ready = FALSE;
+            }
+        } else {
+            fn_8009F2F8(globals->prepareQueue, (u32 *)&message0, 1);
+            if (message0 != 0) {
+                ready = TRUE;
+            } else {
+                ready = FALSE;
+            }
+        }
+        if (!ready) {
+            return FALSE;
+        }
+
+        player->state = 1;
+        setupPlayer->internalState = 0;
+        setupPlayer->dispTextureSet = NULL;
+        setupPlayer->playAudioBuffer = NULL;
+        setupPlayer->curVideoNumber = -1;
+        setupPlayer->curAudioNumber = 0;
+        if (globals->player.audioExist) {
+            fn_801E34F0();
+        }
+        lbl_8047B46C = fn_800A8850(fn_801E3A50);
+        return TRUE;
+    }
+    return FALSE;
+}
+void fn_801E24B0(void)
+{
+    extern void fn_800B884C(u32);
+    extern void fn_800BA6B0(u32);
+    extern void fn_800BC114(u32, u32);
+    extern void fn_800BC52C(u32, u32, u32);
+    extern void fn_800BC580(u32, u32, u32, u32, u32);
+    extern void fn_800BC6F0(u32, u32, u32, u32);
+    extern void fn_800BC8C8(u32);
+    extern void fn_800BCDDC(u32, u32, u32, u32);
+    extern void fn_800BCE88(u32, u32, u32);
+
+    fn_800BCE88(1, 7, 0);
+    fn_800BCDDC(0, 1, 0, 0xF);
+    fn_800B884C(1);
+    fn_800BA6B0(0);
+    fn_800BC8C8(1);
+    fn_800BC6F0(0, 0, 0, 0xFF);
+    fn_800BC114(0, 3);
+    fn_800BC52C(0, 0, 0);
+    fn_800BC52C(1, 0, 0);
+    fn_800BC52C(2, 0, 0);
+    fn_800BC52C(3, 0, 0);
+    fn_800BC580(0, 0, 1, 2, 3);
+    fn_800BC580(1, 0, 0, 0, 3);
+    fn_800BC580(2, 1, 1, 1, 3);
+    fn_800BC580(3, 2, 2, 2, 3);
+}
+
 s32 fn_801E25C8(void)
 {
     void *p;
@@ -1286,7 +1494,6 @@ typedef struct THPAudioDmaState {
     u8 pad48[0x0C];
 } THPAudioDmaState;
 
-extern THPAudioDmaState lbl_8046A440;
 extern s16 *lbl_8047B470;
 extern s16 *lbl_8047B474;
 extern void DCFlushRange(void *addr, u32 nBytes);
@@ -1413,7 +1620,7 @@ BOOL fn_801E34F0(void)
         }
     }
 
-    state = &lbl_8046A440;
+    state = (THPAudioDmaState *)lbl_8046A440;
     state->readMarker = 0;
     state->writeMarker = 0;
     state->dmaPosition = 0;
@@ -1442,7 +1649,7 @@ BOOL fn_801E34F0(void)
 u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
                 u32 secondLength, void *active)
 {
-    THPAudioDmaState *state = &lbl_8046A440;
+    THPAudioDmaState *state = (THPAudioDmaState *)lbl_8046A440;
     u32 bytes = *(u32 *)(lbl_8046AC60 + 0x90) * 40 / 1000;
     u32 samples = bytes / sizeof(s16);
     u64 requested;

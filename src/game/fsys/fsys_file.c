@@ -1361,6 +1361,42 @@ void fn_8017B6B8(FSYSSlot* slot, FSYSFileEntry* entry, u32 index) {
 }
 #endif
 
+typedef struct FSYSCallbackEntry8017BB80 {
+    u32 field_00;
+    u32 groupID;
+    u32 field_08;
+    void* (*callback)(u32 fileHandle, u32 nameHash, u32 size);
+} FSYSCallbackEntry8017BB80;
+
+s32 fn_8017BB80(FSYSSlot* slot, FSYSFileEntry* entry)
+{
+    FSYSCallbackEntry8017BB80* callbackEntry;
+    void* resource;
+    u32 i;
+    u32 size;
+
+    callbackEntry = (FSYSCallbackEntry8017BB80*)gDecompPoolBase;
+    for (i = 0; i < gDVDPoolState; i++, callbackEntry++) {
+        if (callbackEntry->groupID == entry->groupID) {
+            break;
+        }
+    }
+    if (i == gDVDPoolState) {
+        callbackEntry = NULL;
+    }
+
+    if (callbackEntry->callback != NULL) {
+        resource = GSresGetResource(slot->fileHandle, entry->nameHash);
+        size = (entry->flags & 0x80000000) ? entry->compressedSize
+                                           : entry->decompressedSize;
+        if (resource != NULL) {
+            DCFlushRange(resource, size);
+        }
+        callbackEntry->callback(slot->fileHandle, entry->nameHash, size);
+    }
+    return 0;
+}
+
 /* 0x8017BC90 | 0xA4 */
 #pragma push
 #pragma optimization_level 0
@@ -2397,6 +2433,43 @@ void fn_8017E09C(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
     }
 }
 #endif
+
+void fn_8017E1D8(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
+                 u32 callbackB, u32 callbackC)
+{
+    u32 cached;
+    u32 size;
+    u8 readFromCache;
+
+    readFromCache = 0;
+    _fsysGetFilename(slot, fileHandle, callbackA, callbackB, callbackC, 3);
+
+    if (gFSYSManager.activeSlot != slot) {
+        return;
+    }
+    if (slot->reloadFlag == 1) {
+        if (FSYS_SLOT_FILE0(slot) == 0) {
+            FSYS_SLOT_FILE0(slot) = fn_80167F28(slot->filename);
+        }
+        return;
+    }
+    if (FSYS_SLOT_FILE0(slot) == 0) {
+        FSYS_SLOT_FILE0(slot) = fn_80167F28(slot->filename);
+    }
+
+    size = 0x40;
+    cached = fn_8017F794(slot->fileHandle, 0, 0);
+    if (cached != 0) {
+        fn_80180320(slot, (void*)cached, FSYSAlign32(size));
+        DCFlushRange(slot, FSYSAlign32(size));
+        slot->status = 2;
+        readFromCache = 1;
+    }
+    if (!readFromCache) {
+        fn_80167E98(FSYS_SLOT_FILE0(slot), slot, FSYSAlign32(size), 0,
+                    fn_8017F108);
+    }
+}
 
 /* WP-0010 stubs */
 

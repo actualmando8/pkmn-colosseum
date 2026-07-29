@@ -588,13 +588,13 @@ extern void PSVECDistance(void);
 extern f32 lbl_8047D0D0;
 extern f32 lbl_8047D0D4;
 f32 moveLeader__F15HEROMOVE_MEMBER();
-extern void dbgMenuIsOpen(void);
-extern void menuIsCheck(void);
-extern void fn_8018C424(void);
-extern void fn_8000D710(void);
+extern u8 dbgMenuIsOpen(void);
+extern u8 menuIsCheck(u32);
+extern u8 fn_8018C424(u32, u32, u32);
+extern void fn_8000D710(u32);
 extern u8 lbl_80272A38[];
 extern f32 lbl_8047D064;
-void heroMoveMain(void);
+u32 heroMoveMain(void);
 extern void fn_80188AF4(u32, u32);
 extern void fn_80188F78(u32, u32);
 s32 fn_8012F1FC(s32);
@@ -2309,11 +2309,177 @@ extern f64 lbl_8047D058;
 extern f32 lbl_8047D0D4;
 /* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
 /* 0x8012EBD4 | 0x3E4 */
+extern u8 dbgMenuIsOpen(void);
+extern u8 menuIsCheck(u32);
+extern u8 fn_8018C424(u32, u32, u32);
+extern void fn_8000D710(u32);
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;
 extern u8 lbl_80272A38[];
 extern f32 lbl_8047D064;
-/* undecompiled: fn removed (ROM-derived asm), forward-declared for callers */
+u32 heroMoveMain(void)
+{
+    typedef struct HeroMoveFootwork {
+        u32 words[4];
+    } HeroMoveFootwork;
+    typedef struct HeroMoveFootworkPair {
+        HeroMoveFootwork entries[2];
+    } HeroMoveFootworkPair;
+    extern u32 fn_800F7AF0(s32);
+    extern u32 fn_800F7BC4(s32);
+    extern u32 fn_801906A0(u32);
+    extern void fn_800F7434(void*, u32, ...);
+    extern void getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK();
+
+    u32 resources[2];
+    u32 active_resources[2];
+    HeroMoveFootworkPair footwork;
+    u8 footstep[0x40];
+    u32 active_handle = 0;
+    u8* state;
+    u8* ptr_a;
+    u8* ptr_b;
+    u8* ptr_c;
+    u8* active_state;
+    u8* accumulator_state;
+    void* model;
+    void (*callback)(u32);
+    u32 queued_event;
+    u32 initial_handle = 0;
+    s32 active;
+    s32 i;
+    f32 cadence;
+    f32 distance;
+    u8 valid;
+
+    if (dbgMenuIsOpen() != 0) {
+        return 0;
+    }
+    if (menuIsCheck(0xca) != 0) {
+        return 0;
+    }
+    if (GSscene_GetMode() == 6) {
+        return 0;
+    }
+
+    if (*(s32*)(lbl_80426BD0 + 0x188) > 0) {
+        (*(s32*)(lbl_80426BD0 + 0x188))--;
+        return 0;
+    }
+
+    resources[0] = *(u32*)&lbl_8047D030;
+    resources[1] = *(u32*)&lbl_8047D034;
+    active = *(s32*)lbl_80426BD0;
+    if (active >= 0 && active < 2) {
+        initial_handle = resources[active];
+    }
+    if (fn_8018C424(0, initial_handle, 0x80000000) != 0) {
+        return 0;
+    }
+
+    state = lbl_80426BD0;
+    queued_event = *(u32*)(state + 0x18c);
+    if (queued_event != 0) {
+        *(u32*)(state + 0x18c) = 0;
+        fn_800F7434((void*)queued_event, 4, *(u32*)(state + 0x190),
+                    *(u32*)(state + 0x194), *(u32*)(state + 0x198),
+                    *(u32*)(state + 0x19c));
+        return 0;
+    }
+
+    ptr_a = state;
+    for (i = 0; i < *(s32*)(state + 0x410); i++) {
+        fn_80116D30(3, *(u16*)(ptr_a + 0x1d0));
+        ptr_a += 0x34;
+    }
+    ptr_b = state;
+    ptr_a = lbl_80426BD0;
+    for (i = 0; i < *(s32*)(ptr_a + 0x418); i++) {
+        fn_80116D30(2, *(u16*)(ptr_b + 0x370));
+        ptr_b += 0x34;
+    }
+    ptr_c = state;
+    ptr_b = lbl_80426BD0;
+    for (i = 0; i < *(s32*)(ptr_b + 0x414); i++) {
+        fn_80116D30(1, *(u16*)(ptr_c + 0x2a0));
+        ptr_c += 0x34;
+    }
+
+    *(u32*)(ptr_b + 0x414) = 0;
+    *(u32*)(ptr_a + 0x418) = 0;
+    *(u32*)(state + 0x410) = 0;
+    if (*(u32*)(state + 0x18c) != 0) {
+        return 0;
+    }
+
+    if ((fn_800F7BC4(1) & fn_800F7AF0(1) & 0x1c00) != 0) {
+        fn_8000D710(0);
+        return 0;
+    }
+
+    ptr_c = state;
+    for (i = 0; i < 2; i++) {
+        if (i < 0) {
+            goto member_invalid;
+        }
+        if (i < 2) {
+            goto member_check;
+        }
+member_invalid:
+        valid = 0;
+        goto member_done;
+member_check:
+        if ((*(u16*)(ptr_c + 4) & 1) != 0) {
+            goto member_valid;
+        }
+        valid = 0;
+        goto member_done;
+member_valid:
+        valid = 1;
+member_done:
+        if (valid != 0 && i != *(s32*)lbl_80426BD0) {
+            fn_8012DE94(i);
+        }
+        ptr_c += 0x20;
+    }
+
+    distance = moveLeader__F15HEROMOVE_MEMBER(*(s32*)lbl_80426BD0);
+    footwork = *(HeroMoveFootworkPair*)lbl_80272A38;
+    active_state = lbl_80426BD0;
+    active = *(s32*)active_state;
+    fn_800D3088();
+
+    active_resources[0] = *(u32*)&lbl_8047D030;
+    active_resources[1] = *(u32*)&lbl_8047D034;
+    if (active >= 0 && active < 2) {
+        active_handle = active_resources[active];
+    }
+    model = GSresGetResource(0, active_handle);
+    if (model != NULL) {
+        getStep__FP8FOOTSTEPP8_GSmodelPiP8FOOTWORK(
+            footstep, model, &footwork.entries[active],
+            lbl_80426BD0 + active * 0x20 + 0x14);
+        valid = fn_801906A0(0x8ae) == 0;
+        if (valid != 0) {
+            cadence = lbl_8047D064;
+            accumulator_state = lbl_80426BD0;
+            *(f32*)(accumulator_state + 0x13c) += distance;
+            while (*(f32*)(accumulator_state + 0x13c) >= cadence) {
+                ptr_c = state;
+                for (i = 0; i < 8; i++) {
+                    callback = *(void (**)(u32))(ptr_c + 0x140);
+                    if (callback != NULL) {
+                        callback(*(u32*)(ptr_c + 0x144));
+                    }
+                    ptr_c += 8;
+                }
+                *(f32*)(accumulator_state + 0x13c) -= cadence;
+            }
+        }
+    }
+
+    return 0;
+}
 /* 0x8012F008 | 0x114 */
 extern f32 lbl_8047D030;
 extern f32 lbl_8047D034;

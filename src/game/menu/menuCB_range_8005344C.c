@@ -99,6 +99,7 @@ extern const f32 lbl_8047BE60;
 extern const f32 lbl_8047BE64;
 extern const f32 lbl_8047BE6C;
 extern const f32 lbl_8047BE68;
+extern const f32 lbl_8047BE70;
 extern const f32 lbl_8047BE84;
 extern const f32 lbl_8047BE8C;
 extern const f32 lbl_8047BE90;
@@ -110,12 +111,14 @@ extern const MenuCBLayoutEntry lbl_802E61E8[17];
 extern const u32 lbl_80267350[18];
 extern s32 lbl_80267320[6];
 extern u8 lbl_80314F98[];
+extern u8 lbl_80314E08[];
 extern u8 lbl_802EF0A8[];
+extern MenuCBPokemonBlob lbl_803A95E8;
 extern MenuCBSlotInfo lbl_80267398[0x20];
 extern MenuModelWork lbl_803A9720;
 extern u32 lbl_8047A560;
 
-extern void* fn_80057270(MenuCBPane* pane);
+extern void* fn_80057270();
 extern s32 fn_800573C0(void);
 extern s32 fn_800566E8(void);
 extern s32 fn_80057E40(MenuCBPane* pane);
@@ -146,6 +149,10 @@ extern s8 getPokemonBoxNbUsedSlot__5PCBOXFSc(void* pcbox, s8 box);
 extern void winSpriteSetDisp(MenuCBPane* pane, u8 enable);
 extern MenuKeyInfo* windowGetKeyInfo(void);
 extern void fn_8010A420(MenuModelWork* work);
+extern s32 menuModelCheck(MenuModelWork* work, u8 wait);
+extern s32 fn_8010A210(MenuModelWork* work, void* pokemon);
+extern void* menuModelRender(MenuModelWork* work);
+extern void fn_80109C88(MenuModelWork* work, void* pokemon);
 s32 fn_80057694(void);
 void fn_800576A4(u32 value);
 u32 fn_800567AC(void);
@@ -271,6 +278,82 @@ s32 fn_80053728(MenuCBPane* pane, MenuCBPane* sprite) {
     return 0;
 }
 #pragma pop
+
+u32 fn_80053778(u32 unused, u8* pane) {
+    u32 texture;
+    s32 alpha;
+    s32 height;
+    MenuCBPokemonBlob* pokemon;
+    f32 heightScale;
+    f32 fade;
+    extern void fn_800D61E4();
+    extern s32 fn_80057E40();
+
+    texture = 0;
+
+    if (fn_80057E40() != 2) {
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D6A00(6);
+        fn_800D7820(lbl_80314E08);
+
+        heightScale = lbl_8047BE64 * lbl_8047A540;
+        if (heightScale > lbl_8047BE60) {
+            heightScale = lbl_8047BE60;
+        }
+        height = (s32)((f32)(s32)*(s16*)(pane + 0x56) * heightScale);
+
+        fade = lbl_8047BE64 * (lbl_8047A540 - lbl_8047BE6C);
+        if (fade < lbl_8047BE68) {
+            fade = lbl_8047BE68;
+        }
+        alpha = (s32)(lbl_8047BE70 * (lbl_8047BE60 - fade));
+
+        fn_800D67BC(4);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0);
+        fn_800D61E4(*(s16*)(pane + 0x54), 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0);
+        fn_800D61E4(*(s16*)(pane + 0x54), height);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, alpha);
+        fn_800D61E4(0, height);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, alpha);
+        fn_800D6728();
+        return 0;
+    }
+
+    pokemon = fn_80057270();
+    if (pokemon == NULL) {
+        return 0;
+    }
+
+    if ((u8)menuModelCheck(&lbl_803A9720, 0) == 0) {
+        if ((u8)fn_8010A210(&lbl_803A9720, pokemon) != 0) {
+            texture = (u32)menuModelRender(&lbl_803A9720);
+        } else {
+            fn_80109C88(&lbl_803A9720, pokemon);
+            lbl_803A95E8 = *pokemon;
+        }
+    }
+
+    if (texture != 0) {
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D6A00(7);
+        fn_800D7820(lbl_80314F98);
+        fn_800D85D4(0, (void*)texture);
+        fn_800D67BC(2);
+        fn_800D61E4(0, 0);
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047BE68, lbl_8047BE68);
+        fn_800D61E4(*(s16*)(pane + 0x54), *(s16*)(pane + 0x56));
+        fn_800D5CB8(0, 0xff, 0xff, 0xff, 0xff);
+        fn_800D59B8(0, lbl_8047BE60, lbl_8047BE60);
+        fn_800D6728();
+    }
+
+    return 0;
+}
 
 #pragma push
 #pragma peephole off

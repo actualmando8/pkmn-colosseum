@@ -8,3 +8,148 @@
  * range name stays honest until internal TU structure is proven.
  */
 #include "dolphin/types.h"
+
+#define BSWAP32(value)                                                        \
+    (((value) << 24) | (((value) & 0x0000FF00) << 8)                         \
+     | (((value) & 0x00FF0000) >> 8) | ((value) >> 24))
+
+/* fn_80089048 - 0x80089048 | size: 0x338 */
+s32 fn_80089048(u8* destination, const u8* source, void* pokemon)
+{
+    extern u8 fn_80123FBC(void*);
+    extern u16 fn_8011F5C8(void*);
+    extern void fn_8008AE18(void*, void*);
+    extern u8 exribbonGetNo(s32);
+    extern void* memset(void*, s32, u32);
+    extern const char lbl_8026F568[];
+    extern const char lbl_8026F574[];
+    extern void __assert(const char*, u32, const char*);
+    u32 value;
+    u32 i;
+    u16 count;
+    u8* output;
+
+    if (pokemon != NULL && fn_80123FBC(pokemon) == 0) {
+        return 0;
+    }
+
+    *(u32*)(destination + 0) = BSWAP32(*(const u32*)(source + 0));
+    *(u32*)(destination + 4) = BSWAP32(*(const u32*)(source + 4));
+    *(u32*)(destination + 8) = BSWAP32(*(const u32*)(source + 8));
+
+    value = *(const u16*)(source + 0xE);
+    if (pokemon != NULL) {
+        value |= fn_8011F5C8(pokemon) << 16;
+    }
+    *(u32*)(destination + 0xC) = BSWAP32(value);
+
+    count = *(const u16*)(source + 0xE);
+    if (count != 0x32 && count != 0x1E) {
+        __assert(lbl_8026F568, 0xB7, lbl_8026F574);
+    }
+    output = destination + 0x10;
+    for (i = 0; i < count; i++, output += 4) {
+        *(u32*)output = BSWAP32(*(const u32*)(source + 0x10 + i * 4));
+    }
+
+    if (pokemon != NULL) {
+        fn_8008AE18(pokemon, output);
+        memset(output + 0x64, 0, 0xC);
+        for (i = 0; i < 11; i++) {
+            output[0x64 + i] = exribbonGetNo(i);
+        }
+    }
+    return 1;
+}
+
+/* fn_80089380 - 0x80089380 | size: 0x224 */
+s32 fn_80089380(u8* destination, const u8* source)
+{
+    extern u32 lbl_8047A660;
+    extern u32 lbl_8047A664;
+    extern u32 lbl_8047A668;
+    extern u32 lbl_8047A66C;
+    extern const char lbl_8026F568[];
+    extern const char lbl_8026F574[];
+    extern void __assert(const char*, u32, const char*);
+    u32 value;
+    u32 swapped;
+    u32 i;
+    u16 count;
+
+    *(u32*)(destination + 0) = BSWAP32(*(const u32*)(source + 0));
+    *(u32*)(destination + 4) = BSWAP32(*(const u32*)(source + 4));
+    *(u32*)(destination + 8) = BSWAP32(*(const u32*)(source + 8));
+    value = BSWAP32(*(const u32*)(source + 0xC));
+    *(u16*)(destination + 0xC) = value >> 16;
+    *(u16*)(destination + 0xE) = value;
+
+    count = *(u16*)(destination + 0xE);
+    if (count != 0x32 && count != 0x1E) {
+        __assert(lbl_8026F568, 0x6F, lbl_8026F574);
+    }
+    for (i = 0; i < count; i++) {
+        swapped = BSWAP32(*(const u32*)(source + 0x10 + i * 4));
+        *(u16*)(destination + 0x10 + i * 4) = swapped;
+        *(u16*)(destination + 0x12 + i * 4) = swapped >> 16;
+    }
+
+    if (lbl_8047A664 != 0) {
+        *(u32*)(destination + 0) = 0;
+        *(u32*)(destination + 4) = 0;
+        lbl_8047A664 = 0;
+    }
+    if (lbl_8047A660 != 0) {
+        *(u32*)(destination + 0) += lbl_8047A660;
+        *(u32*)(destination + 4) += lbl_8047A660;
+        lbl_8047A660 = 0;
+    }
+    if (lbl_8047A66C != 0) {
+        *(u32*)(destination + 8) = 0;
+        lbl_8047A66C = 0;
+    }
+    if (lbl_8047A668 != 0) {
+        *(u32*)(destination + 8) |= 0x10;
+        lbl_8047A668 = 0;
+    }
+    return 1;
+}
+
+/* fn_800895A4 - 0x800895A4 | size: 0x114 */
+void fn_800895A4(u8* hero, u8* source) {
+    extern void fn_8008BBDC(void*, u8*);
+    extern void heroBiosSetHomePlace(u8*, u8);
+    extern void heroBiosSetSexDataId(u8*, u8);
+    extern void heroBiosSetRnd(u8*, u32);
+    extern void heroBiosSetNamePtr(u8*, void*);
+    extern void* heroBiosGetPokemonPtr(u8*, u16);
+    extern u32 fn_80135938(s32, s32);
+    extern u32 fn_800F9C04(void*, u8*, u32, u32);
+    extern void fn_8011D494(void*, u16);
+    extern void exribbonSetNo(s32, u8);
+    u8 name[0x28];
+    u32 value;
+    u32 i;
+    void* pokemon;
+
+    heroBiosSetHomePlace(hero, (source[0] & 4) != 0 ? 2 : 1);
+    fn_800F9C04(name, source + 4, 7, fn_80135938(0, 5));
+    heroBiosSetNamePtr(hero, name);
+    heroBiosSetSexDataId(hero, source[0xC]);
+
+    value = *(u32*)(source + 0x10);
+    value = (value << 24) | ((value & 0xFF00) << 8)
+          | ((value & 0xFF0000) >> 8) | (value >> 24);
+    heroBiosSetRnd(hero, value);
+
+    for (i = 0; i < 6; i++) {
+        pokemon = heroBiosGetPokemonPtr(hero, (u16)i);
+        fn_8008BBDC(pokemon, source + 0x14 + i * 0x64);
+        fn_8011D494(pokemon, (u16)i);
+    }
+    for (i = 0; i < 11; i++) {
+        exribbonSetNo(i, source[0x26C + i]);
+    }
+}
+
+#undef BSWAP32

@@ -1,10 +1,11 @@
 #include "dolphin/os/OSReset.h"
-#include "dolphin/os/OS.h"
 #include "dolphin/os/OSCache.h"
+#include "dolphin/os/OSContext.h"
 #include "dolphin/os/OSInterrupt.h"
 #include "dolphin/os/OSThread.h"
 #include "dolphin/os/OSTime.h"
 #include "dolphin/os/PPCArch.h"
+#include "dolphin/dvd/dvd.h"
 
 /* SDA symbol aliases used by stub functions */
 extern OSResetFunctionInfo* ResetFunctionQueue_8047A738;
@@ -70,12 +71,46 @@ extern void LCDisable(void);
 extern void ICFlashInvalidate(void);
 extern void* memset(void* dest, int val, u32 n);
 
+typedef struct ApploaderHeader {
+    char date[16];
+    u32 entry;
+    u32 size;
+    u32 rebootSize;
+    u32 reserved2;
+} ApploaderHeader;
+
 #define AT_ADDRESS(addr) : addr
+
+extern ApploaderHeader lbl_803FB820;
+extern void* lbl_8047A728;
+extern void* lbl_8047A72C;
+extern volatile BOOL lbl_8047A730[2];
+
+extern u32 OSReboot_817FFFF8 AT_ADDRESS(0x817FFFF8);
+extern u32 OSReboot_817FFFFC AT_ADDRESS(0x817FFFFC);
+extern u32 OSReboot_812FDFF0 AT_ADDRESS(0x812FDFF0);
+extern u32 OSReboot_812FDFEC AT_ADDRESS(0x812FDFEC);
+extern u8 OSReboot_800030E2 AT_ADDRESS(0x800030E2);
+extern u32 __OSBusClock AT_ADDRESS(0x800000F8);
+extern s32 __OSIsGcam;
+
+extern s32 fn_800A7820(s32 enable);
+extern DVDDiskID* fn_800A7BCC(void);
+extern void fn_8009FAEC(void);
+extern void fn_8009FADC(void* address);
+extern void DVDResume(void);
+extern BOOL DVDCheckDisk(void);
+extern void __DVDPrepareResetAsync(DVDCBCallback callback);
+extern BOOL DVDCancelStreamAsync(DVDCommandBlock* block, DVDCBCallback callback);
+extern void AISetStreamVolLeft(u32 volume);
+extern void AISetStreamVolRight(u32 volume);
+extern void AISetStreamPlayState(u32 state);
+void __OSDoHotReset(u32 resetCode);
 
 volatile u16 __VIRegs[59] AT_ADDRESS(0xCC002000);
 #define __PIRegs     ((volatile u32*)0xCC003000)
 
-#define OS_BUS_CLOCK   (*(u32*)0x800000F8)
+#define OS_BUS_CLOCK   __OSBusClock
 #define OS_TIMER_CLOCK (OS_BUS_CLOCK / 4)
 #define OSMicrosecondsToTicks(usec) (((usec) * (OS_TIMER_CLOCK / 125000)) / 8)
 
@@ -83,6 +118,92 @@ volatile u16 __VIRegs[59] AT_ADDRESS(0xCC002000);
 
 static int CallResetFunctions(int final);
 static void CancelThreads(void);
+
+#define OS_ROUND_UP_32B(value) (((u32)(value) + 0x1F) & ~0x1F)
+
+static inline BOOL IsStreamEnabled(void) {
+    if (fn_800A7BCC()->streaming) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void __OSReboot(u32 resetCode, u32 bootDol) {
+    OSContext exceptionContext;
+    DVDCommandBlock streamCommand;
+    DVDCommandBlock headerCommand;
+    DVDCommandBlock rebootCommand;
+    ApploaderHeader* header = &lbl_803FB820;
+    u32 rebootSize;
+    u32 offset;
+    OSTime start;
+
+    OSDisableInterrupts();
+
+    OSReboot_817FFFFC = 0;
+    OSReboot_817FFFF8 = 0;
+    OSReboot_800030E2 = TRUE;
+    OSReboot_812FDFF0 = (u32)lbl_8047A728;
+    OSReboot_812FDFEC = (u32)lbl_8047A72C;
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(&exceptionContext);
+    DVDInit();
+    fn_800A7820(TRUE);
+    DVDResume();
+
+    lbl_8047A730[0] = FALSE;
+    __DVDPrepareResetAsync((DVDCBCallback)fn_8009FAEC);
+    __OSMaskInterrupts(0xFFFFFFE0);
+    __OSUnmaskInterrupts(0x400);
+    OSEnableInterrupts();
+
+    start = OSGetTime();
+    while (lbl_8047A730[0] != TRUE) {
+        if (!DVDCheckDisk() || OS_TIMER_CLOCK < OSGetTime() - start) {
+            __OSDoHotReset(OSReboot_817FFFFC);
+        }
+    }
+
+    if (!__OSIsGcam && IsStreamEnabled()) {
+        AISetStreamVolLeft(0);
+        AISetStreamVolRight(0);
+        DVDCancelStreamAsync(&streamCommand, NULL);
+
+        start = OSGetTime();
+        while (DVDGetCommandBlockStatus(&streamCommand)) {
+            if (!DVDCheckDisk() || OS_TIMER_CLOCK < OSGetTime() - start) {
+                __OSDoHotReset(OSReboot_817FFFFC);
+            }
+        }
+
+        AISetStreamPlayState(0);
+    }
+
+    DVDReadAbsAsyncPrio(&headerCommand, header, sizeof(ApploaderHeader),
+                        0x2440, NULL, 0);
+    start = OSGetTime();
+    while (DVDGetCommandBlockStatus(&headerCommand)) {
+        if (!DVDCheckDisk() || OS_TIMER_CLOCK < OSGetTime() - start) {
+            __OSDoHotReset(OSReboot_817FFFFC);
+        }
+    }
+
+    offset = header->size + 0x20;
+    rebootSize = OS_ROUND_UP_32B(header->rebootSize);
+    DVDReadAbsAsyncPrio(&rebootCommand, (void*)0x81300000, rebootSize,
+                        offset + 0x2440, NULL, 0);
+    start = OSGetTime();
+    while (DVDGetCommandBlockStatus(&rebootCommand)) {
+        if (!DVDCheckDisk() || OS_TIMER_CLOCK < OSGetTime() - start) {
+            __OSDoHotReset(OSReboot_817FFFFC);
+        }
+    }
+
+    ICInvalidateRange((void*)0x81300000, rebootSize);
+    OSDisableInterrupts();
+    ICFlashInvalidate();
+    fn_8009FADC((void*)0x81300000);
+}
 
 void OSRegisterResetFunction(OSResetFunctionInfo* info) {
     ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue);

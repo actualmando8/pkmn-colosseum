@@ -149,7 +149,7 @@ extern u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr);
 extern void pokemonGetDarkPokemonLevel(void);
 extern u32 pokemonDataCheckValid(u32 a, u16 key);
 extern u8 fn_80121ADC(u8* ptr, u32 slot);
-extern void pokemonSetWazaStatus(void);
+extern s32 pokemonSetWazaStatus(u8*, u32, u8);
 extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
 extern void pokemonInit(u8* ptr);
 extern void pokemonEvolutionCreateAddPokemon();
@@ -435,7 +435,7 @@ extern void GScharCpy();
 extern u16 fn_8010BBB8();
 extern void fn_8001D994(void);
 void pokemonToMenuPokemonStatus();
-extern void GSmsgGetGSchar(void);
+extern u32 GSmsgGetGSchar();
 extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 extern u32 fn_800E0C54(void);
@@ -449,15 +449,15 @@ extern u32 lbl_80478F90; /* obj header ptr (SDA) */
 extern void fn_80135530(void);
 void pokemonGetFriendFormPokemonFriendFilterId(u8* obj, u16 item_id, u32 filter_id);
 extern u8 lbl_80272948[];
-void pokemonGetEffortFromPokemon(void);
+void pokemonGetEffortFromPokemon(u8*, u32, u32, u32);
 extern void fn_80008154(void);
 extern void fn_80142CF4(void);
 extern u32 sexGetPokemonSexRaitoKotei(u32);
 extern void fn_801EE958(void);
 extern void fn_801EEB34(void);
 u32 pokemonCheckFightOut(u8* ptr);
-extern void gamedataAttestBiosCopy(void);
-void pokemonCreate(void);
+extern void gamedataAttestBiosCopy(void* dst, const void* src);
+void pokemonCreate(u8* ptr, u32 pokemon_data_id, u32 level, const void* attest);
 u32 pokemonCreateRndFit(u8*, s32, s32, s32, u32);
 extern void fadeSet(f32 duration, u32 mode);
 extern void fadeCheck(u32 wait);
@@ -1531,7 +1531,7 @@ extern u32 lbl_80478F90;  /* obj header ptr (SDA) */
 /* 0x801236F8 | 0xC0 */
 /* 0x801237B8 | 0x3A4 */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonSetWazaStatus(void);
+s32 pokemonSetWazaStatus(u8*, u32, u8);
 /* 0x80123B5C | 0xF8 */
 /* 0x80 | pokemonWazaReplace | generic */
 /* 0x80123CD4 | 0x84 */
@@ -2972,6 +2972,121 @@ validity_done:
 #endif /* POKEMON_RANGE_EXACT_80122040 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_801226D0)
+typedef struct PokemonEffortEntry {
+    u16 effort_status;
+    u16 species_status;
+    u16 value;
+} PokemonEffortEntry;
+
+typedef struct PokemonEffortTable {
+    PokemonEffortEntry entry[6];
+} PokemonEffortTable;
+
+void pokemonGetEffortFromPokemon(u8* obj, u32 item_id, u32 double_effort,
+                                 u32 defeated_species)
+{
+    extern u32 gamedataAttestCheckValid(u32 value);
+    u16 effort[6][3];
+    u16 species;
+    u8 valid;
+    u16 total;
+    u8 multiplier;
+    u16 original_item;
+    u8 i;
+    u16 gain;
+    u16* entry;
+
+    *(PokemonEffortTable*)effort = *(PokemonEffortTable*)lbl_80272948;
+
+    if (obj == NULL) {
+        return;
+    }
+
+    if (obj == NULL) {
+        valid = 0;
+    } else {
+        species = (u16)pokemonGetStatus(obj, 0, 0x6E, 0);
+        if (species == 0) {
+            valid = 0;
+        } else {
+            if (species == 0) {
+                valid = 0;
+            } else if (pokemonGetStatus(NULL, species, 1, 0) == 0) {
+                valid = 0;
+            } else if ((u32)species >= *(u32*)lbl_80478F90) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+            if (valid == 0) {
+                valid = 0;
+            } else if ((u8)gamedataAttestCheckValid(
+                           pokemonGetStatus(obj, 0, 0x70, 0)) == 0) {
+                valid = 0;
+            } else if ((u8)pokemonGetStatus(obj, 0, 0xB8, 0) == 1) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+        }
+    }
+
+    if (valid == 0) {
+        valid = 0;
+    } else if ((s32)pokemonGetStatus(obj, 0, 0x6E, 0) == 0x19C) {
+        valid = 0;
+    } else if ((u8)pokemonGetStatus(obj, 0, 0xB6, 0) == 1) {
+        valid = 0;
+    } else if ((u8)pokemonGetStatus(obj, 0, 0x7B, 0) == 1) {
+        valid = 0;
+    } else {
+        valid = 1;
+    }
+    if (valid == 0) {
+        return;
+    }
+
+    multiplier = 1;
+    total = 0;
+    i = 0;
+    while (i < 6) {
+        entry = effort[i];
+        entry[2] = (u16)pokemonGetStatus(obj, 0, entry[0], 0);
+        total += entry[2];
+        i++;
+    }
+
+    if ((u8)double_effort == 1) {
+        multiplier = 2;
+    }
+
+    original_item = (u16)item_id;
+    i = 0;
+    while (i < 6) {
+        if (total >= 510) {
+            return;
+        }
+
+        entry = effort[i];
+        gain = (u16)(multiplier * (u16)pokemonGetStatus(
+            NULL, defeated_species, entry[1], 0));
+        if (original_item == 0x18) {
+            gain = (u16)(gain * 2);
+        }
+        if (total + gain > 510) {
+            gain = (u16)(gain - (total + gain - 510));
+        }
+        if (entry[2] + gain > 255) {
+            gain = (u16)(gain - (entry[2] + gain - 255));
+        }
+
+        entry[2] += gain;
+        total += gain;
+        pokemonSetStatus(obj, 0, entry[0], 0, entry[2]);
+        i++;
+    }
+}
+
 #endif /* POKEMON_RANGE_RESIDUAL_801226D0 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_EXACT_801229F4)
@@ -3330,6 +3445,118 @@ u16 pokemonGetOboeWazaDataId(u8* ptr, u8 arg2, u8* counter_ptr) {
 #endif /* POKEMON_RANGE_EXACT_801229F4 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_801237B8)
+s32 pokemonSetWazaStatus(u8* obj, u32 id, u8 replace) {
+    extern u32 pokemonGetStatus(u8* obj, u32 id, u32 selector, u32 index);
+    extern void pokemonSetStatus(u8* obj, u32 param, u16 selector, u32 index,
+                                 u32 value);
+    extern u32* pokemonBiosGetPokemonWazaPtr(void* obj, u32 index, u32 mode);
+    s8 i;
+    s8 found;
+    s32 ext_slot;
+    u16 target_id;
+    u8 valid;
+    s8 j;
+    u16 slot2;
+    u16 move_id;
+    u8 max_pp;
+    u32* dst;
+    u32* src;
+
+    if (obj == NULL) {
+        return -2;
+    }
+
+    if (obj == NULL) {
+        found = -1;
+        goto search_done;
+    } else {
+        target_id = (u16)id;
+        for (found = 0; (s8)found < 4; found++) {
+            ext_slot = (s8)found;
+            if (obj == NULL) {
+                valid = 0;
+            } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, ext_slot) == 0) {
+                valid = 0;
+            } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, ext_slot) == 0x163) {
+                valid = 0;
+            } else {
+                valid = 1;
+            }
+            if ((u8)valid != 0) {
+                if ((s32)pokemonGetStatus(obj, 0, 0x7F, ext_slot) ==
+                    (s32)target_id) {
+                    goto search_done;
+                }
+            }
+        }
+        found = -1;
+    }
+search_done:
+    if ((s8)found >= 0) {
+        return -2;
+    }
+
+    for (j = 0; (s8)j < 4; j++) {
+        if (obj == NULL) {
+            valid = 0;
+        } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, (s8)j) == 0) {
+            valid = 0;
+        } else if ((s32)pokemonGetStatus(obj, 0, 0x7F, (s8)j) == 0x163) {
+            valid = 0;
+        } else {
+            valid = 1;
+        }
+        if ((u8)valid == 0) {
+            if (obj == NULL) {
+                return (s32)(u8)j;
+            }
+            pokemonSetStatus(obj, 0, 0x7F, (s8)j, 0);
+            pokemonSetStatus(obj, 0, 0x80, (s8)j, 0);
+            pokemonSetStatus(obj, 0, 0x81, (s8)j, 0);
+            pokemonSetStatus(obj, 0, 0x7F, (s8)j, (u16)id);
+            if (obj != NULL) {
+                slot2 = (u16)((s8)j + 4);
+                move_id = (u16)pokemonGetStatus(obj, 0, 0x7F, slot2);
+                max_pp = wazaGetMaxPP(
+                    move_id, (u8)pokemonGetStatus(obj, 0, 0x81, slot2));
+            } else {
+                max_pp = 0;
+            }
+            pokemonSetStatus(obj, 0, 0x80, (s8)j, (u8)max_pp);
+            return (s32)(u8)j;
+        }
+    }
+
+    if (replace == 0) {
+        return -1;
+    }
+
+    for (i = 1; (s8)i < 4; i++) {
+        if (obj != NULL) {
+            dst = pokemonBiosGetPokemonWazaPtr(obj, (u16)((s8)i - 1), 0);
+            src = pokemonBiosGetPokemonWazaPtr(obj, (u32)(s8)i, 0);
+            pokemonWazaBiosCopy(dst, src);
+        }
+    }
+
+    if (obj != NULL) {
+        pokemonSetStatus(obj, 0, 0x7F, 3, 0);
+        pokemonSetStatus(obj, 0, 0x80, 3, 0);
+        pokemonSetStatus(obj, 0, 0x81, 3, 0);
+    }
+    pokemonSetStatus(obj, 0, 0x7F, 3, (u16)id);
+    if (obj != NULL) {
+        move_id = (u16)pokemonGetStatus(obj, 0, 0x7F, 7);
+        max_pp = wazaGetMaxPP(
+            move_id, (u8)pokemonGetStatus(obj, 0, 0x81, 7));
+    } else {
+        max_pp = 0;
+    }
+    pokemonSetStatus(obj, 0, 0x80, 3, (u8)max_pp);
+
+    return 3;
+}
+
 s32 pokemonSearchWazaDataId(u8* ptr, u16 target) {
     extern u32 pokemonGetStatus(u8* a, u32 b, u32 c, u32 d);
     s8 i;
@@ -3457,6 +3684,100 @@ u8 pokemonCheckValid(u8* ptr) {
 #endif /* POKEMON_RANGE_EXACT_80123E70 */
 
 #if !defined(POKEMON_RANGE_SPLIT) || defined(POKEMON_RANGE_RESIDUAL_801240C4)
+void pokemonCreate(u8* ptr, u32 pokemon_data_id, u32 level, const void* attest) {
+    u16 random;
+    u32 personality_high;
+    u32 experience;
+    u32 friendship;
+    u32 max_level;
+    void* grow_data;
+    u32 learn_level;
+    u8 learn_counter;
+    u8 current_level;
+    u8 grow_id;
+    u8 valid;
+
+    if (ptr == NULL) {
+        return;
+    }
+    if ((u16)pokemon_data_id == 0) {
+        valid = 0;
+    } else if (pokemonGetStatus(NULL, pokemon_data_id, 1, 0) == 0) {
+        valid = 0;
+    } else if ((u16)pokemon_data_id >= *(u32*)(u32)lbl_80478F90) {
+        valid = 0;
+    } else {
+        valid = 1;
+    }
+    if (valid == 0) {
+        return;
+    }
+    if (attest == NULL) {
+        return;
+    }
+
+    pokemonInit(ptr);
+    pokemonSetStatus(ptr, 0, 0x6E, 0, (u16)pokemon_data_id);
+
+    personality_high = fn_800E0C54() << 16;
+    pokemonSetStatus(ptr, 0, 0x6F, 0,
+                     personality_high | (fn_800E0C54() & 0xFFFF));
+
+    gamedataAttestBiosCopy((void*)pokemonGetStatus(ptr, 0, 0x70, 0), attest);
+    pokemonSetStatus(ptr, 0, 0x77, 0,
+                     GSmsgGetGSchar(pokemonGetStatus(NULL, pokemon_data_id, 1, 0)));
+    pokemonSetStatus(ptr, 0, 0x7A, 0, (u8)level);
+
+    random = (u16)fn_800E0C54();
+    pokemonSetStatus(ptr, 0, 0x93, 0, random & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x94, 0, (random >> 5) & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x95, 0, (random >> 10) & 0x1F);
+
+    random = (u16)fn_800E0C54();
+    pokemonSetStatus(ptr, 0, 0x98, 0, random & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x96, 0, (random >> 5) & 0x1F);
+    pokemonSetStatus(ptr, 0, 0x97, 0, (random >> 10) & 0x1F);
+
+    grow_id = (u8)pokemonGetStatus(
+        NULL, (u16)pokemonGetStatus(ptr, 0, 0x6E, 0), 0x11, 0);
+    current_level = (u8)pokemonGetStatus(ptr, 0, 0x7A, 0);
+    grow_data = pokemonGrowDataBiosGetPtr(grow_id);
+    if (grow_data == NULL) {
+        experience = 0;
+    } else {
+        experience = pokemonGrowDataBiosGetExp(grow_data, current_level);
+    }
+    pokemonSetStatus(ptr, 0, 0x79, 0, experience);
+    friendship = pokemonGetStatus(NULL, pokemon_data_id, 0x14, 0);
+    pokemonSetStatus(ptr, 0, 0x99, 0, friendship);
+    if (fn_800E0C54() & 1) {
+        u32 ability_flag = 1;
+        u16 species;
+
+        if (ptr != NULL) {
+            species = (u16)pokemonGetStatus(ptr, 0, 0x6E, 0);
+            if ((s32)pokemonGetStatus(NULL, species, 0x17, 1) == 0) {
+                ability_flag = 0;
+            }
+            pokemonSetStatus(ptr, 0, 0xB7, 0, (u8)ability_flag);
+        }
+    }
+
+    max_level = (u8)level;
+    for (learn_level = 1; learn_level <= max_level; learn_level++) {
+        learn_counter = 0;
+        for (;;) {
+            if ((s8)pokemonOboeWaza(ptr, (u8)learn_level, (u8*)1,
+                                    &learn_counter) == -3) {
+                break;
+            }
+            learn_counter++;
+        }
+    }
+
+    pokemonResetBasisStatus(ptr);
+}
+
 static u32 pokemonCreateRndFitRand32(void) {
     u32 hi;
     u32 lo;

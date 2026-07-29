@@ -519,6 +519,180 @@ void menuCB_InitMenu(s32 id) {
 }
 #pragma pop
 
+static inline s32 fn_80071AE4_poll_read(s32 chan, u32* response, u8* length,
+                                        u8* status) {
+    extern s32 GBARead(s32 chan, void* destination, u8* status);
+    extern s32 GBAGetStatus(s32 chan, u8* status);
+    u32 timeout;
+    u32 start;
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 1;
+        }
+        if (GBAGetStatus(chan, status) != 0) {
+            return 2;
+        }
+        if ((*status & 0xA) == 8) {
+            break;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+    if (GBARead(chan, response, length) != 0) {
+        return 3;
+    }
+    return 0;
+}
+
+static inline u32 fn_80071AE4_swap_word(u32 value) {
+    u32 result;
+
+    result = value >> 24;
+    result |= (value >> 8) & 0x0000FF00;
+    result |= (value << 8) & 0x00FF0000;
+    result |= value << 24;
+    return result;
+}
+
+/* Send a variable-sized data block to one GBA channel. */
+s32 fn_80071AE4(s32 chan, const u32* data) {
+    u32 response;
+    u32 command;
+    u32 send_word;
+    u8 length;
+    u8 send_status;
+    u8 status;
+    s32 key_channel;
+    s32 result;
+    u32 outer_timeout;
+    u32 outer_start;
+    u32 timeout;
+    u32 start;
+    s32 offset;
+    s32 total_size;
+    s32 outer_expired;
+    const u32* data_ptr;
+    u32 packed;
+    u16 extra_size;
+    u16 word_count;
+
+    key_channel = chan + 1;
+    gbaCommandSetKeyState(key_channel, 2);
+    outer_timeout = OSMillisecondsToTicks(100);
+    outer_start = OSGetTick();
+    packed = fn_80071AE4_swap_word(data[3]);
+    extra_size = packed >> 16;
+    word_count = packed;
+
+    do {
+        outer_expired = OSGetTick() - outer_start > outer_timeout;
+
+        {
+            s32 setup_result;
+
+            setup_result = fn_80073C38(chan);
+            if (setup_result != 0) {
+                result = setup_result;
+                goto transfer_done;
+            }
+        }
+
+        command = 0x22;
+        if (GBAWrite(chan, &command, &length) != 0) {
+            result = 0xB;
+            goto header_done;
+        }
+
+        {
+            s32 poll_result;
+
+            poll_result = fn_80071AE4_poll_read(chan, &response, &length,
+                                                &status);
+            result = poll_result != 0 ? poll_result + 0xB : 0;
+        }
+
+header_done:
+        switch (result) {
+        case 0:
+            if ((response >> 24) != 0x22) {
+                result = 0xF;
+                goto transfer_done;
+            }
+
+            total_size = word_count;
+            total_size = total_size * 4 + 0x10;
+            if (extra_size != 0) {
+                total_size += 0x70;
+            }
+
+            data_ptr = data;
+            for (offset = 0; offset < total_size;
+                 offset += 4, data_ptr++) {
+                send_word = *data_ptr;
+                if (GBAWrite(chan, &send_word, &send_status) != 0) {
+                    result = 0x10;
+                    goto data_done;
+                }
+
+                timeout = OSMillisecondsToTicks(100);
+                start = OSGetTick();
+                for (;;) {
+                    if (OSGetTick() - start > timeout) {
+                        result = 0x11;
+                        goto data_done;
+                    }
+                    if (GBAGetStatus(chan, &send_status) != 0) {
+                        result = 0x12;
+                        goto data_done;
+                    }
+                    if ((send_status & 2) == 0) {
+                        break;
+                    }
+                    if (lbl_803B6E18[chan].func != NULL) {
+                        lbl_803B6E18[chan].func(
+                            chan, lbl_803B6E18[chan].arg);
+                    }
+                    if (lbl_803B6E08[chan] == 0) {
+                        continue;
+                    }
+                    result = 0x3E8;
+                    goto data_done;
+                }
+                if (lbl_803B6E08[chan] != 0) {
+                    result = 0x3E8;
+                    goto data_done;
+                }
+            }
+            result = 0;
+
+data_done:
+            switch (result) {
+            case 0:
+                result = 0;
+                break;
+            default:
+                goto transfer_done;
+            }
+            break;
+        default:
+            goto transfer_done;
+        }
+
+transfer_done:
+        ;
+    } while (result == 1 && outer_expired == 0);
+
+    gbaCommandSetKeyState(key_channel, result != 0 ? 1 : 3);
+    return result;
+}
+
 #pragma push
 #pragma peephole off
 s32 fn_80071E34(s32 chan, void* data) {
@@ -913,6 +1087,161 @@ selected_valid_for_mode3:
     return 0;
 }
 
+/* Check the whole party against the selected party rule. */
+u8 fn_80076F2C(void* hero, const u8* rule, s32 mode)
+{
+    extern s32 pokemonGetStatus();
+    extern u8 pokemonBiosGetTamagoFlag();
+    extern u8 pokemonCheckValid();
+    extern u8 pokemonBiosGetLevel();
+    extern u16 pokemonBiosGetItemDataId();
+    extern u16 pokemonBiosGetPokemonDataId();
+    s32 level_total;
+    u8 unique_species;
+    u8 unique_items;
+    u32 i;
+    u32 j;
+    s32 inner_rejected, inner_invalid, inner_present;
+    s32 outer_rejected, outer_invalid, outer_present;
+    void* pokemon;
+    void* other;
+
+    level_total = 0;
+    unique_species = 1;
+    unique_items = 1;
+    for (i = 0; i < 6; i++) {
+        u8 result;
+
+        pokemon = heroBiosGetPokemonPtr(hero, (u16)i);
+
+        outer_invalid = 0;
+        outer_present = pokemon == 0;
+        if ((s32)outer_present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto pokemon_present;
+            }
+        }
+        outer_invalid = 1;
+pokemon_present:
+        if ((s32)outer_invalid != 0) {
+            continue;
+        }
+
+        outer_rejected = 0;
+        if ((s32)outer_present == 0) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                goto pokemon_valid;
+            }
+        }
+        outer_rejected = 1;
+pokemon_valid:
+        if ((s32)outer_rejected != 0) {
+            result = 0;
+        } else {
+            outer_rejected = 0;
+            if (pokemonBiosGetTamagoFlag(pokemon) == 0) {
+                if (pokemonCheckValid(pokemon) != 0) {
+                    goto pokemon_rejected;
+                }
+            }
+            outer_rejected = 1;
+pokemon_rejected:
+            result = (u8)outer_rejected;
+        }
+        if ((u8)result != 0) {
+            continue;
+        }
+
+        level_total += pokemonBiosGetLevel(pokemon);
+        for (j = i + 1; j < 6; j++) {
+            u8 other_result;
+
+            other = heroBiosGetPokemonPtr(hero, (u16)j);
+
+            inner_present = other == 0;
+            inner_invalid = 0;
+            if ((s32)inner_present == 0) {
+                if (pokemonGetStatus(other, 0, 0x6E, 0) != 0) {
+                    goto other_present;
+                }
+            }
+            inner_invalid = 1;
+other_present:
+            if ((s32)inner_invalid != 0) {
+                continue;
+            }
+
+            inner_rejected = 0;
+            if ((s32)inner_present == 0) {
+                if (pokemonGetStatus(other, 0, 0x6E, 0) != 0) {
+                    goto other_valid;
+                }
+            }
+            inner_rejected = 1;
+other_valid:
+            if ((s32)inner_rejected != 0) {
+                other_result = 0;
+            } else {
+                inner_rejected = 0;
+                if (pokemonBiosGetTamagoFlag(other) == 0) {
+                    if (pokemonCheckValid(other) != 0) {
+                        goto other_rejected;
+                    }
+                }
+                inner_rejected = 1;
+other_rejected:
+                other_result = (u8)inner_rejected;
+            }
+            if ((u8)other_result != 0) {
+                continue;
+            }
+
+            if (pokemonBiosGetItemDataId(pokemon) != 0) {
+                unique_items &= pokemonBiosGetItemDataId(pokemon) !=
+                                pokemonBiosGetItemDataId(other);
+            }
+            unique_species &= pokemonBiosGetPokemonDataId(pokemon) !=
+                              pokemonBiosGetPokemonDataId(other);
+        }
+    }
+
+    switch (mode) {
+    case 0:
+        return level_total <= *(const s16*)(rule + 4);
+    case 1:
+        return rule[0xC] != 0 || unique_species != 0;
+    case 2:
+        return rule[0xD] != 0 || unique_items != 0;
+    case 3:
+    {
+        extern void* heroBiosGetPokemonPtr();
+        s32 count;
+        s32 index;
+        s32 slot_invalid;
+
+        count = 0;
+        index = 0;
+        while ((u16)index < 6) {
+            pokemon = heroBiosGetPokemonPtr(hero, index);
+            slot_invalid = 0;
+            if (pokemon != 0) {
+                if (pokemonGetStatus(pokemon, 0, 0x6E, 0) != 0) {
+                    goto count_present;
+                }
+            }
+            slot_invalid = 1;
+count_present:
+            if (slot_invalid == 0) {
+                count++;
+            }
+            index++;
+        }
+        return *(const s16*)(rule + 6) <= (u16)count;
+    }
+    }
+
+    return 0;
+}
 
 #pragma push
 #pragma scheduling off
@@ -1481,6 +1810,138 @@ transfer_done:
 }
 #pragma pop
 
+/* fn_80072D58 (0x80072D58): send a variable-size data block to one GBA
+ * channel. */
+s32 fn_80072D58(s32 chan, const u32* data, s32 size) {
+    extern s32 GBAWrite(s32 chan, void* source, u8* status);
+    extern s32 GBARead(s32 chan, void* destination, u8* status);
+    extern s32 GBAGetStatus(s32 chan, u8* status);
+    u32 response;
+    u32 command;
+    u32 send_word;
+    u8 length;
+    u8 send_status;
+    u8 status;
+    s32 key_channel;
+    s32 result;
+    u32 outer_timeout;
+    u32 outer_start;
+    u32 start;
+    s32 offset;
+    u32 send_timeout;
+    u32 timeout;
+    s32 outer_expired;
+
+    key_channel = chan + 1;
+    gbaCommandSetKeyState(key_channel, 2);
+    outer_timeout = OSMillisecondsToTicks(100);
+    outer_start = OSGetTick();
+    do {
+        outer_expired = OSGetTick() - outer_start > outer_timeout;
+
+        {
+            s32 setup_result;
+
+            setup_result = fn_80073C38(chan);
+            if (setup_result != 0) {
+                result = setup_result;
+                goto transfer_done;
+            }
+        }
+
+        command = 0x66;
+        if (GBAWrite(chan, &command, &length) != 0) {
+            result = 0xB;
+            goto header_done;
+        }
+
+        {
+            s32 poll_result;
+
+            timeout = OSMillisecondsToTicks(100);
+            start = OSGetTick();
+            for (;;) {
+                if (OSGetTick() - start > timeout) {
+                    poll_result = 1;
+                    goto poll_done;
+                }
+                if (GBAGetStatus(chan, &status) != 0) {
+                    poll_result = 2;
+                    goto poll_done;
+                }
+                if ((status & 0xA) == 8) {
+                    break;
+                }
+                if (lbl_803B6E18[chan].func != NULL) {
+                    lbl_803B6E18[chan].func(chan,
+                                           lbl_803B6E18[chan].arg);
+                }
+                if (lbl_803B6E08[chan] != 0) {
+                    poll_result = 0x3E8;
+                    goto poll_done;
+                }
+            }
+            if (GBARead(chan, &response, &length) != 0) {
+                poll_result = 3;
+            } else {
+                poll_result = 0;
+            }
+poll_done:
+            result = poll_result != 0 ? poll_result + 0xB : 0;
+        }
+
+header_done:
+        switch (result) {
+        case 0:
+            if ((response >> 24) != 0x66) {
+                result = 0xF;
+                goto transfer_done;
+            }
+
+            {
+                const u32* data_ptr = data;
+
+                for (offset = 0; offset < size;
+                     offset += 4, data_ptr++) {
+                    send_word = *data_ptr;
+                    if (GBAWrite(chan, &send_word, &send_status) != 0) {
+                        result = 0x10;
+                        goto transfer_done;
+                    }
+
+                    send_timeout = OSMillisecondsToTicks(100);
+                    start = OSGetTick();
+                    for (;;) {
+                        if (OSGetTick() - start > send_timeout) {
+                            result = 0x11;
+                            goto transfer_done;
+                        }
+                        if (GBAGetStatus(chan, &send_status) != 0) {
+                            result = 0x12;
+                            goto transfer_done;
+                        }
+                        if ((send_status & 2) == 0) {
+                            break;
+                        }
+                    }
+                    if ((offset % 0x40) == 0) {
+                        _threadSwitch();
+                    }
+                }
+            }
+            result = 0;
+            break;
+        default:
+            goto transfer_done;
+        }
+transfer_done:
+        ;
+    } while (result == 1 && outer_expired == 0);
+
+    gbaCommandSetKeyState(key_channel, result != 0 ? 1 : 3);
+    return result;
+}
+
 /* fn_80073E84 (0x80073E84): constant-1 accessor. */
 s32 fn_80073E84(void) {
     return 1;
@@ -1665,6 +2126,140 @@ u8 menuCBRule_CheckPokemonEventFlag(u8* pokemon) {
 }
 #pragma pop
 
+typedef struct MenuRuleMessages {
+    u8 pad[0xFC];
+    u16 pokemonErrors[6];
+} MenuRuleMessages;
+
+s32 fn_80076054(void* hero, const u8* battleRules)
+{
+    extern s32 pokemonGetStatus(void*, s32, s32, s32);
+    extern u8 pokemonBiosGetLevel(void*);
+    extern u32 pokemonBiosGetItemDataId(void*);
+    extern u8 fn_80142984(u32);
+    extern u8* fn_8006B420(void);
+    extern u8 fn_80076F2C(void*, const u8*, u32);
+    extern const u8 lbl_8047C0D0[7];
+    extern const u16 lbl_8047C0D8[4];
+    extern u32 lbl_80478928;
+    extern u16 lbl_802EE458[];
+    const MenuRuleMessages* ruleText = (const MenuRuleMessages*)lbl_80268940;
+    u32 partyWork;
+    u32 validationWork;
+    u32 ruleCheck;
+    s32 ruleSlot;
+    u32 teamCheck;
+
+    for (partyWork = 0; partyWork < 6; partyWork++) {
+        for (validationWork = 0; (s32)validationWork < 6; validationWork++) {
+            if (fn_80076398(heroBiosGetPokemonPtr(hero, (u16)validationWork),
+                           partyWork) == 0) {
+                return ruleText->pokemonErrors[partyWork];
+            }
+        }
+    }
+
+    if (battleRules == 0) {
+        return 0;
+    }
+
+    for (ruleCheck = 0; ruleCheck < 3; ruleCheck++) {
+        for (ruleSlot = 0; ruleSlot < 6; ruleSlot++) {
+            u8 valid = 0;
+
+            partyWork = (u32)heroBiosGetPokemonPtr(hero, (u16)ruleSlot);
+            validationWork = 0;
+
+            if (partyWork == 0 ||
+                pokemonGetStatus((void*)partyWork, 0, 0x6E, 0) == 0) {
+                validationWork = 1;
+            }
+
+            if ((s32)validationWork != 0) {
+                valid = 1;
+            } else {
+                switch (ruleCheck) {
+                case 0:
+                    valid = pokemonBiosGetLevel((void*)partyWork) >=
+                            *(s16*)(battleRules + 0);
+                    break;
+                case 1:
+                    valid = *(s16*)(battleRules + 2) >=
+                            pokemonBiosGetLevel((void*)partyWork);
+                    break;
+                case 2: {
+                    u8 itemValid;
+
+                    partyWork = pokemonBiosGetItemDataId((void*)partyWork);
+                    validationWork = (u32)fn_8006B420();
+                    switch ((u16)partyWork) {
+                    case 0:
+                        itemValid = 1;
+                        break;
+                    case 0xAF:
+                        itemValid = 0;
+                        break;
+                    default:
+                        itemValid = fn_80142984(partyWork);
+                        break;
+                    }
+
+                    if (itemValid == 0) {
+                        valid = 0;
+                        break;
+                    }
+
+                    switch (*(s32*)(validationWork + 8)) {
+                    case 0:
+                        valid = 1;
+                        break;
+                    case 1:
+                        valid = (u16)partyWork == 0;
+                        break;
+                    case 2: {
+                        u8* itemRules = (u8*)validationWork;
+                        s32 itemIndex;
+                        const u32 itemCount = lbl_80478928;
+
+                        for (itemIndex = 0; (u32)itemIndex < itemCount;
+                             itemIndex++) {
+                            if ((u16)partyWork == lbl_802EE458[itemIndex]) {
+                                valid = itemRules[0x18 + itemIndex] == 0;
+                                goto item_rule_checked;
+                            }
+                        }
+                        valid = 1;
+item_rule_checked:
+                        break;
+                    }
+                    default:
+                        valid = 0;
+                        break;
+                    }
+                    break;
+                }
+                default:
+                    __assert((const char*)ruleText + 0x108, 0xFB,
+                             (const char*)ruleText + 0x118);
+                    valid = 0;
+                    break;
+                }
+            }
+
+            if (valid == 0) {
+                return ((const u16*)lbl_8047C0D0)[ruleCheck];
+            }
+        }
+    }
+
+    for (teamCheck = 0; teamCheck < 4; teamCheck++) {
+        if (fn_80076F2C(hero, battleRules, teamCheck) == 0) {
+            return lbl_8047C0D8[teamCheck];
+        }
+    }
+    return 0;
+}
+
 /* menuCBRule_CheckPokemonErrorAll (0x80076334): require every party member to
  * pass the per-slot error check. */
 #pragma push
@@ -1683,6 +2278,197 @@ u8 menuCBRule_CheckPokemonErrorAll(void* pokemon) {
     return 1;
 }
 #pragma pop
+
+/* Validate every party member against the active battle rule. */
+u8 fn_800776E4(void* hero) {
+    extern u8* fn_8006B420(void);
+    extern u8 fn_80076F2C(void* hero, const u8* rule, s32 mode);
+    extern void* heroBiosGetPokemonPtr();
+    extern u8 pokemonCheckValid(void* pokemon);
+    extern u8 pokemonBiosGetLevel(void* pokemon);
+    extern u16 pokemonBiosGetItemDataId(void* pokemon);
+    extern s32 pokemonGetStatus(void* pokemon, s32 index, s32 field, s32 subindex);
+    extern u8 fn_80142984(u16 item);
+    extern void __assert(const char* file, s32 line, const char* condition);
+    extern u8 lbl_80268A48[];
+    extern u8 lbl_80268A58[];
+    extern u16 lbl_802EE458[];
+    extern u32 lbl_80478928;
+    s32 is_null;
+    void* party_pokemon;
+    s32 count;
+    s32 party_slot;
+    u8* rule;
+    u8 result;
+    s32 final_result;
+    s32 mode;
+
+    {
+        void* pokemon;
+        s32 slot;
+        s32 check;
+
+        slot = 0;
+        while ((u16)slot < 6) {
+            pokemon = heroBiosGetPokemonPtr(hero, slot);
+            check = 0;
+            do {
+                if (fn_80076398(pokemon, check) == 0) {
+                    result = 0;
+                    goto pokemon_error_done;
+                }
+                check++;
+            } while (check < 6);
+            result = 1;
+
+pokemon_error_done:
+            if (result == 0) {
+                result = 0;
+                goto party_error_done;
+            }
+            slot++;
+        }
+        result = 1;
+    }
+
+party_error_done:
+    final_result = result != 0;
+    if (final_result == 0) {
+        goto done;
+    }
+
+    rule = fn_8006B420();
+    count = 0;
+    mode = count;
+    do {
+        if (fn_80076F2C(hero, rule, mode) == 0) {
+            result = 0;
+            goto trainer_rule_done;
+        }
+        mode++;
+    } while (mode < 4);
+    result = 1;
+
+trainer_rule_done:
+    if (result == 0) {
+        result = 0;
+        goto regulation_done;
+    } else {
+        party_slot = 0;
+        do {
+            party_pokemon = heroBiosGetPokemonPtr(hero, (u16)party_slot);
+            if (party_pokemon != 0) {
+                if (pokemonCheckValid(party_pokemon) != 0) {
+                    s32 check;
+
+                    is_null = party_pokemon == 0;
+                    check = 0;
+                    do {
+                        s32 blank;
+
+                        blank = 0;
+                        if (is_null == 0) {
+                            if (pokemonGetStatus(party_pokemon, 0, 0x6E, 0) != 0) {
+                                goto pokemon_present;
+                            }
+                        }
+                        blank = 1;
+
+pokemon_present:
+                        if (blank != 0) {
+                            result = 1;
+                        } else {
+                            switch (check) {
+                            case 0:
+                                result = pokemonBiosGetLevel(party_pokemon) >=
+                                         *(s16*)(rule + 0);
+                                break;
+                            case 1:
+                                result = pokemonBiosGetLevel(party_pokemon) <=
+                                         *(s16*)(rule + 2);
+                                break;
+                            case 2:
+                            {
+                                u8* item_rule;
+                                u16 item;
+                                u8 valid_item;
+                                s32 i;
+
+                                item = pokemonBiosGetItemDataId(party_pokemon);
+                                item_rule = fn_8006B420();
+                                switch (item) {
+                                case 0:
+                                    valid_item = 1;
+                                    break;
+                                case 0xAF:
+                                    valid_item = 0;
+                                    break;
+                                default:
+                                    valid_item = fn_80142984(item);
+                                    break;
+                                }
+                                if (valid_item == 0) {
+                                    result = 0;
+                                    break;
+                                }
+
+                                switch (*(s32*)(item_rule + 8)) {
+                                case 0:
+                                    result = 1;
+                                    break;
+                                case 1:
+                                    result = item == 0;
+                                    break;
+                                case 2:
+                                    for (i = 0; (u32)i < lbl_80478928; i++) {
+                                        if (item == lbl_802EE458[i]) {
+                                            result = item_rule[i + 0x18] == 0;
+                                            goto item_rule_done;
+                                        }
+                                    }
+                                    result = 1;
+                                    break;
+                                default:
+                                    result = 0;
+                                    break;
+                                }
+item_rule_done:
+                                break;
+                            }
+                            default:
+                                __assert((const char*)lbl_80268A48, 0xFB,
+                                         (const char*)lbl_80268A58);
+                                result = 0;
+                                break;
+                            }
+                        }
+
+                        if (result == 0) {
+                            result = 0;
+                            goto pokemon_rules_done;
+                        }
+                        check++;
+                    } while (check < 3);
+                    result = 1;
+
+pokemon_rules_done:
+                    if (result == 0) {
+                        result = 0;
+                        goto regulation_done;
+                    }
+                    count++;
+                }
+            }
+            party_slot++;
+        } while (party_slot < 6);
+        result = count > 0;
+    }
+
+regulation_done:
+    final_result = result != 0;
+done:
+    return (u8)final_result;
+}
 
 /* fn_80077A5C (0x80077A5C): accept an empty slot or a zero species value. */
 #pragma push
@@ -3143,6 +3929,127 @@ void fn_800792D8(void) {
 }
 #pragma pop
 
+void fn_800798E8(void* backup)
+{
+    typedef struct MenuSaveSnapshot {
+        u8 bytes[0x1DFD0];
+    } MenuSaveSnapshot;
+    extern s32 fn_801D0748(u32, u32, u32);
+    extern u32 fn_80079C1C();
+    extern void* gamedatasaveGetStatus(u32, u32);
+    extern void* savedataGetStatus(u32, u32);
+    extern void* fn_80128DD4(void*);
+    extern u16 pcboxGetItemCapacity(void*, u32);
+    extern void pcboxDelItem(void*, u32, u32);
+    extern void* heroGetStatus(void*, u32, u32);
+    extern u8 pokemonCheckValid(void*);
+    extern void* floorDataBiosGetCurrentPtr(void);
+    extern u32 floorDataBiosGetFloorID(void*);
+    extern void heroPokemonGetPikachu(void*, u32);
+    void* hero;
+    u32 canBag;
+    void* pcbox;
+    s32 saveResult;
+    u32 canParty;
+    u8 i;
+    void* pokemon;
+    u32 partyResult;
+    u32 heroValue;
+    s8 choice;
+
+    saveResult = fn_801D0748(2, 2, 0);
+    if (saveResult != 3 || gamedatasaveGetStatus(0, 4) == NULL) {
+        if (saveResult != -1) {
+            winMsgOpen(2, 0x44DB, 1, 0);
+            winMsgClose(1);
+        }
+        menuClose(0xEF);
+        lbl_8047A638 = 1;
+        return;
+    }
+
+    lbl_8047A635 = fn_80075AC0();
+    lbl_8047A634 = fn_80075B08();
+    lbl_8047A633 = fn_80075B50();
+    heroValue = (u32)heroGetStatus(0, 0xE, 0);
+    if (fn_80079EF4(1, heroValue) == 0) {
+        return;
+    }
+
+    canBag = 1;
+    pcbox = fn_80128DD4(savedataGetStatus(0, 0));
+    if (lbl_8047A632 != 0 && pcboxGetItemCapacity(pcbox, 0x47) < 1) {
+        canBag = 0;
+    }
+    if (lbl_8047A630 != 0 && pcboxGetItemCapacity(pcbox, 1) < 1) {
+        canBag = 0;
+    }
+
+    canParty = 1;
+    hero = savedataGetStatus(0, 2);
+    if (lbl_8047A631 != 0) {
+        for (i = 0; i < 6; i++) {
+            if (pokemonCheckValid(heroGetStatus(hero, 3, i)) != 1) {
+                partyResult = 1;
+                goto party_capacity_done;
+            }
+        }
+        partyResult = 0;
+party_capacity_done:
+        canParty = partyResult;
+    }
+
+    pokemon = heroGetStatus(0, 1, 0);
+    *(MenuSaveSnapshot*)backup =
+        *(MenuSaveSnapshot*)savedataGetStatus(0, 0);
+    if ((u8)fn_80079C1C(1, canBag, canParty, pokemon) == 0) {
+        return;
+    }
+
+    if (lbl_8047A632 != 0) {
+        pcboxDelItem(pcbox, 0x47, 1);
+        fn_80075A9C();
+    }
+    if (lbl_8047A631 != 0) {
+        heroPokemonGetPikachu(
+            hero, floorDataBiosGetFloorID(floorDataBiosGetCurrentPtr()));
+        fn_80075AE4();
+    }
+    if (lbl_8047A630 != 0) {
+        pcboxDelItem(pcbox, 1, 1);
+        fn_80075B2C();
+    }
+
+    if (fn_801D0748(4, 2, 0) != 4) {
+        menuClose(0xEF);
+        *(MenuSaveSnapshot*)savedataGetStatus(0, 0) =
+            *(MenuSaveSnapshot*)backup;
+        lbl_8047A638 = 1;
+        return;
+    }
+
+    winMsgOpenField(0x43C5, 1, 0);
+    choice = (s8)fn_8001E184();
+    if (choice != 0) {
+        if (choice < 0) {
+            if (choice >= -1) {
+                goto accepted;
+            }
+            goto cancelled;
+        }
+        if (choice >= 2) {
+            goto cancelled;
+        }
+accepted:
+        winMsgOpenField(0x43C8, 1, 0);
+        menuClose(0xEF);
+        lbl_8047A638 = 0;
+        return;
+    }
+cancelled:
+    menuClose(0xEF);
+    lbl_8047A638 = 1;
+}
 
 #pragma push
 #pragma peephole off

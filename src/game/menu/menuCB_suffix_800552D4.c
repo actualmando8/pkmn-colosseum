@@ -399,6 +399,145 @@ s32 fn_800552D4(s8 box, s8 slot)
     return slot;
 }
 
+void fn_800558B8(void)
+{
+    extern void fn_80166A50(s32, s32, s32, s32);
+    extern s32 fn_800576B4(void);
+    extern void fn_80058804(void*, s32);
+    extern s32 fn_8005D3D0(s32);
+    extern void fn_800587D8(void);
+    extern void fn_800546F0(s32);
+    extern s32 fn_80054680(void);
+    extern void fn_800599AC(s32);
+    extern void fn_800546C0(s32);
+    extern u32 fn_80056A78(void);
+    extern s32 fn_800552D4();
+    extern s32 fn_8005D26C(void);
+    extern void fadeSet(s32, f32);
+    extern s32 fadeCheck(s32);
+    extern void fn_8005471C(void);
+    extern void fn_80056A80(void);
+    extern void* fn_800574E0(void);
+    extern s32 fn_80057694(void);
+    extern void fn_80057A38(void);
+    extern u32 fn_80057B34(u32, u32);
+    extern void fn_80057A64(void*, s32);
+    MenuCBPokemonBlob pokemonCopy;
+    void* pokemonCopyPtr;
+    s32 selectedSlot;
+    s32 slot;
+    s32* selectedSlotPtr;
+    s32 selection;
+    s32 result;
+    s32 haveCopy;
+
+    selectedSlot = 0;
+    selectedSlotPtr = &selectedSlot;
+    lbl_8047A560 = 0;
+    fn_80166A50(0x27, 0, 0xFF, 0);
+
+    for (;;) {
+        selection = menuOpenCustom(0x93, 0x10E, (s32)selectedSlotPtr, 0, 1, 0);
+        selectedSlotPtr = NULL;
+
+        if (selection == -1) {
+            if (fn_800576B4() == 3) {
+                fn_80058804((void*)0x1B7E, 1);
+                continue;
+            }
+
+            fn_80058804((void*)0x1B8B, 0);
+            result = fn_8005D3D0(0);
+            fn_800587D8();
+            switch (result) {
+            case 0:
+                continue;
+            }
+            break;
+        }
+
+        if ((s32)lbl_8047A560 != 0) {
+            fn_800546F0(0);
+            while (fn_80054680() == 2) {
+                _threadSwitch();
+            }
+            fn_800599AC(1);
+            fn_800546C0(0);
+            while (fn_80054680() == 3) {
+                _threadSwitch();
+            }
+            lbl_8047A560 = 0;
+            continue;
+        }
+
+        if (selection < 0 || selection >= 32) {
+            result = 3;
+        } else {
+            slot = lbl_80267398[selection].slot;
+            result = lbl_80267398[selection].kind;
+        }
+
+        switch (result) {
+        case 2:
+            fn_800546F0(0);
+            while (fn_80054680() == 2) {
+                _threadSwitch();
+            }
+            fn_800599AC(0);
+            fn_800546C0(0);
+            while (fn_80054680() == 3) {
+                _threadSwitch();
+            }
+            selectedSlot = 0;
+            selectedSlotPtr = &selectedSlot;
+            break;
+        case 0:
+            selectedSlot = fn_800552D4(fn_80056A78(), slot);
+            selectedSlotPtr = &selectedSlot;
+            break;
+        case 1:
+            haveCopy = 0;
+            fn_80058804((void*)0x1B87, 0);
+            result = fn_8005D26C();
+            fn_800587D8();
+            switch (result) {
+            case 0:
+                fadeSet(3, lbl_8047BE98);
+                fadeCheck(1);
+                fn_8005471C();
+                fn_80056A80();
+                if (fn_800576B4() == 3) {
+                    haveCopy = 1;
+                    pokemonCopy = *(MenuCBPokemonBlob*)fn_800574E0();
+                }
+                result = fn_80057694();
+                fn_80057A38();
+                {
+                    u32 box = fn_80056A78();
+                    fn_80057B34(3, box);
+                    fn_80056B74((MenuCBPane*)box, 0);
+                }
+                fn_80054760(0, 0);
+                if (haveCopy != 0) {
+                    pokemonCopyPtr = &pokemonCopy;
+                } else {
+                    pokemonCopyPtr = NULL;
+                }
+                fn_80057A64(pokemonCopyPtr, result);
+                fadeSet(2, lbl_8047BE98);
+                fadeCheck(1);
+                break;
+            default:
+                continue;
+            }
+            break;
+        }
+    }
+
+    fn_80166A50(0x28, 0, 0xFF, 0);
+    menuCloseCustom(0x93, 2, 0);
+    menuCloseSync(0x93, 1);
+}
 
 #pragma push
 #pragma peephole off

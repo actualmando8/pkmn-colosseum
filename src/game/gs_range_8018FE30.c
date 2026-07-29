@@ -191,6 +191,58 @@ u8 fn_801902E0(s32 flagId)
     return result;
 }
 
+#define DEFINE_FLAG_SET(name, args, fixedValue)                               \
+    void name args                                                             \
+    {                                                                          \
+        extern u8* lbl_80478F9C;                                               \
+        extern FlagStateEntry* lbl_80478EEC;                                   \
+        extern u32 lbl_8036C568[];                                             \
+        u8* definition = lbl_80478F9C + (flagId << 3);                         \
+        u32 typeAndWidth = definition[0];                                      \
+        u32* buffer = lbl_80478EEC[(typeAndWidth & 0xC0) >> 6].buffer;         \
+        u32 value = fixedValue;                                                \
+        u32 bitWidth;                                                          \
+        u32 bitOffset;                                                         \
+        u32 wordIndex;                                                         \
+        u32 bitPosition;                                                       \
+        u32 mask;                                                              \
+                                                                               \
+        if (buffer == NULL) {                                                  \
+            GSlogWrite(lbl_802741F8);                                          \
+            return;                                                            \
+        }                                                                      \
+        bitWidth = typeAndWidth & 0x3F;                                        \
+        bitOffset = *(u16*)(definition + 4);                                   \
+        if (32 - __cntlzw(value) > bitWidth) {                                 \
+            GSlogWrite(lbl_802741F8 + 0x34, flagId, value, value,              \
+                       32 - __cntlzw(value), bitWidth);                         \
+            value &= lbl_8036C568[bitWidth];                                   \
+        }                                                                      \
+        wordIndex = bitOffset >> 5;                                            \
+        bitPosition = bitOffset & 0x1F;                                        \
+        if (bitWidth > 1) {                                                    \
+            mask = lbl_8036C568[bitWidth];                                     \
+            buffer[wordIndex] = (buffer[wordIndex] & ~(mask << bitPosition))   \
+                              | (value << bitPosition);                         \
+            if (bitWidth + bitPosition >= 32) {                                \
+                u32 remaining = bitWidth + bitPosition - 32;                   \
+                mask = lbl_8036C568[remaining];                                \
+                buffer[wordIndex + 1] = (buffer[wordIndex + 1] & ~mask)        \
+                                      | (value >> (bitWidth - remaining));      \
+            }                                                                  \
+        } else if (value == 0) {                                               \
+            buffer[wordIndex] &= ~(1u << bitPosition);                         \
+        } else {                                                               \
+            buffer[wordIndex] |= 1u << bitPosition;                            \
+        }                                                                      \
+    }
+
+DEFINE_FLAG_SET(fn_801903B0, (s32 flagId), 0)
+DEFINE_FLAG_SET(fn_80190528, (s32 flagId), 1)
+DEFINE_FLAG_SET(_flagSet, (s32 flagId, u32 valueArg), valueArg)
+
+#undef DEFINE_FLAG_SET
+
 u32 fn_801906A0(s32 flagId)
 {
     extern u8* lbl_80478F9C;

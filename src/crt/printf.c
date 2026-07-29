@@ -35,8 +35,8 @@ s32 vsprintf(char* buf, const char* fmt, va_list args);
  */
 s32 sprintf(char* buf, const char* fmt, ...) {
     extern s32 __StringWrite(void* data, s32 count, __FILE* file);
-    struct { char* p; s32 a; s32 b; } sf;
     va_list args;
+    struct { char* p; s32 a; s32 b; } sf;
     s32 n;
 
     __builtin_va_info(&args);

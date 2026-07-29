@@ -91,6 +91,54 @@ s32 fn_8017F794(u32 a, u32 b, u32 c)
     return 0;
 }
 
+typedef struct GsRangeCacheNode {
+    void* task;
+    struct GsRangeCacheNode* link4;
+    struct GsRangeCacheNode* link8;
+    s32 value;
+    u32 fileHandle;
+    u32 key1;
+    u32 key2;
+    u32 active;
+} GsRangeCacheNode;
+
+void fn_8017F800(u32 fileHandle)
+{
+    extern void fn_8017FB08(void*);
+    GsRangeCacheNode** list = (GsRangeCacheNode**)lbl_80454038;
+    GsRangeCacheNode* node = list[0];
+    GsRangeCacheNode* link4;
+    GsRangeCacheNode* link8;
+
+    while (node != NULL) {
+        if (node->active != 0 && node->fileHandle == fileHandle) {
+            link8 = node->link8;
+            link4 = node->link4;
+            if (link8 != NULL) {
+                link8->link4 = node->link4;
+            }
+            if (link4 != NULL) {
+                link4->link8 = node->link8;
+            }
+            ((u32*)lbl_80454038)[3]--;
+            node->value = 0;
+            node->fileHandle = 0;
+            node->key1 = 0;
+            node->key2 = 0;
+            if (node->task != NULL) {
+                fn_8017FB08(node->task);
+                node->task = NULL;
+            }
+            node->active = 0;
+            if (list[1] == node) {
+                node->link8 = NULL;
+                list[1] = node->link4;
+            }
+        }
+        node = node->link8;
+    }
+}
+
 typedef struct GsRangeMemNode {
     struct GsRangeMemNode* next;
     s32 size;
@@ -133,7 +181,247 @@ s32 fn_8017FA5C(void)
     return sum + lbl_80455048.totalBase;
 }
 
+typedef struct GsRangeDVDQueueEntry {
+    u8 _pad00[0x20];
+    u32 state;
+    s32 mode;
+    void* srcPtr;
+    void* dstPtr;
+    u32 size;
+    u32 flag34;
+    void (*callback)(void* entry);
+    u32 callbackArg;
+    u32 index;
+} GsRangeDVDQueueEntry;
+
+extern u32 lbl_8047B1D4;
+extern u32 lbl_8047B1D8;
+extern u32 OSDisableInterrupts(void);
+extern void OSRestoreInterrupts(u32 level);
+extern void fn_800AE630(void* request, void* owner, u32 direction, u32 offset,
+                        void* callback, void* callbackArg, void* src,
+                        void* dst, u32 size);
 extern void DCFlushRange(void* addr, u32 nBytes);
+void fn_801808E4(volatile GsRangeRequest* req);
+
+void fn_80180320(void* dst, void* src, u32 size)
+{
+    GsRangeDVDQueueEntry* entry;
+    GsRangeDVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+
+    if (size == 0) {
+        return;
+    }
+
+    entry = (GsRangeDVDQueueEntry*)lbl_8047B1D4;
+    result = NULL;
+    for (i = 0; i < lbl_8047B1D8; i++, entry++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    alignedSize = (size + 0x1F) & ~0x1F;
+    entry->flag34 = 1;
+    entry->mode = 1;
+    entry->callback = NULL;
+    entry->callbackArg = 0;
+    entry->srcPtr = dst;
+    entry->dstPtr = src;
+    entry->size = alignedSize;
+    DCFlushRange(dst, size);
+    fn_800AE630(entry, entry, 1, 0, fn_801808E4, entry, src, dst,
+                alignedSize);
+    OSRestoreInterrupts(savedIntr);
+
+    while (entry->state != 0) {
+        if (entry->mode != 1) {
+            entry->state = 0;
+        }
+    }
+}
+
+void* fn_80180450(void* src, void* dst, u32 size)
+{
+    GsRangeDVDQueueEntry* entry;
+    GsRangeDVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1F) & ~0x1F;
+    entry = (GsRangeDVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry++;
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 0;
+    entry->mode = 1;
+    entry->callback = NULL;
+    entry->callbackArg = 0;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst,
+                alignedSize);
+    OSRestoreInterrupts(savedIntr);
+
+    result = entry;
+    while (result->state != 0) {
+        if (result->mode != 1) {
+            result->state = 0;
+        }
+    }
+    return result;
+}
+
+void* fn_80180584(void* src, void* dst, u32 size, u32 cbA, u32 cbB)
+{
+    GsRangeDVDQueueEntry* entry;
+    GsRangeDVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1F) & ~0x1F;
+    entry = (GsRangeDVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry++;
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 1;
+    entry->mode = 1;
+    entry->callback = (void (*)(void*))cbA;
+    entry->callbackArg = cbB;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 1, 0, fn_801808E4, entry, dst, src,
+                alignedSize);
+    OSRestoreInterrupts(savedIntr);
+    return entry;
+}
+
+void* fn_80180694(void* src, void* dst, u32 size, u32 cbA, u32 cbB)
+{
+    GsRangeDVDQueueEntry* entry;
+    GsRangeDVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1F) & ~0x1F;
+    entry = (GsRangeDVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry++;
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 0;
+    entry->mode = 1;
+    entry->callback = (void (*)(void*))cbA;
+    entry->callbackArg = cbB;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst,
+                alignedSize);
+    OSRestoreInterrupts(savedIntr);
+    return entry;
+}
+
+void* fn_801807A8(void* src, void* dst, u32 size)
+{
+    GsRangeDVDQueueEntry* entry;
+    GsRangeDVDQueueEntry* result;
+    u32 i;
+    u32 alignedSize;
+    u32 savedIntr;
+    u32 count;
+
+    if (size == 0) {
+        return NULL;
+    }
+
+    alignedSize = (size + 0x1F) & ~0x1F;
+    entry = (GsRangeDVDQueueEntry*)lbl_8047B1D4;
+    count = lbl_8047B1D8;
+    result = NULL;
+    for (i = 0; i < count; i++) {
+        if (entry->state == 0) {
+            entry->state = 1;
+            result = entry;
+            break;
+        }
+        entry++;
+    }
+
+    entry = result;
+    savedIntr = OSDisableInterrupts();
+    entry->flag34 = 0;
+    entry->mode = 1;
+    entry->callback = NULL;
+    entry->callbackArg = 0;
+    entry->srcPtr = src;
+    entry->dstPtr = dst;
+    entry->size = alignedSize;
+    DCFlushRange(src, alignedSize);
+    fn_800AE630(entry, entry, 0, 0, fn_801808E4, entry, src, dst,
+                alignedSize);
+    OSRestoreInterrupts(savedIntr);
+    return entry;
+}
 
 void fn_801808E4(volatile GsRangeRequest* req)
 {
