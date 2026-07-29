@@ -14,7 +14,7 @@ typedef struct OSResetFunctionInfo {
 } OSResetFunctionInfo;
 
 void OSRegisterResetFunction(OSResetFunctionInfo* info);
-void OSResetSystem(u32 reset, u32 resetCode, BOOL forceMenu);
+void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu);
 u32  OSGetResetCode(void);
 void __OSResetSWInterruptHandler(s16 interrupt, OSContext* context);
 void __OSReboot(u32 resetCode, u32 bootDol);

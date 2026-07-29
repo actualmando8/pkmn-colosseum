@@ -184,7 +184,11 @@ void fn_80058150(void) {
 
     state = (ColosseumBattleConnectState*)lbl_803A9A08;
     if (state->active != 0) {
-        connectedState = state->connected != 0;
+        if (state->connected != 0) {
+            connectedState = 1;
+        } else {
+            connectedState = 0;
+        }
     } else {
         connectedState = 2;
     }
@@ -203,7 +207,11 @@ void fn_80058150(void) {
     if (shouldSkipWait == 0) {
         while (1) {
             if (state->active != 0) {
-                connectedState = state->connected != 0;
+                if (state->connected != 0) {
+                    connectedState = 1;
+                } else {
+                    connectedState = 0;
+                }
             } else {
                 connectedState = 2;
             }

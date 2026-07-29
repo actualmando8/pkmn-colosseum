@@ -49,7 +49,7 @@ static inline u32 cardExnorDone(u32 data, u32 shift)
     return work;
 }
 
-void DoneCallback(void* task)
+void DoneCallback(void* _task)
 {
     u8 readBuffer[64];
     u32 data;
@@ -63,10 +63,12 @@ void DoneCallback(void* task)
     s32 chan;
     CARDControl* card;
     s32 result;
+    DSPTaskInfo* task;
     CARDDecParam* parameter;
     u8* input;
     u8* output;
 
+    task = _task;
     for (chan = 0; chan < 2; ++chan) {
         card = &lbl_803FC620[chan];
         if ((DSPTaskInfo*) card->task == task) {

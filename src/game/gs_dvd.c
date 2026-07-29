@@ -520,7 +520,7 @@ GSDVDWork* _info2work(void* fileInfo)
 
     base = lbl_8047B0F4;
     work = base;
-    for (i = 0; i < lbl_8047B0F8; i++, work++) {
+    for (i = 0; i < lbl_8047B0F8; work++, i++) {
         if (work->active != 0 && work->fileInfo == fileInfo) {
             return &base[i];
         }
@@ -568,9 +568,9 @@ u8 fn_80167118(u32 slot, u32 stream, const char* path, u32 offset,
     extern void fn_80167B70();
     GSsndOpenState* state = &lbl_80478FB4[slot];
     void* resource1;
+    void* sampleData;
     void* resource2;
     void* resource3;
-    void* sampleData;
 
     if (state->active == 1) {
         return 0;

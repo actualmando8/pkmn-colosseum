@@ -496,6 +496,9 @@ static inline void RObjReqAnim(HSD_RObj* robj, f32 frame)
 
 void fn_801AFEFC(HSD_RObj* robj, f32 frame)
 {
+    if (robj == NULL) {
+        return;
+    }
     for (; robj != NULL; robj = robj->next) {
         RObjReqAnim(robj, frame);
     }
@@ -510,6 +513,9 @@ static inline void RObjReqAnimByFlags(HSD_RObj* robj, f32 frame, u32 flags)
 
 void fn_801AFF64(HSD_RObj* robj, f32 frame, u32 flags)
 {
+    if (robj == NULL) {
+        return;
+    }
     for (; robj != NULL; robj = robj->next) {
         RObjReqAnimByFlags(robj, frame, flags);
     }
@@ -525,6 +531,9 @@ static inline void RObjRemoveAnim(HSD_RObj* robj)
 
 void fn_801AFFE0(HSD_RObj* robj)
 {
+    if (robj == NULL) {
+        return;
+    }
     for (; robj != NULL; robj = robj->next) {
         RObjRemoveAnim(robj);
     }

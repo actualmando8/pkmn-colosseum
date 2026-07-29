@@ -1184,7 +1184,11 @@ void HSD_PObjGetMtxMark(s32 index, u32* first, u32* second)
 #pragma optimization_level 1
 void fn_801AB5F8(s32 index, void* ptr, s32 value)
 {
-    extern u8 lbl_80465678[];
+    typedef struct HSD_MtxMark {
+        void* obj;
+        s32 mark;
+    } HSD_MtxMark;
+    extern HSD_MtxMark lbl_80465678[];
     s32 i = index;
 
     if (i >= 2) {
@@ -1198,8 +1202,8 @@ void fn_801AB5F8(s32 index, void* ptr, s32 value)
     }
 
 store:
-    *(void**) ((u8*) lbl_80465678 + (u32) i * 8) = ptr;
-    *(s32*) ((u8*) lbl_80465678 + (u32) i * 8 + 4) = value;
+    lbl_80465678[i].obj = ptr;
+    lbl_80465678[i].mark = value;
 }
 #pragma pop
 
@@ -1208,12 +1212,16 @@ store:
 #pragma optimization_level 1
 void fn_801AB63C(u32 first, u32 second)
 {
-    extern u8 lbl_80465678[];
+    typedef struct HSD_MtxMark {
+        u32 obj;
+        u32 mark;
+    } HSD_MtxMark;
+    extern HSD_MtxMark lbl_80465678[];
     s32 i;
 
     for (i = 0; i < 2; i++) {
-        ((u32*) lbl_80465678)[2 * i] = first;
-        ((u32*) lbl_80465678)[2 * i + 1] = second;
+        lbl_80465678[i].obj = first;
+        lbl_80465678[i].mark = second;
     }
 }
 #pragma pop

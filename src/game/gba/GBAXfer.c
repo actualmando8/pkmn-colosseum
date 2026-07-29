@@ -207,8 +207,8 @@ u32 __GBATransfer(int r3,u32 r4,u32 r5,u32 r6)
   extern u32 OSDisableInterrupts(void);
   extern void OSRestoreInterrupts(u32);
   extern int SIGetTypeAsync();
-  u8 *entry;
   u32 interrupts;
+  u8 *entry;
 
   entry = lbl_804783E0 + r3 * 0x100;
   interrupts = OSDisableInterrupts();

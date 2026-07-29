@@ -3168,7 +3168,11 @@ void menuPokemonDrawItem(u8* ctx, u8* pane) {
         break;
     case 0x3BB:
     case 0x3C9:
-        winSpriteSetDisp(pane, *(u16*)(entry + 0x2A) != 0);
+        if (*(u16*)(entry + 0x2A) != 0) {
+            winSpriteSetDisp(pane, 1);
+        } else {
+            winSpriteSetDisp(pane, 0);
+        }
         break;
     case 0x3BF:
         fn_800FB680(0x2E, 0, color, 0x2BD4);

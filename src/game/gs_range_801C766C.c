@@ -989,7 +989,11 @@ s32 fn_801C7730(s32 side, s32 slot)
         offset.y = lbl_8047E114;
         offset.z = lbl_8047E110 * (f32)sin(angle);
         GSvecAdd(&entries[i].pos, &offset, &partner);
-        entries[i].blocked = fn_8010F320(&partner, &entries[i].pos, 0) != 0;
+        if (fn_8010F320(&partner, &entries[i].pos, 0) != 0) {
+            entries[i].blocked = 1;
+        } else {
+            entries[i].blocked = 0;
+        }
         entries[i].distance = GSvecDistance(&entries[i].pos, &origin);
     }
     qsort(entries, 8, sizeof(DistanceSortEntry), _fnDistanceSortFunc__FPCvPCv);
@@ -1042,7 +1046,11 @@ s32 fn_801C7730(s32 side, s32 slot)
         offset.y = lbl_8047E114;
         offset.z = lbl_8047E110 * (f32)sin(angle);
         GSvecAdd(&entries[i].pos, &offset, &origin);
-        entries[i].blocked = fn_8010F320(&origin, &entries[i].pos, 0) != 0;
+        if (fn_8010F320(&origin, &entries[i].pos, 0) != 0) {
+            entries[i].blocked = 1;
+        } else {
+            entries[i].blocked = 0;
+        }
         entries[i].distance = GSvecDistance(&entries[i].pos, &origin);
     }
     qsort(entries, 8, sizeof(DistanceSortEntry), _fnDistanceSortFunc__FPCvPCv);

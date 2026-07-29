@@ -148,20 +148,33 @@ asm void GBAGetStatus(void) {
 }
 #endif
 #pragma pop
-static inline s32 GBAGetStatusAsync(s32 chan, u32 status, u32 callback) {
-  u8 *entry = lbl_804783E0 + chan * 0x100;
-  if (*(u32 *)(entry + 0x1C) != 0) {
+typedef struct GBAControl {
+  u8 output[5];
+  u8 input[5];
+  s32 outputBytes;
+  s32 inputBytes;
+  u8 *status;
+  u8 *ptr;
+  void (*callback)(s32, s32);
+  s32 ret;
+  u8 padding[0xDC];
+} GBAControl;
+
+static inline s32 GBAGetStatusAsync(s32 chan, u8 *status, void (*callback)(s32, s32)) {
+  GBAControl *gba = &((GBAControl *)lbl_804783E0)[chan];
+  if (gba->callback != NULL) {
     return 2;
   }
-  *(u8 *)(entry + 0x0) = 0;
-  *(u32 *)(entry + 0x14) = status;
-  *(u32 *)(entry + 0x1C) = callback;
+  gba->output[0] = 0;
+  gba->status = status;
+  gba->callback = callback;
   return __GBATransfer(chan, 1, 3, (u32)ShortCommandProc);
 }
 
-u32 GBAGetStatus(int r3, u32 r4) {
+u32 GBAGetStatus(int r3, u8 *r4) {
+  GBAControl *gba = &((GBAControl *)lbl_804783E0)[r3];
   s32 result;
-  result = GBAGetStatusAsync(r3, r4, (u32)__GBASyncCallback);
+  result = GBAGetStatusAsync(r3, r4, (void (*)(s32, s32))__GBASyncCallback);
   if (result != 0) {
     return result;
   }
@@ -177,20 +190,21 @@ asm void GBAReset(void) {
 }
 #endif
 #pragma pop
-static inline s32 GBAResetAsync(s32 chan, u32 status, u32 callback) {
-  u8 *entry = lbl_804783E0 + chan * 0x100;
-  if (*(u32 *)(entry + 0x1C) != 0) {
+static inline s32 GBAResetAsync(s32 chan, u8 *status, void (*callback)(s32, s32)) {
+  GBAControl *gba = &((GBAControl *)lbl_804783E0)[chan];
+  if (gba->callback != NULL) {
     return 2;
   }
-  *(u8 *)(entry + 0x0) = 0xFF;
-  *(u32 *)(entry + 0x14) = status;
-  *(u32 *)(entry + 0x1C) = callback;
+  gba->output[0] = 0xFF;
+  gba->status = status;
+  gba->callback = callback;
   return __GBATransfer(chan, 1, 3, (u32)ShortCommandProc);
 }
 
-u32 GBAReset(int r3, u32 r4) {
+u32 GBAReset(int r3, u8 *r4) {
+  GBAControl *gba = &((GBAControl *)lbl_804783E0)[r3];
   s32 result;
-  result = GBAResetAsync(r3, r4, (u32)__GBASyncCallback);
+  result = GBAResetAsync(r3, r4, (void (*)(s32, s32))__GBASyncCallback);
   if (result != 0) {
     return result;
   }

@@ -2406,7 +2406,11 @@ void fn_8003AFDC(u8* context, PdaSprite* sprite)
         fn_801EE614(battleId);
         fn_801EE8F4(battleId);
         if (fn_801EEAD0(battleId) != 0) {
-            state = fn_801EEC74(battleId) != 0;
+            if (fn_801EEC74(battleId) != 0) {
+                state = 1;
+            } else {
+                state = 0;
+            }
         } else {
             state = 2;
         }

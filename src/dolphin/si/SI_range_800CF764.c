@@ -458,8 +458,6 @@ u32 SISetXY(u32 x, u32 y) {
     return poll;
 }
 
-#pragma push
-#pragma peephole off
 u32 SIEnablePolling(u32 poll) {
     BOOL enabled;
     u32 en;
@@ -482,7 +480,6 @@ u32 SIEnablePolling(u32 poll) {
     OSRestoreInterrupts(enabled);
     return poll;
 }
-#pragma pop
 
 u32 SIDisablePolling(u32 poll) {
     BOOL enabled;

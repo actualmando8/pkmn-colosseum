@@ -300,15 +300,12 @@ void fn_800B80CC(s32 vtxfmt, const GXVtxAttrFmtList_800B771C* list)
 }
 
 void fn_800B7BC4(void) {
-    volatile u32* gx32;
-
     GX_FIFO_U8 = 0x8;
-    gx32 = (u32*)gx;
     GX_FIFO_U8 = 0x50;
-    GX_FIFO_U32 = gx32[0x5];
+    GX_FIFO_U32 = gx->vcdLo;
     GX_FIFO_U8 = 0x8;
     GX_FIFO_U8 = 0x60;
-    GX_FIFO_U32 = gx32[0x6];
+    GX_FIFO_U32 = gx->vcdHi;
     fn_800B771C();
 }
 

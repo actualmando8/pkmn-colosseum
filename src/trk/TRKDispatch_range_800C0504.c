@@ -39,11 +39,11 @@ extern void TRKProcessInput(s32 bufferId);
 
 void OutputData(void* data, s32 length)
 {
-    u8* current = data;
     s32 i;
+    u8* current = data;
 
-    for (i = 0; i < length; i++, current++) {
-        MWTRACE(8, lbl_8026FA34, *current);
+    for (i = 0; i < length; i++) {
+        MWTRACE(8, lbl_8026FA34, current[i]);
         if (i % 16 == 15) {
             MWTRACE(8, lbl_8026FA3C);
         }
