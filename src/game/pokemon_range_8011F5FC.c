@@ -36,7 +36,7 @@ extern void gamedataAttestCreate();
 extern void gamedataAttestInit();
 extern void gamedataCreate();
 extern void gamedataGetStatus();
-extern void GScharCmp();
+extern s32 GScharCmp();
 extern void GScharLenCpy();
 extern void GSflagClear();
 extern void GSmsgFontClose();
@@ -146,13 +146,13 @@ extern void wazaDataBiosSetTypeId(u8* ptr, u16 idx, u8 val);
 extern u32 wazaDataBiosGetFightTrainerAiWazaDamageFuncPtr(u8* ptr);
 extern u32 wazaDataBiosGetFightTrainerAiWazaHitFuncPtr(u8* ptr);
 extern u32 wazaDataBiosGetFightTrainerAiWazaValueFuncPtr(u8* ptr);
-extern void pokemonGetDarkPokemonLevel(void);
+extern s32 pokemonGetDarkPokemonLevel(u8* pokemon);
 extern u32 pokemonDataCheckValid(u32 a, u16 key);
 extern u8 fn_80121ADC(u8* ptr, u32 slot);
 extern s32 pokemonSetWazaStatus(u8*, u32, u8);
 extern u32 pokemonWazaCheckValid(u8* ptr, u32 arg2);
 extern void pokemonInit(u8* ptr);
-extern void pokemonEvolutionCreateAddPokemon();
+extern s32 pokemonEvolutionCreateAddPokemon();
 extern s32 pokemonEvolution();
 extern void savedataInit(void);
 extern void heroAddPokedoru(u8* ptr, u32 offset);
@@ -440,8 +440,8 @@ extern void fn_8010C4D4(void);
 extern void fn_8010C46C(void);
 extern u32 fn_800E0C54(void);
 extern u8 lbl_8027296C[];
-void pokemonCheckSetMonohiroi(void);
-void pokemonAllKaihuku(void);
+s32 pokemonCheckSetMonohiroi(u8* pokemon);
+void pokemonAllKaihuku(u8* pokemon);
 extern u32 fn_801DE190(u32 idx, u32 base, u32 flag);
 extern void fn_801DA3CC(void);
 extern void fn_801DA36C(void);
@@ -468,9 +468,9 @@ extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
 extern void fn_800F9EE4(void);
 extern void jumptable_80363468();
-void getEvoPokemonLevelUp(void);
-extern void itemDataBiosGetItemSoubiDataId(void);
-void pokemonEvolutionCheck(void);
+extern s32 getEvoPokemonLevelUp();
+extern u32 itemDataBiosGetItemSoubiDataId();
+s32 pokemonEvolutionCheck();
 extern u8 lbl_80408400[];
 extern void fn_8013528C(void);
 extern void GScharMakeFromSJIS(void);
@@ -1451,7 +1451,7 @@ extern f32 lbl_8047CFFC;
 extern f32 lbl_8047D000;
 extern f32 lbl_8047D004;
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonGetDarkPokemonLevel(void);
+s32 pokemonGetDarkPokemonLevel(u8* pokemon);
 /* 0x8011F910 | 0x2BC */
 extern f64 lbl_8047D008;
 extern f64 lbl_8047D010;
@@ -1862,15 +1862,200 @@ s32 pokemonEvolutionAll(u8* pokemon, u32 evolution_id, u32 add_species,
 /* 0x80128300 | 0x224 */
 extern u8 lbl_802729A4[];
 extern u8 lbl_80272998[];
-/* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-void pokemonEvolutionCreateAddPokemon();
+s32 pokemonEvolutionCreateAddPokemon(dst, source, species)
+u8* dst;
+u8* source;
+u32 species;
+{
+    u16 volatile_statuses[] = { 0xB0, 0xB1, 0xB2, 0xB3, 0xB4 };
+    u16 condition_statuses[] = {
+        0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8,
+        0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE
+    };
+    u8* data;
+    s32 i;
+
+    if (!pokemonDataCheckValid(0, species)) {
+        return 0;
+    }
+
+    data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(source));
+    if (data == NULL) {
+        return 0;
+    }
+
+    pokemonBiosCopy((u32*)dst, (u32*)source);
+    pokemonBiosSetPokemonDataId(dst, species);
+
+    data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(dst));
+    if (data == NULL) {
+        return 0;
+    }
+
+    pokemonBiosSetNicknamePtr(
+        dst, (void*)GSmsgGetGSchar(pokemonDataBiosGetName(data)));
+    pokemonBiosSetItemDataId(dst, 0);
+    pokemonSetStatus(dst, 0, 0xBB, 0, 0);
+    pokemonSetStatus(dst, 0, 0xBE, 0, 0);
+
+    for (i = 0; i < 5; i++) {
+        pokemonSetStatus(dst, 0, volatile_statuses[i], 0, 0);
+    }
+    for (i = 0; i < 12; i++) {
+        pokemonSetStatus(dst, 0, condition_statuses[i], 0, 0);
+    }
+
+    pokemonSetStatus(dst, 0, 0xAF, 0, 0);
+    pokemonInitJoutai(dst);
+    pokemonSetStatus(dst, 0, 0xBC, 0, 0);
+    pokemonResetBasisStatus(dst);
+    return 1;
+}
 /* 0x80128524 | 0x1A4 */
-/* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
-s32 pokemonEvolution();
+s32 pokemonEvolution(dst, source, species, evolution, learned_moves)
+u8* dst;
+u8* source;
+u32 species;
+u8* evolution;
+u16* learned_moves;
+{
+    u8 move_index;
+    u8 level;
+    u8* old_data;
+    u16 move;
+    s32 move_count;
+    s32 output_offset;
+
+    move_count = 0;
+    output_offset = 0;
+    if (!pokemonCheckValid(source)) {
+        return -1;
+    }
+    if (!pokemonDataCheckValid(0, species)) {
+        return -1;
+    }
+
+    old_data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(source));
+    if (old_data == NULL) {
+        return -1;
+    }
+
+    pokemonBiosCopy((u32*)dst, (u32*)source);
+    if (GScharCmp(pokemonBiosGetNicknamePtr(dst),
+                  (void*)GSmsgGetGSchar(pokemonDataBiosGetName(old_data))) == 0) {
+        pokemonBiosSetNicknamePtr(
+            dst,
+            (void*)GSmsgGetGSchar(
+                pokemonDataBiosGetName(pokemonDataBiosGetPtr(species))));
+    }
+
+    pokemonBiosSetPokemonDataId(dst, species);
+    pokemonResetBasisStatus(dst);
+    if (*evolution == 6) {
+        pokemonDoItemSoubi(dst, 0, 0);
+    }
+
+    level = pokemonBiosGetLevel(dst);
+    move_index = 0;
+    while ((move = pokemonGetOboeWazaDataId(
+                dst, level, &move_index)) != 0) {
+        if (pokemonSearchWazaDataId(dst, move) == -1) {
+            move_count++;
+            *(u16*)((u8*)learned_moves + output_offset) = move;
+            output_offset += 2;
+            if (move_count >= 20) {
+                break;
+            }
+        }
+        move_index++;
+    }
+    return move_count;
+}
 /* 0x801286C8 | 0x39C */
 /* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
 /* 0x80128A64 | 0x25C */
-/* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
+s32 pokemonEvolutionCheck(pokemon, mode, trigger, extra, evolution)
+u8* pokemon;
+s32 mode;
+u16 trigger;
+u16* extra;
+u8* evolution;
+{
+    u16 value;
+    u16 item_id;
+    u16 buff;
+    u16 result;
+    u16 i;
+    u8 kind;
+    u8* data;
+
+    value = 0;
+    if (!pokemonCheckValid(pokemon)) {
+        return 0xFFFF;
+    }
+
+    item_id = pokemonGetSoubiItemDataId((u32)pokemon);
+    if (item_id != 0) {
+        item_id = (u16)itemDataBiosGetItemSoubiDataId(
+            itemDataBiosGetPtr(item_id));
+    }
+    if (item_id == 0x26) {
+        *extra = value;
+        return 0;
+    }
+
+    switch (mode) {
+    case 0:
+        result = getEvoPokemonLevelUp(pokemon, &value, evolution);
+        break;
+
+    case 1:
+        result = 0;
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(pokemon));
+        if (data == NULL) {
+            result = 0xFFFF;
+            break;
+        }
+
+        for (i = 0; i < 5; i++) {
+            kind = pokemonDataBiosGetSinkaKind(data, i);
+            buff = pokemonDataBiosGetSinkaBuff(data, i);
+            if (kind == 7 && buff == trigger) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = buff;
+            }
+        }
+        break;
+
+    case 2:
+        result = 0;
+        data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(pokemon));
+        if (data == NULL) {
+            result = 0xFFFF;
+            break;
+        }
+
+        for (i = 0; i < 5; i++) {
+            kind = pokemonDataBiosGetSinkaKind(data, i);
+            buff = pokemonDataBiosGetSinkaBuff(data, i);
+            if (kind == 5 ||
+                (kind == 6 && buff == pokemonBiosGetItemDataId(pokemon))) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = buff;
+            }
+        }
+        break;
+
+    default:
+        result = 0xFFFF;
+        break;
+    }
+
+    *extra = value;
+    return result;
+}
 /* 0x80128CC0 | 0x1C */
 void* fn_80128CC0(void* ptr) {
     if (ptr == NULL) { return NULL; }

@@ -18,6 +18,8 @@ typedef struct MenuModelWork MenuModelWork;
 typedef struct MenuCBLayoutEntry MenuCBLayoutEntry;
 typedef struct MenuCBStatusWork MenuCBStatusWork;
 typedef struct MenuCursorItem MenuCursorItem;
+typedef struct MenuCBResourceLayout MenuCBResourceLayout;
+typedef struct MenuItemBios MenuItemBios;
 
 typedef struct MenuCBPokemonBlob {
     u8 bytes[0x138];
@@ -88,6 +90,18 @@ struct MenuCursorItem {
     s16 y;
 };
 
+struct MenuCBResourceLayout {
+    s32 itemId;
+    s16 y;
+    u8 pad_06[0x16];
+};
+
+struct MenuItemBios {
+    u8 pad_00[6];
+    s16 x;
+    s16 y;
+};
+
 extern f32 lbl_8047A54C;
 extern void* lbl_8047A548;
 extern f32 lbl_8047A550;
@@ -107,7 +121,7 @@ extern const f32 lbl_8047BE94;
 extern const f32 lbl_8047BE80;
 extern const f32 lbl_8047BE98;
 extern const f32 lbl_8047BE88;
-extern const MenuCBLayoutEntry lbl_802E61E8[17];
+extern MenuCBLayoutEntry lbl_802E61E8[17];
 extern const u32 lbl_80267350[18];
 extern s32 lbl_80267320[6];
 extern u8 lbl_80314F98[];
@@ -117,6 +131,7 @@ extern MenuCBPokemonBlob lbl_803A95E8;
 extern MenuCBSlotInfo lbl_80267398[0x20];
 extern MenuModelWork lbl_803A9720;
 extern u32 lbl_8047A560;
+extern s32 lbl_804788F8;
 
 extern void* fn_80057270();
 extern s32 fn_800573C0(void);
@@ -161,6 +176,9 @@ void menuCursorNormal(MenuCBPane* pane);
 MenuCursorItem* windowGetCursorToItem();
 void fn_80057830(s16 x, s16 y, s32 selected);
 extern void fn_80054760(s32 forward, s32 wait);
+extern MenuItemBios* menuItemBiosGetPtr(s32 itemId);
+extern void menuModelInit(MenuModelWork* work, s16 x, s16 y);
+extern void pokemonInit(MenuCBPokemonBlob* pokemon);
 extern void fn_800558B8(void);
 extern void fn_80056A80(void);
 extern void fn_80056B74(MenuCBPane* pane, s32 enabled);
@@ -779,6 +797,35 @@ void fn_8005471C(void) {
 }
 #pragma dont_inline reset
 #pragma pop
+
+void fn_80054760(s32 forward, s32 wait) {
+    MenuCBResourceLayout* resourceLayouts;
+    MenuItemBios* item;
+    s32 i;
+
+    lbl_8047A544 = wait;
+    if (lbl_804788F8 != 0) {
+        resourceLayouts = (MenuCBResourceLayout*)lbl_802EF0A8;
+        for (i = 0; i < 17; i++) {
+            lbl_802E61E8[i].y =
+                resourceLayouts[lbl_802E61E8[i].itemId].y;
+        }
+        lbl_804788F8 = 0;
+    }
+
+    if (forward == 0) {
+        lbl_8047A558 = lbl_8047BE60;
+        lbl_8047A554 = lbl_8047BE68;
+    } else {
+        lbl_8047A558 = lbl_8047BE68;
+        lbl_8047A554 = lbl_8047BE68;
+    }
+
+    item = menuItemBiosGetPtr(0xD34);
+    menuModelInit(&lbl_803A9720, item->x, item->y);
+    pokemonInit(&lbl_803A95E8);
+    menuOpenCustom(0x8F, 0x1F, 0, 0, 0, 0);
+}
 
 s32 fn_800544A8(u8* ctx) {
     switch ((s8)ctx[1]) {

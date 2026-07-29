@@ -1663,114 +1663,44 @@ asm void menuNameEntryDraw50Cursor(void) {
 #include "src/game/gs_worldmap_fn_8002749C.inc"
 }
 #else
-/*
- * GSmap_DrawMapBackground -- 0x8002749C | size: 0x158
- *
- * Computes screen position and texture UV coordinates for a world-map
- * background tile and writes them into the caller-supplied output buffer.
- *
- * Parameters:
- *   self -- GS object whose +0x60 word is the context/state pointer
- *   r4   -- per-sprite output buffer; r4[6..7] (s16) carries the entry
- *           index on input; on output receives:
- *             r4[0x50..0x51] s16  texture U left edge
- *             r4[0x52..0x53] s16  texture V top  edge
- *             r4[0x54..0x55] s16  screen X
- *             r4[0x56..0x57] s16  screen Y
- *             r4[0x67]       u8   texture column-count (or 0 = skip draw)
- *
- * Endian note: the 0x4330/xoris/lfd/fsubs sequences are the standard
- * big-endian s16->f32 and s32->f32 idioms; all converted to plain C casts
- * below. *  ENDIAN-QA * 
- */
 s32 menuNameEntryDraw50Cursor(void *self, u8 *r4)
 {
-    /* ---- sdata2 globals (r2-relative) ---- */
-    extern f64 lbl_8047B948;  /* int->float bias constant (0x4330000080000000) */
-    extern f32 lbl_8047B93C;  /* map half-pixel / uv prescale multiplier        */
-    extern f32 lbl_8047B934;  /* texture reference size                         */
-    extern f32 lbl_8047B940;  /* uv correction scale                            */
-    extern f32 lbl_8047B938;  /* column-count scale                             */
+    extern u8 lbl_802EF0A8[];
+    u8* context;
+    u8* entry;
+    s32 tileId;
+    s32 tileRow;
+    f32 x;
+    f32 y;
+    f32 scale;
+    f32 scaledX;
+    f32 scaledY;
+    s8 columnCount;
 
-    /* ---- ROM data table (r3-relative) ---- */
-    extern u8 lbl_802EF0A8[];  /* canonical; per-site reinterpret cast */
+    context = *(u8**)((u8*)self + 0x60);
+    entry = lbl_802EF0A8 + *(s16*)(r4 + 6) * 0x1C;
+    tileId = **(s32**)(context + 0x28);
+    x = (f32)*(s16*)(entry + 6);
+    scale = **(f32**)(context + 0x30);
+    y = (f32)*(s16*)(entry + 8);
+    scaledX = lbl_8047B93C * (x * scale);
+    scaledY = lbl_8047B93C * (y * scale);
 
-
-
-    /* ---------- local variables ---------- */
-    u8  *ctx;          /* GS context/state block (ctx = *(u8**)(self+0x60))    */
-    s16  entry_idx;    /* array index read from r4[6]                          */
-    s16 *entry;        /* pointer into ((s16*)lbl_802EF0A8) for this entry             */
-    u32  tile_id;      /* *(u32*)*(ctx+0x28) -- tile/map ID to range-check     */
-    u32  tile_row;     /* *(u32*)*(ctx+0x2c) -- texture row index              */
-    f32  scale;        /* *(f32*)*(ctx+0x30) -- map zoom/scale float           */
-    f32  entry_x;      /* screen-space x from entry table (as f32)             */
-    f32  entry_y;      /* screen-space y from entry table (as f32)             */
-    f32  sx;           /* entry_x * scale                                      */
-    f32  sy;           /* entry_y * scale                                      */
-    f32  hsx;          /* lbl_8047B93C * sx  (half-texel pre-biased component) */
-    f32  hsy;          /* lbl_8047B93C * sy                                    */
-    s32  tex_u_base;   /* integer texture U origin  (*ptrs_38 + tile_id  * 27) */
-    s32  tex_v_base;   /* integer texture V origin  (*ptrs_3c + tile_row * 35) */
-    f32  fu_base;      /* (f32)tex_u_base                                      */
-    f32  fv_base;      /* (f32)tex_v_base                                      */
-    f32  tu;           /* final texture U (float, before truncate)             */
-    f32  tv;           /* final texture V (float, before truncate)             */
-    f32  screen_x_f;   /* final screen X (float, before truncate)              */
-    f32  screen_y_f;   /* final screen Y (float, before truncate)              */
-    s32  col_count;    /* (s32)(lbl_8047B938*(lbl_8047B934-scale)) -- #columns */
-
-    /* ---- decode parameters ---- */
-    ctx       = *(u8 **)((u8 *)self + 0x60);
-    entry_idx = *(s16 *)(r4 + 6);                        /* lha r0, 0x6(r4)   */
-    entry     = (s16 *)((u8 *)((s16*)lbl_802EF0A8) + (s32)entry_idx * 0x1c);
-
-    scale     = *(f32 *)(*(u8 **)(ctx + 0x30));          /* lfs f8, 0x0(r3) after lwz r3,0x30(r9) */
-    tile_id   = *(u32 *)(*(u8 **)(ctx + 0x28));          /* lwz r7, 0x0(r8) */
-    tile_row  = *(u32 *)(*(u8 **)(ctx + 0x2c));          /* lwz r8, 0x0(r5) */
-
-    /* convert s16 entry fields to f32 -- ENDIAN-QA:
-       entry bytes 6..7 = x, bytes 8..9 = y (big-endian s16 pair) */
-    entry_x = (f32)(s32)(s16)(entry[3]);  /* lha r5,0x6(r7); ... fsubs f3,f1,f7 */
-    entry_y = (f32)(s32)(s16)(entry[4]);  /* lha r0,0x8(r7); ... fsubs f4,f0,f7 */
-
-    sx  = entry_x * scale;               /* fmuls f1, f3, f8 */
-    sy  = entry_y * scale;               /* fmuls f0, f4, f8 */
-    hsx = lbl_8047B93C * sx;             /* fmuls f9, f2, f1 */
-    hsy = lbl_8047B93C * sy;             /* fmuls f10, f2, f0 */
-
-    /* range-check: tile_id must be < 15 to produce output */
-    if (tile_id >= 0xf) {
-        /* @L_800275E0 */
-        r4[0x67] = 0;
-        return 0;
+    if (tileId < 0xF) {
+        tileRow = **(s32**)(context + 0x2C);
+        columnCount = (s8)(lbl_8047B938 * (lbl_8047B934 - scale));
+        *(s16*)(r4 + 0x50) =
+            (s16)((f32)(**(s32**)(context + 0x38) + tileId * 0x1B) -
+                  scaledX * lbl_8047B940);
+        *(s16*)(r4 + 0x52) =
+            (s16)((f32)(**(s32**)(context + 0x3C) + tileRow * 0x23) -
+                  scaledY * lbl_8047B940);
+        *(s16*)(r4 + 0x54) = (s16)(x + scaledX);
+        *(s16*)(r4 + 0x56) = (s16)(y + scaledY);
+    } else {
+        columnCount = 0;
     }
-
-    /* ---- screen position (bilinear map-to-screen mapping) ---- */
-    screen_x_f = entry_x + hsx;          /* fadds f1, f3, f9 */
-    screen_y_f = entry_y + hsy;          /* fadds f0, f4, f10 */
-
-    /* ---- texture UV origin (integer coords converted to f32) ---- */
-    tex_u_base = (s32)(*(u32 *)(*(u8 **)(ctx + 0x38))) + (s32)tile_id  * 0x1b;  /* add r0,r3,r0 (r7*27) -- ENDIAN-QA */
-    tex_v_base = (s32)(*(u32 *)(*(u8 **)(ctx + 0x3c))) + (s32)tile_row * 0x23;  /* add r0,r5,r3 (r8*35) -- ENDIAN-QA */
-
-    fu_base = (f32)tex_u_base;           /* xoris+lfd+fsubs chain, s32->f32 */
-    fv_base = (f32)tex_v_base;           /* xoris+lfd+fsubs chain, s32->f32 */
-
-    /* texture UV: offset from base minus UV-correction term */
-    tu = fu_base - hsx * lbl_8047B940;  /* fnmsubs f3, f9,  f4, f2 */
-    tv = fv_base - hsy * lbl_8047B940;  /* fnmsubs f0, f10, f4, f1 */
-
-    /* texture column count: width of the background tile in texels */
-    col_count = (s32)(lbl_8047B938 * (lbl_8047B934 - scale)); /* fmuls f5,f6,f5; fctiwz f3,f5 */
-
-    /* ---- write outputs ---- */
-    *(s16 *)(r4 + 0x50) = (s16)(s32)tu;           /* sth r5, 0x50(r4) */
-    *(s16 *)(r4 + 0x52) = (s16)(s32)tv;           /* sth r5, 0x52(r4) */
-    *(s16 *)(r4 + 0x54) = (s16)(s32)screen_x_f;   /* sth r3, 0x54(r4) */
-    *(s16 *)(r4 + 0x56) = (s16)(s32)screen_y_f;   /* sth r0, 0x56(r4) */
-    r4[0x67] = (u8)(s8)col_count;                  /* stb r6, 0x67(r4) */
-
+    r4[0x67] = columnCount;
     return 0;
 }
 #endif
