@@ -273,6 +273,92 @@ typedef struct GSshadowBound {
 GSshadowSlot*
 _modelShadowFindValidReceiveModel__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound(
     GSmodel* model, GSmodel* receiveModel, GSlight* light,
+    GSshadowBound* bound);
+
+void
+_modelShadowAddAsNewReceiver__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound(
+    GSmodel* model, GSmodel* receiveModel, GSlight* light,
+    GSshadowBound* bound)
+{
+    extern f64 ceil(f64);
+    extern void ObjInfoInit(void*, GSshadowVec*);
+    extern f32 lbl_8047CBC0;
+    GSshadowSlot* slot = NULL;
+    GSshadowVec dimensions;
+    f32 largest;
+    u32 size;
+    u32 i;
+
+    for (i = 0; i < 6; i++) {
+        if (lbl_80401490[i].model == NULL) {
+            slot = &lbl_80401490[i];
+            break;
+        }
+    }
+    if (slot == NULL) {
+        slot =
+            _modelShadowFindValidReceiveModel__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound(
+                model, receiveModel, light, NULL);
+    }
+    if (slot == NULL) {
+        return;
+    }
+
+    for (i = 0; i < 16; i++) {
+        if (slot->receivers[i] == receiveModel) {
+            return;
+        }
+    }
+    for (i = 0; i < 16; i++) {
+        if (slot->receivers[i] == NULL) {
+            break;
+        }
+    }
+    if (i == 16) {
+        return;
+    }
+
+    if (slot->model == NULL) {
+        slot->model = model;
+        slot->light = light;
+        ObjInfoInit(bound, &dimensions);
+        largest = dimensions.x;
+        if (dimensions.y > largest) {
+            largest = dimensions.y;
+        }
+        if (dimensions.z > largest) {
+            largest = dimensions.z;
+        }
+        largest *= (bound->scale->x + bound->scale->y + bound->scale->z) /
+                   lbl_8047CBC0;
+        size = (u32)ceil(largest);
+        slot->minSize = size;
+        slot->maxSize = size;
+    } else if (bound != NULL) {
+        ObjInfoInit(bound, &dimensions);
+        largest = dimensions.x;
+        if (dimensions.y > largest) {
+            largest = dimensions.y;
+        }
+        if (dimensions.z > largest) {
+            largest = dimensions.z;
+        }
+        largest *= (bound->scale->x + bound->scale->y + bound->scale->z) /
+                   lbl_8047CBC0;
+        size = (u32)ceil(largest);
+        if (size < slot->minSize) {
+            slot->minSize = size;
+        }
+        if (size > slot->maxSize) {
+            slot->maxSize = size;
+        }
+    }
+    slot->receivers[i] = receiveModel;
+}
+
+GSshadowSlot*
+_modelShadowFindValidReceiveModel__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound(
+    GSmodel* model, GSmodel* receiveModel, GSlight* light,
     GSshadowBound* bound)
 {
     extern f64 ceil(f64);

@@ -1734,6 +1734,157 @@ void fn_8001D718(void) {
 }
 #endif
 
+typedef struct MenuPokemonQuantityArgs {
+    s32 columns;
+    u8 color[4];
+    s32 menuId;
+    s32 maximum;
+    s32 minimum;
+    s32 unitPrice;
+} MenuPokemonQuantityArgs;
+
+s32 fn_800181C4(page, itemId, itemSlot)
+    s32 page;
+    u16 itemId;
+    s16 itemSlot;
+{
+    extern void* itemDataBiosGetPtr(u16 itemId);
+    extern u16 itemDataBiosGetPrice(void* itemData);
+    extern u32 fn_8002A0B8(u8* color, u32 messageContext, s32 group,
+                           s32 category, ...);
+    extern void winMsgOpenWithSE(s32, u32, s32, s32, u8);
+    extern void winMsgOpen(s32, u32, s32, s32);
+    extern void winMsgClose(s32);
+    extern u8* heroItemGetItemKindToItemAryPtr(void* hero, u8 kind,
+                                               u16* count, s32, s32, s32);
+    extern u8* heroHizukiItemGetItemAryPtr(void* hero, u16* count,
+                                           s32, s32, s32);
+    extern u8 fn_801429E8(void* item);
+    extern u16 itemBiosGetNum(void* item);
+    extern s32 windowGetActiveID(void);
+    extern s32 menuOpenCustom(s32 menuId, s32 parent, void* args,
+                              s32, s32, s32, void* color);
+    extern void menuClose(s32 menuId);
+    extern void menuCloseSync(s32 menuId, s32 wait);
+    extern s8 menuSubOpenYesNo(s32, s32, s32, s32);
+    extern void fn_8012959C(void* hero, u16 item, u16 count, s16 slot);
+    extern void heroItemDecItemDataId(void* hero, u16 item, u16 count,
+                                      s16 slot);
+    extern void fn_80166AB8(s32 sound, s32, s32);
+    extern void heroAddPokedoru(void* hero, u32 amount);
+    extern u8 lbl_80266918[];
+    extern u32 lbl_8047A2BC;
+    extern u32 lbl_8047A2DC;
+    extern void* lbl_8047A2F8;
+    extern s32 lbl_8047A2FC;
+    MenuPokemonQuantityArgs quantityArgs;
+    u8 messageColor;
+    u8* summary;
+    u8* inventory;
+    u16 inventoryCount;
+    u16 quantity;
+    u16 price;
+    u32 message;
+    s32 validIndex;
+    s32 menuId;
+    s32 choice;
+    s32 selectedQuantity;
+    s32 i;
+    s32 kind;
+    u32 saleValue;
+
+    summary = lbl_80266918 + page * 0x4C;
+    price = itemDataBiosGetPrice(itemDataBiosGetPtr(itemId));
+    if (price == 0) {
+        message = fn_8002A0B8(&messageColor, lbl_8047A2BC, 0xB, 0x2D,
+                              itemId, -1);
+        winMsgOpenWithSE(2, message, 1, 0, messageColor);
+        winMsgClose(1);
+        return 0;
+    }
+
+    message = fn_8002A0B8(&messageColor, lbl_8047A2BC, 0xD, 0x2D,
+                          itemId, -1);
+    lbl_8047A2DC = message;
+    kind = *(s32*)(summary + 4);
+    if (kind >= 0) {
+        inventory = heroItemGetItemKindToItemAryPtr(
+            lbl_8047A2F8, (u8)kind, &inventoryCount, 0, 0, 0);
+    } else {
+        inventory = heroHizukiItemGetItemAryPtr(
+            lbl_8047A2F8, &inventoryCount, 0, 0, 0);
+    }
+
+    validIndex = -1;
+    quantity = 0;
+    for (i = 0; i < inventoryCount; i++, inventory += 4) {
+        if (fn_801429E8(inventory)) {
+            validIndex++;
+            if (validIndex >= itemSlot) {
+                quantity = itemBiosGetNum(inventory);
+                break;
+            }
+        }
+    }
+    if (quantity < 1) {
+        return 0;
+    }
+
+    saleValue = price / 2;
+    if (inventoryCount > 100) {
+        menuId = saleValue > 0 ? 0x5E : 0x5C;
+        quantityArgs.columns = 2;
+    } else {
+        menuId = saleValue > 0 ? 0x5D : 0x5B;
+        quantityArgs.columns = 1;
+    }
+    quantityArgs.color[0] = summary[0];
+    quantityArgs.color[1] = summary[1];
+    quantityArgs.color[2] = summary[2];
+    quantityArgs.color[3] = 0;
+    quantityArgs.menuId = menuId;
+    quantityArgs.maximum = quantity;
+    quantityArgs.minimum = 1;
+    quantityArgs.unitPrice = saleValue;
+    lbl_8047A2FC = 1;
+
+    choice = menuOpenCustom(menuId, windowGetActiveID(), &quantityArgs,
+                            0, 1, 1, quantityArgs.color);
+    menuClose(menuId);
+    menuCloseSync(menuId, 1);
+    if (choice == -1) {
+        return 0;
+    }
+    selectedQuantity = lbl_8047A2FC;
+    if (selectedQuantity < 0) {
+        return 0;
+    }
+
+    saleValue *= selectedQuantity;
+    message = fn_8002A0B8(&messageColor, lbl_8047A2BC, 9, 0x4B,
+                          saleValue, -1);
+    winMsgOpenWithSE(2, message, 1, 0, messageColor);
+    choice = menuSubOpenYesNo(0, -1, -1, 0);
+    if (choice == 1 || choice == -1) {
+        winMsgClose(1);
+        return 0;
+    }
+
+    if (kind == -1) {
+        fn_8012959C(lbl_8047A2F8, itemId, (u16)selectedQuantity, itemSlot);
+    } else {
+        heroItemDecItemDataId(lbl_8047A2F8, itemId,
+                              (u16)selectedQuantity, itemSlot);
+    }
+    fn_80166AB8(0x3CB, 0, 0);
+    heroAddPokedoru(lbl_8047A2F8, saleValue);
+    message = fn_8002A0B8(&messageColor, lbl_8047A2BC, 0xA, 0x2D,
+                          itemId, 0x4B, saleValue, -1);
+    winMsgOpen(2, message, 1, 0);
+    winMsgClose(1);
+    return 1;
+}
+
 /* fn_80018594 - 0x80018594 | size: 0x34c */
 extern u32 itemDataBiosGetFieldUseFunc();
 extern u32 itemDataBiosGetBattleUseFunc();
@@ -1869,7 +2020,6 @@ s32 fn_80018594(u32 boxIndex, u32 speciesId, u32 slotIndex, u16* outSpecies) {
 
 /* fn_800188E0 - 0x800188E0 | size: 0x188 */
 extern u32 fn_80143FCC();
-extern void fn_800181C4();
 extern void fn_80017E8C();
 extern u32 lbl_8047A2B8;
 #if 0

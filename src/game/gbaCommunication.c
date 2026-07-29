@@ -30,8 +30,11 @@ extern u8 lbl_803FB380[];
 extern u8 lbl_8047C1E8;
 extern u8 lbl_8026F5A8[];
 extern u8 lbl_8026F5C0[];
+extern u8 lbl_8026F5E4[];
 extern u8 lbl_80314F98[];
 extern u16 lbl_802EED28[];
+extern u8 lbl_802EED44[];
+extern u32 lbl_802EEEC4[];
 extern s32 lbl_802EEFC4[5];
 
 /* Common callees needed by the ported bodies below that are not already
@@ -77,6 +80,10 @@ extern void fn_800FA444();
 extern void fn_800FB680();
 extern void fn_800FB8C8();
 extern void fn_800FBB34();
+extern s32 fn_800FAEF8();
+extern u8 exribbonGetNo(s32 ribbon);
+extern void* menuItemBiosGetPtr(u16 id);
+extern void* menuSpriteBiosGetPtr(u16 id);
 
 extern u16* windowGetKeyInfo(void);
 extern void* pokemonDataBiosGetPtr(u32 id);
@@ -103,6 +110,107 @@ extern u32 fn_8001D624(void* pokemon, u32 arg);
 extern u8 menuSubGetPokemonSexForDisp(void* pokemon);
 
 #if !defined(GBA_COMMUNICATION_EXACT_80092FC8_ONLY)
+
+typedef struct RibbonSpriteInfo {
+    u16 spriteId;
+    u16 itemId;
+    u32 resource;
+    s32 ribbon;
+} RibbonSpriteInfo;
+
+void fn_80093B4C(void* context, void* widget)
+{
+    RibbonSpriteInfo* ribbonInfo = (RibbonSpriteInfo*)lbl_802EED44;
+    u8* state = lbl_803FB380;
+    s32 color;
+    s32 selected;
+    s32 row;
+    s32 column;
+    s32 ribbon;
+    s32 resource = 0;
+    u8* item;
+    u8* sprite;
+
+    if (windowSearchID(0x53) == 0 || *(void**)(state + 0xC) == 0) {
+        return;
+    }
+
+    color = *(u8*)((u8*)context + 0x8B) | 0xFFFFFF00;
+    switch (*(s16*)((u8*)widget + 6)) {
+    case 0x1F7:
+        msgctrlSetValue(0x34, *(u32*)(state + 0x1C));
+        fn_800FBB34(0, 0, *(s16*)((u8*)widget + 0x54),
+                    *(s16*)((u8*)widget + 0x56), color, 0xDD);
+        break;
+
+    case 0x1F6:
+        selected = *(s8*)(state + 0x1A);
+        fn_800FAEF8(0x78, 0xC8, 0x80FFFF, lbl_8026F5E4, selected);
+        if (state[1] != 6) {
+            break;
+        }
+
+        row = selected / 9;
+        column = selected % 9;
+        ribbon = *(s8*)(state + 0x20 + column * 4 + row);
+        if (ribbon < 0) {
+            break;
+        }
+
+        fn_800FAEF8(0x78, 0xC8, 0x80FFFF, lbl_8026F5E4, ribbon);
+        if (ribbonInfo[ribbon].ribbon == -1) {
+            resource = ribbonInfo[ribbon].resource;
+        } else if (ribbonInfo[ribbon].ribbon >= 0 &&
+                   ribbonInfo[ribbon].ribbon < 7) {
+            u8 value = exribbonGetNo(ribbonInfo[ribbon].ribbon);
+            if (value != 0) {
+                resource = lbl_802EEEC4[value - 1];
+            }
+        }
+        fn_800FBB34(0, 0, *(s16*)((u8*)widget + 0x54),
+                    *(s16*)((u8*)widget + 0x56), color, resource);
+        break;
+
+    case 0x1291:
+        selected = *(s8*)(state + 0x1A);
+        for (row = 0; row < 4; row++) {
+            for (column = 0; column < 9; column++) {
+                ribbon = *(s8*)(state + 0x20 + column * 4 + row);
+                if (ribbon >= 0) {
+                    item = menuItemBiosGetPtr(ribbonInfo[ribbon].itemId);
+                    if (row * 9 + column != selected) {
+                        windowDrawSprite2(
+                            *(s16*)((u8*)widget + 0x54) * column / 9,
+                            *(s16*)((u8*)widget + 0x56) * row / 4,
+                            *(s16*)(item + 6), *(s16*)(item + 8), color,
+                            (s32)context, ribbonInfo[ribbon].spriteId, 0);
+                    }
+                }
+            }
+        }
+
+        if (selected < 0) {
+            break;
+        }
+        row = selected / 9;
+        column = selected % 9;
+        ribbon = *(s8*)(state + 0x20 + column * 4 + row);
+        if (ribbon < 0) {
+            break;
+        }
+
+        item = menuItemBiosGetPtr(ribbonInfo[ribbon].itemId);
+        sprite = menuSpriteBiosGetPtr(ribbonInfo[ribbon].spriteId);
+        windowDrawSprite2(
+            *(s16*)((u8*)widget + 0x54) * column / 9 -
+                (*(s16*)(sprite + 0xC) - *(s16*)(item + 6)) / 2,
+            *(s16*)((u8*)widget + 0x56) * row / 4 -
+                (*(s16*)(sprite + 0xE) - *(s16*)(item + 8)) / 2,
+            *(s16*)(item + 6), *(s16*)(item + 8), color, (s32)context,
+            ribbonInfo[ribbon].spriteId, 0);
+        break;
+    }
+}
 
 void fn_80094650(u32 r3, u32 r4) {
     extern void fn_8010C46C();

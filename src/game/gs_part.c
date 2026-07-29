@@ -161,6 +161,91 @@ void GSpartRegisterRotation(GSpart* part, void* userData, void* callback)
     }
 }
 
+typedef struct GSpartVec {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSpartVec;
+
+extern HSD_JObj* lbl_804018B0[];
+extern char lbl_80270F78[];
+extern void GSmodelForceAnimTransformUpdate(void*);
+extern u32 GSmodelIsBlending(void*);
+extern void fn_8019D9DC(HSD_JObj*);
+extern void set__5GSvecFfff(GSpartVec*, f32, f32, f32);
+extern void GSvecAdd(GSpartVec*, const GSpartVec*, const GSpartVec*);
+extern void fn_800E0108(GSpartVec*, const GSpartVec*, const GSpartVec*);
+extern void GSvecCopy(GSpartVec*, const GSpartVec*);
+
+void GSpartGetTransform(GSpart* part, GSpartVec* positionOut,
+                        GSpartVec* rotationOut, GSpartVec* scaleOut)
+{
+    HSD_JObj* jobj = part->jobj;
+    HSD_JObj* node;
+    GSpartVec position;
+    GSpartVec rotation;
+    GSpartVec scale;
+    u32 count = 0;
+    u32 i;
+
+    GSmodelForceAnimTransformUpdate(part->model);
+    if (GSmodelIsBlending(part->model) == 0) {
+        if ((jobj->flags & JOBJ_USER_DEF_MTX) == 0 &&
+            (jobj->flags & JOBJ_MTX_DIRTY) != 0) {
+            fn_8019D9DC(jobj);
+        }
+        position.x = jobj->mtx[0][3];
+        position.y = jobj->mtx[1][3];
+        position.z = jobj->mtx[2][3];
+    } else if (jobj->flags & JOBJ_JOINT) {
+        position.x = jobj->translate_x;
+        position.y = jobj->translate_y;
+        position.z = jobj->translate_z;
+    } else {
+        position.x = jobj->mtx[0][3];
+        position.y = jobj->mtx[1][3];
+        position.z = jobj->mtx[2][3];
+    }
+
+    if (rotationOut != 0 || scaleOut != 0) {
+        node = jobj;
+        while (node != 0) {
+            lbl_804018B0[count++] = node;
+            node = node->parent;
+            if (count >= 16) {
+                GSlogWrite(lbl_80270F78);
+                break;
+            }
+        }
+
+        if (rotationOut != 0) {
+            set__5GSvecFfff(&rotation, 0.0f, 0.0f, 0.0f);
+            for (i = count; i != 0; i--) {
+                node = lbl_804018B0[i - 1];
+                GSvecAdd(&rotation, &rotation, (GSpartVec*)&node->rotate_x);
+            }
+        }
+
+        if (scaleOut != 0) {
+            set__5GSvecFfff(&scale, 1.0f, 1.0f, 1.0f);
+            for (i = count; i != 0; i--) {
+                node = lbl_804018B0[i - 1];
+                fn_800E0108(&scale, &scale, (GSpartVec*)&node->scale_x);
+            }
+        }
+    }
+
+    if (positionOut != 0) {
+        GSvecCopy(positionOut, &position);
+    }
+    if (rotationOut != 0) {
+        GSvecCopy(rotationOut, &rotation);
+    }
+    if (scaleOut != 0) {
+        GSvecCopy(scaleOut, &scale);
+    }
+}
+
 void* GSpartGetMaterial(GSpart* part, u32 index)
 {
     u8* jobj = part->jobj;

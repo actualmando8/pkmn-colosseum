@@ -210,6 +210,115 @@ void fn_801677BC(u8 *flag)
     OSRestoreInterrupts(enabled);
 }
 
+typedef struct ParticleSortNode {
+    struct ParticleSortNode* next;
+    u32 flags;
+} ParticleSortNode;
+
+typedef struct ParticleSortState {
+    ParticleSortNode* secondPass[16];
+    u32 needsSort[16];
+    ParticleSortNode* head[16];
+} ParticleSortState;
+
+extern ParticleSortState lbl_80452708;
+extern void* memset(void* destination, int value, u32 size);
+
+ParticleSortNode* particleSort(s32 listIndex, ParticleSortNode** firstPass,
+                               ParticleSortNode** secondPass)
+{
+    ParticleSortNode* bucketHead[16];
+    ParticleSortNode* bucketTail[16];
+    ParticleSortNode* node;
+    ParticleSortNode* next;
+    ParticleSortNode* firstHead;
+    ParticleSortNode* firstTail;
+    ParticleSortNode* secondHead;
+    ParticleSortNode* secondTail;
+    u32 bucket;
+    s32 i;
+
+    node = lbl_80452708.head[listIndex];
+    if (lbl_80452708.needsSort[listIndex] == 0) {
+        if (node == NULL) {
+            *firstPass = NULL;
+            *secondPass = NULL;
+            return NULL;
+        }
+        *firstPass = (node->flags & 8) != 0 ? node : NULL;
+        *secondPass = lbl_80452708.secondPass[listIndex];
+        return node;
+    }
+
+    lbl_80452708.needsSort[listIndex] = 0;
+    if (node == NULL) {
+        lbl_80452708.secondPass[listIndex] = NULL;
+        *firstPass = NULL;
+        *secondPass = NULL;
+        return NULL;
+    }
+
+    memset(bucketHead, 0, sizeof(bucketHead));
+    memset(bucketTail, 0, sizeof(bucketTail));
+    while (node != NULL) {
+        next = node->next;
+        bucket = ((node->flags >> 25) & 7) +
+                 ((((node->flags >> 3) & 1) ^ 1) * 8);
+        node->next = NULL;
+        if (bucketHead[bucket] == NULL) {
+            bucketHead[bucket] = node;
+        } else {
+            bucketTail[bucket]->next = node;
+        }
+        bucketTail[bucket] = node;
+        node = next;
+    }
+
+    firstHead = NULL;
+    firstTail = NULL;
+    for (i = 0; i < 8; i++) {
+        if (bucketHead[i] != NULL) {
+            if (firstHead == NULL) {
+                firstHead = bucketHead[i];
+            } else {
+                firstTail->next = bucketHead[i];
+            }
+            firstTail = bucketTail[i];
+        }
+    }
+
+    secondHead = NULL;
+    secondTail = NULL;
+    for (i = 8; i < 16; i++) {
+        if (bucketHead[i] != NULL) {
+            if (secondHead == NULL) {
+                secondHead = bucketHead[i];
+            } else {
+                secondTail->next = bucketHead[i];
+            }
+            secondTail = bucketTail[i];
+        }
+    }
+
+    node = NULL;
+    if (firstTail != NULL) {
+        node = firstHead;
+        firstTail->next = secondHead;
+    }
+    if (secondTail != NULL) {
+        if (node == NULL) {
+            node = secondHead;
+        }
+        secondTail->next = NULL;
+    }
+
+    lbl_80452708.head[listIndex] = node;
+    lbl_80452708.secondPass[listIndex] = secondHead;
+    *firstPass = firstHead;
+    *secondPass = secondHead;
+    return node;
+}
+
 void fn_801677F4(u8 *flag)
 {
     BOOL enabled;

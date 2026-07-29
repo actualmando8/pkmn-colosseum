@@ -2509,6 +2509,92 @@ s32 itemUse2PokemonSimulation(void* arg0, void* arg1, void* arg2, void* arg3, vo
     return result;
 }
 
+s32 friendXUp__FP7PokemonP12FightPokemonScUsUs(
+    void* pokemon, void* fightPokemon, s8 change, u16 lower, u16 upper)
+{
+    extern u8 pokemonIsDarkPokemon(void*);
+    extern u8 pokemonGetDarkPokemonLevel(void*);
+    extern s32 pokemonGetStatus(void*, s32, s32, s32);
+    extern void pokemonSetStatus(void*, s32, s32, s32, s32);
+    extern u16 pokemonBiosGetFriend(void*);
+    extern void pokemonBiosSetFriend(void*, u16);
+    extern u16 pokemonBiosGetItemDataId(void*);
+    extern u16 pokemonBiosGetCatchBallId(void*);
+    extern void* fightFloorGetFightPokemonPtrToFightTrainerPtr(s32, void*);
+    extern void* fightTrainerCheckFightPokemonFightOut(void*, void*);
+    extern void fn_802331A4(void*, s32);
+    void* item;
+    void* trainer;
+    s32 oldFriend;
+    s32 effectiveFriend;
+    s32 newFriend;
+    s32 adjusted;
+
+    if (pokemonIsDarkPokemon(pokemon) &&
+        pokemonGetDarkPokemonLevel(pokemon) < 3) {
+        return 0;
+    }
+
+    if (pokemonIsDarkPokemon(pokemon)) {
+        oldFriend = pokemonGetStatus(pokemon, 0, 0xC7, 0);
+    } else {
+        oldFriend = pokemonBiosGetFriend(pokemon);
+    }
+
+    effectiveFriend = pokemonBiosGetFriend(pokemon);
+    if (pokemonIsDarkPokemon(pokemon)) {
+        effectiveFriend += pokemonGetStatus(pokemon, 0, 0xC7, 0);
+    }
+    if (effectiveFriend >= lower && effectiveFriend >= upper) {
+        return 0;
+    }
+
+    adjusted = change;
+    if (adjusted > 0) {
+        item = itemDataBiosGetPtr(pokemonBiosGetItemDataId(pokemon));
+        if (item != NULL &&
+            itemDataBiosGetItemSoubiDataId(item) == 0x1B) {
+            adjusted = adjusted * 150 / 100;
+        }
+        if (pokemonBiosGetCatchBallId(pokemon) == 0xB) {
+            adjusted++;
+        }
+    }
+
+    newFriend = oldFriend + adjusted;
+    if (newFriend > 0xFF) {
+        newFriend = 0xFF;
+    }
+    if (newFriend < 0) {
+        newFriend = 0;
+    }
+
+    if (pokemonIsDarkPokemon(pokemon)) {
+        pokemonSetStatus(pokemon, 0, 0xC7, 0, newFriend);
+        if (fightPokemon != NULL) {
+            trainer = fightFloorGetFightPokemonPtrToFightTrainerPtr(
+                0, fightPokemon);
+            trainer = fightTrainerCheckFightPokemonFightOut(
+                trainer, fightPokemon);
+            if (trainer != NULL) {
+                fn_802331A4(trainer, 0xC7);
+            }
+        }
+    } else {
+        pokemonBiosSetFriend(pokemon, newFriend);
+        if (fightPokemon != NULL) {
+            trainer = fightFloorGetFightPokemonPtrToFightTrainerPtr(
+                0, fightPokemon);
+            trainer = fightTrainerCheckFightPokemonFightOut(
+                trainer, fightPokemon);
+            if (trainer != NULL) {
+                fn_802331A4(trainer, 0x99);
+            }
+        }
+    }
+    return (s16)(newFriend - oldFriend);
+}
+
 typedef struct ItemUsePokemonLog {
     s32 type;
     u16 value;

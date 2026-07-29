@@ -6987,15 +6987,70 @@ asm void fn_800F57F0(void) {
 #include "src/game/gs_thread_fn_800F57F0.inc"
 }
 #else
-s32 fn_800F57F0(arg0)
-    u8 *arg0;
+s32 fn_800F57F0(GSVMCtx* context)
 {
+    union {
+        u32 word;
+        f32 real;
+    } operand;
+    u32* address;
+    u32 index;
+    u32 result;
+    s32 stackIndex;
+    u16 descriptor;
     u8 desc;
-    u32 value;
 
-    GS_VM_READ_U8(arg0, desc);
-    GS_VM_RESOLVE_INDEXED(arg0, desc, value);
-    GS_VM_PUSH(arg0, GS_VM_OPERAND_TRUTH(desc, value) ? 0 : 1);
+    desc = *context->ip++;
+    descriptor = desc;
+    if (descriptor == 0) {
+        GSlogWritef((const char*)lbl_80271068 + 0x28, descriptor);
+        result = lbl_8047E710;
+    } else if (descriptor & 0x80) {
+        stackIndex = context->stackCount;
+        if (stackIndex <= 0) {
+            GSlogWritef((const char*)lbl_80271068 + 0x14);
+            result = context->stack[0];
+        } else {
+            stackIndex--;
+            context->stackCount = stackIndex;
+            result = context->stack[stackIndex];
+        }
+    } else {
+        stackIndex = context->stackCount;
+        if (stackIndex <= 0) {
+            GSlogWritef((const char*)lbl_80271068 + 0x14);
+            index = context->stack[0];
+        } else {
+            stackIndex--;
+            context->stackCount = stackIndex;
+            index = context->stack[stackIndex];
+        }
+        if (descriptor & 0x40) {
+            address = &context->stack[context->frame + index];
+        } else {
+            address = &context->globals[index];
+        }
+        if (descriptor & 0x20 || descriptor & 0x100) {
+            result = (u32)address;
+        } else {
+            result = *address;
+        }
+    }
+
+    if ((desc & 0x3F) == 2) {
+        result = result == 0;
+    } else {
+        operand.word = result;
+        result = operand.real == 0.0f;
+    }
+
+    stackIndex = context->stackCount;
+    if (stackIndex > 0x40) {
+        GSlogWritef((const char*)lbl_80271068);
+    } else {
+        context->stackCount = stackIndex + 1;
+        context->stack[stackIndex] = result;
+    }
     return 1;
 }
 
