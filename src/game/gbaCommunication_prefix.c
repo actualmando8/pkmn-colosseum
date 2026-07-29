@@ -892,7 +892,6 @@ void fn_8008E320(u32 ctx) {
     u32 waitFrames3;
     GSmaterialEntry* material;
     f32 frame;
-    u32 model;
     u32 handle2;
     u32 h06af0400;
     u32 h06bc0400;
@@ -958,22 +957,22 @@ void fn_8008E320(u32 ctx) {
     h06be0400a = fn_801CBA0C(0x06BE0400);
     h06be0400b = fn_801CBA0C(0x06BE0400);
 
-    model = GSresGetResource(ctx, h06af0400);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
-    model = GSresGetResource(ctx, h06bc0400);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
-    model = GSresGetResource(ctx, h06be0400a);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
-    model = GSresGetResource(ctx, h06be0400b);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06af0400);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06bc0400);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06be0400a);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06be0400b);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
 
     GSmodelLinkToGSparticleBank(GSresGetResource(ctx, h06af0400), GSresGetResource(ctx, 0x11511400));
     GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, h06af0400), 4);
@@ -1041,7 +1040,6 @@ void fn_8008E7D4(u32 ctx) {
     u32 waitFrames3;
     GSmaterialEntry* material;
     f32 frame;
-    u32 model;
     u32 handle2;
     u32 h06af0400;
     u32 h06bc0400;
@@ -1104,18 +1102,18 @@ void fn_8008E7D4(u32 ctx) {
     h06bc0400 = fn_801CBA0C(0x06BC0400);
     h06be0400 = fn_801CBA0C(0x06BE0400);
 
-    model = GSresGetResource(ctx, h06af0400);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
-    model = GSresGetResource(ctx, h06bc0400);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
-    model = GSresGetResource(ctx, h06be0400);
-    GSmodelSetShadowFlags(model, 2);
-    GSmodelSetShadowLight(model, lbl_8047A690);
-    GSmodelSetShadowSurface(model, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06af0400);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06bc0400);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
+    handle2 = GSresGetResource(ctx, h06be0400);
+    GSmodelSetShadowFlags(handle2, 2);
+    GSmodelSetShadowLight(handle2, lbl_8047A690);
+    GSmodelSetShadowSurface(handle2, 1, &lbl_8047A694);
 
     GSmodelLinkToGSparticleBank(GSresGetResource(ctx, h06af0400), GSresGetResource(ctx, 0x11511400));
     GSmodelSetGSparticleLinkAttachMode(GSresGetResource(ctx, h06af0400), 4);
@@ -1185,6 +1183,8 @@ void fn_8008D938(u32 ctx) {
 
     u32 elapsed;
     u32 waitFrames;
+    u32 cameraElapsed;
+    u32 cameraWaitFrames;
     u32 elapsedLater;
     u32 waitFramesLater;
     u32 elapsedFinal;
@@ -1891,7 +1891,6 @@ void fn_8008F91C(u32 ctx) {
     u32 handle2;
     u32 modelA;
     u32 modelB;
-    u32 shadowTarget;
     u32 animA;
     u32 animB;
 
@@ -1931,15 +1930,15 @@ void fn_8008F91C(u32 ctx) {
     modelA = fn_801CBA0C(0x06BD0400);
     modelB = fn_801CBA0C(0x06BA0400);
 
-    shadowTarget = GSresGetResource(ctx, modelA);
-    GSmodelSetShadowFlags(shadowTarget, 2);
-    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
-    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+    animA = GSresGetResource(ctx, modelA);
+    GSmodelSetShadowFlags(animA, 2);
+    GSmodelSetShadowLight(animA, lbl_8047A690);
+    GSmodelSetShadowSurface(animA, 1, &lbl_8047A694);
 
-    shadowTarget = GSresGetResource(ctx, modelB);
-    GSmodelSetShadowFlags(shadowTarget, 2);
-    GSmodelSetShadowLight(shadowTarget, lbl_8047A690);
-    GSmodelSetShadowSurface(shadowTarget, 1, &lbl_8047A694);
+    animA = GSresGetResource(ctx, modelB);
+    GSmodelSetShadowFlags(animA, 2);
+    GSmodelSetShadowLight(animA, lbl_8047A690);
+    GSmodelSetShadowSurface(animA, 1, &lbl_8047A694);
 
     cameraPlayAnime(ctx, 0x0CF61800, 0, 0);
     cameraWaitFrames = 1;

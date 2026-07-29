@@ -1943,9 +1943,9 @@ void fn_80092B2C(u32 ctx) {
     extern u32 fn_80113F48(void);
 
     u32 elapsed;
+    u32 shadowTarget;
     u32 waitFrames;
     u32 model;
-    u32 shadowTarget;
     u32 anim;
 
     lbl_8047A690 = GSresGetResource(ctx, 0x0B631602);

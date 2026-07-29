@@ -556,11 +556,11 @@ s8 menuSubOpenYesNo(u8 menuType, s16 x, s16 y, s32 initialValue) {
     extern void windowCheckCursor(s32, s32);
     extern u32 windowGetValue(s32);
     extern void menuCloseCustom(s32, s32, s32);
-    s32 value = initialValue;
+    s8 result;
     s16 activeWindowId;
     s16 windowId;
 
-    if (value != 0) value = 1;
+    if (initialValue != 0) initialValue = 1;
     switch (menuType) {
     case 0:
         windowId = 0x11;
@@ -574,12 +574,12 @@ s8 menuSubOpenYesNo(u8 menuType, s16 x, s16 y, s32 initialValue) {
         break;
     }
     activeWindowId = windowId;
-    menuOpenCustom((s32)activeWindowId, windowGetActiveID(), &value, 0, 0, 0);
+    menuOpenCustom((s32)activeWindowId, windowGetActiveID(), &initialValue, 0, 0, 0);
     if (x >= 0 && y >= 0) menuSetPosition((s32)activeWindowId, x, y);
     windowCheckCursor((s32)activeWindowId, 1);
-    windowId = (s8)windowGetValue((s32)activeWindowId);
+    result = (s8)windowGetValue((s32)activeWindowId);
     menuCloseCustom((s32)activeWindowId, 0, 1);
-    return (s8)windowId;
+    return result;
 }
 #pragma pop
 #endif

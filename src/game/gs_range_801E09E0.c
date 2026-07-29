@@ -24,6 +24,85 @@ void etctoolSetPokemonNakigoe(void)
     }
 }
 
+void fn_801E0FB4(s32 flags, u32 setupCamera, u32 resetQueue)
+{
+    extern u32 lbl_80467CF8[];
+    extern u8 lbl_8047B420;
+    extern u32 lbl_8047B424;
+    extern u32 lbl_8047B428;
+    extern u32 lbl_8047B42C;
+    extern u32 lbl_8047B430;
+    extern u8 lbl_8047B43C;
+    extern void GSgappBlock(u32 taskId);
+    extern void GSgappUnblock(u32 taskId);
+    extern void GSthreadExecuteGroup(u32 group);
+    extern void fn_800D3410(s32 mode, s32 enabled);
+    extern void fn_800D3FA4(s32 flags, u32 setupCamera, u32 resetQueue);
+    extern void fn_800D3190(void);
+    u32 i;
+    s32 enabled;
+
+    enabled = 0;
+    if (lbl_8047B420 == 0) {
+        enabled = 1;
+    } else {
+        switch (lbl_8047B428) {
+        case 0:
+            enabled = 1;
+            break;
+        case 1:
+            lbl_8047B428 = 2;
+            for (i = 0; i < lbl_8047B42C; i++) {
+                if (lbl_80467CF8[i] != 0) {
+                    GSgappBlock(lbl_80467CF8[i]);
+                }
+            }
+            enabled = 1;
+            break;
+        case 2:
+        case 3:
+            lbl_8047B428 = 0;
+            for (i = 0; i < lbl_8047B42C; i++) {
+                if (lbl_80467CF8[i] != 0) {
+                    GSgappUnblock(lbl_80467CF8[i]);
+                }
+            }
+            enabled = 0;
+            break;
+        }
+    }
+
+    switch (lbl_8047B424) {
+    case 3:
+        if (lbl_8047B428 != 2) {
+            lbl_8047B428 = 1;
+        }
+        break;
+    case 4:
+        if (lbl_8047B428 == 0) {
+            lbl_8047B428 = 1;
+        } else {
+            lbl_8047B428 = 2;
+        }
+        lbl_8047B430++;
+        if (lbl_8047B430 >= 5) {
+            lbl_8047B428 = 3;
+            lbl_8047B430 = 0;
+        }
+        break;
+    }
+
+    if (lbl_8047B428 == 2) {
+        GSthreadExecuteGroup(0xE38F910B);
+    }
+    if (lbl_8047B43C != 0) {
+        enabled = 0;
+    }
+    fn_800D3410(0, enabled);
+    fn_800D3FA4(flags, setupCamera, resetQueue);
+    fn_800D3190();
+}
+
 void fn_801E1170(void)
 {
     extern u32 lbl_8047B424;
@@ -250,6 +329,120 @@ void fn_801E17A8(void)
         fn_801E3978(lbl_8047B45C, lbl_8047B458, lbl_8047B454,
                     lbl_80469030[0], lbl_80469030[1]);
     }
+}
+
+typedef struct GsVtrStartArgs {
+    u32 resourceId;
+    u32 mode;
+} GsVtrStartArgs;
+
+typedef struct GsVtrDimensions {
+    u16 pad_00;
+    u16 pad_02;
+    u16 width;
+    u16 height;
+} GsVtrDimensions;
+
+typedef struct GsVtrOrigin {
+    u32 x;
+    u32 y;
+} GsVtrOrigin;
+
+s32 fn_801E1924(GsVtrStartArgs* args)
+{
+    extern const char lbl_80279A68[];
+    extern GsVtrDimensions lbl_80466BC0;
+    extern u32 lbl_80469020[];
+    extern GsVtrOrigin lbl_80469030;
+    extern u32 lbl_8047B444;
+    extern void* lbl_8047B450;
+    extern u32 lbl_8047B454;
+    extern u32 lbl_8047B458;
+    extern void* lbl_8047B45C;
+    extern void GSscratchSetInvalid(void);
+    extern void GSscratchSetValid(void);
+    extern s32 fn_801E4778(u32 resourceId, u8 mode);
+    extern void GSlogWrite(const char* format, ...);
+    extern void fn_801E3930(GsVtrOrigin* origin);
+    extern void fn_801E38E8(u32* state);
+    extern u32 fn_801E4650(void);
+    extern u16 fn_800E2B00(u32 size, u32 alignment);
+    extern void* fn_800E27B0(u16 handle);
+    extern void fn_801E449C(void);
+    extern u32 OSGetTick(void);
+    extern s32 fn_801E40F8(u32, u32, u32);
+    extern u16 fn_800E202C(void* pointer);
+    extern void fn_800E24B0(u16 handle);
+    extern void fn_800E209C(u16 handle);
+    extern void fn_801E3858(s32* first, s32* second);
+    extern void fn_8014F2DC(s32 id, u32, u32, u32, u32, u32);
+    extern void fn_801E4058(void);
+    extern u8 lbl_8047B441;
+    u32 resourceId;
+    u8 mode;
+    u16 handle;
+    u32 remainder;
+    s32 first;
+    s32 second;
+
+    resourceId = args->resourceId;
+    mode = args->mode;
+    GSscratchSetInvalid();
+    if (!fn_801E4778(resourceId, mode)) {
+        GSlogWrite(lbl_80279A68, resourceId);
+        GSscratchSetValid();
+        lbl_8047B444 = 1;
+        return 0;
+    }
+
+    fn_801E3930(&lbl_80469030);
+    fn_801E38E8(lbl_80469020);
+    lbl_8047B45C = &lbl_80466BC0;
+    lbl_8047B458 = (lbl_80466BC0.width - lbl_80469030.x) >> 1;
+    lbl_8047B454 = (lbl_80466BC0.height - lbl_80469030.y) >> 1;
+
+    handle = fn_800E2B00(fn_801E4650(), 0x20);
+    if (handle != 0) {
+        lbl_8047B450 = fn_800E27B0(handle);
+    } else {
+        lbl_8047B450 = NULL;
+    }
+    if (lbl_8047B450 == NULL) {
+        GSlogWrite(lbl_80279A68 + 0x30);
+        GSscratchSetValid();
+        lbl_8047B444 = 1;
+        return 0;
+    }
+
+    fn_801E449C();
+    if (lbl_80469020[3] != 1) {
+        remainder = OSGetTick() % lbl_80469020[3];
+    } else {
+        remainder = 0;
+    }
+    if (!fn_801E40F8(0, 0, remainder)) {
+        GSlogWrite(lbl_80279A68 + 0x5C);
+        handle = fn_800E202C(lbl_8047B450);
+        if (handle != 0) {
+            fn_800E24B0(handle);
+            fn_800E209C(handle);
+        }
+        GSscratchSetValid();
+        lbl_8047B444 = 1;
+        return 0;
+    }
+
+    fn_801E3858(&first, &second);
+    if (first != -1) {
+        fn_8014F2DC(first, 0, 0, 0, 0x7F, 0);
+    }
+    if (second != -1) {
+        fn_8014F2DC(second, 0, 0x7F, 0, 0x7F, 0);
+    }
+    fn_801E4058();
+    lbl_8047B441 = 1;
+    lbl_8047B444 = 1;
+    return 0;
 }
 
 void fn_801E1810(void)

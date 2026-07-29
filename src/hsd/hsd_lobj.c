@@ -566,13 +566,12 @@ asm void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj) {
 void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj)
 {
     HSD_LObj* cur;
-    HSD_LObj* data;
-    HSD_SList** pp;
     s32 i;
 
-    if (lobj != NULL) {
-        for (cur = lobj; cur != NULL; cur = cur->next) {
-            pp = &lbl_8047B2B4;
+    cur = lobj;
+    if (cur != NULL) {
+        for (; cur != NULL; cur = cur->next) {
+            HSD_SList** pp = &lbl_8047B2B4;
             while (*pp != NULL) {
                 if ((*pp)->data == cur) {
                     for (i = 0; i < MAX_GXLIGHT; i++) {
@@ -581,8 +580,8 @@ void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj)
                         }
                     }
                     *pp = fn_801A3E64(*pp);
-                    if (cur != NULL && ref_DEC_801A0D48(cur)) {
-                        hsdDelete_801A0CE8(cur);
+                    if (cur != NULL && ref_DEC(cur)) {
+                        hsdDelete(cur);
                     }
                     break;
                 }
@@ -595,9 +594,9 @@ void HSD_LObjDeleteCurrentAll(HSD_LObj* lobj)
         }
         lbl_8047B2B8 = 0;
         while (lbl_8047B2B4 != NULL) {
-            data = (HSD_LObj*) lbl_8047B2B4->data;
-            if (data != NULL && ref_DEC_801A0D48(data)) {
-                hsdDelete_801A0CE8(data);
+            HSD_LObj* data = (HSD_LObj*) lbl_8047B2B4->data;
+            if (data != NULL && ref_DEC(data)) {
+                hsdDelete(data);
             }
             lbl_8047B2B4 = fn_801A3E64(lbl_8047B2B4);
         }
@@ -636,8 +635,8 @@ void HSD_LObjAddCurrentAll(HSD_LObj* lobj)
                             }
                         }
                         *pp = fn_801A3E64(*pp);
-                        if (cur != NULL && ref_DEC_801A0D48(cur)) {
-                            hsdDelete_801A0CE8(cur);
+                        if (cur != NULL && ref_DEC(cur)) {
+                            hsdDelete(cur);
                         }
                         break;
                     }

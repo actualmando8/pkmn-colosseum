@@ -1012,10 +1012,10 @@ u32 fn_8015A368(u16 group, u16 song, void* arrangement, void* parameters,
                 u8 studio) {
     s32 i;
     SDataGroup* data;
+    u32 sequence;
     SDataMidiSetup* midiSetup;
     void* drumPage;
     void* normalPage;
-    u32 sequence;
     void* project;
 
     for (i = 0; i < lbl_8047AFE8; i++) {

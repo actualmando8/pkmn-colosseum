@@ -32,6 +32,7 @@
 #define SCRIPT_H
 
 #include "dolphin/types.h"
+#include "dolphin/gx/GX.h"
 
 /* ======================================================================
  * Constants
@@ -171,14 +172,8 @@ typedef struct PSParticle {
     /* 0x0C */ u16 lerpTimer;           /* General-purpose lerp countdown */
     /* 0x0E */ u16 color1Timer;         /* Primary color interpolation timer */
     /* 0x10 */ u16 color2Timer;         /* Secondary color interpolation timer */
-    /* 0x12 */ u8 color1R;              /* Primary color - red */
-    /* 0x13 */ u8 color1G;              /* Primary color - green */
-    /* 0x14 */ u8 color1B;              /* Primary color - blue */
-    /* 0x15 */ u8 color1A;              /* Primary color - alpha */
-    /* 0x16 */ u8 color2R;              /* Secondary color - red */
-    /* 0x17 */ u8 color2G;              /* Secondary color - green */
-    /* 0x18 */ u8 color2B;              /* Secondary color - blue */
-    /* 0x19 */ u8 color2A;              /* Secondary color - alpha */
+    /* 0x12 */ GXColor color1;           /* Primary color (RGBA) */
+    /* 0x16 */ GXColor color2;           /* Secondary color (RGBA) */
     /* 0x1A */ u16 waitTimer;           /* Frames to wait before continuing execution */
     /* 0x1C */ u8 loopCounter;          /* Loop iteration counter */
     /* 0x1D */ u8 linkNo;               /* Priority link list number (0-15) */
@@ -211,14 +206,8 @@ typedef struct PSParticle {
     /* 0x68 */ f32 headingAccel;        /* Heading rotation acceleration */
     /* 0x6C */ u16 color1Countdown;     /* Primary color countdown timer */
     /* 0x6E */ u16 color2Countdown;     /* Secondary color countdown timer */
-    /* 0x70 */ u8 color1TargetR;        /* Primary color target - red */
-    /* 0x71 */ u8 color1TargetG;        /* Primary color target - green */
-    /* 0x72 */ u8 color1TargetB;        /* Primary color target - blue */
-    /* 0x73 */ u8 color1TargetA;        /* Primary color target - alpha */
-    /* 0x74 */ u8 color2TargetR;        /* Secondary color target - red */
-    /* 0x75 */ u8 color2TargetG;        /* Secondary color target - green */
-    /* 0x76 */ u8 color2TargetB;        /* Secondary color target - blue */
-    /* 0x77 */ u8 color2TargetA;        /* Secondary color target - alpha */
+    /* 0x70 */ GXColor color1Target;     /* Primary color interpolation target */
+    /* 0x74 */ GXColor color2Target;     /* Secondary color interpolation target */
     /* 0x78 */ u16 sizeXCountdown;      /* Size X interpolation countdown */
     /* 0x7A */ u16 sizeYCountdown;      /* Size Y interpolation countdown */
     /* 0x7C */ u16 alphaCountdown;      /* Alpha interpolation countdown */

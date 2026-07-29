@@ -134,12 +134,7 @@ typedef struct PSCameraObject {
     PSCameraView* view;
 } PSCameraObject;
 
-typedef struct PSColor {
-    u8 r;
-    u8 g;
-    u8 b;
-    u8 a;
-} PSColor;
+typedef GXColor PSColor;
 
 extern s32 lbl_8047B170;
 extern PSFloatBytes lbl_8047B178;
@@ -356,9 +351,9 @@ void psSetGeneratorAngleRadiusScale(PSGeneratorState* gen, f32* scale,
     gen->angleRadiusScale[1] = scale[1];
     gen->angleRadiusScale[2] = scale[2];
 }
-extern void fn_800BA4C8(s32 channel, const PSColor* color);
-extern void fn_800BA5BC(s32 channel, const PSColor* color);
-extern void fn_800BC2F8(s32 reg, const PSColor* color);
+extern void fn_800BA4C8(s32 channel, PSColor color);
+extern void fn_800BA5BC(s32 channel, PSColor color);
+extern void fn_800BC2F8(s32 reg, PSColor color);
 
 #if !defined(PR410_PS_SPLIT) || defined(PR410_PS_PREFIX)
 
@@ -1226,8 +1221,8 @@ void fn_8016AB94(u32 linkMask, s32 mode) {
                     lbl_8047B13C.g = 0xFF;
                     lbl_8047B13C.b = 0xFF;
                     lbl_8047B13C.a = 0xFF;
-                    fn_800BA5BC(4, &lbl_8047B140);
-                    fn_800BA4C8(4, &lbl_8047B13C);
+                    fn_800BA5BC(4, lbl_8047B140);
+                    fn_800BA4C8(4, lbl_8047B13C);
                     psSetupTevInvalidState();
                     psSetupTevCommon();
 
@@ -1243,9 +1238,9 @@ void fn_8016AB94(u32 linkMask, s32 mode) {
                     lbl_8047B130.g = 0xFF;
                     lbl_8047B130.b = 0xFF;
                     lbl_8047B130.a = 0xFF;
-                    fn_800BC2F8(1, &lbl_8047B138);
-                    fn_800BC2F8(2, &lbl_8047B134);
-                    fn_800BC2F8(3, &lbl_8047B130);
+                    fn_800BC2F8(1, lbl_8047B138);
+                    fn_800BC2F8(2, lbl_8047B134);
+                    fn_800BC2F8(3, lbl_8047B130);
                     lbl_8047B148 = -1;
                     fn_800BCEBC(0);
 
@@ -1477,14 +1472,14 @@ PSParticle* psGenerateParticle0(
     pp->waitTimer = scriptData != NULL;
     pp->objRefIndex = 0;
     pp->pad0B = 0xFF;
-    pp->color1R = 0xFF;
-    pp->color1G = 0xFF;
-    pp->color1B = 0xFF;
-    pp->color1A = 0xFF;
-    pp->color2R = 0;
-    pp->color2G = 0;
-    pp->color2B = 0;
-    pp->color2A = 0;
+    pp->color1.r = 0xFF;
+    pp->color1.g = 0xFF;
+    pp->color1.b = 0xFF;
+    pp->color1.a = 0xFF;
+    pp->color2.r = 0;
+    pp->color2.g = 0;
+    pp->color2.b = 0;
+    pp->color2.a = 0;
     pp->color1Timer = 0;
     pp->color2Timer = 0;
     pp->lerpTimer = 0;
@@ -2124,10 +2119,10 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
         pp->color1Countdown--;
         if (pp->color1Countdown == 0) {
             pp->color1Timer = 0;
-            pp->color1R = pp->color1TargetR;
-            pp->color1G = pp->color1TargetG;
-            pp->color1B = pp->color1TargetB;
-            pp->color1A = pp->color1TargetA;
+            pp->color1.r = pp->color1Target.r;
+            pp->color1.g = pp->color1Target.g;
+            pp->color1.b = pp->color1Target.b;
+            pp->color1.a = pp->color1Target.a;
         }
     }
 
@@ -2135,10 +2130,10 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
         pp->color2Countdown--;
         if (pp->color2Countdown == 0) {
             pp->color2Timer = 0;
-            pp->color2R = pp->color2TargetR;
-            pp->color2G = pp->color2TargetG;
-            pp->color2B = pp->color2TargetB;
-            pp->color2A = pp->color2TargetA;
+            pp->color2.r = pp->color2Target.r;
+            pp->color2.g = pp->color2Target.g;
+            pp->color2.b = pp->color2Target.b;
+            pp->color2.a = pp->color2Target.a;
         }
     }
 
@@ -2830,23 +2825,23 @@ void psDispSubPointTrail(PSParticle* pp) {
             s32 step =
                 ((s32)pp->color1Countdown << 16) / pp->color1Timer;
 
-            color.r = (((s32)pp->color1TargetR << 16) +
-                       step * ((s32)pp->color1R -
-                               (s32)pp->color1TargetR)) >> 16;
-            color.g = (((s32)pp->color1TargetG << 16) +
-                       step * ((s32)pp->color1G -
-                               (s32)pp->color1TargetG)) >> 16;
-            color.b = (((s32)pp->color1TargetB << 16) +
-                       step * ((s32)pp->color1B -
-                               (s32)pp->color1TargetB)) >> 16;
-            color.a = (((s32)pp->color1TargetA << 16) +
-                       step * ((s32)pp->color1A -
-                               (s32)pp->color1TargetA)) >> 16;
+            color.r = (((s32)pp->color1Target.r << 16) +
+                       step * ((s32)pp->color1.r -
+                               (s32)pp->color1Target.r)) >> 16;
+            color.g = (((s32)pp->color1Target.g << 16) +
+                       step * ((s32)pp->color1.g -
+                               (s32)pp->color1Target.g)) >> 16;
+            color.b = (((s32)pp->color1Target.b << 16) +
+                       step * ((s32)pp->color1.b -
+                               (s32)pp->color1Target.b)) >> 16;
+            color.a = (((s32)pp->color1Target.a << 16) +
+                       step * ((s32)pp->color1.a -
+                               (s32)pp->color1Target.a)) >> 16;
         } else {
-            color.r = pp->color1R;
-            color.g = pp->color1G;
-            color.b = pp->color1B;
-            color.a = pp->color1A;
+            color.r = pp->color1.r;
+            color.g = pp->color1.g;
+            color.b = pp->color1.b;
+            color.a = pp->color1.a;
         }
         break;
     case 0x80:
@@ -3043,89 +3038,66 @@ PSGeneratorState* psCreateGeneratorID(s32 linkNo, s32 bankIdx, s32 scriptId) {
  * active alpha-light contribution. Verified against 0x8016E814-0x8016EA78.
  */
 void setupChanReg(PSParticle* pp) {
-    PSColor material;
-    PSColor ambient;
-    s32 value;
+    GXColor amb;
+    GXColor mat;
+    s32 step;
+    HSD_LObj* lobj;
 
-    if ((pp->flags & 0x80000000) == 0) {
+    if (!(pp->flags & 0x80000000)) {
         return;
     }
 
     if (pp->sizeYTimer != 0) {
-        s32 step = ((s32)pp->sizeYCountdown << 16) / pp->sizeYTimer;
-
-        value = ((s32)pp->sizeXTargetFinal << 16) +
-                step * ((s32)pp->sizeXTarget -
-                        (s32)pp->sizeXTargetFinal);
-        value >>= 16;
+        step = (pp->sizeYCountdown << 16) / pp->sizeYTimer;
+        amb.r = amb.g = amb.b =
+            ((pp->sizeXTargetFinal << 16) +
+             step * (pp->sizeXTarget - pp->sizeXTargetFinal)) >> 16;
+        amb.a = ((pp->sizeYTargetFinal << 16) +
+                 step * (pp->sizeYTarget - pp->sizeYTargetFinal)) >> 16;
     } else {
-        value = pp->sizeXTarget;
+        amb.r = amb.g = amb.b = pp->sizeXTarget;
+        amb.a = pp->sizeYTarget;
     }
-    material.r = value;
-    material.g = value;
-    material.b = value;
-    material.a = pp->sizeYTimer != 0
-        ? (((s32)pp->sizeYTargetFinal << 16) +
-           (((s32)pp->sizeYCountdown << 16) / pp->sizeYTimer) *
-           ((s32)pp->sizeYTarget - (s32)pp->sizeYTargetFinal)) >> 16
-        : pp->sizeYTarget;
 
-    if (pp->flags & 0x80) {
-        ambient.r = 0xFF;
-        ambient.g = 0xFF;
-        ambient.b = 0xFF;
-        ambient.a = pp->color1A;
-    } else if (pp->color1Timer != 0) {
-        s32 step = ((s32)pp->color1Countdown << 16) / pp->color1Timer;
-
-        ambient.r = (((s32)pp->color1TargetR << 16) +
-                     step * ((s32)pp->color1R -
-                             (s32)pp->color1TargetR)) >> 16;
-        ambient.g = (((s32)pp->color1TargetG << 16) +
-                     step * ((s32)pp->color1G -
-                             (s32)pp->color1TargetG)) >> 16;
-        ambient.b = (((s32)pp->color1TargetB << 16) +
-                     step * ((s32)pp->color1B -
-                             (s32)pp->color1TargetB)) >> 16;
-        ambient.a = (((s32)pp->color1TargetA << 16) +
-                     step * ((s32)pp->color1A -
-                             (s32)pp->color1TargetA)) >> 16;
+    if (pp->flags & PS_FLAG_INVISIBLE) {
+        mat.r = mat.g = mat.b = 0xFF;
     } else {
-        ambient.r = pp->color1R;
-        ambient.g = pp->color1G;
-        ambient.b = pp->color1B;
-        ambient.a = pp->color1A;
-    }
-
-    material.r = (material.r * ambient.r) >> 8;
-    material.g = (material.g * ambient.g) >> 8;
-    material.b = (material.b * ambient.b) >> 8;
-
-    if (ambient.r != lbl_8047B140.r ||
-        ambient.g != lbl_8047B140.g ||
-        ambient.b != lbl_8047B140.b) {
-        lbl_8047B140 = ambient;
-        fn_800BA5BC(0, &ambient);
-    }
-
-    {
-        HSD_LObj* alphaLight = HSD_LObjGetActiveByID(0x100);
-
-        if (alphaLight != NULL) {
-            HSD_MulColor((GXColor*)&material, &alphaLight->color,
-                         (GXColor*)&material);
+        if (pp->color1Timer != 0) {
+            step = (pp->color1Countdown << 16) / pp->color1Timer;
+            mat.r = ((pp->color1Target.r << 16) +
+                     step * (pp->color1.r - pp->color1Target.r)) >> 16;
+            mat.g = ((pp->color1Target.g << 16) +
+                     step * (pp->color1.g - pp->color1Target.g)) >> 16;
+            mat.b = ((pp->color1Target.b << 16) +
+                     step * (pp->color1.b - pp->color1Target.b)) >> 16;
+            mat.a = ((pp->color1Target.a << 16) +
+                     step * (pp->color1.a - pp->color1Target.a)) >> 16;
         } else {
-            material.r = 0;
-            material.g = 0;
-            material.b = 0;
+            mat = pp->color1;
         }
+
+        amb.r = (amb.r * mat.r) >> 8;
+        amb.g = (amb.g * mat.g) >> 8;
+        amb.b = (amb.b * mat.b) >> 8;
     }
 
-    if (material.r != lbl_8047B13C.r ||
-        material.g != lbl_8047B13C.g ||
-        material.b != lbl_8047B13C.b) {
-        lbl_8047B13C = material;
-        fn_800BA4C8(0, &material);
+    if (mat.r != lbl_8047B140.r || mat.g != lbl_8047B140.g ||
+        mat.b != lbl_8047B140.b) {
+        lbl_8047B140 = mat;
+        fn_800BA5BC(0, mat);
+    }
+
+    lobj = HSD_LObjGetActiveByID(0x100);
+    if (lobj != NULL) {
+        HSD_MulColor(&amb, &lobj->color, &amb);
+    } else {
+        amb.r = amb.g = amb.b = 0;
+    }
+
+    if (amb.r != lbl_8047B13C.r || amb.g != lbl_8047B13C.g ||
+        amb.b != lbl_8047B13C.b) {
+        lbl_8047B13C = amb;
+        fn_800BA4C8(0, amb);
     }
 }
 
@@ -3135,115 +3107,92 @@ void setupChanReg(PSParticle* pp) {
  * 0x8016E40C-0x8016E698.
  */
 void setupTevReg(PSParticle* pp) {
-    PSColor color1;
-    PSColor color2;
-    PSColor sizeColor;
+    GXColor reg1;
+    GXColor reg2;
+    GXColor reg3;
+    s32 step;
+    u32 flags;
 
     if (pp->color1Timer != 0) {
-        s32 step = ((s32)pp->color1Countdown << 16) / pp->color1Timer;
-
-        color1.r = (((s32)pp->color1TargetR << 16) +
-                    step * ((s32)pp->color1R -
-                            (s32)pp->color1TargetR)) >> 16;
-        color1.g = (((s32)pp->color1TargetG << 16) +
-                    step * ((s32)pp->color1G -
-                            (s32)pp->color1TargetG)) >> 16;
-        color1.b = (((s32)pp->color1TargetB << 16) +
-                    step * ((s32)pp->color1B -
-                            (s32)pp->color1TargetB)) >> 16;
-        color1.a = (((s32)pp->color1TargetA << 16) +
-                    step * ((s32)pp->color1A -
-                            (s32)pp->color1TargetA)) >> 16;
+        step = (pp->color1Countdown << 16) / pp->color1Timer;
+        reg1.r = ((pp->color1Target.r << 16) +
+                  step * (pp->color1.r - pp->color1Target.r)) >> 16;
+        reg1.g = ((pp->color1Target.g << 16) +
+                  step * (pp->color1.g - pp->color1Target.g)) >> 16;
+        reg1.b = ((pp->color1Target.b << 16) +
+                  step * (pp->color1.b - pp->color1Target.b)) >> 16;
+        reg1.a = ((pp->color1Target.a << 16) +
+                  step * (pp->color1.a - pp->color1Target.a)) >> 16;
     } else {
-        color1.r = pp->color1R;
-        color1.g = pp->color1G;
-        color1.b = pp->color1B;
-        color1.a = pp->color1A;
+        reg1 = pp->color1;
     }
 
     if (pp->color2Timer != 0) {
-        s32 step = ((s32)pp->color2Countdown << 16) / pp->color2Timer;
-
-        color2.r = (((s32)pp->color2TargetR << 16) +
-                    step * ((s32)pp->color2R -
-                            (s32)pp->color2TargetR)) >> 16;
-        color2.g = (((s32)pp->color2TargetG << 16) +
-                    step * ((s32)pp->color2G -
-                            (s32)pp->color2TargetG)) >> 16;
-        color2.b = (((s32)pp->color2TargetB << 16) +
-                    step * ((s32)pp->color2B -
-                            (s32)pp->color2TargetB)) >> 16;
-        color2.a = (((s32)pp->color2TargetA << 16) +
-                    step * ((s32)pp->color2A -
-                            (s32)pp->color2TargetA)) >> 16;
+        step = (pp->color2Countdown << 16) / pp->color2Timer;
+        reg2.r = ((pp->color2Target.r << 16) +
+                  step * (pp->color2.r - pp->color2Target.r)) >> 16;
+        reg2.g = ((pp->color2Target.g << 16) +
+                  step * (pp->color2.g - pp->color2Target.g)) >> 16;
+        reg2.b = ((pp->color2Target.b << 16) +
+                  step * (pp->color2.b - pp->color2Target.b)) >> 16;
+        reg2.a = ((pp->color2Target.a << 16) +
+                  step * (pp->color2.a - pp->color2Target.a)) >> 16;
     } else {
-        color2.r = pp->color2R;
-        color2.g = pp->color2G;
-        color2.b = pp->color2B;
-        color2.a = pp->color2A;
+        reg2 = pp->color2;
     }
 
-    if ((pp->flags & 0x80) ||
-        (pp->flags & 0x80000000) ||
-        (pp->flags & 0x100000)) {
-        if (color1.r != lbl_8047B138.r ||
-            color1.g != lbl_8047B138.g ||
-            color1.b != lbl_8047B138.b ||
-            color1.a != lbl_8047B138.a) {
-            lbl_8047B138 = color1;
-            fn_800BC2F8(1, &color1);
+    flags = pp->flags;
+    if ((flags & PS_FLAG_INVISIBLE) ||
+        ((flags & 0x80000000) && (flags & 0x00100000))) {
+        if (lbl_8047B138.r != reg1.r || lbl_8047B138.g != reg1.g ||
+            lbl_8047B138.b != reg1.b || lbl_8047B138.a != reg1.a) {
+            lbl_8047B138 = reg1;
+            fn_800BC2F8(1, reg1);
+        }
+
+        if (pp->flags & PS_FLAG_INVISIBLE) {
+            if (lbl_8047B134.r != reg2.r || lbl_8047B134.g != reg2.g ||
+                lbl_8047B134.b != reg2.b || lbl_8047B134.a != reg2.a) {
+                lbl_8047B134 = reg2;
+                fn_800BC2F8(2, reg2);
+            }
+        } else if (lbl_8047B134.r != 0 || lbl_8047B134.g != 0 ||
+                   lbl_8047B134.b != 0 || lbl_8047B134.a != 0) {
+            lbl_8047B134.r = 0;
+            lbl_8047B134.g = 0;
+            lbl_8047B134.b = 0;
+            lbl_8047B134.a = 0;
+            fn_800BC2F8(2, lbl_8047B134);
         }
     }
 
-    if (pp->flags & 0x80) {
-        if (color2.r != lbl_8047B134.r ||
-            color2.g != lbl_8047B134.g ||
-            color2.b != lbl_8047B134.b ||
-            color2.a != lbl_8047B134.a) {
-            lbl_8047B134 = color2;
-            fn_800BC2F8(2, &color2);
-        }
-    } else if (lbl_8047B134.r != 0 || lbl_8047B134.g != 0 ||
-               lbl_8047B134.b != 0 || lbl_8047B134.a != 0) {
-        color2.r = 0;
-        color2.g = 0;
-        color2.b = 0;
-        color2.a = 0;
-        lbl_8047B134 = color2;
-        fn_800BC2F8(2, &color2);
-    }
-
-    if (pp->flags & 0x80000000) {
-        s32 value;
-
+    flags = pp->flags;
+    if (flags & 0x80000000) {
         if (pp->sizeXTimer != 0) {
-            s32 step = ((s32)pp->sizeXCountdown << 16) / pp->sizeXTimer;
-
-            value = (((s32)pp->sizeXTargetFinal << 16) +
-                     step * ((s32)pp->sizeXTarget -
-                             (s32)pp->sizeXTargetFinal)) >> 16;
-            sizeColor.a =
-                (((s32)pp->sizeYTargetFinal << 16) +
-                 step * ((s32)pp->sizeYTarget -
-                         (s32)pp->sizeYTargetFinal)) >> 16;
+            step = (pp->sizeXCountdown << 16) / pp->sizeXTimer;
+            reg3.r = reg3.g = reg3.b =
+                ((pp->sizeXStart << 16) +
+                 step * (pp->sizeXCurrent - pp->sizeXStart)) >> 16;
+            reg3.a = ((pp->sizeYStart << 16) +
+                      step * (pp->sizeYCurrent - pp->sizeYStart)) >> 16;
         } else {
-            value = pp->sizeXTarget;
-            sizeColor.a = pp->sizeYTarget;
+            reg3.r = reg3.g = reg3.b = pp->sizeXCurrent;
+            reg3.a = pp->sizeYCurrent;
         }
 
-        sizeColor.r = value;
-        sizeColor.g = value;
-        sizeColor.b = value;
-        if ((pp->flags & 0x80) == 0) {
-            sizeColor.a = (sizeColor.a * color1.a) >> 8;
-        }
-
-        if (sizeColor.r != lbl_8047B130.r ||
-            sizeColor.g != lbl_8047B130.g ||
-            sizeColor.b != lbl_8047B130.b ||
-            sizeColor.a != lbl_8047B130.a) {
-            lbl_8047B130 = sizeColor;
-            fn_800BC2F8(3, &sizeColor);
+        if (flags & PS_FLAG_INVISIBLE) {
+            if (lbl_8047B130.r != reg3.r || lbl_8047B130.g != reg3.g ||
+                lbl_8047B130.b != reg3.b || lbl_8047B130.a != reg3.a) {
+                lbl_8047B130 = reg3;
+                fn_800BC2F8(3, reg3);
+            }
+        } else {
+            reg3.a = (reg3.a * reg1.a) >> 8;
+            if (lbl_8047B130.r != reg3.r || lbl_8047B130.g != reg3.g ||
+                lbl_8047B130.b != reg3.b || lbl_8047B130.a != reg3.a) {
+                lbl_8047B130 = reg3;
+                fn_800BC2F8(3, reg3);
+            }
         }
     }
 }

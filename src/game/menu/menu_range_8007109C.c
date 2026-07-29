@@ -561,6 +561,422 @@ static inline u32 fn_80071AE4_swap_word(u32 value) {
     return result;
 }
 
+s32 fn_80073A44(s32 chan, u16* buttons)
+{
+    u32 setupTimeout;
+    u32 setupStart;
+    u32 response;
+    u32 command;
+    u8 length;
+    u8 status;
+    s32 result;
+    s32 setupExpired;
+
+    setupTimeout = OSMillisecondsToTicks(5);
+    setupStart = OSGetTick();
+    setupExpired = OSGetTick() - setupStart > setupTimeout;
+    result = fn_80073C38(chan);
+    if (result == 1) {
+        if (setupExpired) {
+            return 1;
+        }
+    } else if (result != 0) {
+        return result;
+    }
+
+    command = 0xAA;
+    if (GBAWrite(chan, &command, &length) != 0) {
+        return 0xB;
+    }
+
+    result = fn_80071AE4_poll_read(chan, &response, &length, &status);
+    if (result != 0) {
+        return result + 0xB;
+    }
+    if ((response >> 24) != 0xAA) {
+        return 0xF;
+    }
+
+    *buttons = fn_80071AE4_swap_word(response) >> 16;
+    return 0;
+}
+
+s32 fn_80073C38(s32 chan)
+{
+    extern u32 fn_800D0F44(s32 chan);
+    extern u32 lbl_8047A60C;
+    u32 timeout;
+    u32 start;
+    u32 response;
+    u8 length;
+    u8 status;
+    s32 result;
+
+    if (fn_800D0F44(chan) != 0x40000) {
+        return 1;
+    }
+    if (GBAReset(chan, (u32)&length) != 0) {
+        return 2;
+    }
+
+    timeout = OSMillisecondsToTicks(5);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            result = 1;
+            break;
+        }
+        if (GBAGetStatus(chan, &status) != 0) {
+            result = 2;
+            break;
+        }
+        if ((status & 0xA) == 8) {
+            if (GBARead(chan, &response, &length) != 0) {
+                result = 3;
+            } else {
+                result = 0;
+            }
+            break;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            result = 0x3E8;
+            break;
+        }
+    }
+    if (result != 0) {
+        return result + 2;
+    }
+    if (response != lbl_8047A60C) {
+        return 6;
+    }
+    if (GBAGetStatus(chan, &length) != 0) {
+        return 7;
+    }
+    if (GBAWrite(chan, &response, &length) != 0) {
+        return 8;
+    }
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 9;
+        }
+        if (GBAGetStatus(chan, &length) != 0) {
+            return 10;
+        }
+        if ((length & 2) == 0) {
+            return 0;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+}
+
+s32 fn_80072A00(s32 chan)
+{
+    u32 command;
+    u32 response;
+    u32 outerTimeout;
+    u32 outerStart;
+    u32 setupTimeout;
+    u32 setupStart;
+    u8 length;
+    u8 status;
+    s32 result;
+    s32 innerResult;
+    s32 setupExpired;
+
+    gbaCommandSetKeyState(chan + 1, 2);
+    result = fn_80073C38(chan);
+    if (result != 0) {
+        goto done;
+    }
+
+    command = 0x60;
+    if (GBAWrite(chan, &command, &length) != 0) {
+        result = 0xB;
+        goto done;
+    }
+
+    outerTimeout = OS_TIMER_CLOCK * 3;
+    outerStart = OSGetTick();
+    do {
+        if (OSGetTick() - outerStart > outerTimeout) {
+            result = 0x10;
+            break;
+        }
+
+        setupTimeout = OSMillisecondsToTicks(5);
+        setupStart = OSGetTick();
+        setupExpired = OSGetTick() - setupStart > setupTimeout;
+        innerResult = fn_80073C38(chan);
+        if (innerResult == 1) {
+            if (!setupExpired) {
+                innerResult = 0;
+            }
+        }
+
+        if (innerResult == 0) {
+            command = 0xAA;
+            if (GBAWrite(chan, &command, &length) != 0) {
+                innerResult = 0xB;
+            } else {
+                innerResult =
+                    fn_80071AE4_poll_read(chan, &response, &length, &status);
+                if (innerResult != 0) {
+                    innerResult += 0xB;
+                } else if ((response >> 24) != 0xAA) {
+                    innerResult = 0xF;
+                }
+            }
+        }
+        _threadSwitch();
+    } while (innerResult != 0);
+
+done:
+    gbaCommandSetKeyState(chan + 1, 1);
+    return result;
+}
+
+s32 fn_800730F8(s32 chan, u32 value)
+{
+    u32 timeout;
+    u32 start;
+    u32 command;
+    u32 response;
+    u32 sendValue;
+    u8 length;
+    u8 status;
+    s32 result;
+    s32 expired;
+
+    gbaCommandSetKeyState(chan + 1, 2);
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    sendValue = fn_80071AE4_swap_word(value);
+
+    do {
+        expired = OSGetTick() - start > timeout;
+        result = fn_80073C38(chan);
+        if (result == 0) {
+            command = 0x77;
+            if (GBAWrite(chan, &command, &length) != 0) {
+                result = 0xB;
+            } else {
+                result =
+                    fn_80071AE4_poll_read(chan, &response, &length, &status);
+                if (result != 0) {
+                    result += 0xB;
+                } else if ((response >> 24) != 0x77) {
+                    result = 0xF;
+                }
+            }
+
+            if (result == 0) {
+                GBAWrite(chan, &sendValue, &status);
+                timeout = OSMillisecondsToTicks(100);
+                start = OSGetTick();
+                for (;;) {
+                    if (OSGetTick() - start > timeout) {
+                        result = 0x10;
+                        break;
+                    }
+                    if (GBAGetStatus(chan, &status) != 0) {
+                        result = 0x11;
+                        break;
+                    }
+                    if ((status & 2) == 0) {
+                        result = 0;
+                        break;
+                    }
+                    if (lbl_803B6E18[chan].func != NULL) {
+                        lbl_803B6E18[chan].func(
+                            chan, lbl_803B6E18[chan].arg);
+                    }
+                    if (lbl_803B6E08[chan] != 0) {
+                        result = 0x3E8;
+                        break;
+                    }
+                }
+            }
+        }
+    } while (result == 1 && !expired);
+
+    gbaCommandSetKeyState(chan + 1, result != 0 ? 1 : 3);
+    return result;
+}
+
+s32 fn_800733D0(s32 chan, const u32* data)
+{
+    u32 setupTimeout;
+    u32 setupStart;
+    u32 timeout;
+    u32 start;
+    u32 command;
+    u32 response;
+    u32 word;
+    s32 offset;
+    u8 length;
+    u8 status;
+    s32 result;
+    s32 setupExpired;
+
+    gbaCommandSetKeyState(chan + 1, 2);
+    setupTimeout = OSMillisecondsToTicks(5);
+    setupStart = OSGetTick();
+    setupExpired = OSGetTick() - setupStart > setupTimeout;
+    result = fn_80073C38(chan);
+    if (result == 1) {
+        if (!setupExpired) {
+            result = 0;
+        }
+    }
+    if (result != 0) {
+        goto done;
+    }
+
+    command = 0x88;
+    if (GBAWrite(chan, &command, &length) != 0) {
+        result = 0xB;
+        goto done;
+    }
+    result = fn_80071AE4_poll_read(chan, &response, &length, &status);
+    if (result != 0) {
+        result += 0xB;
+        goto done;
+    }
+    if ((response >> 24) != 0x88) {
+        result = 0xF;
+        goto done;
+    }
+
+    for (offset = 0; offset < 0x780; offset += 4, data++) {
+        word = *data;
+        if (GBAWrite(chan, &word, &status) != 0) {
+            result = 0x10;
+            goto done;
+        }
+
+        timeout = OSMillisecondsToTicks(100);
+        start = OSGetTick();
+        for (;;) {
+            if (OSGetTick() - start > timeout) {
+                result = 0x11;
+                goto done;
+            }
+            if (GBAGetStatus(chan, &status) != 0) {
+                result = 0x12;
+                goto done;
+            }
+            if ((status & 2) == 0) {
+                break;
+            }
+        }
+        if ((offset & 0x3F) == 0) {
+            _threadSwitch();
+        }
+    }
+    result = 0;
+
+done:
+    gbaCommandSetKeyState(chan + 1, 1);
+    return result;
+}
+
+s32 fn_80073700(s32 chan, u32* data)
+{
+    u32 command;
+    u32 response;
+    u32 timeout;
+    u32 start;
+    s32 offset;
+    u8 length;
+    u8 status;
+    s32 result;
+
+    result = fn_80073C38(chan);
+    if (result != 0) {
+        return result;
+    }
+
+    command = 0x99;
+    if (GBAWrite(chan, &command, &length) != 0) {
+        return 0xB;
+    }
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            result = 1;
+            break;
+        }
+        if (GBAGetStatus(chan, &status) != 0) {
+            result = 2;
+            break;
+        }
+        if ((status & 0xA) == 8) {
+            if (GBARead(chan, &response, &length) != 0) {
+                result = 3;
+            } else {
+                result = 0;
+            }
+            break;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            result = 0x3E8;
+            break;
+        }
+    }
+    if (result != 0) {
+        return result + 0xB;
+    }
+    if ((response >> 24) != 0x99) {
+        return 0xF;
+    }
+
+    for (offset = 0; offset < 0x278; offset += 4, data++) {
+        timeout = OSMillisecondsToTicks(100);
+        start = OSGetTick();
+        for (;;) {
+            if (OSGetTick() - start > timeout) {
+                return 0x10;
+            }
+            if (GBAGetStatus(chan, &status) != 0) {
+                return 0x11;
+            }
+            if ((status & 8) != 0) {
+                break;
+            }
+            if (lbl_803B6E18[chan].func != NULL) {
+                lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+            }
+            if (lbl_803B6E08[chan] != 0) {
+                return 0x3E8;
+            }
+        }
+        if (GBARead(chan, &response, &status) != 0) {
+            return 0x12;
+        }
+        *data = response;
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+    return 0;
+}
+
 /* Send a variable-sized data block to one GBA channel. */
 s32 fn_80071AE4(s32 chan, const u32* data) {
     u32 response;
@@ -830,6 +1246,139 @@ extern s32 fn_801906A0(s32);
 extern void _flagSet();
 
 /* fn_80074324 (0x80074324): prep key-state then perform per-channel reset path. */
+s32 fn_80074360(s32 chan)
+{
+    extern u32 fn_800D0F44(s32 chan);
+    u32 response;
+    u32 timeout;
+    u32 start;
+    u8 status;
+    s32 result;
+
+    if (fn_800D0F44(chan) != 0x40000) {
+        return 1;
+    }
+    if (GBAReset(chan, (u32)&status) != 0) {
+        return 2;
+    }
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 3;
+        }
+        if (GBAGetStatus(chan, &status) != 0) {
+            return 4;
+        }
+        if (status == 0x18) {
+            break;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+
+    if (GBARead(chan, &response, &status) != 0) {
+        return 5;
+    }
+    if (response != 0x41585645) {
+        return 6;
+    }
+    if (GBAGetStatus(chan, &status) != 0 && status != 0x10) {
+        return 7;
+    }
+    if (GBAWrite(chan, &response, &status) != 0) {
+        return 8;
+    }
+
+    timeout = OSMillisecondsToTicks(100);
+    start = OSGetTick();
+    for (;;) {
+        if (OSGetTick() - start > timeout) {
+            return 9;
+        }
+        if (GBAGetStatus(chan, &status) != 0) {
+            return 0xA;
+        }
+        if ((status & 0x30) != 0x10) {
+            return 0xB;
+        }
+        if ((status & 2) == 0) {
+            break;
+        }
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+    result = 0;
+    return result;
+}
+
+extern s32 fn_8007480C();
+
+s32 fn_800745B4(s32 chan)
+{
+    u32 command;
+    u32 response;
+    u32 timeout;
+    u32 start;
+    u8 length;
+    u8 status;
+    s32 result;
+    s32 expired;
+
+    result = fn_8007480C(chan);
+    if (result != 0) {
+        goto done;
+    }
+
+    timeout = OS_TIMER_CLOCK * 8;
+    start = OSGetTick();
+    while (OSGetTick() - start <= timeout) {
+        if (lbl_803B6E18[chan].func != NULL) {
+            lbl_803B6E18[chan].func(chan, lbl_803B6E18[chan].arg);
+        }
+        if (lbl_803B6E08[chan] != 0) {
+            return 0x3E8;
+        }
+    }
+
+    timeout = OSMillisecondsToTicks(5);
+    start = OSGetTick();
+    do {
+        expired = OSGetTick() - start > timeout;
+        result = fn_80073C38(chan);
+    } while (result == 1 && !expired);
+    if (result != 0) {
+        goto done;
+    }
+
+    command = 0xAA;
+    if (GBAWrite(chan, &command, &length) != 0) {
+        result = 0xB;
+        goto done;
+    }
+    result = fn_80071AE4_poll_read(chan, &response, &length, &status);
+    if (result != 0) {
+        result += 0xB;
+        goto done;
+    }
+    if ((response >> 24) != 0xAA) {
+        result = 0xF;
+    }
+
+done:
+    gbaCommandSetKeyState(chan + 1, 1);
+    return result;
+}
+
 #pragma push
 #pragma peephole off
 s32 fn_80074324(s32 arg0) {
@@ -839,6 +1388,87 @@ s32 fn_80074324(s32 arg0) {
     return fn_80074360(arg0);
 }
 #pragma pop
+
+void fn_8007581C(void)
+{
+    extern s32 _menuPop_80071398(s32);
+    extern u8* savedataGetStatus(s32, s32);
+    extern void fn_8005E750(void*);
+    extern s32 fn_80063D14(void*);
+    extern s32 menuCB_Battle(void*);
+    extern s32 fn_80062948(void*);
+    extern u8 fn_800FF52C(void);
+    extern void fn_800FF660(void);
+    extern void fn_800FF58C(s32);
+    extern void floorSetFadeScript(s32, u32);
+    extern char lbl_802688F8[];
+    extern char lbl_8026890C[];
+    extern void __assert(const char*, s32, const char*);
+    u8* status;
+    s32 running;
+    s32 result;
+
+    running = 1;
+    result = 0;
+    while (running != 0) {
+        status = savedataGetStatus(0, 0xE);
+        fn_8005E750(status);
+        status = savedataGetStatus(0, 0xE);
+        result = fn_80063D14(status);
+        if (result == 0xB3) {
+            _menuPop_80071398(result);
+        } else {
+            status = savedataGetStatus(0, 0xE);
+            result = menuCB_Battle(status);
+            *(s32*)(savedataGetStatus(0, 0xE) + 0x20) = result;
+            status = savedataGetStatus(0, 0xE);
+            result = fn_80062948(status);
+
+            switch (result) {
+            case 0xD1:
+                status = savedataGetStatus(0, 0xE);
+                if (*(s32*)status == 1) {
+                    status = savedataGetStatus(0, 0xE);
+                    if (*(s32*)(status + 0x20) == 2) {
+                        running = 0;
+                    }
+                }
+                break;
+            case 0x105:
+                _menuPush(0x105);
+                running = 0;
+                break;
+            case 0xAC:
+                status = savedataGetStatus(0, 0xE);
+                if (*(s32*)status == 0) {
+                    result = 0xAE;
+                }
+                _menuPop_80071398(result);
+                running = 0;
+                break;
+            default:
+                _menuPop_80071398(result);
+                running = 0;
+                break;
+            }
+        }
+    }
+
+    if (fn_800FF52C() != 0) {
+        status = savedataGetStatus(0, 0xE);
+        if (*(s32*)status != 1) {
+            __assert(lbl_802688F8, 0xA7, lbl_8026890C);
+        }
+        fn_800FF660();
+        status = savedataGetStatus(0, 0xE);
+        if (*(s32*)status == 1 && result != 0xD1) {
+            _flagSet(0x8AE, 0);
+            floorSetFadeScript(0x5960009, 0);
+            fadeCheck(1);
+        }
+    }
+    fn_800FF58C(0x395);
+}
 
 /* fn_80075A34 (0x80075A34): load the battle scene and start its camera. */
 void fn_80075A34(void) {
@@ -4362,6 +4992,72 @@ s32 fn_8007A82C(void) {
 }
 #pragma pop
 
+void fn_8007A850(void)
+{
+    extern void* fn_801D036C(void);
+    extern void fn_801D0314(void*);
+    void* backup;
+
+    backup = fn_801D036C();
+    fadeCheck(1);
+    do {
+        switch (lbl_8047A638) {
+        case 1:
+        {
+            s32 choice;
+
+            winMsgOpenField(0x43CF, 0, 1);
+            choice = menuOpen(0xE1, 1);
+            winMsgClose(1);
+            switch (choice) {
+            case 1:
+                lbl_8047A638 = 3;
+                break;
+            case 2:
+                lbl_8047A638 = 4;
+                break;
+            case 3:
+                lbl_8047A638 = 2;
+                break;
+            default:
+                menuClose(0xE1);
+                lbl_8047A638 = 0;
+                break;
+            }
+            break;
+        }
+        case 2:
+        {
+            f32 elapsed;
+
+            winMsgOpenField(0x43A5, 1, 0);
+            winMsgClose(1);
+            elapsed = lbl_8047C114;
+            while (elapsed < lbl_8047C108) {
+                s32 frames;
+                u32 ticks;
+
+                _threadSwitch();
+                frames = fn_800D37CC();
+                ticks = fn_800D3088();
+                elapsed += (f32)ticks / (f32)frames;
+            }
+            lbl_8047A638 = 1;
+            break;
+        }
+        case 3:
+            fn_800798E8(backup);
+            break;
+        case 4:
+            fn_800792D8();
+            break;
+        }
+    } while ((s32)lbl_8047A638 > 0);
+
+    fn_801D0314(backup);
+    floorLink(0x321, 0);
+}
+
 void fn_8007AAFC(void) {
     lbl_803F7A30[0x342] = 1;
 }
@@ -4418,6 +5114,85 @@ void fn_8007B0D8(void) {
         lbl_8047A648 = NULL;
         lbl_8047A64C = NULL;
     }
+}
+
+void fn_8007B114(s32 request)
+{
+    extern u32 lbl_803FAEF8[256];
+    extern char* lbl_802EE608[];
+    extern char lbl_803FADF8[];
+    extern void* lbl_80478980;
+    extern u8* lbl_8047A648;
+    extern u32 lbl_8047A64C;
+    extern u32 lbl_8047A650;
+    extern char* strcpy(char*, const char*);
+    extern void* memset(void*, s32, u32);
+    extern void* memmove(void*, const void*, u32);
+    extern s32 DVDOpen(const char*, MenuDVDFileInfo*);
+    extern s32 DVDRead(MenuDVDFileInfo*, void*, s32, s32, s32);
+    extern void DVDClose(MenuDVDFileInfo*);
+    extern void fn_8009AAD4(void*, void*);
+    extern void* fn_8009A9D8(void*, u32);
+    MenuDVDFileInfo file;
+    MenuDVDFileInfo readFile;
+    u32 value;
+    u32 aligned;
+    u32 length;
+    s32 readResult;
+    s32 i;
+    s32 bit;
+
+    for (i = 0; i < 256; i++) {
+        value = i;
+        for (bit = 0; bit < 8; bit++) {
+            if ((value & 1) != 0) {
+                value = (value >> 1) ^ 0xEDB88320;
+            } else {
+                value >>= 1;
+            }
+        }
+        lbl_803FAEF8[i] = value;
+    }
+
+    lbl_8047A64C = 0;
+    strcpy(lbl_803FADF8, lbl_802EE608[OSGetTick() % 3]);
+    if (DVDOpen(lbl_803FADF8, &file) == 0 || file.length == 0) {
+        return;
+    }
+
+    aligned = (file.length + 0x5B) & ~0x1F;
+    lbl_8047A650 = aligned;
+    if (lbl_8047A648 != NULL) {
+        fn_8009AAD4(lbl_80478980, lbl_8047A648);
+    }
+    lbl_8047A648 = fn_8009A9D8(lbl_80478980, aligned);
+    if (lbl_8047A648 == NULL) {
+        return;
+    }
+    memset(lbl_8047A648, 0, aligned);
+    DVDClose(&file);
+
+    if (lbl_8047A64C != 0 ||
+        DVDOpen(lbl_803FADF8, &readFile) == 0 ||
+        readFile.length == 0) {
+        return;
+    }
+    length = readFile.length;
+    readResult = DVDRead(&readFile, lbl_8047A648,
+                         (length + 0x1F) & ~0x1F, 0, 2);
+    if (readResult < 0) {
+        return;
+    }
+    if ((u32)readResult < length) {
+        return;
+    }
+    DVDClose(&readFile);
+
+    memmove(lbl_8047A648 + 0x34, lbl_8047A648, length);
+    memset(lbl_8047A648, 0, 0x34);
+    memset(lbl_8047A648 + length + 0x34, 0,
+           lbl_8047A650 - (length + 0x34));
+    lbl_8047A64C = 1;
 }
 
 /* fn_8007B350 (0x8007B350): prepare the GBA upload context and worker. */

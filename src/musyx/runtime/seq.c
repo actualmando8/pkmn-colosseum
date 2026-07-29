@@ -464,8 +464,7 @@ u32 fn_801463C4(PAGE* normal, PAGE* drum, MIDISETUP* midiSetup, u32* song,
     u32 seqId;
     u32 bpm;
 
-    seq = lbl_8047AF0C;
-    if (seq == NULL) {
+    if ((seq = lbl_8047AF0C) == NULL) {
         return SND_SEQ_ERROR_ID;
     }
     if ((lbl_8047AF0C = seq->next) != NULL) {
