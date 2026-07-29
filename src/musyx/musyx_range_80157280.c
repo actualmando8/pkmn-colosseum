@@ -1237,8 +1237,8 @@ static inline void s3dMakeListenerMatrix(SndListener* listener) {
 }
 
 static inline void s3dRemoveListenerFromRoom(SndRoom* room) {
-    SndListener* listener;
     u32 count;
+    SndListener* listener;
 
     count = 0;
     for (listener = (SndListener*)lbl_8047B044; listener != 0;
@@ -2483,6 +2483,11 @@ typedef struct HwIrqVoice {
     u32 changed[5];
 } HwIrqVoice;
 
+static inline HwIrqVoice* sndGetIrqVoice(u8 voice)
+{
+    return (HwIrqVoice*)((u8*)lbl_8047B024 + voice * 0xF4);
+}
+
 void snd_handle_irq(void) {
     u8 frame;
     u8 voice;
@@ -2505,7 +2510,7 @@ void snd_handle_irq(void) {
     lbl_8047B05E = (lbl_8047B05E + 1) % 3;
     for (voice = 0; voice < lbl_8047B05D; voice++) {
         for (i = 0; i < 5; i++) {
-            ((HwIrqVoice*)((u8*)lbl_8047B024 + voice * 0xF4))->changed[i] = 0;
+            sndGetIrqVoice(voice)->changed[i] = 0;
         }
     }
     fn_801643B8();

@@ -593,7 +593,8 @@ s32 fn_8001374C(s32 entry_idx, s32 target_n, s32* out) {
     void* list;
     s32   idx;
     s32   i;
-    entry = (u8*)sSummaryPageEntries + entry_idx * 0x4C;
+    entry = (u8*)sSummaryPageEntries;
+    entry += entry_idx * 0x4C;
     flag  = *(s32*)(entry + 4);
     if (flag >= 0) {
         list = heroItemGetItemKindToItemAryPtr(lbl_8047A2F8, (u8)flag, buf, 0, 0, 0);

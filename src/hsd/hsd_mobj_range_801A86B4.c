@@ -1,5 +1,6 @@
 #include "dolphin/types.h"
 #include "dolphin/mtx.h"
+#include "hsd/hsd_objalloc.h"
 
 /* =========================================================================
  * Partial banked source for reserved split unit 0x801A86B4 - 0x801AA608.
@@ -662,42 +663,43 @@ void _HSD_ObjAllocForgetMemory(void) {
 }
 
 /* Address: 0x801AA35C | Size: 0x13C */
-void HSD_ObjAllocInit(void* data, u32 size, u32 align)
+void HSD_ObjAllocInit(HSD_ObjAllocData* data, u32 size, u32 align)
 {
-    void** current;
+    HSD_ObjAllocData** current;
+    const char* file = lbl_80274E90;
 
     if (data == NULL) {
-        __assert(lbl_80274E90, 0x1AE, &lbl_8047DC98);
+        __assert(file, 0x1AE, &lbl_8047DC98);
     }
 
     if (data != NULL) {
-        current = &lbl_8047B2E0;
+        current = (HSD_ObjAllocData**)&lbl_8047B2E0;
         while (*current != NULL) {
             if (*current == data) {
-                *current = *(void**)((u8*)*current + 0x28);
+                *current = (*current)->next;
                 break;
             }
-            current = (void**)((u8*)*current + 0x28);
+            current = &(*current)->next;
         }
     } else {
         lbl_8047B2E0 = NULL;
     }
 
     memset(data, 0, 0x2C);
-    *(s32*)((u8*)data + 0x14) = -1;
-    *(u32*)((u8*)data + 0x18) = 0;
-    *(s32*)((u8*)data + 0x1C) = -1;
+    data->numLimit = -1;
+    data->heapLimitSize = 0;
+    data->heapLimitNum = -1;
 
     if (align > 0x20) {
-        __assert(lbl_80274E90, 0x1B9, lbl_80274E90 + 0xC);
+        __assert(file, 0x1B9, file + 0xC);
     }
     if (HSD_GetNbBits(align) != 1) {
-        __assert(lbl_80274E90, 0x1BA, lbl_80274E90 + 0x18);
+        __assert(file, 0x1BA, file + 0x18);
     }
 
-    *(u32*)((u8*)data + 0x24) = align;
-    *(u32*)((u8*)data + 0x20) = (size + align - 1) & ~(align - 1);
-    *(void**)((u8*)data + 0x28) = lbl_8047B2E0;
+    data->align = align;
+    data->size = (size + data->align - 1) & ~(data->align - 1);
+    data->next = lbl_8047B2E0;
     lbl_8047B2E0 = data;
 }
 
@@ -715,7 +717,7 @@ void HSD_ObjFree(void* list, void* data)
 /* Address: 0x801AA4CC | Size: 0x6C  -- HSD_ObjAlloc (from backup hsd_pobj_disp.c) */
 #pragma push
 #pragma optimization_level 1
-void* HSD_ObjAlloc(void* list)
+void* HSD_ObjAlloc(HSD_ObjAllocData* list)
 {
     void* l = list;
 

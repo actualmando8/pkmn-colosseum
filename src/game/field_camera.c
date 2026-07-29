@@ -1954,36 +1954,35 @@ void fn_80117D14(void)
     u32 saved;
     u8* size;
 
-    if (lbl_8047AD88 != 0) {
-        if (lbl_8047AD90 != 0) {
-            fn_800EC134(lbl_8047AD90);
-            saved = (u32)GScameraGetActiveCamera();
-            fn_800D4604(2);
-            fn_800D377C(1);
-            fn_800D3410(lbl_8047AD8C, 0);
-            fn_800D9B24(&a0, &a1, &a2, &a3);
-            fn_800D9AF0(&b0, &b1, &b2, &b3);
-            fn_800D258C(lbl_8047AD94);
-
-            size = (u8*)lbl_8047AD88;
-            fn_800D9D68(0, 0,
-                        (u16)(*(u16*)(size + 0) - 1),
-                        (u16)(*(u16*)(size + 2) - 1));
-            size = (u8*)lbl_8047AD88;
-            fn_800D9C24(0, 0,
-                        (u16)(*(u16*)(size + 0) - 1),
-                        (u16)(*(u16*)(size + 2) - 1));
-            _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
-            GSmodelDrawModel(lbl_8047AD90, 0x3010);
-            fn_800D3190();
-            fn_800D377C(1);
-            fn_800D258C(saved);
-            fn_800D9D68(a0, a1, a2, a3);
-            fn_800D9C24(b0, b1, b2, b3);
-            _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
-            fn_800D4604(1);
-        }
+    if (lbl_8047AD88 == 0 || lbl_8047AD90 == 0) {
+        return;
     }
+    fn_800EC134(lbl_8047AD90);
+    saved = (u32)GScameraGetActiveCamera();
+    fn_800D4604(2);
+    fn_800D377C(1);
+    fn_800D3410(lbl_8047AD8C, 0);
+    fn_800D9B24(&a0, &a1, &a2, &a3);
+    fn_800D9AF0(&b0, &b1, &b2, &b3);
+    fn_800D258C(lbl_8047AD94);
+
+    size = (u8*)lbl_8047AD88;
+    fn_800D9D68(0, 0,
+                (u16)(*(u16*)(size + 0) - 1),
+                (u16)(*(u16*)(size + 2) - 1));
+    size = (u8*)lbl_8047AD88;
+    fn_800D9C24(0, 0,
+                (u16)(*(u16*)(size + 0) - 1),
+                (u16)(*(u16*)(size + 2) - 1));
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+    GSmodelDrawModel(lbl_8047AD90, 0x3010);
+    fn_800D3190();
+    fn_800D377C(1);
+    fn_800D258C(saved);
+    fn_800D9D68(a0, a1, a2, a3);
+    fn_800D9C24(b0, b1, b2, b3);
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+    fn_800D4604(1);
 }
 #pragma pop
 #endif

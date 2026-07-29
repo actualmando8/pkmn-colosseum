@@ -866,6 +866,12 @@ static u32 gobj_next_id;
 /*  TExp node management                                                     */
 /* ========================================================================= */
 
+typedef struct HSD_RenderAllocDataGroup {
+    HSD_ObjAllocData chan;
+    HSD_ObjAllocData tevReg;
+    HSD_ObjAllocData render;
+} HSD_RenderAllocDataGroup;
+
 /* BSS globals */
 extern u8 lbl_80465728[];
 extern u8 lbl_80465754[];
@@ -900,9 +906,11 @@ void* HSD_RenderGetAllocData(void) {
 
 void HSD_RenderInitAllocData(void)
 {
-    HSD_ObjAllocInit(lbl_80465780, 0x1C, 4);
-    HSD_ObjAllocInit(lbl_80465754, 0x14, 4);
-    HSD_ObjAllocInit(lbl_80465728, 0x30, 4);
+    HSD_RenderAllocDataGroup* data = (HSD_RenderAllocDataGroup*)lbl_80465728;
+
+    HSD_ObjAllocInit(&data->render, 0x1C, 4);
+    HSD_ObjAllocInit(&data->tevReg, 0x14, 4);
+    HSD_ObjAllocInit(&data->chan, 0x30, 4);
 }
 
 extern void fn_80193AF0(void* ptr, s32 size);

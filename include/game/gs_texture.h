@@ -78,7 +78,7 @@ typedef struct GStextureHandle {
     /* 0x05 */ u8     mipLevels;      /* number of mipmap levels */
     /* 0x06 */ u8     inUse;          /* 1 = slot occupied */
     /* 0x07 */ u8     dirty;          /* 1 = needs re-upload to GX */
-    /* 0x08 */ u32    format;         /* GS texture format ID */
+    /* 0x08 */ s32    format;         /* GS texture format ID */
     /* 0x0C */ u32    tlutFormat;     /* TLUT palette format */
     /* 0x10 */ u32    wrapS;          /* GX wrap mode S */
     /* 0x14 */ u32    wrapT;          /* GX wrap mode T */

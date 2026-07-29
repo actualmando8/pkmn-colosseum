@@ -129,16 +129,13 @@ static inline GSpartRotationSlot* GSpartFindRotationSlot(GSpart* part)
     if (slot->callback == NULL) {
         return slot;
     }
-    slot++;
-    if (slot->callback == NULL) {
+    if ((++slot)->callback == NULL) {
         return slot;
     }
-    slot++;
-    if (slot->callback == NULL) {
+    if ((++slot)->callback == NULL) {
         return slot;
     }
-    slot++;
-    if (slot->callback == NULL) {
+    if ((++slot)->callback == NULL) {
         return slot;
     }
     GSlogWrite(lbl_80270F44);
@@ -327,15 +324,15 @@ u8 fn_800EE7E0(GSpart* part)
     u8* material;
     u32 value;
 
-    if (union_type_dobj((HSD_JObj*)jobj)) {
-        material = *(u8**)(jobj + 0x18);
-        if (material != NULL) {
-            value = *(u32*)(material + 0xC);
-        } else {
-            value = 0;
-        }
-    } else {
+    if (!union_type_dobj((HSD_JObj*)jobj)) {
         value = 0;
+    } else {
+        material = *(u8**)(jobj + 0x18);
+        if (material == NULL) {
+            value = 0;
+        } else {
+            value = *(u32*)(material + 0xC);
+        }
     }
     return value == 0;
 }

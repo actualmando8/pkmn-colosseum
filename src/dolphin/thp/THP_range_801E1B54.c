@@ -1852,12 +1852,12 @@ u32 fn_801E2B74(s16 *left, s16 *right, u32 requestedSamples, u32 *status)
         audio = THP_ACTIVE_PLAYER.playAudioBuffer->curPtr;
 
         if (right == NULL) {
-            for (i = samples; i != 0; i--) {
+            for (i = 0; i < samples; i++) {
                 *left++ = audio[1];
                 audio += 2;
             }
         } else {
-            for (i = samples; i != 0; i--) {
+            for (i = 0; i < samples; i++) {
                 *right++ = audio[0];
                 *left++ = audio[1];
                 audio += 2;

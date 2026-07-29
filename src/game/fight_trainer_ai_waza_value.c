@@ -160,11 +160,11 @@ u32 fightTrainerAiWazaValueKanarazuSubayasaDaun(void* ctx, u32 param1, u32 param
     u32 enemy[8];
     u32 own[8];
     u32 handle;
-    u32 ownPokemon;
     u16 enemyCount;
     u16 ownCount;
     u16 i;
     u16 j;
+    u32 ownPokemon;
     u8 found;
 
     handle = 0;
