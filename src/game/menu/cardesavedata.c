@@ -572,6 +572,210 @@ void* fn_80082FE4(CardEGridEntry* entry, s8 layer)
 }
 #pragma pop
 
+void fn_800832C8(u8* arena, u8* cardData, s8 layer)
+{
+    typedef struct CardEObjectRecord {
+        u16 id;
+        u8 pad02[0xA];
+        u8 enabled;
+        s8 item[4];
+        u8 pad11;
+        u16 field12;
+        u16 field14;
+        u16 field16;
+        u16 field18;
+        u8 pad1A[2];
+        u32 field1C;
+        u16 field20;
+        u8 pad22[2];
+        u8 field24;
+        u8 pad25[3];
+    } CardEObjectRecord;
+    typedef struct CardEObjectData {
+        u8 bytes[0x2A];
+    } CardEObjectData;
+    extern void* savedataGetStatus(u32, u32);
+    extern void fn_800CAA3C(void*, const void*);
+    extern void fn_801EE1E0(u8 type, u16 id);
+    extern void fn_801EE2B4(u8 type, void* data);
+    extern void fn_801EE10C(u8 type, u8 key);
+    extern char lbl_8026F1C8[];
+    extern char lbl_8026F1D8[];
+    extern char lbl_8047C180[] __attribute__((section(".sdata2")));
+    u8* base;
+    u8* pending;
+    u8* layerData;
+    CardEObjectRecord* record;
+    CardEObjectData* object;
+    CardEGridEntry* entry;
+    CardEGridEntry* found;
+    s32 wanted;
+    s32 count;
+    s32 i;
+    s32 objectIndex;
+
+    base = arena != NULL ? arena : savedataGetStatus(0, 0xD);
+    pending = base + 0x4000;
+    record = (CardEObjectRecord*)(cardData + 0x3AC +
+                                  (s8)cardData[0x61 + layer] * 0x28);
+    if (record->id == 0) {
+        __assert(lbl_8026F1C8, 0x108, lbl_8026F1C8 + 0x10C);
+    }
+
+    pending[0] = 1;
+    pending[1] = cardData[8];
+    pending[2] = layer;
+    fn_800CAA3C(pending + 4, cardData + layer * 0x5C + 0x6E);
+    fn_800CAA3C(pending + 0x60, cardData + layer * 0x5C + 0x182);
+    fn_800CAA3C(pending + 0xBC, cardData + layer * 0x5C + 0x296);
+    fn_800CAA3C(pending + 0x118, record);
+    pending[0x124] = record->enabled;
+    pending[0x125] = cardData[0x6A + layer];
+    *(u16*)(pending + 0x126) = record->field12;
+    *(u16*)(pending + 0x128) = record->field14;
+    *(u16*)(pending + 0x12A) = record->field16;
+    *(u16*)(pending + 0x12C) = record->field18;
+    *(u32*)(pending + 0x130) = record->field1C;
+    *(u16*)(pending + 0x134) = record->field20;
+    pending[0x136] = record->field24;
+    pending[0x1E0] = -1;
+    pending[0x1E1] = 0;
+    pending[0x1E2] = 0;
+
+    wanted = 0;
+    for (;;) {
+        base = arena != NULL ? arena : savedataGetStatus(0, 0xD);
+        entry = (CardEGridEntry*)base;
+        found = NULL;
+        count = 0;
+        while ((u8*)entry + 0x24 <= base + 0x4000 &&
+               entry->id != 0) {
+            CardEGridValidate(entry);
+            if (entry->id == 0) {
+                break;
+            }
+            if (count == wanted) {
+                found = entry;
+            }
+            count++;
+            entry = (CardEGridEntry*)((u8*)entry +
+                                     CardEGridEntrySize(entry));
+        }
+        if (wanted < 0) {
+            found = entry;
+        }
+        if (found == NULL) {
+            __assert(lbl_8026F1C8, 0x121, lbl_8047C180);
+        }
+        if (found->key == pending[1]) {
+            break;
+        }
+        wanted++;
+    }
+
+    layer = pending[2];
+    if (found == NULL) {
+        __assert(lbl_8026F1C8, 0x17F, lbl_8047C180);
+    }
+    if (!CardEGridLayerIsValid(found, layer)) {
+        __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+    }
+    layerData = (u8*)found +
+                layer * (0x76 + found->rows * found->columns * 0x10);
+
+    for (i = 0; i < 4; i++) {
+        objectIndex = record->item[i];
+        if (objectIndex < 0) {
+            *(u16*)(pending + 0x138 + i * 0x2A) = 0;
+            continue;
+        }
+
+        object = (CardEObjectData*)(cardData + 0x514 +
+                                    objectIndex * 0x2A);
+        *(CardEObjectData*)(pending + 0x138 + i * 0x2A) = *object;
+        if (object->bytes[2] != 0) {
+            pending[0x1E0] = i;
+            pending[0x1E2] = object->bytes[0x28];
+            pending[0x1E1] = object->bytes[2];
+            *(u16*)(layerData + 0x98) = *(u16*)object;
+            fn_801EE1E0(pending[0x1E1], *(u16*)object);
+        }
+    }
+
+    fn_800CAA3C(layerData + 0x88, pending + 0x118);
+    layerData[0x94] = pending[0x125];
+    layerData[0x95] = 0;
+    layerData[0x96] = pending[0x1E1];
+    fn_801EE2B4(pending[0x1E1], pending + 0x118);
+    fn_801EE10C(pending[0x1E1], pending[0x125]);
+}
+
+void fn_800830A4(u8* arena)
+{
+    extern void* savedataGetStatus(u32, u32);
+    extern char lbl_8026F1C8[];
+    extern char lbl_8026F1D8[];
+    extern char lbl_8047C180[] __attribute__((section(".sdata2")));
+    CardEGridEntry* entry;
+    CardEGridEntry* scan;
+    CardEGridEntry* found;
+    u8* end;
+    s32 wanted;
+    s32 current;
+    s8 layer;
+    u8 validState;
+
+    if (arena == NULL) {
+        arena = savedataGetStatus(0, 0xD);
+    }
+    validState = arena[0x4000] == 1 || arena[0x4000] == 2;
+    if (!validState) {
+        __assert(lbl_8026F1C8, 0x161, lbl_8026F1C8 + 0xA0);
+    }
+    arena[0x4000] = 0;
+
+    wanted = 0;
+    for (;;) {
+        scan = (CardEGridEntry*)arena;
+        end = arena + 0x4000;
+        found = NULL;
+        current = 0;
+        while ((u8*)scan + 0x24 <= end && scan->id != 0) {
+            if (scan->layers > 3 || scan->rows > 6 || scan->columns > 5) {
+                scan->id = 0;
+                break;
+            }
+            if (current == wanted) {
+                found = scan;
+            }
+            current++;
+            scan = (CardEGridEntry*)((u8*)scan + CardEGridEntrySize(scan));
+        }
+        if (wanted < 0) {
+            found = scan;
+        }
+        entry = found;
+        if (entry == NULL) {
+            __assert(lbl_8026F1C8, 0x169, lbl_8047C180);
+        }
+        if (entry->key == arena[0x4001]) {
+            break;
+        }
+        wanted++;
+    }
+
+    layer = arena[0x4002];
+    if (entry == NULL) {
+        __assert(lbl_8026F1C8, 0x17F, lbl_8047C180);
+    }
+    if (layer < 0 || layer >= entry->layers) {
+        __assert(lbl_8026F1C8, 0x180, lbl_8026F1D8);
+    }
+    *((u8*)entry + layer *
+                        (0x76 + entry->rows * entry->columns * 0x10) +
+      0x95) = 1;
+}
+
 void* fn_800836AC(u8* arena, u8* descriptor, u8 create)
 {
     extern void* savedataGetStatus(u32, u32);

@@ -23,6 +23,7 @@
  */
 
 #include "dolphin/types.h"
+#include "dolphin/gx/GX.h"
 #include "game/gs_gfx.h"
 #include "game/gs_model.h"
 
@@ -404,6 +405,94 @@ void fn_800D377C(s32 mode) {
 extern s32 GSgfxVideoVsyncRate;
 s32 fn_800D37CC(void) {
     return GSgfxVideoVsyncRate;
+}
+
+s32 fn_800D37D4(s32 mode, s32 format, u8 variant, s32 timing,
+                 u8 restricted, u16 retraces)
+{
+    extern void* lbl_803140F8[];
+    extern u8 lbl_8047AA9C;
+    extern u32 lbl_8047AAA0;
+    extern s32 lbl_8047AA98;
+    extern void* memcpy(void*, const void*, u32);
+    extern void fn_801BF4C4(u32);
+    extern void fn_801BF4E4(GXRenderModeObj*);
+
+    GXRenderModeObj renderMode;
+    GXRenderModeObj* selected = 0;
+    u32 index = variant;
+    s32 i;
+
+    if (restricted == 1) {
+        if (mode != 1) {
+            return 0;
+        }
+        if (format != 2) {
+            return 0;
+        }
+    }
+    if (mode == 2) {
+        if (lbl_8047AA9C != 1) {
+            return 0;
+        }
+    }
+
+    if (format == 1) {
+        if (variant == 0) {
+            index = timing == 3 ? 1 : 0;
+        } else {
+            index = timing == 3 ? 3 : 2;
+        }
+    } else if (restricted == 0) {
+        switch (timing) {
+        case 1:
+            index = 4;
+            break;
+        case 2:
+            index = 5;
+            break;
+        case 3:
+            index = 6;
+            break;
+        }
+    } else {
+        index = timing == 3 ? 8 : 7;
+    }
+
+    switch (mode) {
+    case 1:
+        selected = lbl_803140F8[index];
+        break;
+    case 2:
+        selected = lbl_803140F8[9 + index];
+        break;
+    case 3:
+        selected = lbl_803140F8[18 + index];
+        break;
+    case 4:
+        selected = lbl_803140F8[27 + index];
+        break;
+    }
+    if (selected == 0) {
+        return 0;
+    }
+
+    memcpy(&renderMode, selected, sizeof(renderMode));
+    GSgfxVideoVsyncRate = mode == 2 ? 50 : 60;
+    lbl_8047AA98 = mode;
+    if (lbl_8047AAA0 != 0) {
+        renderMode.efbHeight = lbl_8047AAA0;
+    }
+    renderMode.viXOrigin = 30;
+    renderMode.viWidth = 660;
+
+    fn_801BF4C4(1);
+    fn_801BF4E4(&renderMode);
+    for (i = 0; i < retraces; i++) {
+        VIWaitForRetrace();
+    }
+    fn_801BF4C4(0);
+    return 1;
 }
 
 /* Initialise the GS graphics core and its default render state. */

@@ -12,14 +12,63 @@
  */
 #include "dolphin/types.h"
 
+typedef struct MenuCBBattleStartPlayerView {
+    union {
+        u16 marker[6];
+        f32 transitionValue[3];
+    } header;
+    f32 reset[6];
+    f32 position[6];
+    f32 side[6];
+    f32 alpha[6];
+} MenuCBBattleStartPlayerView;
+
+typedef struct MenuCBBattleStartPlayerLayout {
+    MenuCBBattleStartPlayerView view;
+    f32 maxHp[6];
+    f32 hp[6];
+    f32 maxHpDisplay[6];
+} MenuCBBattleStartPlayerLayout;
+
+typedef struct MenuCBBattleStartPosition {
+    f32 x;
+    f32 y;
+    f32 z;
+} MenuCBBattleStartPosition;
+
+typedef struct MenuCBBattleStartTransitions {
+    f32 active[2];
+    f32 current[2];
+    f32 target[2];
+} MenuCBBattleStartTransitions;
+
+typedef struct MenuCBBattleStartModel {
+    u8 data[0x48];
+    f32 scale;
+    u8 pad_4C[4];
+    u32 soundId;
+    u32 battleId;
+    u8 trainerName[0x18];
+    u32 trainerPrefix;
+} MenuCBBattleStartModel;
+
 typedef struct MenuCBBattleStartState {
     void* menu;
     s32 status;
     u16 menuId;
     u8 padA[0x2E];
     s32 timer;
-    u8 pad3C[0x330];
-    u8 model[0x74];
+    f32 deltaTime;
+    MenuCBBattleStartTransitions transitions;
+    MenuCBBattleStartPlayerLayout players[4];
+    MenuCBBattleStartPosition trainerPositions[4];
+    f32 field358;
+    f32 field35C;
+    f32 field360;
+    f32 field364;
+    u8 field368;
+    u8 pad369[3];
+    MenuCBBattleStartModel model;
 } MenuCBBattleStartState;
 
 typedef struct MenuCBBattleStartButton {
@@ -124,6 +173,138 @@ void fn_80061028(s32 status) {
 }
 #pragma pop
 
+typedef struct MenuCBBattleStartMessageContext {
+    u8 pad0[0x8B];
+    u8 alpha;
+} MenuCBBattleStartMessageContext;
+
+typedef struct MenuCBBattleStartResourceData {
+    u8 pad0[0x1D06E];
+    s16 screenWidth;
+} MenuCBBattleStartResourceData;
+
+static s32 battleStartMessageWidth(u32 messageId)
+{
+    extern u32 GSmsgGetRect(u32 messageId);
+    return GSmsgGetRect(messageId) >> 16;
+}
+
+static void battleStartDrawMessage(MenuCBBattleStartMessageContext* context,
+                                   s32 x, u32 messageId)
+{
+    extern void fn_800FB680(s32 x, s32 y, s32 color, u32 messageId);
+    s32 color;
+
+    color = context->alpha | 0xFFFFFF00;
+    fn_800FB680(x, 0, color, messageId);
+}
+
+static void battleStartDrawSingle(MenuCBBattleStartMessageContext* context,
+                                  s32 screenWidth, u32 messageId)
+{
+    s32 x;
+
+    x = (screenWidth - battleStartMessageWidth(messageId)) / 2;
+    battleStartDrawMessage(context, x, messageId);
+}
+
+static void battleStartDrawPair(MenuCBBattleStartMessageContext* context,
+                                s32 screenWidth, u32 firstMessage,
+                                s32 spacing)
+{
+    const u32 secondMessage = 0x3F3D;
+    s32 firstWidth;
+    s32 x;
+
+    firstWidth = battleStartMessageWidth(firstMessage) + spacing;
+    x = (screenWidth - firstWidth -
+         battleStartMessageWidth(secondMessage)) / 2;
+    battleStartDrawMessage(context, x, firstMessage);
+    battleStartDrawMessage(context, x + firstWidth, secondMessage);
+}
+
+void fn_80060434(MenuCBBattleStartMessageContext* context, UICmdMsg* message)
+{
+    extern s32 toolentryTaisenGetBattleType(void);
+    extern s32 fn_8025D9A8(void);
+    extern s32 fn_8025DAD0(void);
+    extern void msgctrlSetValue(s32 index, s32 value);
+    extern u8 lbl_802EF0A8[];
+    extern u32 lbl_802ED9A0[];
+    MenuCBBattleStartResourceData* resources;
+    u32 messageId;
+    s32 displayMode;
+    s32 variant;
+    s32 battleId;
+    s32 spacing;
+
+    (void)message;
+    toolentryTaisenGetBattleType();
+    displayMode = fn_8025D9A8();
+    variant = fn_8025DAD0();
+    battleId = lbl_803A9A60.model.battleId;
+    resources = (MenuCBBattleStartResourceData*)lbl_802EF0A8;
+
+    switch (lbl_803A9A60.status) {
+    case 0:
+        switch (displayMode) {
+        case 0:
+            if (battleId <= 5) {
+                msgctrlSetValue(0x2F, battleId + 1);
+                messageId = 0x3F39;
+            } else if (battleId == 6) {
+                messageId = 0x3F3A;
+            } else if (battleId == 7) {
+                messageId = 0x3F3B;
+            } else {
+                break;
+            }
+            battleStartDrawSingle(context, resources->screenWidth,
+                                  messageId);
+            break;
+        case 1:
+            msgctrlSetValue(0x2F, battleId + 1);
+            battleStartDrawSingle(context, resources->screenWidth, 0x3F3C);
+            break;
+        case 2:
+            battleStartDrawSingle(context, resources->screenWidth,
+                                  lbl_802ED9A0[variant]);
+            break;
+        }
+        break;
+    case 1:
+        switch (displayMode) {
+        case 0:
+            if (battleId <= 5) {
+                msgctrlSetValue(0x2F, battleId + 1);
+                messageId = 0x3F39;
+                spacing = 11;
+            } else if (battleId == 6) {
+                messageId = 0x3F3A;
+                spacing = 9;
+            } else if (battleId == 7) {
+                messageId = 0x3F3B;
+                spacing = 9;
+            } else {
+                break;
+            }
+            battleStartDrawPair(context, resources->screenWidth, messageId,
+                                spacing);
+            break;
+        case 1:
+            msgctrlSetValue(0x2F, battleId + 1);
+            battleStartDrawPair(context, resources->screenWidth, 0x3F3C, 11);
+            break;
+        case 2:
+            msgctrlSetValue(0x2F, battleId);
+            battleStartDrawPair(context, resources->screenWidth,
+                                lbl_802ED9A0[variant], 11);
+            break;
+        }
+        break;
+    }
+}
+
 typedef struct MenuCBBattleStartDrawParams {
     u8 pad0[0x54];
     s16 x;
@@ -150,7 +331,7 @@ void fn_800608C4(void* context, MenuCBBattleStartDrawParams* params) {
     extern f32 lbl_8047BF90;
     void* model;
 
-    model = menuModelRender(lbl_803A9A60.model);
+    model = menuModelRender(&lbl_803A9A60.model);
     if (model != 0) {
 #pragma scheduling on
         fn_800D88DC(3);
@@ -224,6 +405,188 @@ void fn_80061B74(void* context, MenuCBBattleStartMessage* message) {
 }
 #pragma pop
 
+void _menuCBBattleStartSetIndex__Fv(void)
+{
+    extern s32 toolentryTaisenGetBattleType(void);
+    extern u16 toolentryTaisenGetPokemonNum(s32);
+    extern u16 toolentryTaisenGetEntryPokemonNum(s32);
+    extern const u32 lbl_80267AF8[][6];
+    extern const u32 lbl_80267B88[][6];
+    u32 (*order)[6];
+    u16 count[4];
+    s32 battleType;
+    s32 player;
+    s32 slot;
+
+    order = (u32 (*)[6])lbl_803A9E40;
+    battleType = toolentryTaisenGetBattleType();
+    for (player = 0; player < 4; player++) {
+        for (slot = 0; slot < 6; slot++) {
+            order[player][slot] = slot;
+        }
+        count[player] = 0;
+    }
+
+    if (lbl_803A9A60.status == 0) {
+        for (player = 0; player < 4; player++) {
+            count[player] = toolentryTaisenGetPokemonNum(player);
+        }
+    } else if (lbl_803A9A60.status == 1) {
+        for (player = 0; player < 4; player++) {
+            count[player] = toolentryTaisenGetEntryPokemonNum(player);
+        }
+    }
+
+    switch (battleType) {
+    case 0:
+        for (player = 0; player < 2; player++) {
+            if (count[player] != 0) {
+                for (slot = 0; slot < 6; slot++) {
+                    order[player][slot] =
+                        lbl_80267AF8[count[player] - 1][slot];
+                }
+            }
+        }
+        break;
+
+    case 1:
+        for (player = 0; player < 2; player++) {
+            if (count[player] != 0) {
+                for (slot = 0; slot < 6; slot++) {
+                    order[player][slot] =
+                        lbl_80267B88[count[player] - 1][slot];
+                }
+            }
+        }
+        break;
+
+    case 2:
+        for (player = 0; player < 4; player++) {
+            for (slot = 0; slot < count[player] && slot < 6; slot++) {
+                order[player][slot] = slot;
+            }
+            for (; slot < 6; slot++) {
+                order[player][slot] = slot;
+            }
+        }
+        break;
+    }
+}
+
+void menuCBBattleStartInit(void* menu, s32 mode)
+{
+    extern s32 toolentryTaisenGetBattleType(void);
+    extern void* toolentryTaisenGetHeroPtr(s32);
+    extern void* heroBiosGetNamePtr(void*);
+    extern void GScharCpy(void*, const void*);
+    extern u16 toolentryTaisenGetTrainerDataID(s32);
+    extern void* fightTrainerDataBiosGetPtr(u16);
+    extern u16 fightTrainerDataBiosGetKindDataId(void*);
+    extern void* fightTrainerKindDataBiosGetPtr(u16);
+    extern u32 fightTrainerKindDataBiosGetPrefixName(void*);
+    extern s32 fn_8025DBB0(void);
+    extern void _menuCBBattleStartSetIndex__Fv(void);
+    extern void fn_80062334(void);
+    extern void fn_80068F84(void);
+    extern void menuCBPokemonEntryLoadTex(void);
+    extern s32 fn_8025D9A8(void);
+    extern void fn_80165A20(u32, s32, s32);
+    extern void* toolentryTaisenGetEntryPokemonPtr(s32, s32);
+    extern u16 pokemonBiosGetMaxHp(void*);
+    extern u16 pokemonBiosGetHp(void*);
+    extern const u32 lbl_802ED958[];
+    extern const u32 lbl_802ED978[];
+    extern const f32 lbl_8047BF60;
+    extern const f32 lbl_8047BFAC;
+    void* trainer;
+    void* trainerData;
+    void* trainerKind;
+    void* pokemon;
+    s32 firstBattleType;
+    s32 battleType;
+    s32 compatible;
+    s32 battleId;
+    s32 player;
+    s32 slot;
+
+    firstBattleType = toolentryTaisenGetBattleType();
+    compatible = 1;
+    battleType = toolentryTaisenGetBattleType();
+    if (firstBattleType == 2) {
+        if (battleType != 2) {
+            compatible = 0;
+        }
+    } else if (battleType == 2) {
+        compatible = 0;
+    }
+
+    if (compatible != 0) {
+        trainer = toolentryTaisenGetHeroPtr(1);
+        GScharCpy(lbl_803A9A60.model.trainerName,
+                  heroBiosGetNamePtr(trainer));
+        trainerData = fightTrainerDataBiosGetPtr(
+            toolentryTaisenGetTrainerDataID(1));
+        trainerKind = fightTrainerKindDataBiosGetPtr(
+            fightTrainerDataBiosGetKindDataId(trainerData));
+        lbl_803A9A60.model.trainerPrefix =
+            fightTrainerKindDataBiosGetPrefixName(trainerKind);
+    }
+
+    battleId = fn_8025DBB0();
+    lbl_803A9A60.model.battleId = battleId;
+    lbl_803A9A60.menu = menu;
+    lbl_803A9A60.status = mode;
+    lbl_803A9A60.timer = 0;
+    _menuCBBattleStartSetIndex__Fv();
+    fn_80062334();
+    lbl_803A9A60.model.scale = lbl_8047BF60;
+
+    if (mode == 0) {
+        fn_80068F84();
+        menuCBPokemonEntryLoadTex();
+        battleId = fn_8025DBB0();
+        switch (fn_8025D9A8()) {
+        case 0:
+            lbl_803A9A60.model.soundId = lbl_802ED958[battleId];
+            break;
+        case 1:
+            lbl_803A9A60.model.soundId =
+                lbl_802ED978[battleId % 10];
+            break;
+        default:
+            lbl_803A9A60.model.soundId = 0x3CD;
+            break;
+        }
+        fn_80165A20(lbl_803A9A60.model.soundId, 0, 0xFF);
+    } else if (mode == 1) {
+        fn_80068F84();
+        menuCBPokemonEntryLoadTex();
+        for (player = 0; player < 4; player++) {
+            for (slot = 0; slot < 6; slot++) {
+                pokemon =
+                    toolentryTaisenGetEntryPokemonPtr(player, slot);
+                if (pokemon != NULL) {
+                    lbl_803A9A60.players[player].maxHp[slot] =
+                        pokemonBiosGetMaxHp(pokemon);
+                    lbl_803A9A60.players[player].hp[slot] =
+                        pokemonBiosGetHp(pokemon);
+                    lbl_803A9A60.players[player].maxHpDisplay[slot] =
+                        pokemonBiosGetMaxHp(pokemon);
+                } else {
+                    lbl_803A9A60.players[player].maxHp[slot] =
+                        lbl_8047BF60;
+                    lbl_803A9A60.players[player].hp[slot] =
+                        lbl_8047BF60;
+                    lbl_803A9A60.players[player].maxHpDisplay[slot] =
+                        lbl_8047BFAC;
+                }
+            }
+        }
+        lbl_803A9A60.model.soundId = 0x1E;
+        fn_80165A20(0x1E, 0, 0xFF);
+    }
+}
+
 #pragma push
 #pragma peephole off
 s32 fn_80062284(s32 trainer) {
@@ -247,6 +610,201 @@ s32 fn_80062284(s32 trainer) {
     return 1;
 }
 #pragma pop
+
+void fn_80062334(void)
+{
+    extern s32 toolentryTaisenGetBattleType(void);
+    extern const f32 lbl_8047BFA4;
+    extern const f32 lbl_8047BFA8;
+    extern const f32 lbl_8047BFB0;
+    extern const f32 lbl_8047BFB4;
+    extern const f32 lbl_8047BF68;
+    extern const f32 lbl_8047BF70;
+    extern const f32 lbl_8047BF90;
+    extern const f32 lbl_8047BFB8;
+    extern const f32 lbl_8047BF60;
+    extern const f32 lbl_8047BFBC;
+    extern const f32 lbl_8047BFC0;
+    extern const f32 lbl_8047BFC4;
+    f32 forward[6];
+    f32 reverse[6];
+    u32* orders;
+    MenuCBBattleStartPlayerView* view;
+    s32 battleType;
+    s32 player;
+    s32 slot;
+    s32 destination;
+    s32 rightSide;
+
+    forward[0] = lbl_8047BFA4;
+    forward[1] = lbl_8047BFA8;
+    forward[2] = lbl_8047BFB0;
+    forward[3] = lbl_8047BFB4;
+    forward[4] = lbl_8047BF68;
+    forward[5] = lbl_8047BFB8;
+    reverse[0] = lbl_8047BFB8;
+    reverse[1] = lbl_8047BF68;
+    reverse[2] = lbl_8047BFB4;
+    reverse[3] = lbl_8047BFB0;
+    reverse[4] = lbl_8047BFA8;
+    reverse[5] = lbl_8047BFA4;
+
+    battleType = toolentryTaisenGetBattleType();
+    orders = (u32*)lbl_803A9E40;
+
+    for (player = 0; player < 4; player++) {
+        view = &lbl_803A9A60.players[player].view;
+        if (battleType == 2) {
+            for (slot = 0; slot < 6; slot++) {
+                if (lbl_803A9A60.status == 0) {
+                    view->header.marker[slot] = 3;
+                    view->reset[slot] = lbl_8047BF60;
+                } else if (lbl_803A9A60.status == 1) {
+                    view->header.marker[slot] = 0;
+                    view->reset[slot] = lbl_8047BF60;
+                }
+                if (player < 2) {
+                    view->side[slot] = lbl_8047BFBC;
+                    view->position[slot] = forward[slot];
+                } else {
+                    view->side[slot] = lbl_8047BFC0;
+                    view->position[slot] = reverse[slot];
+                }
+                view->alpha[slot] = lbl_8047BF60;
+            }
+        } else {
+            rightSide = player & 1;
+            for (slot = 0; slot < 6; slot++) {
+                destination = orders[player * 6 + slot];
+                if (lbl_803A9A60.status == 0) {
+                    view->header.marker[slot] = 3;
+                    view->reset[slot] = lbl_8047BF60;
+                } else if (lbl_803A9A60.status == 1) {
+                    view->header.marker[slot] = 0;
+                    view->reset[slot] = lbl_8047BF60;
+                }
+                view->side[slot] =
+                    rightSide ? lbl_8047BFC0 : lbl_8047BFBC;
+                view->alpha[slot] = lbl_8047BF60;
+                if (rightSide) {
+                    view->position[destination] = reverse[3 + slot % 3];
+                } else {
+                    view->position[destination] = forward[slot % 3];
+                }
+            }
+        }
+    }
+
+    for (player = 0; player < 4; player++) {
+        lbl_803A9A60.trainerPositions[player].x = lbl_8047BFC4;
+        if (battleType == 2) {
+            lbl_803A9A60.trainerPositions[player].y =
+                player < 2 ? lbl_8047BFBC : lbl_8047BFC0;
+        } else {
+            lbl_803A9A60.trainerPositions[player].y =
+                (player & 1) ? lbl_8047BFC0 : lbl_8047BFBC;
+        }
+        lbl_803A9A60.trainerPositions[player].z = lbl_8047BF60;
+    }
+
+    lbl_803A9A60.field368 = 0;
+    lbl_803A9A60.field358 = lbl_8047BF70;
+    lbl_803A9A60.field35C = lbl_8047BF90;
+    lbl_803A9A60.field360 = lbl_8047BF70;
+    lbl_803A9A60.field364 = lbl_8047BF90;
+    lbl_803A9A60.transitions.target[1] = lbl_8047BF60;
+    lbl_803A9A60.transitions.current[1] = lbl_8047BFBC;
+    lbl_803A9A60.transitions.active[1] = lbl_8047BF60;
+    lbl_803A9A60.transitions.target[0] = lbl_8047BF60;
+    lbl_803A9A60.transitions.current[0] = lbl_8047BFC0;
+    lbl_803A9A60.transitions.active[0] = lbl_8047BF60;
+}
+
+static void battleStartInterpolate(f32* current, f32 target, f32 delta)
+{
+    extern const f32 lbl_8047BF90;
+    extern const f32 lbl_8047BF94;
+    extern const f32 lbl_8047BF98;
+    extern const f32 lbl_8047BF9C;
+    f32 difference;
+    f32 step;
+    f32 distance;
+    f32 magnitude;
+
+    difference = target - *current;
+    step = lbl_8047BF94 * difference * delta;
+    if (step > lbl_8047BF98) {
+        step = lbl_8047BF98;
+    } else if (step <= lbl_8047BF9C) {
+        step = lbl_8047BF9C;
+    }
+
+    *current += step;
+    distance = target - *current;
+    magnitude = step > 0.0f ? step : -step;
+    if (distance < 0.0f) {
+        distance = -distance;
+    }
+    if (distance <= magnitude || distance < lbl_8047BF90) {
+        *current = target;
+    }
+}
+
+void fn_80060A28(void)
+{
+    extern const f32 lbl_8047BF60;
+    MenuCBBattleStartState* state;
+    MenuCBBattleStartPlayerView* view;
+    MenuCBBattleStartPosition* position;
+    f32* countdown;
+    s32 player;
+    s32 slot;
+    s32 index;
+
+    state = &lbl_803A9A60;
+    for (player = 0; player < 4; player++) {
+        view = &state->players[player].view;
+        for (slot = 0; slot < 6; slot++) {
+            if (view->position[slot] != lbl_8047BF60) {
+                view->position[slot] -= state->deltaTime;
+                if (view->position[slot] < lbl_8047BF60) {
+                    view->position[slot] = lbl_8047BF60;
+                }
+            } else if (view->side[slot] != view->alpha[slot]) {
+                battleStartInterpolate(&view->side[slot], view->alpha[slot],
+                                       state->deltaTime);
+            }
+        }
+    }
+
+    for (player = 0; player < 4; player++) {
+        position = &state->trainerPositions[player];
+        if (position->x != lbl_8047BF60) {
+            position->x -= state->deltaTime;
+            if (position->x < lbl_8047BF60) {
+                position->x = lbl_8047BF60;
+            }
+        } else if (position->y != position->z) {
+            battleStartInterpolate(&position->y, position->z,
+                                   state->deltaTime);
+        }
+    }
+
+    countdown = state->players[0].view.header.transitionValue;
+    for (index = 0; index < 2; index++) {
+        if (state->transitions.active[index] != lbl_8047BF60) {
+            countdown[index] -= state->deltaTime;
+            if (countdown[index] < lbl_8047BF60) {
+                countdown[index] = lbl_8047BF60;
+            }
+        } else if (state->transitions.current[index] !=
+                   state->transitions.target[index]) {
+            battleStartInterpolate(&state->transitions.current[index],
+                                   state->transitions.target[index],
+                                   state->deltaTime);
+        }
+    }
+}
 
 void fn_80060D70(void*, UICmdMsg*, s32, s32);
 void fn_80060EF4(void*, UICmdMsg*, s32);

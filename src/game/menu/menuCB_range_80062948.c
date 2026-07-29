@@ -77,7 +77,12 @@ extern s32 fn_8025D9CC(void);
 extern s32 fn_800D37CC(void);
 extern s32 fn_800D3088(void);
 extern f32 lbl_8047BFE8;
+extern f32 lbl_8047BFF8;
+extern f32 lbl_8047BFFC;
+extern f32 lbl_8047C000;
+extern f32 lbl_8047C004;
 extern f32 lbl_8047C010;
+extern f64 atan2(f64, f64);
 extern f32 lbl_8047C014;
 extern f32 lbl_8047C018;
 #endif
@@ -172,6 +177,54 @@ s32 fn_80062948(MenuCBBattleEntryContext* context)
     fn_80061028(1);
     menuCloseCustom(0xDF, 0, 1);
     return result;
+}
+
+s32 fn_80062AB4(void* arg)
+{
+    extern u16 fn_801EF634(void);
+    extern void menuSetEnablePort(s32 port);
+    extern s32 toolentryTaisenGetEntryPlayerNum(void);
+    extern s32 toolentryTaisenGetControlerType(s32 player);
+    extern u8 fn_8008ABA0(s32 controller);
+    extern void msgctrlSetValue(s32 index, s32 value);
+    extern void winMsgOpen(s32 type, s32 message, s32 a, s32 b);
+    extern void winMsgClose(s32 window);
+    MenuCBBattleEntryContext* context = arg;
+    s32 player;
+    s32 count;
+    s32 home;
+    s32 controller;
+    BOOL invalid = FALSE;
+
+    menuSetEnablePort(0);
+    menuOpen(0xDF, 0);
+    menuOpen(0xBA, 1);
+
+    if (fn_801EF634() == 1) {
+        menuSetEnablePort(1);
+        if (toolentryTaisenGetBattleType() != 2 ||
+            toolentryTaisenGetHomePlace(0) == 0) {
+            count = toolentryTaisenGetEntryPlayerNum();
+            for (player = 0; player < count; player++) {
+                home = toolentryTaisenGetHomePlace(player);
+                controller = toolentryTaisenGetControlerType(player);
+                if (controller != 0 && (home == 1 || home == 2) &&
+                    !fn_8008ABA0(controller)) {
+                    invalid = TRUE;
+                    break;
+                }
+            }
+            if (invalid) {
+                msgctrlSetValue(0x30, controller);
+                winMsgOpen(2, 0x44DC, 1, 1);
+                winMsgClose(1);
+                return 0xB3;
+            }
+        }
+    }
+
+    menuSetEnablePort(1);
+    return context->mode == 2 ? 0xD5 : 0xD4;
 }
 
 void fn_800637B0(void)
@@ -319,6 +372,171 @@ void fn_80063AD4(u8* context, UICmdMsg* msg)
 #endif
 
 #if defined(MENUCB_RANGE_RESIDUAL_EMPTY_ONLY)
+void fn_800676EC(u8* context)
+{
+    extern u32 fn_800F7BC4(s32);
+    extern s32 toolentryTaisenGetControlerType(s32);
+    extern s32 toolentryTaisenGetPokemonNum(s32);
+    extern void fn_800679C0(u8*, s32);
+    extern u8 fn_8006905C(void);
+    extern void menuButtonNormal(u8*);
+    u32 buttons;
+    u32 mask;
+    s32 selection;
+
+    buttons = fn_800F7BC4(1);
+    if ((buttons & 0x20) != 0) {
+        if (toolentryTaisenGetControlerType(0) == 1) {
+            switch (*(s32*)&lbl_803A9F08[0]) {
+            case 0:
+                if (lbl_803A9F08[4] == 0) {
+                    buttons = fn_800F7BC4(1);
+                    selection = -1;
+                    if (buttons & 1) {
+                        selection = 0;
+                    }
+                    if (buttons & 8) {
+                        selection = 1;
+                    }
+                    if (buttons & 0x800) {
+                        selection = 2;
+                    }
+                    if (buttons & 4) {
+                        selection = 3;
+                    }
+                    if (buttons & 2) {
+                        selection = 4;
+                    }
+                    if (buttons & 0x400) {
+                        selection = 5;
+                    }
+                    if (toolentryTaisenGetPokemonNum(0) <= selection) {
+                        selection = -1;
+                    }
+                    if (selection >= 0 &&
+                        selection < toolentryTaisenGetPokemonNum(0)) {
+                        context[0x95] = 0;
+                        context[0x98] = 1;
+                        *(s32*)&lbl_803A9F08[0xC] = selection;
+                        fn_800679C0(context, 1);
+                        break;
+                    }
+                }
+                fn_800679C0(context, 1);
+                break;
+            case 1:
+                fn_800679C0(context, 1);
+                break;
+            case 2:
+                buttons = fn_800F7BC4(1);
+                selection = *(s32*)&lbl_803A9F08[0xC];
+                switch (selection) {
+                case 0: mask = 1; break;
+                case 1: mask = 8; break;
+                case 2: mask = 0x800; break;
+                case 3: mask = 4; break;
+                case 4: mask = 2; break;
+                case 5: mask = 0x400; break;
+                default: mask = 0; break;
+                }
+                if ((buttons & mask) == 0) {
+                    context[0x98] = 1;
+                    fn_800679C0(context, 1);
+                }
+                break;
+            }
+        }
+    } else {
+        switch (*(s32*)&lbl_803A9F08[0]) {
+        case 0:
+            fn_800679C0(context, 0);
+            break;
+        case 1:
+            fn_800679C0(context, 1);
+            break;
+        case 2:
+            fn_800679C0(context, 1);
+            context[0x98] = 1;
+            break;
+        }
+    }
+
+    if (fn_8006905C() != 0) {
+        context[0x98] = 1;
+        context[0x99] = 1;
+    }
+    if (lbl_803A9F08[0xCE58] == 0) {
+        context[0x98] = 1;
+        context[0x99] = 1;
+    }
+    if (*(s32*)&lbl_803A9F08[0] == 1) {
+        menuButtonNormal(context);
+    }
+}
+
+void _menuCBPokemonEntryEntCheckGBA__F13GSinputDevicel(
+    s32 inputDevice, s32 player)
+{
+    extern u16 toolentryTaisenGetBattlePlayerID(s32);
+    extern void fn_8008A9E4(s32, u32*);
+    extern s32 toolentryTaisengetEtnryPokemonOrderNum(s32);
+    extern s32 toolentryTaisenSetEtnryPokemonOrder(s32, s32);
+    extern s32 toolentryTaisenDeleteEtnryPokemonOrder(s32);
+    extern u16 toolentryTaisenGetEntryPokemonNum(s32);
+    extern void gbaCommandEntryPokemon(u32, u8*);
+    extern void toolentryTaisenSetEtnryPokemonOrderGBA(
+        s32, s32, u32*);
+    extern void fn_80166AB8(s32, s32, s32);
+    u32 order[8];
+    u32 linkStatus;
+    u32 command;
+    u8 gbaOrder[8];
+    s32 count;
+    s32 oldCount;
+    s32 result;
+    s32 i;
+
+    toolentryTaisenGetBattlePlayerID(player);
+    fn_8008A9E4(inputDevice, &linkStatus);
+    command = linkStatus & 0xFF000000;
+    switch (command) {
+    case 0x01000000:
+        count = toolentryTaisengetEtnryPokemonOrderNum(player);
+        result = toolentryTaisenSetEtnryPokemonOrder(player, count);
+        if (result >= 0) {
+            fn_80166AB8(0x3C3, 0, 0);
+            *(f32*)&lbl_803A9F08[
+                0xCD8C + player * 0x30 + result * 4] =
+                (f32)((5 - result) * 0x18);
+            *(f32*)&lbl_803A9F08[
+                0xCDA4 + player * 0x30 + result * 4] =
+                lbl_8047BFE8;
+        }
+        break;
+    case 0xFF000000:
+        oldCount = toolentryTaisengetEtnryPokemonOrderNum(player);
+        if (oldCount != toolentryTaisenDeleteEtnryPokemonOrder(player)) {
+            fn_80166AB8(0x25, 0, 0);
+        }
+        break;
+    case 0:
+        count = toolentryTaisenGetEntryPokemonNum(player);
+        gbaCommandEntryPokemon(linkStatus, gbaOrder);
+        for (i = 0; i < count; i++) {
+            order[i] = gbaOrder[i];
+        }
+        toolentryTaisenSetEtnryPokemonOrderGBA(player, count, order);
+        lbl_803A9F08[player + 4] = 1;
+        break;
+    case 0x03000000:
+        lbl_803A9F08[0xCE58] = 0;
+        if (*(s32*)&lbl_803A9F08[0xCE5C] < 0) {
+            *(s32*)&lbl_803A9F08[0xCE5C] = inputDevice;
+        }
+        break;
+    }
+}
+
 static inline void menuCBPokemonEntryAdvancePositions(void)
 {
     f32* current;
@@ -362,6 +580,90 @@ static inline void menuCBPokemonEntryAdvancePositions(void)
             }
         }
     }
+}
+
+typedef struct PokemonEntryInputRepeat {
+    u16 current;
+    u16 previous;
+    u16 pressed;
+    u16 repeated;
+    u8 pad_08[2];
+    s8 timer[16];
+} PokemonEntryInputRepeat;
+
+void fn_80068418(PokemonEntryInputRepeat* input, s32 device)
+{
+    extern s8 fn_800F7A08(s32, s32);
+    extern s8 fn_800F7A7C(s32, s32);
+    extern u32 fn_800F7BC4(s32);
+    s32 horizontal;
+    s32 vertical;
+    s32 magnitude;
+    s32 bit;
+    f32 angle;
+    f32 absoluteAngle;
+    u32 buttons;
+    u16 current;
+    u16 pressed;
+    u16 repeated;
+
+    input->previous = input->current;
+    current = 0;
+    horizontal = fn_800F7A08(device, 0);
+    vertical = fn_800F7A7C(device, 0);
+
+    magnitude = vertical < 0 ? -vertical : vertical;
+    if (magnitude > 32 ||
+        (horizontal < 0 ? -horizontal : horizontal) > 32) {
+        angle = (f32)atan2((f64)vertical, (f64)horizontal);
+        absoluteAngle = angle > lbl_8047BFE8 ? angle : -angle;
+        if (absoluteAngle < lbl_8047BFF8) {
+            current |= 2;
+        } else if (absoluteAngle > lbl_8047BFFC) {
+            current |= 1;
+        }
+        if (absoluteAngle > lbl_8047C000 &&
+            absoluteAngle < lbl_8047C004) {
+            if (angle < lbl_8047BFE8) {
+                current |= 4;
+            } else {
+                current |= 8;
+            }
+        }
+    }
+
+    buttons = fn_800F7BC4(device);
+    if ((buttons & 0x008) != 0) current |= 0x001;
+    if ((buttons & 0x004) != 0) current |= 0x002;
+    if ((buttons & 0x001) != 0) current |= 0x004;
+    if ((buttons & 0x002) != 0) current |= 0x008;
+    if ((buttons & 0x100) != 0) current |= 0x010;
+    if ((buttons & 0x200) != 0) current |= 0x020;
+    if ((buttons & 0x400) != 0) current |= 0x040;
+    if ((buttons & 0x800) != 0) current |= 0x080;
+    if ((buttons & 0x010) != 0) current |= 0x100;
+    if ((buttons & 0x040) != 0) current |= 0x200;
+    if ((buttons & 0x020) != 0) current |= 0x400;
+    if ((buttons & 0x1000) != 0) current |= 0x800;
+
+    pressed = current & ~input->previous;
+    repeated = 0;
+    for (bit = 0; bit < 16; bit++) {
+        u16 mask = 1 << bit;
+        if ((pressed & mask) != 0) {
+            input->timer[bit] = 15;
+            repeated |= mask;
+        } else if ((current & mask) != 0) {
+            input->timer[bit] -= fn_800D3088();
+            if (input->timer[bit] <= 0) {
+                input->timer[bit] = 5;
+                repeated |= mask;
+            }
+        }
+    }
+    input->current = current;
+    input->pressed = pressed;
+    input->repeated = repeated;
 }
 
 u8 fn_8006905C(void)

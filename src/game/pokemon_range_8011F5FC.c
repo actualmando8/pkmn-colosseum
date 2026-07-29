@@ -1972,7 +1972,129 @@ u16* learned_moves;
     return move_count;
 }
 /* 0x801286C8 | 0x39C */
-/* undecompiled: fn removed (ROM-derived machine code), forward-declared for callers */
+s32 getEvoPokemonLevelUp(u8* pokemon, u16* extraPokemon, u8* evolution)
+{
+    u8* data;
+    u16 result;
+    u16 deferredResult;
+    u16 requirement;
+    u16 attack;
+    u16 i;
+    u8 kind;
+    s32 slot;
+
+    result = 0;
+    deferredResult = 0;
+    data = pokemonDataBiosGetPtr(pokemonBiosGetPokemonDataId(pokemon));
+    if (data == NULL) {
+        return 0xFFFF;
+    }
+
+    for (i = 0; i < 5; i++) {
+        kind = pokemonDataBiosGetSinkaKind(data, i);
+        requirement = pokemonDataBiosGetSinkaBuff(data, i);
+
+        switch (kind) {
+        case 0:
+            if (pokemonBiosGetFriend(pokemon) >= 220) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = requirement;
+            }
+            break;
+
+        case 1:
+        case 2:
+            pokemonBiosGetFriend(pokemon);
+            break;
+
+        case 3:
+            if (pokemonBiosGetLevel(pokemon) >= requirement) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = requirement;
+            }
+            break;
+
+        case 4:
+            if (pokemonBiosGetLevel(pokemon) >= requirement) {
+                attack = pokemonBiosGetPhyAtk(pokemon);
+                if (attack > pokemonBiosGetPhyDef(pokemon)) {
+                    result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                    evolution[0] = kind;
+                    *(u16*)(evolution + 2) = requirement;
+                }
+            }
+            break;
+
+        case 5:
+            if (pokemonBiosGetLevel(pokemon) >= requirement) {
+                attack = pokemonBiosGetPhyAtk(pokemon);
+                if (attack == pokemonBiosGetPhyDef(pokemon)) {
+                    result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                    evolution[0] = kind;
+                    *(u16*)(evolution + 2) = requirement;
+                }
+            }
+            break;
+
+        case 6:
+            if (pokemonBiosGetLevel(pokemon) >= requirement) {
+                attack = pokemonBiosGetPhyAtk(pokemon);
+                if (attack < pokemonBiosGetPhyDef(pokemon)) {
+                    result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                    evolution[0] = kind;
+                    *(u16*)(evolution + 2) = requirement;
+                }
+            }
+            break;
+
+        case 7:
+            if (pokemonBiosGetLevel(pokemon) >= requirement &&
+                ((pokemonBiosGetRnd(pokemon) >> 16) % 10) < 5) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = requirement;
+            }
+            break;
+
+        case 8:
+            if (pokemonBiosGetLevel(pokemon) >= requirement &&
+                ((pokemonBiosGetRnd(pokemon) >> 16) % 10) >= 5) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = requirement;
+            }
+            break;
+
+        case 9:
+            if (pokemonBiosGetLevel(pokemon) >= requirement) {
+                for (slot = 0; slot < 6; slot++) {
+                    if (!pokemonCheckValid(
+                            (u8*)heroGetStatus(0, 3, (u16)slot))) {
+                        break;
+                    }
+                }
+                if (slot < 6) {
+                    deferredResult =
+                        pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                }
+            }
+            break;
+
+        case 10:
+            if (pokemonBiosGetBeautiful(pokemon) >= requirement) {
+                result = pokemonDataBiosGetSinkaPokemonDataId(data, i);
+                evolution[0] = kind;
+                *(u16*)(evolution + 2) = requirement;
+            }
+            break;
+        }
+    }
+
+    *extraPokemon = deferredResult;
+    return result;
+}
 /* 0x80128A64 | 0x25C */
 s32 pokemonEvolutionCheck(pokemon, mode, trigger, extra, evolution)
 u8* pokemon;

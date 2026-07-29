@@ -22,6 +22,9 @@ typedef struct ModelIntpJObj {
     struct ModelIntpJObj* parent;
     struct ModelIntpJObj* child;
     u32 flags;
+    f32 rotation[4];
+    GSvec scale;
+    GSvec translation;
 } ModelIntpJObj;
 
 void _modelIntpJObjAll__FP8_GSmodelP9_HSD_JObjP9_HSD_JObjP9_HSD_JObjff(
@@ -53,6 +56,45 @@ void _modelIntpJObjAll__FP8_GSmodelP9_HSD_JObjP9_HSD_JObjP9_HSD_JObjff(
             toNode = toNode->next;
         }
     }
+}
+
+void fn_800EB904(GSmodel* model, HSD_JObj* out_arg, HSD_JObj* from_arg,
+                 HSD_JObj* to_arg, f32 blend)
+{
+    extern void fn_8019D620(HSD_JObj*);
+    extern void fn_801AD7CC(f32* from, f32* to, f32* out, f32 blend);
+    ModelIntpJObj* out = (ModelIntpJObj*)out_arg;
+    ModelIntpJObj* from = (ModelIntpJObj*)from_arg;
+    ModelIntpJObj* to = (ModelIntpJObj*)to_arg;
+    f32 inverse = 1.0f - blend;
+
+    (void)model;
+    if (out == NULL || from == NULL || to == NULL) {
+        return;
+    }
+
+    out->translation.x = from->translation.x * inverse +
+                         to->translation.x * blend;
+    out->translation.y = from->translation.y * inverse +
+                         to->translation.y * blend;
+    out->translation.z = from->translation.z * inverse +
+                         to->translation.z * blend;
+    if (!(out->flags & 0x02000000)) {
+        fn_8019D620(out_arg);
+    }
+
+    out->scale.x = from->scale.x * inverse + to->scale.x * blend;
+    out->scale.y = from->scale.y * inverse + to->scale.y * blend;
+    out->scale.z = from->scale.z * inverse + to->scale.z * blend;
+    if (!(out->flags & 0x02000000)) {
+        fn_8019D620(out_arg);
+    }
+
+    fn_801AD7CC(from->rotation, to->rotation, out->rotation, blend);
+    if (!(out->flags & 0x02000000)) {
+        fn_8019D620(out_arg);
+    }
+    lbl_8047ABA0++;
 }
 
 void modelCalculateBlendModel__FP8_GSmodelf(GSmodel* model, f32 unused)

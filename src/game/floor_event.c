@@ -193,42 +193,42 @@ extern u32 lbl_80478EBC;
 extern u32 lbl_80478EB8;
 extern void* fn_80113F48(void);
 extern void fn_8018C1E8(void*, u32, u32);
-extern void fn_801653CC(void);
-extern void msgctrlSetValue(void);
-extern void winMsgOpen(void);
-extern void winMsgClose(void);
-extern void pcboxDelItem(void);
-extern void fn_8001E184(void);
-void floorEventGetTresure(void);
-extern void fn_8018B76C(void);
-extern void fn_8018C7C8(void);
-extern void fn_801902E0(void);
-extern void fn_80166A28(void);
-extern void peopleWaitSyncMotion(void);
-extern void fn_80190528(void);
-void floorEventCtrlTresure(void);
-extern void floorGetResource(void);
-extern void GSmodelSetAnimIndex(void);
-extern void GSmodelSetAnimFrame(void);
-extern void GSmodelSetAnimRate(void);
-extern void GSmodelSetAnimType(void);
-extern void GSmodelStartAnimation(void);
+extern void fn_801653CC(u32, u32, u32);
+extern void msgctrlSetValue(u32, u32);
+extern void winMsgOpen(u32, u32, u32, u32);
+extern void winMsgClose(u32);
+extern u16 pcboxDelItem(u8*, u16, u16);
+extern s32 fn_8001E184(void);
+s32 floorEventGetTresure(u8, u32, s32);
+extern void fn_8018B76C(void*, u32, u32, u32, u32);
+extern void fn_8018C7C8(void*, u32, u32);
+extern u32 fn_801902E0(u16);
+extern void fn_80166A28(u32);
+extern void peopleWaitSyncMotion(void*, u32, u32);
+extern void fn_80190528(u16);
+s32 floorEventCtrlTresure(void*, u32, u8);
+extern void* floorGetResource(void*, u32);
+extern void GSmodelSetAnimIndex(void*, s32);
+extern void GSmodelSetAnimFrame(void*, f32);
+extern void GSmodelSetAnimRate(void*, f32);
+extern void GSmodelSetAnimType(void*, u32);
+extern void GSmodelStartAnimation(void*);
 extern void _threadSwitch(void);
-extern void GSmodelIsAnimating(void);
-extern void GSmodelGetPart(void);
-extern void GSpartGetTransform(void);
-extern void GSpartFree();
-extern void fn_8018AACC(void);
-extern void peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag);
-extern void fn_8018805C(void);
-extern void fn_80184470(void);
-extern void fn_8018C0A8(void);
-extern void fn_801669BC(void);
-extern void GSmodelCanAnimate(void);
-extern void fn_801845E4(void);
-extern void fn_801860F8(void);
-extern void GSmodelGetFrameCount(void);
-extern void fn_800D37CC(void);
+extern u32 GSmodelIsAnimating(void*);
+extern void* GSmodelGetPart(void*, u8);
+extern void GSpartGetTransform(void*, void*, u32, u32);
+extern void GSpartFree(void*);
+extern void fn_8018AACC(u32, u32, u32, void*);
+extern u32 peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag);
+extern void fn_8018805C(u32, u32, f32, f32);
+extern void fn_80184470(u32, u32);
+extern void fn_8018C0A8(u32, u32, void*);
+extern void fn_801669BC(u32);
+extern u32 GSmodelCanAnimate(void*);
+extern void fn_801845E4(u32, u32, u32, u32, u8);
+extern void fn_801860F8(u32, u32, f32, f32, f32);
+extern void GSmodelGetFrameCount(void*, f32*, u32);
+extern s32 fn_800D37CC(void);
 extern f32 lbl_8047CFA0;
 extern u32 lbl_80478EC8;
 extern u32 lbl_80478ECC;
@@ -238,12 +238,12 @@ extern f32 lbl_8047CFAC;
 extern f64 lbl_8047CFB8;
 extern f32 lbl_8047CFB4;
 extern f32 lbl_8047CFB0;
-void floorEventCtrlElevator(void);
-extern void scriptSetCol(void);
-extern void fn_801903B0(void);
-extern void fn_8018C558(void);
-extern void fn_8018C8F4(void);
-void floorEventCtrlDoor(void);
+s32 floorEventCtrlElevator(void*, u32, u16, u32, u32);
+extern void scriptSetCol(s16, u32);
+extern void fn_801903B0(u16);
+extern u32 fn_8018C558(u32, u32);
+extern void fn_8018C8F4(u32, u32, u32);
+s32 floorEventCtrlDoor(void*, u32, u8);
 extern void EvlogSet__FScUl();
 extern void scriptSetEventColID();
 extern void fn_800F7434();
@@ -1485,6 +1485,191 @@ void floorEventSetTresureDisp(u32 rawIndex, u32 display)
         fn_8018C1E8(fn_80113F48(), encoded, display);
     }
 }
+
+/* 0x80115E6C | 0x2F8 */
+s32 floorEventGetTresure(u8 type, u32 item, s32 count)
+{
+    s32 result = 0;
+    u32 message = 0;
+
+    fn_801653CC(0x3CA, 0, 0xFF);
+
+    switch (type) {
+    case 2:
+        msgctrlSetValue(0x4B, item);
+        winMsgOpen(3, 0x3CB5, 1, 0);
+        winMsgClose(1);
+        heroAddPokedoru(0, item);
+        winMsgOpen(3, 0x3CB7, 1, 0);
+        winMsgClose(1);
+        break;
+
+    case 1:
+    case 4:
+        if (count <= 0) {
+            break;
+        }
+
+        msgctrlSetValue(0x2D, item);
+        msgctrlSetValue(0x2F, count);
+        if (type == 1) {
+            message = count == 1 ? 0x3CB4 : 0x3CB9;
+            winMsgOpen(3, message, 1, 0);
+            winMsgClose(1);
+        }
+
+        result = heroItemAddItemDataId(0, (u16)item, (u16)count, -1);
+        if (result == 0) {
+            message = count == 1 ? 0x3CB8 : 0x3CBD;
+        } else if (result > 0) {
+            result = pcboxDelItem(0, (u16)item, (u16)result);
+            message = count == 1 ? 0x3CBA : 0x3CBB;
+        }
+        winMsgOpen(3, message, 1, 0);
+        winMsgClose(1);
+        break;
+
+    case 3:
+        msgctrlSetValue(0x2D, item);
+        winMsgOpen(3, 0x3CBC, 1, 0);
+        winMsgClose(1);
+        heroItemAddItemDataId(0, (u16)item, 1, -1);
+        winMsgOpen(3, 0x3CB6, 1, 0);
+        winMsgClose(1);
+
+        switch (item) {
+        case 0x21A:
+            message = 0x3B33;
+            break;
+        case 0x21B:
+            message = 0x3B39;
+            break;
+        case 0x21C:
+            message = 0x3B37;
+            break;
+        case 0x21D:
+            message = 0x3B35;
+            break;
+        case 0x223:
+            message = 0x44C4;
+            break;
+        }
+
+        winMsgOpen(3, message, 1, 0);
+        result = (s8)fn_8001E184();
+        winMsgClose(1);
+        if (result != 0) {
+            return 0;
+        }
+
+        switch (item) {
+        case 0x21A:
+            message = 0x3B34;
+            break;
+        case 0x21B:
+            message = 0x3B30;
+            break;
+        case 0x21C:
+            message = 0x3B38;
+            break;
+        case 0x21D:
+            message = 0x3B36;
+            break;
+        case 0x223:
+            message = 0x44C5;
+            break;
+        }
+
+        winMsgOpen(3, message, 1, 0);
+        winMsgClose(1);
+        break;
+    }
+
+    return result;
+}
+
+typedef struct FloorTreasureEntry {
+    u8 flags;
+    u8 count;
+    u8 pad02[2];
+    u16 floor;
+    u16 eventFlag;
+    u32 field08;
+    u32 item;
+    u8 pad10[0xC];
+} FloorTreasureEntry;
+
+/* 0x80116164 | 0x30C */
+s32 floorEventCtrlTresure(void* character, u32 param, u8 mode)
+{
+    FloorTreasureEntry* entry;
+    FloorTreasureEntry* displayEntry;
+    u8 displayType;
+
+    entry = (FloorTreasureEntry*)floorEventGetTresureList(param);
+    if (entry == 0) {
+        return -1;
+    }
+
+    displayType = (entry->flags >> 5) & 7;
+    switch (mode) {
+    case 0:
+        switch (displayType) {
+        case 1:
+            fn_8018B76C(character, param, 2, 0, 1);
+            fn_8018C7C8(character, param, 1);
+            break;
+        case 2:
+        case 3:
+            fn_8018C1E8(character, param, 0);
+            break;
+        }
+        break;
+
+    case 1:
+        switch (displayType) {
+        case 1:
+            fn_8018B76C(character, param, 0, 0, 1);
+        case 2:
+        case 3:
+            fn_8018B76C(character, param, 0, 0, 1);
+            break;
+        }
+        break;
+
+    case 2:
+        if (entry->eventFlag != 0 && fn_801902E0(entry->eventFlag) != 0) {
+            return 0;
+        }
+
+        if (displayType == 1) {
+            fn_8018B76C(character, param, 1, 0, 0);
+            fn_80166A28(0x3C2);
+            peopleWaitSyncMotion(character, param, 1);
+        }
+
+        displayEntry = (FloorTreasureEntry*)floorEventGetTresureList(param);
+        if (displayEntry != 0) {
+            switch ((displayEntry->flags >> 5) & 7) {
+            case 1:
+                fn_8018B76C(character, param, 2, 0, 1);
+                fn_8018C7C8(character, param, 1);
+                break;
+            case 2:
+            case 3:
+                fn_8018C1E8(character, param, 0);
+                break;
+            }
+        }
+
+        fn_80190528(entry->eventFlag);
+        floorEventGetTresure((entry->flags >> 2) & 7, entry->item, entry->count);
+        break;
+    }
+
+    return 0;
+}
+
 extern u32 lbl_80478EB8;
 extern u8 lbl_8035BB70[];
 extern u32 lbl_80478EBC;
@@ -1511,3 +1696,279 @@ s32 floorEventChangeTresure(u32 index, u16 val, u8 byte) {
     return 0;
 }
 #endif
+
+typedef struct FloorDoorEntry {
+    s8 openAnim;
+    s8 closeAnim;
+    s8 openEndAnim;
+    s8 closeEndAnim;
+    u8 pad04;
+    s8 alternateAnimA;
+    s8 alternateAnimB;
+    u8 doorType;
+    u8 partIndex;
+    u8 pad09;
+    s16 collisionId;
+    u8 pad0C[2];
+    u16 openFlag;
+    u16 closeFlag;
+    u8 pad12[2];
+    u32 resourceId;
+} FloorDoorEntry;
+
+/* 0x80116958 | 0x3D8 */
+s32 floorEventCtrlDoor(void* floor, u32 index, u8 mode)
+{
+    FloorDoorEntry* door;
+    void* model;
+    s16 animation = -1;
+    u32 sound = 0;
+    u32 savedHero;
+    u32 savedPartner;
+    f32 frame = 0.0f;
+
+    if (index >= *(u32*)lbl_80478EC8) {
+        return -1;
+    }
+    door = (FloorDoorEntry*)lbl_80478ECC + index;
+
+    switch (mode) {
+    case 0:
+        if (door->openFlag != 0 && fn_801902E0(door->openFlag) != 0) {
+            return 0;
+        }
+        if (door->closeFlag != 0 && fn_801902E0(door->closeFlag) == 0) {
+            return 1;
+        }
+    case 1:
+        if (door->openFlag != 0) {
+            fn_80190528(door->openFlag);
+        }
+        scriptSetCol(door->collisionId, 0);
+        break;
+
+    case 2:
+        if (door->openFlag != 0 && fn_801902E0(door->openFlag) == 0) {
+            return 0;
+        }
+    case 3:
+        if (door->openFlag != 0) {
+            fn_801903B0(door->openFlag);
+        }
+        scriptSetCol(door->collisionId, 1);
+        break;
+    }
+
+    if (door->resourceId == 0) {
+        return -1;
+    }
+    model = floorGetResource(floor, door->resourceId);
+    if (model == 0) {
+        return -1;
+    }
+
+    switch (mode) {
+    case 0:
+        animation = door->openAnim;
+        switch (door->doorType) {
+        case 1:
+        case 2:
+            sound = 0x44;
+            break;
+        case 3:
+            sound = 0x4BE;
+            break;
+        }
+        break;
+
+    case 1:
+        animation = door->openEndAnim;
+        if (animation < 0) {
+            animation = door->openAnim;
+            if (animation >= 0) {
+                GSmodelSetAnimIndex(model, animation);
+                GSmodelGetFrameCount(model, &frame, 0);
+                frame -= 1.0f;
+            }
+        }
+        break;
+
+    case 2:
+        animation = door->closeAnim;
+        switch (door->doorType) {
+        case 1:
+        case 2:
+            sound = 0x44;
+            break;
+        case 3:
+            sound = 0x4BE;
+            break;
+        }
+        break;
+
+    case 3:
+        animation = door->closeEndAnim;
+        if (animation < 0) {
+            animation = door->closeAnim;
+            if (animation >= 0) {
+                GSmodelSetAnimIndex(model, animation);
+                GSmodelGetFrameCount(model, &frame, 0);
+                frame -= 1.0f;
+            }
+        }
+        break;
+    }
+
+    if (animation < 0 || GSmodelCanAnimate(model) == 0) {
+        return -1;
+    }
+
+    GSmodelSetAnimIndex(model, animation);
+    GSmodelSetAnimFrame(model, frame);
+    GSmodelSetAnimRate(model, 0.5f);
+    GSmodelSetAnimType(model, 0);
+    GSmodelStartAnimation(model);
+    if (sound != 0) {
+        fn_80166A28(sound);
+    }
+
+    if (mode == 0 || mode == 2) {
+        savedHero = fn_8018C558(0, 0x64);
+        savedPartner = fn_8018C558(0, 0x65);
+        heroMoveInitEvent();
+        while (GSmodelIsAnimating(model) != 0) {
+            _threadSwitch();
+        }
+        heroMoveTermEvent();
+        fn_8018C8F4(0, 0x64, savedHero);
+        fn_8018C8F4(0, 0x65, savedPartner);
+    }
+
+    return 0;
+}
+
+typedef struct FloorEventVec {
+    f32 x;
+    f32 y;
+    f32 z;
+} FloorEventVec;
+
+/* 0x80116470 | 0x4E8 */
+s32 floorEventCtrlElevator(void* floor, u32 index, u16 command,
+                           u32 group, u32 person)
+{
+    FloorDoorEntry* elevator;
+    FloorEventVec position;
+    void* model;
+    void* part;
+    u32 floorGroup;
+    s16 animation = -1;
+    f32 frame = 0.0f;
+
+    if (index >= *(u32*)lbl_80478EC8) {
+        return -1;
+    }
+    elevator = (FloorDoorEntry*)lbl_80478ECC + index;
+    if (elevator->resourceId == 0) {
+        return -1;
+    }
+    model = floorGetResource(floor, elevator->resourceId);
+    if (model == 0) {
+        return -1;
+    }
+
+    floorGroup = floorDataBiosGetGroupID(floorDataBiosGetPtr((u32)floor));
+
+    if (command == 1 || command == 2 ||
+        command == 0x81 || command == 0x82) {
+        animation = elevator->openAnim;
+        if (animation >= 0) {
+            GSmodelSetAnimIndex(model, animation);
+            GSmodelSetAnimFrame(model, frame);
+            GSmodelSetAnimRate(model, 0.5f);
+            GSmodelSetAnimType(model, 0);
+            GSmodelStartAnimation(model);
+        }
+        if (command & 0x80) {
+            fn_80166A28(0x44);
+        }
+        while (GSmodelIsAnimating(model) != 0) {
+            _threadSwitch();
+        }
+
+        part = GSmodelGetPart(model, elevator->partIndex);
+        GSpartGetTransform(part, &position, 0, 0);
+        GSpartFree(part);
+        if (command & 1) {
+            fn_8018AACC(group, person, 1, &position);
+            peopleMoveCheck(group, person, 1);
+            fn_8018805C(group, person, 0.0f, 0.5f);
+            peopleMoveCheck(group, person, 1);
+        } else {
+            fn_80184470(group, person);
+            part = GSmodelGetPart(model, elevator->partIndex);
+            GSpartGetTransform(part, &position, 0, 0);
+            GSpartFree(part);
+            fn_8018C0A8(group, person, &position);
+            position.z += 25.0f;
+            fn_8018AACC(group, person, 1, &position);
+            peopleMoveCheck(group, person, 1);
+        }
+
+        animation = elevator->closeAnim;
+        if (animation >= 0) {
+            GSmodelSetAnimIndex(model, animation);
+            GSmodelSetAnimFrame(model, frame);
+            GSmodelSetAnimRate(model, 0.5f);
+            GSmodelSetAnimType(model, 0);
+            GSmodelStartAnimation(model);
+        }
+        if (command & 0x80) {
+            fn_80166A28(0x44);
+        }
+        while (GSmodelIsAnimating(model) != 0) {
+            _threadSwitch();
+        }
+    } else if (command == 0xC0) {
+        while (GSmodelIsAnimating(model) != 0) {
+            _threadSwitch();
+        }
+        fn_801669BC(0x45);
+        fn_80166A28(0x46);
+    } else {
+        if (command & 4) {
+            animation = elevator->alternateAnimA;
+        } else if (command & 8) {
+            animation = elevator->alternateAnimB;
+        }
+        if (animation < 0 || GSmodelCanAnimate(model) == 0) {
+            return -1;
+        }
+
+        if (command & 0x20) {
+            fn_801845E4(group, person, floorGroup, elevator->resourceId,
+                        elevator->partIndex);
+            fn_801860F8(group, person, 0.0f, 0.0f, 0.0f);
+        }
+        if (command & 0x10) {
+            GSmodelSetAnimIndex(model, animation);
+            GSmodelGetFrameCount(model, &frame, 0);
+            frame -= 1.0f;
+        }
+
+        GSmodelSetAnimIndex(model, animation);
+        GSmodelSetAnimFrame(model, frame);
+        GSmodelSetAnimRate(model, 0.5f);
+        GSmodelSetAnimType(model, 0);
+        GSmodelStartAnimation(model);
+
+        if (command & 0x40) {
+            floorEventCtrlElevator(floor, index, 0xC0, group, person);
+        } else if (command & 0x80) {
+            fn_80166A28(0x45);
+        }
+    }
+
+    GSmodelGetFrameCount(model, &frame, 0);
+    return (s32)(100.0f * ((2.0f * frame) / (f32)fn_800D37CC()));
+}

@@ -1112,7 +1112,7 @@ transfer_done:
 #pragma push
 #pragma peephole off
 s32 fn_80071E34(s32 chan, void* data) {
-    extern s32 fn_80071EA4(s32 chan, void* data);
+    extern s32 fn_80071EA4(s32 chan, u32* data);
     s32 keyChannel;
     s32 result;
 
@@ -1123,6 +1123,52 @@ s32 fn_80071E34(s32 chan, void* data) {
     return result;
 }
 #pragma pop
+
+s32 fn_80071EA4(s32 chan, u32* data)
+{
+    u32 command;
+    u32 response;
+    u8 length;
+    u8 status;
+    s32 result;
+    s32 offset;
+    s32 size;
+
+    result = fn_80073C38(chan);
+    if (result != 0) {
+        return result;
+    }
+
+    command = 0x33;
+    if (GBAWrite(chan, &command, &length) != 0) {
+        return 0xB;
+    }
+    result = fn_80071AE4_poll_read(chan, &response, &length, &status);
+    if (result != 0) {
+        return result + 0xB;
+    }
+    if ((response >> 24) != 0x33) {
+        return 0xF;
+    }
+
+    for (offset = 0; offset < 0x10; offset += 4) {
+        result = fn_80071AE4_poll_read(chan, data, &length, &status);
+        if (result != 0) {
+            return result + 0xF;
+        }
+        data++;
+    }
+
+    size = (fn_80071AE4_swap_word(data[-1]) & 0xFFFF) * 4;
+    for (offset = 0; offset < size; offset += 4) {
+        result = fn_80071AE4_poll_read(chan, data, &length, &status);
+        if (result != 0) {
+            return result + 0x12;
+        }
+        data++;
+    }
+    return 0;
+}
 
 /* fn_80072C74 (0x80072C74): poll one GBA channel and read its response. */
 #pragma push
@@ -2910,6 +2956,108 @@ u8 menuCBRule_CheckPokemonErrorAll(void* pokemon) {
 #pragma pop
 
 /* Validate every party member against the active battle rule. */
+u8 fn_800767B8(void* hero, const u8* rule)
+{
+    extern u8 fn_80076F2C(void* hero, const u8* rule, s32 mode);
+    extern void* heroBiosGetPokemonPtr(void* hero, u16 slot);
+    extern u8 pokemonCheckValid(void* pokemon);
+    extern s32 pokemonGetStatus(void* pokemon, s32 index, s32 field,
+                                s32 subindex);
+    extern u8 pokemonBiosGetLevel(void* pokemon);
+    extern u16 pokemonBiosGetItemDataId(void* pokemon);
+    extern u8* fn_8006B420(void);
+    extern u8 fn_80142984(u16 item);
+    extern u16 lbl_802EE458[];
+    extern u32 lbl_80478928;
+    extern void __assert(const char* file, s32 line, const char* condition);
+    extern const char lbl_80268A48[];
+    extern const char lbl_80268A58[];
+    void* pokemon;
+    u8* itemRule;
+    u16 item;
+    s32 partyCount;
+    s32 slot;
+    s32 check;
+    s32 mode;
+    s32 i;
+    u8 valid;
+
+    for (mode = 0; mode < 4; mode++) {
+        if (!fn_80076F2C(hero, rule, mode)) {
+            return 0;
+        }
+    }
+
+    partyCount = 0;
+    for (slot = 0; slot < 6; slot++) {
+        pokemon = heroBiosGetPokemonPtr(hero, (u16)slot);
+        if (pokemon == NULL || !pokemonCheckValid(pokemon)) {
+            continue;
+        }
+
+        for (check = 0; check < 3; check++) {
+            if (pokemonGetStatus(pokemon, 0, 0x6E, 0) == 0) {
+                valid = 1;
+            } else {
+                switch (check) {
+                case 0:
+                    valid = pokemonBiosGetLevel(pokemon) >=
+                            *(const s16*)(rule + 0);
+                    break;
+                case 1:
+                    valid = pokemonBiosGetLevel(pokemon) <=
+                            *(const s16*)(rule + 2);
+                    break;
+                case 2:
+                    item = pokemonBiosGetItemDataId(pokemon);
+                    itemRule = fn_8006B420();
+                    if (item == 0) {
+                        valid = 1;
+                    } else if (item == 0xAF) {
+                        valid = 0;
+                    } else {
+                        valid = fn_80142984(item);
+                    }
+                    if (!valid) {
+                        break;
+                    }
+
+                    switch (*(s32*)(itemRule + 8)) {
+                    case 0:
+                        valid = 1;
+                        break;
+                    case 1:
+                        valid = item == 0;
+                        break;
+                    case 2:
+                        valid = 1;
+                        for (i = 0; (u32)i < lbl_80478928; i++) {
+                            if (item == lbl_802EE458[i]) {
+                                valid = itemRule[i + 0x18] == 0;
+                                break;
+                            }
+                        }
+                        break;
+                    default:
+                        valid = 0;
+                        break;
+                    }
+                    break;
+                default:
+                    __assert(lbl_80268A48, 0xFB, lbl_80268A58);
+                    valid = 0;
+                    break;
+                }
+            }
+            if (!valid) {
+                return 0;
+            }
+        }
+        partyCount++;
+    }
+    return partyCount != 0;
+}
+
 u8 fn_800776E4(void* hero) {
     extern u8* fn_8006B420(void);
     extern u8 fn_80076F2C(void* hero, const u8* rule, s32 mode);

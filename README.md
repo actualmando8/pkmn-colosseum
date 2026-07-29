@@ -30,7 +30,7 @@ uv run --with matplotlib tools/plot_progress.py -o /tmp/progress.png
 
 | Metric | Value |
 |---|---|
-| Fuzzy match | 77.35% |
+| Fuzzy match | 78.29% |
 | Function match | 77.29% (6,649 / 8,603 functions) |
 | Code match | 40.86% (1,019,476 / 2,495,108 matched code bytes) |
 | Data match | 97.29% (2,136,513 / 2,196,100 matched data bytes) |

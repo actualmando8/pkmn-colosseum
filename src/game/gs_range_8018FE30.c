@@ -15,9 +15,11 @@ typedef struct FlagStateEntry {
 
 typedef struct FlagDefinition {
     u8 typeAndWidth;
-    u8 _pad01[3];
+    u8 initialValue;
+    u8 itemSwap;
+    u8 event;
     u16 bitPosition;
-    u8 _pad06[2];
+    s16 next;
 } FlagDefinition;
 
 extern const char lbl_802741F8[];
@@ -35,16 +37,51 @@ typedef struct FlagInitState {
     u32* buffer3;
 } FlagInitState;
 
+void fn_801903B0(s32 flagId);
+void _flagSet(s32 flagId, u32 value);
+
+void fn_8018FE30(s32 flagId)
+{
+    extern FlagDefinition* lbl_80478F9C;
+    extern u8* lbl_80478F98;
+    extern u32** lbl_80478ED4;
+    FlagDefinition* definitions = lbl_80478F9C;
+    s32 current;
+
+    if (flagId < 0) {
+        return;
+    }
+
+    for (current = flagId; current != -1;
+         current = definitions[current].next) {
+        if (definitions[current].initialValue != 0) {
+            fn_801903B0(current);
+        }
+    }
+
+    current = *(s16*)(lbl_80478F98 + 4);
+    while (current != flagId && current != -1) {
+        FlagDefinition* definition = &definitions[current];
+
+        if (definition->initialValue != 0) {
+            _flagSet(current,
+                     lbl_80478ED4[definition->initialValue][0]);
+        }
+        current = definition->next;
+    }
+}
+
 void fn_801909A8(u32* buffer1, u32 count1, u32* buffer2, u32 count2,
                  u32* buffer3, u32 count3)
 {
     extern FlagInitState* lbl_80478EEC;
-    extern u32* lbl_80478F98;
+    extern u8* lbl_80478F98;
     extern FlagDefinition* lbl_80478F9C;
     FlagInitState* state;
     u32 i;
 
-    GSflagInitBitPos(lbl_80478F9C, lbl_80478F98[0], count1, count2, count3);
+    GSflagInitBitPos(lbl_80478F9C, *(u32*)lbl_80478F98, count1, count2,
+                     count3);
 
     state = lbl_80478EEC;
     state->buffer1 = buffer1;
