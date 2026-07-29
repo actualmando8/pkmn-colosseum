@@ -421,7 +421,7 @@ u32 SIGetStatus(s32 chan) {
 #pragma dont_inline reset
 
 void fn_800D0338(s32 chan, u32 command) {
-    ((volatile SICommandQueueEntry*)0xCC006400)[chan].reg = command;
+    __SIChannelRegs[chan].reg = command;
 }
 
 void fn_800D034C(void) {
@@ -487,7 +487,7 @@ u32 SIDisablePolling(u32 poll) {
     return newPoll;
 }
 
-BOOL SIGetResponseRaw(s32 chan) {
+static inline u32 SIGetStatusInline(s32 chan) {
     BOOL enabled;
     u32 sr;
 
@@ -500,10 +500,16 @@ BOOL SIGetResponseRaw(s32 chan) {
         }
     }
     OSRestoreInterrupts(enabled);
+    return sr;
+}
 
+BOOL SIGetResponseRaw(s32 chan) {
+    u32 sr;
+
+    sr = SIGetStatusInline(chan);
     if (sr & 0x20) {
-        InputBuffer[chan][0] = __SIChannelRegs[chan].unk4;
-        InputBuffer[chan][1] = __SIChannelRegs[chan].unk8;
+        InputBuffer[chan][0] = __SIRegs[3 * chan + 1];
+        InputBuffer[chan][1] = __SIRegs[3 * chan + 2];
         InputBufferValid[chan] = TRUE;
         return TRUE;
     }

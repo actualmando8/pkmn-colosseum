@@ -289,29 +289,32 @@ static inline s32 TRKAppendBufferInline(TRKMessageBuffer* buf, u8* src, u32 n) {
     return err;
 }
 
+static inline s32 TRKAppendBuffer1_ui32(TRKMessageBuffer* buf, u32 data) {
+    u8* bigEndianData;
+    u8* byteData;
+    u8 swapBuffer[sizeof(data)];
+
+    if (*(s32*)gTRKBigEndian != 0) {
+        bigEndianData = (u8*)&data;
+    } else {
+        byteData = (u8*)&data;
+        bigEndianData = swapBuffer;
+        bigEndianData[0] = byteData[3];
+        bigEndianData[1] = byteData[2];
+        bigEndianData[2] = byteData[1];
+        bigEndianData[3] = byteData[0];
+    }
+
+    return TRKAppendBufferInline(buf, bigEndianData, sizeof(data));
+}
+
 /* TRKAppendBuffer_ui32 - 0x800BEAB4 | size 0xFC | scope global */
 s32 TRKAppendBuffer_ui32(TRKMessageBuffer* buf, u32* src, s32 count) {
-    u8 swapped[4];
-    u32 value;
-    s32 i = 0;
-    s32 err = 0;
+    s32 err;
+    s32 i;
 
-    while (err == 0 && i < count) {
-        u8* write;
-
-        value = *src;
-        if (*(s32*)gTRKBigEndian != 0) {
-            write = (u8*)&value;
-        } else {
-            swapped[0] = ((u8*)&value)[3];
-            swapped[1] = ((u8*)&value)[2];
-            swapped[2] = ((u8*)&value)[1];
-            swapped[3] = ((u8*)&value)[0];
-            write = swapped;
-        }
-        err = TRKAppendBufferInline(buf, write, sizeof(value));
-        src++;
-        i++;
+    for (i = 0, err = 0; err == 0 && i < count; i++) {
+        err = TRKAppendBuffer1_ui32(buf, src[i]);
     }
 
     return err;

@@ -1843,10 +1843,12 @@ u32 fn_801E2B74(s16 *left, s16 *right, u32 requestedSamples, u32 *status)
     }
 
     if (THP_ACTIVE_PLAYER.playAudioBuffer->validSample != 0) {
-        samples = THP_ACTIVE_PLAYER.playAudioBuffer->validSample >=
-                          requestedSamples
-                      ? requestedSamples
-                      : THP_ACTIVE_PLAYER.playAudioBuffer->validSample;
+        if (THP_ACTIVE_PLAYER.playAudioBuffer->validSample >=
+            requestedSamples) {
+            samples = requestedSamples;
+        } else {
+            samples = THP_ACTIVE_PLAYER.playAudioBuffer->validSample;
+        }
         audio = THP_ACTIVE_PLAYER.playAudioBuffer->curPtr;
 
         if (right == NULL) {

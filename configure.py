@@ -3604,6 +3604,19 @@ config.libs = [
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
+            # The vendor SDK separates vec.c from the quaternion source here.
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800A3C54.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
+            Object(
+                CodeCandidate,
+                "dolphin/sdk_candidate_800A3CB0.c",
+                mw_version="GC/1.2.5n",
+                progress_category="sdk",
+            ),
             Object(
                 CodeCandidate,
                 "dolphin/sdk_candidate_800A3D3C.c",

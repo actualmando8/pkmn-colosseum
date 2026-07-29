@@ -3295,10 +3295,10 @@ void pokemonGetEffortFromPokemon(u8* obj, u32 item_id, u32 double_effort,
     extern u32 gamedataAttestCheckValid(u32 value);
     u16 effort[6][3];
     u16 species;
+    u16 original_item;
     u8 valid;
     u16 total;
     u8 multiplier;
-    u16 original_item;
     u8 i;
     u16 gain;
     u16* entry;

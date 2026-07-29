@@ -2747,6 +2747,7 @@ void fn_8018AACC(u32 groupId, u32 index, u8 keepFacing, GSvec* target) {
     GSvec rotation;
     f32 oldSpeed;
     f32 angle;
+    f32 fullTurn;
     s32 revolutions;
 
     original = peopleFindBySelf(peopleFindSelf(groupId, index));
@@ -2767,9 +2768,10 @@ void fn_8018AACC(u32 groupId, u32 index, u8 keepFacing, GSvec* target) {
     entry = peopleFindBySelf(peopleFindSelf(groupId, index));
     if (entry != NULL) {
         fn_8018FC2C(entry, &rotation);
-        revolutions = (s32)(rotation.y / lbl_8047D7C0);
+        fullTurn = lbl_8047D7C0;
+        revolutions = (s32)(rotation.y / fullTurn);
         entry->pad22 = 1;
-        entry->field_40 = angle + lbl_8047D7C0 * revolutions;
+        entry->field_40 = angle + fullTurn * revolutions;
         entry->field_44 = oldSpeed;
     }
     if (keepFacing == 0) {

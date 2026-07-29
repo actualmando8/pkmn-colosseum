@@ -202,12 +202,12 @@ void fn_80202C1C(u32 r3,u32 r4)
     extern int fightOutPokemonEnemySearchAry();
     extern s8 fightOutPokemonEnemyCheckValid();
     extern void fightOutPokemonEnemyCreate();
+  u32 iVar5;
   u8 bVar1;
   u16 uVar2;
   u16 uVar3;
   u32 uVar4;
   u8 cVar9;
-  u32 iVar5;
   u16 sVar8;
   u32 iVar6;
   u32 iVar7;

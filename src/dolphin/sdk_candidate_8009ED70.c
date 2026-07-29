@@ -13,7 +13,9 @@ BOOL OSUnlink(OSModuleHeader* newModule, OSModuleHeader* module)
     u32* p;
     u32 offset;
     u32 x;
+    u32 branchMask;
 
+    branchMask = ~0x03FFFFFC;
     idNew = newModule->info.id;
     for (imp = (OSImportInfo*)module->impOffset;
          imp < (OSImportInfo*)(module->impOffset + module->impSize); imp++)
@@ -38,7 +40,7 @@ found:
             *p = x;
             break;
         case 2:
-            *p = (*p & ~0x03FFFFFC) | (x & 0x03FFFFFC);
+            *p = (*p & branchMask) | (x & 0x03FFFFFC);
             break;
         case 3:
             *(u16*)p = x & 0xFFFF;
@@ -61,7 +63,7 @@ found:
             if (module->unresolvedSection != 0) {
                 x = module->unresolved - (u32)p;
             }
-            *p = (*p & ~0x03FFFFFC) | (x & 0x03FFFFFC);
+            *p = (*p & branchMask) | (x & 0x03FFFFFC);
             break;
         case 11:
         case 12:

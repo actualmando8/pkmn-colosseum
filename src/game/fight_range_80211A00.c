@@ -14541,9 +14541,9 @@ void fn_8021D688(void)
   struct {
     u32 value;
   } context;
-  u32 waza;
   u32 fightPokemon;
   u32 pokemon;
+  u32 waza;
   u16 savedStatus;
   u16 item;
   u32 itemParam;
@@ -20800,7 +20800,6 @@ u32 fn_80238B0C(u32 r3, u32 r4, u32 r5, short r6)
   u16 uVar5;
   u16 uVar6;
   u16 uVar7;
-  u16 floorStatus;
   u32 uVar3;
   u32 uVar10;
   u16 uVar11;
@@ -20810,6 +20809,7 @@ u32 fn_80238B0C(u32 r3, u32 r4, u32 r5, short r6)
   } loop;
 #define bVar9 loop.bVar9
   u16 local_38 [2];
+  u16 floorStatus;
 
   if ((r5 & 0xffff) == 9) {
     return 0x3f;

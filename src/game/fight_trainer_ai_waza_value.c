@@ -97,25 +97,27 @@ u32 fightTrainerAiWazaValueKogoerukaze(void* ctx, u32 param1, u32 param2, u32 pa
     s32 fn_80236D60(void*, u32, u32);
     u8 fn_80237F74(void*, u32, u32);
     u32 fn_80239984(u32, void*, u32);
+    u16 j;
     void fn_80239EE8(u32, void*, u32, u32, u32, u32, u32, u32);
     u32 enemy[8];
     u32 own[8];
     u32 handle;
+    u32 ownPokemon;
     u16 enemyCount;
     u16 ownCount;
     u16 i;
-    u16 j;
 
     handle = 0;
     enemyCount = fightFloorGetFightTrainerFightOutPokemonPtrAry(0, ctx, enemy, 1, 1);
     ownCount = fightFloorGetFightTrainerFightOutPokemonPtrAry(0, ctx, own, 0, 1);
 
     for (i = 0; i < ownCount; i++) {
-        if (own[i] == 0) {
+        ownPokemon = own[i];
+        if (ownPokemon == 0) {
             continue;
         }
         for (j = 0; j < enemyCount; j++) {
-            if (enemy[j] != 0 && fn_80236D60(ctx, own[i], enemy[j]) > 0) {
+            if (enemy[j] != 0 && fn_80236D60(ctx, ownPokemon, enemy[j]) > 0) {
                 handle = fn_80239984(handle, ctx, 0xcf);
                 fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xcf);
                 break;
@@ -158,6 +160,7 @@ u32 fightTrainerAiWazaValueKanarazuSubayasaDaun(void* ctx, u32 param1, u32 param
     u32 enemy[8];
     u32 own[8];
     u32 handle;
+    u32 ownPokemon;
     u16 enemyCount;
     u16 ownCount;
     u16 i;
@@ -169,12 +172,13 @@ u32 fightTrainerAiWazaValueKanarazuSubayasaDaun(void* ctx, u32 param1, u32 param
     ownCount = fightFloorGetFightTrainerFightOutPokemonPtrAry(0, ctx, own, 0, 1);
 
     for (i = 0; i < ownCount; i++) {
-        if (own[i] == 0) {
+        ownPokemon = own[i];
+        if (ownPokemon == 0) {
             continue;
         }
         found = 0;
         for (j = 0; j < enemyCount; j++) {
-            if (enemy[j] != 0 && fn_80236D60(ctx, own[i], enemy[j]) > 0) {
+            if (enemy[j] != 0 && fn_80236D60(ctx, ownPokemon, enemy[j]) > 0) {
                 handle = fn_80239984(handle, ctx, 0xcc);
                 fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, 0xcc);
                 found = 1;
