@@ -617,3 +617,598 @@ s32 fn_8010A210(void* objPtr, void* pokemon)
 
     return match;
 }
+
+s32 fn_80109C88(void* objPtr, void* pokemon)
+{
+    extern u32 GSthreadCreate(s32 priority, void* stack, u32 stackSize,
+                               s32 unk1, s32 unk2, void* entry);
+    extern void GSthreadSetArgs(u32 task, u32 count, ...);
+    extern u32 GSthreadIsRunning(u32 task);
+    extern void GSthreadClose(u32 task);
+    extern u32 fn_800FF560(void);
+    extern void fn_8010A88C(void);
+    extern u8 fn_80121ADC(void* pokemon, u32 slot);
+
+    u8* obj = (u8*)objPtr;
+    u8 valid;
+    u16 f66;
+    u16 f0E;
+    u32 f6F;
+    u8 f0C1;
+    s32 match;
+    u8 kind;
+    u32 threadHandle;
+
+    if (obj == NULL) {
+        return 0;
+    }
+
+    valid = 1;
+    pokemonGetStatus(pokemon, 0, 0x6E, 0);
+    f66 = (u16)pokemonGetStatus(pokemon, 0, 0x66, 0);
+    if (pokemonGetStatus(pokemon, 0, 0xC2, 0) != 0) {
+        f0E = (fn_80121ADC(pokemon, 0x3E) == 1) ? 0x87 : 0x25;
+    } else {
+        f0E = 0;
+    }
+    f6F = pokemonGetStatus(pokemon, 0, 0x6F, 0);
+    f0C1 = (u8)pokemonGetStatus(pokemon, 0, 0xC1, 0);
+
+    if (obj[1] != 0) {
+        if (obj[4] != valid) {
+            match = 0;
+        } else if (obj[4] == 0) {
+            match = (*(u32*)(obj + 8) == f66);
+        } else {
+            match = (*(u16*)(obj + 8) == f66) && (*(u16*)(obj + 0xA) == f0E) &&
+                    (*(u32*)(obj + 0xC) == f6F) && (obj[0x12] == f0C1);
+        }
+    } else {
+        if (obj[0x14] != valid) {
+            match = 0;
+        } else if (obj[0x14] == 0) {
+            match = (*(u32*)(obj + 0x18) == f66);
+        } else {
+            match = (*(u16*)(obj + 0x18) == f66) && (*(u16*)(obj + 0x1A) == f0E) &&
+                    (*(u32*)(obj + 0x1C) == f6F) && (obj[0x22] == f0C1);
+        }
+    }
+
+    if (!match) {
+        return 0;
+    }
+
+    kind = obj[0];
+    if (kind == 0) {
+        obj[0] = 1;
+    }
+
+    obj[4] = 1;
+    *(u16*)(obj + 0x10) = (u16)pokemonGetStatus(pokemon, 0, 0x6E, 0);
+    *(u16*)(obj + 8) = (u16)pokemonGetStatus(pokemon, 0, 0x66, 0);
+    if (pokemonGetStatus(pokemon, 0, 0xC2, 0) != 0) {
+        *(u16*)(obj + 0xA) = (fn_80121ADC(pokemon, 0x3E) == 1) ? 0x87 : 0x25;
+    } else {
+        *(u16*)(obj + 0xA) = 0;
+    }
+    *(u32*)(obj + 0xC) = pokemonGetStatus(pokemon, 0, 0x6F, 0);
+    obj[0x12] = (u8)pokemonGetStatus(pokemon, 0, 0xC1, 0);
+    obj[1] = 1;
+
+    threadHandle = *(u32*)(obj + 0x28);
+    if (threadHandle != 0) {
+        if (GSthreadIsRunning(threadHandle)) {
+            return 1;
+        }
+        GSthreadClose(threadHandle);
+    }
+
+    threadHandle = GSthreadCreate(1, (void*)fn_800FF560(), 0x4000, 1, 1,
+                                   (void*)fn_8010A88C);
+    *(u32*)(obj + 0x28) = threadHandle;
+    if (threadHandle != 0) {
+        GSthreadSetArgs(threadHandle, 1, obj);
+    }
+    return 1;
+}
+
+s32 menuModelInit(u8* objPtr, s32 w, s32 h)
+{
+    typedef struct Vec3 {
+        f32 x, y, z;
+    } Vec3;
+    typedef struct Obj {
+        u8 pad[0x2C];
+        s32 w;
+        s32 h;
+        void* texture;
+        void* camera;
+        void* lights[3];
+    } Obj;
+    extern s32 lbl_8047AD40;
+    extern u8 lbl_8047AD44;
+    extern const u8 lbl_80271F38[];
+    extern f32 lbl_8047CE74;
+    extern void GSlogWrite(const char* fmt, ...);
+    extern void* GStextureCreate(u16 w, u16 h, u32 format, u32 a, u32 b);
+    extern void GStextureSetFilter(void* tex, u32 min, u32 mag, u32 unk);
+    extern void* fn_800D29A0(void);
+    extern void GScameraSetPosition(void* camera, Vec3* pos);
+    extern void GScameraSetRotation(void* camera, Vec3* rot);
+    extern void* GSlightCreate(void);
+    extern void GSlightSetType(void* light, u32 type);
+    extern void GSlightSetColor(void* light, Vec3* color);
+    extern void GSlightSetPosition(void* light, Vec3* pos);
+    extern void GSlightSetTarget(void* light, Vec3* target);
+    extern void GSlightSetActive(void* light, u32 active);
+    extern void set__5GSvecFfff(Vec3* out, f32 x, f32 y, f32 z);
+
+    Obj* obj = (Obj*)objPtr;
+    Vec3 pos;
+    Vec3 rot;
+    Vec3 target;
+    Vec3 color1;
+    Vec3 color0;
+    void* light;
+    s32 i;
+
+    pos = *(Vec3*)(lbl_80271F38 + 0xc);
+    rot = *(Vec3*)(lbl_80271F38 + 0x18);
+    target = *(Vec3*)(lbl_80271F38 + 0x24);
+    color1 = *(Vec3*)(lbl_80271F38 + 0x30);
+    color0 = *(Vec3*)(lbl_80271F38 + 0x3c);
+
+    if (obj == NULL) {
+        return 0;
+    }
+
+    memset(obj, 0, 0x48);
+
+    if (lbl_8047AD40 >= 4) {
+        GSlogWrite((const char*)(lbl_80271F38 + 0x70));
+        return 0;
+    }
+
+    obj->w = w;
+    obj->h = h;
+    if (w < 0x100) {
+        w = 0x100;
+    }
+    if (w > 0x280) {
+        w = 0x280;
+    }
+    if (h < 0x100) {
+        h = 0x100;
+    }
+    if (h > 0x1e0) {
+        h = 0x1e0;
+    }
+
+    obj->texture = GStextureCreate((u16)w, (u16)h, 0x45, 0, 0);
+    if (obj->texture == NULL) {
+        GSlogWrite((const char*)(lbl_80271F38 + 0x8c));
+        return 0;
+    }
+
+    GStextureSetFilter(obj->texture, 2, 2, 0);
+
+    obj->camera = fn_800D29A0();
+    if (obj->camera == NULL) {
+        GSlogWrite((const char*)(lbl_80271F38 + 0xac));
+        return 0;
+    }
+
+    GScameraSetPosition(obj->camera, &pos);
+    GScameraSetRotation(obj->camera, &rot);
+
+    for (i = 0; i < 3; i++) {
+        light = GSlightCreate();
+        if (light != NULL) {
+            if (i == 1) {
+                GSlightSetType(light, 2);
+                GSlightSetColor(light, &color1);
+                GSlightSetPosition(light, &pos);
+                GSlightSetTarget(light, &target);
+            } else if (i == 0) {
+                GSlightSetType(light, 0);
+                GSlightSetColor(light, &color0);
+            } else {
+                set__5GSvecFfff(&pos, lbl_8047CE74, lbl_8047CE74, lbl_8047CE74);
+                GSlightSetType(light, 2);
+                GSlightSetColor(light, &color1);
+                GSlightSetPosition(light, &pos);
+                GSlightSetTarget(light, &target);
+            }
+            GSlightSetActive(light, 0);
+            obj->lights[i] = light;
+        }
+    }
+
+    if (lbl_8047AD40 == 0) {
+        lbl_8047AD44 = 0;
+    }
+    lbl_8047AD40++;
+    return 1;
+}
+
+s32 fn_8010A88C(void* objPtr)
+{
+    extern s32 lbl_8047AD40;
+    extern u8 lbl_8047AD44;
+    extern s32 fn_8010B560(void);
+    extern void _threadSwitch(void);
+    extern void fn_801DADC0(u32 arg);
+    extern void fn_801DB100(u32 handle);
+    extern void GSmodelFree(void* model);
+    extern u32 fn_801DE190(u16 hi, u32 key, u8 rare);
+    extern u32 fn_801DAC3C(void* object);
+    extern void GSmodelSetVisibility(u32 model, u32 visible);
+    extern s32 fn_801DDD28(u32 model, u32 a, u32 b);
+    extern void fn_801DA914(u32 model, u32 a, u16 b);
+    extern void fn_801DA9E8(u32 model, u32 a, u16 b);
+    extern u32 floorOpenObject(u32 key);
+    extern u32 GSmodelCanAnimate(void* model);
+    extern void GSmodelSetAnimIndex(u32 model, u32 index);
+    extern void GSmodelSetAnimRate(u32 model, f32 rate);
+    extern void GSmodelStartAnimation(u32 model);
+    extern void GSmodelSetAnimType(u32 model, u32 type);
+    extern void set__5GSvecFfff(void* out, f32 x, f32 y, f32 z);
+    extern void GSmodelSetRotation(u32 model, void* rot);
+    extern void fn_8010AB00(void* obj);
+    extern f32 lbl_8047CE70;
+    extern f32 lbl_8047CE78;
+    extern f32 lbl_8047CE7C;
+    extern f32 lbl_8047CE80;
+    typedef struct Vec3 {
+        f32 x, y, z;
+    } Vec3;
+
+    u8* obj = (u8*)objPtr;
+    u32 model;
+    Vec3 rotVec;
+
+    if (obj == NULL) {
+        return 0;
+    }
+    if (obj[1] == 0) {
+        return 0;
+    }
+
+    while (!fn_8010B560()) {
+        _threadSwitch();
+    }
+
+    if (!lbl_8047AD44) {
+        lbl_8047AD44 = 1;
+        fn_801DADC0(4);
+    }
+
+    for (;;) {
+        if (obj != NULL) {
+            obj[1] = 0;
+            if (obj[0x14] != 0) {
+                if (*(u32*)(obj + 0x24) != 0) {
+                    fn_801DB100(*(u32*)(obj + 0x24));
+                    *(u32*)(obj + 0x24) = 0;
+                }
+            } else if (*(u32*)(obj + 0x24) != 0) {
+                GSmodelFree((void*)*(u32*)(obj + 0x24));
+                *(u32*)(obj + 0x24) = 0;
+            }
+            obj[0] = 0;
+        }
+
+        obj[0] = 1;
+        obj[1] = 0;
+        *(u32*)(obj + 0x14) = *(u32*)(obj + 4);
+        *(u32*)(obj + 0x18) = *(u32*)(obj + 8);
+        *(u32*)(obj + 0x1c) = *(u32*)(obj + 0xc);
+        *(u32*)(obj + 0x20) = *(u32*)(obj + 0x10);
+
+        if (obj[0x14] != 0) {
+            model = fn_801DE190(*(u16*)(obj + 0x18), *(u32*)(obj + 0x1c), obj[0x22]);
+            *(u32*)(obj + 0x24) = model;
+            if (model == 0) {
+                obj[0] = 0;
+                return 0;
+            }
+            model = fn_801DAC3C((void*)model);
+            if (model == 0) {
+                obj[0] = 0;
+                return 0;
+            }
+            GSmodelSetVisibility(model, 0);
+            if (*(u16*)(obj + 0x1a) != 0) {
+                if (fn_801DDD28(model, 4, 0)) {
+                    fn_801DA914(model, 4, *(u16*)(obj + 0x1a));
+                    fn_801DA9E8(model, 4, *(u16*)(obj + 0x1a));
+                }
+            }
+        } else {
+            model = floorOpenObject(*(u32*)(obj + 0x18));
+            *(u32*)(obj + 0x24) = model;
+            if (model == 0) {
+                return 0;
+            }
+            if (GSmodelCanAnimate((void*)model)) {
+                GSmodelSetAnimIndex(model, *(u32*)(obj + 0x1c));
+                GSmodelSetAnimRate(model, lbl_8047CE70);
+                GSmodelStartAnimation(model);
+            }
+            GSmodelSetVisibility(model, 0);
+            model = *(u32*)(obj + 0x24);
+        }
+
+        GSmodelSetAnimType(model, 1);
+        set__5GSvecFfff(&rotVec, lbl_8047CE78, lbl_8047CE7C, lbl_8047CE80);
+        GSmodelSetRotation(model, &rotVec);
+        fn_8010AB00(obj);
+
+        obj[0] = 2;
+        if (obj[1] != 1) {
+            break;
+        }
+    }
+
+    *(u32*)(obj + 0x28) = 0;
+    return 1;
+}
+
+s32 fn_8010AB00(void* objPtr)
+{
+    typedef struct Vec3 {
+        f32 x, y, z;
+    } Vec3;
+    extern u32 fn_801DAC3C(void* object);
+    extern u32 fn_801DAC24(void* object);
+    extern void memoGetScaleAngle(u16 key, f32* scale, f32* angle);
+    extern void GSmodelCenterNull(u32 model);
+    extern s32 fn_800EE0E8(u32 model);
+    extern void* GSmodelGetPart(u32 model, s32 index);
+    extern void GSpartGetTransform(void* part, Vec3* out, u32 a, u32 b);
+    extern void GSpartFree(void* part);
+    extern void modelRemoveCenterNull(u32 model);
+    extern void* GSmodelGetBound(u32 model);
+    extern void ObjInfoInit(void* bound, void* out);
+    extern void GScameraGetPerspective(void* camera, f32* fovY, f32* aspect,
+                                        f32* near, f32* far);
+    extern f32 tan(f32 x);
+    extern void set__5GSvecFfff(Vec3* out, f32 x, f32 y, f32 z);
+    extern void GScameraSetPosition(void* camera, Vec3* pos);
+    extern void GScameraSetPerspective(void* camera, f32 fovY, f32 aspect,
+                                        f32 near, f32 far);
+    extern void GScameraLookAt(void* camera, Vec3* eye, Vec3* target);
+    extern const u8 lbl_80271F38[];
+    extern Vec3 lbl_8035B430;
+    extern Vec3 lbl_8035B43C;
+    extern f32 lbl_8047CE84;
+    extern f32 lbl_8047CE88;
+    extern f32 lbl_8047CE8C;
+    extern f32 lbl_8047CE90;
+    extern f32 lbl_8047CE94;
+    extern f32 lbl_8047CE98;
+    extern f32 lbl_8047CE9C;
+    extern f32 lbl_8047CEA0;
+    extern f32 lbl_8047CEA4;
+    extern f32 lbl_8047CEA8;
+
+    u8* obj = (u8*)objPtr;
+    u32 model;
+    f32 fovScale;
+    f32 scaleParam;
+    f32 angleParam;
+    void* part;
+    s32 partIndex;
+    Vec3 transform;
+    u8 bound[0x14];
+    f32 fovY, aspect, near, far;
+    f32 maxBound;
+    Vec3 eyePos;
+    Vec3 lightPos;
+    Vec3 ambientColor;
+
+    if (obj == NULL) {
+        return 0;
+    }
+
+    if (obj[0x14] != 0) {
+        s32 category;
+        model = fn_801DAC3C((void*)*(u32*)(obj + 0x24));
+        category = fn_801DAC24((void*)*(u32*)(obj + 0x24));
+
+        if (category == 1) {
+            fovScale = lbl_8047CE90;
+        } else if (category >= 1) {
+            if (category == 3) {
+                fovScale = lbl_8047CE98;
+            } else if (category >= 3) {
+                fovScale = lbl_8047CE8C;
+            } else {
+                fovScale = lbl_8047CE94;
+            }
+        } else if (category == -1) {
+            fovScale = lbl_8047CE88;
+        } else if (category >= -1) {
+            fovScale = lbl_8047CE8C;
+        } else if (category >= -2) {
+            fovScale = lbl_8047CE84;
+        } else {
+            fovScale = lbl_8047CE8C;
+        }
+
+        memoGetScaleAngle(*(u16*)(obj + 0x20), &scaleParam, &angleParam);
+    } else {
+        model = *(u32*)(obj + 0x24);
+        fovScale = lbl_8047CE8C;
+        scaleParam = lbl_8047CE8C;
+    }
+
+    if (model == 0) {
+        obj[0] = 0;
+        return 0;
+    }
+
+    GSmodelCenterNull(model);
+    partIndex = fn_800EE0E8(model) - 1;
+    transform.x = 0.0f;
+    transform.y = 0.0f;
+    transform.z = 0.0f;
+    part = GSmodelGetPart(model, partIndex);
+    if (part != NULL) {
+        GSpartGetTransform(part, &transform, 0, 0);
+        GSpartFree(part);
+    }
+    modelRemoveCenterNull(model);
+    ObjInfoInit(GSmodelGetBound(model), bound);
+
+    if (*(u32*)(obj + 0x38) == 0) {
+        return 0;
+    }
+
+    GScameraGetPerspective((void*)*(u32*)(obj + 0x38), &fovY, &aspect, &near, &far);
+
+    fovY = lbl_8047CE9C;
+    aspect = (f32)(*(s32*)(obj + 0x2c)) / (f32)(*(s32*)(obj + 0x30));
+    maxBound = (*(f32*)(bound + 0) > *(f32*)(bound + 4)) ? *(f32*)(bound + 0)
+                                                          : *(f32*)(bound + 4);
+
+    set__5GSvecFfff(&eyePos, lbl_8047CE8C, transform.y,
+                     (lbl_8047CE84 * (maxBound / fovScale) / (f32)tan(lbl_8047CEA0)) *
+                         scaleParam);
+    GScameraSetPosition((void*)*(u32*)(obj + 0x38), &eyePos);
+    GScameraSetPerspective((void*)*(u32*)(obj + 0x38), fovY, aspect, near, far);
+    GScameraLookAt((void*)*(u32*)(obj + 0x38), &lbl_8035B430, &lbl_8035B43C);
+
+    ambientColor = *(Vec3*)lbl_80271F38;
+    lightPos = eyePos;
+    lightPos.x = eyePos.x - lbl_8047CEA4;
+    lightPos.y = eyePos.y + lbl_8047CEA8;
+
+    GSlightSetType((void*)*(u32*)(obj + 0x44), 2);
+    GSlightSetColor((void*)*(u32*)(obj + 0x44), &ambientColor);
+    GSlightSetPosition((void*)*(u32*)(obj + 0x44), &lightPos);
+    GSlightSetTarget((void*)*(u32*)(obj + 0x44), &transform);
+    GSlightSetActive((void*)*(u32*)(obj + 0x44), 1);
+
+    return 1;
+}
+
+u16 fn_8010B16C(u16 key, void* (*callback)(u32), u32 arg)
+{
+    typedef struct Entry {
+        void* data;
+        u16 key;
+        u8 state;
+        s8 slot;
+        void* (*callback)(u32);
+        u32 arg;
+    } Entry;
+    extern s32 lbl_8047AD48;
+    extern Entry* lbl_8047AD4C;
+    extern void* _menuFaceBiosGetPtr__FUs(u16 key);
+    extern void fn_8010BD6C(u16 key, void* (*cb)(u32), u32 a);
+    extern void fn_8017B1CC(u32 group);
+    extern s32 fn_8017B000(u32 fileHandle, u32 requestID, u32 callbackA,
+                            u32 callbackB, u32 callbackC);
+
+    void* pokemon;
+    void* found;
+    Entry* entry;
+    s32 count;
+    s32 i;
+    s32 idx;
+
+retry:
+    if (key == 0) {
+        pokemon = NULL;
+        if (callback != NULL) {
+            pokemon = callback(arg);
+        }
+        if (pokemon == NULL) {
+            key = 0;
+        } else if (!pokemonCheckValid(pokemon) || pokemonBiosGetTamagoFlag(pokemon)) {
+            key = 0x33D;
+        } else {
+            u16 species = pokemonGetStatus(pokemon, 0, 0x6E, 0);
+            if (species == 0xC9) {
+                u8 form = pokemonGetAnnonKatati(pokemonBiosGetRnd(pokemon));
+                key = lbl_8035B478[form][pokemonCheckRare(pokemon) != 0];
+            } else {
+                key = pokemonGetStatus(NULL, species, 0x5B, pokemonCheckRare(pokemon) != 0);
+            }
+        }
+    }
+
+    if (key != 0) {
+        goto haveKey;
+    }
+
+    count = 0;
+    entry = lbl_8047AD4C;
+    for (; count < lbl_8047AD48; entry++, count++) {
+        if (entry->data == NULL) {
+            break;
+        }
+    }
+    entry = lbl_8047AD4C;
+    for (i = 0; i < count; i++, entry++) {
+        if (entry->state == 1) {
+            return 0;
+        }
+    }
+
+    count = 0;
+    entry = lbl_8047AD4C;
+    for (; count < lbl_8047AD48; entry++, count++) {
+        if (entry->data == NULL) {
+            break;
+        }
+    }
+    entry = lbl_8047AD4C;
+    idx = 0;
+    for (; idx < count; idx++, entry++) {
+        if (entry->state == 0) {
+            key = entry->key;
+            break;
+        }
+    }
+    if (idx == count) {
+        fn_8017B1CC(0x5c0);
+        return 0;
+    }
+
+haveKey:
+    found = _menuFaceBiosGetPtr__FUs(key);
+    if (found == NULL) {
+        key = 0;
+        goto retry;
+    }
+
+    count = 0;
+    entry = lbl_8047AD4C;
+    for (; count < lbl_8047AD48; entry++, count++) {
+        if (entry->data == NULL) {
+            break;
+        }
+    }
+    entry = lbl_8047AD4C;
+    for (i = 0; i < count; i++, entry++) {
+        if (entry->state == 1) {
+            return 1;
+        }
+    }
+
+    found = _menuFaceBiosGetPtr__FUs(key);
+    entry = lbl_8047AD4C;
+    idx = -1;
+    for (i = 0; i < lbl_8047AD48; i++, entry++) {
+        if (found == entry->data) {
+            idx = i;
+            break;
+        }
+    }
+
+    lbl_8047AD4C[idx].state = 1;
+    fn_8017B000(0x5c0, (u32)found, (u32)fn_8010B5C4, 0, key);
+    return 1;
+}
