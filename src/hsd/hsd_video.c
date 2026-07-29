@@ -97,6 +97,7 @@ extern char lbl_8027575C[];
 extern void fn_800B959C(u16 left, u16 top, u16 width, u16 height);
 extern void fn_800B96BC(u16 width, u16 height);
 extern void fn_800B9874(u32 clamp);
+extern f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight);
 extern u32 fn_800B9B14(f32 scale);
 extern void fn_800B9BDC(GXColor color, u32 clear_z);
 extern void fn_800B9C44(BOOL aa, u8 sample_pattern[12][2], BOOL vf,
@@ -107,8 +108,8 @@ extern void fn_800B8E74(void);
 extern void fn_801B278C(BOOL enable);
 extern void fn_801B273C(BOOL enable);
 extern void fn_801B27DC(BOOL enable, u32 func, BOOL update);
-extern void GXSetDrawDone(void);
-extern void GXWaitDrawDone(void);
+extern void fn_800B8DA8(void);
+extern void GXDrawDone(void);
 extern void __assert(const char* file, u32 line, const char* expr);
 extern void HSD_Panic(const char* file, u32 line, const char* msg);
 
@@ -165,15 +166,42 @@ static inline int HSD_VIWaitXFBFlushSub(void)
     return val;
 }
 
-/* HSD_VIWaitXFBFlush */
+/* Finalize the active XFB draw and advance its state. */
 void fn_801BF6AC(void)
 {
+    BOOL intr;
+    BOOL inner;
+    int idx;
+
     if (_p->nb_xfb < 2) {
         return;
     }
-    while (HSD_VIWaitXFBFlushSub()) {
-        VIWaitForRetrace();
+
+    intr = OSDisableInterrupts();
+    idx = HSD_VISearchXFBByStatus(HSD_VI_XFB_DRAWING);
+    if (idx == -1) {
+        __assert(lbl_8047DF30, 0x30D, lbl_802756F8);
     }
+
+    inner = OSDisableInterrupts();
+    if (_p->xfb[idx].status != HSD_VI_XFB_DRAWING) {
+        __assert(lbl_8047DF30, 0x260, lbl_802756F8 + 0xC);
+    }
+    _p->xfb[idx].status = HSD_VI_XFB_WAITDONE;
+    _p->xfb[idx].vi_all = _p->current;
+    _p->current.chg_flag = 0;
+    OSRestoreInterrupts(inner);
+
+    inner = OSDisableInterrupts();
+    if (_p->xfb[idx].status != HSD_VI_XFB_WAITDONE) {
+        __assert(lbl_8047DF30, 0x2E4, lbl_802756F8 + 0x38);
+    }
+    _p->xfb[idx].status =
+        HSD_VISearchXFBByStatus(HSD_VI_XFB_NEXT) != -1
+            ? HSD_VI_XFB_DRAWDONE
+            : HSD_VI_XFB_NEXT;
+    OSRestoreInterrupts(inner);
+    OSRestoreInterrupts(intr);
 }
 
 void fn_801BFA1C(HSD_VIStatus* vi, void* buffer, HSD_RenderPass rpass);
@@ -181,7 +209,6 @@ void fn_801BFA1C(HSD_VIStatus* vi, void* buffer, HSD_RenderPass rpass);
 /* HSD_VICopyXFBAsync */
 void fn_801BF8A0(HSD_RenderPass rpass)
 {
-    BOOL intr;
     int idx;
 
     if (_p->nb_xfb < 2) {
@@ -190,21 +217,12 @@ void fn_801BF8A0(HSD_RenderPass rpass)
     idx = HSD_VIWaitXFBDrawEnable();
     fn_801BFA1C(&_p->current.vi, _p->xfb[idx].buffer, rpass);
 
-    intr = OSDisableInterrupts();
-    if (_p->xfb[idx].status != HSD_VI_XFB_DRAWING) {
-        __assert(lbl_8047DF30, 590, lbl_80275704);
-    }
-    _p->xfb[idx].status = HSD_VI_XFB_WAITDONE;
-    _p->xfb[idx].vi_all = _p->current;
-    _p->current.chg_flag = 0;
-    OSRestoreInterrupts(intr);
-
     while (fn_801BFCA0()) {
-        GXWaitDrawDone();
+        fn_800B8DA8();
     }
     _p->drawdone.waiting = 1;
     _p->drawdone.arg = idx;
-    GXSetDrawDone();
+    GXDrawDone();
 }
 
 /* HSD_VICopyEFB2XFBPtr */
@@ -226,8 +244,9 @@ void fn_801BFA1C(HSD_VIStatus* vi, void* buffer, HSD_RenderPass rpass)
     case HSD_RP_SCREEN:
         fn_800B9874(3);
         fn_800B959C(0, 0, rmode->fbWidth, rmode->efbHeight);
-        n_xfb_lines = fn_800B9B14((f32) rmode->xfbHeight /
-                                  (f32) rmode->efbHeight);
+        n_xfb_lines =
+            fn_800B9B14(GXGetYScaleFactor(rmode->efbHeight,
+                                          rmode->xfbHeight));
         fn_800B96BC(rmode->fbWidth, n_xfb_lines);
         fn_800B9E88(buffer, TRUE);
         break;
@@ -303,8 +322,6 @@ void fn_801BFF18(u32 retraceCount)
     int idx;
     int flush = 0;
     int renew = 0;
-    static int vr_count;
-    static int renew_count;
 
     idx = HSD_VISearchXFBByStatus(HSD_VI_XFB_NEXT);
     if (idx != -1) {
@@ -335,12 +352,17 @@ void fn_801BFF18(u32 retraceCount)
     if (flush) {
         VIFlush();
     }
-    if (renew) {
-        renew_count++;
-    }
-    if (++vr_count >= _p->perf.frame_period) {
-        _p->perf.frame_renew = renew_count;
-        vr_count = renew_count = 0;
+    {
+        static int vr_count = 0;
+        static int renew_count = 0;
+
+        if (renew) {
+            renew_count++;
+        }
+        if (++vr_count >= _p->perf.frame_period) {
+            _p->perf.frame_renew = renew_count;
+            vr_count = renew_count = 0;
+        }
     }
     if (_p->pre_cb) {
         _p->pre_cb(retraceCount);

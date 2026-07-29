@@ -1766,8 +1766,8 @@ u32 fn_8004C6C0(u8* context, u8* object)
 
     table = *(const PdaMailRowTable*)lbl_802672A0;
     cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
-    value = *(s16*)(object + 6);
     for (index = 0; index < 10; index++) {
+        value = *(s16*)(object + 6);
         if (value == table.values[index]) {
             break;
         }
@@ -1812,8 +1812,8 @@ u32 fn_8004C8AC(u8* context, u8* object)
 
     table = *(const PdaMailRowTable*)lbl_80267278;
     cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
-    value = *(s16*)(object + 6);
     for (index = 0; index < 10; index++) {
+        value = *(s16*)(object + 6);
         if (value == table.values[index]) {
             break;
         }
@@ -1857,8 +1857,8 @@ u32 fn_8004CA98(u8* context, u8* object)
 
     table = *(const PdaMailRowTable*)lbl_80267250;
     cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
-    value = *(s16*)(object + 6);
     for (index = 0; index < 10; index++) {
+        value = *(s16*)(object + 6);
         if (value == table.values[index]) {
             break;
         }
@@ -1892,8 +1892,8 @@ u32 fn_8004CC38(u8* context, u8* object)
 
     table = *(const PdaMailRowTable*)lbl_80267228;
     cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
-    value = *(s16*)(object + 6);
     for (index = 0; index < 10; index++) {
+        value = *(s16*)(object + 6);
         if (value == table.values[index]) {
             break;
         }
@@ -1927,8 +1927,8 @@ u32 fn_8004CDD8(u8* context, u8* object)
 
     table = *(const PdaMailRowTable*)lbl_80267200;
     cursors[1].packed = cursors[0].packed = (u16)(cursorBiosGetPos(10) >> 16);
-    value = *(s16*)(object + 6);
     for (index = 0; index < 10; index++) {
+        value = *(s16*)(object + 6);
         if (value == table.values[index]) {
             break;
         }
@@ -1939,10 +1939,10 @@ u32 fn_8004CDD8(u8* context, u8* object)
     index += cursors[1].position.page * 10;
     mailId = pdaMailGetMailID(index);
     if (mailId >= 0) {
-        if (fn_801D1B78(mailId) == 0) {
-            visible = 1;
-        } else {
+        if (fn_801D1B78(mailId) != 0) {
             visible = 0;
+        } else {
+            visible = 1;
         }
     } else {
         visible = 0;

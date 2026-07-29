@@ -294,7 +294,6 @@ BOOL SIRegisterPollingHandler(__OSInterruptHandler handler) {
 BOOL SIUnregisterPollingHandler(__OSInterruptHandler handler) {
     BOOL enabled;
     int i;
-    int count;
 
     enabled = OSDisableInterrupts();
 
@@ -302,20 +301,13 @@ BOOL SIUnregisterPollingHandler(__OSInterruptHandler handler) {
         if (RDSTHandler[i] == handler) {
             RDSTHandler[i] = 0;
 
-            count = 0;
-            if (RDSTHandler[0] == 0) {
-                count = 1;
-                if (RDSTHandler[1] == 0) {
-                    count = 2;
-                    if (RDSTHandler[2] == 0) {
-                        count = 3;
-                        if (RDSTHandler[3] == 0) {
-                            count = 4;
-                        }
-                    }
+            for (i = 0; i < 4; i++) {
+                if (RDSTHandler[i] != 0) {
+                    break;
                 }
             }
-            if (count == 4) {
+
+            if (i == 4) {
                 SIEnablePollingInterrupt(FALSE);
             }
 
@@ -338,12 +330,9 @@ void SIInit(void) {
     Si_80313F8C.poll = 0;
     SISetSamplingRate(0);
 
-    {
-        volatile u32* csr = &__SIRegs[SI_COMCSR_IDX];
-        while (*csr & SI_COMCSR_TSTART_MASK) {
-        }
-        *csr = SI_COMCSR_TCINT_MASK;
+    while (__SIRegs[SI_COMCSR_IDX] & SI_COMCSR_TSTART_MASK) {
     }
+    __SIRegs[SI_COMCSR_IDX] = SI_COMCSR_TCINT_MASK;
 
     __OSSetInterruptHandler(0x14, SIInterruptHandler_800CFA60);
     __OSUnmaskInterrupts(0x800);

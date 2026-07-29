@@ -60,10 +60,12 @@ s32 TRKTargetSupportRequest(void)
         TRKPostEvent(event);
         return 0;
     } else if (command == 0xD2) {
+        u32 handle = *(u32*) (gTRKCPUState + 0x10);
+        u8 mode = *(u32*) (gTRKCPUState + 0x14);
+        u32 openLength = *(u32*) (gTRKCPUState + 0x18);
+
         result = HandleOpenFileSupportRequest(
-            *(u32*) (gTRKCPUState + 0x10),
-            *(u32*) (gTRKCPUState + 0x14) & 0xFF,
-            *(u32*) (gTRKCPUState + 0x18), &ioResult);
+            handle, mode, openLength, &ioResult);
         if (ioResult == 0 && result != 0) {
             ioResult = 1;
         }

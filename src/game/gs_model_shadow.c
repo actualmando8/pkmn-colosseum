@@ -35,7 +35,10 @@ typedef struct {
 /* Slot table used by the debug shadow-texture pool: lbl_80401490, stride 0x58 */
 typedef struct {
     GSmodel* model;
-    u8 _pad[0x4C];
+    GSlight* light;
+    GSmodel* receivers[16];
+    u32 minSize;
+    u32 maxSize;
     u8 flag;    /* 0x50 */
     u8 _pad2[3];
     void* obj;  /* 0x54 */
@@ -255,5 +258,88 @@ void _modelShadowSetShadowFlag__FP9_HSD_JObjPPvi(GSjobjNode* jobj, void* arg, in
     }
 }
 #pragma peephole reset
+
+typedef struct GSshadowVec {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSshadowVec;
+
+typedef struct GSshadowBound {
+    u8 pad_00[0xC];
+    GSshadowVec* scale;
+} GSshadowBound;
+
+GSshadowSlot*
+_modelShadowFindValidReceiveModel__FP8_GSmodelP8_GSmodelP7GSlightP7GSbound(
+    GSmodel* model, GSmodel* receiveModel, GSlight* light,
+    GSshadowBound* bound)
+{
+    extern f64 ceil(f64);
+    extern void ObjInfoInit(void*, GSshadowVec*);
+    extern void fn_800E3D14(GSmodel*, GSshadowVec*);
+    extern f32 GSvecSquareDistance(GSshadowVec*, GSshadowVec*);
+    extern f32 lbl_8047CBC0;
+    extern f32 lbl_8047CBC8;
+    GSshadowVec dimensions;
+    GSshadowVec position;
+    GSshadowVec otherPosition;
+    GSshadowSlot* slot;
+    f32 largest;
+    u32 size;
+    u32 i;
+    u32 j;
+    u8 valid;
+
+    for (i = 0; i < 6; i++) {
+        slot = &lbl_80401490[i];
+        if (slot->model != model || slot->light != light) {
+            continue;
+        }
+
+        if (bound != NULL) {
+            ObjInfoInit(bound, &dimensions);
+            largest = dimensions.x;
+            if (dimensions.y > largest) {
+                largest = dimensions.y;
+            }
+            if (dimensions.z > largest) {
+                largest = dimensions.z;
+            }
+            largest *= (bound->scale->x + bound->scale->y +
+                        bound->scale->z) /
+                       lbl_8047CBC0;
+            size = (u32)ceil(largest);
+            if (size < slot->minSize ||
+                size < slot->maxSize / 3 ||
+                size > slot->minSize * 3) {
+                continue;
+            }
+            if (size <= slot->maxSize) {
+                return slot;
+            }
+        }
+
+        if (lbl_8047AB88 > lbl_8047CBC8) {
+            fn_800E3D14(receiveModel, &position);
+            valid = 1;
+            for (j = 0; j < 16; j++) {
+                if (slot->receivers[j] != NULL) {
+                    fn_800E3D14(slot->receivers[j], &otherPosition);
+                    if (GSvecSquareDistance(&position, &otherPosition) >
+                        lbl_8047AB88) {
+                        valid = 0;
+                        break;
+                    }
+                }
+            }
+            if (!valid) {
+                continue;
+            }
+        }
+        return slot;
+    }
+    return NULL;
+}
 
 #endif

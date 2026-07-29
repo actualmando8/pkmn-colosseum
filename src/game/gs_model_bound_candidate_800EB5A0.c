@@ -16,6 +16,45 @@ extern void GSmtxMakeZRotation(GSmtx, f32);
 extern void fn_800E042C(GSmtx, const GSvec*);
 extern void fn_800E0290(GSmtx, GSmtx, GSmtx);
 
+typedef struct ModelIntpJObj {
+    u8 pad_00[8];
+    struct ModelIntpJObj* next;
+    struct ModelIntpJObj* parent;
+    struct ModelIntpJObj* child;
+    u32 flags;
+} ModelIntpJObj;
+
+void _modelIntpJObjAll__FP8_GSmodelP9_HSD_JObjP9_HSD_JObjP9_HSD_JObjff(
+    GSmodel* model, HSD_JObj* out, HSD_JObj* from, HSD_JObj* to, f32 blend)
+{
+    extern void fn_800EB904(GSmodel*, HSD_JObj*, HSD_JObj*, HSD_JObj*, f32);
+    ModelIntpJObj* outNode;
+    ModelIntpJObj* fromNode;
+    ModelIntpJObj* toNode;
+
+    if (out == NULL || from == NULL || to == NULL) {
+        return;
+    }
+
+    fn_800EB904(model, out, from, to, blend);
+    outNode = (ModelIntpJObj*)out;
+    fromNode = (ModelIntpJObj*)from;
+    toNode = (ModelIntpJObj*)to;
+    if (!(outNode->flags & 0x1000)) {
+        outNode = outNode->child;
+        fromNode = fromNode->child;
+        toNode = toNode->child;
+        while (outNode != NULL) {
+            _modelIntpJObjAll__FP8_GSmodelP9_HSD_JObjP9_HSD_JObjP9_HSD_JObjff(
+                model, (HSD_JObj*)outNode, (HSD_JObj*)fromNode,
+                (HSD_JObj*)toNode, blend);
+            outNode = outNode->next;
+            fromNode = fromNode->next;
+            toNode = toNode->next;
+        }
+    }
+}
+
 void modelCalculateBlendModel__FP8_GSmodelf(GSmodel* model, f32 unused)
 {
     HSDJObj* jobj;

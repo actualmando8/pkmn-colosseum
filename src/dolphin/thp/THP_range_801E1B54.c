@@ -1709,6 +1709,118 @@ u32 fn_801E260C(s16 *dmaBuffer, u32 firstLength, u32 unused,
     return samples;
 }
 
+/*
+ * Resynchronise the MusyX DMA ring after a seek: rotate the decoded samples
+ * so that the position MusyX last requested lands at the start of the ring,
+ * rebase the pending markers, then refill the hole left by the rotation.
+ */
+void fn_801E2CA8(void)
+{
+    THPAudioDmaState *state = (THPAudioDmaState *)lbl_8046A440;
+    u32 samples = *(u32 *)(lbl_8046AC60 + 0x90) * 40 / 1000;
+    u32 requestOffset;
+    u32 decodeOffset;
+    u32 moved;
+    u32 remaining;
+    s32 marker;
+
+    if (state->requestedPosition == state->decodedPosition) {
+        state->decodedPosition = 0;
+        if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+            THPDecodeAudioBlock(state, lbl_8047B470, lbl_8047B474, samples);
+        } else {
+            THPDecodeAudioBlock(state, lbl_8047B470, NULL, samples);
+        }
+    } else {
+        requestOffset = (u32)(state->requestedPosition % samples);
+        decodeOffset = (u32)(state->decodedPosition % samples);
+        if (decodeOffset == 0) {
+            decodeOffset = samples;
+        }
+
+        if (requestOffset < decodeOffset) {
+            moved = (decodeOffset - requestOffset) * sizeof(s16);
+            memcpy(lbl_8047B470, lbl_8047B470 + requestOffset, moved);
+            if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+                memcpy(lbl_8047B474, lbl_8047B474 + requestOffset, moved);
+            }
+
+            marker = state->readMarker;
+            while (marker != state->writeMarker) {
+                state->markers[marker] =
+                    state->markers[marker] % samples - requestOffset;
+                marker++;
+                if (marker >= 5) {
+                    marker = 0;
+                }
+            }
+
+            remaining = samples - moved / sizeof(s16);
+            state->decodedPosition = samples - remaining;
+            if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+                THPDecodeAudioBlock(state, lbl_8047B470 + moved / sizeof(s16),
+                                    lbl_8047B474 + moved / sizeof(s16),
+                                    remaining);
+            } else {
+                THPDecodeAudioBlock(state, lbl_8047B470 + moved / sizeof(s16),
+                                    NULL, remaining);
+            }
+        } else {
+            memcpy((u8 *)state + 0xA0, lbl_8047B470, samples / 4);
+            moved = (samples - requestOffset) * sizeof(s16);
+            memcpy(lbl_8047B470, lbl_8047B470 + requestOffset, moved);
+            memcpy(lbl_8047B470 + moved / sizeof(s16), (u8 *)state + 0xA0,
+                   samples / 4);
+            if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+                memcpy((u8 *)state + 0xA0, lbl_8047B474, samples / 4);
+                memcpy(lbl_8047B474, lbl_8047B474 + requestOffset, moved);
+                memcpy(lbl_8047B474 + moved / sizeof(s16), (u8 *)state + 0xA0,
+                       samples / 4);
+            }
+
+            marker = state->readMarker;
+            while (marker != state->writeMarker) {
+                if (state->markers[marker] % samples > samples / 2) {
+                    state->markers[marker] =
+                        state->markers[marker] % samples - requestOffset;
+                } else {
+                    state->markers[marker] = state->markers[marker] % samples +
+                                             (samples - requestOffset);
+                }
+                marker++;
+                if (marker >= 5) {
+                    marker = 0;
+                }
+            }
+
+            remaining = requestOffset - decodeOffset;
+            state->decodedPosition = samples - remaining;
+            if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+                THPDecodeAudioBlock(state,
+                                    lbl_8047B470 + samples - requestOffset +
+                                        decodeOffset,
+                                    lbl_8047B474 + samples - requestOffset +
+                                        decodeOffset,
+                                    remaining);
+            } else {
+                THPDecodeAudioBlock(state,
+                                    lbl_8047B470 + samples - requestOffset +
+                                        decodeOffset,
+                                    NULL, remaining);
+            }
+        }
+    }
+
+    state->dmaPosition = 0;
+    state->requestedPosition = 0;
+    DCFlushRange(lbl_8047B470, samples * sizeof(s16));
+    fn_8014E9B4(lbl_80478D00, 0, samples, 0, 0);
+    if (*(u32 *)(lbl_8046AC60 + 0x8C) == 2) {
+        DCFlushRange(lbl_8047B474, samples * sizeof(s16));
+        fn_8014E9B4(lbl_80478D04, 0, samples, 0, 0);
+    }
+}
+
 #pragma pop
 
 #pragma optimize_for_size on

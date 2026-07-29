@@ -898,7 +898,7 @@ extern void fn_8017F800(u32 fileHandle);
 extern u32 fn_8017FA5C(void);
 extern u32 fn_8017F794();
 extern void fn_80167E98();
-extern void fn_8017F108(void);
+extern void fn_8017F108(s32 result);
 extern void fn_80179FA4();
 extern u32 lbl_8047B1B8;
 extern u32 lbl_8047B1BC;

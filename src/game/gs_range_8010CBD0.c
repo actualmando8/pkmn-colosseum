@@ -34,6 +34,119 @@ extern GSColSysState lbl_80404C68;
 #define COL_LAYER_IDX (COL_STATE->activeLayer)
 #define COL_LAYER_PTR(n) ((void*)((u8*)COL_STATE + 4 + (n) * GSCOLSYS_LAYER_SIZE))
 
+typedef struct CcdOffsetBlock {
+    void* field_00;
+    u32 field_04;
+    void* field_08;
+    void* field_0C;
+} CcdOffsetBlock;
+
+typedef struct CcdOffsetRecord {
+    u8 pad_00[0x24];
+    CcdOffsetBlock* field_24;
+    CcdOffsetBlock* field_28;
+    CcdOffsetBlock* field_2C;
+    CcdOffsetBlock* field_30;
+    CcdOffsetBlock* field_34;
+    CcdOffsetBlock* field_38;
+    u32 field_3C;
+} CcdOffsetRecord;
+
+typedef struct CCD_FILEHEAD {
+    CcdOffsetRecord* records;
+    u32 count;
+} CCD_FILEHEAD;
+
+void _offsetCCD__FP12CCD_FILEHEAD(CCD_FILEHEAD* head)
+{
+    u8* base;
+    CcdOffsetRecord* record;
+    CcdOffsetBlock* block;
+    u32 i;
+
+    if (head == NULL) {
+        return;
+    }
+    base = (u8*)head;
+    head->records = (CcdOffsetRecord*)(base + (u32)head->records);
+    record = head->records;
+
+    for (i = 0; i < head->count; i++, record++) {
+        if (record->field_24 != NULL) {
+            record->field_24 =
+                (CcdOffsetBlock*)(base + (u32)record->field_24);
+            block = record->field_24;
+            if (block->field_00 != NULL) {
+                block->field_00 = base + (u32)block->field_00;
+            }
+            if (block->field_08 != NULL) {
+                block->field_08 = base + (u32)block->field_08;
+            }
+            if (block->field_0C != NULL) {
+                block->field_0C = base + (u32)block->field_0C;
+            }
+        }
+        if (record->field_28 != NULL) {
+            record->field_28 =
+                (CcdOffsetBlock*)(base + (u32)record->field_28);
+            block = record->field_28;
+            if (block->field_00 != NULL) {
+                block->field_00 = base + (u32)block->field_00;
+            }
+            if (block->field_08 != NULL) {
+                block->field_08 = base + (u32)block->field_08;
+            }
+            if (block->field_0C != NULL) {
+                block->field_0C = base + (u32)block->field_0C;
+            }
+        }
+        if (record->field_2C != NULL) {
+            record->field_2C =
+                (CcdOffsetBlock*)(base + (u32)record->field_2C);
+            block = record->field_2C;
+            if (block->field_00 != NULL) {
+                block->field_00 = base + (u32)block->field_00;
+            }
+            if (block->field_08 != NULL) {
+                block->field_08 = base + (u32)block->field_08;
+            }
+            if (block->field_0C != NULL) {
+                block->field_0C = base + (u32)block->field_0C;
+            }
+        }
+        if (record->field_30 != NULL) {
+            record->field_30 =
+                (CcdOffsetBlock*)(base + (u32)record->field_30);
+            block = record->field_30;
+            if (block->field_00 != NULL) {
+                block->field_00 = base + (u32)block->field_00;
+            }
+        }
+        if (record->field_34 != NULL) {
+            record->field_34 =
+                (CcdOffsetBlock*)(base + (u32)record->field_34);
+            block = record->field_34;
+            if (block->field_00 != NULL) {
+                block->field_00 = base + (u32)block->field_00;
+            }
+            if (block->field_08 != NULL) {
+                block->field_08 = base + (u32)block->field_08;
+            }
+            if (block->field_0C != NULL) {
+                block->field_0C = base + (u32)block->field_0C;
+            }
+        }
+        if (record->field_38 != NULL) {
+            record->field_38 =
+                (CcdOffsetBlock*)(base + (u32)record->field_38);
+            block = record->field_38;
+            if (block->field_00 != NULL) {
+                block->field_00 = base + (u32)block->field_00;
+            }
+        }
+    }
+}
+
 /* 0x8010CBD0 | 0x34 */
 void* GScolsys2GetCurFloor(void) {
     s32 layer;
@@ -135,8 +248,6 @@ void fn_8010CD6C(void)
 /* 0x8010CFE4 | 0x54 */
 s32 fn_8010CFE4(void* fileHead)
 {
-    extern void _offsetCCD__FP12CCD_FILEHEAD(void*);
-
     if (COL_LAYER_IDX < 0) {
         return 0;
     }
@@ -264,7 +375,6 @@ extern void fn_800DA1E8(s32, s32, s32);
 extern void fn_800D9ED8(s32);
 extern void fn_8010CA30(ColMtx out, u32 index);
 extern void fn_8010C8D0(ColMtx out, u32 index);
-extern void fn_8010D20C(void*, ColMtx, ColMtx);
 extern void PSMTXMultVec(ColMtx, const ColVec3, ColVec3);
 extern void fn_800D6A00(s32);
 extern void fn_800D67BC(s32);
@@ -283,6 +393,49 @@ static inline void ColDrawSetColor(ColDrawColor color)
 {
     fn_800D5CB8(0, color.channel.r, color.channel.g,
                 color.channel.b, color.channel.a);
+}
+
+void fn_8010D20C(void* model, ColMtx matrix, ColMtx normalMatrix)
+{
+    ColDrawGroup* group;
+    ColDrawColor color;
+    ColVec3 transformed;
+    u8* triangle;
+    u32 i;
+    s32 vertex;
+    u8 flags;
+    u32 level;
+
+    group = model;
+    triangle = group->data;
+    fn_800D6A00(3);
+
+    for (i = 0; i < group->count; i++, triangle += 0x34) {
+        memset(&color, 0, sizeof(color));
+        color.channel.a = 0xC0;
+
+        flags = triangle[0x30];
+        level = flags >> 4;
+        color.channel.g =
+            (u8)(127.0f * ((f32)level / 15.0f) + 128.0f);
+        if ((flags & 0xF) + 1 >= 16) {
+            color.channel.b = 0;
+        }
+
+        level = triangle[0x31] >> 4;
+        if (level > 0) {
+            color.channel.r = level * 4 + 0xC0;
+        }
+
+        fn_800D67BC(3);
+        for (vertex = 0; vertex < 3; vertex++) {
+            PSMTXMultVec(matrix, *(ColVec3*)(triangle + vertex * 12),
+                         transformed);
+            fn_800D6680(transformed[0], transformed[1], transformed[2]);
+            ColDrawSetColor(color);
+        }
+        fn_800D6728();
+    }
 }
 
 static inline void ColDrawEdges(ColMtx matrix, ColDrawGroup* group,
@@ -524,6 +677,68 @@ s32 GScolsys2WalkGetLayer(Vec3f* position, u8* layer, u8* subLayer)
 
     *layer = hits[closest].layer;
     *subLayer = hits[closest].subLayer;
+    return 1;
+}
+
+s32 getCpPolyVec__FP5GSvecP5GSvecP5GSvecP5GSvec(
+    Vec3f* out, Vec3f* point, Vec3f* vertices, Vec3f* plane)
+{
+    extern f32 lbl_8047CEE0;
+    extern f32 lbl_8047CEE4;
+    extern f32 lbl_8047CEE8;
+    f32 minX;
+    f32 minZ;
+    f32 maxX;
+    f32 maxZ;
+    f32 cross;
+    Vec3f* a;
+    Vec3f* b;
+    s32 i;
+
+    minX = lbl_8047CEE4;
+    minZ = lbl_8047CEE4;
+    maxX = lbl_8047CEE8;
+    maxZ = lbl_8047CEE8;
+    for (i = 0; i < 3; i++) {
+        if (minX > vertices[i].x) {
+            minX = vertices[i].x;
+        }
+        if (minZ > vertices[i].z) {
+            minZ = vertices[i].z;
+        }
+        if (maxX < vertices[i].x) {
+            maxX = vertices[i].x;
+        }
+        if (maxZ < vertices[i].z) {
+            maxZ = vertices[i].z;
+        }
+    }
+
+    if (minX > point->x || minZ > point->z ||
+        maxX < point->x || maxZ < point->z) {
+        return 0;
+    }
+
+    for (i = 0; i < 3; i++) {
+        a = &vertices[i];
+        b = &vertices[(i + 1) % 3];
+        cross = (b->z - a->z) * (point->x - a->x) -
+                (b->x - a->x) * (point->z - a->z);
+        if (cross > lbl_8047CEE0) {
+            return 0;
+        }
+    }
+
+    if (plane->y == lbl_8047CEE0) {
+        return 0;
+    }
+    out->x = point->x;
+    out->y = point->y +
+             (plane->y * (point->y - vertices[0].y) +
+              plane->x * (point->x - vertices[0].x) -
+              plane->z * (point->z - vertices[0].z)) /
+                 plane->y;
+    out->z = point->z;
     return 1;
 }
 

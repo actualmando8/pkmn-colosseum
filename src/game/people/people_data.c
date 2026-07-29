@@ -2508,3 +2508,93 @@ s32 itemUse2PokemonSimulation(void* arg0, void* arg1, void* arg2, void* arg3, vo
 
     return result;
 }
+
+typedef struct ItemUsePokemonLog {
+    s32 type;
+    u16 value;
+    u16 extra;
+} ItemUsePokemonLog;
+
+void hpRecover__FP20ITEMUSE2POKEMON_LOG1PsP7PokemonUcbUsP12FightPokemon(
+    ItemUsePokemonLog* log, s16* logCount, void* pokemon, u8 recovery,
+    u8 revive, u16 amount, void* fightPokemon)
+{
+    extern u16 pokemonBiosGetHp(void*);
+    extern u16 pokemonBiosGetMaxHp(void*);
+    extern void pokemonBiosSetHp(void*, u16);
+    extern void* fightFloorGetFightPokemonPtrToFightTrainerPtr(s32, void*);
+    extern void* fightTrainerCheckFightPokemonFightOut(void*, void*);
+    extern void fn_802331A4(void*, s32);
+    u16 oldHp;
+    u16 maxHp;
+    u16 newHp;
+    u16 recoveryAmount;
+    u8 revived;
+    void* trainer;
+
+    revived = 0;
+    oldHp = pokemonBiosGetHp(pokemon);
+    maxHp = pokemonBiosGetMaxHp(pokemon);
+    if (oldHp >= maxHp) {
+        return;
+    }
+
+    switch (recovery) {
+    case 0xFF:
+        recoveryAmount = maxHp;
+        break;
+    case 0xFE:
+        recoveryAmount = maxHp / 2;
+        if (recoveryAmount == 0) {
+            recoveryAmount = 1;
+        }
+        break;
+    case 0xFD:
+        recoveryAmount = amount;
+        break;
+    default:
+        recoveryAmount = recovery;
+        break;
+    }
+    if (recoveryAmount == 0) {
+        return;
+    }
+
+    if (oldHp == 0) {
+        if (revive == 0) {
+            return;
+        }
+        revived = 1;
+    } else if (revive != 0) {
+        return;
+    }
+
+    newHp = oldHp + recoveryAmount;
+    if (newHp > maxHp) {
+        newHp = maxHp;
+    }
+    pokemonBiosSetHp(pokemon, newHp);
+
+    if (fightPokemon != NULL) {
+        trainer = fightFloorGetFightPokemonPtrToFightTrainerPtr(
+            0, fightPokemon);
+        trainer = fightTrainerCheckFightPokemonFightOut(
+            trainer, fightPokemon);
+        if (trainer != NULL) {
+            fn_802331A4(trainer, 0x83);
+        }
+    }
+
+    if (revived != 0 && *logCount < 0x20) {
+        log[*logCount].type = 0x16;
+        log[*logCount].value = 0;
+        log[*logCount].extra = 0;
+        (*logCount)++;
+    }
+    if (*logCount < 0x20) {
+        log[*logCount].type = 0x15;
+        log[*logCount].value = newHp - oldHp;
+        log[*logCount].extra = 0;
+        (*logCount)++;
+    }
+}
