@@ -491,7 +491,7 @@ void fn_800BC228(u32 stage, s32 op, u32 bias, u32 scale, u32 clamp,
     GXData_800BB30C* p;
 
     reg = gx->tevColorEnv[stage];
-    reg = __rlwimi(reg, op, 18, 13, 13);
+    reg = __rlwimi(reg, op & 1, 18, 13, 13);
     if (op <= 1) {
         reg = __rlwimi(reg, scale, 20, 10, 11);
         reg = __rlwimi(reg, bias, 16, 14, 15);
@@ -514,7 +514,7 @@ void fn_800BC290(u32 stage, s32 op, u32 bias, u32 scale, u32 clamp,
     GXData_800BB30C* p;
 
     reg = gx->tevAlphaEnv[stage];
-    reg = __rlwimi(reg, op, 18, 13, 13);
+    reg = __rlwimi(reg, op & 1, 18, 13, 13);
     if (op <= 1) {
         reg = __rlwimi(reg, scale, 20, 10, 11);
         reg = __rlwimi(reg, bias, 16, 14, 15);
@@ -554,14 +554,12 @@ typedef struct GXFogAdjTable_800BCCDC {
 void fn_800BC2F8(u32 id, GXColor_800BC2F8 color) {
     u32 reg0;
     u32 reg1;
-    GXData_800BB30C* p;
 
     reg0 = 0;
     reg0 = (reg0 & ~0xFFU) | color.r;
     reg0 = (reg0 & ~0xFF000U) | (color.a << 12);
     reg0 = (reg0 & 0xFFFFFFU) | ((id * 2 + 0xE0) << 24);
 
-    p = gx;
     reg1 = 0;
     reg1 = (reg1 & ~0xFFU) | color.b;
     reg1 = (reg1 & ~0xFF000U) | (color.g << 12);
@@ -571,7 +569,7 @@ void fn_800BC2F8(u32 id, GXColor_800BC2F8 color) {
     GX_BP_REG(reg1);
     GX_BP_REG(reg1);
     GX_BP_REG(reg1);
-    p->field_002 = 0;
+    gx->field_002 = 0;
 }
 
 void fn_800BC36C(u32 id, GXColorS10_800BC36C color) {
@@ -604,7 +602,6 @@ void fn_800BC36C(u32 id, GXColorS10_800BC36C color) {
 void fn_800BC3E0(u32 id, GXColor_800BC2F8 color) {
     u32 reg0;
     u32 reg1;
-    GXData_800BB30C* p;
 
     reg0 = 0;
     reg0 = (reg0 & ~0xFFU) | color.r;
@@ -612,16 +609,15 @@ void fn_800BC3E0(u32 id, GXColor_800BC2F8 color) {
     reg0 = (reg0 & ~0xF00000U) | 0x800000U;
     reg0 = (reg0 & 0xFFFFFFU) | ((id * 2 + 0xE0) << 24);
 
-    p = gx;
     reg1 = 0;
     reg1 = (reg1 & ~0xFFU) | color.b;
     reg1 = (reg1 & ~0xFF000U) | (color.g << 12);
     reg1 = (reg1 & ~0xF00000U) | 0x800000U;
 
-    GX_BP_REG(reg0);
     reg1 = (reg1 & 0xFFFFFFU) | ((id * 2 + 0xE1) << 24);
+    GX_BP_REG(reg0);
     GX_BP_REG(reg1);
-    p->field_002 = 0;
+    gx->field_002 = 0;
 }
 
 void fn_800BC454(s32 stage, u32 value) {
@@ -988,6 +984,7 @@ void fn_800BD768(f32* projection) {
 
 void fn_800BD7A0(u32 xOrigin, u32 yOrigin, u32 width, u32 height) {
     GXData_800BB30C* p = gx;
+    u32* scissorBR;
     u32 x0;
     u32 y0;
     u32 x1;
@@ -997,10 +994,11 @@ void fn_800BD7A0(u32 xOrigin, u32 yOrigin, u32 width, u32 height) {
     y0 = yOrigin + 0x156;
     x1 = x0 + width - 1;
     y1 = y0 + height - 1;
+    scissorBR = &p->scissorBR;
     p->scissorTL = (p->scissorTL & ~0x7FFU) | y0;
     p->scissorTL = (p->scissorTL & ~0x7FF000U) | (x0 << 12);
-    p->scissorBR = (p->scissorBR & ~0x7FFU) | y1;
-    p->scissorBR = (p->scissorBR & ~0x7FF000U) | (x1 << 12);
+    p->scissorBR = (*scissorBR & ~0x7FFU) | y1;
+    p->scissorBR = (*scissorBR & ~0x7FF000U) | (x1 << 12);
     GX_BP_REG(p->scissorTL);
     GX_BP_REG(p->scissorBR);
     p->field_002 = 0;
@@ -1509,17 +1507,17 @@ void fn_800BD07C(u32 fieldMode, u32 halfAspectRatio) {
 }
 
 void fn_800BD830(u32 arg0, u32 arg1) {
-    GXData_800BB30C* p = gx;
-    u32 value = arg0 + 0x156U;
-    u32 cmd = arg1 + 0x156U;
+    u32 reg = 0;
+    u32 hx;
+    u32 hy;
 
-    value = (value >> 1U) & 0xFFC00FFFU;
-    cmd = ((cmd << 9U) | (cmd >> 23U)) & 0x003FFFFFU;
-    value |= cmd;
-    value &= 0x00FFFFFFU;
-
-    GX_BP_REG(0x59000000U | value);
-    p->field_002 = 0;
+    hx = (arg0 + 0x156U) >> 1;
+    hy = (arg1 + 0x156U) >> 1;
+    reg = (reg & ~0x3FFU) | hx;
+    reg = (reg & ~0xFFC00U) | (hy << 10);
+    reg = (reg & 0xFFFFFFU) | 0x59000000U;
+    GX_BP_REG(reg);
+    gx->field_002 = 0;
 }
 
 void TRKNubMainLoop(void) {

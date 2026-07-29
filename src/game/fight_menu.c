@@ -1951,6 +1951,7 @@ s32 fightMenuFightTrainerAgbHeroSelectIrekaeFightPokemon(u32 r3, u32 r4, u32 r5,
     extern u8 menuIsCheck(u32);
     extern void menuCloseCustom(u32, u32, u32);
     u32 ctx;
+    u32 msg;
     u32 param1;
     u32 param2;
     s32 target;
@@ -1961,7 +1962,6 @@ s32 fightMenuFightTrainerAgbHeroSelectIrekaeFightPokemon(u32 r3, u32 r4, u32 r5,
     u32 status;
     u16 side;
     s32 index;
-    u32 msg;
     u32 entry;
     s32 kind;
 

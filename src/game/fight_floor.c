@@ -221,8 +221,7 @@ u32 fightFloorGetFightTrainerFightOutPokemonIsFightActionAttackWazaOut(void* arg
     struct { void* r4; void* arr; u32 cnt; u32 a; u32 b; } sdata;
     void* ctx1;
     void* ctx2;
-    u32 count;
-    u32 i;
+    u32 count, i;
 
     ctx1 = arg5;
     ctx2 = arg6;
@@ -1232,7 +1231,8 @@ u32 _fightFloorIsIrekaeFightOutPokemonSub__FPvUsPv(void *param_1, u32 r4_unused,
     extern u32 fightOutPokemonCheckFightOut(void*);
     extern u32 fightTrainerIsGcHero(void*);
     void *pkmn;
-    u32 count, i;
+    u32 count;
+    u32 i;
     u8 *outptr;
     u16 tmp;
 

@@ -627,7 +627,7 @@ u16 fightTypeGetFightSideFightOutPokemonMax(u16 index) {
     } else {
         fightoutPokemonNum = type->fightoutPokemonNum;
     }
-    return (u8)trainerNum * (u8)fightoutPokemonNum;
+    return trainerNum * (u8)fightoutPokemonNum;
 }
 
 /* Address: 0x8020E1A4 | Size: 0x18 | Pattern: nullcheck_getter */

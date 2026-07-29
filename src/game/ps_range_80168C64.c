@@ -3038,8 +3038,8 @@ PSGeneratorState* psCreateGeneratorID(s32 linkNo, s32 bankIdx, s32 scriptId) {
  * active alpha-light contribution. Verified against 0x8016E814-0x8016EA78.
  */
 void setupChanReg(PSParticle* pp) {
-    GXColor amb;
     GXColor mat;
+    GXColor amb;
     s32 step;
     HSD_LObj* lobj;
 
@@ -3159,8 +3159,7 @@ void setupTevReg(PSParticle* pp) {
         } else if (lbl_8047B134.r != 0 || lbl_8047B134.g != 0 ||
                    lbl_8047B134.b != 0 || lbl_8047B134.a != 0) {
             lbl_8047B134.r = 0;
-            lbl_8047B134.g = 0;
-            lbl_8047B134.b = 0;
+            lbl_8047B134.g = lbl_8047B134.b = 0;
             lbl_8047B134.a = 0;
             fn_800BC2F8(2, lbl_8047B134);
         }

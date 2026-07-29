@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 2266
+    "total_units": 2268
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 2198,
-    "source_backed_units": 2192,
+    "named_units": 2200,
+    "source_backed_units": 2194,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "993188",
-    "matched_code_percent": 39.805412,
+    "matched_code": "1024808",
+    "matched_code_percent": 41.07269,
     "matched_data": "2136513",
     "matched_data_percent": 97.28669,
-    "matched_functions": 6582,
-    "matched_functions_percent": 76.508194,
-    "fuzzy_match_percent": 73.00083
+    "matched_functions": 6680,
+    "matched_functions_percent": 77.64733,
+    "fuzzy_match_percent": 78.36927
   },
   "unit_topology": [
     {
@@ -6052,13 +6052,39 @@
       "sections": [
         {
           "name": ".text",
-          "size": 708,
+          "size": 476,
           "virtual_address": 2148153976
         }
       ],
-      "total_code": 708,
+      "total_code": 476,
       "total_data": 0,
-      "total_functions": 12
+      "total_functions": 10
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_800A3C54",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 92,
+          "virtual_address": 2148154452
+        }
+      ],
+      "total_code": 92,
+      "total_data": 0,
+      "total_functions": 1
+    },
+    {
+      "name": "main/dolphin/sdk_candidate_800A3CB0",
+      "sections": [
+        {
+          "name": ".text",
+          "size": 140,
+          "virtual_address": 2148154544
+        }
+      ],
+      "total_code": 140,
+      "total_data": 0,
+      "total_functions": 1
     },
     {
       "name": "main/dolphin/sdk_candidate_800A3D3C",

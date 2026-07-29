@@ -405,7 +405,7 @@ u32 fightTrainerAiWazaValueJibaku(void* ctx, u32 param1, u32 param2, u32 param3)
 
     for (i = 0; i < ownCount; i++) {
         if (fn_80236BFC(ctx, own[i], 0x14) == 1) {
-            valueId = 0x99 - (i == 0);
+            valueId = i == 0 ? 0x98 : 0x99;
             handle = fn_80239984(handle, ctx, valueId);
             fn_80239EE8(0xec64, ctx, fightOutPokemonGetPokemonPtr(param1), 0, 0, param2, 0, valueId);
         }
