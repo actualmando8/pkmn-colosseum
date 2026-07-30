@@ -380,8 +380,8 @@ HSD_TExp* MObjMakeTExp(HSD_MObj* mobj, HSD_TObj* tobj_top, HSD_TExp** list)
     HSD_TObj* tobj;
     HSD_TObj* toon = NULL;
     u32 done = 0;
-    u32 diffuse_bits;
-    u32 alpha_bits;
+    s32 diffuse_bits;
+    s32 alpha_bits;
 
     MOBJ_ASSERT(395, list, lbl_8047DC38);
 

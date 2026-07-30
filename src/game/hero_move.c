@@ -3285,7 +3285,9 @@ u32 heroMoveSetNeckMode(s32 idx, s32 state)
     if (idx < 0 || idx >= 2) {
         valid = 0;
     } else {
-        if ((*(u16*)(lbl_80426BD0 + idx * 0x20 + 4) & 1) == 0) {
+        entry = lbl_80426BD0;
+        entry += idx * 0x20;
+        if ((*(u16*)(entry + 4) & 1) == 0) {
             valid = 0;
         } else {
             valid = 1;

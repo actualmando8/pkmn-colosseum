@@ -353,7 +353,11 @@ u32 fn_801D19A4(s32 idx) {
         entry = &lbl_80478E9C[idx];
     }
 
-    current = entry == NULL ? 0xFFFF : *(u16*)((u8*)entry + 2);
+    if (entry == NULL) {
+        current = 0xFFFF;
+    } else {
+        current = *(u16*)((u8*)entry + 2);
+    }
     if (current == 0xFFFF) {
         return 0xFFFF;
     }

@@ -1972,7 +1972,7 @@ u32 fn_8004DDC0(u8* context)
     u8* input;
     u32 soundId;
     s32 limit;
-    s8 selection;
+    s32 selection;
 
     input = fn_80105624();
     if (lbl_8047A520 != 0) {
@@ -1999,14 +1999,14 @@ u32 fn_8004DDC0(u8* context)
         limit = fn_801D1618();
         selection = context[0x95] + 1;
         context[0x95] = selection;
-        if (selection >= limit + 1) {
+        if ((s8)selection >= limit + 1) {
             context[0x95] = limit;
         }
     }
     if ((*(u16*)(input + 4) & 1) != 0) {
         selection = context[0x95] - 1;
         context[0x95] = selection;
-        if (selection < 0) {
+        if ((s8)selection < 0) {
             context[0x95] = 0;
         }
     }
@@ -2030,7 +2030,7 @@ extern s32 fn_801026A4(u32 menuId, ...);
 extern void fn_80102510(u32 menuId);
 
 #pragma peephole off
-u8 fn_8004DFCC(u8 initialSelection)
+s32 fn_8004DFCC(u8 initialSelection)
 {
     u32 selection;
     u32 state;

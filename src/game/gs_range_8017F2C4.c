@@ -297,7 +297,7 @@ s32 fn_8017F928(s32 size, u32 fileHandle, u32 key1, u32 key2)
 
     for (i = 1; i < count; i++) {
         node = &pool[i];
-        if (node->active == 0) {
+        if ((s32)node->active == 0) {
             node->link8 = NULL;
             node->link4 = list[1];
             buf = fn_8017FDB0((size + 0x1f) & ~0x1f);
@@ -748,7 +748,7 @@ void* fn_80180450(void* src, void* dst, u32 size)
     count = lbl_8047B1D8;
     result = NULL;
     for (i = 0; i < count; i++) {
-        if (entry->state == 0) {
+        if ((s32)entry->state == 0) {
             entry->state = 1;
             result = entry;
             break;
@@ -771,7 +771,7 @@ void* fn_80180450(void* src, void* dst, u32 size)
     OSRestoreInterrupts(savedIntr);
 
     result = entry;
-    while (result->state != 0) {
+    while ((s32)result->state != 0) {
         if (result->mode != 1) {
             result->state = 0;
         }
@@ -881,7 +881,7 @@ void* fn_801807A8(void* src, void* dst, u32 size)
     count = lbl_8047B1D8;
     result = NULL;
     for (i = 0; i < count; i++) {
-        if (entry->state == 0) {
+        if ((s32)entry->state == 0) {
             entry->state = 1;
             result = entry;
             break;

@@ -1823,7 +1823,8 @@ u32 fn_8017C8FC(FSYSSlot* slot) {
                 break;
             }
 
-            if ((sub->state == 4 || sub->state == 6) && slot->reloadFlag == 1) {
+            if ((sub->state == 4 || sub->state == 6) &&
+                (s32)slot->reloadFlag == 1) {
                 FSYS_SLOT_CURRENT_SUB(slot) = sub;
                 if (cached == 0) {
                     fn_8017B6B8(slot, entry, i);
@@ -1875,7 +1876,7 @@ u32 fn_8017C8FC(FSYSSlot* slot) {
                 if (FSYS_SLOT_CURRENT_SUB(slot) != NULL) {
                     break;
                 }
-            } else if (sub->state == 4 && slot->reloadFlag == 1) {
+            } else if (sub->state == 4 && (s32)slot->reloadFlag == 1) {
                 if (slot->loadMode == 0) {
                     FSYS_SLOT_CURRENT_SUB(slot) = sub;
                     if (cached == 0) {
@@ -2184,7 +2185,7 @@ void fn_8017D960(FSYSSlot* slot) {
 
     slot->status = FSYS_STATUS_LOADED;
 
-    if (slot->reloadFlag == 1) {
+    if ((s32)slot->reloadFlag == 1) {
         if ((s32)slot->loadMode == 3) {
             for (i = 0; i < slot->numEntries; i++) {
                 entry = FSYSGetEntryByIndex(slot, i);
@@ -2447,7 +2448,7 @@ void fn_8017E1D8(FSYSSlot* slot, u32 fileHandle, u32 callbackA,
     if (gFSYSManager.activeSlot != slot) {
         return;
     }
-    if (slot->reloadFlag == 1) {
+    if ((s32)slot->reloadFlag == 1) {
         if (FSYS_SLOT_FILE0(slot) == 0) {
             FSYS_SLOT_FILE0(slot) = fn_80167F28(slot->filename);
         }

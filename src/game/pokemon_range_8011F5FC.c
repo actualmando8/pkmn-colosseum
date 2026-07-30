@@ -2646,7 +2646,7 @@ void pokemonToMenuWazaStatus(u8* ptr, u8* out) {
     extern u32 pokemonGetStatus();
     u8 i;
     u8 valid;
-    u32 slot2;
+    u16 slot2;
     u16 id;
     u16 resolved;
     u16 extra;

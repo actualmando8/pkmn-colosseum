@@ -2143,7 +2143,7 @@ void fn_801B65F0(ColTExpNode* tev, u32 sel, ColTExpNode* exp, s32 idx)
 /* ========================================================================= */
 
 /* HSD_TExpAlphaOp */
-void fn_801B6CD8(ColTExpNode* texp, u32 op, u32 bias, u32 scale, u8 clamp) {
+void fn_801B6CD8(ColTExpNode* texp, s32 op, u32 bias, u32 scale, u8 clamp) {
     if (texp == NULL) {
         __assert(&lbl_8047DE70, 0x1D3, &lbl_8047DE90);
     }
@@ -2178,7 +2178,7 @@ void fn_801B6DC0(ColTExpNode* texp, u32 input_a, u32 input_b,
 }
 
 /* HSD_TExpColorOp */
-void fn_801B6E74(ColTExpNode* texp, u32 op, u32 bias, u32 scale, u8 clamp) {
+void fn_801B6E74(ColTExpNode* texp, s32 op, u32 bias, u32 scale, u8 clamp) {
     if (texp == NULL) {
         __assert(&lbl_8047DE70, 0x1A3, &lbl_8047DE90);
     }

@@ -510,7 +510,7 @@ u8 fn_801C9910(void)
     return 0;
 }
 
-void fn_801C9B6C(s32 arg0, s32 arg1, u16 arg2, u8 arg3)
+void fn_801C9B6C(s32 arg0, s32 arg1, s16 arg2, u8 arg3)
 {
     s32 floorId;
     s32 resId;
@@ -806,22 +806,22 @@ void fn_801CA4F8(f32 frames)
     }
 }
 
-u16 fn_801CA5C4(u16 arg0, u8 arg1, s32 arg2)
+u16 fn_801CA5C4(u32 arg0, u8 arg1, s32 arg2)
 {
     extern void fn_80112700(void);
     extern void fn_801903B0(u32 flagId);
-    extern void* fightEncountDataBiosGetPtr(u16 index);
+    extern void* fightEncountDataBiosGetPtr(u32 index);
     extern u16 fn_8006A65C(void);
     extern void fn_801CBA90(s32 value);
     extern void floorSetFadeScript(s32 a, s32 b);
     extern u32 fn_8020DAD0(u32 arg0);
     extern u8 fightEncountDataBiosGetZenmetuFlag(void* ptr);
-    extern u16 fn_801EF634(void);
-    extern u32 fightFloorIsGcHeroWin(u32 obj, u32 side);
+    extern u32 fn_801EF634(void);
+    extern u8 fightFloorIsGcHeroWin(u32 obj, u32 side);
     extern int fadeSet();
     extern const f32 lbl_8047E108;
 
-    u32 done = 0;
+    u8 done = 0;
     u32 result;
     u32 old;
     u16 input;

@@ -255,13 +255,13 @@ void fn_802080A8(void* r3, u8 r4, u8 r5, u32 r6, u8 r7)
     extern u32 fightFloorGetStatus();
     extern void fightMenuOpenMsg();
     extern void fightMenuFightOutPokemonRenewStatusMenu();
-    u32 saved_r25 = 0;
+  u32 saved_r25;
   u16 uVar4;
   int iVar1;
   u32 uVar2;
   u16 uVar5;
   u8 cVar6;
-  int iVar3;
+  u32 iVar3;
 
   uVar4 = fightFloorGetStatus(0,0,0x14,0);
   iVar1 = (int)pokemonGetStatus(r3,0,0xee,0);
