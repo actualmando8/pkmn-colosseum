@@ -136,29 +136,34 @@ s32 fn_80034280(void)
 /* fn_800345A4 - 0x800345A4 | size: 0x164 */
 void fn_800345A4(void* unused, u8* sprite) {
     extern u32 lbl_802E61D8[];
-    extern void winSpriteSetDisp(u8*, s32);
+    extern void winSpriteSetDisp(u8*, u8);
     extern u32 fn_8012A5B0(s32, s32, s32);
     u32 value;
-    s32 visible;
     s16 id;
 
     value = fn_8012A5B0(0, 0xE, 0);
     id = *(s16*)(sprite + 6);
-    if (id == 0x7BC || id == 0x7F1) {
-        visible = value < lbl_802E61D8[3];
-    } else if (id == 0x7F0 || id == 0x805) {
-        visible = value >= lbl_802E61D8[2]
-               && value < lbl_802E61D8[3];
-    } else if (id == 0x7EF || id == 0x804) {
-        visible = value >= lbl_802E61D8[1]
-               && value < lbl_802E61D8[2];
-    } else if (id == 0x7EE || id == 0x803) {
-        visible = value >= lbl_802E61D8[0]
-               && value < lbl_802E61D8[1];
-    } else {
-        return;
+    switch (id) {
+    case 0x7BC:
+    case 0x7F1:
+        winSpriteSetDisp(sprite, value < lbl_802E61D8[3]);
+        break;
+    case 0x7F0:
+    case 0x805:
+        winSpriteSetDisp(sprite, value >= lbl_802E61D8[2]
+                              && value < lbl_802E61D8[3]);
+        break;
+    case 0x7EF:
+    case 0x804:
+        winSpriteSetDisp(sprite, value >= lbl_802E61D8[1]
+                              && value < lbl_802E61D8[2]);
+        break;
+    case 0x7EE:
+    case 0x803:
+        winSpriteSetDisp(sprite, value >= lbl_802E61D8[0]
+                              && value < lbl_802E61D8[1]);
+        break;
     }
-    winSpriteSetDisp(sprite, visible);
 }
 
 /* fn_80034708 - 0x80034708 | size: 0xB0 */

@@ -106,7 +106,7 @@ void fn_800EE288(GSpart* part)
 }
 
 typedef struct GSpartRotationSlot {
-    void* callback;
+    s32 callback;
     u32 partIndex;
     void* userData;
 } GSpartRotationSlot;
@@ -126,16 +126,16 @@ static inline GSpartRotationSlot* GSpartFindRotationSlot(GSpart* part)
     }
 
     slot = (GSpartRotationSlot*)(model + 0xE4);
-    if (slot->callback == NULL) {
+    if (slot->callback == 0) {
         return slot;
     }
-    if ((++slot)->callback == NULL) {
+    if ((++slot)->callback == 0) {
         return slot;
     }
-    if ((++slot)->callback == NULL) {
+    if ((++slot)->callback == 0) {
         return slot;
     }
-    if ((++slot)->callback == NULL) {
+    if ((++slot)->callback == 0) {
         return slot;
     }
     GSlogWrite(lbl_80270F44);
@@ -152,7 +152,7 @@ void GSpartRegisterRotation(GSpart* part, void* userData, void* callback)
 
     slot = GSpartFindRotationSlot(part);
     if (slot != NULL) {
-        slot->callback = callback;
+        slot->callback = (s32)callback;
         slot->partIndex = part->index;
         slot->userData = userData;
     }

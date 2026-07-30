@@ -2272,7 +2272,7 @@ void fn_800472CC(PdaSprite* alphaSprite)
             lbl_802E52C8[i].alpha = lbl_8047BC94;
         }
     }
-    for (i = 7; i > (s32)lbl_8047A4EC; i--) {
+    for (i = 7; i > lbl_8047A4EC; i--) {
         lbl_802E52C8[i].alpha -= lbl_8047BCC4;
         if (lbl_802E52C8[i].alpha < lbl_8047BC94) {
             lbl_802E52C8[i].alpha = lbl_8047BC94;
@@ -3287,7 +3287,7 @@ void fn_8003B6D0(u8* ctx) {
     value = *(u32*)base;
     battleId = (u32)(u16)*(u16*)((u8*)lbl_8047A4D4 + value * 4 + 2);
     message = 0;
-    if ((fn_801EEFAC(battleId, 0) & 0xFFFF) == 9) {
+    if ((u32)(u16)fn_801EEFAC(battleId, 0) == 9U) {
         fn_801EE248(battleId);
         value = fn_8011E778();
         if (value != 0) {

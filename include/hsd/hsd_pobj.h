@@ -69,7 +69,7 @@ struct HSD_VtxDescList {
     u32 attr;          /* GXAttr */
     u32 attr_type;     /* GXAttrType */
     u32 comp_cnt;      /* GXCompCnt */
-    u32 comp_type;     /* GXCompType */
+    s32 comp_type;     /* GXCompType */
     u8 frac;
     u16 stride;
     void* vertex;

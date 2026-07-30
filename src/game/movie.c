@@ -757,12 +757,12 @@ extern void fn_8017B370(u32 arg);
 extern void fn_8003686C(void);
 extern void menuClose(u32 sceneId);
 extern s32 fn_800D37CC(void);
-extern u16 __cvt_fp2unsigned(f32 value);
+extern u32 __cvt_fp2unsigned(f32 value);
 extern void fn_800A0FC8(u32 arg);
 extern void fn_800D37D4(u32 a, u32 b, u32 c, u32 d, u32 e, u16 size);
 extern f32 lbl_8047BA4C;
 extern s32 lbl_8047A464;
-extern s32 lbl_804788B8;
+extern u32 lbl_804788B8;
 extern f32 lbl_8047BA50[];
 #if 0
 asm void fn_800366A8(void) {

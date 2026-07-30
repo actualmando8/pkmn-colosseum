@@ -866,7 +866,7 @@ have_item:
 #endif
 
 /* fn_80013DFC - 0x80013DFC | size: 0x184 */
-extern void itemDataBiosGetPtr(u16);
+extern void itemDataBiosGetPtr(u32);
 extern u8   itemDataBiosGetHidenMachineNo(void);
 extern u8   itemDataBiosGetKind(void);
 extern s32  menuPokemonOpenItemGive(u8, u8, s32, s32);
@@ -911,7 +911,7 @@ after:
         *out = 0;
         return 0;
     }
-    itemDataBiosGetPtr(idx);
+    itemDataBiosGetPtr((u16)idx);
     x = (u8)itemDataBiosGetKind();
     menuCloseCustom(0x59, 0, 1);
     lbl_8047A2EC = menuPokemonOpenItemGive((u8)x, (u8)target_n, idx, 0);
@@ -1549,7 +1549,7 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
 s32 fn_80014E50(u8* ctx) {
     u8* state;
     u8* p;
-    s32 slot;
+    s8 slot;
     s32 count;
     s32 new_slot;
     u8* inner;

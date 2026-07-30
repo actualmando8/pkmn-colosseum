@@ -329,20 +329,20 @@ struct HSD_ImageDesc {
 struct HSD_TObj {
     HSD_Obj parent;           /* 0x00 */
     HSD_TObj* next;           /* 0x08 */
-    u32 id;                   /* 0x0C  GXTexMapID (assigned at setup) */
-    u32 src;                  /* 0x10  GXTexGenSrc */
-    u32 mtxid;                /* 0x14  GXTexMtx */
+    s32 id;                   /* 0x0C  GXTexMapID (assigned at setup) */
+    s32 src;                  /* 0x10  GXTexGenSrc */
+    s32 mtxid;                /* 0x14  GXTexMtx */
     Quaternion rotate;        /* 0x18 */
     Vec scale;                /* 0x28 */
     Vec translate;            /* 0x34 */
-    u32 wrap_s;               /* 0x40  GXTexWrapMode */
-    u32 wrap_t;               /* 0x44  GXTexWrapMode */
+    s32 wrap_s;               /* 0x40  GXTexWrapMode */
+    s32 wrap_t;               /* 0x44  GXTexWrapMode */
     u8 repeat_s;              /* 0x48 */
     u8 repeat_t;              /* 0x49 */
     u16 anim_id;              /* 0x4A  id as authored, for TexAnim lookup */
     u32 flags;                /* 0x4C */
     f32 blending;             /* 0x50 */
-    u32 magFilt;              /* 0x54  GXTexFilter */
+    s32 magFilt;              /* 0x54  GXTexFilter */
     HSD_ImageDesc* imagedesc; /* 0x58 */
     HSD_Tlut* tlut;           /* 0x5C */
     HSD_TexLODDesc* lod;      /* 0x60 */
@@ -351,7 +351,7 @@ struct HSD_TObj {
     HSD_Tlut** tluttbl;       /* 0x6C */
     u8 tlut_no;               /* 0x70 */
     Mtx mtx;                  /* 0x74 */
-    u32 coord;                /* 0xA4  GXTexCoordID */
+    s32 coord;                /* 0xA4  GXTexCoordID */
     HSD_TObjTev* tev;         /* 0xA8 */
 };                            /* 0xAC */
 

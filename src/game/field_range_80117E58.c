@@ -3239,16 +3239,16 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     extern u8 fn_80119DD0(u16 idx);
     extern u8 fn_80119E50(u16 idx);
     extern u8 fn_80119E90(u16 idx);
-    extern u16 fn_80119ED0(u16 idx);
-    extern u8 fn_80119F10(u16 idx);
+    extern u32 fn_80119ED0(u16 idx);
+    extern u32 fn_80119F10(u16 idx);
     extern void fn_80119F90(u8* ptr, u16 val);
     extern void fn_80119FA0(u8* ptr, u32 val);
-    extern void fn_80119FB0(u8* ptr, u8 val);
+    extern void fn_80119FB0(u8* ptr, u32 val);
     extern void fn_80119FC0(u8* ptr, u8 val);
-    extern void fn_80119FD0(u8* ptr, u8 val);
+    extern void fn_80119FD0(u8* ptr, s8 val);
     extern void fn_80119FE0(u8* ptr, u16 val);
     extern void fn_80119FF0(u8* ptr, u16 val);
-    extern u8 fn_8011A030(u8* ptr);
+    extern u32 fn_8011A030(u8* ptr);
     extern u8* statusGetStatus(u32 a, void* b, u32 c, u32 d, u32 e);
     u32 idx;
     u8 type;
@@ -3263,9 +3263,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     selector = fn_80119F10(id);
     span = fn_80119ED0(id);
     elem = statusGetStatus(selector, obj, 0, span, 0);
-    if (elem != NULL) {
-        elem += (u16)idx << 4;
-    }
+    elem = elem == NULL ? NULL : elem + ((u16)idx << 4);
     if (elem == NULL) { return; }
 
     type = fn_80119E50(id);

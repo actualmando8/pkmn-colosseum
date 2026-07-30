@@ -29,7 +29,7 @@ void fn_801E0FB4(s32 flags, u32 setupCamera, u32 resetQueue)
     extern u32 lbl_80467CF8[];
     extern u8 lbl_8047B420;
     extern u32 lbl_8047B424;
-    extern u32 lbl_8047B428;
+    extern s32 lbl_8047B428;
     extern u32 lbl_8047B42C;
     extern u32 lbl_8047B430;
     extern u8 lbl_8047B43C;

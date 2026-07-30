@@ -68,11 +68,11 @@ void fn_801D228C(s32 seqHandle) {
     extern void fn_801EE67C(s32);
     extern void fn_800F7434(s32, s32, ...);
     extern void heroMoveAddAutoEvent(s32, u16, s32, s32, s32);
-    u16 handle = (u16)seqHandle;
+    s32 handle = seqHandle;
     u16 count;
     u16 i;
-    s32 object;
-    u8 limit;
+    u32 object;
+    u32 limit;
 
     object = fn_801D1504(handle);
     if (object != -1 && object != 0) {
@@ -90,7 +90,7 @@ void fn_801D228C(s32 seqHandle) {
             object = ((s32 (*)(s32, s32))fn_801D1864)(handle, i);
             fn_801EED30(object, 1);
             limit = (u8)((s32 (*)(s32, s32))fn_801D1734)(handle, i);
-            if (fn_801EE614(object) < limit) {
+            if (fn_801EE614(object) < (u8)limit) {
                 fn_801EE67C(object);
             }
         }

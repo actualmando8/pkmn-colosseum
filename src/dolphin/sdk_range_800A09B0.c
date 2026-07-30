@@ -34,7 +34,7 @@ BOOL fn_800A09B0(BOOL commit, u32 offset)
 
     if (commit) {
         if (offset == 0) {
-            if (2 < (control->sram[0x13] & 3)) {
+            if (2U < (control->sram[0x13] & 3)) {
                 control->sram[0x13] &= ~3;
             }
 

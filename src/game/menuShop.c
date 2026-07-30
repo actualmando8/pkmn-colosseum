@@ -1967,7 +1967,7 @@ s32 fn_8002BCE8(ShopPositionOwner* owner, ShopPositionDrawData* draw) {
 #endif
 
 /* fn_8002BE08 - 0x8002BE08 | size: 0x20c | WALL 86.5%: regalloc + scheduling */
-extern void itemDataBiosGetDoc(void);
+extern u32 itemDataBiosGetDoc(void);
 extern f32 lbl_8047B9B8;
 extern f32 lbl_8047B9BC;
 extern u32 lbl_8047A3E4;
@@ -2031,7 +2031,7 @@ u32 fn_8002BE08(u8* arg0) {
     }
     if ((u16)r3val != 0) {
         itemDataBiosGetPtr((u16)r3val);
-        itemDataBiosGetDoc();
+        r3val = itemDataBiosGetDoc();
     } else {
         u8 b = ctx[0x1c];
         if (b == 0 || b == 1) {

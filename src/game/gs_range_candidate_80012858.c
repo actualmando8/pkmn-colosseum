@@ -100,9 +100,11 @@ s32 fn_80012B94(u8* ctx)
     s32 delay;
     s32 position;
     s32 i;
-    s8 command;
+    u8 command;
 
-    command = (s8)fn_801040D0(ctx, 0);
+    maxHeight = 0;
+    totalWidth = 0;
+    command = (u8)fn_801040D0(ctx, 0);
     values = fn_80103FE4(ctx);
     count = (s8)fn_801040D0(ctx, 2);
     capacity = fn_8005D9E4(*(s32*)(ctx + 4));
@@ -110,8 +112,6 @@ s32 fn_80012B94(u8* ctx)
         count = capacity;
     }
 
-    maxHeight = 0;
-    totalWidth = 0;
     iter = values;
     for (i = 0; i < count; i++, iter += 4) {
         range = fn_800FA444(*(s32*)iter);
@@ -121,19 +121,23 @@ s32 fn_80012B94(u8* ctx)
         totalWidth += (range & 0xFFFF) + 2;
     }
 
-    if (command == 0x7F) {
-        fn_8001EA98(0, 0, maxHeight + 0x20, totalWidth);
-    } else if (command >= 0 && command < 2) {
+    switch (command) {
+    case 0:
+    case 1:
         fn_8001E644(0, 0, maxHeight + 0x20, totalWidth, ctx[0x8B]);
+        break;
+    case 0x7F:
+        fn_8001EA98(0, 0, maxHeight + 0x20, totalWidth);
+        break;
     }
 
     position = 1;
     iter = values;
     for (i = 0; i < count; i++, iter += 4) {
-        if (*(s32*)iter != 0) {
+        if (*(u32*)iter != 0) {
             range = fn_800FA444(*(s32*)iter);
-            fn_800FB680(0x20, position, -1, *(s32*)iter);
             delay = (range & 0xFFFF) + 2;
+            fn_800FB680(0x20, position, -1, *(s32*)iter);
         } else {
             delay = 0x14;
         }
