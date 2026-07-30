@@ -258,7 +258,13 @@ def main():
                 continue
             if d.get("bad"):
                 continue
-            if d.get("rounds", 0) > rnd:
+            # `rounds` predates live manifest injection and only works when
+            # every unit starts in round zero.  Track the actual global round
+            # as new units finish so a late addition runs once, rather than
+            # repeatedly occupying a worker until its counter catches up.
+            if d.get("last_round") == rnd:
+                continue
+            if "last_round" not in d and d.get("rounds", 0) > rnd:
                 continue
             yield fn
 
@@ -313,6 +319,7 @@ def main():
                 won, best = harvest(w, metas.get(fn, {}), args.nearwin_threshold)
                 d = state["done"].setdefault(fn, {})
                 d["rounds"] = d.get("rounds", 0) + 1
+                d["last_round"] = round_no
                 d["best"] = best if best is not None else d.get("best")
                 d["base"] = w.base_score
                 if won:
