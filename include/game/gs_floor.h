@@ -133,8 +133,8 @@ typedef struct GSFloorContext {
 typedef struct GSFloorResource {
     /* 0x00 */ struct GSFloorResource* prev;
     /* 0x04 */ struct GSFloorResource* next;
-    /* 0x08 */ u32     active;
-    /* 0x0C */ u32     status;
+    /* 0x08 */ s32     active;
+    /* 0x0C */ s32     status;
     /* 0x10 */ u32     floorId;
     /* 0x14 */ u8      priority;
     /* 0x15 */ u8      pending;

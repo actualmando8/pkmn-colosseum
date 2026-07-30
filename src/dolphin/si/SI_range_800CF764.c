@@ -62,8 +62,7 @@ static OSAlarm lbl_80400030[4];
 static s64 TypeTime[4];
 static s64 XferTime[4];
 static SITypeAndStatusCallback TypeCallback[4][4];
-/* Keep the retail slot while partial polling functions retain external RDSTHandler. */
-static u8 _rdstHandlerStorage[sizeof(__OSInterruptHandler) * 4];
+static __OSInterruptHandler lbl_80400150[4];
 static BOOL InputBufferValid[4];
 static u32 InputBuffer[4][2];
 static volatile u32 InputBufferVcount[4];
@@ -77,7 +76,6 @@ typedef struct SIControl {
 } SIControl;
 
 extern SIControl Si_80313F8C;
-extern __OSInterruptHandler RDSTHandler[4];
 extern u32 Type_80313FA0[4];
 
 extern const char* __SIVersion;
@@ -230,8 +228,8 @@ void SIInterruptHandler_800CFA60(__OSInterrupt interrupt, OSContext* context) {
         }
 
         for (i = 0; i < 4; i++) {
-            if (RDSTHandler[i] != 0) {
-                (*RDSTHandler[i])(interrupt, context);
+            if (lbl_80400150[i] != 0) {
+                (*lbl_80400150[i])(interrupt, context);
             }
         }
     }
@@ -272,15 +270,15 @@ BOOL SIRegisterPollingHandler(__OSInterruptHandler handler) {
     enabled = OSDisableInterrupts();
 
     for (i = 0; i < 4; i++) {
-        if (RDSTHandler[i] == handler) {
+        if (lbl_80400150[i] == handler) {
             OSRestoreInterrupts(enabled);
             return TRUE;
         }
     }
 
     for (i = 0; i < 4; i++) {
-        if (RDSTHandler[i] == 0) {
-            RDSTHandler[i] = handler;
+        if (lbl_80400150[i] == 0) {
+            lbl_80400150[i] = handler;
             SIEnablePollingInterrupt(TRUE);
             OSRestoreInterrupts(enabled);
             return TRUE;
@@ -298,11 +296,11 @@ BOOL SIUnregisterPollingHandler(__OSInterruptHandler handler) {
     enabled = OSDisableInterrupts();
 
     for (i = 0; i < 4; i++) {
-        if (RDSTHandler[i] == handler) {
-            RDSTHandler[i] = 0;
+        if (lbl_80400150[i] == handler) {
+            lbl_80400150[i] = 0;
 
             for (i = 0; i < 4; i++) {
-                if (RDSTHandler[i] != 0) {
+                if (lbl_80400150[i] != 0) {
                     break;
                 }
             }

@@ -191,9 +191,10 @@ u32 scriptAddItem(u16 itemId, s32 count)
 {
     s32 ret = 0;
     if (count > 0) {
-        ret = heroItemAddItemDataId((u8*)0, itemId, (u16)count, -1);
+        ret = heroItemAddItemDataId((u8*)0, itemId, count & 0xFFFF, -1);
     } else if (count < 0) {
-        ret = heroItemDecItemDataId((u8*)0, itemId, (u16)(-count), -1);
+        count = -count;
+        ret = heroItemDecItemDataId((u8*)0, itemId, count & 0xFFFF, -1);
     }
     return ret;
 }

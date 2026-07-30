@@ -184,7 +184,7 @@ u32 fn_801664F0(const GSvec* position);
 u32 fn_80166578(const GSvec* position, const GSvec* arg1, const GSvec* arg2, const GSvec* arg3, f32 arg4, f32 arg5,
                 f32 arg6, u32 arg7);
 u32 fn_80166670(u32 id, u32 volume, u32 arg2);
-u32 fn_801666BC(u32 id);
+s32 fn_801666BC(u32 id);
 u32 fn_801667D8(u32 id, u32 volume, u32 arg2);
 u32 fn_801668DC(u32 id, u32 volume, u32 arg2);
 void fn_801669E4(u32 id, u32 arg1, u32 arg2);

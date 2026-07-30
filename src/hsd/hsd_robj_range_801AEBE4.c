@@ -284,7 +284,8 @@ void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc)
     for (; robj != NULL && desc != NULL;
          robj = robj->next, desc = desc->next)
     {
-        if ((robj->flags & ROBJ_TYPE_MASK) == REFTYPE_JOBJ) {
+        switch (robj->flags & ROBJ_TYPE_MASK) {
+        case REFTYPE_JOBJ:
             HSD_JObjUnrefThis(robj->u.jobj);
             robj->u.jobj =
                 HSD_IDGetDataFromTable(NULL, (u32) desc->u.joint, NULL);
@@ -292,10 +293,14 @@ void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc)
                 __assert("robj.c", 0x330, "robj->u.jobj");
             }
             RObjJObjRefThis(robj->u.jobj);
-        } else if ((robj->flags & ROBJ_TYPE_MASK) == REFTYPE_EXP) {
+            break;
+        case REFTYPE_EXP: {
             HSD_Rvalue* rvalue = robj->u.exp.rvalue;
             HSD_RvalueList* list = desc->u.exp->rvalue;
 
+            if (list == NULL) {
+                break;
+            }
             while (rvalue != NULL && list->joint != NULL) {
                 HSD_JObjUnrefThis(rvalue->jobj);
                 rvalue->jobj =
@@ -307,6 +312,8 @@ void fn_801AEBE4(HSD_RObj* robj, HSD_RObjDesc* desc)
                 rvalue = rvalue->next;
                 list++;
             }
+            break;
+        }
         }
     }
 }
@@ -346,6 +353,15 @@ void fn_801AEFF0(HSD_RObj* robj, HSD_JObj* jobj)
 
     if (jobj == NULL) {
         __assert("robj.c", 0x29E, "jobj");
+    }
+
+    for (current = robj; current != NULL; current = current->next) {
+        if ((current->flags & ROBJ_TYPE_MASK) == REFTYPE_LIMIT) {
+            break;
+        }
+    }
+    if (current == NULL) {
+        return;
     }
 
     for (current = robj; current != NULL; current = current->next) {
@@ -550,9 +566,12 @@ static inline void RObjAnim(HSD_RObj* robj)
 
 void fn_801B0040(HSD_RObj* robj)
 {
-    if (robj != NULL) {
-        for (; robj != NULL; robj = robj->next) {
-            RObjAnim(robj);
-        }
+    HSD_RObj* current;
+
+    if (robj == NULL) {
+        return;
+    }
+    for (current = robj; current != NULL; current = current->next) {
+        RObjAnim(current);
     }
 }

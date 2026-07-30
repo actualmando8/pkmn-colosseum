@@ -1465,10 +1465,10 @@ void* floorEventGetTresureList(u32 param)
 /* 0x80115D64 | 0xA0 */
 void floorEventSetTresureDisp(u32 rawIndex, u32 display)
 {
-    u32 encoded;
-    u32 found = 0;
-    u32 index;
     u8* entry;
+    u32 index;
+    u32 found = 0;
+    u32 encoded;
 
     for (index = 0; index < *(u32*)lbl_80478EB8; index++) {
         entry = (u8*)lbl_80478EBC + index * 0x1C;

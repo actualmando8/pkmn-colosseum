@@ -268,7 +268,13 @@ u32 fightTrainerEnemyPokemonEraseAry(void* ctx, u16 count, short matchVal)
                             bVar1 = 1;
                         }
                     }
-                    if ((bVar1) && (sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4), matchVal == sVar3)) goto LAB_0020b8ac;
+                    if (bVar1) {
+                        sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                        if (sVar3 != matchVal) {
+                            continue;
+                        }
+                        goto LAB_0020b8ac;
+                    }
                 }
             }
             iVar4 = NULL;
@@ -363,7 +369,13 @@ u32 fightTrainerEnemyPokemonRegistAry(void* ctx, u16 count, u32 matchVal)
                             bVar1 = 1;
                         }
                         }
-                        if ((bVar1) && (sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4), (short)matchVal == sVar3)) goto LAB_0020ba60;
+                        if (bVar1) {
+                            sVar3 = fightTrainerEnemyPokemonBiosGetFightEntryeId(iVar4);
+                            if (sVar3 != (short)matchVal) {
+                                continue;
+                            }
+                            goto LAB_0020ba60;
+                        }
                     }
                 }
                 iVar4 = NULL;

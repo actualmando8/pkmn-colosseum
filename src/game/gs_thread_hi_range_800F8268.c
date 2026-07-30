@@ -303,7 +303,7 @@ void fn_800F8268(void) {
         ax = (s8)r30[0xA];
         if (ax != -1) {
             if (ax >= -1 && ax < 1) {
-            if (*(u32*)(r28 + 0xC) == 3) {
+            if (*(s32*)(r28 + 0xC) == 3) {
                 btnState = fn_800D0F44((u32)r29);
                 if (btnState == 0x00900000) {
                     *(u32*)(r28 + 0x4) = 0;

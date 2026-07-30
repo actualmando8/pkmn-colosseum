@@ -67,7 +67,7 @@ asm void pcboxGetItemCapacity(void) {
 u16 pcboxGetItemCapacity(void* base, u16 effect_id) {
     extern u8 itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
-    extern u16 itemGetStatus(void*, u32, u32, u32);
+    extern s32 itemGetStatus(void*, u32, u32, u32);
     void* cur;
     void* entry;
     s16 idx;
@@ -109,7 +109,7 @@ asm void pcboxAddItem(void) {
 u16 pcboxAddItem(void* base, u16 effect_id, u16 r5) {
     extern void* itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
-    extern u32 itemGetStatus(void*, u32, u32, u32);
+    extern s32 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80140ACC(void*, u16, u16, u16, s16, u16, u32);
     void* status; void* cur; s16 idx; s32 i;
     status = base;
@@ -140,7 +140,7 @@ asm void pcboxDelItem(void) {
 u16 pcboxDelItem(void* base, u16 effect_id, u16 r5) {
     extern void* itemDataBiosGetPtr(u16);
     extern u8 fn_801429E8(void*);
-    extern u32 itemGetStatus(void*, u32, u32, u32);
+    extern s32 itemGetStatus(void*, u32, u32, u32);
     extern u16 fn_80141308(void*, u16, u16, u16, s16, u16, u32, u32);
     void* status; void* cur; s16 idx; s32 i;
     status = base;
@@ -169,10 +169,10 @@ void* pcboxGetItem(void* base, s16 index) {
     if (base == 0) {
         base = (void*)savedataGetStatus(0, 3);
     }
-    if ((s16)index >= 0 && (s16)index < 0xeb) {
-        return (u8*)base + 0x6dec + (s32)(s16)index * 4;
+    if (index < 0 || index >= 0xeb) {
+        return NULL;
     }
-    return 0;
+    return (u8*)base + 0x6dec + (s32)index * 4;
 }
 #endif
 
@@ -549,7 +549,7 @@ void pcboxInit(void* base) {
     u8* cur;
 
     status = base;
-    if (status == 0) {
+    if (base == 0) {
         status = (u8*)savedataGetStatus(0, 3);
     }
     i = 0;

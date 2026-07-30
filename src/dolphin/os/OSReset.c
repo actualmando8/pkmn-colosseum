@@ -304,7 +304,9 @@ void __OSDoHotReset(u32 resetCode) {
 #pragma push
 #pragma peephole off
 void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
+    BOOL rc;
     BOOL padcal;
+    u32 unused[3];
 
     OSDisableScheduler();
     __OSStopAudioSystem();

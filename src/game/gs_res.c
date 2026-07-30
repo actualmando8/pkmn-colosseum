@@ -256,12 +256,21 @@ u32 GSresGetResource(u32 key1, u32 key2) {
     u8* entry;
     u32 i;
 
+    i = lbl_8047AC60;
     entry = (u8*)lbl_8047AC5C;
-    for (i = lbl_8047AC60; i > 0; i--, entry += 0x14) {
-        if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0x8) == key1 && *(u32*)(entry + 0xC) == key2)
-            return *(u32*)(entry + 0x4);
+    for (; i > 0; i--) {
+        if (*(u32*)(entry + 0x4) != 0 && *(u32*)(entry + 0x8) == key1 &&
+            *(u32*)(entry + 0xC) == key2) {
+            goto found;
+        }
+        entry += 0x14;
     }
-    return 0;
+    entry = NULL;
+found:
+    if (entry == NULL) {
+        return 0;
+    }
+    return *(u32*)(entry + 0x4);
 }
 #pragma pop
 #endif
@@ -285,16 +294,32 @@ void GSresRegisterResource(u32 fn, u32 key1, u32 key2, u32 val) {
     arr = (u8*)lbl_8047AC5C;
     i = lbl_8047AC60;
     p = arr;
-    for (; i > 0; i--, p += 0x14) {
-        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 && *(u32*)(p + 0xC) == key2)
-            return;
+    for (; i > 0; i--) {
+        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 &&
+            *(u32*)(p + 0xC) == key2) {
+            goto existing;
+        }
+        p += 0x14;
     }
+    p = NULL;
+existing:
+    if (p != NULL) {
+        return;
+    }
+
     p = arr;
     i = lbl_8047AC60;
-    for (; i > 0; i--, p += 0x14) {
-        if (*(u32*)(p + 0x4) == 0) break;
+    while (i-- != 0) {
+        if (*(u32*)(p + 0x4) == 0) {
+            goto free_slot;
+        }
+        p += 0x14;
     }
-    if (i == 0) return;
+    p = NULL;
+free_slot:
+    if (p == NULL) {
+        return;
+    }
     *(u16*)(p + 0x0) = 0;
     *(u32*)(p + 0x4) = fn;
     *(u32*)(p + 0x8) = key1;
@@ -324,15 +349,27 @@ void* GSresAllocResourceAlign(u32 align, u32 size, u32 key1, u32 key2, u32 val) 
     arr = (u8*)lbl_8047AC5C;
     count = lbl_8047AC60;
     p = arr;
-    for (i = count; i > 0; i--, p += 0x14) {
-        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 && *(u32*)(p + 0xC) == key2)
-            return NULL;
+    for (i = count; i > 0; i--) {
+        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 &&
+            *(u32*)(p + 0xC) == key2) {
+            goto duplicate_align;
+        }
+        p += 0x14;
     }
+    p = NULL;
+duplicate_align:
+    if (p != NULL) return NULL;
+
     slot = arr;
-    for (i = count; i > 0; i--, slot += 0x14) {
-        if (*(u32*)(slot + 0x4) == 0) break;
+    for (i = count; i > 0; i--) {
+        if (*(u32*)(slot + 0x4) == 0) {
+            goto free_align;
+        }
+        slot += 0x14;
     }
-    if (i == 0) return NULL;
+    slot = NULL;
+free_align:
+    if (slot == NULL) return NULL;
     *(u16*)slot = (u16)GSmemAlloc(align, size);
     if (*(u16*)slot == 0) return NULL;
     *(u32*)(slot + 0x4) = (u32)GSmemGetPtr(*(u16*)slot);
@@ -368,15 +405,27 @@ void* GSresAllocResource(u32 size, u32 key1, u32 key2, u32 val) {
     arr = (u8*)lbl_8047AC5C;
     count = lbl_8047AC60;
     p = arr;
-    for (i = count; i > 0; i--, p += 0x14) {
-        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 && *(u32*)(p + 0xC) == key2)
-            return NULL;
+    for (i = count; i > 0; i--) {
+        if (*(u32*)(p + 0x4) != 0 && *(u32*)(p + 0x8) == key1 &&
+            *(u32*)(p + 0xC) == key2) {
+            goto duplicate_raw;
+        }
+        p += 0x14;
     }
+    p = NULL;
+duplicate_raw:
+    if (p != NULL) return NULL;
+
     slot = arr;
-    for (i = count; i > 0; i--, slot += 0x14) {
-        if (*(u32*)(slot + 0x4) == 0) break;
+    for (i = count; i > 0; i--) {
+        if (*(u32*)(slot + 0x4) == 0) {
+            goto free_raw;
+        }
+        slot += 0x14;
     }
-    if (i == 0) return NULL;
+    slot = NULL;
+free_raw:
+    if (slot == NULL) return NULL;
     *(u16*)slot = (u16)GSmemAllocRaw(size);
     if (*(u16*)slot == 0) return NULL;
     *(u32*)(slot + 0x4) = (u32)GSmemGetPtr(*(u16*)slot);

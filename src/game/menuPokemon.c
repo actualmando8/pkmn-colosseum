@@ -2392,7 +2392,7 @@ asm void fn_80019070(void) {
 }
 #else
 #pragma optimization_level 4
-u32 fn_80019070(u16 species) {
+u32 fn_80019070(u32 species) {
     u8* r4;
     u32 r7;
     u32 r6;

@@ -890,7 +890,6 @@ void fn_8008E320(u32 ctx) {
     u32 waitFrames2;
     u32 elapsed3;
     u32 waitFrames3;
-    GSmaterialEntry* material;
     f32 frame;
     u32 handle2;
     u32 h06af0400;
@@ -921,9 +920,9 @@ void fn_8008E320(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry*)GSresGetResource(ctx, 0x0CE61000);
-    fn_80118874(material->texture, 1);
-    material->texture = NULL;
+    handle2 = GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(((GSmaterialEntry*)handle2)->texture, 1);
+    ((GSmaterialEntry*)handle2)->texture = NULL;
 
     frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
@@ -1038,7 +1037,6 @@ void fn_8008E7D4(u32 ctx) {
     u32 waitFrames2;
     u32 elapsed3;
     u32 waitFrames3;
-    GSmaterialEntry* material;
     f32 frame;
     u32 handle2;
     u32 h06af0400;
@@ -1067,9 +1065,9 @@ void fn_8008E7D4(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry*)GSresGetResource(ctx, 0x0CE61000);
-    fn_80118874(material->texture, 1);
-    material->texture = NULL;
+    handle2 = GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(((GSmaterialEntry*)handle2)->texture, 1);
+    ((GSmaterialEntry*)handle2)->texture = NULL;
 
     frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
@@ -1743,11 +1741,10 @@ void fn_8008F524(u32 ctx) {
     extern void GSmodelSetAnimType(u32 handle, u32 val);
     extern void GSmodelStartAnimation(u32 handle);
 
-    u32 elapsed;
     u32 waitFrames;
+    u32 elapsed;
     u32 cameraElapsed;
     u32 cameraWaitFrames;
-    GSmaterialEntry *material;
     f32 frame;
     u32 handle2;
     u32 modelA;
@@ -1777,9 +1774,9 @@ void fn_8008F524(u32 ctx) {
 
     fn_801CB7C4(0x0CE61000);
 
-    material = (GSmaterialEntry *)GSresGetResource(ctx, 0x0CE61000);
-    fn_80118874(material->texture, 1);
-    material->texture = NULL;
+    handle2 = GSresGetResource(ctx, 0x0CE61000);
+    fn_80118874(((GSmaterialEntry *)handle2)->texture, 1);
+    ((GSmaterialEntry *)handle2)->texture = NULL;
 
     frame = 0.0f;
     handle2 = GSresGetResource(ctx, 0x0CE61004);
@@ -1893,6 +1890,7 @@ void fn_8008F91C(u32 ctx) {
     u32 modelB;
     u32 animA;
     u32 animB;
+    u32 shadowB;
 
     lbl_8047A690 = GSresGetResource(ctx, 0x0CE61602);
     lbl_8047A694 = GSresGetResource(ctx, 0x0CE61002);
@@ -1935,10 +1933,10 @@ void fn_8008F91C(u32 ctx) {
     GSmodelSetShadowLight(animA, lbl_8047A690);
     GSmodelSetShadowSurface(animA, 1, &lbl_8047A694);
 
-    animA = GSresGetResource(ctx, modelB);
-    GSmodelSetShadowFlags(animA, 2);
-    GSmodelSetShadowLight(animA, lbl_8047A690);
-    GSmodelSetShadowSurface(animA, 1, &lbl_8047A694);
+    shadowB = GSresGetResource(ctx, modelB);
+    GSmodelSetShadowFlags(shadowB, 2);
+    GSmodelSetShadowLight(shadowB, lbl_8047A690);
+    GSmodelSetShadowSurface(shadowB, 1, &lbl_8047A694);
 
     cameraPlayAnime(ctx, 0x0CF61800, 0, 0);
     cameraWaitFrames = 1;

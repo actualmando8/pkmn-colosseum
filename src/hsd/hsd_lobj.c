@@ -300,10 +300,11 @@ HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc)
     nextp = &first;
     while (ldesc != NULL) {
         HSD_ClassInfo* info;
-        HSD_LObj* lobj;
 
         if (ldesc->class_name == NULL ||
             (info = fn_80193748(ldesc->class_name)) == NULL) {
+            HSD_LObj* lobj;
+
             if (lbl_8047B2B0 != NULL) {
                 info = lbl_8047B2B0;
             } else {
@@ -313,16 +314,16 @@ HSD_LObj* HSD_LObjLoadDesc(HSD_LightDesc* ldesc)
             if (lobj == NULL) {
                 __assert(&lbl_8047DBB8, 0x5D5, &lbl_8047DBC0);
             }
+            *nextp = lobj;
         } else {
-            lobj = (HSD_LObj*) fn_80193828(info);
-            if (lobj == NULL) {
+            *nextp = (HSD_LObj*) fn_80193828(info);
+            if (*nextp == NULL) {
                 __assert(&lbl_8047DBB8, 0x67B, &lbl_8047DBC4);
             }
         }
 
-        *nextp = lobj;
-        HSD_LOBJ_METHOD(lobj)->load(lobj, ldesc);
-        nextp = &lobj->next;
+        HSD_LOBJ_METHOD(*nextp)->load(*nextp, ldesc);
+        nextp = &(*nextp)->next;
         ldesc = ldesc->next;
     }
     *nextp = NULL;

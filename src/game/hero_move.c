@@ -3274,8 +3274,8 @@ asm void heroMoveSetNeckMode(void) {
 u32 heroMoveSetNeckMode(s32 idx, s32 state)
 {
     u32 values[2];
-    u32 value;
     u8* entry;
+    u32 value;
     u32 valid;
 
     if (state < 0 || state >= 2) {
@@ -3301,8 +3301,9 @@ u32 heroMoveSetNeckMode(s32 idx, s32 state)
         value = values[idx];
     }
 
-    entry = lbl_80426BD0 + idx * 0x20;
-    switch (*(s32*)(entry + 0xC)) {
+    entry = lbl_80426BD0;
+    entry += idx * 0x20;
+    switch (*(s32*)(entry += 0xC)) {
     case 1:
         fn_80188AF4(0, value);
         break;
@@ -3316,7 +3317,7 @@ u32 heroMoveSetNeckMode(s32 idx, s32 state)
     default:
         break;
     }
-    *(u32*)(entry + 0xC) = state;
+    *(u32*)entry = state;
     return 1;
 }
 #endif

@@ -164,9 +164,11 @@ void fn_801AE50C(HSD_RObj* robj)
         HSD_Rvalue* rvalue_next;
 
         next = robj->next;
-        if ((robj->flags & ROBJ_TYPE_MASK) == REFTYPE_JOBJ) {
+        switch (robj->flags & ROBJ_TYPE_MASK) {
+        case REFTYPE_JOBJ:
             HSD_JObjUnrefThis(robj->u.jobj);
-        } else if ((robj->flags & ROBJ_TYPE_MASK) == REFTYPE_EXP) {
+            break;
+        case REFTYPE_EXP:
             for (rvalue = robj->u.exp.rvalue; rvalue != NULL;
                  rvalue = rvalue_next)
             {
@@ -174,6 +176,7 @@ void fn_801AE50C(HSD_RObj* robj)
                 HSD_JObjUnrefThis(rvalue->jobj);
                 HSD_ObjFree(lbl_80465688, rvalue);
             }
+            break;
         }
         HSD_AObjRemove(robj->aobj);
         HSD_ObjFree(lbl_804656B4, robj);
@@ -243,46 +246,45 @@ HSD_RObj* HSD_RObjLoadDesc(HSD_RObjDesc* desc)
 {
     HSD_RObj* robj;
 
-    if (desc == NULL) {
-        return NULL;
-    }
+    if (desc != NULL) {
+        robj = fn_801AE4B0();
+        robj->next = HSD_RObjLoadDesc(desc->next);
+        robj->flags = desc->flags;
 
-    robj = fn_801AE4B0();
-    robj->next = HSD_RObjLoadDesc(desc->next);
-    robj->flags = desc->flags;
-
-    switch (robj->flags & ROBJ_TYPE_MASK) {
-    case REFTYPE_JOBJ:
-        break;
-    case REFTYPE_LIMIT:
-        switch (robj->flags & 0x0FFFFFFF) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-            robj->u.limit = 0.017453292f * desc->u.limit;
+        switch (robj->flags & ROBJ_TYPE_MASK) {
+        case REFTYPE_JOBJ:
+            break;
+        case REFTYPE_LIMIT:
+            switch (robj->flags & 0x0FFFFFFF) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                robj->u.limit = 0.017453292f * desc->u.limit;
+                break;
+            default:
+                robj->u.limit = desc->u.limit;
+                break;
+            }
+            break;
+        case REFTYPE_EXP:
+            RObjExpLoadDesc(&robj->u.exp, desc->u.exp);
+            break;
+        case REFTYPE_BYTECODE:
+            RObjByteCodeExpLoadDesc(&robj->u.exp, desc->u.bcexp);
+            robj->flags &= ~ROBJ_TYPE_MASK;
+            break;
+        case REFTYPE_IKHINT:
+            robj->u.ik_hint.bone_length = desc->u.ik_hint->bone_length;
+            robj->u.ik_hint.rotate_x = desc->u.ik_hint->rotate_x;
             break;
         default:
-            robj->u.limit = desc->u.limit;
+            HSD_Panic("robj.c", 0x37D, "unexpected type of robj.\n");
             break;
         }
-        break;
-    case REFTYPE_EXP:
-        RObjExpLoadDesc(&robj->u.exp, desc->u.exp);
-        break;
-    case REFTYPE_BYTECODE:
-        RObjByteCodeExpLoadDesc(&robj->u.exp, desc->u.bcexp);
-        robj->flags &= ~ROBJ_TYPE_MASK;
-        break;
-    case REFTYPE_IKHINT:
-        robj->u.ik_hint.bone_length = desc->u.ik_hint->bone_length;
-        robj->u.ik_hint.rotate_x = desc->u.ik_hint->rotate_x;
-        break;
-    default:
-        HSD_Panic("robj.c", 0x37D, "unexpected type of robj.\n");
-        break;
+        return robj;
     }
-    return robj;
+    return NULL;
 }

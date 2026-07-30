@@ -102,11 +102,14 @@ extern GSFloorResource* lbl_8047ACCC;
                                                                                 \
         resource = lbl_8047ACB0 + (startIndex);                                 \
         for (i = (poolCount); i > 0; i--, resource++) {                         \
-            if (resource->active == 0) {                                        \
-                break;                                                          \
+            if (resource->active != 0) {                                        \
+                continue;                                                       \
             }                                                                   \
+            goto free_resource;                                                 \
         }                                                                       \
-        if (i == 0) {                                                           \
+        resource = NULL;                                                        \
+    free_resource:                                                              \
+        if (resource == NULL) {                                                 \
             return;                                                             \
         }                                                                       \
         resource->prev = NULL;                                                  \

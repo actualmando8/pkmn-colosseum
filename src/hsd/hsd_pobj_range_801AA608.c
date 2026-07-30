@@ -215,7 +215,10 @@ extern const f32 lbl_8047DCC0;
 extern char lbl_8047DCC4;
 extern char lbl_8047DCCC;
 extern char lbl_8047DCD8;
+extern char lbl_8047DCE0;
+extern char lbl_8047DCE4;
 extern char lbl_80274F04;
+extern u32 lbl_80465678[];
 extern void fn_801B2878(u32 mode);
 extern void fn_800B84E0(u32 attr, void* data, u8 stride);
 extern void fn_800B7D3C(void);
@@ -254,7 +257,9 @@ static inline void PObjFreeEnvelopeList(HSD_SList* list)
         while (envelope != NULL) {
             HSD_Envelope* next = envelope->next;
             HSD_JObjUnrefThis(envelope->jobj);
-            fn_80193AF0(envelope, sizeof(HSD_Envelope));
+            if (envelope != NULL) {
+                fn_80193AF0(envelope, sizeof(HSD_Envelope));
+            }
             envelope = next;
         }
         list = fn_801A3E64(list);
@@ -269,7 +274,9 @@ static inline void PObjFreeShapeSet(HSD_ShapeSet* shapeSet)
     if (shapeSet->flags & 2) {
         fn_801A6960(shapeSet->blend.bp);
     }
-    fn_80193AF0(shapeSet, sizeof(HSD_ShapeSet));
+    if (shapeSet != NULL) {
+        fn_80193AF0(shapeSet, sizeof(HSD_ShapeSet));
+    }
 }
 
 void PObjRelease(HSD_Class* object)
@@ -442,23 +449,33 @@ static inline void HSD_MtxInverseTranspose(Mtx src, Mtx dst)
     }
 }
 
+static inline void PObjGetMtxMark(s32 index, void** obj, u32* mark)
+{
+    *obj = (void*) lbl_80465678[2 * index];
+    *mark = lbl_80465678[2 * index + 1];
+}
+
+static inline void PObjSetMtxMark(s32 index, void* obj, s32 mark)
+{
+    lbl_80465678[2 * index] = (u32) obj;
+    lbl_80465678[2 * index + 1] = mark;
+}
+
 static inline PObjSetupFlag GetSetupFlags(HSD_JObj* jobj, u32 rendermode)
 {
     PObjSetupFlag flags = 0;
 
-    if (!(rendermode & 0x04000000)) {
-        if (jobj->flags & JOBJ_LIGHTING) {
-            flags |= SETUP_NORMAL;
-        }
-        if (_HSD_TObjGetCurrentByType(NULL, 1) != NULL) {
-            flags |= SETUP_NORMAL | SETUP_REFLECTION;
-        }
-        if (_HSD_TObjGetCurrentByType(NULL, 5) != NULL) {
-            flags |= SETUP_NORMAL | SETUP_HIGHLIGHT;
-        }
-        if (_HSD_TObjGetCurrentByType(NULL, 2) != NULL) {
-            flags |= SETUP_NORMAL | SETUP_HIGHLIGHT;
-        }
+    if (jobj->flags & JOBJ_LIGHTING) {
+        flags |= SETUP_NORMAL;
+    }
+    if (_HSD_TObjGetCurrentByType(NULL, 1) != NULL) {
+        flags |= SETUP_NORMAL | SETUP_REFLECTION;
+    }
+    if (_HSD_TObjGetCurrentByType(NULL, 5) != NULL) {
+        flags |= SETUP_NORMAL | SETUP_REFLECTION;
+    }
+    if (_HSD_TObjGetCurrentByType(NULL, 2) != NULL) {
+        flags |= SETUP_NORMAL | SETUP_HIGHLIGHT;
     }
     return flags;
 }
@@ -472,11 +489,11 @@ static inline void SetupRigidModelMtx(HSD_PObj* pobj, Mtx vmtx, Mtx pmtx,
     void* marked_obj;
     u32 mark;
 
-    HSD_PObjGetMtxMark(0, (u32*) &marked_obj, &mark);
+    PObjGetMtxMark(0, &marked_obj, &mark);
     if (marked_obj == jobj && mark == HSD_MTX_RIGID) {
         return;
     }
-    fn_801AB5F8(0, jobj, HSD_MTX_RIGID);
+    PObjSetMtxMark(0, jobj, HSD_MTX_RIGID);
 
     fn_800BD554(0);
     GXLoadPosMtxImm(pmtx, 0);
@@ -526,11 +543,11 @@ void SetupSharedVtxModelMtx(HSD_PObj* pobj, Mtx vmtx, Mtx pmtx,
     void* marked_obj;
     u32 mark;
 
-    HSD_PObjGetMtxMark(0, (u32*) &marked_obj, &mark);
+    PObjGetMtxMark(0, &marked_obj, &mark);
     if (marked_obj != jobj && mark != HSD_MTX_RIGID) {
         flags |= 1;
     }
-    HSD_PObjGetMtxMark(1, (u32*) &marked_obj, &mark);
+    PObjGetMtxMark(1, &marked_obj, &mark);
     if (marked_obj != pobj->u.jobj && mark != HSD_MTX_RIGID) {
         flags |= 2;
     }
@@ -849,6 +866,10 @@ static inline void HSD_JObjRefThis(HSD_JObj* jobj)
 static inline void resolveEnvelopeRefs(HSD_SList* list,
                                        HSD_EnvelopeDesc** desc_list)
 {
+    if (list == NULL || desc_list == NULL) {
+        return;
+    }
+
     for (; list != NULL && *desc_list != NULL;
          list = list->next, desc_list++)
     {
@@ -1160,8 +1181,6 @@ void HSD_PObjGetMtxMark(s32 index, u32* first, u32* second)
     extern char lbl_8047DCB8;
     extern char lbl_8047DCE0;
     extern char lbl_8047DCE4;
-    extern u32 lbl_80465678[];
-
     if (first == NULL) {
         __assert(&lbl_8047DCB8, 0x663, &lbl_8047DCE0);
     }
@@ -1184,11 +1203,6 @@ void HSD_PObjGetMtxMark(s32 index, u32* first, u32* second)
 #pragma optimization_level 1
 void fn_801AB5F8(s32 index, void* ptr, s32 value)
 {
-    typedef struct HSD_MtxMark {
-        void* obj;
-        s32 mark;
-    } HSD_MtxMark;
-    extern HSD_MtxMark lbl_80465678[];
     s32 i = index;
 
     if (i >= 2) {
@@ -1202,8 +1216,8 @@ void fn_801AB5F8(s32 index, void* ptr, s32 value)
     }
 
 store:
-    lbl_80465678[i].obj = ptr;
-    lbl_80465678[i].mark = value;
+    lbl_80465678[2 * i] = (u32) ptr;
+    lbl_80465678[2 * i + 1] = value;
 }
 #pragma pop
 
@@ -1212,16 +1226,11 @@ store:
 #pragma optimization_level 1
 void fn_801AB63C(u32 first, u32 second)
 {
-    typedef struct HSD_MtxMark {
-        u32 obj;
-        u32 mark;
-    } HSD_MtxMark;
-    extern HSD_MtxMark lbl_80465678[];
     s32 i;
 
     for (i = 0; i < 2; i++) {
-        lbl_80465678[i].obj = first;
-        lbl_80465678[i].mark = second;
+        lbl_80465678[2 * i] = first;
+        lbl_80465678[2 * i + 1] = second;
     }
 }
 #pragma pop

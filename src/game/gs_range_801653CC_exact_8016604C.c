@@ -223,7 +223,7 @@ u32 fn_80166670(u32 id, u32 volume, u32 arg2)
     return fn_8016737C(entry, volume, arg2);
 }
 
-u32 fn_801666BC(u32 id)
+s32 fn_801666BC(u32 id)
 {
   u32 offset = id * (sizeof(GSsndEntry));
   u8 *entry = ((u8 *) lbl_80478FAC) + offset;
