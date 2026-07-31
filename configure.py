@@ -1504,12 +1504,13 @@ config.libs = [
                     (CodeCandidate, "musyx/musyx_candidate_80161134.c"),
                     (Matching, "musyx/musyx_input_getters_exact_801615D4.c"),
                     (Matching, "musyx/musyx_input_aux_exact_80161934.c"),
-                    (CodeCandidate, "musyx/musyx_candidate_80161D20.c"),
+                    (Matching, "musyx/runtime/snd_midictrl_exact_80161D20.c"),
+                    (Matching, "musyx/runtime/snd_service_exact_80162070.c"),
                 ]
             ],
             Object(
                 Matching,
-                "musyx/musyx_hw_exact_80162858.c",
+                "musyx/musyx_hw_exact_8016221C.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
@@ -11127,11 +11128,6 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                Matching,
-                "game/data/data_80369CB0.c",
-                progress_category="game",
-            ),
-            Object(
                 DataCandidate,
                 "game/data/data_8036C864.c",
                 progress_category="game",
@@ -11414,11 +11410,6 @@ config.libs = [
             Object(
                 Matching,
                 "game/data/data_80368EC8_suffix.c",
-                progress_category="game",
-            ),
-            Object(
-                DataCandidate,
-                "game/data/data_80369CD4.c",
                 progress_category="game",
             ),
             Object(
