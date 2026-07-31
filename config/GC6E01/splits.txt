@@ -327,10 +327,7 @@ game/gs_title_exact_8002058C.c:
 	.text       start:0x8002058C end:0x800205B8
 
 game/gs_title_exact_800205B8.c:
-	.text       start:0x800205B8 end:0x800205C0
-
-game/gs_title_exact_800205C0.c:
-	.text       start:0x800205C0 end:0x800205C8
+	.text       start:0x800205B8 end:0x800205C8
 
 game/gs_title_candidate_800205C8.c:
 	.text       start:0x800205C8 end:0x8002060C
