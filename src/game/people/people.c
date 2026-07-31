@@ -80,6 +80,7 @@ void fn_8018FC98(PeopleEntry* entry, void* pos);
 void* fn_8018FCBC(PeopleEntry* entry);
 void fn_8018FC08(PeopleEntry* entry, void* vec);
 void fn_80184A90(PeopleEntry* entry);
+void fn_801845E4(u32 groupId, u32 index, s32 nodeA, s32 nodeB, s32 nodeC);
 void fn_80184D80(PeopleEntry* entry);
 void fn_8018524C(PeopleEntry* entry, u8 loopPath);
 void fn_801858C4(PeopleEntry* entry);
@@ -124,6 +125,8 @@ extern void GSmodelSetAnimRate(void*, f32);
 extern void GSmodelSetAnimFrame(void*, f32);
 extern void GSmodelSetAnimType(void*, s32);
 extern void GSmodelSetAnimIndex(void*, s32);
+extern u8 GSmodelIsBlending(void*);
+extern void GSmodelAttachToGSpart(void*, void*, s32, s32, s32);
 extern void GScolsys2HumanEnable(void);
 extern void fn_800EE288(void*);
 extern s32 fn_80110084(s32*, const void*);
@@ -1011,11 +1014,11 @@ s32 fn_80181478(u32 groupId, u32 index, u8 doSetup) { /* TODO: match -- 984 byte
 #endif
 
 /* 0x80181EB0 | 0x308 */
-extern void fn_80113F48(void);
-extern void fn_801CBA0C(void);
-extern void fn_800E3CC8(void);
-extern void GSmodelClearShadowFlags(void);
-extern void fn_801CB834(void);
+extern u32 fn_80113F48(void);
+extern u32 fn_801CBA0C(u32);
+extern void fn_800E3CC8(void*, u8);
+extern void GSmodelClearShadowFlags(void*, u32);
+extern void fn_801CB834(u32, u32, u32, u32);
 extern void fn_80166A28(u32);
 extern u16 fn_800F7318(u32, ...);
 #if 0
@@ -1023,7 +1026,47 @@ asm void fn_80181EB0(void) {
 #include "src/game/people/people_fn_80181EB0.inc"
 }
 #else
-void fn_80181EB0(void) { /* TODO: match -- 776 bytes at 0x80181EB0 */ }
+void fn_80181EB0(u32 groupId, u32 index) {
+    PeopleEntry* entry;
+    void* model;
+    u32 modelGroup;
+    u32 modelIndex;
+    s8 attachmentIndex;
+
+    attachmentIndex = 0;
+    modelGroup = fn_80113F48();
+    modelIndex = fn_801CBA0C(0x0F850400);
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry != NULL) {
+        PeopleInfoBiosEntry* info = peopleInfoBiosGetPtr(entry->scriptRef);
+        if (info != NULL) {
+            attachmentIndex = fn_8018F698(info);
+        }
+    }
+
+    if (attachmentIndex >= 0) {
+        fn_801845E4(modelGroup, modelIndex, groupId, index,
+                    attachmentIndex);
+    } else {
+        fn_801845E4(modelGroup, modelIndex, groupId, index, 0);
+    }
+
+    model = GSresGetResource(modelGroup, modelIndex);
+    if (model != NULL) {
+        fn_800E3CC8(model, 1);
+        GSmodelClearShadowFlags(model, 1);
+    }
+
+    fn_801CB834(modelIndex, 0, 0, 0);
+    fn_80166A28(0x47);
+
+    entry = peopleFindBySelf(peopleFindSelf(modelGroup, modelIndex));
+    if (entry != NULL) {
+        entry->flagId = fn_800F7318(0xF, 0x0596000E, 0x1000, 1, 0, 4,
+                                    modelGroup, modelIndex, 0, 0);
+    }
+}
 #endif
 
 /* 0x801821B8 | 0xE60 */
@@ -1344,14 +1387,14 @@ void fn_80184948(u32 groupId, u32 index, f32 speed) {
 /* 0x80184A90 | 0x2F0 */
 extern f32 lbl_8047D7A0;
 extern f64 lbl_8047D7F0;
-extern u32 lbl_8047D7F8;
+extern f32 lbl_8047D7F8;
 extern f64 lbl_8047D7A8;
-extern u32 lbl_8047D7FC;
+extern f32 lbl_8047D7FC;
 extern f32 lbl_8047D7C0;
-extern u32 lbl_8047D804;
+extern f32 lbl_8047D804;
 extern f32 lbl_8047D800;
-extern u32 lbl_8047D808;
-extern u32 lbl_8047D810;
+extern f64 lbl_8047D808;
+extern f32 lbl_8047D810;
 extern f32 lbl_8047D814;
 extern u32 lbl_8047D7D0;
 #if 0
@@ -1359,7 +1402,107 @@ asm void fn_80184A90(void) {
 #include "src/game/people/people_fn_80184A90.inc"
 }
 #else
-void fn_80184A90(PeopleEntry* entry) { /* TODO: match -- 752 bytes at 0x80184A90 */ }
+void fn_80184A90(PeopleEntry* entry) {
+    GSvec rotation;
+    f32 current;
+    f32 target;
+    f32 difference;
+    f32 step;
+    f32 tickCount;
+    u8 active;
+    u8 directTurn;
+    u32 ticks;
+
+    active = entry->pad22;
+    if (active == 0) {
+        return;
+    }
+
+    fn_8018FC2C(entry, &rotation);
+    directTurn = 1;
+    if (peopleTestFlags(entry, 0x40000000)) {
+        directTurn = 0;
+        if (peopleTestFlags(entry, 8)) {
+            directTurn = 1;
+        }
+    }
+
+    if (directTurn) {
+        current = rotation.y;
+        while (current < lbl_8047D7A0) {
+            current = (f32)(current + lbl_8047D7F0);
+        }
+        while (current >= (f32)lbl_8047D7F0) {
+            current = (f32)(current - lbl_8047D7F0);
+        }
+        rotation.y = current;
+
+        target = entry->field_40;
+        while (target < lbl_8047D7A0) {
+            target = (f32)(target + lbl_8047D7F0);
+        }
+        while (target >= (f32)lbl_8047D7F0) {
+            target = (f32)(target - lbl_8047D7F0);
+        }
+
+        step = lbl_8047D7F8 * entry->field_44;
+        ticks = fn_800D3088();
+        while (ticks-- != 0) {
+            difference = target - rotation.y;
+            if ((difference < 0 ? -difference : difference) >=
+                (f32)lbl_8047D7A8) {
+                if (difference < lbl_8047D7A0) {
+                    difference =
+                        (f32)(lbl_8047D7F0 + difference);
+                } else {
+                    difference =
+                        (f32)(difference - lbl_8047D7F0);
+                }
+            }
+            if ((difference < 0 ? -difference : difference) <= step) {
+                rotation.y = target;
+                active = 0;
+                break;
+            }
+            if (difference > lbl_8047D7A0) {
+                rotation.y += step;
+            } else {
+                rotation.y -= step;
+            }
+        }
+    } else {
+        current = rotation.y;
+        target = entry->field_40;
+        if (current - target > lbl_8047D7FC) {
+            rotation.y = current - lbl_8047D7C0;
+        } else if (target - current > lbl_8047D7FC) {
+            rotation.y = current + lbl_8047D7C0;
+        }
+
+        difference = target - rotation.y;
+        step = difference /
+               (lbl_8047D800 * (lbl_8047D804 - entry->field_44));
+        if ((step < 0 ? -step : step) <= (f32)lbl_8047D808) {
+            step = step < lbl_8047D7A0 ?
+                       lbl_8047D810 : lbl_8047D814;
+        }
+
+        tickCount = (f32)(u32)fn_800D3088();
+        rotation.y += step * tickCount;
+        if (step < lbl_8047D7A0) {
+            if (rotation.y <= target) {
+                rotation.y = target;
+                active = 0;
+            }
+        } else if (rotation.y >= target) {
+            rotation.y = target;
+            active = 0;
+        }
+    }
+
+    fn_8018FC08(entry, &rotation);
+    entry->pad22 = active;
+}
 #endif
 
 /* 0x80184D80 | 0x4CC */
@@ -1823,7 +1966,41 @@ asm void fn_80187A60(void) {
 #include "src/game/people/people_fn_80187A60.inc"
 }
 #else
-void fn_80187A60(void) { /* TODO: match -- 744 bytes at 0x80187A60 */ }
+void fn_80187A60(u32 groupId, u32 index, u32 targetGroupId,
+                 u32 targetIndex, f32 turnSpeed) {
+    PeopleEntry* entry;
+    void* targetModel;
+    GSvec targetPosition;
+    GSvec direction;
+    GSvec rotation;
+    f32 angle;
+    f32 fullTurn;
+    s32 revolutions;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return;
+    }
+
+    targetModel = GSresGetResource(targetGroupId, targetIndex);
+    if (targetModel == NULL) {
+        return;
+    }
+
+    GSvecCopy(&targetPosition, GSmodelGetPositionPtr(targetModel));
+    fn_800E0168(&direction, &targetPosition, fn_8018FCBC(entry));
+    angle = (f32)atan2(direction.x, direction.z);
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry != NULL) {
+        fn_8018FC2C(entry, &rotation);
+        fullTurn = lbl_8047D7C0;
+        revolutions = (s32)(rotation.y / fullTurn);
+        entry->pad22 = 1;
+        entry->field_40 = angle + fullTurn * revolutions;
+        entry->field_44 = turnSpeed;
+    }
+}
 #endif
 
 /* 0x80188984 | 0x170 -- find a people entry by (groupId, index) and busy-wait
@@ -2087,7 +2264,101 @@ asm void peopleBiosPopData(void) {
 #include "src/game/people/people_fn_8018F87C.inc"
 }
 #else
-void peopleBiosPopData(void) { /* TODO */ }
+void peopleBiosPopData(u8* src, u32 size) {
+    extern void fn_8018E1C4(void*, u32, u32, u32);
+    extern void GSmodelSetVisibility(void*, u8);
+    extern void GScolsys2HumanEnable(s32, u8);
+    extern void fn_8018F08C(void*, u32);
+    extern void GSmodelPopState(void*, void*);
+    extern void fn_801848D0(void*, s32, s32, s32);
+    extern void GSvecCopy(void*, void*);
+    extern void GSmodelSetPosition(void*, void*);
+    extern void GSmodelSetRotation(void*, void*);
+    extern void fn_80188AF4(u32, u32);
+    extern void fn_80188FA0(u32, u32, u32, u32);
+    extern void fn_80188CA0(u32, u32, s32, s32, s32);
+    extern void fn_801812C4(void*);
+    extern f32 lbl_8047D8B0;
+    u8* restored[64];
+    u8* saved;
+    u8* entry;
+    u8* model;
+    u32 count;
+    u32 i;
+    u32 j;
+
+    memset(gPeopleArray, 0, gPeopleMaxCount * PEOPLE_ENTRY_SIZE);
+    count = size / PEOPLE_SPAWN_DATA_SIZE;
+    if (count * PEOPLE_SPAWN_DATA_SIZE != size || count > 64) {
+        return;
+    }
+
+    saved = src;
+    for (i = 0; i < count; i++, saved += PEOPLE_SPAWN_DATA_SIZE) {
+        entry = NULL;
+        for (j = 0; j < (u32)gPeopleMaxCount; j++) {
+            u8* candidate = (u8*)gPeopleArray + j * PEOPLE_ENTRY_SIZE;
+            if (candidate[0] == 0) {
+                memset(candidate, 0, PEOPLE_ENTRY_SIZE);
+                candidate[0] = 1;
+                *(void**)(candidate + 4) = candidate;
+                *(s32*)(candidate + 0x50) = -1;
+                *(f32*)(candidate + 0x58) = lbl_8047D8B0;
+                entry = candidate;
+                break;
+            }
+        }
+        fn_8018E1C4(entry, *(u32*)(saved + 8), *(u32*)(saved + 0x0C),
+                    *(u32*)(saved + 0x10));
+        memcpy(entry + 0x20, saved, 0xBC);
+        restored[i] = entry;
+    }
+
+    saved = src;
+    for (i = 0; i < count; i++, saved += PEOPLE_SPAWN_DATA_SIZE) {
+        entry = restored[i];
+        model = *(u8**)(entry + 8);
+        if (model != NULL) {
+            GSmodelSetVisibility(model, entry[0x21]);
+        }
+        if (*(s32*)(entry + 0x50) >= 0) {
+            GScolsys2HumanEnable(*(s32*)(entry + 0x50), entry[0x23]);
+        }
+        fn_8018F08C(entry, *(u32*)(entry + 0x90));
+        GSmodelPopState(model, saved + 0xEC);
+
+        if (*(s32*)(entry + 0xC8) != -1 &&
+            *(s32*)(entry + 0xCC) != -1) {
+            fn_801848D0(model, *(s32*)(entry + 0xC8),
+                        *(s32*)(entry + 0xCC), *(s32*)(entry + 0xD0));
+            GSvecCopy(GSmodelGetPositionPtr(model), saved + 0xBC);
+            GSvecCopy(GSmodelGetRotationPtr(model), saved + 0xC8);
+            GSmodelSetPosition(model, saved + 0xD4);
+            GSmodelSetRotation(model, saved + 0xE0);
+        }
+
+        switch (entry[0x96]) {
+        case 0:
+            fn_80188AF4(*(u32*)(entry + 0x28), *(u32*)(entry + 0x2C));
+            break;
+        case 1:
+            fn_80188FA0(*(u32*)(entry + 0x28), *(u32*)(entry + 0x2C),
+                        *(u32*)(entry + 0xC0), *(u32*)(entry + 0xC4));
+            break;
+        case 2:
+            fn_80188CA0(*(u32*)(entry + 0x28), *(u32*)(entry + 0x2C),
+                        (s32)*(f32*)(entry + 0xA8),
+                        (s32)*(f32*)(entry + 0xAC),
+                        (s32)*(f32*)(entry + 0xB0));
+            break;
+        }
+        if (entry[0x96] != 0) {
+            for (j = 0; j < 60; j++) {
+                fn_801812C4(entry);
+            }
+        }
+    }
+}
 #endif
 #pragma pop
 #pragma push
@@ -2280,13 +2551,55 @@ void fn_80184470(u32 groupId, u32 index) {
     }
 }
 
-/* fn_801845E4 -- not recovered, gap in archive campaign (size 0x2EC) */
-void fn_801845E4(void) {
+/* fn_801845E4 -- attach a model part and record its resource identifiers */
+void fn_801845E4(u32 groupId, u32 index, s32 nodeA, s32 nodeB, s32 nodeC) {
+    PeopleEntry* entry;
+    PeopleEntry* cleanup;
+    void* model;
+    void* oldModel;
+    void* resource;
+    void* part;
+    s32 animIndex;
+    s32 blendIndex;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return;
+    }
+
+    model = GSresGetResource(groupId, index);
+    if (model == NULL) {
+        return;
+    }
+
+    cleanup = peopleFindBySelf(peopleFindSelf(groupId, index));
+    oldModel = GSresGetResource(groupId, index);
+    if (cleanup != NULL && oldModel != NULL && cleanup->walkNodeC >= 0) {
+        cleanup->walkNodeA = -1;
+        cleanup->walkNodeB = -1;
+        cleanup->walkNodeC = -1;
+        GSmodelDetachFromGSpart(oldModel, 1);
+    }
+
+    entry->walkNodeA = nodeA;
+    entry->walkNodeB = nodeB;
+    entry->walkNodeC = nodeC;
+
+    if (GSmodelIsBlending(model)) {
+        GSmodelGetAnimIndex(model, &animIndex, &blendIndex);
+        GSmodelSetAnimIndex(model, blendIndex);
+    }
+
+    resource = GSresGetResource(nodeA, nodeB);
+    if (resource != NULL) {
+        part = GSmodelGetPart(resource, nodeC);
+        GSmodelAttachToGSpart(model, part, 7, 0, 1);
+        GSpartFree(part);
+    }
 }
 
 /* fn_801848D0 -- not recovered, gap in archive campaign (size 0x78) */
 void fn_801848D0(void* a, s32 b, s32 c, s32 d) {
-    void GSmodelAttachToGSpart();
     void* res = GSresGetResource(b, c);
     if (res != 0) {
         void* part = GSmodelGetPart(res, d);
@@ -2329,8 +2642,35 @@ void fn_8018790C(u32 groupId, u32 index) {
     }
 }
 
-/* fn_80187D48 -- not recovered, gap in archive campaign (size 0x314) */
-void fn_80187D48(void) {
+/* fn_80187D48 -- turn a person toward a world-space position */
+void fn_80187D48(u32 groupId, u32 index, f32 targetX, f32 targetY,
+                 f32 targetZ, f32 turnSpeed) {
+    PeopleEntry* entry;
+    GSvec targetPosition;
+    GSvec direction;
+    GSvec rotation;
+    f32 angle;
+    f32 fullTurn;
+    s32 revolutions;
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry == NULL) {
+        return;
+    }
+
+    set__5GSvecFfff(&targetPosition, targetX, targetY, targetZ);
+    fn_800E0168(&direction, &targetPosition, fn_8018FCBC(entry));
+    angle = (f32)atan2(direction.x, direction.z);
+
+    entry = peopleFindBySelf(peopleFindSelf(groupId, index));
+    if (entry != NULL) {
+        fn_8018FC2C(entry, &rotation);
+        fullTurn = lbl_8047D7C0;
+        revolutions = (s32)(rotation.y / fullTurn);
+        entry->pad22 = 1;
+        entry->field_40 = angle + fullTurn * revolutions;
+        entry->field_44 = turnSpeed;
+    }
 }
 
 /* fn_8018805C -- not recovered, gap in archive campaign (size 0x1B8) */

@@ -88,7 +88,9 @@ void fn_801101B4(void* meshData) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-s32 GScolsys2ThruGetFixedMdlEventList(f32 x, f32 z, void* outTriangles) {
+s32 GScolsys2ThruGetFixedMdlEventList(
+    GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f32 radius,
+    GScolsys2TriangleList* triList, GSfieldQueryTriangle* outTriangles) {
     /* TODO: match -- 1992 bytes at 0x8011069C */
 }
 #pragma pop
@@ -306,19 +308,124 @@ s32 GScolsys2ThruGetMdlEventList(GScolsys2Vec3* point, GScolsys2Vec3* dirVec, f3
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void GScolsys2ThruGetEventList(void) {
-    /* TODO: match -- 460 bytes at 0x80111470 */
+s32 GScolsys2ThruGetEventList(
+    GScolsys2Vec3* point, GScolsys2Vec3* dirVec,
+    GSfieldQueryTriangle* out, f32 radius) {
+    GSFieldWzxData* wzx;
+    GSFieldWzxRegion* region;
+    GSfieldQueryTriangle temporary[4];
+    f32 mtxInv[12];
+    f32 mtxFwd[12];
+    s32 enabled;
+    s32 resultCount = 0;
+    u32 regionIndex;
+
+    wzx = (GSFieldWzxData*)fn_8010CBC0();
+    region = wzx->regions;
+    for (regionIndex = 0;
+         regionIndex < wzx->regionCount && resultCount < 4;
+         regionIndex++, region++) {
+        GScolsys2TriangleList* list;
+        s32 temporaryCount;
+        s32 i;
+
+        GScolsys2GetObjEnable(regionIndex, &enabled);
+        if (enabled == 0) {
+            continue;
+        }
+        list = *(GScolsys2TriangleList**)((u8*)region + 0x2C);
+        if (list == NULL) {
+            continue;
+        }
+        if ((*(u16*)((u8*)region + 0x3C) & 1) != 0) {
+            fn_8010CA30(mtxInv, regionIndex);
+            fn_8010C8D0(mtxFwd, regionIndex);
+            temporaryCount = GScolsys2ThruGetMdlEventList(
+                point, dirVec, radius, list, mtxInv, mtxFwd, temporary);
+        } else {
+            temporaryCount = GScolsys2ThruGetFixedMdlEventList(
+                point, dirVec, radius, list, temporary);
+        }
+        for (i = 0; i < temporaryCount && resultCount < 4; i++) {
+            s32 j;
+            for (j = 0; j < resultCount; j++) {
+                if (out[j].id == temporary[i].id) {
+                    break;
+                }
+            }
+            if (j == resultCount) {
+                out[resultCount++] = temporary[i];
+            }
+        }
+    }
+    return resultCount;
 }
 #pragma pop
 
 /* 0x8011163C | 0x228 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GScolsys2ThruGetEventID(void) {
-    /* TODO: match -- 552 bytes at 0x8011163C */
+s32 GScolsys2ThruGetEventID(
+    GScolsys2Vec3* start, GScolsys2Vec3* end,
+    f32 radius, GSfieldQueryTriangle* out)
+{
+    extern f32 PSVECMag(void*);
+    extern const f32 lbl_8047CF58;
+    extern const f32 lbl_8047CF5C;
+    GSfieldQueryTriangle temporary[4];
+    GScolsys2Vec3 direction;
+    GScolsys2Vec3 point;
+    f32 length;
+    f32 step;
+    f32 position;
+    f32 sample;
+    s32 outCount;
+
+    outCount = 0;
+    if (fn_8010CBC0() == NULL) {
+        return 0;
+    }
+
+    PSVECSubtract(end, start, &direction);
+    length = PSVECMag(&direction);
+    if (length <= lbl_8047CF58) {
+        return 0;
+    }
+    step = radius / length;
+    if (step > lbl_8047CF5C) {
+        step = lbl_8047CF5C;
+    }
+
+    position = lbl_8047CF58;
+    while (position < lbl_8047CF5C && outCount < 4) {
+        s32 temporaryCount;
+        s32 i;
+
+        sample = position + step;
+        if (sample > lbl_8047CF5C) {
+            sample = lbl_8047CF5C;
+        }
+        PSVECScale(&direction, &point, sample);
+        PSVECAdd(&point, start, &point);
+        temporaryCount =
+            GScolsys2ThruGetEventList(&point, &direction, temporary, radius);
+
+        for (i = 0; i < temporaryCount && outCount < 4; i++) {
+            s32 j;
+            for (j = 0; j < outCount; j++) {
+                if (temporary[i].id == out[j].id) {
+                    break;
+                }
+            }
+            if (j == outCount) {
+                out[outCount++] = temporary[i];
+            }
+        }
+        if (step <= lbl_8047CF58) {
+            break;
+        }
+        position += step;
+    }
+    return outCount;
 }
-#pragma pop
 
 /* 0x80111864 | 0x338 */
 #pragma push

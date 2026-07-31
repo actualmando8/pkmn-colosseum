@@ -102,6 +102,11 @@ extern f32 lbl_8047CD8C;  /* sdata2: float constant */
 extern f32 lbl_8047CD90;  /* sdata2: float constant */
 extern f32 lbl_8047CD94;  /* sdata2: float constant */
 extern f64 lbl_8047CD98;  /* sdata2: double constant */
+extern f32 lbl_8047CDA0;
+extern f32 lbl_8047CDA4;
+extern f32 lbl_8047CDA8;
+extern f32 lbl_8047CDAC;
+extern f32 lbl_8047CDB0;
 extern f32 lbl_8047CE3C;  /* sdata2: float constant */
 extern f32 lbl_8047CE50;  /* sdata2: float constant */
 extern f32 lbl_8047CE5C;  /* sdata2: float constant */
@@ -116,6 +121,7 @@ extern u8  lbl_8035B3F0[];  /* module name string */
 
 /* Additional external functions (not already declared above) */
 extern void fn_800BF74C(void);
+extern void fn_800BE30C(void);
 extern void fn_800D9ED8(s32);
 extern void fn_800D88DC(s32);
 extern void fn_800D888C(s32);
@@ -127,7 +133,7 @@ extern void fn_800DA028(s32);
 extern void fn_800D6A00(s32);
 extern void fn_800D7820(s32);
 extern void fn_800D67BC(s32);
-extern void fn_800D6680(f32);
+extern void fn_800D6680(f32, f32, f32);
 extern void fn_800D5CB8(s32, s32, s32, s32, s32);
 extern void fn_800D6728(void);
 
@@ -164,7 +170,7 @@ extern void* kaisuuBiosGetMin(u32 index);
 extern u32 kaisuuGetKaisuu(u32 param);
 extern void fn_80101B34(u32 param);
 extern void fn_80101B88(u32 val);
-extern void fn_80101B90(void);
+extern void fn_80101B90(u32 color);
 extern void fn_80101D5C(void);
 extern void fn_80101D8C(void);
 extern void fn_80101FB8(u8 param);
@@ -295,8 +301,45 @@ void fn_80101B88(u32 val) { lbl_8047ACF0 = val; }
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80101B90(void) {
-    /* TODO: match -- 460 bytes at 0x80101B90 */
+void fn_80101B90(u32 color) {
+    u32 tick;
+    f32 width;
+    u8 red;
+    u8 green;
+    u8 blue;
+
+    if (lbl_8047ACF0 != 0) {
+        tick = OSGetTick();
+        fn_800D9ED8(1);
+        fn_800D88DC(1);
+        fn_800D888C(6);
+        fn_800D9B58(lbl_8047CD80, lbl_8047CD80, lbl_8047CD84,
+                     lbl_8047CD88);
+        fn_800DA4C4(1, 6, 7);
+        fn_800DA2BC(2, 1, 0);
+        fn_800DA1E8(1, 1, 1);
+        fn_800DA028(0);
+        fn_800D6A00(7);
+        fn_800D7820(0);
+
+        red = color >> 16;
+        green = color >> 8;
+        blue = color;
+        fn_800D67BC(2);
+        width = lbl_8047CD84 *
+            (((f32)(lbl_8047ACEC - lbl_8047ACE8) / (f32)lbl_80478B28) /
+             lbl_8047CD8C);
+        fn_800D6680(width, lbl_8047CD90, lbl_8047CD80);
+        fn_800D5CB8(0, red, green, blue, 0xFF);
+
+        width = lbl_8047CD84 *
+            (((f32)(tick - lbl_8047ACE8) / (f32)lbl_80478B28) /
+             lbl_8047CD8C);
+        fn_800D6680(width, lbl_8047CD94, lbl_8047CD80);
+        fn_800D5CB8(0, red, green, blue, 0xFF);
+        fn_800D6728();
+        lbl_8047ACEC = tick;
+    }
 }
 #pragma pop
 
@@ -308,13 +351,57 @@ void fn_80101D5C(void) {
 }
 
 /* 0x80101D8C | 0x22C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80101D8C(void) {
-    /* TODO: match -- 556 bytes at 0x80101D8C */
+void fn_80101D8C(void)
+{
+    f32 width;
+    s32 offset;
+    s8 line;
+    u32 tick;
+
+    if (lbl_8047ACF0 == 0) {
+        return;
+    }
+
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D9B58(lbl_8047CD80, lbl_8047CD80, lbl_8047CD84,
+                lbl_8047CD88);
+    fn_800DA4C4(1, 6, 7);
+    fn_800DA2BC(2, 1, 0);
+    fn_800DA1E8(1, 1, 1);
+    fn_800DA028(0);
+
+    width = lbl_8047CD84 *
+            (((f32)lbl_8047ACF8 / lbl_8047CDA0) /
+             (f32)lbl_80478B28);
+    fn_800D6A00(7);
+    fn_800D7820(0);
+    fn_800D67BC(2);
+    fn_800D6680(lbl_8047CD80, lbl_8047CDA4, lbl_8047CD80);
+    fn_800D5CB8(0, 0, 0xFF, 0, 0xFF);
+    fn_800D6680(width, lbl_8047CDA8, lbl_8047CD80);
+    fn_800D5CB8(0, 0, 0xFF, 0, 0xFF);
+    fn_800D6728();
+
+    fn_800D6A00(1);
+    fn_800D7820(0);
+    offset = 0;
+    for (line = 0; line <= (s8)lbl_80478B28; line++) {
+        f32 x = (f32)(offset / lbl_80478B28);
+        fn_800D67BC(2);
+        fn_800D6680(x, lbl_8047CDAC, lbl_8047CD80);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D6680(x, lbl_8047CDB0, lbl_8047CD80);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D6728();
+        offset += 0x280;
+    }
+
+    tick = OSGetTick();
+    lbl_8047ACE8 = tick;
+    lbl_8047ACEC = tick;
+    fn_800BE30C();
 }
-#pragma pop
 
 /* 0x80101FB8 | 0x4C */
 void fn_80101FB8(u8 param) {
@@ -323,4 +410,3 @@ void fn_80101FB8(u8 param) {
     lbl_8047ACF4 = fn_800B8FD8((void*)fn_80101B34);
     fn_800BD91C(0x22, 0x16);
 }
-

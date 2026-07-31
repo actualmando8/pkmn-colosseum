@@ -234,8 +234,78 @@ void fn_80111F2C(u8* state) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8011207C(void) {
-    /* TODO: match -- 484 bytes at 0x8011207C */
+void fn_8011207C(u8* state, u32 stateSize) {
+    extern void GSmodelPopState(void*, void*);
+    extern void GSlightPopState(void*, void*);
+    FloorArchiveResourceLists* lists;
+    void* floor;
+    void* resource;
+    u32 mapId;
+    u32 groupId;
+    u32 resourceId;
+    u32 baseId;
+    u32 stateCount = stateSize / 0x74;
+    u32 i;
+    u32 j;
+
+    floor = floorDataBiosGetCurrentPtr();
+    mapId = floorDataBiosGetMapResID(floor);
+    if (mapId == 0) {
+        return;
+    }
+    floor = floorDataBiosGetCurrentPtr();
+    groupId = floorDataBiosGetGroupID(floor);
+    lists = HSD_ArchiveGetPublicAddress(
+        GSresGetResource(groupId, mapId), lbl_802720B0);
+    if (lists == NULL) {
+        return;
+    }
+    if (lists->models != NULL) {
+        baseId = floorReadMakeModelResID(mapId);
+        for (i = 0; lists->models[i] != 0; i++) {
+            resourceId = baseId | i;
+            resource = GSresGetResource(groupId, resourceId);
+            if (resource != NULL) {
+                u8* record = state;
+                for (j = 0; j < stateCount; j++, record += 0x74) {
+                    if (*(u32*)record == resourceId) {
+                        switch (*(u32*)(record + 4)) {
+                        case 1:
+                            GSmodelPopState(resource, record + 8);
+                            break;
+                        case 2:
+                            GSlightPopState(resource, record + 8);
+                            break;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    if (lists->lights != NULL) {
+        baseId = floorReadMakeLightResID(mapId);
+        for (i = 0; lists->lights[i] != 0; i++) {
+            resourceId = baseId | i;
+            resource = GSresGetResource(groupId, resourceId);
+            if (resource != NULL) {
+                u8* record = state;
+                for (j = 0; j < stateCount; j++, record += 0x74) {
+                    if (*(u32*)record == resourceId) {
+                        switch (*(u32*)(record + 4)) {
+                        case 1:
+                            GSmodelPopState(resource, record + 8);
+                            break;
+                        case 2:
+                            GSlightPopState(resource, record + 8);
+                            break;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
 #pragma pop
 

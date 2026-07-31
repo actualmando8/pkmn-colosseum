@@ -245,8 +245,39 @@ void wazaSequenceSysFreeSequenceResource(void* obj) {
  * wazaSequenceSysFreeWazaResource - Waza sequence data parse.
  * Address: 0x801DB288 | Size: 0x170
  */
-void wazaSequenceSysFreeWazaResource(void* seqData, s32 moveID) {
-    /* TODO: Parse sequence data (0x170 bytes) */
+void wazaSequenceSysFreeWazaResource(void* seqData, ...) {
+    extern u8 lbl_80467CD4[];
+    u16 resourceId = *(u16*)((u8*)seqData + 0x30);
+    s32 references = 0;
+    s32 i;
+
+    if (resourceId != 0) {
+        u8* owner = *(u8**)lbl_80467CC0;
+        u16 ownerCount = *(u16*)(lbl_80467CC0 + 4);
+
+        for (i = 0; i < ownerCount; i++, owner += 0x8C) {
+            u8* entry = *(u8**)(owner + 0x68);
+            while (entry != NULL) {
+                if (*(u16*)(entry + 0x30) == resourceId) {
+                    references++;
+                }
+                entry = *(u8**)(entry + 0x34);
+            }
+        }
+        for (i = 0; i < 16; i++) {
+            if (*(u16*)(lbl_80467CD4 + i * 2) == resourceId) {
+                references++;
+            }
+        }
+        if (references == 1) {
+            while (fn_8017B2CC(resourceId) == 1) {
+                _threadSwitch();
+            }
+            fn_800F915C(resourceId);
+            fn_8017B1CC(resourceId);
+        }
+        *(u16*)((u8*)seqData + 0x30) = 0;
+    }
 }
 
 /**

@@ -2488,11 +2488,11 @@ void fn_8002060C(void) {
 #endif
 
 /* fn_80020618 - 0x80020618 | size: 0x304 */
-extern void windowGetKeyInfo(void);
+extern void* windowGetKeyInfo(void);
 extern s32 gamedatasaveGetStatus(s32, s32);
-extern void fn_80166CC0(void);
+extern void fn_80166CC0(u32);
 extern void fn_800F78A4(s32, s32, s32, s32, s32);
-extern void gamedatasaveSetStatus(void);
+extern void gamedatasaveSetStatus(s32, s32, s32);
 extern u32 lbl_8047B878;
 extern u8 lbl_803A1FC8[];
 extern u32 lbl_8047B880;
@@ -2506,7 +2506,101 @@ asm void fn_80020618(void) {
 #include "src/game/gs_title_fn_80020618.inc"
 }
 #else
-void fn_80020618(void) { /* TODO */ }
+s32 fn_80020618(void) {
+    typedef struct TitleOptionState {
+        s32 selection;
+        s32 unk04;
+        s32 counter;
+        s32 toggle;
+        f32 output;
+        f32 unk14;
+        f32 amplitude;
+        f32 delta;
+        f32 timer;
+        f32 phase;
+        f32 speed;
+    } TitleOptionState;
+    TitleOptionState* state;
+    u8* keyInfo;
+    f32 tickScale;
+    f32 phase;
+    s32 value;
+
+    keyInfo = windowGetKeyInfo();
+    tickScale = (f32)(s32)fn_800D37CC();
+    state = (TitleOptionState*)lbl_803A1FC8;
+    state->delta = (f32)(u32)fn_800D3088() / tickScale;
+    state->phase += state->delta;
+    if (state->phase >= *(f32*)&lbl_8047B868) {
+        state->phase = *(f32*)&lbl_8047B86C;
+    }
+
+    if (gamedatasaveGetStatus(0, 9) == 1) {
+        if (state->timer != *(f32*)&lbl_8047B86C) {
+            state->timer += state->delta;
+            if (state->timer >= *(f32*)&lbl_8047B868) {
+                state->timer = *(f32*)&lbl_8047B86C;
+                state->counter = 0;
+            }
+        }
+    } else {
+        state->timer += state->delta;
+        if (state->timer >= *(f32*)&lbl_8047B868) {
+            state->timer = *(f32*)&lbl_8047B86C;
+            state->counter++;
+            if ((state->counter % 2) == 0) {
+                state->toggle ^= 1;
+                if (state->toggle != 0) {
+                    state->amplitude = *(f32*)&lbl_8047B86C;
+                } else {
+                    state->amplitude = *(f32*)&lbl_8047B870;
+                }
+            }
+        }
+    }
+
+    phase = lbl_8047B874 * state->timer * state->speed;
+    state->output = state->amplitude * (f32)sin(phase);
+
+    value = *(u16*)(keyInfo + 6);
+    if (value & 2) {
+        if (state->selection < 2) {
+            state->selection++;
+        }
+    } else if (value & 1) {
+        if (state->selection > 0) {
+            state->selection--;
+        }
+    } else {
+        keyInfo = windowGetKeyInfo();
+        switch (state->selection) {
+        case 0:
+            if (*(u16*)(keyInfo + 6) & 4) {
+                fn_80166CC0(1);
+            }
+            if (*(u16*)(keyInfo + 6) & 8) {
+                fn_80166CC0(0);
+            }
+            break;
+        case 1:
+            if (*(u16*)(keyInfo + 6) & 4) {
+                if (gamedatasaveGetStatus(0, 9) != 0) {
+                    fn_800F78A4(1, 0, 0xFF, 0x1E, 0);
+                }
+                gamedatasaveSetStatus(0, 9, 0);
+                state->counter = 1;
+                state->timer = *(f32*)&lbl_8047B868;
+                state->toggle = 1;
+            }
+            if (*(u16*)(keyInfo + 6) & 8) {
+                gamedatasaveSetStatus(0, 9, 1);
+                state->amplitude = *(f32*)&lbl_8047B86C;
+            }
+            break;
+        }
+    }
+    return 0;
+}
 #endif
 #endif
 
@@ -3151,7 +3245,7 @@ s32 fn_80021A9C(u32 r3, u32* r4) {
 /* fn_80021B14 - 0x80021B14 | size: 0x53c */
 extern void fn_80142EF8(void);
 extern void fn_801431AC(void);
-extern void fn_80014110(void);
+extern s32 fn_80014110(void);
 extern s32 fn_80121ADC(s32, s32);
 extern s16 fn_80144574(void*, s32, s32, u16, s32);
 extern void fn_80166A50(s32, s32, s32, s32);
@@ -3159,7 +3253,7 @@ extern void fn_8001D378(void);
 extern u8 lbl_80478890[8];
 extern u8 lbl_80266DB0[];
 extern u8 lbl_80266D78[];
-extern void fn_80023968(void);
+extern s32 fn_80023968(u32, u32*);
 #if !defined(GS_TITLE_SPLIT) || defined(GS_TITLE_RANGE_80021B14)
 #if 0
 asm void fn_80021B14(void) {
@@ -3235,7 +3329,100 @@ asm void fn_8002217C(void) {
 #include "src/game/gs_title_fn_8002217C.inc"
 }
 #else
-void fn_8002217C(void) { /* TODO */ }
+s32 fn_8002217C(u16 wazaDataId, u32* result) {
+    typedef struct TitleEffectEntry {
+        s32 code;
+        s16 x;
+        s16 y;
+    } TitleEffectEntry;
+    typedef struct TitleSpecialEntry {
+        s32 code;
+        s32 message;
+    } TitleSpecialEntry;
+    typedef struct TitleSpecialTable {
+        TitleSpecialEntry entries[7];
+    } TitleSpecialTable;
+    typedef struct TitleBgmTable {
+        u16 entries[5];
+    } TitleBgmTable;
+    TitleEffectEntry effects[33];
+    char message[0x84];
+    TitleSpecialTable special;
+    TitleBgmTable bgm;
+    s32 slot;
+    s32 pokemon;
+    s32 data;
+    s16 effectCount;
+    s32 specialIndex;
+    s32 effectIndex;
+    s32 bgmIndex;
+    s32 soundId;
+
+    slot = fn_80014110();
+    fn_80014118(slot, &pokemon, &data);
+    if ((u8)fn_80121ADC(pokemon, 0x3E)) {
+        msgctrlSetValue(
+            0x32, (void*)pokemonBiosGetNicknamePtr(pokemon));
+        winMsgOpen(2, 0x424D, 1, 0);
+        winMsgClose(1);
+        return 1;
+    }
+
+    effectCount =
+        fn_80144574(effects, pokemon, data, wazaDataId, 0);
+    if (effectCount > 0) {
+        bgm = *(TitleBgmTable*)lbl_80266DB0;
+        for (bgmIndex = 0; bgmIndex < 5; bgmIndex++) {
+            if (wazaDataId == bgm.entries[bgmIndex]) {
+                break;
+            }
+        }
+        soundId = bgmIndex < 5 ? 0x466 : 0x465;
+        fn_80166A50(soundId, 0, 0xFF, 0);
+        fn_8001D378();
+    }
+
+    special = *(TitleSpecialTable*)lbl_80266D78;
+    if (effectCount <= 0) {
+        fn_800F96E4(message, 0x41, (void*)0x4261);
+    } else {
+        for (specialIndex = 0; specialIndex < 7; specialIndex++) {
+            for (effectIndex = 0; effectIndex < effectCount;
+                 effectIndex++) {
+                if (special.entries[specialIndex].code ==
+                    effects[effectIndex].code) {
+                    break;
+                }
+            }
+            if (effectIndex < effectCount) {
+                break;
+            }
+        }
+
+        if (specialIndex >= 7) {
+            fn_800F96E4(message, 0x41, (void*)0x4261);
+        } else {
+            msgctrlSetValue(
+                0x32, (void*)pokemonBiosGetNicknamePtr(pokemon));
+            msgctrlSetValue(
+                0x2F, (void*)(s32)effects[effectIndex].x);
+            msgctrlSetValue(
+                0x30, (void*)(s32)effects[effectIndex].y);
+            fn_800F96E4(
+                message, 0x41,
+                (void*)special.entries[specialIndex].message);
+        }
+    }
+
+    msgctrlSetValue(0x4D, message);
+    winMsgOpen(2, 0xE0, 1, 0);
+    winMsgClose(1);
+    if (effectCount > 0) {
+        *result = 1;
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 /* fn_80022478 - 0x80022478 | size: 0x2a8 */
@@ -3982,15 +4169,88 @@ s32 fn_80023760(u32 arg0, u32* arg1) {
 #endif
 
 /* fn_80023968 - 0x80023968 | size: 0x234 */
-extern void itemDataBiosGetItemEffectParam(void);
-extern void itemParamGetPtr(void);
-extern void itemParamGetPPSelectFlag(void);
+extern void* itemDataBiosGetItemEffectParam(void*);
+extern void* itemParamGetPtr(void*);
+extern u8 itemParamGetPPSelectFlag(void*);
 #if 0
 asm void fn_80023968(void) {
 #include "src/game/gs_title_fn_80023968.inc"
 }
 #else
-void fn_80023968(void) { /* TODO */ }
+s32 fn_80023968(u32 arg0, u32* arg1)
+{
+    extern void* itemDataBiosGetPtr(u32);
+    extern void fn_800216E8(void*, s32, void*, s32, s32);
+    u8 nameBuf[0x84];
+    u8 textBuf[0x108];
+    s32 blocked;
+    s32 mode;
+    s32 slot;
+    s32 sc;
+    s32 sd;
+    s32 effect;
+
+    blocked = 0;
+    for (;;) {
+        slot = fn_800141BC((void*)arg0, 1);
+        if (slot < 0) {
+            break;
+        }
+        fn_80014118(slot, &sc, &sd);
+        if ((u8)fn_80121ADC(sc, 0x3E) != 0) {
+            blocked = 1;
+            break;
+        }
+        if (itemParamGetPPSelectFlag(
+                itemParamGetPtr(itemDataBiosGetItemEffectParam(
+                    itemDataBiosGetPtr((u16)arg0))))) {
+            mode = fn_80019B48((s8)slot);
+            fn_80019B1C();
+        } else {
+            mode = 0;
+        }
+        if (mode >= 0) {
+            break;
+        }
+    }
+
+    if (slot >= 0) {
+        if (blocked) {
+            msgctrlSetValue(0x32, pokemonBiosGetNicknamePtr(sc));
+            winMsgOpen(2, 0x424D, 1, 0);
+            winMsgClose(1);
+            effect = 0;
+        } else {
+            u16* table;
+            s32 soundId;
+
+            effect = fn_80144574(textBuf, sc, sd, (u16)arg0, (u8)mode);
+            if ((s16)effect > 0) {
+                table = (u16*)lbl_80266DB0;
+                if (arg0 == table[0] || arg0 == table[1] ||
+                    arg0 == table[2] || arg0 == table[3] ||
+                    arg0 == table[4]) {
+                    soundId = 0x466;
+                } else {
+                    soundId = 0x465;
+                }
+                fn_80166A50(soundId, 0, 0xFF, 0);
+                fn_8001D378();
+            }
+            fn_800216E8(nameBuf, 0x40, textBuf, effect, sc);
+            msgctrlSetValue(0x4D, nameBuf);
+            winMsgOpen(2, 0xE0, 1, 0);
+            winMsgClose(1);
+        }
+    }
+
+    fn_80014198(slot);
+    if (slot >= 0 && (s16)effect > 0) {
+        *arg1 = 1;
+        return 0;
+    }
+    return 1;
+}
 #endif
 
 /* fn_80023B9C - 0x80023B9C | size: 0x20c */

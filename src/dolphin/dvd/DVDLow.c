@@ -338,15 +338,15 @@ BOOL DVDLowAudioBufferConfig(BOOL enable, u32 size,
 void DVDLowReset(void)
 {
     u32 reg;
-    OSTime duration;
     OSTime resetStart;
+    OSTime duration;
 
     __DIRegs[1] = 2;
     reg = __PIRegs[9];
     __PIRegs[9] = (reg & ~4) | 1;
 
-    duration = OSMicrosecondsToTicks(12);
     resetStart = __OSGetSystemTime();
+    duration = OSMicrosecondsToTicks(12);
     while ((__OSGetSystemTime() - resetStart) < duration) {
     }
 

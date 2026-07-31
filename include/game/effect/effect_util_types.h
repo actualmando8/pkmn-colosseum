@@ -624,7 +624,7 @@ extern u32 fightTargetGetTragetPtrToRelativeHostSideFightTargetId(void* arg, u16
 
 extern void fn_800D37CC(void);
 
-extern void fn_80137780(void);
+extern u8* fn_80137780(u8* work, u8* params);
 
 extern void GSvecCopy(void);
 
@@ -634,7 +634,7 @@ extern void GStextureLoad(void);
 
 extern void fn_800EFD14(void);
 
-extern void fn_8013757C(void);
+extern u8* fn_8013757C(u8* work, u8* params, s32 frames);
 
 extern void GStextureSetWrap(void);
 

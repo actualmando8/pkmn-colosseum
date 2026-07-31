@@ -225,7 +225,7 @@ extern void menuSetPosition(void* p, s16 a, s16 b);
 extern void menuButtonNormal(void* p);
 extern void menuPlaySe(void* p, void* q);
 extern u8 _menuGetAgbKeyInfo__FlPUs(s32, u16*);
-extern void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK();
+extern void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(void*);
 extern void menuGetKeyInfo(void* output, s32 port);
 extern u8 menuGetEnablePort(void);
 extern u8 menuSetEnablePort(u8 val);
@@ -1443,13 +1443,94 @@ u8 _menuGetGcKeyInfo__FlPUs(s32 port, u16* keys) {
 #pragma pop
 
 /* 0x801038F8 | 0x2B0 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(void) {
-    /* TODO: match -- 688 bytes at 0x801038F8 */
+void _menuUpdateKeyInfo__FP15WINDOW_SYS_WORK(void* unused) {
+    typedef struct MenuKeyInfo {
+        u16 keys;
+        u16 previousKeys;
+        u16 pressedKeys;
+        u16 repeatKeys;
+        u16 heldKeys;
+        s8 repeatTimer[16];
+    } MenuKeyInfo;
+    MenuKeyInfo* keyInfo;
+    MenuKeyInfo* selected;
+    void* activeWindow;
+    u16 keys;
+    u16 pressed;
+    u16 repeat;
+    u16 held;
+    u16 bit;
+    u8 inputType;
+    s32 port;
+    s32 i;
+
+    (void)unused;
+    keyInfo = (MenuKeyInfo*)(lbl_80404ACC + 0x2A);
+    for (port = 0; port < 4; port++, keyInfo++) {
+        lbl_8047AD08[port] = lbl_8047AD04[port];
+        keys = 0;
+        if (_menuGetGcKeyInfo__FlPUs(port, &keys)) {
+            inputType = 1;
+        } else if (_menuGetAgbKeyInfo__FlPUs(port, &keys)) {
+            inputType = 2;
+        } else {
+            inputType = 0;
+            keys = 0;
+        }
+
+        if (inputType == 0) {
+            if (lbl_8047AD08[port] >= 2 &&
+                lbl_8047AD08[port] < 4) {
+                lbl_8047AD04[port] = 3;
+                keys = 0x8000;
+            } else {
+                lbl_8047AD04[port] = 0;
+            }
+        } else {
+            lbl_8047AD04[port] = inputType;
+        }
+
+        keyInfo->previousKeys = keyInfo->keys;
+        pressed = keys & ~keyInfo->previousKeys;
+        repeat = 0;
+        held = 0;
+        for (i = 0; i < 16; i++) {
+            bit = 1 << i;
+            if (pressed & bit) {
+                keyInfo->repeatTimer[i] = 15;
+                repeat |= bit;
+            } else if (keys & bit) {
+                keyInfo->repeatTimer[i] -= fn_800D3088();
+                if (keyInfo->repeatTimer[i] <= 0) {
+                    keyInfo->repeatTimer[i] = 5;
+                    repeat |= bit;
+                    held |= bit;
+                } else {
+                    held |= keyInfo->heldKeys & bit;
+                }
+            }
+        }
+        if (pressed & 0xF) {
+            keyInfo->repeatTimer[0] = 15;
+            keyInfo->repeatTimer[1] = 15;
+            keyInfo->repeatTimer[2] = 15;
+            keyInfo->repeatTimer[3] = 15;
+        }
+        keyInfo->keys = keys;
+        keyInfo->pressedKeys = pressed;
+        keyInfo->repeatKeys = repeat;
+        keyInfo->heldKeys = held;
+    }
+
+    activeWindow = windowSearchID(windowGetActiveID());
+    if (activeWindow == NULL) {
+        inputType = 1;
+    } else {
+        inputType = *((u8*)activeWindow + 0xB);
+    }
+    selected = windowGetPortKeyInfo(inputType);
+    memcpy(lbl_80404ACC + 0x10, selected, sizeof(MenuKeyInfo));
 }
-#pragma pop
 
 /* 0x80103BA8 | 0x108 */
 void menuGetKeyInfo(void* output, s32 port) {

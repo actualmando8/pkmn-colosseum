@@ -7783,7 +7783,8 @@ u8 *fn_800F6D18(arg0, arg1, arg2)
 
     GS_VM_PUSH(entry, 0);
     for (i = 0; i < arg1; i++) {
-        GS_VM_PUSH(entry, *__va_arg(arg2, 1));
+        u32 value = *__va_arg(arg2, 1);
+        GS_VM_PUSH(entry, value);
     }
     GS_VM_PUSH(entry, 0);
     GS_VM_PUSH(entry, 0);
