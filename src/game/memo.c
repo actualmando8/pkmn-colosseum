@@ -401,7 +401,7 @@ void memoDataSet(u16 *r3, u32 r4) {
 	      return;
 	    }
 	  }
-		  *(u16 *)((u8 *)queue + ((u32)count * 12 + 4)) = (u16)(rawLookup | 0x8000);
+		  queue[(u32)count * 6 + 2] = (u16)(rawLookup | 0x8000);
 	  r5 = pokemonBiosGetRnd(r30);
 	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
 	  r5 = pokemonBiosGetCatchTrainerRnd(r30);
