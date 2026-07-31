@@ -16,23 +16,164 @@
 #include "game/gs_field_colquery_types.h"
 
 /* 0x8010FAF4 | 0x304 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010FAF4(void) {
-    /* TODO: match -- 772 bytes at 0x8010FAF4 */
+s32 fn_8010FAF4(
+    u8* source, f32 unusedStep, s32 excludedIndex,
+    GScolsys2Vec3* segmentStart,
+    GScolsys2Vec3* segmentEnd, GScolsys2Vec3* result)
+{
+    extern u8* GScolsys2GetCurFloor(void);
+    extern void* fn_8018D998(s32, s32);
+    extern void* peopleSearchID(void*);
+    extern GScolsys2Vec3* fn_8018FCBC(void*);
+    extern f32 sqrtf(f32);
+    extern f32 lbl_8047CF20;
+    extern f32 lbl_8047CF40;
+    extern f32 lbl_8047CF44;
+    u8* floor;
+    GScolsys2Vec3 current;
+    GScolsys2Vec3 adjusted;
+    s32 pass;
+
+    (void)segmentStart;
+    (void)unusedStep;
+    current = *segmentEnd;
+    floor = GScolsys2GetCurFloor();
+    pass = 0;
+
+    do {
+        s32 collided;
+        s32 index;
+        u8* entry;
+
+        collided = 0;
+        entry = floor + 0xA00;
+        for (index = 0; index < 0x30; index++, entry += 0x14) {
+            GScolsys2Vec3* other;
+            void* person;
+            f32 dx;
+            f32 dz;
+            f32 distance;
+            f32 combinedRadius;
+            f32 scale;
+
+            if (index == excludedIndex ||
+                (*(u16*)(entry + 0x10) & 1) == 0 ||
+                (*(u16*)(entry + 0x10) & 2) != 0) {
+                continue;
+            }
+            person = peopleSearchID(
+                fn_8018D998(*(s32*)(entry + 0), *(s32*)(entry + 4)));
+            if (person == NULL) {
+                continue;
+            }
+            other = fn_8018FCBC(person);
+            if (other == NULL) {
+                continue;
+            }
+            if (other->y >= current.y + *(f32*)(source + 0xC) ||
+                other->y + *(f32*)(entry + 0xC) <= current.y) {
+                continue;
+            }
+
+            dx = current.x - other->x;
+            dz = current.z - other->z;
+            distance = sqrtf(dx * dx + dz * dz);
+            combinedRadius =
+                *(f32*)(entry + 8) + *(f32*)(source + 8);
+            if (distance >= combinedRadius) {
+                continue;
+            }
+            if (result == NULL) {
+                return 1;
+            }
+            if (distance <= lbl_8047CF20) {
+                distance = lbl_8047CF40;
+            }
+            scale = (lbl_8047CF44 + combinedRadius) / distance;
+            adjusted.x = other->x + dx * scale;
+            adjusted.y = current.y;
+            adjusted.z = other->z + dz * scale;
+            collided = 1;
+            break;
+        }
+        if (!collided) {
+            break;
+        }
+        current = adjusted;
+        pass++;
+    } while (pass < 10);
+
+    if (pass <= 0) {
+        return 0;
+    }
+    *result = current;
+    return 1;
 }
-#pragma pop
 
 /* 0x8010FDF8 | 0x1CC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void GScolsys2HumanCollision(void) {
-    /* TODO: match -- 460 bytes at 0x8010FDF8 */
-}
-#pragma pop
+s32 GScolsys2HumanCollision(
+    s32 index, GScolsys2Vec3* start, GScolsys2Vec3* end, void* result) {
+    extern u8* GScolsys2GetCurFloor(void);
+    extern f32 PSVECDistance(void*, void*);
+    extern void PSVECSubtract(void*, void*, void*);
+    extern void PSVECScale(void*, void*, f32);
+    extern void PSVECAdd(void*, void*, void*);
+    extern s32 fn_8010FAF4(u8*, f32, s32, GScolsys2Vec3*,
+                           GScolsys2Vec3*, GScolsys2Vec3*);
+    extern f32 lbl_8047CF20;
+    extern f32 lbl_8047CF40;
+    u8* floor;
+    u8* entry;
+    GScolsys2Vec3 delta;
+    GScolsys2Vec3 segmentStart;
+    GScolsys2Vec3 segmentEnd;
+    f32 distance;
+    f32 step;
+    f32 t;
 
+    if (index < 0 || index >= 0x30) {
+        return 4;
+    }
+    floor = GScolsys2GetCurFloor();
+    if (floor == NULL) {
+        return 1;
+    }
+    entry = floor + 0xA00 + index * 0x14;
+    if ((*(u16*)(entry + 0x10) & 1) == 0) {
+        return 4;
+    }
+
+    distance = PSVECDistance(start, end);
+    if (distance > lbl_8047CF20) {
+        step = *(f32*)(entry + 8) / distance;
+        if (step > lbl_8047CF40) {
+            step = lbl_8047CF40;
+        }
+    } else {
+        step = lbl_8047CF20;
+    }
+    PSVECSubtract(end, start, &delta);
+    t = lbl_8047CF20;
+    while (t < lbl_8047CF40) {
+        f32 next = t + step;
+        if (next > lbl_8047CF40) {
+            next = lbl_8047CF40;
+        }
+        PSVECScale(&delta, &segmentStart, t);
+        PSVECAdd(&segmentStart, start, &segmentStart);
+        PSVECScale(&delta, &segmentEnd, next);
+        PSVECAdd(&segmentEnd, start, &segmentEnd);
+        if (fn_8010FAF4(entry, next, index, &segmentStart,
+                        &segmentEnd, result)) {
+            return 6;
+        }
+        if (step <= lbl_8047CF20) {
+            break;
+        }
+        t += step;
+    }
+    return 7;
+}
 /* 0x8010FFC4 | 0xC0 */
 #pragma push
 #pragma optimization_level 0
