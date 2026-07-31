@@ -1,0 +1,25 @@
+{
+  "base_sha": "f8b67c12f14cba7f99820924e1cb3239c92c4578",
+  "regressions": {
+    "menuSubGetPokemonSexForFightDisp": {
+      "base": 100.0,
+      "head": 97.94118
+    },
+    "winMsgClose": {
+      "base": 100.0,
+      "head": 98.125
+    },
+    "winMsgCloseField": {
+      "base": 100.0,
+      "head": 98.125
+    },
+    "winMsgCloseFight": {
+      "base": 100.0,
+      "head": 98.125
+    },
+    "winMsgCloseLevelUpStatus": {
+      "base": 100.0,
+      "head": 98.125
+    }
+  }
+}
