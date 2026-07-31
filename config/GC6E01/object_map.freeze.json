@@ -6,24 +6,24 @@
     "total_code": 2495108,
     "total_data": 2196100,
     "total_functions": 8603,
-    "total_units": 2268
+    "total_units": 2267
   },
   "topology_status": {
     "auto_units": 68,
-    "named_units": 2200,
-    "source_backed_units": 2194,
+    "named_units": 2199,
+    "source_backed_units": 2193,
     "auto_code": 0,
     "auto_data": 57687,
     "auto_functions": 0
   },
   "baseline_progress": {
-    "matched_code": "1024808",
-    "matched_code_percent": 41.07269,
+    "matched_code": "1035792",
+    "matched_code_percent": 41.512913,
     "matched_data": "2136513",
     "matched_data_percent": 97.28669,
-    "matched_functions": 6680,
-    "matched_functions_percent": 77.64733,
-    "fuzzy_match_percent": 78.36927
+    "matched_functions": 6709,
+    "matched_functions_percent": 77.98442,
+    "fuzzy_match_percent": 79.99844
   },
   "unit_topology": [
     {
@@ -1461,26 +1461,13 @@
       "sections": [
         {
           "name": ".text",
-          "size": 8,
+          "size": 16,
           "virtual_address": 2147616184
         }
       ],
-      "total_code": 8,
+      "total_code": 16,
       "total_data": 0,
-      "total_functions": 1
-    },
-    {
-      "name": "main/game/gs_title_exact_800205C0",
-      "sections": [
-        {
-          "name": ".text",
-          "size": 8,
-          "virtual_address": 2147616192
-        }
-      ],
-      "total_code": 8,
-      "total_data": 0,
-      "total_functions": 1
+      "total_functions": 2
     },
     {
       "name": "main/game/gs_title_candidate_800205C8",
