@@ -49,6 +49,7 @@
  */
 
 #include "dolphin/types.h"
+#include "dolphin/mtx.h"
 #include "game/effect/gs_effect.h"
 
 /* ===== External engine functions ===== */
@@ -100,7 +101,7 @@ extern void  fn_800D6728(void);
 /* ===== Forward declarations (vtable callbacks) ===== */
 BOOL  fn_801379E4(u8* w);
 BOOL  fn_80137A2C(u8* w);
-void  fn_80137D14(void);
+BOOL  fn_80137D14(u8* work, u32 steps);
 int   fn_80137F58(u8* w);
 BOOL  tracefxStartEffect(u8* w);
 
@@ -109,6 +110,7 @@ extern const char lbl_80272B08[]; /* "tracefxStartEffect: Could not start trail 
 
 /* ===== SDA21 float constants ===== */
 extern f32 lbl_8047D118;   /* 60.0f -- frames-per-second constant */
+extern f32 lbl_8047D11C;
 extern f64 lbl_8047D128;   /* 4503599627370496.0 -- int-to-float magic */
 extern f32 lbl_8047D130;   /* lerp denominator constant */
 extern f64 lbl_8047D140;   /* int-to-float magic (unsigned) */
@@ -914,8 +916,54 @@ void fn_801364A8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80137114(void) {
-    /* TODO: match -- 584 bytes at 0x80137114 */
+u8* fn_80137114(u8* work, u8* params, s32 frames) {
+    extern void fn_8013DB64(u8*, s32, f32, f32);
+    u8* data;
+    s32 count;
+    s32 duration;
+    s32 i;
+    f32 value;
+
+    count = *(s32*)params;
+    memset(work, 0, 0x20);
+    if (*(s32*)(params + 4) == 3) {
+        *(u32*)(work + 0x10) = *(u32*)(params + 8);
+        data = params + 0x0C;
+        for (i = 0; i < count; i++, data += 0x10) {
+            duration =
+                (s32)(((f32)*(s32*)(data + 8) *
+                       (f32)(s32)GSgfxGetFrameCount()) /
+                      lbl_8047D118);
+            fn_8013DB64(work, duration, *(f32*)data,
+                        *(f32*)(data + 4));
+        }
+        return data;
+    }
+    if (*(s32*)(params + 4) == 2) {
+        *(u32*)(work + 0x10) = 1;
+        data = params + 8;
+        for (i = 0; i < count; i++, data += 0x10) {
+            duration =
+                (s32)(((f32)*(s32*)(data + 8) *
+                       (f32)(s32)GSgfxGetFrameCount()) /
+                      lbl_8047D118);
+            fn_8013DB64(work, duration, *(f32*)data,
+                        *(f32*)(data + 4));
+        }
+        return data;
+    }
+    if (*(s32*)(params + 4) == 1) {
+        *(u32*)(work + 0x10) = 1;
+        value = *(f32*)params;
+        duration =
+            (s32)(((f32)frames * (f32)(s32)GSgfxGetFrameCount()) /
+                  lbl_8047D118) /
+            3;
+        fn_8013DB64(work, duration, lbl_8047D11C, value);
+        fn_8013DB64(work, duration, value, value);
+        fn_8013DB64(work, duration, lbl_8047D11C, lbl_8047D11C);
+    }
+    return params;
 }
 #pragma pop
 
@@ -999,8 +1047,68 @@ u32 fn_8013735C(void* work, void* params, u32 frames) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8013757C(void) {
-    /* TODO: match -- 516 bytes at 0x8013757C */
+u8* fn_8013757C(u8* work, u8* params, s32 frames) {
+    extern u16 fn_800E2C04(u32, u32);
+    extern void* GStextureLoad(void*);
+    extern void fn_800EFD14(void*, u16);
+    extern void GStextureSetWrap(void*, s32, s32);
+    extern u8 lbl_80314638[];
+    extern u8 lbl_80314AE8[];
+    u8* textureData;
+    void* texture;
+    u16 handle;
+    u32 size;
+    u32 color;
+
+    memset(work, 0, 0x70);
+    *(u16*)(work + 0x12) =
+        (u16)(((f32)frames * (f32)(s32)GSgfxGetFrameCount()) /
+              lbl_8047D118);
+
+    color = *(u32*)(params + 0);
+    work[0x23] = color >> 24;
+    work[0x22] = color >> 16;
+    work[0x21] = color >> 8;
+    work[0x20] = color;
+    color = *(u32*)(params + 4);
+    work[0x27] = color >> 24;
+    work[0x26] = color >> 16;
+    work[0x25] = color >> 8;
+    work[0x24] = color;
+    GSvecCopy(work + 0x34, params + 0x0C);
+    GSvecCopy(work + 0x40, params + 0x18);
+    *(u16*)(work + 8) = *(u32*)(params + 8);
+    *(f32*)(work + 0x4C) = *(f32*)(params + 0x24);
+    *(f32*)(work + 0x50) = *(f32*)(params + 0x28);
+    *(f32*)(work + 0x54) = *(f32*)(params + 0x2C);
+    *(f32*)(work + 0x58) = *(f32*)(params + 0x30);
+    *(f32*)(work + 0x5C) = *(f32*)(params + 0x34);
+    *(f32*)(work + 0x60) = *(f32*)(params + 0x38);
+    *(f32*)(work + 0x64) = *(f32*)(params + 0x3C);
+    *(f32*)(work + 0x68) = *(f32*)(params + 0x40);
+    *(f32*)(work + 0x6C) = *(f32*)(params + 0x44);
+    *(u16*)(work + 0x0E) = *(u32*)(params + 0x48);
+
+    textureData = (u8*)(((u32)params + 0x73) & ~0x1F);
+    size = (*(u32*)(params + 0x4C) + 0x1F) & ~0x1F;
+    handle = fn_800E2C04(size, 0x20);
+    if (handle != 0) {
+        void* copy = fn_800E27B0(handle);
+        memcpy(copy, textureData, size);
+        texture = GStextureLoad(copy);
+        *(void**)(work + 0x1C) = texture;
+        fn_800EFD14(texture, handle);
+    } else {
+        *(void**)(work + 0x1C) = NULL;
+    }
+    textureData += size;
+    texture = *(void**)(work + 0x1C);
+    if (texture != NULL) {
+        GStextureSetWrap(texture, 2, 2);
+    }
+    *(void**)(work + 0x14) = lbl_80314638;
+    *(void**)(work + 0x18) = lbl_80314AE8;
+    return textureData;
 }
 #pragma pop
 
@@ -1008,8 +1116,80 @@ void fn_8013757C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80137780(void) {
-    /* TODO: match -- 492 bytes at 0x80137780 */
+u8* fn_80137780(u8* work, u8* params) {
+    typedef struct TraceColor {
+        u8 r;
+        u8 g;
+        u8 b;
+        u8 a;
+    } TraceColor;
+    extern void fn_8013AB60(u8*, TraceColor*, TraceColor*, s32);
+    u8* data;
+    TraceColor first;
+    TraceColor second;
+    u32 firstValue;
+    u32 secondValue;
+    s32 duration;
+    s32 count;
+    s32 i;
+    s32 offset;
+    BOOL useRgb;
+    BOOL useAlpha;
+
+    count = *(s32*)(params + 4);
+    memset(work, 0, 0x5C);
+    work[0x4C] = *(u32*)params;
+    useRgb = TRUE;
+    useAlpha = FALSE;
+    if (*(s32*)(params + 8) == 1 || *(s32*)(params + 8) == 2) {
+        offset = -4;
+    } else {
+        offset = 0;
+        if ((*(u32*)(params + 0x0C) & 4) != 0) {
+            useRgb = FALSE;
+        }
+        if ((*(u32*)(params + 0x0C) & 1) != 0) {
+            useAlpha = TRUE;
+        }
+    }
+    if (*(u32*)params == 0) {
+        useRgb = TRUE;
+        useAlpha = TRUE;
+    }
+    work[0x4E] = useAlpha;
+    data = params + offset + 0x10;
+
+    for (i = 0; i < count; i++, data += 0x10) {
+        firstValue = *(u32*)(data + 0);
+        secondValue = *(u32*)(data + 4);
+        if (useRgb) {
+            first.r = firstValue;
+            first.g = firstValue >> 8;
+            first.b = firstValue >> 16;
+            second.r = secondValue;
+            second.g = secondValue >> 8;
+            second.b = secondValue >> 16;
+        } else {
+            first.r = first.g = first.b = 0x7F;
+            second.r = second.g = second.b = 0x7F;
+        }
+        if (useAlpha) {
+            first.a = firstValue >> 24;
+            second.a = secondValue >> 24;
+        } else {
+            first.a = second.a = 0xFF;
+        }
+        duration = *(s32*)(data + 8);
+        if (duration >= 0) {
+            duration =
+                (s32)(((f32)duration * (f32)(s32)GSgfxGetFrameCount()) /
+                      lbl_8047D118);
+        } else {
+            duration = -1;
+        }
+        fn_8013AB60(work, &first, &second, duration);
+    }
+    return data;
 }
 #pragma pop
 
@@ -1180,8 +1360,72 @@ fail:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80137D14(void) {
-    /* TODO: match -- 580 bytes at 0x80137D14 */
+BOOL fn_80137D14(u8* work, u32 steps) {
+    void* model;
+    void* part;
+    u8* node;
+    Vec start;
+    Vec end;
+    Vec previousStart;
+    Vec previousEnd;
+    f32 fraction;
+    u32 i;
+
+    if (*(u16*)(work + 0x1C) >= *(u16*)(work + 0x20)) {
+        return FALSE;
+    }
+    model = GSresGetResource(*(u16*)(work + 0x24),
+                             *(u16*)(work + 0x26));
+    if (model == NULL || *(void**)(work + 0x14) == NULL) {
+        return FALSE;
+    }
+    part = GSmodelGetPart(model, *(u16*)(work + 0x28));
+    if (part == NULL) {
+        return FALSE;
+    }
+    GSpartGetTransform(part, &start, NULL, NULL);
+    GSpartFree(part);
+    part = GSmodelGetPart(model, *(u16*)(work + 0x2A));
+    if (part == NULL) {
+        return FALSE;
+    }
+    GSpartGetTransform(part, &end, NULL, NULL);
+    GSpartFree(part);
+
+    node = *(u8**)work;
+    if (*(u16*)(work + 0x1C) != 0) {
+        GSvecCopy(&previousStart, node);
+        GSvecCopy(&previousEnd, node + 0x0C);
+        fraction = 1.0f / (f32)steps;
+    }
+    for (i = 0; i < steps; i++) {
+        node = *(u8**)(node + 0x18);
+        if (*(u16*)(work + 0x1C) != 0) {
+            f32 t = fraction * (f32)(i + 1);
+            GSlerpGetLinearInterpolationVector(
+                node, &previousStart, &start, t);
+            GSlerpGetLinearInterpolationVector(
+                node + 0x0C, &previousEnd, &end, t);
+        } else {
+            GSvecCopy(node, &start);
+            GSvecCopy(node + 0x0C, &end);
+        }
+    }
+    *(u8**)work = node;
+    *(u16*)(work + 0x1C) += steps;
+    *(u16*)(work + 0x1E) += steps;
+    if (*(u16*)(work + 0x1C) > *(u16*)(work + 0x20)) {
+        *(u16*)(work + 0x1C) = *(u16*)(work + 0x20);
+    }
+    if (*(u16*)(work + 0x1E) > *(u16*)(work + 0x22)) {
+        *(u16*)(work + 0x1E) = *(u16*)(work + 0x22);
+    }
+    if (*(u16*)(work + 0x1E) >
+        *(u16*)(work + 0x20) - *(u16*)(work + 0x1C)) {
+        *(u16*)(work + 0x1E) =
+            *(u16*)(work + 0x20) - *(u16*)(work + 0x1C);
+    }
+    return TRUE;
 }
 #pragma pop
 

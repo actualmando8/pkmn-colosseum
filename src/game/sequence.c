@@ -390,8 +390,70 @@ void fn_801DD3E4(void* obj) {
  * sequenceLoad - Waza scene snapshot.
  * Address: 0x801DD45C | Size: 0x18C
  */
-void sequenceLoad(void* effect, void* data) {
-    /* TODO: Scene snapshot for transition effects (0x18C bytes) */
+BOOL sequenceLoad(void* effect, void* data) {
+    extern void* GSresGetResource(u32, u32);
+    extern u32 fn_801DF160(void*);
+    extern void fn_800EB268(void*, u32);
+    extern void* fn_801195AC(void*);
+    extern void GSmodelLinkToGSparticleBank(void*, void*);
+    extern void GSmodelLinkTexAnimToAnim(void*, s32);
+    extern void GSmodelSetAnimEndedCallback(void*, void*, void*);
+    extern void sequenceAnimEndCallback(void);
+    extern void fn_801DEF0C(void*, s32, s32);
+    extern void fn_801DA4E8(void*, s32);
+    extern void GSmodelSetPosition(void*, void*);
+    extern void GSmodelSetRotation(void*, void*);
+    extern void GSmodelSetScale(void*, void*);
+    extern u32 wazaSequenceSysGetModelShadowLight__Fv(void);
+    extern s32 wazaSequenceSysGetModelShadowCount__Fv(void);
+    extern void* wazaSequenceSysGetModelShadowList__Fv(void);
+    extern void GSmodelSetShadowFlags(void*, s32);
+    extern void GSmodelSetShadowLight(void*, u32);
+    extern void GSmodelSetShadowSurface(void*, s32, void*);
+    extern void GSmodelSetBoundCheck(void*, s32);
+    extern void fn_800E3B44(void*, s32);
+    extern void GSlogWrite(const char*, ...);
+    extern u8 lbl_803727B0[];
+    extern u8 lbl_803727BC[];
+    extern const char lbl_80279998[];
+    u8* sequence = effect;
+    void* model;
+
+    if (sequence == NULL) {
+        return FALSE;
+    }
+    if (fn_801DD5E8(sequence, data)) {
+        model = GSresGetResource(*(u32*)(sequence + 0), *(u32*)(sequence + 4));
+        *(void**)(sequence + 0x24) = model;
+        fn_800EB268(model, fn_801DF160(sequence));
+        if (*(u32*)(sequence + 0xC) != 0) {
+            *(void**)(sequence + 0x28) =
+                fn_801195AC(GSresGetResource(
+                    *(u32*)(sequence + 0), *(u32*)(sequence + 0xC)));
+            GSmodelLinkToGSparticleBank(model, *(void**)(sequence + 0x28));
+        }
+        GSmodelLinkTexAnimToAnim(model, 1);
+        GSmodelSetAnimEndedCallback(model, sequenceAnimEndCallback, sequence);
+        fn_801DEF0C(sequence, 1, 1);
+        fn_801DA4E8(sequence, 0);
+        GSmodelSetPosition(model, lbl_803727B0);
+        GSmodelSetRotation(model, lbl_803727B0);
+        GSmodelSetScale(model, lbl_803727BC);
+        if (wazaSequenceSysGetModelShadowLight__Fv() != 0 &&
+            wazaSequenceSysGetModelShadowCount__Fv() != 0) {
+            GSmodelSetShadowFlags(model, 1);
+            GSmodelSetShadowLight(
+                model, wazaSequenceSysGetModelShadowLight__Fv());
+            GSmodelSetShadowSurface(
+                model, wazaSequenceSysGetModelShadowCount__Fv(),
+                wazaSequenceSysGetModelShadowList__Fv());
+            GSmodelSetBoundCheck(model, 1);
+            fn_800E3B44(model, 1);
+        }
+        return TRUE;
+    }
+    GSlogWrite(lbl_80279998);
+    return FALSE;
 }
 
 /**

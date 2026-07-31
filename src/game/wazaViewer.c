@@ -1299,13 +1299,128 @@ void fn_801D7464(void) {
  * Referenced by battle_logic.c.
  */
 void fn_801D7B94(void* effect) {
-    /* TODO: Waza sequence update (0x2C4 bytes)
-     * 1. Advances the sequence frame counter
-     * 2. Checks if any entries should start this frame
-     * 3. Updates active entries (position, animation, fade)
-     * 4. Checks if any entries have finished
-     * 5. Returns when all entries are complete
-     */
+    extern u8 lbl_804673F8[];
+    extern u8 lbl_80314638[];
+    extern const f32 lbl_8047E318;
+    extern const f32 lbl_8047E30C;
+    extern const f32 lbl_8047E330;
+    extern const f32 lbl_8047E334;
+    extern const f32 lbl_8047E338;
+    extern const f32 lbl_8047E33C;
+    extern const f32 lbl_8047E340;
+    extern const f32 lbl_8047E344;
+    extern void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID();
+    extern void* GScameraGetActiveCamera(void);
+    extern void GScameraGetPosition(void*, WazaViewerVec*);
+    extern void GScameraGetPerspective(
+        void*, f32*, f32*, f32*, f32*);
+    extern void fn_800DA4C4(s32, s32, s32);
+    extern void fn_800DA2BC(s32, s32, s32);
+    extern void fn_800DA1E8(s32, s32, s32);
+    extern void fn_800DA028(s32);
+    extern f32 fn_800E008C(WazaViewerVec*);
+    extern void fn_800B944C(s32, s32);
+    extern void fn_800D88DC(s32);
+    extern void fn_800D888C(s32);
+    extern void fn_800D7820(void*);
+    extern void fn_800D6A00(s32);
+    extern void fn_800D67BC(s32);
+    extern void GSpartGetTransform(
+        GSpart*, WazaViewerVec*, void*, void*);
+    extern void clear__5GSvecFv(WazaViewerVec*);
+    extern void fn_800D6680(f32, f32, f32);
+    extern void fn_800D5CB8(s32, s32, s32, s32, s32);
+    extern void fn_800D6728(void);
+    u8* data;
+    u8* entry;
+    struct GSmodel* model;
+    GSpart* part;
+    void* camera;
+    WazaViewerVec transform;
+    WazaViewerVec cameraPosition;
+    f32 aspect;
+    f32 fov;
+    f32 scale;
+    s32 partIndex;
+    s32 i;
+
+    data = effect;
+    model = *(struct GSmodel**)(data + 0x24);
+    entry = *(u8**)(data + 0x2C) + *(u16*)(data + 0x32) * 0xD4;
+    _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(
+        *(void**)(data + 0x2C));
+    camera = GScameraGetActiveCamera();
+    GScameraGetPosition(camera, &cameraPosition);
+    GScameraGetPerspective(camera, &fov, &aspect, &aspect, &aspect);
+
+    switch (*(s32*)(data + 0x10)) {
+    case -2:
+        aspect = lbl_8047E318;
+        break;
+    case -1:
+        aspect = lbl_8047E330;
+        break;
+    case 0:
+        aspect = lbl_8047E30C;
+        break;
+    case 1:
+        aspect = lbl_8047E334;
+        break;
+    case 2:
+        aspect = lbl_8047E338;
+        break;
+    case 3:
+        aspect = lbl_8047E33C;
+        break;
+    }
+
+    fn_800DA4C4(1, 6, 1);
+    fn_800DA2BC(1, 1, 1);
+    fn_800DA1E8(0, 7, 0);
+    fn_800DA028(0);
+    scale = lbl_8047E340 * aspect /
+            (fov * fn_800E008C(&cameraPosition));
+    if (scale > lbl_8047E30C) {
+        scale = lbl_8047E30C;
+    }
+    fn_800B944C((s32)(lbl_8047E344 * scale), 5);
+    fn_800D88DC(1);
+    fn_800D888C(6);
+    fn_800D7820(lbl_80314638);
+    fn_800D6A00(0);
+
+    partIndex = *(s32*)(lbl_804673F8 + 0x18);
+    if (partIndex < 0) {
+        fn_800D67BC(0x10);
+        for (i = 0; i < 0x10; i++) {
+            part = GSmodelGetPart(
+                model, *(s32*)(entry + 0x4C + i * 4));
+            if (part != NULL) {
+                GSpartGetTransform(part, &transform, NULL, NULL);
+                GSpartFree(part);
+            } else {
+                clear__5GSvecFv(&transform);
+                *(u32*)(lbl_804673F8 + 0x0C) |= 2;
+            }
+            fn_800D6680(transform.x, transform.y, transform.z);
+            fn_800D5CB8(0, 0xFF, 0, 0, 0xDC);
+        }
+        fn_800D6728();
+    } else {
+        fn_800D67BC(1);
+        part = GSmodelGetPart(
+            model, *(s32*)(entry + 0x4C + partIndex * 4));
+        if (part != NULL) {
+            GSpartGetTransform(part, &transform, NULL, NULL);
+            GSpartFree(part);
+        } else {
+            clear__5GSvecFv(&transform);
+            *(u32*)(lbl_804673F8 + 0x0C) |= 2;
+        }
+        fn_800D6680(transform.x, transform.y, transform.z);
+        fn_800D5CB8(0, 0xFF, 0, 0, 0xDC);
+        fn_800D6728();
+    }
 }
 
 #endif

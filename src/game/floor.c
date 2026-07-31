@@ -57,7 +57,139 @@ s32 floorCheckFightKind(u32 id) {
 #pragma optimization_level 0
 #pragma optimizewithasm off
 void fn_801123D4(u32 floorDataEntry, u32 loadMode) {
-    /* TODO: match -- 812 bytes at 0x801123D4 */
+    extern void GSscene_SetMode(s32);
+    extern void fn_800D36B4(void*);
+    extern u8 floorDataBiosGetFloorKind(void*);
+    extern s32 fn_8017B2CC(s32);
+    extern void fn_800F915C(s32);
+    extern void fn_8017B1CC(s32);
+    extern void fn_8017B13C(s32, u32);
+    extern void fn_8017B3E4(s32);
+    extern void _threadSwitch(void);
+    extern u32 heroMoveGetKenObjID(void);
+    extern void GSlogWrite(const char*, ...);
+    extern u32 lbl_802720A0[];
+    extern const char lbl_802720BC[];
+    u32 sceneData[4];
+    u32 setupData[4];
+    u32 objectId;
+    s32 status;
+    u8 kind;
+
+    sceneData[0] = lbl_802720A0[0];
+    sceneData[1] = lbl_802720A0[1];
+    sceneData[2] = lbl_802720A0[2];
+    sceneData[3] = lbl_802720A0[3];
+    GSscene_SetMode(3);
+    setupData[0] = sceneData[0];
+    setupData[1] = sceneData[1];
+    setupData[2] = sceneData[2];
+    setupData[3] = sceneData[3];
+    fn_800D36B4(setupData);
+
+    kind = floorDataBiosGetFloorKind((void*)floorDataEntry);
+    if (kind == 6) {
+        status = fn_8017B2CC(0x9A);
+        if (status == 1) {
+            do {
+                _threadSwitch();
+                status = fn_8017B2CC(0x9A);
+            } while (status == 1);
+        }
+        if (status == 0) {
+            fn_800F915C(0x9A);
+            fn_8017B1CC(0x9A);
+        }
+
+        status = fn_8017B2CC(0x0C);
+        if (status == 1) {
+            do {
+                _threadSwitch();
+                status = fn_8017B2CC(0x0C);
+            } while (status == 1);
+        }
+        if (status == 0) {
+            fn_800F915C(0x0C);
+            fn_8017B1CC(0x0C);
+        }
+
+        status = fn_8017B2CC(0x0B);
+        if (status == 1) {
+            do {
+                _threadSwitch();
+                status = fn_8017B2CC(0x0B);
+            } while (status == 1);
+        }
+        if (status == 0) {
+            fn_800F915C(0x0B);
+            fn_8017B1CC(0x0B);
+        }
+    } else if (kind == 1) {
+        status = fn_8017B2CC(0x0C);
+        if (status == 1) {
+            do {
+                _threadSwitch();
+                status = fn_8017B2CC(0x0C);
+            } while (status == 1);
+        }
+        if (status == 0) {
+            fn_800F915C(0x0C);
+            fn_8017B1CC(0x0C);
+        }
+
+        objectId = heroMoveGetKenObjID();
+        if (objectId != 0x00F70400 && fn_8017B2CC(0x9A) != 0) {
+            fn_8017B13C(0x9A, objectId);
+            do {
+                status = fn_8017B2CC(0x9A);
+                if (status < 0) {
+                    GSlogWrite(lbl_802720BC);
+                }
+                if (status == 0) {
+                    break;
+                }
+                _threadSwitch();
+            } while (TRUE);
+        }
+        if (fn_8017B2CC(0x0B) != 0) {
+            fn_8017B3E4(0x0B);
+            do {
+                status = fn_8017B2CC(0x0B);
+                if (status < 0) {
+                    GSlogWrite(lbl_802720BC);
+                }
+                if (status == 0) {
+                    break;
+                }
+                _threadSwitch();
+            } while (TRUE);
+        }
+    } else if (kind == 2) {
+        status = fn_8017B2CC(0x0B);
+        if (status == 1) {
+            do {
+                _threadSwitch();
+                status = fn_8017B2CC(0x0B);
+            } while (status == 1);
+        }
+        if (status == 0) {
+            fn_800F915C(0x0B);
+            fn_8017B1CC(0x0B);
+        }
+        if (fn_8017B2CC(0x0C) != 0) {
+            fn_8017B3E4(0x0C);
+            do {
+                status = fn_8017B2CC(0x0C);
+                if (status < 0) {
+                    GSlogWrite(lbl_802720BC);
+                }
+                if (status == 0) {
+                    break;
+                }
+                _threadSwitch();
+            } while (TRUE);
+        }
+    }
 }
 #pragma pop
 
@@ -268,13 +400,115 @@ void fn_80112F8C(void) {
 #pragma pop
 
 /* 0x80112FEC | 0x25C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_80112FEC(void) {
-    /* TODO: match -- 604 bytes at 0x80112FEC */
+void fn_80112FEC(void* floor)
+{
+    typedef struct FloorObjectEntry {
+        u8 flags;
+        u8 pad_01;
+        s16 rotation;
+        u16 floorId;
+        u16 eventFlag;
+        u16 hideFlag;
+        u8 pad_0A[6];
+        f32 x;
+        f32 y;
+        f32 z;
+    } FloorObjectEntry;
+    extern u32 floorDataBiosGetGroupID(void);
+    extern u8 fn_800FF548(void);
+    extern void* fn_8018E050(u32, u32, u32);
+    extern void* fn_8018D998(u32, u32);
+    extern void set__5GSvecFfff(void*, f32, f32, f32);
+    extern void fn_8018C0A8(u32, u32, void*);
+    extern void fn_8018BF24(u32, u32, void*);
+    extern void fn_8018CB5C(u32, u32);
+    extern void fn_8018C7C8(u32, u32, s32);
+    extern void fn_8018C1E8(u32, u32, s32);
+    extern void* GSresGetResource(u32, u32);
+    extern void GSmodelClearShadowFlags(void*, u32);
+    extern u8 fn_801902E0(u16);
+    extern void floorEventCtrlTresure(u32, u32, u32);
+    extern void fn_801837D8(u32, u32, s32, u32, s32);
+    extern u32* lbl_80478EB8;
+    extern FloorObjectEntry* lbl_80478EBC;
+    extern const f32 lbl_8047CF70;
+    extern const f32 lbl_8047CF74;
+    u32 group;
+    u32 objectIndex;
+    u32 i;
+    u32 floorId;
+
+    group = floorDataBiosGetGroupID();
+    objectIndex = 0;
+    floorId = *(u32*)((u8*)floor + 0xC);
+    for (i = 0; i < *lbl_80478EB8; i++) {
+        FloorObjectEntry* entry = &lbl_80478EBC[i];
+        u32 type;
+        u32 peopleInfo;
+        u32 resourceId;
+        void* object;
+        f32 position[3];
+        f32 rotation[3];
+
+        if (entry->floorId != floorId) {
+            continue;
+        }
+        type = (entry->flags >> 5) & 7;
+        switch (type) {
+        case 1:
+            peopleInfo = 0x03770400;
+            break;
+        case 2:
+            peopleInfo = 0x03780400;
+            break;
+        case 3:
+            peopleInfo = 0x03790400;
+            break;
+        default:
+            continue;
+        }
+
+        resourceId = 0x7FFF0000 | objectIndex++;
+        if (fn_800FF548() == 0) {
+            object = fn_8018E050(group, resourceId, peopleInfo);
+        } else {
+            object = fn_8018D998(group, resourceId);
+        }
+        if (object == NULL || fn_800FF548() == 1) {
+            continue;
+        }
+
+        set__5GSvecFfff(position, entry->x, entry->y, entry->z);
+        fn_8018C0A8(group, resourceId, position);
+        set__5GSvecFfff(rotation, lbl_8047CF70,
+                        lbl_8047CF74 * entry->rotation,
+                        lbl_8047CF70);
+        fn_8018BF24(group, resourceId, rotation);
+        fn_8018CB5C(group, resourceId);
+        fn_8018C7C8(group, resourceId, 4);
+        fn_8018C1E8(group, resourceId, 1);
+
+        if (type == 2) {
+            object = GSresGetResource(group, resourceId);
+            if (object != NULL) {
+                GSmodelClearShadowFlags(object, 1);
+            }
+        }
+        if (entry->eventFlag != 0) {
+            if (fn_801902E0(entry->eventFlag)) {
+                floorEventCtrlTresure(group, resourceId, 0);
+            } else {
+                floorEventCtrlTresure(group, resourceId, 1);
+                if (entry->hideFlag != 0 &&
+                    !fn_801902E0(entry->hideFlag)) {
+                    fn_8018C1E8(group, resourceId, 0);
+                }
+                fn_801837D8(group, resourceId, 0x0596000A,
+                            entry->eventFlag, entry->hideFlag);
+            }
+        }
+    }
 }
-#pragma pop
 
 /* 0x80113248 | 0x29C */
 #pragma push
@@ -391,13 +625,119 @@ void _floorInitCharacters__FP11GSfloor_dd_(void* a) {
 #pragma pop
 
 /* 0x801134E4 | 0x294 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void floorInitMap(void) {
-    /* TODO: match -- 660 bytes at 0x801134E4 */
+void floorInitMap(u32 group, u32 floorId)
+{
+    typedef struct FloorSceneData {
+        void** models;
+        u32 pad_04;
+        void** lights;
+    } FloorSceneData;
+    extern void* GSresGetResource(u32, u32);
+    extern void* HSD_ArchiveGetPublicAddress(void*, const char*);
+    extern u32 floorReadMakeModelResID(u32);
+    extern u32 floorReadMakeLightResID(u32);
+    extern u32 floorReadMakeCameraResID(u32);
+    extern u32 floorReadMakeFogResID(u32);
+    extern void fn_800F9210(u32, u32);
+    extern void GSresRegisterResource(void*, u32, u32, void*);
+    extern u32 _floorUnloadModel__FPvUlUl(u32);
+    extern void GSmodelSetVisibility(void*, u32);
+    extern s32 fn_800057A0(void);
+    extern u32 fn_800FF56C(void);
+    extern u8 GSmodelCanAnimate(void*);
+    extern void GSmodelLinkTexAnimToAnim(void*, u32);
+    extern void GSmodelSetTexAnimRate(void*, f32);
+    extern void GSlightSetActive(void*, u32);
+    extern u8 GSlightCanAnimate(void*);
+    extern void GSlightSetAnimIndex(void*, u32);
+    extern void GSlightSetAnimRate(void*, f32);
+    extern void GSlightStartAnimation(void*);
+    extern void cameraSetGScamera(void*);
+    extern void fn_800D2B90(void*);
+    extern const char lbl_80272088[];
+    extern const char lbl_8035B878[];
+    extern f32 lbl_8047CF94;
+    extern f32 lbl_8047CF98;
+    FloorSceneData* data;
+    void* archive;
+    void* object;
+    u32 baseId;
+    u32 index;
+
+    if (floorId == 0) {
+        return;
+    }
+    archive = GSresGetResource(group, floorId);
+    data = HSD_ArchiveGetPublicAddress(
+        archive, lbl_80272088 + 0x28);
+    if (data == NULL) {
+        return;
+    }
+
+    if (data->models != NULL) {
+        baseId = floorReadMakeModelResID(floorId);
+        for (index = 0; data->models[index] != NULL; index++) {
+            u32 resourceId = baseId | index;
+            object = floorOpenObject(resourceId);
+            if (object == NULL) {
+                GSlogWrite(lbl_80272088 + 0x64, lbl_8035B878, index);
+                GSlogWrite(lbl_80272088 + 0x88);
+                continue;
+            }
+            fn_800F9210(group, resourceId);
+            GSresRegisterResource(object, group, resourceId,
+                                  _floorUnloadModel__FPvUlUl);
+            GSmodelSetVisibility(object, 0);
+
+            if (fn_800057A0() == 1) {
+                switch (fn_800FF56C()) {
+                case 3:
+                case 0xB:
+                case 0xC:
+                case 0xD:
+                case 0xE:
+                case 0x15:
+                case 0x24:
+                case 0x25:
+                case 0x26:
+                case 0x72:
+                case 0x75:
+                case 0x7B:
+                case 0xCA:
+                case 0xD0:
+                case 0xDE:
+                    if (GSmodelCanAnimate(object)) {
+                        GSmodelLinkTexAnimToAnim(object, 0);
+                        GSmodelSetTexAnimRate(object, lbl_8047CF94);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    if (data->lights != NULL) {
+        baseId = floorReadMakeLightResID(floorId);
+        for (index = 0; data->lights[index] != NULL; index++) {
+            object = GSresGetResource(group, baseId | index);
+            if (object != NULL) {
+                GSlightSetActive(object, 1);
+                if (GSlightCanAnimate(object)) {
+                    GSlightSetAnimIndex(object, 0);
+                    GSlightSetAnimRate(object, lbl_8047CF98);
+                    GSlightStartAnimation(object);
+                }
+            }
+        }
+    }
+
+    object = GSresGetResource(group, floorReadMakeCameraResID(floorId));
+    if (object != NULL) {
+        cameraSetGScamera(object);
+    }
+    object = GSresGetResource(group, floorReadMakeFogResID(floorId));
+    fn_800D2B90(object);
 }
-#pragma pop
 
 /* 0x80113778 | 0xB0 */
 void floorChangePos(u32 floorId, s16 direction, f32 x, f32 y, f32 z) {
@@ -575,8 +915,52 @@ void fn_801139BC(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void _floorUpdate__FUi14FloorEnterMode(void) {
-    /* TODO: match -- 376 bytes at 0x80113A0C */
+void _floorUpdate__FUi14FloorEnterMode(u32 floorId, s32 enterMode) {
+    extern void fn_801171C8(void);
+    extern void fn_80117D14(void);
+    extern void cameraUpdate(void);
+    extern u8* GSresGetResource(u32, u32);
+    extern void fn_8010D8D4(s32);
+    extern void fn_800D9ED8(s32);
+    extern void fn_800FAEF8(s32, s32, u32, const char*, u32, ...);
+    extern s8 lbl_8047AD60;
+    extern u8 lbl_8035B818[];
+    extern const char lbl_80272088[];
+    s32 priority;
+    s32 i;
+
+    (void)floorId;
+    (void)enterMode;
+    fn_801171C8();
+    fn_80117D14();
+    cameraUpdate();
+    if (GSresGetResource(0, 2) != NULL &&
+        *GSresGetResource(0, 2) != 0) {
+        fn_8010D8D4(0);
+        if (GSresGetResource(0, 2) != NULL &&
+            *GSresGetResource(0, 2) != 0) {
+            fn_800D9ED8(1);
+            priority = 0x1E;
+            for (i = 0; i < 10; i++, priority += 12) {
+                u8* entry = lbl_8035B818 + ((lbl_8047AD60 + i) % 10) * 8;
+                switch ((s8)entry[0]) {
+                case 1:
+                    fn_800FAEF8(0x1E, priority, 0x8080FFFF,
+                                lbl_80272088 + 0xA4, *(u32*)(entry + 4));
+                    break;
+                case 2:
+                    fn_800FAEF8(0x1E, priority, 0x8080FFFF,
+                                lbl_80272088 + 0xB4, *(u32*)(entry + 4));
+                    break;
+                case 3:
+                    fn_800FAEF8(0x1E, priority, 0x8080FFFF,
+                                lbl_80272088 + 0xC8, *(u32*)(entry + 4));
+                    break;
+                }
+            }
+            fn_800D9ED8(0);
+        }
+    }
 }
 #pragma pop
 
@@ -584,8 +968,61 @@ void _floorUpdate__FUi14FloorEnterMode(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void _floorInitialize__FUi14FloorEnterMode(void) {
-    /* TODO: match -- 396 bytes at 0x80113B84 */
+void _floorInitialize__FUi14FloorEnterMode(void* floor, s32 enterMode) {
+    extern void heroMoveInit(void*, void*);
+    extern u8 fn_800FF548(void);
+    extern void _floorInitCharacters__FP11GSfloor_dd_(void*);
+    extern u8 fn_801902E0(u16);
+    extern void floorEventCtrlDoor(u32, u32, u32);
+    extern void fn_80112FEC(void*);
+    extern void fn_80117164(void*);
+    extern void GSscene_SetMode(s32);
+    extern void cameraSetTarget(s32, s32);
+    extern void GSscene_SetCameraViewVector(void*);
+    extern void cameraUpdate(void);
+    extern void fn_800F7D38(s32, s32, s32);
+    extern void fn_800F7C8C(s32, s32, s32);
+    extern u8 lbl_80408378[];
+    extern u8* lbl_80478ECC;
+    extern u32* lbl_80478EC8;
+    extern const u8 lbl_80272088[];
+    u32 floorId = *(u32*)((u8*)floor + 0xC);
+    u32 i;
+
+    (void)enterMode;
+    heroMoveInit(lbl_80408378 + 0x10, lbl_80408378 + 0x1C);
+    if (fn_800FF548() == 0) {
+        _floorInitCharacters__FP11GSfloor_dd_(floor);
+        for (i = 0; i < *lbl_80478EC8; i++) {
+            u8* entry = lbl_80478ECC + i * 0x18;
+            if (*(u16*)(entry + 0xC) == floorId) {
+                switch (entry[7]) {
+                case 1:
+                case 3:
+                    floorEventCtrlDoor(
+                        floorId, i, fn_801902E0(*(u16*)(entry + 0xE)) ? 1 : 3);
+                    break;
+                case 2:
+                    floorEventCtrlDoor(floorId, i, 3);
+                    break;
+                }
+            }
+        }
+        fn_80112FEC(floor);
+    }
+    fn_80117164(floor);
+    if (fn_800FF548() == 0) {
+        u32 view[3];
+        view[0] = *(const u32*)(lbl_80272088 + 0);
+        view[1] = *(const u32*)(lbl_80272088 + 4);
+        view[2] = *(const u32*)(lbl_80272088 + 8);
+        GSscene_SetMode(0);
+        cameraSetTarget(0, 0x64);
+        GSscene_SetCameraViewVector(view);
+    }
+    cameraUpdate();
+    fn_800F7D38(1, 0, 0);
+    fn_800F7C8C(1, 0, 0);
 }
 #pragma pop
 

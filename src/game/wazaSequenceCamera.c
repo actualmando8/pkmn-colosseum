@@ -11,6 +11,7 @@
  */
 
 #include "game/battle/battle_waza_types.h"
+#include "dolphin/mtx.h"
 
 #pragma peephole on
 #pragma peephole on
@@ -97,7 +98,9 @@ void* wazaSequenceCameraGetPattern__Fbi(u8 shortTable, s32 flags) {
  */
 extern void* lbl_8047B3EC;
 extern void* lbl_8047B3F0;
+extern u32 lbl_8047B3E8;
 extern s32 lbl_8047B410;
+extern f32 lbl_80478CDC;
 
 extern u8 lbl_80467CC0[];
 extern void fn_801DD158(void* obj);
@@ -160,7 +163,99 @@ void fn_801D2C74(void* owner) {
  * Address: 0x801D2D28 | Size: 0x26C
  */
 void fn_801D2D28(void) {
-    /* TODO: Waza animation setup (0x26C bytes) */
+    typedef struct CameraFovKey {
+        f32 start;
+        f32 end;
+        u32 startFrame;
+        u32 endFrame;
+    } CameraFovKey;
+    extern CameraFovKey lbl_804673D4[];
+    extern u8 lbl_8047B3F4;
+    extern u32 fn_800D3088(void);
+    extern void* GSmodelGetPart(void*, u32);
+    extern void GSpartGetTransform(void*, Vec*, void*, void*);
+    extern void GSpartFree(void*);
+    extern void GSmodelGetPosition(void*, Vec*);
+    extern void GSscene_GetCameraPositionVector(Vec*);
+    extern void fn_800E0168(Vec*, Vec*, Vec*);
+    extern void cameraMoveTargetOfs(s32, Vec*, f32);
+    extern f32 GSlerpGetLinearInterpolationFloat(f32, f32, f32);
+    extern void cameraSetFov(f32);
+    extern BOOL cameraMoveEndCheckSpecial(s32);
+    extern f32 lbl_8047E1E0;
+    u8* sequence;
+    u8* camera;
+    u8* model;
+    CameraFovKey* key;
+    Vec target;
+    Vec origin;
+    void* part;
+    f32 t;
+    u32 frame;
+    u32 partId;
+    u32 i;
+
+    if (lbl_8047B3F4 == 0 || lbl_8047B3EC == NULL) {
+        return;
+    }
+
+    camera = lbl_8047B3F0;
+    if (camera != NULL && *(u32*)(camera + 0x18) != 0 &&
+        *(u32*)(camera + 0x20) != 0) {
+        return;
+    }
+
+    frame = fn_800D3088();
+    sequence = lbl_8047B3EC;
+    model = *(u8**)(sequence + 0x24);
+    key = (CameraFovKey*)(*(u8**)(sequence + 0x2C) +
+                          *(u16*)(sequence + 0x32) * 0xD4);
+    if (camera != NULL) {
+        partId = *(u32*)((u8*)key + 0x4C + camera[0x17] * 4);
+    } else {
+        partId = *(u32*)((u8*)key + 0x54);
+    }
+    part = GSmodelGetPart(model, partId);
+    if (part != NULL) {
+        GSpartGetTransform(part, &target, NULL, NULL);
+        if (camera != NULL && *(u16*)(camera + 0x2E) == 3 &&
+            (*(u16*)(camera + 0x2C) == 0x154 ||
+             *(u16*)(camera + 0x2C) == 0x6E)) {
+            GSscene_GetCameraPositionVector(&origin);
+        } else {
+            GSmodelGetPosition(model, &origin);
+        }
+        fn_800E0168(&target, &target, &origin);
+        cameraMoveTargetOfs(7, &target, lbl_8047E1E0);
+        GSpartFree(part);
+    }
+
+    lbl_8047B3E8 += frame;
+    key = lbl_804673D4;
+    for (i = 0; i < 2; i++, key++) {
+        if (lbl_8047B3E8 <= key->startFrame) {
+            lbl_80478CDC = key->start;
+            break;
+        }
+        if (lbl_8047B3E8 <= key->endFrame) {
+            t = (f32)(lbl_8047B3E8 - key->startFrame) /
+                (f32)(key->endFrame - key->startFrame);
+            lbl_80478CDC =
+                GSlerpGetLinearInterpolationFloat(key->start, key->end, t);
+            break;
+        }
+        lbl_80478CDC = key->end;
+    }
+    cameraSetFov(lbl_80478CDC);
+
+    if (lbl_8047B3F0 == NULL && !cameraMoveEndCheckSpecial(0)) {
+        GSscene_SetMode(8);
+        fn_801765F4(0);
+        lbl_8047B3EC = NULL;
+        if (fn_800057A8() == 2) {
+            GSscene_SetMode(2);
+        }
+    }
 }
 
 /**
@@ -269,22 +364,367 @@ void _wazaSequenceCameraDoFOV__FP13ModelSequenceP24wazaSequenceCameraParamsif(vo
  * Address: 0x801D49D8 | Size: 0x3C8
  * State machine for spread/multi-target move animations.
  */
-void _wazaSequenceCameraSelectDuration__FUcPff(void) {
-    /* TODO: Move animation state machine D (0x3C8 bytes) */
+s32 _wazaSequenceCameraSelectDuration__FUcPff(
+    u8 mode, f32* thresholds, s32 duration)
+{
+    extern f32 fn_800E0BE4();
+    f32 random;
+
+    if (mode == 1) {
+        return duration < 12 ? duration : 12;
+    }
+    if (mode == 2) {
+        return duration < 20 ? duration : 20;
+    }
+    if (mode == 4) {
+        return duration < 45 ? duration : 45;
+    }
+    if (mode == 8) {
+        return duration;
+    }
+    if (mode == 3) {
+        random = fn_800E0BE4();
+        return random < thresholds[0]
+                   ? (duration < 12 ? duration : 12)
+                   : (duration < 20 ? duration : 20);
+    }
+    if (mode == 5) {
+        random = fn_800E0BE4();
+        return random < thresholds[0]
+                   ? (duration < 12 ? duration : 12)
+                   : (duration < 45 ? duration : 45);
+    }
+    if (mode == 9) {
+        random = fn_800E0BE4();
+        return random < thresholds[0]
+                   ? (duration < 12 ? duration : 12)
+                   : duration;
+    }
+    if (mode == 6) {
+        random = fn_800E0BE4();
+        return random < thresholds[1]
+                   ? (duration < 20 ? duration : 20)
+                   : (duration < 45 ? duration : 45);
+    }
+    if (mode == 10) {
+        random = fn_800E0BE4();
+        return random < thresholds[1]
+                   ? (duration < 20 ? duration : 20)
+                   : duration;
+    }
+    if (mode == 12) {
+        random = fn_800E0BE4();
+        return random < thresholds[2]
+                   ? (duration < 45 ? duration : 45)
+                   : duration;
+    }
+    if (mode == 7) {
+        random = fn_800E0BE4();
+        if (random < thresholds[0]) {
+            return duration < 12 ? duration : 12;
+        }
+        if (random < thresholds[1]) {
+            return duration < 20 ? duration : 20;
+        }
+        return duration < 45 ? duration : 45;
+    }
+    if (mode == 11) {
+        random = fn_800E0BE4();
+        if (random < thresholds[0]) {
+            return duration < 12 ? duration : 12;
+        }
+        if (random < thresholds[1]) {
+            return duration < 20 ? duration : 20;
+        }
+        return duration;
+    }
+    if (mode == 13) {
+        random = fn_800E0BE4();
+        if (random < thresholds[0]) {
+            return duration < 12 ? duration : 12;
+        }
+        if (random < thresholds[2]) {
+            return duration < 45 ? duration : 45;
+        }
+        return duration;
+    }
+    if (mode == 14) {
+        random = fn_800E0BE4();
+        if (random < thresholds[1]) {
+            return duration < 12 ? duration : 12;
+        }
+        if (random < thresholds[2]) {
+            return duration < 20 ? duration : 20;
+        }
+        return duration;
+    }
+    if (mode == 15) {
+        random = fn_800E0BE4();
+        if (random < thresholds[0]) {
+            return duration < 12 ? duration : 12;
+        }
+        if (random < thresholds[1]) {
+            return duration < 12 ? duration : 12;
+        }
+        if (random < thresholds[2]) {
+            return duration < 20 ? duration : 20;
+        }
+    }
+    return duration;
 }
 
 /**
  * _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams - Move animation helper: particle burst.
  * Address: 0x801D4DA0 | Size: 0x218
  */
-void _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams(s32 effectID, s32 slot) {
-    /* TODO: Particle burst helper (0x218 bytes) */
+void _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSequenceCameraParams(
+    void* modelSequence, void* wazaSequence, void* cameraParams)
+{
+    extern f32 fn_800E0BE4(u8, s32);
+    extern s32 lbl_80478CD8;
+    extern const f32 lbl_8047E1F4;
+    u32 flags;
+    u8 option0;
+    u8 option1;
+    u8 option2;
+    u8 option3;
+    s32 count;
+    s32* motion;
+    f32 interval;
+
+    motion = cameraParams;
+    if (*(u16*)((u8*)modelSequence + 0x70) == 0x13A) {
+        *motion = 4;
+        return;
+    }
+
+    count = 0;
+    option0 = option1 = option2 = option3 = 0;
+    if (wazaSequence != NULL) {
+        flags = *(u32*)((u8*)wazaSequence + 8);
+        if ((flags & 1) != 0) {
+            *motion = 5;
+            return;
+        }
+        if ((flags & 8) != 0) {
+            option0 = 1;
+            count++;
+        }
+        if ((flags & 0x10) != 0) {
+            option1 = 1;
+            count++;
+        }
+        if ((flags & 0x20) != 0) {
+            option2 = 1;
+            count++;
+        }
+        if ((flags & 0x40) != 0) {
+            option3 = 1;
+            count++;
+        }
+    }
+
+    if (count == 0) {
+        count = 4;
+        option0 = option1 = option2 = option3 = 1;
+    } else if (count == 1) {
+        if (option0) {
+            *motion = 3;
+        }
+        if (option1) {
+            *motion = 0;
+        }
+        if (option2) {
+            *motion = 1;
+        }
+        if (option3) {
+            *motion = 2;
+        }
+        lbl_80478CD8 = *motion;
+        return;
+    }
+
+    interval = lbl_8047E1F4 / (f32)count;
+    for (;;) {
+        f32 random;
+        f32 limit;
+
+        random = fn_800E0BE4(0, 0);
+        limit = interval;
+        if (option0) {
+            if (random < limit) {
+                *motion = 3;
+                if (lbl_80478CD8 != *motion) {
+                    break;
+                }
+            }
+            limit += interval;
+        }
+        if (option1) {
+            if (random < limit) {
+                *motion = 0;
+                if (lbl_80478CD8 != *motion) {
+                    break;
+                }
+            }
+            limit += interval;
+        }
+        if (option2) {
+            if (random < limit) {
+                *motion = 1;
+                if (lbl_80478CD8 != *motion) {
+                    break;
+                }
+            }
+            limit += interval;
+        }
+        if (option3 && random < limit) {
+            *motion = 2;
+            if (lbl_80478CD8 != *motion) {
+                break;
+            }
+        }
+    }
+    lbl_80478CD8 = *motion;
 }
 
 /**
  * _wazaSequenceCameraCalculateParams__FP13ModelSequenceiP24wazaSequenceCameraParams - Move animation helper: model projectile.
  * Address: 0x801D4FB8 | Size: 0x370
  */
-void _wazaSequenceCameraCalculateParams__FP13ModelSequenceiP24wazaSequenceCameraParams(s32 modelID, s32 attackerSlot, s32 targetSlot) {
-    /* TODO: Model projectile helper (0x370 bytes) */
+void _wazaSequenceCameraCalculateParams__FP13ModelSequenceiP24wazaSequenceCameraParams(
+    void* modelSequence, s32 flags, void* cameraParams)
+{
+    extern void* GSmodelGetBound(void*);
+    extern void GSmodelGetRotation(void*, Vec*);
+    extern f32 fn_800E008C(Vec*);
+    extern f32 lbl_8047E1F4, lbl_8047E1FC, lbl_8047E200, lbl_8047E20C;
+    extern f32 lbl_8047E240, lbl_8047E244, lbl_8047E248, lbl_8047E24C;
+    extern f32 lbl_8047E250, lbl_8047E288, lbl_8047E28C, lbl_8047E290;
+    extern f32 lbl_8047E294, lbl_8047E298, lbl_8047E29C, lbl_8047E2A0;
+    extern f32 lbl_8047E2A4, lbl_8047E2A8, lbl_8047E2AC, lbl_8047E2B0;
+    extern f32 lbl_8047E2B4, lbl_8047E2B8, lbl_8047E2BC, lbl_8047E2C0;
+    extern f32 lbl_8047E2C4, lbl_8047E2C8, lbl_8047E2CC, lbl_8047E2D0;
+    extern f32 lbl_8047E2D4, lbl_8047E2D8;
+    u8* sequence = modelSequence;
+    u8* params = cameraParams;
+    void* model = *(void**)(sequence + 0x24);
+    u8* bound = GSmodelGetBound(model);
+    Vec rotation;
+    f32 distanceScale;
+    f32 sizeScale;
+    f32 lower;
+    f32 upper;
+    f32 magnitude;
+    s32 mode;
+
+    GSmodelGetRotation(model, &rotation);
+    *(f32*)(params + 0x14) = rotation.y;
+    mode = *(s32*)(sequence + 0x10);
+    if (mode == -2 || mode == -1) {
+        sizeScale = lbl_8047E288;
+        distanceScale = lbl_8047E240;
+    } else if (mode == 1) {
+        sizeScale = lbl_8047E28C;
+        distanceScale = lbl_8047E244;
+    } else if (mode == 2) {
+        sizeScale = lbl_8047E290;
+        distanceScale = lbl_8047E248;
+    } else if (mode == 3) {
+        sizeScale = lbl_8047E294;
+        distanceScale = lbl_8047E24C;
+    } else {
+        sizeScale = lbl_8047E298;
+        distanceScale = lbl_8047E1F4;
+    }
+
+    if (flags & 1) {
+        *(f32*)(params + 0x0C) = lbl_8047E1FC;
+        *(f32*)(params + 0x10) = lbl_8047E29C;
+    } else if (flags & 2) {
+        *(f32*)(params + 0x0C) = lbl_8047E2A0;
+        *(f32*)(params + 0x10) = lbl_8047E2A4;
+    } else if (flags & 4) {
+        if (mode > 0) {
+            *(f32*)(params + 0x0C) = lbl_8047E2A0;
+            *(f32*)(params + 0x10) = lbl_8047E2A4;
+        } else {
+            *(f32*)(params + 0x0C) = lbl_8047E2A4;
+            *(f32*)(params + 0x10) = lbl_8047E2A8;
+        }
+    } else if (flags & 8) {
+        if (mode > 0) {
+            *(f32*)(params + 0x0C) = lbl_8047E2A4;
+            *(f32*)(params + 0x10) = lbl_8047E2A8;
+        } else {
+            *(f32*)(params + 0x0C) = lbl_8047E2A8;
+            *(f32*)(params + 0x10) = lbl_8047E2AC;
+        }
+    } else if (flags & 0x10) {
+        *(f32*)(params + 0x0C) = lbl_8047E2AC;
+        *(f32*)(params + 0x10) = lbl_8047E2B0;
+    } else if (mode > 0) {
+        *(f32*)(params + 0x0C) = lbl_8047E2A0;
+        *(f32*)(params + 0x10) = lbl_8047E2A8;
+    } else {
+        *(f32*)(params + 0x0C) = lbl_8047E2A0;
+        *(f32*)(params + 0x10) = lbl_8047E2B4;
+    }
+
+    if (flags & 0x20) {
+        *(f32*)(params + 0x20) = lbl_8047E200;
+        *(f32*)(params + 0x24) = lbl_8047E2C0;
+        lower = lbl_8047E2B8;
+        upper = lbl_8047E2BC;
+    } else if (flags & 0x40) {
+        *(f32*)(params + 0x20) = lbl_8047E2C0;
+        *(f32*)(params + 0x24) = lbl_8047E250;
+        lower = lbl_8047E2B8;
+        upper = lbl_8047E2C4;
+    } else if (flags & 0x80) {
+        *(f32*)(params + 0x20) = lbl_8047E250;
+        *(f32*)(params + 0x24) = lbl_8047E2C8;
+        lower = lbl_8047E2B8;
+        upper = lbl_8047E20C;
+    } else {
+        *(f32*)(params + 0x20) = lbl_8047E20C;
+        *(f32*)(params + 0x24) = lbl_8047E2C8;
+        lower = lbl_8047E2B8;
+        upper = lbl_8047E20C;
+    }
+
+    *(f32*)(params + 0x20) *= distanceScale;
+    *(f32*)(params + 0x24) *= distanceScale;
+    magnitude = fn_800E008C((Vec*)(bound + 0x28));
+    *(f32*)(params + 0x04) = lbl_8047E2CC * magnitude;
+    *(f32*)(params + 0x08) = *(f32*)(bound + 0x2C);
+    *(f32*)(params + 0x18) = *(f32*)(bound + 0x14);
+    *(f32*)(params + 0x1C) = *(f32*)(bound + 0x20);
+
+    if (*(f32*)(params + 0x18) < lower) {
+        *(f32*)(params + 0x18) = lower;
+        if (*(f32*)(params + 0x1C) < lower) {
+            *(f32*)(params + 0x1C) = lbl_8047E294 * lower;
+        }
+    }
+    if (*(f32*)(params + 0x1C) > upper) {
+        *(f32*)(params + 0x1C) = upper;
+        if (*(f32*)(params + 0x18) > upper) {
+            *(f32*)(params + 0x18) = lbl_8047E2D0 * upper;
+        }
+    }
+    *(f32*)(params + 0x04) *= sizeScale;
+    *(f32*)(params + 0x08) *= sizeScale;
+    if (*(f32*)(params + 0x20) < lbl_8047E20C) {
+        *(f32*)(params + 0x20) = lbl_8047E20C;
+    }
+    if (*(f32*)(params + 0x24) < lbl_8047E2D4) {
+        *(f32*)(params + 0x24) = lbl_8047E2D4;
+    }
+    if (*(f32*)(params + 0x20) > lbl_8047E2D8) {
+        *(f32*)(params + 0x20) = lbl_8047E2D8;
+    }
+    if (*(f32*)(params + 0x24) > lbl_8047E2C8) {
+        *(f32*)(params + 0x24) = lbl_8047E2C8;
+    }
 }

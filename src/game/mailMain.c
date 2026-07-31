@@ -201,8 +201,91 @@ void mailMainReceiveTerminate(void) {
  * fn_801D2404 - Waza effect complex transform.
  * Address: 0x801D2404 | Size: 0x288
  */
-void fn_801D2404(s32 seqHandle, f32 x, f32 y, f32 z, f32 scale, f32 rot) {
-    /* TODO: Effect complex transform (0x288 bytes) */
+void fn_801D2404(void) {
+    extern void* fn_800F92D4(u32);
+    extern s32 GStextureGetXsize(void*);
+    extern s32 GStextureGetYsize(void*);
+    extern void fn_800FE6D0(s32, s32);
+    extern void fn_800FE35C(void);
+    extern void spriteSetEnv(void);
+    extern void fn_800D9ED8(s32);
+    extern void fn_800D7820(void*);
+    extern void fn_800D88DC(s32);
+    extern void fn_800D888C(s32);
+    extern void fn_800D85D4(s32, void*);
+    extern void fn_800D6A00(s32);
+    extern void fn_800D67BC(s32);
+    extern void fn_800D61E4(s16, s16);
+    extern void fn_800D5CB8(s32, u8, u8, u8, u8);
+    extern void fn_800D59B8(s32, f32, f32);
+    extern void fn_800D6728(void);
+    extern s32 gamedatasaveGetStatus(s32, s32);
+    extern void fn_800F78A4(s32, s32, s32, s32, s32);
+    extern s32 fn_800D3088(void);
+    extern s32 fn_801666BC(u32);
+    extern void fn_800F9210(s32, s32);
+    extern void fn_80166B18(u32);
+    extern void fn_801667D8(u32, s32, s32);
+    extern u8 lbl_80314F98[];
+    extern f32 lbl_8047E1B4, lbl_8047E1B8, lbl_8047E1BC;
+    void* texture;
+    s32 width;
+    s32 height;
+    s32 visible;
+    u32 sound;
+    u32 work;
+
+    if (lbl_80467390[0] == 0) {
+        return;
+    }
+
+    visible = 0;
+    if (lbl_80467390[1] < 0x258 &&
+        lbl_80467390[1] % 60 < 30) {
+        visible = 1;
+    }
+    if (visible) {
+        texture = fn_800F92D4(0x0C881200);
+        width = GStextureGetXsize(texture);
+        height = GStextureGetYsize(texture);
+        fn_800FE6D0(0, 0);
+        fn_800FE35C();
+        spriteSetEnv();
+        fn_800D9ED8(1);
+        fn_800D7820(lbl_80314F98);
+        fn_800D88DC(3);
+        fn_800D888C(4);
+        fn_800D85D4(0, texture);
+        fn_800D6A00(7);
+        fn_800D67BC(2);
+        fn_800D61E4(0x15, 0x25);
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047E1B4, lbl_8047E1B4);
+        fn_800D61E4((s16)(width + 0x15), (s16)(height + 0x25));
+        fn_800D5CB8(0, 0xFF, 0xFF, 0xFF, 0xFF);
+        fn_800D59B8(0, lbl_8047E1B8, lbl_8047E1B8);
+        fn_800D6728();
+        fn_800D9ED8(0);
+        if (gamedatasaveGetStatus(0, 9) == 0 &&
+            (f32)lbl_80467390[1] < lbl_8047E1BC) {
+            fn_800F78A4(1, 0, 0xFF, 0x1E, 0);
+        }
+    }
+
+    lbl_80467390[1] += fn_800D3088();
+    sound = lbl_80467390[2];
+    if (sound != 0 && fn_801666BC(sound) != 2) {
+        fn_800F9210(0, 0x408);
+        fn_80166B18(sound);
+        work = lbl_80467390[3];
+        if (work != 0 && work != 0xFFFFFFFF) {
+            fn_801667D8(work, 0, 0);
+        }
+        lbl_80467390[2] = 0;
+    }
+    if (lbl_80467390[1] >= 0x258 && lbl_80467390[2] == 0) {
+        lbl_80467390[0] = 0;
+    }
 }
 
 /**
@@ -249,8 +332,92 @@ void mailMainReceiveStart(s32 seqHandle, s32 slot, s32 boneIdx) {
  * Address: 0x801D2764 | Size: 0x274
  */
 s32 chkMailSend(s32 seqHandle, f32 step) {
-    /* TODO: Mail eligibility/update routine (0x274 bytes). */
-    return 0;
+    extern u16 mailGetSendRate(s32);
+    extern u8 fn_801D142C(s32);
+    extern u16 fn_801D13E4(s32);
+    extern u16 fn_801D1338(u16);
+    extern u8 mailGetSendCondType(s32);
+    extern u32 mailGetSendCondition(s32);
+    extern void* fn_801906A0(u32);
+    extern s32 fn_800F7434(u32, s32, ...);
+    extern f32 lbl_8047E1C8, lbl_8047E1CC;
+    u16 rate;
+    u16 expected;
+    u16 actual;
+    u8 comparison;
+    u8 conditionType;
+    u32 condition;
+    s32 eligible;
+
+    if (mailGetReceiveNumber(seqHandle) >= 0) {
+        return FALSE;
+    }
+    rate = mailGetSendRate(seqHandle);
+    if (rate == 0xFFFF) {
+        return FALSE;
+    }
+    if (step >= (lbl_8047E1C8 * (f32)rate) / lbl_8047E1CC) {
+        return FALSE;
+    }
+
+    comparison = fn_801D142C(seqHandle);
+    if (comparison == 0xFF) {
+        return FALSE;
+    }
+    expected = fn_801D13E4(seqHandle);
+    if (expected == 0xFFFF) {
+        return FALSE;
+    }
+    actual = fn_801D1338(expected);
+    eligible = FALSE;
+    switch (comparison) {
+    case 0:
+        eligible = actual == expected;
+        break;
+    case 1:
+        eligible = actual > expected;
+        break;
+    case 2:
+        eligible = actual < expected;
+        break;
+    case 3:
+        eligible = actual >= expected;
+        break;
+    case 4:
+        eligible = actual <= expected;
+        break;
+    case 5:
+        eligible = actual != expected;
+        break;
+    case 6:
+        eligible = TRUE;
+        break;
+    }
+    if (!eligible) {
+        return FALSE;
+    }
+
+    conditionType = mailGetSendCondType(seqHandle);
+    if (conditionType == 0xFF) {
+        return FALSE;
+    }
+    eligible = FALSE;
+    if (conditionType == 0) {
+        eligible = TRUE;
+    } else if (conditionType == 1) {
+        condition = mailGetSendCondition(seqHandle);
+        if (condition != 0xFFFFFFFF &&
+            fn_801906A0(condition) != NULL) {
+            eligible = TRUE;
+        }
+    } else if (conditionType == 2) {
+        condition = mailGetSendCondition(seqHandle);
+        if (condition != 0xFFFFFFFF && condition != 0 &&
+            fn_800F7434(condition, 0) != 0) {
+            eligible = TRUE;
+        }
+    }
+    return eligible;
 }
 
 /**

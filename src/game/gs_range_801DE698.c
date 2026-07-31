@@ -27,8 +27,66 @@ void fn_801DE698(s32 arg0, s32 arg1) {
  * _eyeTexAnimEnded - Waza stat change update.
  * Address: 0x801DEC64 | Size: 0x1B0
  */
-void _eyeTexAnimEnded(s32 arg0, s32 arg1) {
-    /* TODO: Stat change effect update (0x1B0 bytes) */
+void _eyeTexAnimEnded(void* model, u8* callback) {
+    extern void GSmodelLinkTexAnimToAnim(void*, u32);
+    extern u8 GSmodelIsAnimating(void*);
+    extern f32 GSmodelGetAnimFrame(void*);
+    extern f32 GSmodelGetAnimRate(void*);
+    extern u32 GSmodelGetAnimType(void*);
+    extern void GSmodelGetAnimIndex(void*, u32*, u32*);
+    extern void GSmodelSetTexAnimIndex(void*, u32);
+    extern u32 fn_800D3088(void);
+    extern void GSmodelSetTexAnimFrame(void*, f32);
+    extern void GSmodelSetTexAnimRate(void*, f32);
+    extern void GSmodelSetTexAnimType(void*, u32);
+    extern void GSmodelStartTexAnimation(void*);
+    extern void GSlogWrite(const char*, ...);
+    extern const char lbl_802799D8[];
+    u8* owner;
+    u32 animIndex;
+    u32 unused;
+    f32 frame;
+    f32 rate;
+    u32 type;
+
+    if ((*(u32*)callback & 3) != 2 || (*(u32*)callback & 4) != 0) {
+        return;
+    }
+    owner = *(u8**)(callback + 8);
+    if (owner == NULL || (owner[0x18] & 8) != 0 ||
+        model != *(void**)(owner + 0x24)) {
+        return;
+    }
+    animIndex = *(u32*)(callback + 4);
+    if (animIndex != (s16)*(u16*)(owner + 0x1A) &&
+        animIndex != (s16)*(u16*)(owner + 0x1E) &&
+        animIndex != (s16)*(u16*)(owner + 0x1C)) {
+        return;
+    }
+    switch (owner[0x19]) {
+    case 1:
+        owner[0x19] = 6;
+        break;
+    case 2:
+    case 3:
+        GSmodelLinkTexAnimToAnim(model, 1);
+        if (GSmodelIsAnimating(model)) {
+            frame = GSmodelGetAnimFrame(model);
+            rate = GSmodelGetAnimRate(model);
+            type = GSmodelGetAnimType(model);
+            GSmodelGetAnimIndex(model, &animIndex, &unused);
+            GSmodelSetTexAnimIndex(model, animIndex);
+            GSmodelSetTexAnimFrame(model, frame + rate * fn_800D3088());
+            GSmodelSetTexAnimRate(model, rate);
+            GSmodelSetTexAnimType(model, type);
+            GSmodelStartTexAnimation(model);
+        }
+        owner[0x19] = 0;
+        break;
+    default:
+        GSlogWrite(lbl_802799D8);
+        break;
+    }
 }
 
 /**
@@ -92,7 +150,56 @@ found:
  * Address: 0x801DEF0C | Size: 0x164
  */
 void fn_801DEF0C(void* obj, s32 arg1, s32 arg2) {
-    /* TODO: Status effect visual update (0x164 bytes) */
+    extern void GSmodelLinkTexAnimToAnim(void*, u32);
+    extern void GSmodelGetAnimIndex(void*, u32*, u32*);
+    extern void GSmodelSetAnimType(void*, u32);
+    extern void GSmodelSetAnimRate(void*, f32);
+    extern u8 GSmodelHasAnimationEnded(void*);
+    extern void GSmodelSetAnimIndex(void*, u32);
+    extern void GSmodelSetAnimFrame(void*, f32);
+    extern void GSmodelStartAnimation(void*);
+    extern f32 lbl_8047E3C8;
+    extern f32 lbl_8047E3CC;
+    u8* effect = obj;
+    u8* table;
+    s32 count;
+    u32 animIndex = 0;
+    u32 currentIndex;
+    u32 unused;
+    void* model;
+
+    if (effect == NULL || effect[0x16] != 0 || (effect[0x18] & 8) != 0) {
+        return;
+    }
+    model = *(void**)(effect + 0x24);
+    if ((effect[0x18] & 4) == 0) {
+        effect[0x19] = 0;
+        GSmodelLinkTexAnimToAnim(model, 1);
+    }
+    table = *(u8**)(effect + 0x2C);
+    if ((effect[0x18] & 2) != 0 && *(u16*)(effect + 0x14) > 0x10) {
+        if (*(s32*)(table + 0xDD4) != 1) {
+            table += 0xD40;
+        }
+    }
+    count = *(s32*)(table + 4);
+    table += 0x8C;
+    while (count-- > 0) {
+        if (*(s32*)table == 0) {
+            animIndex = *(u32*)(table + 4);
+            break;
+        }
+        table += 8;
+    }
+    GSmodelGetAnimIndex(model, &currentIndex, &unused);
+    GSmodelSetAnimType(model, arg1);
+    GSmodelSetAnimRate(model, lbl_8047E3C8);
+    if (animIndex != currentIndex || (u8)arg2 != 0 ||
+        GSmodelHasAnimationEnded(model)) {
+        GSmodelSetAnimIndex(model, animIndex);
+        GSmodelSetAnimFrame(model, lbl_8047E3CC);
+    }
+    GSmodelStartAnimation(model);
 }
 
 /**
@@ -176,7 +283,63 @@ s32 fn_801DF160(u8* obj) {
  * Address: 0x801DF1D0 | Size: 0x16C
  */
 void fn_801DF1D0(void* obj) {
-    /* TODO: Weather effect render (0x16C bytes) */
+    extern u8 fn_801DAC54(void*);
+    extern u32 fn_800D3088(void);
+    extern f32 fn_800E0BE4(void);
+    extern void GSmodelLinkTexAnimToAnim(void*, u32);
+    extern void GSmodelSetTexAnimIndex(void*, u32);
+    extern void GSmodelSetTexAnimRate(void*, f32);
+    extern void GSmodelSetTexAnimType(void*, u32);
+    extern void GSmodelSetTexAnimFrame(void*, f32);
+    extern void GSmodelStartTexAnimation(void*);
+    extern f32 lbl_8047E3C8;
+    extern f32 lbl_8047E3CC;
+    extern f32 lbl_8047E3D8;
+    extern f32 lbl_8047E3DC;
+    extern f32 lbl_8047E3E0;
+    extern f32 lbl_8047E3E4;
+    u8* effect = obj;
+    void* model;
+    u16 timer;
+    f32 threshold;
+
+    if (fn_801DAC54(effect) != 0 || (effect[0x18] & 8) != 0) {
+        return;
+    }
+    if (effect[0x19] != 0) {
+        *(u16*)(effect + 0x20) = 0;
+        return;
+    }
+    if (*(s16*)(effect + 0x1C) < 0) {
+        return;
+    }
+    *(u16*)(effect + 0x20) += (u16)fn_800D3088();
+    timer = *(u16*)(effect + 0x20);
+    if (timer < 10) {
+        return;
+    }
+    if (timer < 60) {
+        f32 t = (f32)(timer - 10) / lbl_8047E3E0;
+        threshold = t * (lbl_8047E3E4 - t) * lbl_8047E3DC;
+    } else if (timer < 180) {
+        threshold = lbl_8047E3DC;
+    } else {
+        threshold = lbl_8047E3D8;
+    }
+    if (threshold < fn_800E0BE4()) {
+        return;
+    }
+    model = *(void**)(effect + 0x24);
+    if (model != NULL) {
+        effect[0x19] = 3;
+        GSmodelLinkTexAnimToAnim(model, 0);
+        GSmodelSetTexAnimIndex(model, *(s16*)(effect + 0x1C));
+        GSmodelSetTexAnimRate(model, lbl_8047E3C8);
+        GSmodelSetTexAnimType(model, 0);
+        GSmodelSetTexAnimFrame(model, lbl_8047E3CC);
+        GSmodelStartTexAnimation(model);
+        *(u16*)(effect + 0x20) = 0;
+    }
 }
 
 /**

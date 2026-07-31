@@ -755,7 +755,7 @@ s32 fn_8010E138(void* origin, void* direction) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-s32 fn_8010E53C(void* origin, void* direction, f32 radius) {
+s32 fn_8010E53C(Vec3f* point, void* data, f32 radius, Vec3f* result) {
     /* TODO: match -- 1516 bytes at 0x8010E53C */
 }
 #pragma pop
@@ -764,38 +764,184 @@ s32 fn_8010E53C(void* origin, void* direction, f32 radius) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-s32 fn_8010EB28(void* meshData, void* sweep, void* result) {
+s32 fn_8010EB28(Vec3f* point, void* data, ColMtx inverse,
+                ColMtx forward, f32 radius, Vec3f* result) {
     /* TODO: match -- 1212 bytes at 0x8010EB28 */
 }
 #pragma pop
 
 /* 0x8010EFE4 | 0x1A4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-s32 fn_8010EFE4(void* segStart, void* segEnd,
-                 void* planeNormal, s32 doubleSided) {
-    /* TODO: match -- 420 bytes at 0x8010EFE4 */
+s32 fn_8010EFE4(Vec3f* segStart, Vec3f* segEnd, f32 radius,
+                Vec3f* result, s32 useAlternate)
+{
+    ColDrawScene* scene;
+    ColDrawObject* object;
+    Vec3f current;
+    Vec3f hitPoint;
+    Vec3f* hitPointPtr;
+    ColMtx inverse;
+    ColMtx forward;
+    s32 pass;
+
+    current = *segEnd;
+    scene = fn_8010CBC0();
+    hitPointPtr = result != NULL ? &hitPoint : NULL;
+    pass = 0;
+
+    do {
+        s32 hits;
+        u32 index;
+
+        object = scene->objects;
+        hits = 0;
+        for (index = 0; index < scene->count; index++, object++) {
+            ColDrawGroup* group;
+            s32 enabled;
+            s32 collided;
+
+            GScolsys2GetObjEnable(index, &enabled);
+            if (enabled == 0) {
+                continue;
+            }
+            group = useAlternate ? object->edgeGroup1 : object->edgeGroup0;
+            if (group == NULL) {
+                continue;
+            }
+            if ((object->flags & 1) != 0) {
+                fn_8010CA30(inverse, index);
+                fn_8010C8D0(forward, index);
+                collided = fn_8010EB28(&current, group, inverse, forward,
+                                       radius, hitPointPtr);
+            } else {
+                collided =
+                    fn_8010E53C(&current, group, radius, hitPointPtr);
+            }
+            if (collided != 0) {
+                if (result == NULL) {
+                    return 1;
+                }
+                hits++;
+                if (hitPointPtr != NULL) {
+                    current = *hitPointPtr;
+                }
+            }
+        }
+        if (hits <= 0) {
+            break;
+        }
+        pass++;
+    } while (pass < 10);
+
+    if (pass <= 0) {
+        return 0;
+    }
+    *result = current;
+    return 1;
 }
-#pragma pop
 
 /* 0x8010F188 | 0x198 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-s32 fn_8010F188(void* center, f32 radius, void* result) {
-    /* TODO: match -- 408 bytes at 0x8010F188 */
+s32 fn_8010F188(Vec3f* start, Vec3f* end, f32 radius, Vec3f* result)
+{
+    extern f32 PSVECDistance(const Vec3f*, const Vec3f*);
+    extern void PSVECSubtract(const Vec3f*, const Vec3f*, Vec3f*);
+    extern void PSVECScale(const Vec3f*, Vec3f*, f32);
+    extern void PSVECAdd(const Vec3f*, const Vec3f*, Vec3f*);
+    extern const f32 lbl_8047CF00;
+    extern const f32 lbl_8047CF04;
+    Vec3f direction;
+    Vec3f segmentStart;
+    Vec3f segmentEnd;
+    f32 distance;
+    f32 step;
+    f32 position;
+    f32 next;
+
+    if (fn_8010CBC0() == NULL) {
+        return 0;
+    }
+
+    distance = PSVECDistance(start, end);
+    step = lbl_8047CF00;
+    if (distance > step) {
+        step = radius / distance;
+        if (step > lbl_8047CF04) {
+            step = lbl_8047CF04;
+        }
+    }
+
+    PSVECSubtract(end, start, &direction);
+    position = lbl_8047CF00;
+    while (position < lbl_8047CF04) {
+        next = position + step;
+        if (next > lbl_8047CF04) {
+            next = lbl_8047CF04;
+        }
+        PSVECScale(&direction, &segmentStart, position);
+        PSVECAdd(&segmentStart, start, &segmentStart);
+        PSVECScale(&direction, &segmentEnd, next);
+        PSVECAdd(&segmentEnd, start, &segmentEnd);
+        if (fn_8010EFE4(&segmentStart, &segmentEnd, radius, result, 1)) {
+            return 1;
+        }
+        if (step <= lbl_8047CF00) {
+            break;
+        }
+        position += step;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x8010F320 | 0x198 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void fn_8010F320(void) {
-    /* TODO: match -- 408 bytes at 0x8010F320 */
+s32 fn_8010F320(Vec3f* start, Vec3f* end, f32 radius, Vec3f* result)
+{
+    extern f32 PSVECDistance(const Vec3f*, const Vec3f*);
+    extern void PSVECSubtract(const Vec3f*, const Vec3f*, Vec3f*);
+    extern void PSVECScale(const Vec3f*, Vec3f*, f32);
+    extern void PSVECAdd(const Vec3f*, const Vec3f*, Vec3f*);
+    extern const f32 lbl_8047CF00;
+    extern const f32 lbl_8047CF04;
+    Vec3f direction;
+    Vec3f segmentStart;
+    Vec3f segmentEnd;
+    f32 distance;
+    f32 step;
+    f32 position;
+    f32 next;
+
+    if (fn_8010CBC0() == NULL) {
+        return 0;
+    }
+
+    distance = PSVECDistance(start, end);
+    step = lbl_8047CF00;
+    if (distance > step) {
+        step = radius / distance;
+        if (step > lbl_8047CF04) {
+            step = lbl_8047CF04;
+        }
+    }
+
+    PSVECSubtract(end, start, &direction);
+    position = lbl_8047CF00;
+    while (position < lbl_8047CF04) {
+        next = position + step;
+        if (next > lbl_8047CF04) {
+            next = lbl_8047CF04;
+        }
+        PSVECScale(&direction, &segmentStart, position);
+        PSVECAdd(&segmentStart, start, &segmentStart);
+        PSVECScale(&direction, &segmentEnd, next);
+        PSVECAdd(&segmentEnd, start, &segmentEnd);
+        if (fn_8010EFE4(&segmentStart, &segmentEnd, radius, result, 0)) {
+            return 1;
+        }
+        if (step <= lbl_8047CF00) {
+            break;
+        }
+        position += step;
+    }
+    return 0;
 }
-#pragma pop
 
 /* 0x8010F4B8 | 0xEC */
 s32 GScolsys2UtilGetCpPlaneLine(Vec3f* out, f32* tOut,
