@@ -2165,6 +2165,26 @@ u8 inpTranslateExCtrl(u8 r3) {
 #pragma dont_inline reset
 #endif
 #pragma pop
+/*
+ * Retail emits inpTranslateExCtrl both out of line and inlined at the extended
+ * controller accessors. Keep the shared source shape available to those
+ * inlined call sites while the public function remains callable.
+ */
+static inline u8 inpTranslateExCtrlInline(u8 ctrl) {
+    switch (ctrl) {
+    case 0x80: ctrl = 0x80; break;
+    case 0x81: ctrl = 0x82; break;
+    case 0x82: ctrl = 0xA0; break;
+    case 0x83: ctrl = 0xA1; break;
+    case 0x84: ctrl = 0x83; break;
+    case 0x85: ctrl = 0x84; break;
+    case 0x86: ctrl = 0xA2; break;
+    case 0x87: ctrl = 0xA3; break;
+    case 0x88: ctrl = 0xA4; break;
+    }
+    return ctrl;
+}
+
 extern void fn_80160BDC(void);
 extern void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value); /* inpSetMidiCtrl -- true
                                                                   * signature is all-u8
@@ -2202,21 +2222,8 @@ asm void fn_80161D90(void) {
 #else
 u16 inpGetExCtrl(u8* obj, u8 ctrl) {
     u16 value;
-    u8 code = ctrl;
 
-    switch (code) {
-    case 0x80: code = 0x80; break;
-    case 0x81: code = 0x82; break;
-    case 0x82: code = 0xA0; break;
-    case 0x83: code = 0xA1; break;
-    case 0x84: code = 0x83; break;
-    case 0x85: code = 0x84; break;
-    case 0x86: code = 0xA2; break;
-    case 0x87: code = 0xA3; break;
-    case 0x88: code = 0xA4; break;
-    }
-
-    switch (code) {
+    switch (inpTranslateExCtrlInline(ctrl)) {
     case 0xA0:
         value = (*(s16*)(obj + 0x1C4) << 1) + 0x2000;
         break;
@@ -2232,22 +2239,8 @@ u16 inpGetExCtrl(u8* obj, u8 ctrl) {
 #endif
 #pragma pop
 void inpSetExCtrl(u8* obj, u8 ctrl, s16 value) {
-    u8 code;
-
     value = value < 0 ? 0 : value > 0x3FFF ? 0x3FFF : value;
-    code = ctrl;
-    switch (code) {
-    case 0x80: code = 0x80; break;
-    case 0x81: code = 0x82; break;
-    case 0x82: code = 0xA0; break;
-    case 0x83: code = 0xA1; break;
-    case 0x84: code = 0x83; break;
-    case 0x85: code = 0x84; break;
-    case 0x86: code = 0xA2; break;
-    case 0x87: code = 0xA3; break;
-    case 0x88: code = 0xA4; break;
-    }
-    switch (code) {
+    switch (inpTranslateExCtrlInline(ctrl)) {
     case 0xA0:
     case 0xA1:
         break;
