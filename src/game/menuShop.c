@@ -3267,8 +3267,7 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
 
         /* (3) empty selection -> back out and close the menu */
         if ((selectedItem & 0xffff) == 0) {
-            menuCloseCustom(0x60, 0, 1);
-            return;
+            break;
         }
 
         /* validate the item exists */
@@ -3367,6 +3366,7 @@ void fn_8002D154(s32 mapIndex, u8 colorIndex)
             }
         }
     }
+    menuCloseCustom(0x60, 0, 1);
 }
 #endif
 
@@ -3763,10 +3763,10 @@ void fn_8002D91C(u32 arg0)
         } while (loop_state != 3);
 
         /* Post-loop: close sub-dialogs based on type_byte */
-        if (type_byte == 2 || type_byte == 3) {
-            winMsgClose(1);
-        } else {
+        if (type_byte != 2 && type_byte != 3) {
             fn_8002A1C4((u8 *)(u32)arg0, 2, (s32)-1);
+        } else {
+            winMsgClose(1);
         }
 
         /* Release the GSmem scratch block */

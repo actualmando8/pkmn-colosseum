@@ -612,7 +612,7 @@ extern void winSeqCheckMove(void);
 extern void pokemonReplace(void);
 extern u32 fn_80019064(void);
 extern void fn_80018F54();
-extern void fn_8001D718(void);
+extern void fn_8001D718(f32 target);
 extern f32 lbl_8047B7C0;
 extern u8 lbl_802E4E58[];
 #if 0
@@ -629,7 +629,6 @@ void fn_8001C7B8(void) {
     extern void fn_80018F54();
     extern u32 fn_80019064();
     extern void fn_8001C064();
-    extern void fn_8001D718();
     extern void fn_8006AEEC();
     extern void fn_80097F08();
     extern void _threadSwitch();
@@ -1322,8 +1321,7 @@ void fn_8001C7B8(void) {
                         r29 = r29 + 0x1;
 
                     }
-                    f1 = lbl_8047B7C0;
-                    fn_8001D718();
+                    fn_8001D718(lbl_8047B7C0);
                     r5 = *(u8*)((u8*)r31 + 0x4);
                     r3 = (u32)lbl_802E4E58;
                     tmp = (u32)lbl_802E4E58;
@@ -1684,8 +1682,8 @@ void fn_8001D378(void) {
 #endif
 
 /* 0x8001D718 | 0xCC */
-extern s32 fn_800D37CC();
-extern void fn_800D3088(void);
+extern s32 fn_800D37CC(void);
+extern u32 fn_800D3088(void);
 extern f32 lbl_8047B7C8;
 extern f64 lbl_8047B7D0;
 extern f64 lbl_8047B7D8;
@@ -1694,43 +1692,16 @@ asm void fn_8001D718(void) {
 #include "src/game/gs_pcbox_fn_8001D718.inc"
 }
 #else
-void fn_8001D718(void) {
-    extern f32 lbl_8047B7C8;
-    extern f64 lbl_8047B7D0;
-    extern f64 lbl_8047B7D8;
-    extern void fn_800D3088();
-    extern void fn_800D37CC();
+void fn_8001D718(f32 target) {
     extern void _threadSwitch();
-    u8 sp[0x70];
-    u32 tmp = 0;
-    u32 r3 = 0;
-    u32 r31 = 0;
-    f32 f0 = 0.0f;
-    f32 f1 = 0.0f;
-    f32 f27 = 0.0f;
-    f32 f28 = 0.0f;
-    f32 f29 = 0.0f;
-    f32 f30 = 0.0f;
-    f32 f31 = 0.0f;
+    f32 progress = lbl_8047B7C8;
 
-    f27 = f1;
-    f28 = lbl_8047B7C8;
-    f29 = lbl_8047B7D0;
-    r31 = 0x43300000;
-    f31 = lbl_8047B7D8;
-    while (f28 < f27) {
-
+    while (progress < target) {
+        f32 divisor;
         _threadSwitch();
-        fn_800D37CC();
-        *(u32*)(sp + 0xC) = tmp;
-        f30 = f0 - f29;
-        fn_800D3088();
-        f0 = f0 - f31;
-        f0 = f0 / f30;
-        f28 = f28 + f0;
-
+        divisor = (f32)fn_800D37CC();
+        progress += (f32)fn_800D3088() / divisor;
     }
-    return;
 }
 #endif
 

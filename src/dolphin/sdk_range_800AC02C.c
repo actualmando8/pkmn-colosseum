@@ -575,19 +575,21 @@ u32 AIGetStreamVolRight(void) {
 #if !defined(SDK_AC02C_EXACT_ACTIVE) || \
     defined(SDK_AC02C_CANDIDATE_AIINIT_ONLY)
 void AIInit(u8* stack) {
+    u32 ticksPer125us;
+
     if (lbl_8047A8D8 != TRUE) {
         OSRegisterVersion(lbl_80478A28);
 
-        lbl_8047A8E0 = OSNanosecondsToTicks_800AC02C(31524);
-        lbl_8047A8E8 = OSNanosecondsToTicks_800AC02C(42024);
-        lbl_8047A8F0 = OSNanosecondsToTicks_800AC02C(42000);
-        lbl_8047A8F8 = OSNanosecondsToTicks_800AC02C(63000);
-        lbl_8047A900 = OSNanosecondsToTicks_800AC02C(3000);
-        AISetStreamVolRight(0);
-        AISetStreamVolLeft(0);
+        ticksPer125us = OS_TIMER_CLOCK_800AC02C / 125000;
+        lbl_8047A8E0 = (31524 * ticksPer125us) / 8000;
+        lbl_8047A8E8 = (42024 * ticksPer125us) / 8000;
+        lbl_8047A8F0 = (42000 * ticksPer125us) / 8000;
+        lbl_8047A8F8 = (63000 * ticksPer125us) / 8000;
+        lbl_8047A900 = (3000 * ticksPer125us) / 8000;
+        __AIRegs[1] =
+            (__AIRegs[1] & ~0xff00) | ((0 & 0xff) << 8);
+        __AIRegs[1] = (__AIRegs[1] & ~0xff) | (0 & 0xff);
         __AIRegs[0] = (__AIRegs[0] & ~0x20) | 0x20;
-        __AIRegs[1] &= ~0xFF;
-        __AIRegs[2] = 0;
         __AIRegs[3] = 0;
         __AI_set_stream_sample_rate(1);
         AISetDSPSampleRate(0);

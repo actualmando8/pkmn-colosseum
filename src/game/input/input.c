@@ -548,27 +548,26 @@ s32 fn_800F80B0(s32 padIdx) {
     u8* pad = &lbl_80401C10[0];
     u8* nul = NULL;
 
-    if (*(s32*)pad == 0) goto found;
-    pad += 0x6C;
-    if (*(s32*)pad == 0) goto found;
-    pad += 0x6C;
-    if (*(s32*)pad == 0) goto found;
-    pad += 0x6C;
-    if (*(s32*)pad == 0) goto found;
-    pad = nul;
-found:
+    if (*(s32*)pad != 0) {
+        pad += 0x6C;
+        if (*(s32*)pad != 0) {
+            pad += 0x6C;
+            if (*(s32*)pad != 0) {
+                pad += 0x6C;
+                if (*(s32*)pad != 0) {
+                    pad = nul;
+                }
+            }
+        }
+    }
     if (pad == NULL) {
         return 4;
     }
-    if (padIdx >= 5) {
-        return 1;
+    if (padIdx < 5 && padIdx >= 1) {
+        *(u32*)pad = padIdx;
+        return 0;
     }
-    if (padIdx < 1) {
-        return 1;
-    }
-
-    *(u32*)pad = padIdx;
-    return 0;
+    return 1;
 }
 #endif
 extern void PADSetAnalogMode(void);

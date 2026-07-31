@@ -1426,15 +1426,18 @@ void fightTrainerCreateFightTrainerDataIdToHero(
     void* savedHero;
     u16 pokemonDataId;
     u16 itemDataId;
+    u16 trainerPokemonCount;
     u16 trainerKind;
     u8 sex;
     u16 i;
 
-    if (hero == NULL || trainerDataId == 0) {
+    if (hero == NULL) {
         return;
     }
-    if ((u16)(u32)fightTrainerGetStatus(NULL, trainerDataId, 2, 0) == 0 &&
-        inputDevice == 0) {
+    trainerPokemonCount =
+        (u16)(u32)fightTrainerGetStatus(NULL, trainerDataId, 2, 0);
+    if (trainerDataId == 0 ||
+        (trainerPokemonCount == 0 && inputDevice == 0)) {
         return;
     }
 
@@ -1459,8 +1462,11 @@ void fightTrainerCreateFightTrainerDataIdToHero(
 
     pokemonDataId =
         (u16)(u32)fightTrainerGetStatus(NULL, trainerDataId, 5, 0);
-    while (fightTrainerCreateFightTrainerPokemonDataIdToPokemon(
-               pokemonDataId, pokemon, heroGetStatus(hero, 2, 0))) {
+    for (;;) {
+        if (!fightTrainerCreateFightTrainerPokemonDataIdToPokemon(
+                pokemonDataId, pokemon, heroGetStatus(hero, 2, 0))) {
+            break;
+        }
         pokemonSetStatus(pokemon, 0, 0xC9, 0, pokemonDataId);
         if ((s16)heroCatchPokemon(
                 hero, pokemon, 0,

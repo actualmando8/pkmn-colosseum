@@ -794,11 +794,7 @@ void fn_801EFA08(void) {
         r31 = r29;
 
         /* Inner battle polling loop */
-        while (1) {
-            fn_801EF634();
-            tmp = r3 & 0xFFFF;
-            if (tmp != 1) break;
-
+        do {
             /* Save/restore VSync, read pad input */
             ((void(*)(void))dbgMenuGetEnable)();
             r27 = r3;
@@ -930,7 +926,9 @@ void fn_801EFA08(void) {
             fn_801EF634();
             tmp = r3 & 0xFFFF;
             if (tmp != 1) break;
-        }
+            fn_801EF634();
+            tmp = r3 & 0xFFFF;
+        } while (tmp == 1);
         ((void(*)(void))fightActionDispFifoAll)();
     }
     ((void(*)(void))battleCameraIsSimple)();

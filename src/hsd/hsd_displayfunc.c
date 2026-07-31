@@ -261,9 +261,7 @@ void fn_801985E0(HSD_JObj* jobj, Mtx src, Mtx dst)
 
     PSVECCrossProduct(&x_unit, &y, &z);
     magnitude = PSVECMag(&z);
-    if (magnitude < lbl_80478ACC) {
-        PSMTXCopy(src, dst);
-    } else {
+    if (magnitude >= lbl_80478ACC) {
         sz /= magnitude;
         PSVECCrossProduct(&z, &x_unit, &y);
         sy /= lbl_80478ACC + PSVECMag(&y);
@@ -279,6 +277,8 @@ void fn_801985E0(HSD_JObj* jobj, Mtx src, Mtx dst)
         dst[0][3] = position.x;
         dst[1][3] = position.y;
         dst[2][3] = position.z;
+    } else {
+        PSMTXCopy(src, dst);
     }
 }
 
@@ -315,9 +315,7 @@ void fn_80198B20(HSD_JObj* jobj, Mtx src, Mtx dst)
     }
 
     magnitude = PSVECMag(&x);
-    if (magnitude < lbl_80478ACC) {
-        PSMTXCopy(src, dst);
-    } else {
+    if (magnitude >= lbl_80478ACC) {
         sx /= magnitude;
         PSVECCrossProduct(&x, &y_unit, &z);
         sz /= lbl_80478ACC + PSVECMag(&z);
@@ -333,6 +331,8 @@ void fn_80198B20(HSD_JObj* jobj, Mtx src, Mtx dst)
         dst[0][3] = position.x;
         dst[1][3] = position.y;
         dst[2][3] = position.z;
+    } else {
+        PSMTXCopy(src, dst);
     }
 }
 

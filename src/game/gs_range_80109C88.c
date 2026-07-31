@@ -23,20 +23,28 @@ u16 fn_8010BBB8(void* pokemon)
     u16 species;
     u8 form;
 
-    if (pokemon == NULL) {
+    if (pokemon == (void*)0) {
         return 0;
     }
-    if (!pokemonCheckValid(pokemon) || pokemonBiosGetTamagoFlag(pokemon)) {
+    if (pokemonCheckValid(pokemon) == 0) {
+        return 0x33D;
+    }
+    if (pokemonBiosGetTamagoFlag(pokemon) != 0) {
         return 0x33D;
     }
 
     species = pokemonGetStatus(pokemon, 0, 0x6E, 0);
     if (species == 0xC9) {
         form = pokemonGetAnnonKatati(pokemonBiosGetRnd(pokemon));
-        return lbl_8035B478[form][pokemonCheckRare(pokemon) != 0];
+        if (pokemonCheckRare(pokemon)) {
+            return lbl_8035B478[form][1];
+        }
+        return lbl_8035B478[form][0];
     }
-    return pokemonGetStatus(NULL, species, 0x5B,
-                            pokemonCheckRare(pokemon) != 0);
+    if (pokemonCheckRare(pokemon)) {
+        return pokemonGetStatus((void*)0, species, 0x5B, 1);
+    }
+    return pokemonGetStatus((void*)0, species, 0x5B, 0);
 }
 
 u32 fn_8010B560(void) {
@@ -168,7 +176,6 @@ s32 fn_8010BD6C(u16 key, void* (*callback)(u32), u32 arg)
     lbl_8047AD4C[index] = saved;
     return index;
 }
-
 void fn_8010C220(void) {
 }
 
@@ -195,8 +202,6 @@ void fn_8010C224(s32 count)
     extern void* fn_800E27B0(u16 handle);
     extern u16 fn_800E2C04(u32 size, u32 alignment);
 
-    Entry* e1;
-    Entry2* e2;
     s32 i;
 
     lbl_8047AD48 = count;
@@ -213,14 +218,13 @@ void fn_8010C224(s32 count)
     memset(lbl_8047AD54, 0, count * sizeof(Entry2));
 
     for (i = 0; i < count; i++) {
-        e2 = &lbl_8047AD54[i];
-        if (e2->handle == 0) {
-            e2->handle = fn_800E2C04(0x6ec0, 0x20);
-            e2->data = fn_800E27B0(e2->handle);
+        if (lbl_8047AD54[i].handle == 0) {
+            lbl_8047AD54[i].handle = fn_800E2C04(0x6ec0, 0x20);
+            lbl_8047AD54[i].data =
+                fn_800E27B0(lbl_8047AD54[i].handle);
         }
-        memset(e2->data, 0, 0x6ec0);
-        e1 = &lbl_8047AD4C[i];
-        e1->slot = (s8)i;
+        memset(lbl_8047AD54[i].data, 0, 0x6ec0);
+        lbl_8047AD4C[i].slot = (s8)i;
     }
 }
 
@@ -237,9 +241,17 @@ u16 fn_8010B01C(void* pokemon, void* (*callback)(u32), u32 arg)
         u16 species = pokemonGetStatus(pokemon, 0, 0x6E, 0);
         if (species == 0xC9) {
             u8 form = pokemonGetAnnonKatati(pokemonBiosGetRnd(pokemon));
-            key = lbl_8035B478[form][pokemonCheckRare(pokemon) != 0];
+            if (pokemonCheckRare(pokemon) == 0) {
+                key = lbl_8035B478[form][0];
+            } else {
+                key = lbl_8035B478[form][1];
+            }
         } else {
-            key = pokemonGetStatus(NULL, species, 0x5B, pokemonCheckRare(pokemon) != 0);
+            if (pokemonCheckRare(pokemon) == 0) {
+                key = pokemonGetStatus(NULL, species, 0x5B, 0);
+            } else {
+                key = pokemonGetStatus(NULL, species, 0x5B, 1);
+            }
         }
     }
     return fn_8010B16C(key, callback, arg);
@@ -331,26 +343,29 @@ void fn_8010B5C4(void* unused1, u32 unused2, u16 key)
     void* found2;
     Entry* entry;
     s32 i;
+    s32 j;
     u8* res;
     void* tex;
 
     found1 = _menuFaceBiosGetPtr__FUs(key);
     found2 = _menuFaceBiosGetPtr__FUs(key);
 
-    entry = lbl_8047AD4C;
-    for (i = 0; i < lbl_8047AD48; i++, entry++) {
-        if (found2 == entry->data) {
+    i = -1;
+    for (j = 0; j < lbl_8047AD48; j++) {
+        if (found2 == lbl_8047AD4C[j].data) {
+            i = j;
             break;
         }
     }
 
-    if (i >= lbl_8047AD48) {
+    if (i < 0) {
         if (found1 != NULL) {
             fn_800F9210(0x5c0, (u32)found1);
         }
         return;
     }
 
+    entry = &lbl_8047AD4C[i];
     res = GSresGetResource(0x5c0, (u32)found1);
     res[7] = 0;
     *(u32*)(res + 0x28) -= (u32)res;
@@ -460,7 +475,6 @@ s32 fn_8010A420(void* obj)
 
     return 1;
 }
-
 s32 fn_8010B718(u8* context, void* srcNode, void* pokemon)
 {
     typedef struct Entry {
@@ -675,7 +689,6 @@ s32 fn_8010B9E8(u8* context, void* srcNode, u16 key)
     winSpriteDrawTexture(context, &lbl_80404BF0);
     return 1;
 }
-
 s32 fn_8010A010(void* objPtr, u32 key)
 {
     extern u32 fn_800FF560(void);
@@ -982,20 +995,24 @@ s32 menuModelInit(u8* objPtr, s32 w, s32 h)
     for (i = 0; i < 3; i++) {
         light = GSlightCreate();
         if (light != NULL) {
-            if (i == 1) {
+            switch (i) {
+            case 0:
+                GSlightSetType(light, 0);
+                GSlightSetColor(light, &color0);
+                break;
+            case 1:
                 GSlightSetType(light, 2);
                 GSlightSetColor(light, &color1);
                 GSlightSetPosition(light, &pos);
                 GSlightSetTarget(light, &target);
-            } else if (i == 0) {
-                GSlightSetType(light, 0);
-                GSlightSetColor(light, &color0);
-            } else {
+                break;
+            case 2:
                 set__5GSvecFfff(&pos, lbl_8047CE74, lbl_8047CE74, lbl_8047CE74);
                 GSlightSetType(light, 2);
                 GSlightSetColor(light, &color1);
                 GSlightSetPosition(light, &pos);
                 GSlightSetTarget(light, &target);
+                break;
             }
             GSlightSetActive(light, 0);
             obj->lights[i] = light;
@@ -1008,7 +1025,6 @@ s32 menuModelInit(u8* objPtr, s32 w, s32 h)
     lbl_8047AD40++;
     return 1;
 }
-
 s32 fn_8010A88C(void* objPtr)
 {
     extern s32 lbl_8047AD40;
@@ -1131,7 +1147,6 @@ s32 fn_8010A88C(void* objPtr)
     *(u32*)(obj + 0x28) = 0;
     return 1;
 }
-
 s32 fn_8010AB00(void* objPtr)
 {
     typedef struct Vec3 {

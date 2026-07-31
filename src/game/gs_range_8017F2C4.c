@@ -136,40 +136,42 @@ void* fn_8017F484(u32 group, u32 handle, u32 size)
     u32 alignedExtra;
     u16 h;
 
-    if (res->version < 3) {
+    if (res->version >= 3) {
+        if (res->bssSize != 0) {
+            alignedSize = (size + 0x1f) & ~0x1f;
+            alignedExtra = (res->bssSize + 0x1f) & ~0x1f;
+            bufHandle = fn_800E2B00(alignedSize, 0x20);
+            if ((bufHandle & 0xffff) != 0) {
+                buf = fn_800E27B0(bufHandle);
+            } else {
+                buf = NULL;
+            }
+            memcpy(buf, res, size);
+            fn_800F9210(group, handle);
+            newRes = (GsRangeReloadResource*)GSresAllocResourceAlign(
+                alignedSize + alignedExtra, 0x20, group, handle, fn_8017F6B4);
+            memcpy(newRes, buf, alignedSize);
+            fn_8009ED4C(newRes, (u8*)newRes + alignedSize);
+        } else {
+            alignedSize = (size + 0x1f) & ~0x1f;
+            bufHandle = fn_800E2B00(alignedSize, 0x20);
+            if ((bufHandle & 0xffff) != 0) {
+                buf = fn_800E27B0(bufHandle);
+            } else {
+                buf = NULL;
+            }
+            memcpy(buf, res, size);
+            fn_800F9210(group, handle);
+            newRes = (GsRangeReloadResource*)GSresAllocResourceAlign(
+                alignedSize, 0x20, group, handle, fn_8017F6B4);
+            DCFlushRange(newRes, alignedSize);
+            memcpy(newRes, buf, alignedSize);
+            fn_8009ED4C(newRes, (u8*)newRes + ((alignedSize + newRes->fixSize + 0x1f) & ~0x1f));
+        }
+    } else {
         fn_8009ED4C(res, NULL);
         newRes = res;
         buf = NULL;
-    } else if (res->bssSize != 0) {
-        alignedSize = (size + 0x1f) & ~0x1f;
-        alignedExtra = (res->bssSize + 0x1f) & ~0x1f;
-        bufHandle = fn_800E2B00(alignedSize, 0x20);
-        if ((bufHandle & 0xffff) != 0) {
-            buf = fn_800E27B0(bufHandle);
-        } else {
-            buf = NULL;
-        }
-        memcpy(buf, res, size);
-        fn_800F9210(group, handle);
-        newRes = (GsRangeReloadResource*)GSresAllocResourceAlign(
-            alignedSize + alignedExtra, 0x20, group, handle, fn_8017F6B4);
-        memcpy(newRes, buf, alignedSize);
-        fn_8009ED4C(newRes, (u8*)newRes + alignedSize);
-    } else {
-        alignedSize = (size + 0x1f) & ~0x1f;
-        bufHandle = fn_800E2B00(alignedSize, 0x20);
-        if ((bufHandle & 0xffff) != 0) {
-            buf = fn_800E27B0(bufHandle);
-        } else {
-            buf = NULL;
-        }
-        memcpy(buf, res, size);
-        fn_800F9210(group, handle);
-        newRes = (GsRangeReloadResource*)GSresAllocResourceAlign(
-            alignedSize, 0x20, group, handle, fn_8017F6B4);
-        DCFlushRange(newRes, alignedSize);
-        memcpy(newRes, buf, alignedSize);
-        fn_8009ED4C(newRes, (u8*)newRes + ((alignedSize + newRes->fixSize + 0x1f) & ~0x1f));
     }
 
     if (newRes->prolog != NULL) {
@@ -349,10 +351,10 @@ s32 fn_8017FA5C(void)
     }
 
     count = 0;
-    node = head;
+    node = head->next;
     for (;;) {
         count++;
-        if ((u32)node > 0x80000000u) {
+        if ((u32)node <= 0x80000000u) {
             return sum;
         }
         if (node != NULL) {

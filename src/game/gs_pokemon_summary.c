@@ -2087,14 +2087,15 @@ s32 fn_80017E8C(s32 pageIndex, u16 species, s16 slotIndex) {
         return 0;
     }
 
-    if ((u16)pcboxGetItemCapacity(0, species) < result) {
+    if ((u16)pcboxGetItemCapacity(0, species) >= result) {
+        pcboxDelItem(0, species, (u16)result);
+    } else {
         msgctrlSetValue(0x2D, species);
         winMsgOpen(2, 0x2B49, 1, 0);
         winMsgClose(1);
         return 0;
     }
 
-    pcboxDelItem(0, species, (u16)result);
     if (dataSource == -1) {
         fn_8012959C((void*)lbl_8047A2F8, species, (u16)result, slotIndex);
     } else {

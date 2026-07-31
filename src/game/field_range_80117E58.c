@@ -3240,7 +3240,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     extern u8 fn_80119E50(u16 idx);
     extern u8 fn_80119E90(u16 idx);
     extern u32 fn_80119ED0(u16 idx);
-    extern u32 fn_80119F10(u16 idx);
+    extern u8* fn_80119F10(u16 idx);
     extern void fn_80119F90(u8* ptr, u16 val);
     extern void fn_80119FA0(u8* ptr, u32 val);
     extern void fn_80119FB0(u8* ptr, u32 val);
@@ -3249,20 +3249,18 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     extern void fn_80119FE0(u8* ptr, u16 val);
     extern void fn_80119FF0(u8* ptr, u16 val);
     extern u32 fn_8011A030(u8* ptr);
-    extern u8* statusGetStatus(u32 a, void* b, u32 c, u32 d, u32 e);
+    extern u8* statusGetStatus(u8* a, void* b, u32 c, u32 d, u32 e);
     u32 idx;
     u8 type;
     u32 old_count;
-    u32 selector;
-    u32 span;
+    u8* selector;
     u8* elem;
 
     if (id == 0) { return; }
 
     idx = (u8)fn_80119E90(id);
     selector = fn_80119F10(id);
-    span = fn_80119ED0(id);
-    elem = statusGetStatus(selector, obj, 0, span, 0);
+    elem = statusGetStatus(selector, obj, 0, fn_80119ED0(id), 0);
     elem = elem == NULL ? NULL : elem + ((u16)idx << 4);
     if (elem == NULL) { return; }
 
@@ -3286,7 +3284,7 @@ void fn_8011B2C0(void* obj, u16 id, u16 arg3) {
     fn_80119FD0(elem, (s8)kaisuuGetKaisuu(fn_80119D90(id)));
     if (type == 4) {
         u32 count = old_count + 1;
-        u8 limit = fn_80119DD0(id);
+        u32 limit = fn_80119DD0(id);
         if (limit < (u8)count) {
             count = limit;
         }
