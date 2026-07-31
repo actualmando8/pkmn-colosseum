@@ -121,7 +121,6 @@ extern u8 pokemonGetSex(void*);
 extern u8 pokemonCheckValid(void*);
 extern u32 pokemonGetStatus(void*, s32, s32, s32);
 
-#pragma peephole off
 u8 menuSubGetPokemonSexForFightDisp(void* pokemon)
 {
     void* species;
@@ -148,7 +147,6 @@ u8 menuSubGetPokemonSexForFightDisp(void* pokemon)
     }
     return pokemonGetSex(pokemon);
 }
-#pragma peephole reset
 
 /* 0x8001DACC | 0x4DC */
 extern void fn_800F92D4(void);

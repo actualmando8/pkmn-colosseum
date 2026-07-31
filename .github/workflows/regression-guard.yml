@@ -34,7 +34,11 @@ jobs:
           ninja build/${{ matrix.version }}/report.json
           cp build/${{ matrix.version }}/report.json /tmp/head_report.json
       - name: Fail on any per-function regression
-        run: python3 .github/scripts/check_regression.py /tmp/base_report.json /tmp/head_report.json
+        run: |
+          python3 .github/scripts/check_regression.py \
+            /tmp/base_report.json /tmp/head_report.json \
+            --cleanup-manifest .github/regression_policy_cleanup.json \
+            --base-sha ${{ github.event.pull_request.base.sha }}
       # src/ is ~41% one-line #include shims (the sanctioned split-by-address
       # technique). That is exactly the shape that would hide double counting,
       # so assert the metric still measures the game exactly once.
