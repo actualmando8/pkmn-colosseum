@@ -142,13 +142,11 @@ u32 scriptGetPokedoru(void)
 }
 #pragma pop
 
-s32 scriptSetEventCol(u8 enable)
+void scriptSetEventCol(u8 enable)
 {
-    s32 id = lbl_80478CB0;
-    if (id >= 0) {
-        GScolsys2SetObjEnable(id, enable);
+    if (lbl_80478CB0 >= 0) {
+        GScolsys2SetObjEnable(lbl_80478CB0, enable);
     }
-    return id;
 }
 #endif
 
@@ -198,7 +196,6 @@ u32 scriptAddItem(u16 itemId, s32 count)
     }
     return ret;
 }
-
 #pragma push
 #pragma scheduling off
 u32 scriptGetItem(s32 a, s32 b)
@@ -266,7 +263,6 @@ next_temochi:
     }
     return 0;
 }
-
 void scriptStoreTemochiPokemon(u8* arg)
 {
     TemochiEntry* entry = lbl_804670B4;
@@ -286,7 +282,6 @@ void scriptStoreTemochiPokemon(u8* arg)
         }
     }
 }
-
 #pragma push
 #pragma scheduling off
 u32 scriptGetEarthRibbon(void)

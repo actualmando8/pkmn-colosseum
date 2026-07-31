@@ -606,37 +606,40 @@ u32 _fightActionFlowAllFightOutPokemonDoFightActionOneLoop__FP11FIGHT_FLOORUc(vo
           if (cVar7 == 0) {
             pokemonSetStatus(iVar3,0,0x112,0,1);
           }
-          else if (phase == 0) {
-            sVar6 = fightActionGetKindDataId((void*)iVar4);
-            if (sVar6 == 8) {
-LAB_00208d8c:
-              iVar5 = (int)pokemonGetStatus(iVar3,0,0x112,0);
-              if (iVar5 != 1) {
-                pokemonSetStatus(iVar3,0,0x112,0,1);
-                puVar9 = local_48;
-                puVar8 = (u32 *)iVar4;
-                iVar3 = 6;
-                do {
-                  puVar9[0] = puVar8[0];
-                  puVar9[1] = puVar8[1];
-                  puVar8 += 2;
-                  puVar9 += 2;
-                  iVar3 = iVar3 + -1;
-                } while (iVar3 != 0);
-                fightActionFlowFifo(local_48);
-                if (phase != 0) {
-                  fightFloorInitFightTarget(0);
-                  sVar6 = fn_801EF634();
-                  if (sVar6 != 0) {
-                    return 1;
-                  }
+          else {
+            if (phase == 0) {
+              sVar6 = fightActionGetKindDataId((void*)iVar4);
+              if (sVar6 != 8) {
+                continue;
+              }
+            } else {
+              sVar6 = fightActionGetKindDataId((void*)iVar4);
+              if (sVar6 == 8) {
+                continue;
+              }
+            }
+            iVar5 = (int)pokemonGetStatus(iVar3,0,0x112,0);
+            if (iVar5 != 1) {
+              pokemonSetStatus(iVar3,0,0x112,0,1);
+              puVar9 = local_48;
+              puVar8 = (u32 *)iVar4;
+              iVar3 = 6;
+              do {
+                puVar9[0] = puVar8[0];
+                puVar9[1] = puVar8[1];
+                puVar8 += 2;
+                puVar9 += 2;
+                iVar3 = iVar3 + -1;
+              } while (iVar3 != 0);
+              fightActionFlowFifo(local_48);
+              if (phase != 0) {
+                fightFloorInitFightTarget(0);
+                sVar6 = fn_801EF634();
+                if (sVar6 != 0) {
+                  return 1;
                 }
               }
             }
-          }
-          else {
-            sVar6 = fightActionGetKindDataId((void*)iVar4);
-            if (sVar6 != 8) goto LAB_00208d8c;
           }
         }
       }

@@ -215,7 +215,7 @@ void fn_801B019C(HSDViewingRect* rect, HSDShadowVec* point,
 
     PSVECSubtract(point, &rect->origin, &delta);
     distance = PSVECDotProduct(&delta, &rect->normal);
-    if (rect->object != NULL) {
+    if ((s32)rect->object != 0) {
         if (distance <= lbl_8047DDC0) {
             return;
         }
@@ -281,6 +281,8 @@ void fn_801B0408(HSDViewingRect* rect, HSDShadowVec* origin,
     extern void PSVECCrossProduct(void* a, void* b, void* out);
     extern f32 PSVECMag(void* vec);
     HSDShadowVec normalized_up;
+    f32 min;
+    f32 max;
 
     if (rect == NULL) {
         __assert(lbl_802752C0, 0x366, &lbl_8047DDB8);
@@ -293,10 +295,12 @@ void fn_801B0408(HSDViewingRect* rect, HSDShadowVec* origin,
     PSVECCrossProduct(&rect->normal, &normalized_up, &rect->axis_y);
     PSVECCrossProduct(&rect->axis_y, &rect->normal, &rect->axis_x);
     rect->distance = PSVECMag(&rect->direction);
-    rect->min_y = lbl_8047DDC4;
-    rect->min_x = lbl_8047DDC4;
-    rect->max_y = lbl_8047DDC8;
-    rect->max_x = lbl_8047DDC8;
+    min = lbl_8047DDC4;
+    max = lbl_8047DDC8;
+    rect->min_y = min;
+    rect->min_x = min;
+    rect->max_y = max;
+    rect->max_x = max;
     rect->object = object;
 }
 
@@ -378,11 +382,11 @@ void fn_801B073C(HSD_SList** list, void* object) {
     extern HSD_SList* fn_801A3E64(HSD_SList* node);
     HSD_SList** current;
 
-    if (list == NULL) {
+    current = list;
+    if (current == NULL) {
         return;
     }
 
-    current = list;
     if (object != NULL) {
         while (*current != NULL) {
             if ((*current)->data == object) {
@@ -460,12 +464,12 @@ void fn_801B0A98(HSDShadow* shadow, HSD_LObj* light, f32 distance) {
     extern char lbl_8047DDD4;
     extern char lbl_8047DDE0;
     extern f32 lbl_8047DDC0;
-    extern f32 PSVECMag(void* vec);
-    extern void PSVECScale(void* src, void* dst, f32 scale);
-    extern void PSVECAdd(void* a, void* b, void* out);
+    extern f32 PSVECMag(const Vec* vec);
+    extern void PSVECScale(const Vec* src, Vec* dst, f32 scale);
+    extern void PSVECAdd(const Vec* a, const Vec* b, Vec* out);
+    Vec eye;
     Vec interest;
     Vec position;
-    Vec eye;
 
     if (shadow == NULL) {
         __assert(lbl_802752C0, 0x24D, &lbl_8047DDCC);
@@ -476,7 +480,7 @@ void fn_801B0A98(HSDShadow* shadow, HSD_LObj* light, f32 distance) {
 
     switch (light->flags & 3) {
     case 1:
-        if (distance <= lbl_8047DDC0) {
+        if (!(distance > lbl_8047DDC0)) {
             __assert(lbl_802752C0, 0x252, lbl_802752F4);
         }
         HSD_CObjGetInterest(shadow->camera, &interest);

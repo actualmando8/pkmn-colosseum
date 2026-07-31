@@ -11,6 +11,7 @@
  */
 
 #include "game/colosseum.h"
+#include "crt/string.h"
 #include "game/fight_action.h"
 #include "game/trainer.h"
 #include "game/pokemon.h"
@@ -87,7 +88,7 @@ fightSeqGetNromalWazaDamage(u32 r3, u32 r4, u32 r5, u32 r6, u8 r7, u8 r8, void *
     extern void fn_802274F0();
     extern int fn_80232110();
     extern u32 lbl_80478D60;
-    extern u8 lbl_80478D78[1];
+    extern u8 lbl_80478D78[8];
     extern u32 lbl_8047B610;
     extern u32 lbl_8047B618;
   u32 uVar2;
@@ -302,9 +303,7 @@ void fightSeqInit(void) {
         }
     }
     fightFloorLoopValidFightOutPokemon(0, (u32)fn_802136A4, 0, 0);
-    for (i = 0; i < 8; i++) {
-        lbl_80478D78[i] = 0;
-    }
+    memset(lbl_80478D78, 0, 8);
     lbl_8047B62C = 0;
     fightFloorLoopValidFightOutPokemon(0, (u32)_fightSeqInitSubFightOutPokemon__FPvUsPv, 0, 0);
 }

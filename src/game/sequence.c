@@ -829,20 +829,21 @@ void fn_801DE598(u32 group, u32 resource) {
     state = fn_8017B2CC(group);
     if (state < 0) {
         fn_8017B3E4(group);
-    } else if (state == 0 && resource != 0 &&
+    } else if (fn_8017B2CC(group) == 0 && resource != 0 &&
                GSresGetResource(group, resource) == NULL) {
         fn_8017B3E4(group);
     }
 
-    do {
+    for (;;) {
         state = fn_8017B2CC(group);
         if (state < 0) {
             GSlogWrite(lbl_802799C8);
         }
-        if (state != 0) {
-            _threadSwitch();
+        if (state == 0) {
+            break;
         }
-    } while (state != 0);
+        _threadSwitch();
+    }
 }
 
 #endif

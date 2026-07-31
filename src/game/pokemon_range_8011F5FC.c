@@ -1922,6 +1922,7 @@ u16* learned_moves;
     u8 move_index;
     u8 level;
     u8* old_data;
+    void* nickname;
     u16 move;
     s32 move_count;
     s32 output_offset;
@@ -1941,7 +1942,8 @@ u16* learned_moves;
     }
 
     pokemonBiosCopy((u32*)dst, (u32*)source);
-    if (GScharCmp(pokemonBiosGetNicknamePtr(dst),
+    nickname = pokemonBiosGetNicknamePtr(dst);
+    if (GScharCmp(nickname,
                   (void*)GSmsgGetGSchar(pokemonDataBiosGetName(old_data))) == 0) {
         pokemonBiosSetNicknamePtr(
             dst,

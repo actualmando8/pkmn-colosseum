@@ -340,15 +340,15 @@ void fn_8016782C(u8 *flag)
 u8 *fn_80167864(void)
 {
     BOOL enabled;
+    u8 *entry;
     u32 i;
     u32 offset;
-    u8 *entry;
     u8 *result;
 
     enabled = OSDisableInterrupts();
-    entry = lbl_8047B0C4;
     result = 0;
-    for (i = 0; i < lbl_8047B0C8; i++, entry += 0x78) {
+    for (i = 0; i < lbl_8047B0C8; i++) {
+        entry = &lbl_8047B0C4[i * 0x78];
         if (*entry != 1) {
             offset = i * 0x78;
             lbl_8047B0C4[offset] = 1;

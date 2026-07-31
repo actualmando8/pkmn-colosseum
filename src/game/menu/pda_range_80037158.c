@@ -2644,6 +2644,8 @@ void fn_80044378(u8* context, PdaSprite* sprite)
     f32 y;
     u16 pokemonId;
     u32 model;
+    u32 pokemonRnd;
+    u32 trainerRnd;
 
     scene = (u8*)&lbl_803A6818;
     /* retail reads the s16 eventId at +6 here, not messageId at +0x4c;
@@ -2689,8 +2691,10 @@ void fn_80044378(u8* context, PdaSprite* sprite)
                 }
                 fn_801240C4(model, pokemonId, 0xA,
                              gamedataGetStatus(0, 1));
-                fn_8011DFE0(model, fn_8025FDDC(0, pokemonId));
-                fn_8011DF90(model, fn_8025FD34(0, pokemonId));
+                pokemonRnd = fn_8025FDDC(0, pokemonId);
+                trainerRnd = fn_8025FD34(0, pokemonId);
+                fn_8011DFE0(model, pokemonRnd);
+                fn_8011DF90(model, trainerRnd);
                 fn_8011F5C8();
                 fn_8011E778();
                 model = fn_800FA280(fn_8011E760());
@@ -3386,16 +3390,15 @@ void fn_8003F040(void) {
         for (j = gap; j < count; j++) {
             k = j - gap;
             p = base + k * 0x1a;
-            while (k >= 0) {
-                q = base + (k + gap) * 0x1a;
-                if (GScharCmp((u32)(p + 2), (u32)(q + 2)) < 0) {
-                    break;
-                }
+            q = base + (k + gap) * 0x1a;
+            while (k >= 0 &&
+                   GScharCmp((u32)(p + 2), (u32)(q + 2)) >= 0) {
                 memcpy(tmp, p, 0x1a);
                 memcpy(p, q, 0x1a);
                 memcpy(q, tmp, 0x1a);
                 p -= gap * 0x1a;
                 k -= gap;
+                q = base + (k + gap) * 0x1a;
             }
         }
     }

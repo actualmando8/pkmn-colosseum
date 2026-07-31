@@ -586,7 +586,8 @@ void fn_8018A44C(u32 groupId, u32 index, f32 amount) {
         fn_8018FC2C(entry, &rotation);
         revolutions = (s32)(rotation.y / lbl_8047D7C0);
         entry->pad22 = 1;
-        entry->field_40 = angle + lbl_8047D7C0 * revolutions;
+        angle += lbl_8047D7C0 * revolutions;
+        entry->field_40 = angle;
         entry->field_44 = oldSpeed;
     }
 }
@@ -1970,8 +1971,8 @@ void fn_80187A60(u32 groupId, u32 index, u32 targetGroupId,
                  u32 targetIndex, f32 turnSpeed) {
     PeopleEntry* entry;
     void* targetModel;
-    GSvec targetPosition;
     GSvec direction;
+    GSvec targetPosition;
     GSvec rotation;
     f32 angle;
     f32 fullTurn;
@@ -2646,8 +2647,8 @@ void fn_8018790C(u32 groupId, u32 index) {
 void fn_80187D48(u32 groupId, u32 index, f32 targetX, f32 targetY,
                  f32 targetZ, f32 turnSpeed) {
     PeopleEntry* entry;
-    GSvec targetPosition;
     GSvec direction;
+    GSvec targetPosition;
     GSvec rotation;
     f32 angle;
     f32 fullTurn;
@@ -3082,13 +3083,13 @@ BOOL peopleMoveCheck(u32 groupId, u32 index, u8 waitFlag)
 /* fn_8018AACC -- not recovered, gap in archive campaign (size 0x3F4) */
 void fn_8018AACC(u32 groupId, u32 index, u8 keepFacing, GSvec* target) {
     PeopleEntry* original;
-    PeopleEntry* entry;
     GSvec delta;
+    PeopleEntry* entry;
     GSvec rotation;
     f32 oldSpeed;
     f32 angle;
-    f32 fullTurn;
     s32 revolutions;
+    f32 fullTurn;
 
     original = peopleFindBySelf(peopleFindSelf(groupId, index));
     if (original == NULL) {

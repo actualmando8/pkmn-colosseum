@@ -22,7 +22,10 @@ s32 fn_80087AE8(u8* work, u32 flags)
     }
 
     for (;;) {
-        while (fn_80102620(0x10C) != 0) {
+        for (;;) {
+            if (fn_80102620(0x10C) == 0) {
+                break;
+            }
             _threadSwitch();
         }
         if ((flags & 2) != 0 && (*(u16*)(fn_80105624() + 4) & 0x20) != 0) {

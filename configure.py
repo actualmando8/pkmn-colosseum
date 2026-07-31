@@ -3697,7 +3697,7 @@ config.libs = [
                 CodeCandidate,
                 "dolphin/sdk_range_800AC440.c",
                 mw_version="GC/1.1p1",
-                extra_cflags=["-O4,s"],
+                extra_cflags=["-O4,p"],
                 progress_category="sdk",
             ),
             Object(
@@ -7321,7 +7321,7 @@ config.libs = [
             Object(
                 CodeCandidate,
                 "game/battle/battle_grid_residual_801C3114_r40_801C3B80_gc125n.c",
-                mw_version="GC/1.2.5n",
+                mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -9072,7 +9072,6 @@ config.libs = [
                 CodeCandidate,
                 "game/gs_log_r57_800DE09C_o1.c",
                 mw_version="GC/1.3",
-                cflags=["-O1" if flag == "-O4,p" else flag for flag in cflags_base],
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
             ),
@@ -10215,6 +10214,13 @@ config.libs = [
                 extra_cflags=["-O2"],
                 progress_category="hsd",
             ),
+            Object(
+                CodeCandidate,
+                "hsd/hsd_mobj_candidate_801A6DDC.c",
+                mw_version="GC/1.3",
+                extra_cflags=["-O1"],
+                progress_category="hsd",
+            ),
             *[
                 Object(
                     status,
@@ -10225,7 +10231,6 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "hsd/hsd_mobj_candidate_801A6CA4.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A6DC4.c"),
-                    (CodeCandidate, "hsd/hsd_mobj_candidate_801A6DDC.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A6E00.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A6F78.c"),
                     (Matching, "hsd/hsd_mobj_exact_801A7E3C.c"),
@@ -10381,6 +10386,7 @@ config.libs = [
                 CodeCandidate,
                 "hsd/hsd_texp_candidate_801B4264.c",
                 mw_version="GC/1.3",
+                extra_cflags=["-O1"],
                 progress_category="hsd",
             ),
             Object(

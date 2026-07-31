@@ -22,8 +22,8 @@
 #include "game/battle/battle_grid_types.h"
 
 void battleGridUpdate(void);
-f32 battleGridGetDistance(s32 slot);
-void battleGridGetNormalisedScale(void);
+f32 battleGridGetDistance(u8 side);
+void battleGridGetNormalisedScale(f32* scale);
 
 /* CRT */
 extern void* memset(void* dst, int val, u32 size);
@@ -81,20 +81,33 @@ void* battleGridGetPtr(void) {
  * sets up the 4-position double battle layout.
  */
 void fn_801C3114(void) {
-    s32 i;
-    BattleGridSceneWork* sceneWork;
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern s32 lbl_80478CA8;
+    extern s32 lbl_80478CAC;
+    extern u8 lbl_8047B399;
+    extern u8 lbl_8047B39A;
+    extern u8 lbl_8047B39C[12] __attribute__((section(".sdata")));
+    extern void fn_801DA4E8(void*, u32);
+    u16 visibilityIndex;
+    u16 j;
+    u16 i;
+    BattleGridGroupEntry* group = lbl_80466DE8.entries;
 
-    memset(lbl_80467030, 0, 0x20);
-    memset(lbl_80466E50, 0, 0x1E0);
+    memset(&lbl_80466DE8, 0, 0x44);
+    visibilityIndex = 0;
+    lbl_80478CAC = -1;
+    lbl_80478CA8 = 200;
+    lbl_8047B399 = 0;
 
-    /* Initialize 4 BattleGridSlot entries with default values */
-    sceneWork = (BattleGridSceneWork*)lbl_80466E50;
-    for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        BattleGridSceneSlot* slot = &sceneWork->slots[i];
-        slot->active = 0;
-        slot->jobj = NULL;
-        slot->rotationY = 0.0f;
-        slot->scale = 1.0f;
+    if (lbl_8047B39A != 0) {
+        for (i = 0; i < 4; i++, group++) {
+            fn_801DA4E8(group->slot, lbl_8047B39C[visibilityIndex++]);
+            for (j = 0; j < 2; j++) {
+                fn_801DA4E8(group->pokemon[j],
+                            lbl_8047B39C[visibilityIndex++]);
+            }
+        }
+        lbl_8047B39A = 0;
     }
 }
 
@@ -106,14 +119,116 @@ void fn_801C3114(void) {
  * position markers, and initial camera placement.
  */
 void fn_801C31EC(void) {
-    /* Full grid setup with model loading:
-     * 1. Initialize grid state
-     * 2. Set up stage model (battle colosseum arena)
-     * 3. Place position markers for all 4 slots
-     * 4. Initialize camera to default battle overhead view
-     */
-    fn_801C3114();
-    battleGridUpdate();
+    typedef struct FloorData {
+        u8 pad_00[8];
+        u32 resourceId;
+    } FloorData;
+    typedef struct ModelList {
+        void** models;
+    } ModelList;
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern s32 lbl_80478CA8;
+    extern s32 lbl_80478CAC;
+    extern u8 lbl_8047B399;
+    extern u8 lbl_8047B39A;
+    extern u8 lbl_8047B39C[12] __attribute__((section(".sdata")));
+    extern const f32 lbl_8047DF5C;
+    extern const f32 lbl_8047DF60;
+    extern const f32 lbl_8047DF64;
+    extern const f32 lbl_8047DF68;
+    extern char lbl_802757FC[];
+    extern s32 fn_801DAC24(void*);
+    extern FloorData* floorDataBiosGetCurrentPtr(void);
+    extern void* fn_80113F48(void);
+    extern void set__5GSvecFfff(f32*, f32, f32, f32);
+    extern void* GSresGetResource(void*, u32);
+    extern ModelList* HSD_ArchiveGetPublicAddress(void*, const char*);
+    extern u32 floorReadMakeModelResID(u32);
+    extern void GSmodelSetScale(void*, f32*);
+    extern void cameraSetOffsetScale(f32*);
+    extern void fn_801DA4E8(void*, u32);
+    BattleGridGroupEntry* group;
+    FloorData* floor;
+    ModelList* modelList;
+    void* resourceBase;
+    void* resource;
+    s32 maxField;
+    u32 modelId;
+    f32 scaleValue;
+    u16 visibilityIndex;
+    u16 i;
+    u16 j;
+    f32 scale[3];
+
+    memset(&lbl_80466DE8, 0, 0x44);
+    lbl_80478CAC = -1;
+    lbl_80478CA8 = 200;
+
+    maxField = -2;
+    group = lbl_80466DE8.entries;
+    if (lbl_80466DE8.count == 0) {
+        maxField = 0;
+    } else {
+        for (i = 0; i < 4; i++, group++) {
+            if (group->slot != NULL) {
+                for (j = 0; j < 2; j++) {
+                    if (group->pokemon[j] != NULL) {
+                        s32 field = fn_801DAC24(group->pokemon[j]);
+                        if (field > maxField) {
+                            maxField = field;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    floor = floorDataBiosGetCurrentPtr();
+    resourceBase = fn_80113F48();
+    switch (maxField) {
+    case 1:
+        scaleValue = lbl_8047DF5C;
+        break;
+    case 2:
+        scaleValue = lbl_8047DF60;
+        break;
+    case 3:
+        scaleValue = lbl_8047DF64;
+        break;
+    default:
+        scaleValue = lbl_8047DF68;
+        break;
+    }
+    set__5GSvecFfff(scale, scaleValue, scaleValue, scaleValue);
+
+    resource = GSresGetResource(fn_80113F48(), floor->resourceId);
+    if (resource != NULL) {
+        modelList = HSD_ArchiveGetPublicAddress(resource, lbl_802757FC);
+        if (modelList != NULL && modelList->models != NULL) {
+            modelId = floorReadMakeModelResID(floor->resourceId);
+            for (i = 0; modelList->models[i] != NULL; i++) {
+                void* model = GSresGetResource(resourceBase, modelId | i);
+                if (model != NULL) {
+                    GSmodelSetScale(model, scale);
+                }
+            }
+        }
+    }
+    cameraSetOffsetScale(scale);
+
+    lbl_8047B399 = 0;
+    group = lbl_80466DE8.entries;
+    visibilityIndex = 0;
+    if (lbl_8047B39A != 0) {
+        for (i = 0; i < 4; i++, group++) {
+            fn_801DA4E8(group->slot, lbl_8047B39C[visibilityIndex++]);
+            for (j = 0; j < 2; j++) {
+                fn_801DA4E8(group->pokemon[j],
+                            lbl_8047B39C[visibilityIndex++]);
+            }
+        }
+        lbl_8047B39A = 0;
+    }
 }
 
 /**
@@ -129,6 +244,7 @@ void fn_801C31EC(void) {
  */
 void battleGridUpdate(void) {
     extern void HSD_AObjInterpretAnim(void* ctx, f32 posX, f32 posZ);
+    f32 scale[3];
     /* Main battle grid setup:
      * 1. Load stage model from FDAT
      * 2. Set up position transforms for all 4 battle slots
@@ -139,70 +255,140 @@ void battleGridUpdate(void) {
      */
     HSD_AObjInterpretAnim((void*)lbl_80466E50, 0.0f, 0.0f);
     battleGridGetDistance(0);
-    battleGridGetNormalisedScale();
+    battleGridGetNormalisedScale(scale);
 }
 
 /**
- * battleGridGetDistance - Load models for all grid positions (renamed
- * from fn_801C3A64; confirmed name -- naming pass 2026-07-07).
+ * battleGridGetDistance (renamed from fn_801C3A64; confirmed name --
+ * naming pass 2026-07-07).
  * Address: 0x801C3A64 | Size: 0x11C
- * Loads Pokemon and trainer models into each active grid slot.
+ * Chooses the battle-grid distance from the largest active Pokemon class.
  */
-f32 battleGridGetDistance(s32 slot) {
-    s32 i;
-    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
+f32 battleGridGetDistance(u8 side) {
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern s32 fn_801DAC24(void*);
+    extern const f32 lbl_8047DF64;
+    extern const f32 lbl_8047DF68;
+    extern const f32 lbl_8047DF6C;
+    extern const f32 lbl_8047DF70;
+    extern const f32 lbl_8047DF74;
+    extern const f32 lbl_8047DF78;
+    extern const f32 lbl_8047DF7C;
+    s32 maxField;
+    u8** pokemon;
+    BattleGridGroupEntry* group;
+    f32 distance;
+    u16 j;
+    u16 i;
 
-    /* Load Pokemon and trainer models into each active grid slot */
-    for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        BattleGridSceneSlot* slot = &state->slots[i];
-        s32 active = slot->active;
-
-        if (active != 0) {
-            /* Model is already loaded or should be loaded from battle data */
-            void* jobj = slot->jobj;
-            if (jobj != NULL) {
-                f32 x = slot->posX;
-                f32 y = slot->posY;
-                f32 z = slot->posZ;
-                fn_8036A384(jobj, x, y, z);
+    group = (BattleGridGroupEntry*)&lbl_80466DE8;
+    maxField = -2;
+    if (((BattleGridGroupTable*)group)->count == 0) {
+        maxField = 0;
+    } else {
+        for (i = 0; i < 4; i++, group++) {
+            if (group->slot != NULL) {
+                pokemon = group->pokemon;
+                for (j = 0; j < 2; j++, pokemon++) {
+                    if (*pokemon != NULL) {
+                        s32 field = fn_801DAC24(*pokemon);
+                        if (field > maxField) {
+                            maxField = field;
+                        }
+                    }
+                }
             }
         }
     }
+
+    switch (maxField) {
+    case -2:
+    case -1:
+        distance = lbl_8047DF6C;
+        break;
+    case 1:
+        distance = lbl_8047DF64;
+        break;
+    case 2:
+        distance = lbl_8047DF70;
+        break;
+    case 3:
+        distance = lbl_8047DF74;
+        break;
+    default:
+        distance = lbl_8047DF68;
+        break;
+    }
+
+    if (side != 0) {
+        return lbl_8047DF7C * distance;
+    }
+    return lbl_8047DF78 * distance;
 }
 
 /**
- * battleGridGetNormalisedScale - Update all grid positions (renamed from
- * fn_801C3B80; confirmed name -- naming pass 2026-07-07).
+ * battleGridGetNormalisedScale (renamed from fn_801C3B80; confirmed name --
+ * naming pass 2026-07-07).
  * Address: 0x801C3B80 | Size: 0x118
- * Recalculates world-space positions for all grid slots
- * (e.g., after a Pokemon switch or camera change).
+ * Chooses the model scale from the largest active Pokemon class.
  */
-void battleGridGetNormalisedScale(void) {
-    s32 i;
-    BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
+void battleGridGetNormalisedScale(f32* scale) {
+    extern BattleGridGroupTable lbl_80466DE8;
+    extern s32 fn_801DAC24(void*);
+    extern void set__5GSvecFfff(f32*, f32, f32, f32);
+    extern const f32 lbl_8047DF64;
+    extern const f32 lbl_8047DF68;
+    extern const f32 lbl_8047DF6C;
+    extern const f32 lbl_8047DF70;
+    extern const f32 lbl_8047DF74;
+    extern const f32 lbl_8047DFA0;
+    s32 maxField;
+    u8** pokemon;
+    BattleGridGroupEntry* group = lbl_80466DE8.entries;
+    f32 scaleValue;
+    u16 j;
+    u16 i;
 
-    /* Recalculate world-space positions for all grid slots */
-    for (i = 0; i < BATTLE_TOTAL_POKEMON; i++) {
-        BattleGridSceneSlot* slot = &state->slots[i];
-        s32 active = slot->active;
-
-        if (active == 0) {
-            continue;
-        }
-
-        {
-            void* jobj = slot->jobj;
-            if (jobj != NULL) {
-                f32 x = slot->posX;
-                f32 y = slot->posY;
-                f32 z = slot->posZ;
-                f32 scale = slot->scale;
-
-                fn_8036A384(jobj, x, y, z);
-                fn_8036A478(jobj, scale, scale, scale);
+    maxField = -2;
+    if (lbl_80466DE8.count == 0) {
+        maxField = 0;
+    } else {
+        for (i = 0; i < 4; i++, group++) {
+            if (group->slot != NULL) {
+                pokemon = group->pokemon;
+                for (j = 0; j < 2; j++, pokemon++) {
+                    if (*pokemon != NULL) {
+                        s32 field = fn_801DAC24(*pokemon);
+                        if (field > maxField) {
+                            maxField = field;
+                        }
+                    }
+                }
             }
         }
     }
+
+    switch (maxField) {
+    case -2:
+    case -1:
+        scaleValue = lbl_8047DF6C;
+        break;
+    case 1:
+        scaleValue = lbl_8047DF64;
+        break;
+    case 2:
+        scaleValue = lbl_8047DF70;
+        break;
+    case 3:
+        scaleValue = lbl_8047DF74;
+        break;
+    default:
+        scaleValue = lbl_8047DF68;
+        break;
+    }
+
+    scaleValue *= lbl_8047DFA0;
+    set__5GSvecFfff(scale, scaleValue, scaleValue, scaleValue);
 }
 
 #endif

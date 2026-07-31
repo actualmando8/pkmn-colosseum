@@ -594,11 +594,14 @@ s32 menuCloseCustom(s32 id, u32 mode, u8 wait) {
 
     windowClose(window, mode);
     if (wait != 0) {
-        while (windowSearchID(id) != NULL) {
+        for (;;) {
+            if (windowSearchID(id) == NULL) {
+                break;
+            }
             if (GSthreadGetCurrentThread() == 0) {
                 GSlogWrite((const char*)lbl_80271E10,
                            (const char*)lbl_8035B060, id);
-                return 0;
+                break;
             }
             _threadSwitch();
         }

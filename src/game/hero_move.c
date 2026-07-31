@@ -2220,25 +2220,52 @@ extern f32 lbl_8047D07C;
 extern f32 lbl_8047D038;
 s32 heroMoveCheckEvent(void* event)
 {
-    extern void fn_8018D998(u32 group, u32 handle);
-    extern void* peopleSearchID(void);
+    typedef struct HeroMoveEventVec {
+        f32 x;
+        f32 y;
+        f32 z;
+    } HeroMoveEventVec;
+    extern u32 fn_8018D998(u32 group, u32 handle);
+    extern void* peopleSearchID(u32 id);
+    extern HeroMoveEventVec* fn_8018FCBC(void* person);
+    extern HeroMoveEventVec* peopleGetPosition(void* person);
+    extern f64 sin(f64 angle);
+    extern f64 cos(f64 angle);
+    extern void PSVECAdd(HeroMoveEventVec* dst, const HeroMoveEventVec* lhs,
+                         const HeroMoveEventVec* rhs);
+    extern s32 GScolsys2CheckGetEventID(const HeroMoveEventVec* position,
+                                        const HeroMoveEventVec* offset,
+                                        void* event);
     s32 member = *(s32*)lbl_80426BD0;
+    HeroMoveEventVec* rotation;
+    HeroMoveEventVec* position;
+    HeroMoveEventVec origin;
+    HeroMoveEventVec offset;
+    void* person;
     u32 handles[2];
+    u32 handle = 0;
+    s32 result = -1;
 
     handles[0] = *(u32*)&lbl_8047D030;
     handles[1] = *(u32*)&lbl_8047D034;
-    if ((u32)member < 2) {
-        fn_8018D998(0, handles[member]);
-    }
-    if (peopleSearchID() == NULL) {
-        return -1;
+    if (member >= 0 && member < 2) {
+        handle = handles[member];
     }
 
-    /*
-     * The remaining target code offsets the active person's position and
-     * performs the event collision query into event.
-     */
-    return -1;
+    person = peopleSearchID(fn_8018D998(0, handle));
+    if (person != NULL) {
+        position = fn_8018FCBC(person);
+        rotation = peopleGetPosition(person);
+        origin = *position;
+        origin.y += lbl_8047D078;
+        offset.x = lbl_8047D07C * (f32)sin(rotation->y);
+        offset.y = lbl_8047D038;
+        offset.z = lbl_8047D07C * (f32)cos(rotation->y);
+        PSVECAdd(&origin, &offset, &offset);
+        result = GScolsys2CheckGetEventID(&origin, &offset, event);
+    }
+
+    return result;
 }
 /* 0x8012C660 | 0x424 */
 extern f32 lbl_8047D030;

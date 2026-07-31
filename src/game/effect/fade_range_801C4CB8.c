@@ -1229,7 +1229,8 @@ void fadeFluidCalcParms(f32 dt) {
     f32 accel = lbl_8047E0C8 - (lbl_8047E0CC * wave);
     f32 damping = ratio * diff;
     f32 accelOut = accel * ratio;
-    f32 neighbor = (lbl_8047E0C4 * wave) * ratio;
+    f32 neighborBase = lbl_8047E0C4 * wave;
+    f32 neighbor = neighborBase * ratio;
 
     fluid->damping = damping;
     fluid->accel = accelOut;

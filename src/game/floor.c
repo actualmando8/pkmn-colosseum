@@ -256,18 +256,25 @@ void fn_801127BC(void) {
     extern u32 fn_800FF560(void);
     extern void fn_800FF2A0(u32, u32, void*);
     extern void fn_80112844(void);
-    GSFieldColqueryState* state = (GSFieldColqueryState*)lbl_80408378;
     s32 kind;
 
     lbl_80478DD0 = 1;
     floorDataBiosGetCurrentPtr();
     kind = floorDataBiosGetFloorKind();
-    if (kind >= 5 && kind < 7) {
+    switch (kind) {
+    case 5:
+    case 6:
         fn_800D3074(1);
-    } else {
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    default:
         fn_800D3074(2);
+        break;
     }
-    if (state->transitionPollCallback != 0) {
+    if (*(u32*)(lbl_80408378 + 0x28) != 0) {
         fn_800FF2A0(0, fn_800FF560(), (void*)fn_80112844);
     }
 }
@@ -745,17 +752,15 @@ void floorChangePos(u32 floorId, s16 direction, f32 x, f32 y, f32 z) {
     extern const f32 lbl_8047CF74;
     extern u32 fn_800FF56C(void);
     extern void fn_800FF58C(u32);
-    GSFieldColqueryState* state = (GSFieldColqueryState*)lbl_80408378;
-
     if (floorId == 0) {
         return;
     }
     set__5GSvecFfff((void*)(lbl_80408378 + 0x10), x, y, z);
     set__5GSvecFfff((void*)(lbl_80408378 + 0x1C), lbl_8047CF70,
                     lbl_8047CF74 * direction, lbl_8047CF70);
-    state->field_00 = fn_800FF56C();
-    state->field_04 = floorId;
-    state->field_08 = 0;
+    *(u32*)(lbl_80408378 + 0x0) = fn_800FF56C();
+    *(u32*)(lbl_80408378 + 0x4) = floorId;
+    *(u8*)(lbl_80408378 + 0x8) = 0;
     fn_800FF58C(floorId);
 }
 
