@@ -30,7 +30,7 @@ static inline s32 getConnectJobState(void)
     return 2;
 }
 
-s32 fn_80057C9C(void* pokemon, void* callback, s32* navigation)
+void fn_80057C9C(void* pokemon, void* callback, s32* navigation)
 {
     u8 ownsRequest = 0;
     s32 status;
@@ -61,5 +61,4 @@ s32 fn_80057C9C(void* pokemon, void* callback, s32* navigation)
     if (ownsRequest) {
         lbl_803A9A08.request = 0;
     }
-    return status;
 }

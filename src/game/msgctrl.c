@@ -1077,9 +1077,7 @@ s32 msgctrlWait(EffectUtilCommandObj* obj) {
         obj->waitCounter = (s16)((s16)stream[0] + 1);
     }
     counter = obj->waitCounter;
-    counter = counter - 1;
-    obj->waitCounter = counter;
-    if (counter <= 0) {
+    if ((obj->waitCounter = --counter) <= 0) {
         obj->waitCounter = 0;
         goto doneIncrement;
     }

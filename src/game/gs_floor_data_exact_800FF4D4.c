@@ -19,7 +19,7 @@ void fn_800FF4D4(void* data, u8 typeId)
     if (lbl_8047ACE0 < 0x18) {
         handler = &lbl_80404918[lbl_8047ACE0];
         handler->typeId = typeId;
-        memcpy(&handler->reserved, data, 0xC);
+        memcpy(&handler->loadFunc, data, 0xC);
         lbl_8047ACE0++;
     }
 }

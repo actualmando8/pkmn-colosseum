@@ -15,7 +15,8 @@ u32 fn_801653CC(u32 id, void* buffer, u32 size)
         return 0;
     }
 
-    entry = &lbl_80478FAC[id];
+    entry = lbl_80478FAC;
+    entry += id;
     waveIndex = entry->waveIndex;
     if (waveIndex < *lbl_80478E30) {
         resource = GSresAllocResourceAlign(0x10000, 0x20, 0, 0x408, 0);
@@ -25,7 +26,10 @@ u32 fn_801653CC(u32 id, void* buffer, u32 size)
                 fn_80165EE0(wave, resource, 0x10000);
                 fn_80166B3C(id, 0, 0x408);
                 fn_80166A50(id, (u32)buffer, size, 0);
-                while (fn_801666BC(id) == 2) {
+                for (;;) {
+                    if (fn_801666BC(id) != 2) {
+                        break;
+                    }
                     _threadSwitch();
                 }
                 fn_80166B18(id);

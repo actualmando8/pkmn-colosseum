@@ -684,7 +684,7 @@ void* fightOutPokemonCreateFightActionAttackWaza(void* ctx, void* p2, u32 p3,
 
     result = pokemonGetStatus(ctx, 0, 0xD9, 0);
     if (result == NULL) {
-        result = NULL;
+        return NULL;
     } else {
         fightWazaCreate(result, p8, zokusei, p7, p9);
         result = pokemonGetStatus(ctx, 0, 0xFE, 0);
@@ -700,7 +700,7 @@ void* fightOutPokemonCreateFightActionAttackWaza(void* ctx, void* p2, u32 p3,
             }
         }
         if (result == NULL) {
-            result = NULL;
+            return NULL;
         }
     }
     return result;

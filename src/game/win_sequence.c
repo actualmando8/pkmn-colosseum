@@ -114,7 +114,7 @@ extern u8  lbl_80315690[]; /* resource table, 8-byte entries */
 /* Additional externs used by various functions */
 extern void  GSmodelFree(u32);     /* GSmem release/unref */
 extern void  fn_800D2738(void);
-extern void* menuDataBiosGetPtr(void);    /* linked list head */
+extern void* menuDataBiosGetPtr(void*);    /* linked list head */
 extern void* menuItemBiosGetPtr(s16 idx); /* node by index */
 extern void* menuSeBiosGetPtr(s32);
 extern u16   fn_8005D798(void*, s32);
@@ -310,7 +310,7 @@ extern void fn_80106F98(s32 windowId);
 extern void _winSeqMoveSub(void* targetPtr, void* statePtr);
 extern s32 winSeqCheckMove(s32 param);
 extern s32 fn_80107170(s32 r3, s32 r31);
-extern void winSeqMoveMenu(void);
+extern void winSeqMoveMenu(void*);
 extern s32 fn_80107E78(void* r3, s32 r4, u16 r30);
 extern s32 winSeqIsCheck(s32 r3, u16 r30);
 extern void fn_80107F38(s32 param, u32 key);
@@ -414,13 +414,99 @@ _ret0:
 }
 
 /* 0x801071D0 | 0x304 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
-void winSeqMoveMenu(void) {
-    /* TODO: match -- 772 bytes at 0x801071D0 */
+void winSeqMoveMenu(void* windowPtr) {
+    u8* window = windowPtr;
+    u8* node;
+    u8* scratch;
+    u8* menuData;
+    u8* item;
+    u32 i;
+
+    scratch = lbl_80404B8C;
+    *(s16*)(scratch + 0x00) = *(s16*)(window + 0x84);
+    *(s16*)(scratch + 0x02) = *(s16*)(window + 0x86);
+    *(u32*)(scratch + 0x04) = *(u32*)(window + 0x88);
+    scratch[0x20] = window[0x00];
+    menuData = menuDataBiosGetPtr((void*)*(u32*)(window + 0x04));
+    *(s16*)(scratch + 0x08) = *(s16*)(menuData + 0x06);
+    menuData = menuDataBiosGetPtr((void*)*(u32*)(window + 0x04));
+    *(s16*)(scratch + 0x0A) = *(s16*)(menuData + 0x08);
+    for (i = 0; i < fn_800D3088(); i++) {
+        _winSeqMoveSub(scratch, window + 0x24);
+    }
+    *(s16*)(window + 0x84) = *(s16*)(scratch + 0x00);
+    *(s16*)(window + 0x86) = *(s16*)(scratch + 0x02);
+    *(u32*)(window + 0x88) = *(u32*)(scratch + 0x04);
+    window[0x00] = scratch[0x20];
+
+    for (node = *(u8**)(window + 0x1C); node != NULL;
+         node = *(u8**)node) {
+        scratch = lbl_80404B68;
+        *(s16*)(scratch + 0x00) = *(s16*)(node + 0x50);
+        *(s16*)(scratch + 0x02) = *(s16*)(node + 0x52);
+        *(u32*)(scratch + 0x04) = *(u32*)(node + 0x64);
+        *(f32*)(scratch + 0x0C) = *(f32*)(node + 0x68);
+        *(f32*)(scratch + 0x10) = *(f32*)(node + 0x6C);
+        scratch[0x20] = node[0x04];
+        *(u32*)(scratch + 0x14) = *(u32*)(node + 0x58);
+        *(s16*)(scratch + 0x18) = *(s16*)(node + 0x5C);
+        *(s16*)(scratch + 0x1A) = *(s16*)(node + 0x5E);
+        *(s16*)(scratch + 0x1C) = *(s16*)(node + 0x60);
+        *(s16*)(scratch + 0x1E) = *(s16*)(node + 0x62);
+        item = menuItemBiosGetPtr(*(s16*)(node + 0x06));
+        *(s16*)(scratch + 0x08) = *(s16*)(item + 0x02);
+        item = menuItemBiosGetPtr(*(s16*)(node + 0x06));
+        *(s16*)(scratch + 0x0A) = *(s16*)(item + 0x04);
+        for (i = 0; i < fn_800D3088(); i++) {
+            _winSeqMoveSub(scratch, node + 0x0C);
+        }
+        *(s16*)(node + 0x50) = *(s16*)(scratch + 0x00);
+        *(s16*)(node + 0x52) = *(s16*)(scratch + 0x02);
+        *(u32*)(node + 0x64) = *(u32*)(scratch + 0x04);
+        *(f32*)(node + 0x68) = *(f32*)(scratch + 0x0C);
+        *(f32*)(node + 0x6C) = *(f32*)(scratch + 0x10);
+        node[0x04] = scratch[0x20];
+        *(u32*)(node + 0x58) = *(u32*)(scratch + 0x14);
+        *(s16*)(node + 0x5C) = *(s16*)(scratch + 0x18);
+        *(s16*)(node + 0x5E) = *(s16*)(scratch + 0x1A);
+        *(s16*)(node + 0x60) = *(s16*)(scratch + 0x1C);
+        *(s16*)(node + 0x62) = *(s16*)(scratch + 0x1E);
+    }
+
+    for (node = *(u8**)(window + 0x20); node != NULL;
+         node = *(u8**)node) {
+        scratch = lbl_80404B68;
+        *(s16*)(scratch + 0x00) = *(s16*)(node + 0x50);
+        *(s16*)(scratch + 0x02) = *(s16*)(node + 0x52);
+        *(u32*)(scratch + 0x04) = *(u32*)(node + 0x64);
+        *(f32*)(scratch + 0x0C) = *(f32*)(node + 0x68);
+        *(f32*)(scratch + 0x10) = *(f32*)(node + 0x6C);
+        scratch[0x20] = node[0x04];
+        *(u32*)(scratch + 0x14) = *(u32*)(node + 0x58);
+        *(s16*)(scratch + 0x18) = *(s16*)(node + 0x5C);
+        *(s16*)(scratch + 0x1A) = *(s16*)(node + 0x5E);
+        *(s16*)(scratch + 0x1C) = *(s16*)(node + 0x60);
+        *(s16*)(scratch + 0x1E) = *(s16*)(node + 0x62);
+        item = menuItemBiosGetPtr(*(s16*)(node + 0x06));
+        *(s16*)(scratch + 0x08) = *(s16*)(item + 0x02);
+        item = menuItemBiosGetPtr(*(s16*)(node + 0x06));
+        *(s16*)(scratch + 0x0A) = *(s16*)(item + 0x04);
+        for (i = 0; i < fn_800D3088(); i++) {
+            _winSeqMoveSub(scratch, node + 0x0C);
+        }
+        *(s16*)(node + 0x50) = *(s16*)(scratch + 0x00);
+        *(s16*)(node + 0x52) = *(s16*)(scratch + 0x02);
+        *(u32*)(node + 0x64) = *(u32*)(scratch + 0x04);
+        *(f32*)(node + 0x68) = *(f32*)(scratch + 0x0C);
+        *(f32*)(node + 0x6C) = *(f32*)(scratch + 0x10);
+        node[0x04] = scratch[0x20];
+        *(u32*)(node + 0x58) = *(u32*)(scratch + 0x14);
+        *(s16*)(node + 0x5C) = *(s16*)(scratch + 0x18);
+        *(s16*)(node + 0x5E) = *(s16*)(scratch + 0x1A);
+        *(s16*)(node + 0x60) = *(s16*)(scratch + 0x1C);
+        *(s16*)(node + 0x62) = *(s16*)(scratch + 0x1E);
+    }
 }
-#pragma pop
 
 /* 0x801074D4 | 0x9A4 */
 void _winSeqMoveSub(void* targetPtr, void* statePtr) {
@@ -882,7 +968,6 @@ void fn_801081F8(void* r3_arg, u16 r4, u16 r5) {
         }
     }
 }
-
 /* 0x80108518 | 0x68 */
 #pragma push
 #pragma optimization_level 0

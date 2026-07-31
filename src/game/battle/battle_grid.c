@@ -22,7 +22,7 @@
 #include "game/battle/battle_grid_types.h"
 
 void battleGridUpdate(void);
-void battleGridGetDistance(void);
+f32 battleGridGetDistance(s32 slot);
 void battleGridGetNormalisedScale(void);
 
 /* CRT */
@@ -138,7 +138,7 @@ void battleGridUpdate(void) {
      * 6. Initialize model animation system
      */
     HSD_AObjInterpretAnim((void*)lbl_80466E50, 0.0f, 0.0f);
-    battleGridGetDistance();
+    battleGridGetDistance(0);
     battleGridGetNormalisedScale();
 }
 
@@ -148,7 +148,7 @@ void battleGridUpdate(void) {
  * Address: 0x801C3A64 | Size: 0x11C
  * Loads Pokemon and trainer models into each active grid slot.
  */
-void battleGridGetDistance(void) {
+f32 battleGridGetDistance(s32 slot) {
     s32 i;
     BattleGridSceneWork* state = (BattleGridSceneWork*)lbl_80466E50;
 

@@ -15,6 +15,25 @@
 #include "dolphin/types.h"
 #include "game/world/gs_field.h"
 #include "game/gs_field_colquery_types.h"
+#include "hsd/hsd_archive.h"
+
+typedef struct FloorArchiveResourceLists {
+    u32* models;
+    u32 unused04;
+    u32* lights;
+} FloorArchiveResourceLists;
+
+extern const char lbl_802720B0[];
+extern void* GSresGetResource(u32 groupId, u32 resourceId);
+extern void* floorDataBiosGetCurrentPtr(void);
+extern u32 floorDataBiosGetMapResID(void*);
+extern u32 floorDataBiosGetGroupID(void*);
+extern u32 floorReadMakeModelResID(u32);
+extern u32 floorReadMakeLightResID(u32);
+extern void GSmodelPushState(void*, void*);
+extern void GSlightPushState(void*, void*);
+extern void GSmodelSetVisibility(void*, u8);
+extern void GSlightSetActive(void*, u8);
 
 /* 0x80111C24 | 0x1D4 */
 #pragma push
@@ -116,8 +135,45 @@ s32 GScolsys2Sun(void* origin, void* dir) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80111DF8(void) {
-    /* TODO: match -- 308 bytes at 0x80111DF8 */
+u32 fn_80111DF8(void) {
+    FloorArchiveResourceLists* lists;
+    void* floor;
+    u32 mapId;
+    u32 groupId;
+    u32 baseId;
+    u32 modelCount;
+    u32 lightCount;
+    u32 i;
+
+    modelCount = 0;
+    lightCount = 0;
+    floor = floorDataBiosGetCurrentPtr();
+    mapId = floorDataBiosGetMapResID(floor);
+    if (mapId != 0) {
+        floor = floorDataBiosGetCurrentPtr();
+        groupId = floorDataBiosGetGroupID(floor);
+        lists = HSD_ArchiveGetPublicAddress(
+            GSresGetResource(groupId, mapId), lbl_802720B0);
+        if (lists != NULL) {
+            if (lists->models != NULL) {
+                baseId = floorReadMakeModelResID(mapId);
+                for (i = 0; lists->models[i] != 0; i++) {
+                    if (GSresGetResource(groupId, baseId | i) != NULL) {
+                        modelCount++;
+                    }
+                }
+            }
+            if (lists->lights != NULL) {
+                baseId = floorReadMakeLightResID(mapId);
+                for (i = 0; lists->lights[i] != 0; i++) {
+                    if (GSresGetResource(groupId, baseId | i) != NULL) {
+                        lightCount++;
+                    }
+                }
+            }
+        }
+    }
+    return (modelCount + lightCount) * 0x74;
 }
 #pragma pop
 
@@ -125,8 +181,52 @@ void fn_80111DF8(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80111F2C(void) {
-    /* TODO: match -- 336 bytes at 0x80111F2C */
+void fn_80111F2C(u8* state) {
+    FloorArchiveResourceLists* lists;
+    void* floor;
+    void* resource;
+    u32 mapId;
+    u32 groupId;
+    u32 resourceId;
+    u32 baseId;
+    u32 i;
+
+    floor = floorDataBiosGetCurrentPtr();
+    mapId = floorDataBiosGetMapResID(floor);
+    if (mapId != 0) {
+        floor = floorDataBiosGetCurrentPtr();
+        groupId = floorDataBiosGetGroupID(floor);
+        lists = HSD_ArchiveGetPublicAddress(
+            GSresGetResource(groupId, mapId), lbl_802720B0);
+        if (lists != NULL) {
+            if (lists->models != NULL) {
+                baseId = floorReadMakeModelResID(mapId);
+                for (i = 0; lists->models[i] != 0; i++) {
+                    resourceId = baseId | i;
+                    resource = GSresGetResource(groupId, resourceId);
+                    if (resource != NULL) {
+                        *(u32*)(state + 0) = resourceId;
+                        *(u32*)(state + 4) = 1;
+                        GSmodelPushState(resource, state + 8);
+                        state += 0x74;
+                    }
+                }
+            }
+            if (lists->lights != NULL) {
+                baseId = floorReadMakeLightResID(mapId);
+                for (i = 0; lists->lights[i] != 0; i++) {
+                    resourceId = baseId | i;
+                    resource = GSresGetResource(groupId, resourceId);
+                    if (resource != NULL) {
+                        *(u32*)(state + 0) = resourceId;
+                        *(u32*)(state + 4) = 2;
+                        GSlightPushState(resource, state + 8);
+                        state += 0x74;
+                    }
+                }
+            }
+        }
+    }
 }
 #pragma pop
 
@@ -143,7 +243,42 @@ void fn_8011207C(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_80112260(void) {
-    /* TODO: match -- 288 bytes at 0x80112260 */
+void fn_80112260(s32 visible) {
+    FloorArchiveResourceLists* lists;
+    void* floor;
+    void* resource;
+    u32 mapId;
+    u32 groupId;
+    u32 baseId;
+    u32 i;
+
+    floor = floorDataBiosGetCurrentPtr();
+    mapId = floorDataBiosGetMapResID(floor);
+    if (mapId != 0) {
+        floor = floorDataBiosGetCurrentPtr();
+        groupId = floorDataBiosGetGroupID(floor);
+        lists = HSD_ArchiveGetPublicAddress(
+            GSresGetResource(groupId, mapId), lbl_802720B0);
+        if (lists != NULL) {
+            if (lists->models != NULL) {
+                baseId = floorReadMakeModelResID(mapId);
+                for (i = 0; lists->models[i] != 0; i++) {
+                    resource = GSresGetResource(groupId, baseId | i);
+                    if (resource != NULL) {
+                        GSmodelSetVisibility(resource, (u8)visible);
+                    }
+                }
+            }
+            if (lists->lights != NULL) {
+                baseId = floorReadMakeLightResID(mapId);
+                for (i = 0; lists->lights[i] != 0; i++) {
+                    resource = GSresGetResource(groupId, baseId | i);
+                    if (resource != NULL) {
+                        GSlightSetActive(resource, (u8)visible);
+                    }
+                }
+            }
+        }
+    }
 }
 #pragma pop

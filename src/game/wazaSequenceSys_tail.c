@@ -60,12 +60,62 @@ void fn_801DADC0(void* context) {
  * Allocates waza context and prepares the system for move animations.
  */
 void fn_801DAEF8(s32 count) {
-    /* TODO: Waza system init (0x168 bytes)
-     * 1. Allocates waza context structure
-     * 2. Initializes effect pool with 'count' entries
-     * 3. Clears all sequence data
-     * 4. Resets frame counters
-     */
+    extern u8 lbl_80467CD4[];
+    extern void* floorDataBiosGetCurrentPtr(void);
+    extern u32 floorDataBiosGetGroupID(void*);
+    extern u32 floorDataBiosGetShadowReciveNum(void*);
+    extern void* floorDataBiosGetShadowReciveID(void*, u32);
+    extern void* floorDataBiosGetShadowLightID(void*);
+    extern void* GSresGetResource(u32, u32);
+    extern void fn_801019F8(void);
+    extern u16 _toolentryAlloc__FUl(u32);
+    extern void* fn_800E27B0(u16);
+    void* floor;
+    void* resource;
+    u32 groupId;
+    u32 receiverCount;
+    u32 size;
+    u16 handle;
+    s32 i;
+
+    memset(lbl_80467CC0, 0, 0x14);
+    memset(lbl_80467CD4, 0, 0x20);
+
+    floor = floorDataBiosGetCurrentPtr();
+    groupId = floorDataBiosGetGroupID(floor);
+    receiverCount = floorDataBiosGetShadowReciveNum(floor);
+    lbl_8047B414 = 0;
+    for (i = 0; i < receiverCount; i++) {
+        resource = GSresGetResource(
+            groupId, (u32)floorDataBiosGetShadowReciveID(floor, i));
+        if (resource != NULL) {
+            ((void**)lbl_80467C80)[lbl_8047B414++] = resource;
+        }
+    }
+
+    resource = floorDataBiosGetShadowLightID(floor);
+    if (resource != NULL) {
+        lbl_8047B418 = (s32)GSresGetResource(groupId, (u32)resource);
+    }
+
+    if (count != 0) {
+        fn_801019F8();
+        size = count * 0x8C;
+        handle = _toolentryAlloc__FUl(size);
+        if (handle != 0) {
+            *(u16*)(lbl_80467CC0 + 0x10) = handle;
+            *(u16*)(lbl_80467CC0 + 4) = count;
+            *(void**)lbl_80467CC0 = fn_800E27B0(handle);
+            memset(*(void**)lbl_80467CC0, 0, size);
+            fn_801D301C();
+            fn_801DE598(0x6F7, 0);
+            *(void**)(lbl_80467CC0 + 8) =
+                GSresGetResource(0x6F7, 0x11EF2400);
+            *(void**)(lbl_80467CC0 + 0xC) =
+                GSresGetResource(0x6F7, 0x11EE2400);
+            lbl_80467CC0[6] = 0;
+        }
+    }
 }
 
 #endif

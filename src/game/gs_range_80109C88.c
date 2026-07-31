@@ -389,7 +389,7 @@ s32 fn_8010A420(void* obj)
     extern char lbl_80271F80[];
     extern char lbl_8035B458[];
     extern void GSlogWrite(const char* fmt, ...);
-    extern u32 GSthreadIsRunning(u32 task);
+    extern u8 GSthreadIsRunning(u32 task);
     extern void GSthreadClose(u32 task);
     extern void fn_801DB100(u32 handle);
     extern void GSmodelFree(void* a);
@@ -414,12 +414,11 @@ s32 fn_8010A420(void* obj)
         if (o->taskHandle == 0) {
             break;
         }
-        if (GSthreadIsRunning(o->taskHandle)) {
-            _threadSwitch();
-            continue;
+        if (GSthreadIsRunning(o->taskHandle) == 0) {
+            GSthreadClose(o->taskHandle);
+            break;
         }
-        GSthreadClose(o->taskHandle);
-        break;
+        _threadSwitch();
     }
 
     if (o != NULL) {

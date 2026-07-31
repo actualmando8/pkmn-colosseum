@@ -20,7 +20,7 @@ extern TemochiEntry lbl_804670B4[];
 extern const f32 lbl_8047E114;
 
 /* ===== Engine / hero helpers ===== */
-extern void* heroGetStatus(void* ptr, u32 a, u32 b);
+extern void* heroGetStatus(void* ptr, u32 a, u16 b);
 extern u32   heroSetStatus(u8* ptr, u32 a, u32 b);
 extern void  heroAddPokecoupon(u8* ptr, s32 offset);
 extern void  heroDecPokecoupon(u8* ptr, s32 offset);
@@ -35,7 +35,7 @@ extern s32 fn_801906A0(u32 flag);
 extern s32  _flagSet(u32 flag, s32 value);
 
 /* ===== Pokemon helpers ===== */
-extern u32  pokemonCheckValid(void* mon);
+extern u8   pokemonCheckValid(void* mon);
 extern u32  pokemonGetStatus(void* mon, s32 a, s32 b, s32 c);
 extern u32  pokemonBiosGetDarkFlag(void* mon);
 extern f32  pokemonGetDp(void* mon);

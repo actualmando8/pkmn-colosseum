@@ -324,16 +324,92 @@ u32 mailGetAttachFileGroup(s32 idx) {
  * fn_801D1734 - Waza animation play with target tracking.
  * Address: 0x801D1734 | Size: 0x130
  */
-void fn_801D1734(s32 attackerSlot, s32 targetSlot, s32 moveID) {
-    /* TODO: Waza animation with target tracking (0x130 bytes) */
+u8 fn_801D1734(s32 sequence, s32 index) {
+    extern u32* lbl_80478EA0;
+    extern u16* lbl_80478EA4;
+    WazaEntry* entry;
+    u16 current;
+    u16 count;
+
+    if (sequence < 0 || (u32)sequence >= *lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478E9C[sequence];
+    }
+    current = entry == NULL ? 0xFFFF : *(u16*)((u8*)entry + 2);
+
+    if (current == 0xFFFF) {
+        count = 0xFFFF;
+    } else {
+        count = 0;
+        while (current < *lbl_80478EA0) {
+            if (*(u16*)((u8*)lbl_80478EA4 + current * 4 + 2) == 0) {
+                break;
+            }
+            count++;
+            current++;
+        }
+    }
+    if (count == 0xFFFF || index >= count) {
+        return 0xFF;
+    }
+
+    if (sequence < 0 || (u32)sequence >= *lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478E9C[sequence];
+    }
+    current = entry == NULL ? 0xFFFF : *(u16*)((u8*)entry + 2);
+    if (current == 0xFFFF) {
+        return 0xFF;
+    }
+    return ((u8*)lbl_80478EA4)[(u16)(current + index) * 4];
 }
 
 /**
  * fn_801D1864 - Waza animation play with camera.
  * Address: 0x801D1864 | Size: 0x140
  */
-void fn_801D1864(s32 attackerSlot, s32 targetSlot, s32 moveID, s32 cameraMode) {
-    /* TODO: Waza animation with camera (0x140 bytes) */
+u16 fn_801D1864(s32 sequence, s32 index) {
+    extern u32* lbl_80478EA0;
+    extern u16* lbl_80478EA4;
+    WazaEntry* entry;
+    u16 current;
+    u16 count;
+
+    if (sequence < 0 || (u32)sequence >= *lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478E9C[sequence];
+    }
+    current = entry == NULL ? 0xFFFF : *(u16*)((u8*)entry + 2);
+
+    if (current == 0xFFFF) {
+        count = 0xFFFF;
+    } else {
+        count = 0;
+        while (current < *lbl_80478EA0) {
+            if (*(u16*)((u8*)lbl_80478EA4 + current * 4 + 2) == 0) {
+                break;
+            }
+            count++;
+            current++;
+        }
+    }
+    if (count == 0xFFFF || index >= count) {
+        return 0xFFFF;
+    }
+
+    if (sequence < 0 || (u32)sequence >= *lbl_80478E98) {
+        entry = NULL;
+    } else {
+        entry = &lbl_80478E9C[sequence];
+    }
+    current = entry == NULL ? 0xFFFF : *(u16*)((u8*)entry + 2);
+    if (current == 0xFFFF) {
+        return 0xFFFF;
+    }
+    return *(u16*)((u8*)lbl_80478EA4 + (u16)(current + index) * 4 + 2);
 }
 
 /**

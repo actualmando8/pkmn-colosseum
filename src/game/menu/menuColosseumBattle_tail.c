@@ -222,7 +222,7 @@ extern void pokemonInit(void*);
 extern void fadeSet(s32, f32);
 extern s32 fn_80056A78(void);
 extern void fn_80056A80(void);
-extern s32 fn_80057C9C(void*, void*, s32*);
+extern void fn_80057C9C(void*, void*, s32*);
 extern void fn_80056B74(s32, s32);
 extern void fn_80054760(s32, s32);
 extern void fn_80057A38(void);
