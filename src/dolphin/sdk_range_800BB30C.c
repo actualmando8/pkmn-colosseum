@@ -681,16 +681,14 @@ void fn_800BC580(u32 table, u32 red, u32 green, u32 blue, u32 alpha) {
 #if defined(SDK_800BC618_SUFFIX_ACTIVE)
 void fn_800BC618(u32 comp0, u8 ref0, u32 op, u32 comp1, u8 ref1) {
     u32 reg = ref0;
-    GXData_800BB30C* p;
 
     reg |= 0xF3000000U;
     reg = (reg & ~0xFF00U) | (ref1 << 8);
     reg = (reg & ~0x70000U) | (comp0 << 16);
     reg = (reg & ~0x380000U) | (comp1 << 19);
     reg = (reg & ~0xC00000U) | (op << 22);
-    p = gx;
     GX_BP_REG(reg);
-    p->field_002 = 0;
+    gx->field_002 = 0;
 }
 
 void fn_800BC66C(u32 op, u32 format, u32 bias) {

@@ -94,8 +94,8 @@ extern void fn_800D7A70(u32);
 extern void fn_800DB098(void);
 extern void fn_800DB758(u16);
 extern void lightGetFrameCount__FP9_HSD_AObj(u8*);
-extern void fn_800DE09C(void);
-extern void fn_800DE128(void);
+extern void fn_800DE09C(char*, u32, const char*, ...);
+extern void fn_800DE128();
 extern void fn_800E09E8(void*, void*, u32);
 extern u8 fn_800E0E14(u32, u32);
 extern u32 _matGSmatObjMakeTExp(void*, void*, void*, void*, void*);
@@ -842,22 +842,19 @@ asm void fn_800DE09C(void) {
 #include "src/game/gs_render_fn_800DE09C.inc"
 }
 #else
-void fn_800DE09C(void) {
-    if (*(u16*)&lbl_8047AAF8 != 0) {
-        fn_800E24B0(*(u16*)&lbl_8047AAF8);
-        fn_800E209C(*(u16*)&lbl_8047AAF8);
-        *(u16*)&lbl_8047AAF8 = 0;
-    }
-    if (*(u16*)&lbl_8047AAFA != 0) {
-        fn_800E24B0(*(u16*)&lbl_8047AAFA);
-        fn_800E209C(*(u16*)&lbl_8047AAFA);
-        *(u16*)&lbl_8047AAFA = 0;
-    }
-    lbl_8047AAFC = 0;
-    lbl_8047AB00 = 0;
-    lbl_8047AB04 = 0;
-    lbl_8047AB08 = 0;
-    lbl_8047AB0C = 0;
+typedef struct GSLogVaList {
+    u8 gpr;
+    u8 fpr;
+    u16 padding;
+    u32* overflow_arg_area;
+    u32* reg_save_area;
+} GSLogVaList;
+
+void fn_800DE09C(char* dst, u32 size, const char* format, ...) {
+    GSLogVaList args;
+
+    __builtin_va_info(&args);
+    fn_800DE128(dst, size, format, &args);
 }
 #endif
 

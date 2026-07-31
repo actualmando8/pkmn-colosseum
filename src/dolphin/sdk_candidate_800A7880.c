@@ -16,6 +16,7 @@ BOOL DVDCancelAsync(DVDCommandBlock* block, DVDCBCallback callback)
 {
     BOOL enabled;
     DVDLowCallback old;
+    DVDCommandBlock* finished;
 
     enabled = OSDisableInterrupts();
     switch (block->state) {
@@ -92,6 +93,7 @@ BOOL DVDCancelAsync(DVDCommandBlock* block, DVDCBCallback callback)
         if (block->state == 7) {
             ResumeFromHere_8047A810 = 7;
         }
+        finished = executing_8047A7E8;
         executing_8047A7E8 = &DummyCommandBlock_803FC3A0;
         block->state = 10;
         if (block->callback != NULL) {

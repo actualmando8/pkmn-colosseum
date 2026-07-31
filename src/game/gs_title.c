@@ -2770,17 +2770,15 @@ asm void fn_80020EA4(void) {
 #else
 void fn_80020EA4(u8* r3, u8* r4) {
     u8* r31;
-    u8 byte;
     r31 = r3;
     if ((s32)(&lbl_8047A360)[1] == 4) {
         if (fn_8002091C() >= 0) {
-            byte = r31[0x8b];
-            fn_800FB680(0, -8, byte | (s32)-0x100, lbl_802E4EF0[fn_8002091C()]);
+            fn_800FB680(0, -8, r31[0x8b] | (s32)-0x100, lbl_802E4EF0[fn_8002091C()]);
         }
     } else if ((s32)(&lbl_8047A360)[1] != 5) {
         if ((s32)lbl_8047A360 >= 0) {
-            byte = r31[0x8b];
-            fn_800FB680(0, -8, byte | (s32)-0x100, lbl_802E4ED8[(s32)lbl_8047A360]);
+            fn_800FB680(0, -8, r31[0x8b] | (s32)-0x100,
+                        lbl_802E4ED8[(s32)lbl_8047A360]);
         }
     }
 }

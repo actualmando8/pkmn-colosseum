@@ -41,13 +41,22 @@
  */
 
 #include "dolphin/types.h"
+#include "dolphin/mtx.h"
 #include "game/gs_colsys.h"
 
 /* ===== External SDK / engine functions ===== */
 extern void  GStextureFree(void);                        /* GStexture trigger (fn_8010C364) */
+extern void PSMTXIdentity(Mtx m);
+extern void PSMTXCopy(const Mtx src, Mtx dst);
+extern void PSMTXConcat(const Mtx left, const Mtx right, Mtx out);
+extern void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 angle);
+extern void PSMTXScaleApply(const Mtx src, Mtx dst, f32 x, f32 y, f32 z);
+extern void PSMTXTransApply(const Mtx src, Mtx dst, f32 x, f32 y, f32 z);
 
 /* ===== Static data tables (data section) ===== */
 extern GSColSurfaceType lbl_8035B500[]; /* Surface type table (0x12 entries, 0x2C each) */
+extern const Vec lbl_80272020[3];
+extern const u32 lbl_80272044[3];
 
 /* ===== SDA globals ===== */
 
@@ -426,8 +435,47 @@ s32 GScolsys2SetObjEnable(s32 triIndex, s32 visible) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010C8D0(void) {
-    /* TODO: match -- 352 bytes at 0x8010C8D0 */
+s32 fn_8010C8D0(Mtx out, u32 triIndex) {
+    typedef struct ColAxes {
+        Vec axis[3];
+    } ColAxes;
+    typedef struct ColAxisOrder {
+        u32 index[3];
+    } ColAxisOrder;
+    u8* base = (u8*)COL_STATE;
+    void* wzx = COL_WZX;
+    u8* entry;
+    ColAxisOrder order;
+    Mtx result;
+    ColAxes axes;
+    Mtx combined;
+    Mtx rotation;
+    u32 i;
+    u32* axisOrder;
+
+    if (wzx == NULL) {
+        return 0;
+    }
+    if (triIndex >= *(u32*)((u8*)wzx + 4)) {
+        return 0;
+    }
+
+    entry = base + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE + 4
+          + triIndex * GSCOLSYS_TRI_ENTRY_SIZE;
+    PSMTXIdentity(out);
+    if ((*(u16*)(entry + 0x24) & 1) != 0) {
+        axes = *(const ColAxes*)lbl_80272020;
+        order = *(const ColAxisOrder*)lbl_80272044;
+        PSMTXIdentity(combined);
+        for (i = 0, axisOrder = order.index; i < 3; i++, axisOrder++) {
+            PSMTXRotAxisRad(rotation, &axes.axis[*axisOrder],
+                            *(f32*)(entry + 0xC + *axisOrder * 4));
+            PSMTXConcat(rotation, combined, combined);
+        }
+        PSMTXCopy(combined, result);
+        PSMTXConcat(out, result, out);
+    }
+    return 1;
 }
 #pragma pop
 
@@ -435,8 +483,51 @@ void fn_8010C8D0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_8010CA30(void) {
-    /* TODO: match -- 400 bytes at 0x8010CA30 */
+s32 fn_8010CA30(Mtx out, u32 triIndex) {
+    typedef struct ColAxes {
+        Vec axis[3];
+    } ColAxes;
+    typedef struct ColAxisOrder {
+        u32 index[3];
+    } ColAxisOrder;
+    u8* base = (u8*)COL_STATE;
+    void* wzx = COL_WZX;
+    u8* entry;
+    ColAxisOrder order;
+    Mtx result;
+    ColAxes axes;
+    Mtx combined;
+    Mtx rotation;
+    u32 i;
+    u32* axisOrder;
+
+    if (wzx == NULL) {
+        return 0;
+    }
+    if (triIndex >= *(u32*)((u8*)wzx + 4)) {
+        return 0;
+    }
+
+    entry = base + COL_LAYER_IDX * GSCOLSYS_LAYER_SIZE + 4
+          + triIndex * GSCOLSYS_TRI_ENTRY_SIZE;
+    PSMTXIdentity(out);
+    if ((*(u16*)(entry + 0x24) & 1) != 0) {
+        PSMTXScaleApply(out, out, *(f32*)(entry + 0x18),
+                       *(f32*)(entry + 0x1C), *(f32*)(entry + 0x20));
+        axes = *(const ColAxes*)lbl_80272020;
+        order = *(const ColAxisOrder*)lbl_80272044;
+        PSMTXIdentity(combined);
+        for (i = 0, axisOrder = order.index; i < 3; i++, axisOrder++) {
+            PSMTXRotAxisRad(rotation, &axes.axis[*axisOrder],
+                            *(f32*)(entry + 0xC + *axisOrder * 4));
+            PSMTXConcat(rotation, combined, combined);
+        }
+        PSMTXCopy(combined, result);
+        PSMTXConcat(out, result, out);
+        PSMTXTransApply(out, out, *(f32*)(entry + 0),
+                       *(f32*)(entry + 4), *(f32*)(entry + 8));
+    }
+    return 1;
 }
 #pragma pop
 

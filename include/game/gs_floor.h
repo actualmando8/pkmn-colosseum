@@ -173,15 +173,15 @@ typedef struct GSFloorDataEntry {
  * Fields recovered from fn_800FF970 (state 4):
  *   0x00: u8   typeId        -- resource type identifier (matched against header byte)
  *   0x01-0x03: padding
- *   0x04: u32  reserved
- *   0x08: void* readFunc     -- function to read/load the resource
+ *   0x04: void* loadFunc     -- function to restore the resource
+ *   0x08: void* saveFunc     -- function to snapshot the resource
  *   0x0C: void* sizeFunc     -- function to compute the resource size
  */
 typedef struct GSFloorResHandler {
     /* 0x00 */ u8    typeId;
     /* 0x01 */ u8    pad01[3];
-    /* 0x04 */ u32   reserved;
-    /* 0x08 */ void* readFunc;
+    /* 0x04 */ void* loadFunc;
+    /* 0x08 */ void* saveFunc;
     /* 0x0C */ void* sizeFunc;
 } GSFloorResHandler;
 

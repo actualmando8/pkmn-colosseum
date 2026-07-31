@@ -618,13 +618,13 @@ s32 fightFloorGetEnemyFightSideManyDamageHpRate(u32 unused, u32 r4arg) {
     extern u8 fightOutPokemonEnemyCheckValid(u32);
     extern u32 fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(u32);
     extern u8 fightOutPokemonCheckValid(u32);
-    extern u32 fightOutPokemonEnemyBiosGetInitHp(u32);
+    extern u16 fightOutPokemonEnemyBiosGetInitHp(u32);
     extern u32 fightOutPokemonEnemyBiosGetDamage(u32);
     u32 r31;
     s32 r30;
     u32 r29;
     u16 initHp;
-    u16 r28;
+    u32 r28;
     u32 acc;
     s32 score;
     u32 poke;
@@ -638,8 +638,8 @@ s32 fightFloorGetEnemyFightSideManyDamageHpRate(u32 unused, u32 r4arg) {
             poke = fightOutPokemonEnemyBiosGetTargetFightOutPokemonPtr(r29);
             if (poke != 0) {
                 if ((u8)fightOutPokemonCheckValid(poke) != 0) {
-                    acc = fightOutPokemonEnemyBiosGetDamage(r29);
                     initHp = fightOutPokemonEnemyBiosGetInitHp(r29);
+                    acc = fightOutPokemonEnemyBiosGetDamage(r29);
                     if (initHp == 0) initHp = 1;
                     score = ((u16)acc * 0x64) / initHp;
                     if (score > r30) r30 = score;

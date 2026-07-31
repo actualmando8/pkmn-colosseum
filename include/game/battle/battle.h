@@ -339,7 +339,7 @@ typedef struct TypeMatchup {
 /* fn_801C3114 */ void fn_801C3114(void);                        /* battleGrid_Init */
 /* fn_801C31EC */ void fn_801C31EC(void);                        /* battleGrid_Setup */
 /* battleGridUpdate (was fn_801C3430) */ void battleGridUpdate(void);                        /* battleGridSetup 0x634 */
-/* battleGridGetDistance (was fn_801C3A64) */ void battleGridGetDistance(void);                        /* battleGridLoadModels 0x11C */
+/* battleGridGetDistance (was fn_801C3A64) */ f32 battleGridGetDistance(s32 slot);                     /* battleGridLoadModels 0x11C */
 /* battleGridGetNormalisedScale (was fn_801C3B80) */ void battleGridGetNormalisedScale(void);                        /* battleGridUpdatePositions */
 /* battleGridRemovePokemon (was fn_801C3C98) */ void battleGridRemovePokemon(u8* pokemon);
 /* battleGridReplacePokemon (was fn_801C3D64) */ void battleGridReplacePokemon(u8* pokemon, u8* replacement);
@@ -426,7 +426,7 @@ typedef struct GStexture GStexture;
 /* fn_801C8834 */ void fn_801C8834(s32 slot);
 /* fn_801C89F8 */ void fn_801C89F8(s32 side, s32 slot);          /* EncounterSequence 0x3D8 */
 /* fn_801C8DD0 */ s32  fn_801C8DD0(s32 slot);
-/* fn_801C8E14 */ s32  fn_801C8E14(s32 pokemonID, s32 animIdx, s16 moveID, u8 animType);
+/* fn_801C8E14 */ s32  fn_801C8E14(s32 pokemonID, s32 animIdx, u16 moveID, u8 animType);
 
 /* Scene state & effects */
 /* fn_801C9910 */ void fn_801C9910(void);
@@ -456,8 +456,8 @@ typedef struct GStexture GStexture;
 /* fn_801D142C */ u32  fn_801D142C(s32 idx);
 
 /* Waza animation controllers */
-/* fn_801D1734 */ void fn_801D1734(s32 attackerSlot, s32 targetSlot, s32 moveID);
-/* fn_801D1864 */ void fn_801D1864(s32 attackerSlot, s32 targetSlot, s32 moveID, s32 cameraMode);
+/* fn_801D1734 */ u8 fn_801D1734(s32 sequence, s32 index);
+/* fn_801D1864 */ u16 fn_801D1864(s32 sequence, s32 index);
 /* fn_801D2D28 */ void fn_801D2D28(void);
 
 /* Waza animation state machines */
@@ -470,7 +470,7 @@ typedef struct GStexture GStexture;
 
 /* Core waza sequence API */
 /* fn_801D7464 */ void fn_801D7464(void);                        /* wazaSequenceLoad 0x730 */
-/* fn_801D7B94 */ void fn_801D7B94(void);                        /* wazaSequenceUpdate 0x2C4 */
+/* fn_801D7B94 */ void fn_801D7B94(void* effect);                 /* wazaSequenceUpdate 0x2C4 */
 /* fn_801D7E58 */ void fn_801D7E58(void* entry);                 /* wazaSequenceEntryStop */
 /* fn_801D81CC */ void fn_801D81CC(void* entry);                 /* wazaSequenceEntryUpdate */
 /* fn_801D84F4 */ void fn_801D84F4(void);                        /* wazaSequenceEntryStart */

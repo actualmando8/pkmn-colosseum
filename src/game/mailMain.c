@@ -54,7 +54,43 @@ void mailMainSendByScrpt(s32 seqHandle, f32 alpha, f32 speed) {
  * Address: 0x801D216C | Size: 0x120
  */
 void mailMainSendAllMail(s32 seqHandle, f32 targetScale, f32 speed) {
-    /* TODO: Effect scale animation (0x120 bytes) */
+    extern f32 lbl_8047E1B0;
+    extern u32 fn_8016557C(void);
+    extern void* GSresAllocResourceAlign(u32, u32, u32, u32, u32);
+    extern u32 fn_801654E0(u32, void*, u32);
+    extern u32 fn_80166B3C(u32, u32, u32);
+    extern u32 fn_80166A50(u32, u32, u32, u32);
+    u32 soundId;
+    u32 workId;
+    void* buffer;
+    s32 count;
+    s32 sent;
+    s32 i;
+
+    count = mailGetNbMailData();
+    sent = 0;
+    for (i = 0; i < count; i++) {
+        if (chkMailSend(i, lbl_8047E1B0)) {
+            mailAddMailbox(i);
+            sent = 1;
+        }
+    }
+    if (sent && lbl_80467390[0] == 0) {
+        soundId = fn_801D1650(fn_801D16C4());
+        if (soundId != 0) {
+            workId = fn_8016557C();
+            buffer = GSresAllocResourceAlign(0x10000, 0x20, 0, 0x408, 0);
+            fn_801654E0(soundId, buffer, 0x10000);
+            fn_80166B3C(soundId, 0, 0x408);
+            fn_80166A50(soundId, 0, 0xFF, 0);
+        } else {
+            workId = 0;
+        }
+        lbl_80467390[0] = 1;
+        lbl_80467390[1] = 0;
+        lbl_80467390[2] = soundId;
+        lbl_80467390[3] = workId;
+    }
 }
 
 /**
@@ -212,8 +248,9 @@ void mailMainReceiveStart(s32 seqHandle, s32 slot, s32 boneIdx) {
  * chkMailSend - Waza effect detach and fly.
  * Address: 0x801D2764 | Size: 0x274
  */
-void chkMailSend(s32 seqHandle, f32 velX, f32 velY, f32 velZ) {
-    /* TODO: Effect detach and fly (0x274 bytes) */
+s32 chkMailSend(s32 seqHandle, f32 step) {
+    /* TODO: Mail eligibility/update routine (0x274 bytes). */
+    return 0;
 }
 
 /**
@@ -221,7 +258,45 @@ void chkMailSend(s32 seqHandle, f32 velX, f32 velY, f32 velZ) {
  * Address: 0x801D29D8 | Size: 0x130
  */
 void cbStep(s32 moveID, s32 hitCount) {
-    /* TODO: Multi-hit effect setup (0x130 bytes) */
+    extern f32 fn_800E0BE4(void);
+    extern u32 fn_8016557C(void);
+    extern void* GSresAllocResourceAlign(u32, u32, u32, u32, u32);
+    extern u32 fn_801654E0(u32, void*, u32);
+    extern u32 fn_80166B3C(u32, u32, u32);
+    extern u32 fn_80166A50(u32, u32, u32, u32);
+    u32 soundId;
+    u32 workId;
+    void* buffer;
+    f32 step;
+    s32 count;
+    s32 sent;
+    s32 i;
+
+    step = fn_800E0BE4();
+    count = mailGetNbMailData();
+    sent = 0;
+    for (i = 0; i < count; i++) {
+        if (chkMailSend(i, step)) {
+            mailAddMailbox(i);
+            sent = 1;
+        }
+    }
+    if (sent && lbl_80467390[0] == 0) {
+        soundId = fn_801D1650(fn_801D16C4());
+        if (soundId != 0) {
+            workId = fn_8016557C();
+            buffer = GSresAllocResourceAlign(0x10000, 0x20, 0, 0x408, 0);
+            fn_801654E0(soundId, buffer, 0x10000);
+            fn_80166B3C(soundId, 0, 0x408);
+            fn_80166A50(soundId, 0, 0xFF, 0);
+        } else {
+            workId = 0;
+        }
+        lbl_80467390[0] = 1;
+        lbl_80467390[1] = 0;
+        lbl_80467390[2] = soundId;
+        lbl_80467390[3] = workId;
+    }
 }
 
 /**

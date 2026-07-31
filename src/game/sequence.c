@@ -390,7 +390,7 @@ void fn_801DD3E4(void* obj) {
  * sequenceLoad - Waza scene snapshot.
  * Address: 0x801DD45C | Size: 0x18C
  */
-void sequenceLoad(void) {
+void sequenceLoad(void* effect, void* data) {
     /* TODO: Scene snapshot for transition effects (0x18C bytes) */
 }
 

@@ -356,7 +356,7 @@ u32 fightSideGetValidFightTrainerPtr(u32 param_1) {
 /* 0x801F72B0 | size: 0xD8 | medium */
 void fightSideGetFightTrainerGridParam(u32 param_1, u16 param_2, u16 param_3, u8* param_4, s8* param_5) {
     extern u32 fightSideDataBiosGetPtr(u32);
-    extern u16 fightSideDataBiosGetYrot(u32);
+    extern u32 fightSideDataBiosGetYrot(u32);
     u32 uVar1;
     u16 uVar2;
 

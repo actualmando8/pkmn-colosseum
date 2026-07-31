@@ -430,7 +430,7 @@ void fn_801C8DD0(s32 a, s32 b, s32 c, s32 d, s32 e)
     menuSubOpenSelect(1, a, b, c, d, e);
 }
 
-extern s32 fn_801C8E14(s32 floorDataId, u32 actorIndex, s16 mode,
+extern s32 fn_801C8E14(s32 floorDataId, u32 actorIndex, u16 mode,
                        u8 direction);
 extern u8 fn_801C9910(void);
 extern void floorEventCtrlElevator(s32 arg0, s32 arg1, u16 arg2,
@@ -510,7 +510,7 @@ u8 fn_801C9910(void)
     return 0;
 }
 
-void fn_801C9B6C(s32 arg0, s32 arg1, s16 arg2, u8 arg3)
+void fn_801C9B6C(s32 arg0, s32 arg1, u16 arg2, u8 arg3)
 {
     s32 floorId;
     s32 resId;
@@ -523,10 +523,10 @@ void fn_801C9B6C(s32 arg0, s32 arg1, s16 arg2, u8 arg3)
 
     if (arg2 & 1) {
         found = heroMoveGetResID(&floorId, &resId, 1);
-        if (found && (arg3 != 0 || !fn_801C9910())) {
-            lbl_8047B3C4 = 1;
-        } else {
+        if (!found || (arg3 == 0 && !fn_801C9910())) {
             lbl_8047B3C4 = 0;
+        } else {
+            lbl_8047B3C4 = 1;
         }
     }
 
@@ -1082,7 +1082,7 @@ s32 fn_801C7730(s32 side, s32 slot)
 }
 
 /* Drive one scripted field actor animation and its paired movement actors. */
-s32 fn_801C8E14(s32 floorDataId, u32 actorIndex, s16 mode, u8 direction)
+s32 fn_801C8E14(s32 floorDataId, u32 actorIndex, u16 mode, u8 direction)
 {
     typedef struct FieldAnimActor {
         s8 enterAnim;

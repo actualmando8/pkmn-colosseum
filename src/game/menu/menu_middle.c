@@ -2670,6 +2670,8 @@ void fn_8006C018(void* menu) {
             return;
         }
         break;
+    default:
+        return;
     }
 
     menuButtonNormal(button);
@@ -2721,6 +2723,8 @@ void fn_8006C0DC(void* menu) {
             return;
         }
         break;
+    default:
+        return;
     }
 
     menuButtonNormal(button);

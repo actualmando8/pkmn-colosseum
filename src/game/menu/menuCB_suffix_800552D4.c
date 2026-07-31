@@ -216,7 +216,7 @@ s32 fn_800552D4(s8 box, s8 slot)
     extern void fadeSet(s32, f32);
     extern s32 fadeCheck(s32);
     extern void fn_8005471C(void);
-    extern s32 fn_80057C9C(void*, void*, s32*);
+    extern void fn_80057C9C(void*, void*, s32*);
     extern void* menuItemBiosGetPtr(s32);
     extern void fn_80057830(s16, s16, s32);
     extern MenuCBPane* windowSearchID(s32);

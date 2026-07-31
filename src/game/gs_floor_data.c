@@ -45,6 +45,7 @@ extern u32 lbl_8047ACA8;
 extern u32 lbl_8047ACB0;
 extern u32 lbl_8047ACB4;
 extern u32 lbl_8047ACB8;
+extern u32 lbl_8047ACBC;
 extern u32 lbl_8047ACC0;
 extern u32 lbl_8047ACC4;
 extern u32 lbl_8047ACC8;
@@ -112,8 +113,66 @@ found:
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_800FF178(void) {
-    /* TODO: match -- 296 bytes at 0x800FF178 */
+void fn_800FF178(u8 priority, u32 floorId, void* callback) {
+    GSFloorResource* resource;
+    GSFloorResource* current;
+    GSFloorResource* next;
+    u32 remaining;
+
+    resource = (GSFloorResource*)lbl_8047ACB0 + lbl_8047ACB4 + lbl_8047ACB8;
+    remaining = lbl_8047ACBC;
+    while (remaining-- != 0) {
+        if (resource->active == 0) {
+            break;
+        }
+        resource++;
+    }
+    if (remaining == (u32)-1) {
+        resource = NULL;
+    }
+    if (resource == NULL) {
+        return;
+    }
+
+    resource->prev = NULL;
+    resource->next = NULL;
+    resource->active = 5;
+    resource->status = 0;
+    resource->floorId = floorId;
+    resource->priority = priority;
+    resource->pending = 0;
+    if (resource->status == 0) {
+        resource->callback = callback;
+    } else {
+        resource->callback = callback;
+        resource->textureHandle = 0;
+        resource->modelHandle = NULL;
+    }
+
+    current = lbl_8047ACCC;
+    if (current == NULL) {
+        lbl_8047ACCC = resource;
+        return;
+    }
+    while ((next = current->next) != NULL &&
+           current->priority < resource->priority) {
+        current = next;
+    }
+    if (next == NULL && current->priority < resource->priority) {
+        resource->prev = current;
+        resource->next = NULL;
+        current->next = resource;
+        return;
+    }
+    if (current->prev != NULL) {
+        current->prev->next = resource;
+    }
+    resource->prev = current->prev;
+    resource->next = current;
+    current->prev = resource;
+    if (lbl_8047ACCC == current) {
+        lbl_8047ACCC = resource;
+    }
 }
 #pragma pop
 
@@ -121,8 +180,66 @@ void fn_800FF178(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_800FF2A0(void) {
-    /* TODO: match -- 288 bytes at 0x800FF2A0 */
+void fn_800FF2A0(u8 priority, u32 floorId, void* callback) {
+    GSFloorResource* resource;
+    GSFloorResource* current;
+    GSFloorResource* next;
+    u32 remaining;
+
+    resource = (GSFloorResource*)lbl_8047ACB0 + lbl_8047ACB4;
+    remaining = lbl_8047ACB8;
+    while (remaining-- != 0) {
+        if (resource->active == 0) {
+            break;
+        }
+        resource++;
+    }
+    if (remaining == (u32)-1) {
+        resource = NULL;
+    }
+    if (resource == NULL) {
+        return;
+    }
+
+    resource->prev = NULL;
+    resource->next = NULL;
+    resource->active = 3;
+    resource->status = 0;
+    resource->floorId = floorId;
+    resource->priority = priority;
+    resource->pending = 0;
+    if (resource->status == 0) {
+        resource->callback = callback;
+    } else {
+        resource->callback = callback;
+        resource->textureHandle = 0;
+        resource->modelHandle = NULL;
+    }
+
+    current = lbl_8047ACCC;
+    if (current == NULL) {
+        lbl_8047ACCC = resource;
+        return;
+    }
+    while ((next = current->next) != NULL &&
+           current->priority < resource->priority) {
+        current = next;
+    }
+    if (next == NULL && current->priority < resource->priority) {
+        resource->prev = current;
+        resource->next = NULL;
+        current->next = resource;
+        return;
+    }
+    if (current->prev != NULL) {
+        current->prev->next = resource;
+    }
+    resource->prev = current->prev;
+    resource->next = current;
+    current->prev = resource;
+    if (lbl_8047ACCC == current) {
+        lbl_8047ACCC = resource;
+    }
 }
 #pragma pop
 
@@ -130,8 +247,66 @@ void fn_800FF2A0(void) {
 #pragma push
 #pragma optimization_level 0
 #pragma optimizewithasm off
-void fn_800FF3C0(void) {
-    /* TODO: match -- 276 bytes at 0x800FF3C0 */
+void fn_800FF3C0(u8 priority, u32 floorId, void* callback) {
+    GSFloorResource* resource;
+    GSFloorResource* current;
+    GSFloorResource* next;
+    u32 remaining;
+
+    resource = (GSFloorResource*)lbl_8047ACB0;
+    remaining = lbl_8047ACB4;
+    while (remaining-- != 0) {
+        if (resource->active == 0) {
+            break;
+        }
+        resource++;
+    }
+    if (remaining == (u32)-1) {
+        resource = NULL;
+    }
+    if (resource == NULL) {
+        return;
+    }
+
+    resource->prev = NULL;
+    resource->next = NULL;
+    resource->active = 1;
+    resource->status = 0;
+    resource->floorId = floorId;
+    resource->priority = priority;
+    resource->pending = 0;
+    if (resource->status == 0) {
+        resource->callback = callback;
+    } else {
+        resource->callback = callback;
+        resource->textureHandle = 0;
+        resource->modelHandle = NULL;
+    }
+
+    current = lbl_8047ACCC;
+    if (current == NULL) {
+        lbl_8047ACCC = resource;
+        return;
+    }
+    while ((next = current->next) != NULL &&
+           current->priority < resource->priority) {
+        current = next;
+    }
+    if (next == NULL && current->priority < resource->priority) {
+        resource->prev = current;
+        resource->next = NULL;
+        current->next = resource;
+        return;
+    }
+    if (current->prev != NULL) {
+        current->prev->next = resource;
+    }
+    resource->prev = current->prev;
+    resource->next = current;
+    current->prev = resource;
+    if (lbl_8047ACCC == current) {
+        lbl_8047ACCC = resource;
+    }
 }
 #pragma pop
 
@@ -146,7 +321,7 @@ void fn_800FF4D4(void* data, u8 typeId) {
     if (lbl_8047ACE0 < 0x18) {
         handler = &lbl_80404918[lbl_8047ACE0];
         handler->typeId = typeId;
-        memcpy(&handler->reserved, data, 0xC);
+        memcpy(&handler->loadFunc, data, 0xC);
         lbl_8047ACE0++;
     }
 }

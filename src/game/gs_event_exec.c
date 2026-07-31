@@ -1549,7 +1549,7 @@ s32 fn_80014D1C(u8* ctx, u8* tgt) {
 s32 fn_80014E50(u8* ctx) {
     u8* state;
     u8* p;
-    s8 slot;
+    s32 slot;
     s32 count;
     s32 new_slot;
     u8* inner;
@@ -1559,7 +1559,7 @@ s32 fn_80014E50(u8* ctx) {
     count = *(s32*)(p + 8);
 
     if ((*(volatile u16*)(state + 6) & 2) != 0) {
-        slot  = (s32)(s8)ctx[0x95];
+        slot = *(s8*)(ctx + 0x95);
         new_slot = slot + 1;
         if (new_slot >= count) {
             new_slot = count - 1;
@@ -1574,7 +1574,7 @@ s32 fn_80014E50(u8* ctx) {
         *(s8*)(ctx + 0x95) = new_slot;
     }
     if ((*(volatile u16*)(state + 6) & 1) != 0) {
-        slot  = (s32)(s8)ctx[0x95];
+        slot = *(s8*)(ctx + 0x95);
         new_slot = slot - 1;
         if (new_slot < 0) {
             new_slot = 0;
