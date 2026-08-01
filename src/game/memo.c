@@ -392,9 +392,9 @@ void memoDataSet(u16 *r3, u32 r4) {
     queue = (u16 *)savedataGetStatus(0, 0xC);
   }
   rawLookup = pokemonBiosGetPokemonDataId(r30);
-	  lookup = rawLookup;
 	  count = *queue;
 	  for (i = 0; (u32)(u16)i < (u32)count; i = i + 1) {
+	    lookup = rawLookup;
 	    r5 = (i & 0xffff) * 12;
 	    r0 = (u32)*(u16 *)((u8 *)queue + r5 + 4) & 0x3FFF;
 	    if (r0 == lookup) {
@@ -403,7 +403,8 @@ void memoDataSet(u16 *r3, u32 r4) {
 	  }
 		  queue[(u32)count * 6 + 2] = (u16)(rawLookup | 0x8000);
 	  r5 = pokemonBiosGetRnd(r30);
-	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0xC)) = r5;
+	  lookup = *queue;
+	  *(u32 *)((u8 *)queue + ((u32)lookup * 12 + 0xC)) = r5;
 	  r5 = pokemonBiosGetCatchTrainerRnd(r30);
 	  *(u32 *)((u8 *)queue + ((u32)*queue * 12 + 0x8)) = r5;
   *queue = (u16)(*queue + 1);
