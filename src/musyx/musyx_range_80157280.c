@@ -8206,6 +8206,11 @@ extern u32 lbl_80449390[];            /* inpGlobalMIDIDirtyFlags (flat; matches 
                                         * a conflicting sized type) */
 extern u8  lbl_80449590[8][16][134];  /* midi_ctrl */
 extern u8  lbl_8044D890[8][16];       /* inpChannelDefaults (pre-2.0.1: just pbRange) */
+
+#define INP_GLOBAL_MIDI_DIRTY_FLAGS(base) ((u32(*)[16])(base))
+#define INP_MIDI_CTRL(base) ((u8(*)[16][134])((base) + 0x200))
+#define INP_CHANNEL_DEFAULTS(base) ((u8(*)[16])((base) + 0x4500))
+#define INP_FX_CTRL(base) ((u8(*)[134])((base) + 0x4580))
 extern u8  lbl_8044D910[64][134];     /* fx_ctrl */
 extern u8  lbl_8044FA90[64];          /* inpFXChannelDefaults (pre-2.0.1: just pbRange) */
 extern u8  lbl_8044FAD0[8][16];       /* midi_lastNote */
@@ -8227,17 +8232,19 @@ void fn_8016039C(u8 chan, u8 midiSet, s32 flag) { /* inpSetGlobalMIDIDirtyFlag *
 
 extern void synthKeyStateUpdate(SynthVoiceMini* svoice);
 
-static inline void inpSetRPNHi(u8 set, u8 channel, u8 value) {
-    u32 i;
+static inline void inpSetRPNHi(u8* base, u8 set, u8 channel, u8 value) {
+    u8 (*midiCtrl)[16][134] = (u8(*)[16][134])(base + 0x200);
+    u8 (*channelDefaults)[16] = (u8(*)[16])(base + 0x4500);
     u16 rpn;
+    u32 i;
     u8 range;
 
-    rpn = lbl_80449590[set][channel][100] |
-          (lbl_80449590[set][channel][101] << 8);
+    rpn = midiCtrl[set][channel][100] |
+          (midiCtrl[set][channel][101] << 8);
     switch (rpn) {
     case 0:
         range = value > 24 ? 24 : value;
-        lbl_8044D890[set][channel] = range;
+        channelDefaults[set][channel] = range;
         for (i = 0; i < synthInfo.voiceNum; i++) {
             if (set == lbl_8047AF48[i].midiSet &&
                 channel == lbl_8047AF48[i].midi) {
@@ -8254,20 +8261,22 @@ static inline void inpSetRPNHi(u8 set, u8 channel, u8 value) {
 static inline void inpSetRPNLo(u8 set, u8 channel, u8 value) {
 }
 
-static inline void inpSetRPNDec(u8 set, u8 channel) {
-    u32 i;
+static inline void inpSetRPNDec(u8* base, u8 set, u8 channel) {
+    u8 (*midiCtrl)[16][134] = (u8(*)[16][134])(base + 0x200);
+    u8 (*channelDefaults)[16] = (u8(*)[16])(base + 0x4500);
     u16 rpn;
+    u32 i;
     u8 range;
 
-    rpn = lbl_80449590[set][channel][100] |
-          (lbl_80449590[set][channel][101] << 8);
+    rpn = midiCtrl[set][channel][100] |
+          (midiCtrl[set][channel][101] << 8);
     switch (rpn) {
     case 0:
-        range = lbl_8044D890[set][channel];
+        range = channelDefaults[set][channel];
         if (range != 0) {
             range--;
         }
-        lbl_8044D890[set][channel] = range;
+        channelDefaults[set][channel] = range;
         for (i = 0; i < synthInfo.voiceNum; i++) {
             if (set == lbl_8047AF48[i].midiSet &&
                 channel == lbl_8047AF48[i].midi) {
@@ -8281,20 +8290,22 @@ static inline void inpSetRPNDec(u8 set, u8 channel) {
     }
 }
 
-static inline void inpSetRPNInc(u8 set, u8 channel) {
-    u32 i;
+static inline void inpSetRPNInc(u8* base, u8 set, u8 channel) {
+    u8 (*midiCtrl)[16][134] = (u8(*)[16][134])(base + 0x200);
+    u8 (*channelDefaults)[16] = (u8(*)[16])(base + 0x4500);
     u16 rpn;
+    u32 i;
     u8 range;
 
-    rpn = lbl_80449590[set][channel][100] |
-          (lbl_80449590[set][channel][101] << 8);
+    rpn = midiCtrl[set][channel][100] |
+          (midiCtrl[set][channel][101] << 8);
     switch (rpn) {
     case 0:
-        range = lbl_8044D890[set][channel];
+        range = channelDefaults[set][channel];
         if (range < 24) {
             range++;
         }
-        lbl_8044D890[set][channel] = range;
+        channelDefaults[set][channel] = range;
         for (i = 0; i < synthInfo.voiceNum; i++) {
             if (set == lbl_8047AF48[i].midiSet &&
                 channel == lbl_8047AF48[i].midi) {
@@ -8312,6 +8323,7 @@ static inline void inpSetRPNInc(u8 set, u8 channel) {
 #pragma optimization_level 4
 #pragma optimizewithasm off
 void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value) { /* inpSetMidiCtrl */
+    u8* base = (u8*)lbl_80449390;
     u32 i;
 
     if (channel == 0xFF) {
@@ -8321,20 +8333,20 @@ void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value) { /* inpSetMidiCtrl */
     if (set != 0xFF) {
         switch (ctrl) {
         case 6:
-            inpSetRPNHi(set, channel, value);
+            inpSetRPNHi(base, set, channel, value);
             break;
         case 38:
             inpSetRPNLo(set, channel, value);
             break;
         case 96:
-            inpSetRPNDec(set, channel);
+            inpSetRPNDec(base, set, channel);
             break;
         case 97:
-            inpSetRPNInc(set, channel);
+            inpSetRPNInc(base, set, channel);
             break;
         }
 
-        lbl_80449590[set][channel][ctrl] = value & 0x7F;
+        INP_MIDI_CTRL(base)[set][channel][ctrl] = value & 0x7F;
         for (i = 0; i < synthInfo.voiceNum; i++) {
             if (set == lbl_8047AF48[i].midiSet &&
                 channel == lbl_8047AF48[i].midi) {
@@ -8342,24 +8354,24 @@ void fn_801603C0(u8 ctrl, u8 channel, u8 set, u8 value) { /* inpSetMidiCtrl */
                 synthKeyStateUpdate(&lbl_8047AF48[i]);
             }
         }
-        ((u32(*)[16])lbl_80449390)[set][channel] = 0xFF;
+        INP_GLOBAL_MIDI_DIRTY_FLAGS(base)[set][channel] = 0xFF;
     } else {
         switch (ctrl) {
         case 6:
-            inpSetRPNHi(set, channel, value);
+            inpSetRPNHi(base, set, channel, value);
             break;
         case 38:
             inpSetRPNLo(set, channel, value);
             break;
         case 96:
-            inpSetRPNDec(set, channel);
+            inpSetRPNDec(base, set, channel);
             break;
         case 97:
-            inpSetRPNInc(set, channel);
+            inpSetRPNInc(base, set, channel);
             break;
         }
 
-        lbl_8044D910[channel][ctrl] = value & 0x7F;
+        INP_FX_CTRL(base)[channel][ctrl] = value & 0x7F;
         for (i = 0; i < synthInfo.voiceNum; i++) {
             if (set == lbl_8047AF48[i].midiSet &&
                 channel == lbl_8047AF48[i].midi) {
