@@ -6982,6 +6982,7 @@ void fn_8015B250(u32 dest, u32 nsDelay) {
     u8 st1;
     u8 getAuxFrame;
     u16 rampResetOffsetFlags[5];
+    DSPstudioinfo* stp;
     DSPvoice* dsp_vptr;
     DSPvoice* next_dsp_vptr;
     u32 tmp_addr;
@@ -7004,14 +7005,12 @@ void fn_8015B250(u32 dest, u32 nsDelay) {
 
     u32 newVoice;
     _SPB* spb;
-    DSPstudioinfo* stp;
     u32 procVoiceFlag;
     u32 offset;
     u32 endAddr;
     u32 loopAddr;
     u32 zeroAddr;
-    DSPvoice* sp78;
-    DSPvoice* sp74;
+    DSPvoice* nextVoice;
 
     dspCmdCurBase = dspCmdPtr = dspCmdList;
     dspCmdMaxPtr = dspCmdPtr + 0xC0;
@@ -7069,8 +7068,8 @@ void fn_8015B250(u32 dest, u32 nsDelay) {
                 cyclesUsed += 0x294D;
             }
             last_pb = NULL;
-            for (v = 0, dsp_vptr = stp->voiceRoot, sp78 = dsp_vptr; dsp_vptr;
-                 v++, dsp_vptr = dsp_vptr->next, sp74 = dsp_vptr) {
+            for (v = 0, dsp_vptr = stp->voiceRoot; dsp_vptr;
+                 v++, dsp_vptr = dsp_vptr->next, nextVoice = dsp_vptr) {
                 voices[v] = dsp_vptr;
             }
             voiceNum = (u32)v;

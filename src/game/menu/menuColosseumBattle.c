@@ -298,8 +298,9 @@ extern u8 lbl_803A9A18[];
 void menuColosseumBattleMain(void) {
     extern s32 fn_8007162C(void);
     extern s32 fn_80071344(void);
-    extern s32 fn_80071398();
-    extern s32 fn_800714C8(void);
+    extern s32 _menuPop_80071398();
+    extern s32 _menuPop(void);
+    extern void _menuPush(s32);
     extern s32 fn_80071160(void);
     extern s32 menuOpenCustom(s32, s32, void*, s32, s32, s32, ...);
     extern s32 menuIsCheck(s32);
@@ -317,7 +318,7 @@ void menuColosseumBattleMain(void) {
     extern s32 fn_8006ADEC(void);
     extern u32 fn_800FF540(void);
     extern u32 fn_801906A0(s32);
-    extern u8* fn_80104704(u32);
+    extern void* windowSearchID(s32);
     extern s32 windowGetActiveID(void);
     extern u8* windowGetKeyInfo(void);
     extern s32 fn_80076054(void*, void*);
@@ -404,7 +405,7 @@ void menuColosseumBattleMain(void) {
                 t = 2;
                 *(s32*)(WORKP + 0) = t;
                 break;
-            case 3:
+            case 2:
             default:
                 cmd = -1;
                 break;
@@ -538,7 +539,7 @@ void menuColosseumBattleMain(void) {
                 if (*(s32*)(WORKP + 0) != 0) {
                     __assert((char*)(dat + 0x98), 0xAB, (char*)(dat + 0x158));
                 }
-                fn_8019075C(0x8AE, (*(s32*)(q - 0x3670) == 0) ? 1 : 2);
+                _flagSet(0x8AE, (*(s32*)(q - 0x3670) == 0) ? 1 : 2);
                 fn_80069C0C(WORKP);
                 cmd = 0xD1;
             } else {
@@ -567,15 +568,15 @@ void menuColosseumBattleMain(void) {
                 if (*(s32*)(WORKP + 0) != 1) {
                     __assert((char*)(dat + 0x98), 0x82, (char*)(dat + 0x1B0));
                 }
-                fn_8019075C(0x8AE, (*(s32*)(q - 0x3670) == 0) ? 1 : 2);
-                fn_8019075C(0xB59, *(s32*)(WORKP + 0x14));
-                fn_8019075C(0xAFC, 0);
-                fn_8019075C(0xB11, 0);
-                fn_8019075C(0xDE1, 0);
+                _flagSet(0x8AE, (*(s32*)(q - 0x3670) == 0) ? 1 : 2);
+                _flagSet(0xB59, *(s32*)(WORKP + 0x14));
+                _flagSet(0xAFC, 0);
+                _flagSet(0xB11, 0);
+                _flagSet(0xDE1, 0);
                 heroMoveSyncWithHero();
-                fn_8019075C(0xAFC, *(s32*)(q - 0x3634));
-                fn_8019075C(0xB11, *(s32*)(q - 0x362C));
-                fn_8019075C(0xDE1, *(s32*)(q - 0x3628));
+                _flagSet(0xAFC, *(s32*)(q - 0x3634));
+                _flagSet(0xB11, *(s32*)(q - 0x362C));
+                _flagSet(0xDE1, *(s32*)(q - 0x3628));
                 floorId = *(s32*)(q - 0x3654);
                 posX = *(f32*)(WORKP + 0xC9B4);
                 posY = *(f32*)(WORKP + 0xC9B8);
@@ -632,13 +633,13 @@ void menuColosseumBattleMain(void) {
                 u8* mem;
                 s32 r;
                 prevCmd = (u8)(v == 1);
-                npc = fn_80104704((u16)fn_8007162C());
+                npc = windowSearchID((u16)fn_8007162C());
                 if (npc != NULL) {
                     mem = *(u8**)(npc + 0x20);
                 } else {
                     mem = NULL;
                 }
-                fn_80108518(mem + 0xC, 0x1CE);
+                winSetSequence(mem + 0xC, 0x1CE);
                 r = menuOpenCustom(0xBC, 0, NULL, 0x10, 1, 1, prevCmd);
                 switch (r) {
                 case 0:
@@ -657,7 +658,7 @@ void menuColosseumBattleMain(void) {
                 }
                 default:
                     menuCloseCustom(0xBC, 0, 1);
-                    fn_80108518(mem + 0xC, 0x1CA);
+                    winSetSequence(mem + 0xC, 0x1CA);
                     break;
                 }
                 break;
@@ -717,7 +718,7 @@ void menuColosseumBattleMain(void) {
                 fn_8006E0CC();
                 fn_8006B4AC(0);
                 winMsgClose(1);
-                fn_800714C8();
+                _menuPop();
                 cmd = -1;
                 break;
             }
@@ -725,7 +726,7 @@ void menuColosseumBattleMain(void) {
             heroBiosSetHomePlace((u8*)prevCmd, 0);
             fn_8006AC28(lbl_8047A5A0, 0);
             fn_8006A824(lbl_8047A5A0, (u8*)prevCmd);
-            fn_800714C8();
+            _menuPop();
             cmd = 0xB2;
             break;
         }
@@ -747,13 +748,13 @@ void menuColosseumBattleMain(void) {
             r = fn_800849B4(0, 2, arr, NULL);
             fn_8006B4AC(0);
             if (r < 0) {
-                fn_800714C8();
+                _menuPop();
                 cmd = -1;
                 break;
             }
             fn_8006AC28(lbl_8047A5A0, 0);
             fn_8006A824(lbl_8047A5A0, lbl_8047A5A0 + 0x1660);
-            fn_800714C8();
+            _menuPop();
             cmd = 0xB2;
             break;
         }
@@ -853,7 +854,7 @@ void menuColosseumBattleMain(void) {
                 }
                 menuCloseCustom(0xDA, 0, 0);
                 fn_8006E0CC();
-                fn_800714C8();
+                _menuPop();
                 winMsgClose(1);
                 cmd = -1;
                 break;
@@ -927,7 +928,7 @@ void menuColosseumBattleMain(void) {
                 winMsgClose(1);
                 menuCloseCustom(0xDA, 0, 0);
                 fn_8006E0CC();
-                fn_800714C8();
+                _menuPop();
                 cmd = -1;
                 break;
             }
@@ -1179,7 +1180,7 @@ void menuColosseumBattleMain(void) {
                     }
                     goto c0_end;
                 case 8:
-                    fn_800714C8();
+                    _menuPop();
                     cmd = 0xC1;
                     goto c0_end;
                 default:
@@ -1197,7 +1198,7 @@ void menuColosseumBattleMain(void) {
             }
             switch (r) {
             case 5:
-                fn_800714C8();
+                _menuPop();
                 cmd = 0xC0;
                 break;
             case 6:
@@ -1254,9 +1255,9 @@ void menuColosseumBattleMain(void) {
                 break;
             default:
                 if (*(s32*)(WORKP + 4) == 2) {
-                    cmd = fn_80071398(0xB3);
+                    cmd = _menuPop_80071398(0xB3);
                 } else {
-                    cmd = fn_80071398(0xAF);
+                    cmd = _menuPop_80071398(0xAF);
                 }
                 break;
             }
@@ -1265,7 +1266,7 @@ void menuColosseumBattleMain(void) {
         case 0xC2:
             switch (fn_80071344()) {
             case 0:
-                fn_800714C8();
+                _menuPop();
                 if (*(s32*)(WORKP + 0x10) != 4) {
                     cmd = 0xB1;
                     break;
@@ -1278,7 +1279,7 @@ void menuColosseumBattleMain(void) {
                 break;
             case 1:
             default:
-                cmd = fn_80071398(0xB3);
+                cmd = _menuPop_80071398(0xB3);
                 break;
             }
             break;
@@ -1326,7 +1327,7 @@ void menuColosseumBattleMain(void) {
             }
             r = fn_800849B4(mode2, 0x1A, arr, NULL);
             if (r < 0) {
-                cmd = fn_80071398(0xB3);
+                cmd = _menuPop_80071398(0xB3);
                 break;
             }
             if (*(s32*)(WORKP + 0x59AC) == 0) {
@@ -1408,7 +1409,7 @@ void menuColosseumBattleMain(void) {
                     }
                     winMsgClose(1);
                 }
-                cmd = fn_80071398(0xB3);
+                cmd = _menuPop_80071398(0xB3);
                 break;
             }
             r = fn_8010264C(0xD0, 1);
@@ -1445,7 +1446,7 @@ void menuColosseumBattleMain(void) {
                     }
                     winMsgClose(1);
                 }
-                cmd = fn_80071398(0xB3);
+                cmd = _menuPop_80071398(0xB3);
                 break;
             }
             if (*(s32*)(WORKP + 4) != 2) {
@@ -1511,7 +1512,7 @@ void menuColosseumBattleMain(void) {
                     }
                     winMsgClose(1);
                 }
-                cmd = fn_80071398(0xB3);
+                cmd = _menuPop_80071398(0xB3);
                 break;
             }
             }
@@ -1525,7 +1526,7 @@ void menuColosseumBattleMain(void) {
         case 0xB8:
             savedataGetStatus(0, 0xE);
             fn_80062948();
-            cmd = fn_80071398();
+            cmd = _menuPop_80071398();
             break;
         case 0xB9: {
             s32 r = fn_8010264C(0xB9, 1);
@@ -1666,11 +1667,11 @@ void menuColosseumBattleMain(void) {
             st = *(s32*)(WORKP + 0);
             switch (st) {
             case 0:
-                cmd = fn_80071398(0xAE);
+                cmd = _menuPop_80071398(0xAE);
                 break;
             case 1:
             default:
-                cmd = fn_80071398(0xAC);
+                cmd = _menuPop_80071398(0xAC);
                 break;
             }
             break;
@@ -1687,7 +1688,7 @@ void menuColosseumBattleMain(void) {
         }
         prevCmd = first;
         if (cmd < 0) {
-            s32 r = fn_800714C8();
+            s32 r = _menuPop();
             menuCloseCustom(0xBE, 0, 1);
             if (r < 0) {
                 goto done;
@@ -1698,7 +1699,7 @@ void menuColosseumBattleMain(void) {
                 menuCloseCustom(fn_8007162C(), 0, 0);
             }
             menuCloseCustom(0xBE, 0, 1);
-            fn_800715BC(cmd);
+            _menuPush(cmd);
         }
         if (floorId != 0) {
             s32 r = fn_8007162C();
