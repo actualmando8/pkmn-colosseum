@@ -2102,6 +2102,7 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
     u8* stream;
     u8 opcode;
     u16 delay;
+    f32 scratch[4];
 
     if (pp->flags & PS_FLAG_PAUSED) {
         _psListGetNext(pp);
@@ -2237,66 +2238,62 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                     switch (normalizedOp) {
                     /* ---- 0x80: SET_POSITION (verified @ 0x8016F8D4) ---- */
                     case 0x80: {
-                        f32 vec[3];
-                        if (opcode & 1) stream = getFloat(stream, &vec[0]);
-                        if (opcode & 2) stream = getFloat(stream, &vec[1]);
-                        if (opcode & 4) stream = getFloat(stream, &vec[2]);
-                        psApplyOffsetLocalRotation(pp, vec);
-                        pp->positionX = vec[0];
-                        pp->positionY = vec[1];
-                        pp->positionZ = vec[2];
+                        if (opcode & 1) stream = getFloat(stream, &scratch[0]);
+                        if (opcode & 2) stream = getFloat(stream, &scratch[1]);
+                        if (opcode & 4) stream = getFloat(stream, &scratch[2]);
+                        psApplyOffsetLocalRotation(pp, scratch);
+                        pp->positionX = scratch[0];
+                        pp->positionY = scratch[1];
+                        pp->positionZ = scratch[2];
                         break;
                     }
 
                     /* ---- 0x88: ADD_POSITION (verified @ 0x8016F95C) ---- */
                     case 0x88: {
-                        f32 vec[3];
-                        if (opcode & 1) stream = getFloat(stream, &vec[0]);
-                        if (opcode & 2) stream = getFloat(stream, &vec[1]);
-                        if (opcode & 4) stream = getFloat(stream, &vec[2]);
-                        psApplyOffsetLocalRotation(pp, vec);
-                        pp->positionX += vec[0];
-                        pp->positionY += vec[1];
-                        pp->positionZ += vec[2];
+                        if (opcode & 1) stream = getFloat(stream, &scratch[0]);
+                        if (opcode & 2) stream = getFloat(stream, &scratch[1]);
+                        if (opcode & 4) stream = getFloat(stream, &scratch[2]);
+                        psApplyOffsetLocalRotation(pp, scratch);
+                        pp->positionX += scratch[0];
+                        pp->positionY += scratch[1];
+                        pp->positionZ += scratch[2];
                         break;
                     }
 
                     /* ---- 0x90: SET_VELOCITY (verified @ 0x8016F9FC) ---- */
                     case 0x90: {
-                        f32 vec[3];
-                        if (opcode & 1) stream = getFloat(stream, &vec[0]);
-                        if (opcode & 2) stream = getFloat(stream, &vec[1]);
-                        if (opcode & 4) stream = getFloat(stream, &vec[2]);
-                        psApplyOffsetLocalRotation(pp, vec);
-                        pp->velocityX = vec[0];
-                        pp->velocityY = vec[1];
-                        pp->velocityZ = vec[2];
+                        if (opcode & 1) stream = getFloat(stream, &scratch[0]);
+                        if (opcode & 2) stream = getFloat(stream, &scratch[1]);
+                        if (opcode & 4) stream = getFloat(stream, &scratch[2]);
+                        psApplyOffsetLocalRotation(pp, scratch);
+                        pp->velocityX = scratch[0];
+                        pp->velocityY = scratch[1];
+                        pp->velocityZ = scratch[2];
                         break;
                     }
 
                     /* ---- 0x98: ADD_VELOCITY (verified @ 0x8016FA84) ---- */
                     case 0x98: {
-                        f32 vec[3];
-                        if (opcode & 1) stream = getFloat(stream, &vec[0]);
-                        if (opcode & 2) stream = getFloat(stream, &vec[1]);
-                        if (opcode & 4) stream = getFloat(stream, &vec[2]);
+                        if (opcode & 1) stream = getFloat(stream, &scratch[0]);
+                        if (opcode & 2) stream = getFloat(stream, &scratch[1]);
+                        if (opcode & 4) stream = getFloat(stream, &scratch[2]);
 
                         if ((pp->flags & 0x20000000) == 0) {
-                            psApplyOffsetLocalRotation(pp, vec);
+                            psApplyOffsetLocalRotation(pp, scratch);
                         } else {
                             void* peopleObj = pp->peopleObj;
                             if (peopleObj != NULL &&
                                 (*(u16*)((u8*)peopleObj + 0x88) & 0x40) != 0) {
                                 f32* p = (f32*)((u8*)peopleObj + 0x98);
                                 f32 scale = (p[0] + p[1] + p[2]) / 3.0f;
-                                vec[0] *= scale;
-                                vec[1] *= scale;
-                                vec[2] *= scale;
+                                scratch[0] *= scale;
+                                scratch[1] *= scale;
+                                scratch[2] *= scale;
                             }
                         }
-                        pp->velocityX += vec[0];
-                        pp->velocityY += vec[1];
-                        pp->velocityZ += vec[2];
+                        pp->velocityX += scratch[0];
+                        pp->velocityY += scratch[1];
+                        pp->velocityZ += scratch[2];
                         break;
                     }
 
@@ -2433,65 +2430,57 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                     /* ---- 0xA8: randomized local position offset
                      * (verified @ 0x8017068C) ---- */
                     case 0xA8: {
-                        f32 amplitude;
-                        f32 offset[3];
-
-                        stream = getFloat(stream, &amplitude);
-                        offset[0] = amplitude -
-                            2.0f * amplitude * fn_801ADC7C();
-                        stream = getFloat(stream, &amplitude);
-                        offset[1] = amplitude -
-                            2.0f * amplitude * fn_801ADC7C();
-                        stream = getFloat(stream, &amplitude);
-                        offset[2] = amplitude -
-                            2.0f * amplitude * fn_801ADC7C();
-                        psApplyOffsetLocalRotation(pp, offset);
-                        pp->positionX += offset[0];
-                        pp->positionY += offset[1];
-                        pp->positionZ += offset[2];
+                        stream = getFloat(stream, &scratch[3]);
+                        scratch[0] = scratch[3] -
+                            2.0f * scratch[3] * fn_801ADC7C();
+                        stream = getFloat(stream, &scratch[3]);
+                        scratch[1] = scratch[3] -
+                            2.0f * scratch[3] * fn_801ADC7C();
+                        stream = getFloat(stream, &scratch[3]);
+                        scratch[2] = scratch[3] -
+                            2.0f * scratch[3] * fn_801ADC7C();
+                        psApplyOffsetLocalRotation(pp, scratch);
+                        pp->positionX += scratch[0];
+                        pp->positionY += scratch[1];
+                        pp->positionZ += scratch[2];
                         break;
                     }
 
                     /* ---- 0xA9: MODIFY_DIR (verified @ 0x80170744) ---- */
                     case 0xA9: {
-                        f32 f;
-                        stream = getFloat(stream, &f);
-                        modifyDir(pp, f);
+                        stream = getFloat(stream, &scratch[0]);
+                        modifyDir(pp, scratch[0]);
                         break;
                     }
 
                     /* ---- 0xAA: MODIFY_DIR_GEN_BASE (verified @ 0x80170844... entry
                      * partially transcribed at 0x80170764) ---- */
                     case 0xAA: {
-                        f32 a, b, c, d;
-                        stream = getFloat(stream, &a);
-                        stream = getFloat(stream, &b);
-                        stream = getFloat(stream, &c);
-                        stream = getFloat(stream, &d);
+                        stream = getFloat(stream, &scratch[0]);
+                        stream = getFloat(stream, &scratch[1]);
+                        stream = getFloat(stream, &scratch[2]);
+                        stream = getFloat(stream, &scratch[3]);
                         if (pp->peopleObj == NULL) break;
-                        modifyDirGenBase(pp, d, a, b, c);
+                        modifyDirGenBase(pp, scratch[3], scratch[0], scratch[1],
+                                         scratch[2]);
                         break;
                     }
 
                     /* ---- 0xAB: scale velocity (verified @ 0x80170988) ---- */
                     case 0xAB: {
-                        f32 factor;
-
-                        stream = getFloat(stream, &factor);
-                        pp->velocityX *= factor;
-                        pp->velocityY *= factor;
-                        pp->velocityZ *= factor;
+                        stream = getFloat(stream, &scratch[0]);
+                        pp->velocityX *= scratch[0];
+                        pp->velocityY *= scratch[0];
+                        pp->velocityZ *= scratch[0];
                         break;
                     }
 
                     /* ---- 0xAC: randomized lerp target (verified @ 0x801709CC) ---- */
                     case 0xAC: {
-                        f32 range;
-
                         stream = getTime(stream, &pp->lerpTimer);
                         stream = getFloat(stream, &pp->lerpTarget);
-                        stream = getFloat(stream, &range);
-                        pp->lerpTarget += range * fn_801ADC7C();
+                        stream = getFloat(stream, &scratch[0]);
+                        pp->lerpTarget += scratch[0] * fn_801ADC7C();
                         if (pp->lerpTimer == 0) {
                             pp->lerpValue = pp->lerpTarget;
                         }
@@ -2525,11 +2514,9 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
 
                     /* ---- 0xB6: add heading target (verified @ 0x80170C18) ---- */
                     case 0xB6: {
-                        f32 delta;
-
                         stream = getTime(stream, &pp->headingTimer);
-                        stream = getFloat(stream, &delta);
-                        pp->headingSpeed += delta;
+                        stream = getFloat(stream, &scratch[0]);
+                        pp->headingSpeed += scratch[0];
                         if (pp->headingTimer == 0) {
                             pp->heading = pp->headingSpeed;
                         }
@@ -2570,6 +2557,31 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
+                    case 0xFA:
+                        pp->loopCounter = *stream++;
+                        pp->loopPC = (u16)(stream - (u8*)pp->scriptData);
+                        break;
+
+                    case 0xFB:
+                        pp->loopCounter--;
+                        if (pp->loopCounter != 0) {
+                            stream = (u8*)pp->scriptData + pp->loopPC;
+                        }
+                        break;
+
+                    case 0xFC:
+                        pp->savedPC = (u16)(stream - (u8*)pp->scriptData);
+                        break;
+
+                    case 0xFD:
+                        stream = (u8*)pp->scriptData + pp->savedPC;
+                        break;
+
+                    case 0xFE:
+                    case 0xFF:
+                        pp->repeatCount = 1;
+                        goto end_commands;
+
                     default:
                         break;
                     }
@@ -2579,6 +2591,7 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                 if (delay != 0) break;
             }
 
+        end_commands:
             pp->pc = (u16)(stream - (u8*)pp->scriptData);
             pp->waitTimer = delay;
         }

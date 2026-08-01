@@ -30,11 +30,11 @@ uv run --with matplotlib tools/plot_progress.py -o /tmp/progress.png
 
 | Metric | Value |
 |---|---|
-| Fuzzy match | 80.00% |
-| Function match | 77.98% (6,709 / 8,603 functions) |
-| Code match | 41.51% (1,035,792 / 2,495,108 matched code bytes) |
+| Fuzzy match | 80.01% |
+| Function match | 78.01% (6,711 / 8,603 functions) |
+| Code match | 41.64% (1,038,984 / 2,495,108 matched code bytes) |
 | Data match | 97.29% (2,136,513 / 2,196,100 matched data bytes) |
-| Linked into DOL | 1,029 / 2,267 scoring units (26.04% of code) |
+| Linked into DOL | 1,030 / 2,266 scoring units (26.15% of code) |
 
 These numbers come from the canonical dtk/objdiff report generated at
 `build/GC6E01/report.json`. Old campaign metrics and helper reports are archived

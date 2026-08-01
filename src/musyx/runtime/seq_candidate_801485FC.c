@@ -489,10 +489,9 @@ static inline void InitStream(SEQ_STREAM* stream, u32 offset)
     u16 delta;
 
     if (offset != 0) {
-        stream->nextAddr =
-            GetStreamValue(ARR_GET(lbl_8047AF08->arrbase, offset), &delta,
-                           &stream->nextDelta);
-        if (stream->nextAddr != NULL) {
+        if ((stream->nextAddr =
+                 GetStreamValue(ARR_GET(lbl_8047AF08->arrbase, offset), &delta,
+                                &stream->nextDelta)) != NULL) {
             stream->nextTime = delta;
         } else {
             stream->nextTime = 0x7FFFFFFF;
@@ -508,9 +507,8 @@ static inline u16 HandleStream(SEQ_STREAM* stream)
 
     stream->value += stream->nextDelta;
     if (stream->nextAddr != NULL) {
-        stream->nextAddr =
-            GetStreamValue(stream->nextAddr, &delta, &stream->nextDelta);
-        if (stream->nextAddr != NULL) {
+        if ((stream->nextAddr = GetStreamValue(stream->nextAddr, &delta,
+                                               &stream->nextDelta)) != NULL) {
             stream->nextTime += delta;
         } else {
             stream->nextTime = 0x7FFFFFFF;
@@ -616,20 +614,22 @@ SEQ_EVENT* fn_801485FC(SEQ_EVENT* event, u8 secIndex, u32* loopFlag)
             macId = lbl_8047AF08->prgState[midi].macId;
             if (macId != 0xFFFF) {
                 key += pa->patternInfo->transpose;
-                key = key < 0 ? 0 : (key > 0x7F ? 0x7F : key);
+                key = key > 0x7F ? 0x7F : (key < 0 ? 0 : key);
                 velocity += pa->patternInfo->velocityAdd;
-                velocity =
-                    velocity < 0 ? 0 : (velocity > 0x7F ? 0x7F : velocity);
+                velocity = velocity > 0x7F
+                               ? 0x7F
+                               : (velocity < 0 ? 0 : velocity);
                 note = AllocateNote(event->time + pe->length, secIndex);
                 if (note != NULL) {
-                    note->id = synthStartSound(
-                        macId, lbl_8047AF08->prgState[midi].priority,
-                        lbl_8047AF08->prgState[midi].maxVoices, key, velocity,
-                        64, midi, lbl_8047AF00, secIndex, 0, event->trackId,
-                        lbl_8047AF08->trackVolGroup[event->trackId],
-                        lbl_8047AEFC ? -1 : 0, lbl_8047AF08->defStudio,
-                        lbl_804356A4[lbl_8047AF08->defStudio * 2]);
-                    if (note->id == SND_SEQ_ERROR_ID) {
+                    if ((note->id = synthStartSound(
+                             macId, lbl_8047AF08->prgState[midi].priority,
+                             lbl_8047AF08->prgState[midi].maxVoices, key,
+                             velocity, 64, midi, lbl_8047AF00, secIndex, 0,
+                             event->trackId,
+                             lbl_8047AF08->trackVolGroup[event->trackId],
+                             lbl_8047AEFC ? -1 : 0, lbl_8047AF08->defStudio,
+                             lbl_804356A4[lbl_8047AF08->defStudio * 2])) ==
+                        SND_SEQ_ERROR_ID) {
                         FreeNote(note);
                     }
                 }
