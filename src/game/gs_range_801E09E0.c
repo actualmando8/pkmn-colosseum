@@ -30,6 +30,13 @@ extern f32 lbl_8047E418;
 extern f32 lbl_8047E41C;
 extern f32 lbl_8047E420;
 
+#define GS_SDATA2 __declspec(section ".sdata2")
+extern GS_SDATA2 const char lbl_8047E458[];
+extern GS_SDATA2 const char lbl_8047E45C[];
+extern GS_SDATA2 const char lbl_8047E464[];
+extern GS_SDATA2 const char lbl_8047E46C[];
+extern GS_SDATA2 const char lbl_8047E474[];
+
 extern u32 fn_800D3088(void);
 extern s32 fn_800D37CC(void);
 extern void _threadSwitch(void);
@@ -408,11 +415,6 @@ void _vtrTexDispFunc__Fv(void)
     extern f32 lbl_8047E44C;
     extern f32 lbl_8047E450;
     extern f32 lbl_8047E454;
-    extern char lbl_8047E458[];
-    extern char lbl_8047E45C[];
-    extern char lbl_8047E464[];
-    extern char lbl_8047E46C[];
-    extern char lbl_8047E474[];
     extern u8 lbl_80314958[];
     extern u8 lbl_80314C78[];
     extern void fn_800D88DC(s32 mode);
@@ -433,9 +435,14 @@ void _vtrTexDispFunc__Fv(void)
     extern void fn_800D6728(void);
     extern void fn_800FAEF8(s32 x, s32 y, s32 color, const char* text,
                             ...);
-    const char* message;
 
-    if (!lbl_8047B420 || !lbl_8047B434 || lbl_8047B438 == NULL) {
+    if (!lbl_8047B420) {
+        return;
+    }
+    if (!lbl_8047B434) {
+        return;
+    }
+    if (lbl_8047B438 == NULL) {
         return;
     }
 
@@ -483,30 +490,31 @@ void _vtrTexDispFunc__Fv(void)
     fn_800D59B8(0, lbl_8047E450, lbl_8047E450);
     fn_800D6728();
 
-    message = NULL;
     switch (lbl_8047B424) {
     case 0:
-        message = lbl_8047E458;
+        fn_800FAEF8(0x230, 0x2C, -1, lbl_8047E458);
         break;
     case 1:
-        message = lbl_8047E45C;
+        fn_800FAEF8(0x230, 0x2C, -1, lbl_8047E45C);
         break;
     case 2:
-        message = lbl_8047E464;
+        fn_800FAEF8(0x230, 0x2C, -1, lbl_8047E464);
         break;
     case 3:
-        if (lbl_8047B428 < 2) {
-            message = lbl_8047E46C;
-        } else if (lbl_8047B428 == 2 || lbl_8047B428 == 3) {
-            message = lbl_8047E45C;
+        switch (lbl_8047B428) {
+        case 0:
+        case 1:
+            fn_800FAEF8(0x230, 0x2C, -1, lbl_8047E46C);
+            break;
+        case 2:
+        case 3:
+            fn_800FAEF8(0x230, 0x2C, -1, lbl_8047E45C);
+            break;
         }
         break;
     case 4:
-        message = lbl_8047E474;
+        fn_800FAEF8(0x230, 0x2C, -1, lbl_8047E474);
         break;
-    }
-    if (message != NULL) {
-        fn_800FAEF8(0x230, 0x2C, -1, message);
     }
     fn_800D9ED8(0);
 }
