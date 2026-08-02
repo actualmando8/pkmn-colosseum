@@ -732,6 +732,7 @@ asm void PSMTXMultVecSR(const register Mtx m, const register Vec* src,
 }
 #endif
 
+#if !defined(SDK_PROJECTION_PREFIX_EXCLUDE)
 void C_MTXFrustum(Mtx44 m, f32 top, f32 bottom, f32 left, f32 right, f32 near, f32 far)
 {
     f32 scaledNear;
@@ -823,6 +824,7 @@ void C_MTXOrtho(Mtx44 m, f32 top, f32 bottom, f32 left, f32 right, f32 near, f32
     m[3][2] = lbl_8047C2B0;
     m[3][3] = lbl_8047C2A8;
 }
+#endif
 
 #if !defined(SDK_VECTOR_PREFIX_EXCLUDE)
 asm void PSVECAdd(const register Vec* lhs, const register Vec* rhs,
@@ -870,10 +872,12 @@ asm void PSVECScale(const register Vec* src, register Vec* dst,
 
 void PSVECNormalize(Vec* src, Vec* dst)
 {
+    extern f32 lbl_8047C2C0;
+    extern f32 lbl_8047C2C4;
     register Vec* srcReg = src;
     register Vec* dstReg = dst;
-    register f32 half = 0.5f;
-    register f32 three = 3.0f;
+    register f32 half = lbl_8047C2C0;
+    register f32 three = lbl_8047C2C4;
     register f32 pair;
     register f32 z;
     register f32 sum;
@@ -911,13 +915,15 @@ asm f32 PSVECSquareMag(const register Vec* src)
 
 f32 PSVECMag(const register Vec* src)
 {
-    register f32 half = 0.5f;
+    extern f32 lbl_8047C2C0;
+    extern f32 lbl_8047C2C4;
     register f32 pair;
     register f32 square;
-    register f32 zero;
     register f32 estimate;
     register f32 temp;
     register f32 three;
+    register f32 half = lbl_8047C2C0;
+    register f32 zero;
 
     asm {
         psq_l pair, 0(src), 0, 0
@@ -931,7 +937,7 @@ f32 PSVECMag(const register Vec* src)
         asm {
             frsqrte estimate, square
         }
-        three = 3.0f;
+        three = lbl_8047C2C4;
         asm {
             fmuls temp, estimate, estimate
             fmuls estimate, estimate, half
@@ -995,15 +1001,17 @@ asm f32 PSVECSquareDistance(const register Vec* lhs,
 
 f32 PSVECDistance(const register Vec* lhs, const register Vec* rhs)
 {
-    register f32 half = 0.5f;
+    extern f32 lbl_8047C2C0;
+    extern f32 lbl_8047C2C4;
     register f32 lhsPair;
     register f32 rhsPair;
     register f32 delta;
     register f32 square;
-    register f32 zero;
     register f32 estimate;
     register f32 temp;
+    register f32 half;
     register f32 three;
+    register f32 zero;
 
     asm {
         psq_l lhsPair, 4(lhs), 0, 0
@@ -1013,12 +1021,15 @@ f32 PSVECDistance(const register Vec* lhs, const register Vec* rhs)
         psq_l rhsPair, 0(rhs), 0, 0
         ps_mul delta, delta, delta
         ps_sub lhsPair, lhsPair, rhsPair
+    }
+    half = lbl_8047C2C0;
+    asm {
         ps_madd square, lhsPair, lhsPair, delta
         fsubs zero, half, half
         ps_sum0 square, square, delta, delta
     }
     if (zero != square) {
-        three = 3.0f;
+        three = lbl_8047C2C4;
         asm {
             frsqrte estimate, square
             fmuls temp, estimate, estimate
