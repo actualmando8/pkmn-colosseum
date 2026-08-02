@@ -26,6 +26,7 @@ void* __FileWrite(void* pFile, const char* pBuffer, u32 char_num);
 
 s32 vsprintf(char* buf, const char* fmt, va_list args);
 
+#ifndef PRINTF_RESIDUAL_ONLY
 /*
  * sprintf - 0x800C8520 | size: 0xE0
  *
@@ -105,6 +106,7 @@ s32 printf(const char* fmt, ...) {
 
     return result;
 }
+#endif
 
 /* ------------------------------------------------------------------ */
 /* MSL printf.c body (0x800C8864 onward, printf_candidate_800C8864).   */
@@ -158,7 +160,8 @@ extern char* strchr(const char* s, int c);
 extern u32 strlen(const char* s);
 extern void* memchr(const void* s, int c, u32 n);
 extern s32 wcstombs(char* dst, const u16* src, u32 n);
-extern const char stringBase0_8026FFE0[];
+const char stringBase0_8026FFE0[] =
+    "\0-INF\0-inf\0INF\0inf\0-NAN\0-nan\0NAN\0nan";
 
 #define CRT_STR_EMPTY   (stringBase0_8026FFE0)
 #define CRT_STR_NEG_INF (stringBase0_8026FFE0 + 1)
@@ -1305,6 +1308,7 @@ const char* parse_format_800CA11C(const char* format_string, va_list* arg,
 }
 
 /* __StringWrite - 0x800C87F8 | size: 0x6C */
+#ifndef PRINTF_RESIDUAL_ONLY
 s32 __StringWrite(u8* ctx, const void* src, u32 count) {
     extern void* memcpy(void* dst, const void* src, u32 n);
     u32 pos;
@@ -1321,6 +1325,7 @@ s32 __StringWrite(u8* ctx, const void* src, u32 count) {
     *(u32*)(ctx + 0x8) += len;
     return 1;
 }
+#endif
 
 /* ------------------------------------------------------------------ */
 /* MSL qsort.c, appended to this object at 0x800CA620.                 */
