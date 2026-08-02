@@ -1,6 +1,6 @@
 /**
- * @file fight_trainer_ai_waza_value_candidate_8024B474.c
- * @brief Candidate fightTrainerAiWazaValue.cpp range, 0x8024B474 - 0x8024E578.
+ * @file fight_trainer_ai_waza_value_residual_8024B474.c
+ * @brief Exact fightTrainerAiWazaValue.cpp residual, 0x8024B474 - 0x8024E578.
  *
  * Physically split from fight_trainer_ai_waza_value.c so this
  * translation unit owns only the functions in the stated range.
