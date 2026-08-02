@@ -15553,8 +15553,6 @@ void fn_8021FAD4(void)
                     fightFloorSetStatus(0, 0, 0x43, 0, other);
                     fightWazaInitLoop(moveStatus);
                     {
-                    void* messageControl = lbl_8047B62C;
-                    u8* message = lbl_80379BF4;
                     flags1 = lbl_8047B618 & 0xFFFFFFBF;
                     lbl_80478D78[3] = 0;
                     *(volatile u32*)&lbl_8047B618 = flags1;
@@ -15563,7 +15561,7 @@ void fn_8021FAD4(void)
                     lbl_80478D78[6] = 0;
                     lbl_8047B618 = flags2 | 0x200;
                     lbl_8047B627 = 0;
-                    fn_80211B94(messageControl, message, 0);
+                    fn_80211B94(lbl_8047B62C, lbl_80379BF4, 0);
                     lbl_8047B610 = (u8*)lbl_80379BFF[moveEffect];
                     return;
                     }
@@ -18807,8 +18805,8 @@ u32 fn_8022F2F8(void)
                 }
                 fightOutPokemonInitJoutaiKeep(ctx);
                 lbl_8047B618 = lbl_8047B618 | 0x80000;
-                lbl_8047B610 = lbl_80379992;
                 flagBase[5] = 0;
+                lbl_8047B610 = lbl_80379992;
                 result = 1;
             }
             lbl_8047B644++;
