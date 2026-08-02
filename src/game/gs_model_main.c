@@ -238,7 +238,7 @@ void fn_800E85E8(GSmodel* model);
 
 extern void fn_801B25C4(u32 mask);
 extern void* GScameraGetActiveCamera(void);
-extern s32 fn_80195A6C(void* camera);
+extern s32 HSD_CObjSetCurrent(void* camera);
 extern void GSlightSetupLights(void* camera);
 extern void modelShadowPrepare__FP8_GSmodelb(GSmodel* model, s32 active);
 extern void fn_801A13CC(HSDJObj* jobj, s32 arg1, s32 flags, s32 arg3);
@@ -252,7 +252,7 @@ void fn_800E3604(s32 flags, u8 slot)
 
     fn_801B25C4(0x7F);
     camera = GScameraGetActiveCamera();
-    if (camera != NULL && fn_80195A6C(*(void**)((u8*)camera + 0xC)) != 0) {
+    if (camera != NULL && HSD_CObjSetCurrent(*(void**)((u8*)camera + 0xC)) != 0) {
         u32 i;
 
         GSlightSetupLights(*(void**)((u8*)camera + 0xC));
@@ -297,7 +297,7 @@ void GSmodelDrawModel(GSmodel* model, u32 flags)
     fn_801B25C4(0x7F);
     camera = GScameraGetActiveCamera();
     if (camera != NULL) {
-        if (fn_80195A6C(*(void**)((u8*)camera + 0xC)) != 0) {
+        if (HSD_CObjSetCurrent(*(void**)((u8*)camera + 0xC)) != 0) {
             HSDJObj* jobj;
 
             GSlightSetupLights(*(void**)((u8*)camera + 0xC));

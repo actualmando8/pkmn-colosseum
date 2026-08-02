@@ -11444,12 +11444,25 @@
       "sections": [
         {
           "name": ".sdata2",
-          "size": 64,
+          "size": 16,
           "virtual_address": 2152188744
         }
       ],
       "total_code": 0,
-      "total_data": 64,
+      "total_data": 16,
+      "total_functions": 0
+    },
+    {
+      "name": "main/game/data/sdata2_8047CB60",
+      "sections": [
+        {
+          "name": ".sdata2",
+          "size": 40,
+          "virtual_address": 2152188768
+        }
+      ],
+      "total_code": 0,
+      "total_data": 40,
       "total_functions": 0
     },
     {
@@ -11511,10 +11524,15 @@
           "name": ".text",
           "size": 804,
           "virtual_address": 2148414980
+        },
+        {
+          "name": ".sdata2",
+          "size": 8,
+          "virtual_address": 2152188760
         }
       ],
       "total_code": 804,
-      "total_data": 0,
+      "total_data": 8,
       "total_functions": 3
     },
     {
