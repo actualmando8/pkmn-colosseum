@@ -96,6 +96,8 @@ extern f32 lbl_8047D694; /* pi / 2 */
 extern f32 lbl_8047D698; /* -pi / 2 */
 extern f64 lbl_8047D6A0; /* 2.0 */
 extern f64 lbl_8047D6A8; /* pi */
+extern const f64 lbl_8047D650; /* 0.5 */
+extern const f32 lbl_8047D658; /* -1.0f */
 extern const char lbl_8047D670[7];
 extern const char lbl_8047D678[5];
 
@@ -1945,94 +1947,6 @@ void psCopyGeneratorData(PSParticle* gen, void* peopleObj) {
     }
 }
 
-void psApplyOffsetLocalRotation(PSParticle* pp, f32* vec3) {
-    typedef f32 Mtx[3][4];
-    extern void PSMTXIdentity(Mtx mtx);
-    extern void PSMTXScale(Mtx mtx, f32 x, f32 y, f32 z);
-    extern void PSMTXRotRad(Mtx mtx, char axis, f32 radians);
-    extern void PSMTXConcat(Mtx lhs, Mtx rhs, Mtx dst);
-    extern void PSMTXMultVec(Mtx mtx, f32* src, f32* dst);
-    Mtx rotX;
-    Mtx rotY;
-    Mtx rotZ;
-    Mtx scale;
-
-    if (pp->peopleObj == NULL ||
-        !(((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x8)) {
-        return;
-    }
-
-    if (((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x10) {
-        PSMTXIdentity(scale);
-    } else {
-        PSMTXScale(scale,
-                   ((PSGeneratorState*)pp->peopleObj)->generatorData[3],
-                   ((PSGeneratorState*)pp->peopleObj)->generatorData[4],
-                   ((PSGeneratorState*)pp->peopleObj)->generatorData[5]);
-    }
-
-    PSMTXRotRad(rotX, 'X',
-                ((PSGeneratorState*)pp->peopleObj)->generatorData[0]);
-    PSMTXRotRad(rotY, 'Y',
-                ((PSGeneratorState*)pp->peopleObj)->generatorData[1]);
-    PSMTXRotRad(rotZ, 'Z',
-                ((PSGeneratorState*)pp->peopleObj)->generatorData[2]);
-    PSMTXConcat(rotY, rotX, rotX);
-    PSMTXConcat(rotZ, rotX, rotX);
-    PSMTXConcat(scale, rotX, rotX);
-    PSMTXMultVec(rotX, vec3, vec3);
-}
-
-void psApplyVelocityLocalRotation(PSParticle* pp) {
-    typedef f32 Mtx[3][4];
-    extern void PSMTXRotRad(Mtx mtx, char axis, f32 radians);
-    extern void PSMTXConcat(Mtx lhs, Mtx rhs, Mtx dst);
-    extern void PSMTXMultVec(Mtx mtx, f32* src, f32* dst);
-    Mtx rotX;
-    Mtx rotY;
-    Mtx rotZ;
-    f32 velocity[3];
-
-    if (pp->peopleObj == NULL ||
-        !(((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x4)) {
-        return;
-    }
-
-    velocity[0] = pp->velocityX;
-    velocity[1] = pp->velocityY;
-    velocity[2] = pp->velocityZ;
-    PSMTXRotRad(rotX, 'X',
-                ((PSGeneratorState*)pp->peopleObj)->generatorData[0]);
-    PSMTXRotRad(rotY, 'Y',
-                ((PSGeneratorState*)pp->peopleObj)->generatorData[1]);
-    PSMTXRotRad(rotZ, 'Z',
-                ((PSGeneratorState*)pp->peopleObj)->generatorData[2]);
-    PSMTXConcat(rotY, rotX, rotX);
-    PSMTXConcat(rotZ, rotX, rotX);
-    PSMTXMultVec(rotX, velocity, velocity);
-    pp->velocityX = velocity[0];
-    pp->velocityY = velocity[1];
-    pp->velocityZ = velocity[2];
-}
-
-u8* getTime(u8* stream, u16* out) {
-    *out = *stream++;
-    if (*out & 0x80) {
-        *out = ((*out & 0x7F) << 8) + *stream++;
-    }
-
-    return stream;
-}
-
-u8* getFloat(u8* stream, f32* out) {
-    lbl_8047B178.bytes[0] = *stream++;
-    lbl_8047B178.bytes[1] = *stream++;
-    lbl_8047B178.bytes[2] = *stream++;
-    lbl_8047B178.bytes[3] = *stream++;
-    *out = lbl_8047B178.value;
-    return stream;
-}
-
 void psSetBillboardCamera(HSD_Obj* obj) {
     HSD_Obj* old_obj;
 
@@ -2099,14 +2013,14 @@ void psInterpretParticles(u32 linkMask) {
  * ====================================================================== */
 PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
     extern PSParticle* _psListGetNext(PSParticle*);
-    u8* stream;
     u8 opcode;
     u16 delay;
+    PSParticle* spawned;
+    u8* stream;
     f32 scratch[4];
 
     if (pp->flags & PS_FLAG_PAUSED) {
-        _psListGetNext(pp);
-        return pp;
+        return _psListGetNext(pp);
     }
 
     /* ---- Phase 1: interpolation timers (verified vs retail asm) ---- */
@@ -2189,8 +2103,6 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
     if (pp->waitTimer != 0) {
         pp->waitTimer--;
         if (pp->waitTimer == 0) {
-            PSParticle* spawned;
-
             stream = (u8*)pp->scriptData + pp->pc;
 
             for (;;) {
@@ -2504,6 +2416,60 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         pp->flags |= 0x60;
                         break;
 
+                    /* ---- 0xB2: bake the attached application transform ---- */
+                    case 0xB2: {
+                        PSAppSRT* appSRT = (PSAppSRT*)pp->parentObj;
+
+                        if (appSRT == NULL || appSRT->active != 0) {
+                            break;
+                        }
+                        genPosUpdate(appSRT->owner);
+                        HSD_MTXSRT(appSRT->matrix, &appSRT->scaleX,
+                                   &appSRT->translationX,
+                                   &appSRT->rotationX, NULL);
+                        scratch[0] = appSRT->matrix[0][0] * pp->positionX +
+                                     appSRT->matrix[0][1] * pp->positionY +
+                                     appSRT->matrix[0][2] * pp->positionZ +
+                                     appSRT->matrix[0][3];
+                        scratch[1] = appSRT->matrix[1][0] * pp->positionX +
+                                     appSRT->matrix[1][1] * pp->positionY +
+                                     appSRT->matrix[1][2] * pp->positionZ +
+                                     appSRT->matrix[1][3];
+                        scratch[2] = appSRT->matrix[2][0] * pp->positionX +
+                                     appSRT->matrix[2][1] * pp->positionY +
+                                     appSRT->matrix[2][2] * pp->positionZ +
+                                     appSRT->matrix[2][3];
+                        pp->positionX = scratch[0];
+                        pp->positionY = scratch[1];
+                        pp->positionZ = scratch[2];
+                        psRemoveParticleAppSRT(pp);
+                        break;
+                    }
+
+                    /* ---- 0xB3: interpolate the two alpha endpoints ---- */
+                    case 0xB3:
+                        if (pp->alphaTimer != 0) {
+                            s32 scale = ((u32)pp->alphaCountdown << 16) /
+                                        pp->alphaTimer;
+                            pp->alphaStart = (u8)(((pp->alphaTargetStart << 16) +
+                                scale * (pp->alphaStart - pp->alphaTargetStart)) >> 16);
+                            pp->alphaEnd = (u8)(((pp->alphaTargetEnd << 16) +
+                                scale * (pp->alphaEnd - pp->alphaTargetEnd)) >> 16);
+                        }
+                        stream = getTime(stream, &pp->alphaTimer);
+                        pp->alphaMode = stream[0];
+                        pp->alphaTargetStart = stream[1];
+                        pp->alphaTargetEnd = stream[2];
+                        stream += 3;
+                        if (pp->alphaTimer == 0) {
+                            pp->alphaStart = pp->alphaTargetStart;
+                            pp->alphaEnd = pp->alphaTargetEnd;
+                            pp->alphaCountdown = 0;
+                        } else {
+                            pp->alphaCountdown = pp->alphaTimer;
+                        }
+                        break;
+
                     /* ---- 0xB4/0xB5: toggle bit 0x200 (verified @ 0x80170BF8) ---- */
                     case 0xB4:
                         pp->flags |= 0x200;
@@ -2528,6 +2494,165 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         u8 slot = *stream++;
 
                         setVelToJObj(pp, lbl_80452DC8[pp->cameraSlot + slot]);
+                        break;
+                    }
+
+                    /* ---- 0xB8: apply a radial force around a camera slot ---- */
+                    case 0xB8: {
+                        u8 slot = *stream++ + pp->cameraSlot;
+
+                        stream = getFloat(stream, &scratch[0]);
+                        stream = getFloat(stream, &scratch[1]);
+                        if (pp->peopleObj != NULL &&
+                            (((PSGeneratorState*)pp->peopleObj)->generatorFlags &
+                             0x100) != 0) {
+                            f32 scale =
+                                (((PSGeneratorState*)pp->peopleObj)->generatorData[3] +
+                                 ((PSGeneratorState*)pp->peopleObj)->generatorData[4] +
+                                 ((PSGeneratorState*)pp->peopleObj)->generatorData[5]) /
+                                3.0f;
+                            scratch[0] *= scale;
+                            scratch[1] *= scale;
+                        }
+                        if (applyForceJObj(pp, lbl_80452DC8[slot], scratch[0],
+                                          scratch[1]) != 0) {
+                            pp->repeatCount = 1;
+                            goto end_commands;
+                        }
+                        break;
+                    }
+
+                    case 0xB9: {
+                        u16 scriptId = ((u16)stream[0] << 8) | stream[1];
+
+                        stream += 2;
+                        spawned = psGenerateParticleID0(pp, pp->linkNo,
+                            pp->bankIndex, scriptId, NULL);
+                        if (spawned == NULL) {
+                            break;
+                        }
+                        spawned->positionX = pp->positionX;
+                        spawned->positionY = pp->positionY;
+                        spawned->positionZ = pp->positionZ;
+                        spawned->velocityX = pp->velocityX;
+                        spawned->velocityY = pp->velocityY;
+                        spawned->velocityZ = pp->velocityZ;
+                        spawned->scriptId = pp->scriptId;
+                        spawned->peopleObj = pp->peopleObj;
+                        if (pp->peopleObj != NULL) {
+                            (*(u32*)((u8*)pp->peopleObj + 0x4C))++;
+                        }
+                        if (*(u32*)((u8*)pp->peopleObj + 4) & 0x20000000) {
+                            spawned->flags |= 0x20000000;
+                        }
+                        psApplyVelocityLocalRotation(spawned);
+                        if (pp->parentObj != NULL) {
+                            if (pp->peopleObj != NULL &&
+                                (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
+                                psChangeParticleAppSRT(spawned,
+                                    (PSAppSRT*)pp->parentObj);
+                            } else {
+                                psAttachParticleAppSRT(spawned,
+                                    (PSAppSRT*)pp->parentObj);
+                            }
+                        }
+                        psInterpretParticle0(spawned, pp);
+                        break;
+                    }
+
+                    case 0xBA: {
+                        u16 tableIndex = ((u16)stream[0] << 8) | stream[1];
+                        u32* bank = (u32*)lbl_804527C8[pp->bankIndex];
+                        u16 scriptId = bank != NULL ?
+                            (u16)bank[tableIndex] : tableIndex;
+
+                        stream += 2;
+                        spawned = psGenerateParticleID0(pp, pp->linkNo,
+                            pp->bankIndex, scriptId, NULL);
+                        if (spawned == NULL) {
+                            break;
+                        }
+                        spawned->positionX = pp->positionX;
+                        spawned->positionY = pp->positionY;
+                        spawned->positionZ = pp->positionZ;
+                        spawned->velocityX = pp->velocityX;
+                        spawned->velocityY = pp->velocityY;
+                        spawned->velocityZ = pp->velocityZ;
+                        spawned->scriptId = pp->scriptId;
+                        spawned->peopleObj = pp->peopleObj;
+                        if (pp->peopleObj != NULL) {
+                            (*(u32*)((u8*)pp->peopleObj + 0x4C))++;
+                        }
+                        if (*(u32*)((u8*)pp->peopleObj + 4) & 0x20000000) {
+                            spawned->flags |= 0x20000000;
+                        }
+                        psApplyVelocityLocalRotation(spawned);
+                        if (pp->parentObj != NULL) {
+                            if (pp->peopleObj != NULL &&
+                                (*(u16*)((u8*)pp->peopleObj + 0x12) & 0x40)) {
+                                psChangeParticleAppSRT(spawned,
+                                    (PSAppSRT*)pp->parentObj);
+                            } else {
+                                psAttachParticleAppSRT(spawned,
+                                    (PSAppSRT*)pp->parentObj);
+                            }
+                        }
+                        psInterpretParticle0(spawned, pp);
+                        break;
+                    }
+
+                    case 0xBB: {
+                        if (pp->color2Timer != 0) {
+                            s32 scale = ((u32)pp->color2Countdown << 16) /
+                                        pp->color2Timer;
+                            pp->color2.r = (u8)(((pp->color2Target.r << 16) +
+                                scale * (pp->color2.r - pp->color2Target.r)) >> 16);
+                            pp->color2.g = (u8)(((pp->color2Target.g << 16) +
+                                scale * (pp->color2.g - pp->color2Target.g)) >> 16);
+                            pp->color2.b = (u8)(((pp->color2Target.b << 16) +
+                                scale * (pp->color2.b - pp->color2Target.b)) >> 16);
+                            pp->color2.a = (u8)(((pp->color2Target.a << 16) +
+                                scale * (pp->color2.a - pp->color2Target.a)) >> 16);
+                        }
+                        scratch[0] = fn_801ADC7C();
+                        pp->color2Target.r = U8ClampAdd(pp->color2Target.r,
+                            (s8)stream[0] * 2 * scratch[0]);
+                        scratch[0] = fn_801ADC7C();
+                        pp->color2Target.g = U8ClampAdd(pp->color2Target.g,
+                            (s8)stream[1] * 2 * scratch[0]);
+                        scratch[0] = fn_801ADC7C();
+                        pp->color2Target.b = U8ClampAdd(pp->color2Target.b,
+                            (s8)stream[2] * 2 * scratch[0]);
+                        scratch[0] = fn_801ADC7C();
+                        pp->color2Target.a = U8ClampAdd(pp->color2Target.a,
+                            (s8)stream[3] * 2 * scratch[0]);
+                        stream += 4;
+                        if (pp->color2Timer == 0) {
+                            pp->color2 = pp->color2Target;
+                        } else {
+                            pp->color2Countdown = pp->color2Timer;
+                        }
+                        break;
+                    }
+
+                    case 0xBC: {
+                        u8 range;
+                        void** bankData;
+                        void* objTable;
+
+                        pp->objRefIndex = stream[0];
+                        range = stream[1];
+                        stream += 2;
+                        pp->objRefIndex = (u8)
+                            ((f32)range * fn_801ADC7C() + pp->objRefIndex);
+                        bankData = (void**)lbl_804529C8[pp->bankIndex];
+                        objTable = bankData != NULL ?
+                            ((void**)bankData)[pp->animIndex] : NULL;
+                        if (objTable != NULL &&
+                            ((void**)((u8*)objTable + 0x18))[pp->objRefIndex] !=
+                                NULL) {
+                            pp->flags |= PS_FLAG_OBJ_REF;
+                        }
                         break;
                     }
 
@@ -2557,27 +2682,50 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
-                    case 0xFA:
+                    case 0xF4: {
+                        u8 reverse = *stream++;
+
+                        stream = getFloat(stream, &pp->headingSpeed);
+                        stream = getFloat(stream, &pp->headingAccel);
+                        stream = getTime(stream, &pp->headingTimer);
+                        if (pp->headingTimer != 0) {
+                            if (reverse == 0) {
+                                pp->headingSpeed = (f32)
+                                    ((f64)pp->headingAccel * lbl_8047D650 +
+                                     pp->headingSpeed);
+                            } else {
+                                pp->headingSpeed *= lbl_8047D658;
+                                pp->headingSpeed = (f32)
+                                    (pp->headingSpeed -
+                                     (f64)pp->headingAccel * lbl_8047D650);
+                            }
+                        } else {
+                            pp->headingSpeed = 0.0f;
+                            pp->headingAccel = 0.0f;
+                        }
+                        break;
+                    }
+
+                    case 0xFB:
                         pp->loopCounter = *stream++;
                         pp->loopPC = (u16)(stream - (u8*)pp->scriptData);
                         break;
 
-                    case 0xFB:
+                    case 0xFC:
                         pp->loopCounter--;
                         if (pp->loopCounter != 0) {
                             stream = (u8*)pp->scriptData + pp->loopPC;
                         }
                         break;
 
-                    case 0xFC:
+                    case 0xFD:
                         pp->savedPC = (u16)(stream - (u8*)pp->scriptData);
                         break;
 
-                    case 0xFD:
+                    case 0xFE:
                         stream = (u8*)pp->scriptData + pp->savedPC;
                         break;
 
-                    case 0xFE:
                     case 0xFF:
                         pp->repeatCount = 1;
                         goto end_commands;
@@ -2682,6 +2830,94 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
 
     _psListGetNext(pp);
     return pp;
+}
+
+void psApplyOffsetLocalRotation(PSParticle* pp, f32* vec3) {
+    typedef f32 Mtx[3][4];
+    extern void PSMTXIdentity(Mtx mtx);
+    extern void PSMTXScale(Mtx mtx, f32 x, f32 y, f32 z);
+    extern void PSMTXRotRad(Mtx mtx, char axis, f32 radians);
+    extern void PSMTXConcat(Mtx lhs, Mtx rhs, Mtx dst);
+    extern void PSMTXMultVec(Mtx mtx, f32* src, f32* dst);
+    Mtx rotX;
+    Mtx rotY;
+    Mtx rotZ;
+    Mtx scale;
+
+    if (pp->peopleObj == NULL ||
+        !(((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x8)) {
+        return;
+    }
+
+    if (((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x10) {
+        PSMTXIdentity(scale);
+    } else {
+        PSMTXScale(scale,
+                   ((PSGeneratorState*)pp->peopleObj)->generatorData[3],
+                   ((PSGeneratorState*)pp->peopleObj)->generatorData[4],
+                   ((PSGeneratorState*)pp->peopleObj)->generatorData[5]);
+    }
+
+    PSMTXRotRad(rotX, 'X',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[0]);
+    PSMTXRotRad(rotY, 'Y',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[1]);
+    PSMTXRotRad(rotZ, 'Z',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[2]);
+    PSMTXConcat(rotY, rotX, rotX);
+    PSMTXConcat(rotZ, rotX, rotX);
+    PSMTXConcat(scale, rotX, rotX);
+    PSMTXMultVec(rotX, vec3, vec3);
+}
+
+void psApplyVelocityLocalRotation(PSParticle* pp) {
+    typedef f32 Mtx[3][4];
+    extern void PSMTXRotRad(Mtx mtx, char axis, f32 radians);
+    extern void PSMTXConcat(Mtx lhs, Mtx rhs, Mtx dst);
+    extern void PSMTXMultVec(Mtx mtx, f32* src, f32* dst);
+    Mtx rotX;
+    Mtx rotY;
+    Mtx rotZ;
+    f32 velocity[3];
+
+    if (pp->peopleObj == NULL ||
+        !(((PSGeneratorState*)pp->peopleObj)->generatorFlags & 0x4)) {
+        return;
+    }
+
+    velocity[0] = pp->velocityX;
+    velocity[1] = pp->velocityY;
+    velocity[2] = pp->velocityZ;
+    PSMTXRotRad(rotX, 'X',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[0]);
+    PSMTXRotRad(rotY, 'Y',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[1]);
+    PSMTXRotRad(rotZ, 'Z',
+                ((PSGeneratorState*)pp->peopleObj)->generatorData[2]);
+    PSMTXConcat(rotY, rotX, rotX);
+    PSMTXConcat(rotZ, rotX, rotX);
+    PSMTXMultVec(rotX, velocity, velocity);
+    pp->velocityX = velocity[0];
+    pp->velocityY = velocity[1];
+    pp->velocityZ = velocity[2];
+}
+
+u8* getTime(u8* stream, u16* out) {
+    *out = *stream++;
+    if (*out & 0x80) {
+        *out = ((*out & 0x7F) << 8) + *stream++;
+    }
+
+    return stream;
+}
+
+u8* getFloat(u8* stream, f32* out) {
+    lbl_8047B178.bytes[0] = *stream++;
+    lbl_8047B178.bytes[1] = *stream++;
+    lbl_8047B178.bytes[2] = *stream++;
+    lbl_8047B178.bytes[3] = *stream++;
+    *out = lbl_8047B178.value;
+    return stream;
 }
 
 /*
