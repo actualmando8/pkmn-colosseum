@@ -648,16 +648,18 @@ typedef struct GsVtrDimensions {
     u16 pad_02;
     u16 width;
     u16 height;
+    u8 pad_08[0x1F0];
 } GsVtrDimensions;
 
 typedef struct GsVtrOrigin {
     u32 x;
     u32 y;
+    u32 pad_08[2];
 } GsVtrOrigin;
 
 s32 fn_801E1924(GsVtrStartArgs* args)
 {
-    extern const char lbl_80279A68[];
+    extern const char lbl_80279A68[0x80];
     extern GsVtrDimensions lbl_80466BC0;
     extern u32 lbl_80469020[];
     extern GsVtrOrigin lbl_80469030;
@@ -681,7 +683,7 @@ s32 fn_801E1924(GsVtrStartArgs* args)
     extern u16 fn_800E202C(void* pointer);
     extern void fn_800E24B0(u16 handle);
     extern void fn_800E209C(u16 handle);
-    extern void fn_801E3858(s32* first, s32* second);
+    extern void fn_801E3858(u32* first, u32* second);
     extern void fn_8014F2DC(s32 id, u32, u32, u32, u32, u32);
     extern void fn_801E4058(void);
     extern u8 lbl_8047B441;
@@ -689,8 +691,8 @@ s32 fn_801E1924(GsVtrStartArgs* args)
     u8 mode;
     u16 handle;
     u32 remainder;
-    s32 first;
-    s32 second;
+    u32 first;
+    u32 second;
 
     resourceId = args->resourceId;
     mode = args->mode;
@@ -740,10 +742,10 @@ s32 fn_801E1924(GsVtrStartArgs* args)
     }
 
     fn_801E3858(&first, &second);
-    if (first != -1) {
+    if (first != (u32)-1) {
         fn_8014F2DC(first, 0, 0, 0, 0x7F, 0);
     }
-    if (second != -1) {
+    if (second != (u32)-1) {
         fn_8014F2DC(second, 0, 0x7F, 0, 0x7F, 0);
     }
     fn_801E4058();
