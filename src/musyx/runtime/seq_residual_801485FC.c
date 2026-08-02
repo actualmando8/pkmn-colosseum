@@ -1,6 +1,6 @@
 /**
- * @file seq_candidate_801485FC.c
- * @brief MusyX runtime sequencer suffix candidate, 0x801485FC - 0x8014A23C.
+ * @file seq_residual_801485FC.c
+ * @brief MusyX runtime sequencer residual, 0x801485FC - 0x8014A23C.
  *
  * Split out of the misnamed people_field.c unit (2026-07-02). Reference:
  * AxioDL/musyx `musyx/runtime/seq.c`, cross-verified byte-exact against the
@@ -657,8 +657,7 @@ SEQ_EVENT* fn_801485FC(SEQ_EVENT* event, u8 secIndex, u32* loopFlag)
 
 
 /* This translation unit is a topology-only split of the original seq.c. */
-#if !defined(SEQ_SUFFIX_BANK_ACTIVE) || \
-    defined(SEQ_EXACT_80149090_8014A23C)
+#if defined(SEQ_EXACT_80149090_8014A23C)
 /*
  * Compile-only copies preserve MWCC's original same-TU inlining decisions.
  * Declaring them inline prevents unused out-of-line copies from being emitted.

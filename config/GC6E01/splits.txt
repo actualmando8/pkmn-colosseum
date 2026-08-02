@@ -3467,7 +3467,7 @@ game/data/data_80363AC8.c:
 	.data       start:0x80363AC8 end:0x80363CA4
 
 game/data/data_80363CA8_prefix.c:
-	.data       start:0x80363CA8 end:0x80368A80
+	.data       start:0x80363CA8 end:0x80368A30
 
 game/gamedata.c:
 	.text       start:0x8013528C end:0x80135A30
@@ -3721,14 +3721,15 @@ game/item_range_80144574.c:
 musyx/runtime/seq_get_private_id_exact_8014635C.c:
 	.text       start:0x8014635C end:0x801463C4
 
-musyx/runtime/seq_candidate_801463C4.c:
+musyx/runtime/seq_residual_801463C4.c:
 	.text       start:0x801463C4 end:0x80146E88
 
 musyx/runtime/seq_exact_80146E88.c:
 	.text       start:0x80146E88 end:0x801485FC
 
-musyx/runtime/seq_candidate_801485FC.c:
+musyx/runtime/seq_residual_801485FC.c:
 	.text       start:0x801485FC end:0x80149090
+	.data       start:0x80368A30 end:0x80368A80
 
 musyx/runtime/seq_exact_80149090.c:
 	.text       start:0x80149090 end:0x8014A23C

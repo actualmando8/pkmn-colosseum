@@ -1244,8 +1244,8 @@ config.libs = [
                 progress_category="musyx",
             ),
             Object(
-                CodeCandidate,
-                "musyx/runtime/seq_candidate_801463C4.c",
+                Matching,
+                "musyx/runtime/seq_residual_801463C4.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
@@ -1258,8 +1258,8 @@ config.libs = [
                 progress_category="musyx",
             ),
             Object(
-                CodeCandidate,
-                "musyx/runtime/seq_candidate_801485FC.c",
+                Matching,
+                "musyx/runtime/seq_residual_801485FC.c",
                 mw_version="GC/1.3.2",
                 extra_cflags=["-use_lmw_stmw off", "-sdata 8", "-sdata2 8"],
                 progress_category="musyx",
