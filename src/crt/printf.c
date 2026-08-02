@@ -158,6 +158,17 @@ extern char* strchr(const char* s, int c);
 extern u32 strlen(const char* s);
 extern void* memchr(const void* s, int c, u32 n);
 extern s32 wcstombs(char* dst, const u16* src, u32 n);
+extern const char stringBase0_8026FFE0[];
+
+#define CRT_STR_EMPTY   (stringBase0_8026FFE0)
+#define CRT_STR_NEG_INF (stringBase0_8026FFE0 + 1)
+#define CRT_STR_NEG_INF_LOWER (stringBase0_8026FFE0 + 6)
+#define CRT_STR_INF     (stringBase0_8026FFE0 + 11)
+#define CRT_STR_INF_LOWER (stringBase0_8026FFE0 + 15)
+#define CRT_STR_NEG_NAN (stringBase0_8026FFE0 + 19)
+#define CRT_STR_NEG_NAN_LOWER (stringBase0_8026FFE0 + 24)
+#define CRT_STR_NAN     (stringBase0_8026FFE0 + 29)
+#define CRT_STR_NAN_LOWER (stringBase0_8026FFE0 + 33)
 
 const char* parse_format_800CA11C(const char* format_string, va_list* arg,
                                   print_format* format);
@@ -322,7 +333,7 @@ int __pformatter_800C88BC(WriteProcT WriteProc, void* WriteProcArg,
             }
 
             if (buff_ptr == NULL) {
-                buff_ptr = "";
+                buff_ptr = (char*)CRT_STR_EMPTY;
             }
 
             if (format.alternate_form) {
@@ -481,16 +492,16 @@ char* float2str(f64 num, char* buff, print_format format) {
         if (num < 0) {
             p = buff - 5;
             if (isupper(format.conversion_char)) {
-                strcpy(p, "-INF");
+                strcpy(p, CRT_STR_NEG_INF);
             } else {
-                strcpy(p, "-inf");
+                strcpy(p, CRT_STR_NEG_INF_LOWER);
             }
         } else {
             p = buff - 4;
             if (isupper(format.conversion_char)) {
-                strcpy(p, "INF");
+                strcpy(p, CRT_STR_INF);
             } else {
-                strcpy(p, "inf");
+                strcpy(p, CRT_STR_INF_LOWER);
             }
         }
         return p;
@@ -499,16 +510,16 @@ char* float2str(f64 num, char* buff, print_format format) {
         if (dec.sign) {
             p = buff - 5;
             if (isupper(format.conversion_char)) {
-                strcpy(p, "-NAN");
+                strcpy(p, CRT_STR_NEG_NAN);
             } else {
-                strcpy(p, "-nan");
+                strcpy(p, CRT_STR_NEG_NAN_LOWER);
             }
         } else {
             p = buff - 4;
             if (isupper(format.conversion_char)) {
-                strcpy(p, "NAN");
+                strcpy(p, CRT_STR_NAN);
             } else {
-                strcpy(p, "nan");
+                strcpy(p, CRT_STR_NAN_LOWER);
             }
         }
         return p;
@@ -752,16 +763,16 @@ char* double2hex(f64 num, char* buff, print_format format) {
         if (*sptr & 0x8000) {
             p = buff - 5;
             if (format.conversion_char == 'A') {
-                strcpy(p, "-INF");
+                strcpy(p, CRT_STR_NEG_INF);
             } else {
-                strcpy(p, "-inf");
+                strcpy(p, CRT_STR_NEG_INF_LOWER);
             }
         } else {
             p = buff - 4;
             if (format.conversion_char == 'A') {
-                strcpy(p, "INF");
+                strcpy(p, CRT_STR_INF);
             } else {
-                strcpy(p, "inf");
+                strcpy(p, CRT_STR_INF_LOWER);
             }
         }
         return p;
@@ -769,16 +780,16 @@ char* double2hex(f64 num, char* buff, print_format format) {
         if (*(char*)&num & 0x80) {
             p = buff - 5;
             if (format.conversion_char == 'A') {
-                strcpy(p, "-NAN");
+                strcpy(p, CRT_STR_NEG_NAN);
             } else {
-                strcpy(p, "-nan");
+                strcpy(p, CRT_STR_NEG_NAN_LOWER);
             }
         } else {
             p = buff - 4;
             if (format.conversion_char == 'A') {
-                strcpy(p, "NAN");
+                strcpy(p, CRT_STR_NAN);
             } else {
-                strcpy(p, "nan");
+                strcpy(p, CRT_STR_NAN_LOWER);
             }
         }
         return p;
