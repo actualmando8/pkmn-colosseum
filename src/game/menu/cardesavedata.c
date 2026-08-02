@@ -479,19 +479,58 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
         return 0;
     case 28:
         object[0x6A] = (u8)value;
-        if (value < 0 || value > 0x24) {
+        switch (object[0x6A]) {
+        case 0:
+        case 13:
+        case 18:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+        case 30:
+        case 32:
+        case 36:
+            break;
+        default:
             return 0;
         }
         break;
     case 29:
         object[0x6B] = (u8)value;
-        if (value < 0 || value > 0x24) {
+        switch (object[0x6B]) {
+        case 0:
+        case 13:
+        case 18:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+        case 30:
+        case 32:
+        case 36:
+            break;
+        default:
             return 0;
         }
         break;
     case 30:
         object[0x6C] = (u8)value;
-        if (value < 0 || value > 0x24) {
+        switch (object[0x6C]) {
+        case 0:
+        case 13:
+        case 18:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+        case 30:
+        case 32:
+        case 36:
+            break;
+        default:
             return 0;
         }
         break;
@@ -526,13 +565,19 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
         GScharCpy(object + 0x3AC + index * 0x28, text);
         break;
     case 41:
-        record = object + 0x3AC + index * 0x28;
-        if (value == 2) {
+        switch (value) {
+        case 0:
+            record = object + 0x3AC + index * 0x28;
             record[0x0C] = 1;
-        } else if (value == 3) {
-            record[0x0C] = 2;
-        } else {
+            break;
+        case 1:
+            record = object + 0x3AC + index * 0x28;
             record[0x0C] = 0;
+            break;
+        default:
+            record = object + 0x3AC + index * 0x28;
+            record[0x0C] = 0;
+            return 0;
         }
         break;
     case 42:
@@ -707,21 +752,30 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
         break;
     case 67:
         record = object + index * 0x2A;
-        if (value == 2) {
-            record[0x538] = 1;
-        } else if (value == 3) {
-            record[0x538] = 2;
-        } else {
+        switch (value) {
+        case 1:
             record[0x538] = 0;
+            break;
+        case 2:
+            record[0x538] = 1;
+            break;
+        case 3:
+            record[0x538] = 2;
+            break;
+        default:
+            record[0x538] = 0;
+            break;
         }
         break;
     case 68:
         record = object + index * 0x2A;
         record[0x539] = (value & 0x20) ? -1 : (s8)(value - 1);
-        for (i = 0; i < 0x1A; i++) {
-            if (((const s8*)(table + 0xCE0))[i] ==
-                (s8)record[0x539]) {
-                return 1;
+        for (i = 0; i < 0x0D; i++) {
+            for (j = 0; j < 2; j++) {
+                if (((const s8*)(table + 0xCE0))[i * 2 + j] ==
+                    (s8)record[0x539]) {
+                    return 1;
+                }
             }
         }
         return 0;
