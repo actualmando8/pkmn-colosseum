@@ -8,6 +8,183 @@
  */
 #include "dolphin/types.h"
 
+typedef struct GSvec_801E09E0 {
+    f32 x;
+    f32 y;
+    f32 z;
+} GSvec_801E09E0;
+
+typedef struct EtcToolSequenceData {
+    u32 objectIds[13];
+    GSvec_801E09E0 objectPosition;
+    GSvec_801E09E0 objectScale;
+} EtcToolSequenceData;
+
+extern const EtcToolSequenceData lbl_80279A00;
+extern const GSvec_801E09E0 lbl_803750C8[3];
+extern f32 lbl_8047E3F0;
+extern f32 lbl_8047E3F4;
+extern f32 lbl_8047E410;
+extern f32 lbl_8047E414;
+extern f32 lbl_8047E418;
+extern f32 lbl_8047E41C;
+extern f32 lbl_8047E420;
+
+extern u32 fn_800D3088(void);
+extern s32 fn_800D37CC(void);
+extern void _threadSwitch(void);
+extern void GSvecCopy(void*, const void*);
+extern void* GSmodelGetPart(void*, s32);
+extern void GSpartGetTransform(void*, void*, s32, s32);
+extern void GSpartFree(void*);
+extern void GSmodelSetPosition(void*, const void*);
+extern void GSmodelSetScale(void*, const void*);
+extern void GSmodelSetVisibility(void*, u8);
+extern void GSmodelFree(void*);
+extern void* fn_800F92D4(u32);
+extern void* fn_800FF56C(void);
+extern void floorEventCtrlDoor(void*, u32, u32);
+extern void* floorOpenObject(u32);
+extern void* sodateyaGetPokemonPtr(u32);
+extern u8 pokemonBiosGetCatchBallId(void*);
+extern u32 pokemonBiosGetPokemonDataId(void*);
+extern void* pokemonDataBiosGetPtr(u32);
+extern u16 pokemonDataBiosGetVoice(void*);
+extern void fn_80166AB8(u32, u32, u32);
+extern void fn_80183018(u32, u32);
+extern void fn_80183350(u32, u32);
+extern void fn_80185EE8(u32, u32, u32, f32, f32, f32);
+extern void fn_8018805C(u32, u32, f32, f32);
+extern void peopleMoveCheck(u32, u32, u32);
+extern void fn_8018BDF4(u32, u32, void*);
+
+static inline void etctoolWait(f32 duration)
+{
+    f32 elapsed;
+
+    elapsed = lbl_8047E3F4;
+    while (elapsed < duration) {
+        elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        _threadSwitch();
+    }
+}
+
+void fn_801E09E0(void)
+{
+    GSvec_801E09E0 position;
+    GSvec_801E09E0 savedPosition;
+    GSvec_801E09E0 objectPosition;
+    GSvec_801E09E0 objectScale;
+    const GSvec_801E09E0* sequencePositions = lbl_803750C8;
+    const EtcToolSequenceData* data = &lbl_80279A00;
+    void* object;
+    BOOL running;
+    void* resource;
+    void* pokemon;
+    void* pokemonData;
+    void* part;
+    u32 objectIds[13];
+    u32 state;
+    u8 ballId;
+
+    objectPosition = data->objectPosition;
+    objectScale = data->objectScale;
+    object = NULL;
+    state = 0;
+    running = TRUE;
+    resource = fn_800FF56C();
+
+    do {
+        switch (state) {
+        case 0:
+            fn_8018BDF4(0x4D, 1, &savedPosition);
+            fn_80183350(0x4D, 1);
+            part = GSmodelGetPart(fn_800F92D4(0x01DA1002), 0);
+            GSpartGetTransform(part, &position, 0, 0);
+            GSpartFree(part);
+            GSvecCopy(&position, &sequencePositions[1]);
+            fn_80185EE8(0x4D, 1, 1, position.x, position.y, position.z);
+            peopleMoveCheck(0x4D, 1, 1);
+            floorEventCtrlDoor(resource, 0x2C, 0);
+            etctoolWait(lbl_8047E418);
+            state = 1;
+            break;
+
+        case 1:
+            GSvecCopy(&position, &sequencePositions[2]);
+            fn_80185EE8(0x4D, 1, 1, position.x, position.y, position.z);
+            peopleMoveCheck(0x4D, 1, 1);
+            floorEventCtrlDoor(resource, 0x2C, 2);
+            etctoolWait(lbl_8047E3F0);
+
+            fn_80185EE8(0x4D, 1, 1, position.x, position.y,
+                        position.z + lbl_8047E410);
+            peopleMoveCheck(0x4D, 1, 1);
+            floorEventCtrlDoor(resource, 0x2C, 0);
+
+            GSvecCopy(&position, &sequencePositions[1]);
+            fn_80185EE8(0x4D, 1, 1, position.x, position.y, position.z);
+            peopleMoveCheck(0x4D, 1, 1);
+            floorEventCtrlDoor(resource, 0x2C, 2);
+            etctoolWait(lbl_8047E41C);
+
+            fn_80185EE8(0x4D, 1, 1, savedPosition.x, savedPosition.y,
+                        savedPosition.z);
+            peopleMoveCheck(0x4D, 1, 1);
+            fn_8018805C(0x4D, 1, lbl_8047E3F4, lbl_8047E410);
+            state = 10;
+            etctoolWait(lbl_8047E420);
+            break;
+
+        case 10:
+            pokemon = sodateyaGetPokemonPtr(0);
+            ballId = pokemonBiosGetCatchBallId(pokemon);
+            objectIds[0] = data->objectIds[0];
+            objectIds[1] = data->objectIds[1];
+            objectIds[2] = data->objectIds[2];
+            objectIds[3] = data->objectIds[3];
+            objectIds[4] = data->objectIds[4];
+            objectIds[5] = data->objectIds[5];
+            objectIds[6] = data->objectIds[6];
+            objectIds[7] = data->objectIds[7];
+            objectIds[8] = data->objectIds[8];
+            objectIds[9] = data->objectIds[9];
+            objectIds[10] = data->objectIds[10];
+            objectIds[11] = data->objectIds[11];
+            objectIds[12] = data->objectIds[12];
+            object = floorOpenObject(objectIds[ballId]);
+            GSvecCopy(&objectPosition, &sequencePositions[0]);
+
+            pokemon = sodateyaGetPokemonPtr(0);
+            if (pokemon != NULL) {
+                pokemonData = pokemonDataBiosGetPtr(
+                    pokemonBiosGetPokemonDataId(pokemon));
+                if (pokemonData != NULL) {
+                    fn_80166AB8(pokemonDataBiosGetVoice(pokemonData), 0, 0);
+                }
+            }
+
+            GSmodelSetPosition(object, &objectPosition);
+            GSmodelSetScale(object, &objectScale);
+            state = 2;
+            break;
+
+        case 2:
+            etctoolWait(lbl_8047E414);
+            state = 100;
+            break;
+
+        case 100:
+            running = FALSE;
+            fn_80183018(0x4D, 1);
+            GSmodelSetVisibility(object, 0);
+            GSmodelFree(object);
+            object = NULL;
+            break;
+        }
+    } while (running);
+}
+
 void etctoolSetPokemonNakigoe(void)
 {
     void *pokemonData;
