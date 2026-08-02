@@ -4,4 +4,4 @@
  */
 #define SEQ_SUFFIX_BANK_ACTIVE
 #define SEQ_EXACT_80149090_8014A23C
-#include "src/musyx/runtime/seq_candidate_801485FC.c"
+#include "src/musyx/runtime/seq_residual_801485FC.c"

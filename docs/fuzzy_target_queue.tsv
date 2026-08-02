@@ -36,10 +36,8 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 2914.4	2920	0.19	fn_800FC7E0	main/game/gs_msg	src/game/gs_msg.c	0.1168
 2780.0	2784	0.14	_wazaSequenceCameraDoPosition__FP13ModelSequenceP24wazaSequenceCameraParamsfb	main/game/wazaSequenceCamera	src/game/wazaSequenceCamera.c	0.11142
 2768.0	2768	0.0	fn_8004A7A8	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.11094
-2756.0	2756	0.0	fn_801463C4	main/musyx/runtime/seq_candidate_801463C4	src/musyx/runtime/seq_candidate_801463C4.c	0.11046
 2752.0	2752	0.0	fn_800499BC	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.1103
 2740.2	3180	13.83	fn_801364A8	main/game/effect/tracefx	src/game/effect/tracefx.c	0.10982
-2708.0	2708	0.0	fn_801485FC	main/musyx/runtime/seq_candidate_801485FC	src/musyx/runtime/seq_candidate_801485FC.c	0.10853
 2676.0	2676	0.0	psDispSubAppSRT	main/game/ps_candidate_8016AB94	src/game/ps_candidate_8016AB94.c	0.10725
 2484.0	2484	0.0	fn_80048918	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.09955
 2464.0	2464	0.0	MakeColorGenTExp	main/hsd/hsd_tobj_candidate_801BBDDC	src/hsd/hsd_tobj_candidate_801BBDDC.c	0.09875

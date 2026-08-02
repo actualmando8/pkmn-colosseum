@@ -376,7 +376,7 @@ extern void inpResetMidiCtrl(u8 midi, u8 midiSet, u32 coldReset);
 extern void fn_80160ED4(u8 midi, u8 midiSet);
 extern void InitTrackEvents(void);
 
-static void StartPause(SEQ_INSTANCE* si);
+void StartPause(SEQ_INSTANCE* si);
 
 static inline void DoPrgChange(SEQ_INSTANCE* seq, u8 program, u8 midi)
 {
@@ -438,6 +438,7 @@ static inline u32 GetPublicId(u32 seqId)
     return publicId;
 }
 
+#ifndef SEQ_801463C4_ONLY
 u32 seqGetPrivateId(u32 seqId) {
     SEQ_INSTANCE* si;
     for (si = lbl_8047AF14; si != NULL; si = si->next) {
@@ -452,6 +453,7 @@ u32 seqGetPrivateId(u32 seqId) {
     }
     return SND_SEQ_ERROR_ID;
 }
+#endif
 
 u32 fn_801463C4(PAGE* normal, PAGE* drum, MIDISETUP* midiSetup, u32* song,
                 SND_PLAYPARA* para, u8 studio, u16 groupId)
@@ -612,6 +614,7 @@ u32 fn_801463C4(PAGE* normal, PAGE* drum, MIDISETUP* midiSetup, u32* song,
     return seqId;
 }
 
+#ifndef SEQ_801463C4_ONLY
 static void KillNotes(SEQ_INSTANCE* seq) {
     NOTE* n;
     u32 i;
@@ -661,3 +664,4 @@ static void ResetNotes(SEQ_INSTANCE* seq) {
         seq->noteKeyOff = NULL;
     }
 }
+#endif

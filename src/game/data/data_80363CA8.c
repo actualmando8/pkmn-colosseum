@@ -4,6 +4,7 @@
 
 #if !defined(DATA_80363CA8_ISOLATED)
 #define DATA_80363CA8_PREFIX
+#define DATA_80363CA8_SEQ_TABLE
 #define DATA_80363CA8_SYNTHMACROS_LEGACY
 #define DATA_80363CA8_SUFFIX
 #endif
@@ -4482,6 +4483,9 @@ u8 lbl_80368630[1024] = {
     0x00, 0x00, 0x00, 0x00,
 };
 
+#endif
+
+#if defined(DATA_80363CA8_SEQ_TABLE)
 void* jumptable_80368A30[20] = {
     (void*)((u8*)fn_801485FC + 0x4AC),
     (void*)((u8*)fn_801485FC + 0x4DC),
