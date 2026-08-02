@@ -1694,10 +1694,10 @@ asm void fn_8001D718(void) {
 #else
 void fn_8001D718(f32 target) {
     extern void _threadSwitch();
+    f32 divisor;
     f32 progress = lbl_8047B7C8;
 
     while (progress < target) {
-        f32 divisor;
         _threadSwitch();
         divisor = (f32)fn_800D37CC();
         progress += (f32)fn_800D3088() / divisor;
