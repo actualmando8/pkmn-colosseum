@@ -18441,8 +18441,8 @@ u32 fn_8022D6BC(u32 attacker, u32 defender)
             moveStatus13 != 0) {
             if (fn_800E0C54() % 3 == 0) {
                 u32 value = 0x42;
-                lbl_8047B618 = lbl_8047B618 | 0x2000;
                 lbl_80478D78[3] = value;
+                lbl_8047B618 = lbl_8047B618 | 0x2000;
                 value = 0;
                 fn_80211B94(lbl_8047B62C, lbl_8037992F, value);
                 result = 1;
@@ -18456,8 +18456,8 @@ u32 fn_8022D6BC(u32 attacker, u32 defender)
             moveStatus13 != 0) {
             if (fn_800E0C54() % 3 == 0) {
                 u32 value = 0x45;
-                lbl_8047B618 = lbl_8047B618 | 0x2000;
                 lbl_80478D78[3] = value;
+                lbl_8047B618 = lbl_8047B618 | 0x2000;
                 value = 0;
                 fn_80211B94(lbl_8047B62C, lbl_8037992F, value);
                 result = 1;
@@ -18471,8 +18471,8 @@ u32 fn_8022D6BC(u32 attacker, u32 defender)
             (status11C != 0 || status11E != 0)) {
             if (fn_800E0C54() % 3 == 0) {
                 u32 value = 0x43;
-                lbl_8047B618 = lbl_8047B618 | 0x2000;
                 lbl_80478D78[3] = value;
+                lbl_8047B618 = lbl_8047B618 | 0x2000;
                 value = 0;
                 fn_80211B94(lbl_8047B62C, lbl_8037992F, value);
                 result = 1;
