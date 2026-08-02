@@ -133,49 +133,68 @@ void GSscratchFree(void *ptr)
 void *GSscratchAlloc(u8 blockCount,
                      void (*callback)(BOOL valid, void *ptr, u8 blockCount))
 {
-    GSscratchAllocation *allocation;
-    u32 usedMask;
     u32 scanMask;
     u32 occupied;
-    u8 firstBlock;
+    u8 shiftCount;
     u8 remaining;
+    u32 usedMask;
+    u8 firstBlock;
+    GSscratchAllocation *allocation;
 
-    if (lbl_8047ABE8 == 1 || blockCount == 0 || blockCount > 32) {
+    if (lbl_8047ABE8 == 1) {
+        return NULL;
+    }
+    if (blockCount == 0 || blockCount > 32) {
         return NULL;
     }
 
+    usedMask = lbl_8047ABEC;
     for (firstBlock = 0; firstBlock < 32; firstBlock++) {
-        scanMask = 0x80000000 >> firstBlock;
-        occupied = 0;
         remaining = blockCount;
+        shiftCount = firstBlock;
+        occupied = 0;
+        scanMask = 0x80000000;
+        while (shiftCount-- != 0) {
+            scanMask >>= 1;
+        }
         while (remaining-- != 0) {
             occupied <<= 1;
-            if (scanMask == 0 || (lbl_8047ABEC & scanMask) != 0) {
+            if (scanMask != 0) {
+                if ((usedMask & scanMask) != 0) {
+                    occupied |= 1;
+                }
+                scanMask >>= 1;
+            } else {
                 occupied |= 1;
             }
-            scanMask >>= 1;
         }
-        if (occupied != 0) {
-            continue;
-        }
+        if (occupied == 0) {
+            if ((allocation = GSscratchFindFreeAllocation()) == NULL) {
+                return NULL;
+            }
 
-        allocation = GSscratchFindFreeAllocation();
-        if (allocation == NULL) {
-            return NULL;
-        }
+            {
+                u32 allocationMask;
+                u8 allocationShift;
 
-        allocation->firstBlock = firstBlock;
-        allocation->blockCount = blockCount;
-        allocation->callback = callback;
-        usedMask = lbl_8047ABEC;
-        scanMask = 0x80000000 >> firstBlock;
-        remaining = blockCount;
-        while (remaining-- != 0) {
-            usedMask |= scanMask;
-            scanMask >>= 1;
+                allocation->firstBlock = firstBlock;
+                allocationShift = firstBlock;
+                allocationMask = 0x80000000;
+                allocation->blockCount = blockCount;
+                allocation->callback = callback;
+                while (allocationShift-- != 0) {
+                    allocationMask >>= 1;
+                }
+                usedMask = lbl_8047ABEC;
+                remaining = blockCount;
+                while (remaining-- != 0) {
+                    usedMask |= allocationMask;
+                    allocationMask >>= 1;
+                }
+                lbl_8047ABEC = usedMask;
+                return lbl_8047ABE0 + allocation->firstBlock * 0x200;
+            }
         }
-        lbl_8047ABEC = usedMask;
-        return lbl_8047ABE0 + firstBlock * 0x200;
     }
     return NULL;
 }
