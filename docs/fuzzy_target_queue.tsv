@@ -185,7 +185,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 1136.0	1136	0.0	fn_8003C2B8	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.04553
 1132.0	1136	0.35	fn_800232F0	main/game/gs_title_candidate_800232F0	src/game/gs_title_candidate_800232F0.c	0.04537
 1128.0	1128	0.0	fn_80038A0C	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.04521
-1127.4	1532	26.41	fightTrainerAiWazaValueJibaku	main/game/fight_trainer_ai_waza_value_candidate_8024BFC0	src/game/fight_trainer_ai_waza_value_candidate_8024BFC0.c	0.04518
 1124.0	1124	0.0	psDispSubPointTrail	main/game/ps_candidate_8016AB94	src/game/ps_candidate_8016AB94.c	0.04505
 1120.0	1120	0.0	get_shape_vertex_xyz	main/hsd/hsd_pobj_range_801AA608	src/hsd/hsd_pobj_range_801AA608.c	0.04489
 1120.0	1120	0.0	get_shape_normal_xyz	main/hsd/hsd_pobj_range_801AA608	src/hsd/hsd_pobj_range_801AA608.c	0.04489
@@ -194,7 +193,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 1118.5	1600	30.09	fightTrainerAiWazaValueKoraeru	main/game/fight_trainer_ai_waza_value_middle	src/game/fight_trainer_ai_waza_value_middle.c	0.04483
 1117.7	1364	18.06	fn_8019F1C4	main/hsd/hsd_jobj	src/hsd/hsd_jobj.c	0.0448
 1115.4	1348	17.26	JObjReleaseChild	main/hsd/hsd_jobj	src/hsd/hsd_jobj.c	0.0447
-1113.2	1488	25.19	fightTrainerAiWazaValueJisin	main/game/fight_trainer_ai_waza_value_candidate_8024B474	src/game/fight_trainer_ai_waza_value_candidate_8024B474.c	0.04462
 1107.0	2320	52.28	fn_800D892C	main/game/gs_gfx_layer_candidate_800D892C	src/game/gs_gfx_layer_candidate_800D892C.c	0.04437
 1104.0	1104	0.0	_menuCBBattleStartSetIndex__Fv	main/game/menu/menuCB_BattleStart	src/game/menu/menuCB_BattleStart.c	0.04425
 1100.0	1104	0.36	fn_801874BC	main/game/people/people	src/game/people/people.c	0.04409
@@ -407,7 +405,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 732.0	736	0.54	fn_801B0BD8	main/hsd/hsd_shadow_candidate_801B06DC	src/hsd/hsd_shadow_candidate_801B06DC.c	0.02934
 732.0	732	0.0	fn_8015AD1C	main/musyx/musyx_candidate_8015AD1C	src/musyx/musyx_candidate_8015AD1C.c	0.02934
 732.0	732	0.0	fn_80072D58	main/game/menu/menu_range_8007109C	src/game/menu/menu_range_8007109C.c	0.02934
-731.2	1096	33.29	fightTrainerAiWazaValueJikoanji	main/game/fight_trainer_ai_waza_value_prefix	src/game/fight_trainer_ai_waza_value_prefix.c	0.02931
 728.0	728	0.0	fn_8008F91C	main/game/gbaCommunication_prefix	src/game/gbaCommunication_prefix.c	0.02918
 728.0	728	0.0	fn_80079C1C	main/game/menu/menu_range_8007109C	src/game/menu/menu_range_8007109C.c	0.02918
 728.0	728	0.0	fn_800730F8	main/game/menu/menu_range_8007109C	src/game/menu/menu_range_8007109C.c	0.02918
@@ -584,7 +581,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 552.0	552	0.0	fn_800772AC	main/game/menu/menu_range_8007109C	src/game/menu/menu_range_8007109C.c	0.02212
 552.0	552	0.0	SelectThread	main/dolphin/os/OSThread		0.02212
 550.6	1224	55.01	fn_80018A68	main/game/menuPokemon	src/game/menuPokemon.c	0.02207
-548.8	792	30.71	fightTrainerAiWazaValueSunaarasi	main/game/fight_trainer_ai_waza_value_middle_suffix_8024498C	src/game/fight_trainer_ai_waza_value_middle_suffix_8024498C.c	0.022
 548.0	552	0.72	GScolsys2ThruGetEventID	main/game/GScolsys2Thru_range_80110084	src/game/GScolsys2Thru_range_80110084.c	0.02196
 548.0	548	0.0	psRemoveParticle	main/game/ps_candidate_801698F8	src/game/ps_candidate_801698F8.c	0.02196
 548.0	548	0.0	pokemonEvolutionCreateAddPokemon	main/game/pokemon_range_8012640C	src/game/pokemon_range_8012640C.c	0.02196
@@ -684,7 +680,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 484.0	484	0.0	fn_801CF7E4	main/game/field_candidate_801CBA90	src/game/field_candidate_801CBA90.c	0.0194
 484.0	484	0.0	fn_80037F40	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.0194
 484.0	484	0.0	__AI_SRC_INIT	main/dolphin/sdk_range_800AC6D4	src/dolphin/sdk_range_800AC6D4.c	0.0194
-481.0	696	30.9	fightTrainerAiWazaValueKogoerukaze	main/game/fight_trainer_ai_waza_value	src/game/fight_trainer_ai_waza_value.c	0.01928
 480.3	748	35.79	fn_801634A8	main/musyx/musyx_candidate_801634A8	src/musyx/musyx_candidate_801634A8.c	0.01925
 480.0	484	0.83	fn_8011207C	main/game/GScolsys2Sun_range_80111C24	src/game/GScolsys2Sun_range_80111C24.c	0.01924
 480.0	480	0.0	fn_800638F4	main/game/menu/menuCB_range_80062948	src/game/menu/menuCB_range_80062948.c	0.01924
@@ -816,7 +811,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 415.6	492	15.54	menuFightOpenWaza	main/game/menuFight	src/game/menuFight.c	0.01666
 415.4	3704	88.78	HSD_LObjSetup	main/hsd/hsd_lobj	src/hsd/hsd_lobj.c	0.01665
 415.0	636	34.75	fn_800889E4	main/game/gba/gba_conv	src/game/gba/gba_conv.c	0.01663
-414.1	600	30.99	fightTrainerAiWazaValueNihonbare	main/game/fight_trainer_ai_waza_value_middle_suffix_8024498C	src/game/fight_trainer_ai_waza_value_middle_suffix_8024498C.c	0.0166
 412.7	1148	64.05	fn_800788BC	main/game/menu/menu_range_8007109C	src/game/menu/menu_range_8007109C.c	0.01654
 412.0	412	0.0	fn_8010A420	main/game/gs_range_80109C88	src/game/gs_range_80109C88.c	0.01651
 412.0	412	0.0	fn_8009D510	main/dolphin/sdk_range_8009BD84	src/dolphin/sdk_range_8009BD84.c	0.01651
@@ -853,7 +847,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 392.0	392	0.0	fn_801BD8D0	main/hsd/hsd_tobj_candidate_801BBDDC	src/hsd/hsd_tobj_candidate_801BBDDC.c	0.01571
 392.0	392	0.0	fn_8003F2DC	main/game/menu/pda_range_80037158	src/game/menu/pda_range_80037158.c	0.01571
 392.0	392	0.0	HSD_MkRotationMtx	main/hsd/hsd_mobj_range_801A86B4	src/hsd/hsd_mobj_range_801A86B4.c	0.01571
-390.1	572	31.8	fightTrainerAiWazaValueKanarazuSubayasaDaun	main/game/fight_trainer_ai_waza_value	src/game/fight_trainer_ai_waza_value.c	0.01563
 389.4	1540	74.71	fn_80058150	main/game/menu/menuColosseumBattle_prefix	src/game/menu/menuColosseumBattle_prefix.c	0.01561
 388.8	1140	65.9	menuFightButtonSecretWazaTop	main/game/menuFight	src/game/menuFight.c	0.01558
 388.0	424	8.48	fn_8013CA48	main/game/effect/effect_visual_candidate_8013C670	src/game/effect/effect_visual_candidate_8013C670.c	0.01555
