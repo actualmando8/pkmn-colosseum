@@ -3947,12 +3947,14 @@ asm void aramGetStreamBufferAddress(void) {
 #include "src/game/people/people_field_fn_80163DB0.inc"
 }
 #else
+#if !defined(MUSYX_ARAM_GET_STREAM_BUFFER_ADDRESS_DECL_ONLY)
 u32 aramGetStreamBufferAddress(u32 idx, u32 *out) {
     if (out != 0) {
         *out = lbl_80450098[(u8)idx].f8;
     }
     return lbl_80450098[(u8)idx].f4;
 }
+#endif
 #endif
 #pragma pop
 #pragma push
