@@ -2977,6 +2977,23 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
+                    case 0xED: {
+                        u8 count;
+
+                        stream = getFloat(stream, &scratch[0]);
+                        stream = getFloat(stream, &scratch[1]);
+                        count = *stream++;
+                        if (count != 0) {
+                            scratch[0] += scratch[1] *
+                                (s32)((count + 1) * fn_801ADC7C()) / count;
+                        } else {
+                            scratch[0] += scratch[1] * fn_801ADC7C();
+                        }
+                        pp->headingSpeed += scratch[0];
+                        pp->heading += scratch[0];
+                        break;
+                    }
+
                     /* ---- 0xF1: SPAWN_GENERATOR via table (verified @ 0x80170364) ---- */
                     case 0xF1: {
                         PSParticle* gen;
@@ -3003,7 +3020,7 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
-                    case 0xF4: {
+                    case 0xF3: {
                         u8 reverse = *stream++;
 
                         stream = getFloat(stream, &pp->headingSpeed);
@@ -3027,26 +3044,27 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
-                    case 0xFB:
+                    case 0xFA:
                         pp->loopCounter = *stream++;
                         pp->loopPC = (u16)(stream - (u8*)pp->scriptData);
                         break;
 
-                    case 0xFC:
+                    case 0xFB:
                         pp->loopCounter--;
                         if (pp->loopCounter != 0) {
                             stream = (u8*)pp->scriptData + pp->loopPC;
                         }
                         break;
 
-                    case 0xFD:
+                    case 0xFC:
                         pp->savedPC = (u16)(stream - (u8*)pp->scriptData);
                         break;
 
-                    case 0xFE:
+                    case 0xFD:
                         stream = (u8*)pp->scriptData + pp->savedPC;
                         break;
 
+                    case 0xFE:
                     case 0xFF:
                         pp->repeatCount = 1;
                         goto end_commands;
