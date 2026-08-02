@@ -630,19 +630,20 @@ HSD_ClassInfo* fn_80193748(const char* class_name)
     return NULL;
 }
 
-BOOL fn_80193788(HSD_ClassInfo* info, HSD_ClassInfo* p)
+BOOL fn_80193788(void* info, void* p)
 {
     HSD_ClassInfo* c;
     HSD_ClassInfo* parent;
 
-    if (info == NULL || p == NULL) {
+    c = (HSD_ClassInfo*)p;
+    if (info == NULL || c == NULL) {
         return FALSE;
     }
 
-    c = (HSD_ClassInfo*) info;
-    parent = (HSD_ClassInfo*) p;
+    parent = c;
+    c = (HSD_ClassInfo*)info;
 
-    if (!(c->head.flags & 1)) {
+    if (!(((HSD_ClassInfo*)info)->head.flags & 1)) {
         c->head.info_init();
     }
     if (!(parent->head.flags & 1)) {
