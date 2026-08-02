@@ -255,6 +255,7 @@ u32 fn_80080310(void* output, const u8* packed, void* auxiliary)
     bitPosition = 0;
     switch (*(s32*)output) {
     case 0:
+    case 72:
         for (descriptorIndex = 0; descriptorIndex < 40;
              descriptorIndex++) {
             DECODE_ONE((const u32*)lbl_80268DC0 + descriptorIndex * 3,
@@ -464,6 +465,167 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
             }
         }
         return 0;
+    case 47:
+        record = object + 0x3AC + index * 0x28;
+        record[0x24] = (u8)value;
+        for (i = 0; i < 0x24; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0x6B0))[i] == (u8)value) {
+                return 1;
+            }
+        }
+        return 0;
+    case 48:
+        record = object + index * 0x2A;
+        *(u16*)(record + 0x514) = (u16)value;
+        for (i = 0; i < 0x183; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0x6F0))[i] == (u8)value) {
+                return 1;
+            }
+        }
+        return 0;
+    case 49:
+        record = object + index * 0x2A;
+        record[0x516] = (u8)value;
+        for (i = 0; i < 0x1E; i++) {
+            if ((lbl_80268DC0 + 0x9F8)[i] == (u8)value) {
+                return 1;
+            }
+        }
+        return 0;
+    case 50:
+        record = object + index * 0x2A;
+        record[0x517] = (u8)value;
+        return 1;
+    case 51:
+        record = object + index * 0x2A;
+        half = (u16)value;
+        *(u16*)(record + 0x518 + subindex * 2) = half;
+        for (i = 0; i < 0x163; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0xA18))[i] == (u8)value) {
+                return 1;
+            }
+        }
+        return 0;
+    case 52:
+        record = object + index * 0x2A;
+        half = (u16)value;
+        *(u16*)(record + 0x520) = half;
+        for (i = 0; i < 0x2F; i++) {
+            if (((const u16*)(lbl_80268DC0 + 0x384))[i] == half) {
+                return 1;
+            }
+        }
+        return 0;
+    case 53:
+        record = object + index * 0x2A;
+        record[0x522] = (value >= 0 && value < 2) ? (s8)value : -1;
+        return 1;
+    case 54:
+        record = object + index * 0x2A;
+        record[0x523] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
+        return 1;
+    case 55:
+        record = object + index * 0x2A;
+        record[0x524] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
+        return 1;
+    case 56:
+        record = object + index * 0x2A;
+        record[0x525] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
+        return 1;
+    case 57:
+        record = object + index * 0x2A;
+        record[0x526] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
+        return 1;
+    case 58:
+        record = object + index * 0x2A;
+        record[0x527] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
+        return 1;
+    case 59:
+        record = object + index * 0x2A;
+        record[0x528] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
+        return 1;
+    case 60:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x52A) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 61:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x52C) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 62:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x52E) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 63:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x530) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 64:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x532) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 65:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x534) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 66:
+        record = object + index * 0x2A;
+        *(s16*)(record + 0x536) =
+            (value >= 0 && value <= 0xFF) ? (s16)value : -1;
+        return 1;
+    case 67:
+        record = object + index * 0x2A;
+        if (value == 2) {
+            record[0x538] = 1;
+        } else if (value == 3) {
+            record[0x538] = 2;
+        } else {
+            record[0x538] = 0;
+        }
+        return 1;
+    case 68:
+        record = object + index * 0x2A;
+        record[0x539] = (value & 0x20) ? -1 : (s8)(value - 1);
+        for (i = 0; i < 0x1A; i++) {
+            if (((const s8*)(lbl_80268DC0 + 0xCE0))[i] ==
+                (s8)record[0x539]) {
+                return 1;
+            }
+        }
+        return 0;
+    case 69:
+        record = object + index * 0x2A;
+        record[0x53A] = (u8)value;
+        return record[0x53A] < 4;
+    case 70:
+        record = object + index * 0x2A;
+        record[0x53B] = (u8)value;
+        if (record[0x53B] < 5) {
+            return 1;
+        }
+        record[0x53B] = 0;
+        return 0;
+    case 71:
+        record = object + index * 0x2A;
+        record[0x53C] = (u8)value;
+        return 1;
+    case 73:
+        *(u32*)(object + 0xAFC) = (u32)value;
+        for (i = 0; i < 0x2B; i++) {
+            if (((const u32*)(lbl_80268DC0 + 0xCFC))[i] == (u32)value) {
+                return 1;
+            }
+        }
+        return 0;
+    case 74:
+        GScharCpy(object + 0xB00, text);
+        return 1;
     default:
         return 0;
     }
