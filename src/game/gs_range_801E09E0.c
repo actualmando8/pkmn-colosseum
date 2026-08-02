@@ -58,16 +58,15 @@ extern void fn_8018805C(u32, u32, f32, f32);
 extern void peopleMoveCheck(u32, u32, u32);
 extern void fn_8018BDF4(u32, u32, void*);
 
-static inline void etctoolWait(f32 duration)
-{
-    f32 elapsed;
-
-    elapsed = lbl_8047E3F4;
-    while (elapsed < duration) {
-        elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
-        _threadSwitch();
-    }
-}
+#define ETCTOOL_WAIT(duration)                                             \
+    do {                                                                   \
+        f32 elapsed = lbl_8047E3F4;                                        \
+        f32 limit = (duration);                                            \
+        while (elapsed < limit) {                                          \
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();            \
+            _threadSwitch();                                               \
+        }                                                                  \
+    } while (0)
 
 void fn_801E09E0(void)
 {
@@ -106,7 +105,7 @@ void fn_801E09E0(void)
             fn_80185EE8(0x4D, 1, 1, position.x, position.y, position.z);
             peopleMoveCheck(0x4D, 1, 1);
             floorEventCtrlDoor(resource, 0x2C, 0);
-            etctoolWait(lbl_8047E418);
+            ETCTOOL_WAIT(lbl_8047E418);
             state = 1;
             break;
 
@@ -115,7 +114,7 @@ void fn_801E09E0(void)
             fn_80185EE8(0x4D, 1, 1, position.x, position.y, position.z);
             peopleMoveCheck(0x4D, 1, 1);
             floorEventCtrlDoor(resource, 0x2C, 2);
-            etctoolWait(lbl_8047E3F0);
+            ETCTOOL_WAIT(lbl_8047E3F0);
 
             fn_80185EE8(0x4D, 1, 1, position.x, position.y,
                         position.z + lbl_8047E410);
@@ -126,14 +125,14 @@ void fn_801E09E0(void)
             fn_80185EE8(0x4D, 1, 1, position.x, position.y, position.z);
             peopleMoveCheck(0x4D, 1, 1);
             floorEventCtrlDoor(resource, 0x2C, 2);
-            etctoolWait(lbl_8047E41C);
+            ETCTOOL_WAIT(lbl_8047E41C);
 
             fn_80185EE8(0x4D, 1, 1, savedPosition.x, savedPosition.y,
                         savedPosition.z);
             peopleMoveCheck(0x4D, 1, 1);
             fn_8018805C(0x4D, 1, lbl_8047E3F4, lbl_8047E410);
             state = 10;
-            etctoolWait(lbl_8047E420);
+            ETCTOOL_WAIT(lbl_8047E420);
             break;
 
         case 10:
@@ -170,7 +169,7 @@ void fn_801E09E0(void)
             break;
 
         case 2:
-            etctoolWait(lbl_8047E414);
+            ETCTOOL_WAIT(lbl_8047E414);
             state = 100;
             break;
 
