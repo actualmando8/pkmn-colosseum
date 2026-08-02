@@ -1181,7 +1181,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 272.0	272	0.0	fn_8017BB80	main/game/fsys/fsys_file_candidate_8017B1CC	src/game/fsys/fsys_file_candidate_8017B1CC.c	0.0109
 272.0	272	0.0	fn_80071208	main/game/menu/menu_range_8007109C	src/game/menu/menu_range_8007109C.c	0.0109
 272.0	272	0.0	_modelParseSetupInstanceMtx__FP5GSmtxP9_HSD_JObjP5GSmtx	main/game/gs_model_parse_candidate_800EA6D4	src/game/gs_model_parse_candidate_800EA6D4.c	0.0109
-272.0	272	0.0	_fightInitialize__FUi14FloorEnterMode	main/game/battle/battle_main_candidate_801EF4B0	src/game/battle/battle_main_candidate_801EF4B0.c	0.0109
 272.0	272	0.0	Read	main/dolphin/dvd/DVDLow		0.0109
 272.0	272	0.0	HandlePositionFileSupportRequest	main/trk/TRKDispatch_range_800C0504		0.0109
 271.3	972	72.09	fn_8001329C	main/game/gs_event_exec	src/game/gs_event_exec.c	0.01087
@@ -1642,7 +1641,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 64.8	84	22.86	PSVECDistance	main/dolphin/sdk_candidate_800A3A78	src/dolphin/sdk_candidate_800A3A78.c	0.0026
 64.2	1352	95.25	fn_80053ED8	main/game/menu/menuCB_range_8005344C	src/game/menu/menuCB_range_8005344C.c	0.00257
 64.0	80	20.0	GXLoadNrmMtxImm	main/dolphin/sdk_candidate_800BD454	src/dolphin/sdk_candidate_800BD454.c	0.00257
-64.0	64	0.0	strncmp	main/crt/string_range_800CA78C		0.00257
 64.0	64	0.0	fn_80167B70	main/game/gs_dvd_candidate_80167040	src/game/gs_dvd_candidate_80167040.c	0.00257
 64.0	64	0.0	fn_800EE288	main/game/gs_part	src/game/gs_part.c	0.00257
 64.0	64	0.0	OSEnableScheduler	main/dolphin/os/OSThread		0.00257
@@ -1715,7 +1713,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 48.4	260	81.38	fn_800AAE34	main/dolphin/pad/PAD	src/dolphin/pad/PAD.c	0.00194
 48.0	84	42.86	PSMTXMultVecSR	main/dolphin/sdk_range_800A37CC	src/dolphin/sdk_range_800A37CC.c	0.00192
 48.0	84	42.86	PSMTXMultVec	main/dolphin/sdk_range_800A37CC	src/dolphin/sdk_range_800A37CC.c	0.00192
-48.0	48	0.0	strchr	main/crt/string_range_800CA78C		0.00192
 48.0	48	0.0	fn_8016821C	main/game/gs_dvd_candidate_80167FA8	src/game/gs_dvd_candidate_80167FA8.c	0.00192
 48.0	48	0.0	fn_80167EF8	main/game/gs_dvd_candidate_80167E64	src/game/gs_dvd_candidate_80167E64.c	0.00192
 48.0	48	0.0	fn_80167A6C	main/game/gs_dvd_candidate_80167040	src/game/gs_dvd_candidate_80167040.c	0.00192
@@ -1736,9 +1733,7 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 44.6	440	89.87	fn_800D1D00	main/game/gs_render_util	src/game/gs_render_util.c	0.00179
 44.6	100	55.36	_threadSwitch	main/game/gs_thread	src/game/gs_thread.c	0.00179
 44.2	116	61.93	__GBATransfer	main/game/gba/GBAXfer	src/game/gba/GBAXfer.c	0.00177
-44.0	44	0.0	memchr	main/crt/mem_range_800C811C		0.00176
 44.0	44	0.0	_toolentryAlloc__FUl	main/game/gs_mem	src/game/gs_mem.c	0.00176
-44.0	44	0.0	__memrchr	main/crt/mem_range_800C811C		0.00176
 44.0	44	0.0	DVDLowWaitCoverClose	main/dolphin/dvd/DVDLow		0.00176
 43.8	240	81.75	TRKReadBuffer_ui32	main/trk/TRKNub_candidate_800BE844	src/trk/TRKNub_candidate_800BE844.c	0.00176
 43.6	2020	97.84	fn_802317E4	main/game/fight_range_80230568	src/game/fight_range_80230568.c	0.00175
@@ -1824,7 +1819,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 30.3	232	86.93	fn_8006ACCC	main/game/menu/menu_middle_range_8006ACCC	src/game/menu/menu_middle_range_8006ACCC.c	0.00121
 30.2	144	79.03	fn_800BD7A0	main/dolphin/sdk_candidate_800BD7A0	src/dolphin/sdk_candidate_800BD7A0.c	0.00121
 30.0	388	92.27	fn_800F67C8	main/game/gs_thread_candidate_800F0424	src/game/gs_thread_candidate_800F0424.c	0.0012
-29.8	276	89.2	fn_801653CC	main/game/gs_range_801653CC_prefix	src/game/gs_range_801653CC_prefix.c	0.00119
 29.3	312	90.62	HSD_MObjCompileTev	main/hsd/hsd_mobj_candidate_801A6FF0	src/hsd/hsd_mobj_candidate_801A6FF0.c	0.00117
 29.2	344	91.5	fn_8021CA00	main/game/fight_range_8021CA00	src/game/fight_range_8021CA00.c	0.00117
 29.0	164	82.29	menuFightDrawSecretSelect	main/game/menuFight	src/game/menuFight.c	0.00116
@@ -2074,7 +2068,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 8.6	316	97.28	fn_8018CA20	main/game/people/people	src/game/people/people.c	0.00034
 8.6	236	96.36	fn_801CB61C	main/game/field_candidate_801CB61C	src/game/field_candidate_801CB61C.c	0.00034
 8.6	160	94.62	fn_80193788	main/hsd/hsd_range_801920E4	src/hsd/hsd_range_801920E4.c	0.00034
-8.6	36	76.11	HSD_MObjSetAlpha	main/hsd/hsd_mobj_candidate_801A6DDC	src/hsd/hsd_mobj_candidate_801A6DDC.c	0.00034
 8.5	164	94.83	dbgMenuColisionDisp	main/game/dbgMenu	src/game/dbgMenu.c	0.00034
 8.5	128	93.38	fn_8006AF44	main/game/menu/menu_middle_range_8006AF44	src/game/menu/menu_middle_range_8006AF44.c	0.00034
 8.5	88	90.36	fn_8000682C	main/game/gs_task_residual_80006724	src/game/gs_task_residual_80006724.c	0.00034
@@ -2191,7 +2184,6 @@ headroom_bytes	size	fuzzy_pct	function	unit	source_path	pp_value
 4.4	68	93.53	HSD_MObjAddTObjNext	main/hsd/hsd_mobj_candidate_801A6CA4	src/hsd/hsd_mobj_candidate_801A6CA4.c	0.00018
 4.2	804	99.48	fn_80220868	main/game/fight_range_80220868	src/game/fight_range_80220868.c	0.00017
 4.2	260	98.38	_fightFloorGetFightTrainerFightPokemonPtrArySub__FPvUsPv	main/game/fight_floor_candidate_801F1B14	src/game/fight_floor_candidate_801F1B14.c	0.00017
-4.2	212	98.02	battleGridAddPokemon	main/game/battle/battle_grid_residual_801C3E3C	src/game/battle/battle_grid_residual_801C3E3C.c	0.00017
 4.2	112	96.25	fn_80165FDC	main/game/gs_range_801653CC_candidate_80165FDC	src/game/gs_range_801653CC_candidate_80165FDC.c	0.00017
 4.2	112	96.25	fadeEffectHookFunction_yoko_or_tate_or_ball_Init	main/game/effect/fade_effect_candidate_801C4814	src/game/effect/fade_effect_candidate_801C4814.c	0.00017
 4.2	72	94.17	GSmodelSetShadowTextureSize	main/game/gs_model_shadow_candidate_800E8F80	src/game/gs_model_shadow_candidate_800E8F80.c	0.00017

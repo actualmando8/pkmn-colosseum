@@ -506,7 +506,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/mem_range_800C811C.c",
                 mw_version="GC/2.0",
                 progress_category="runtime",
@@ -518,7 +518,7 @@ config.libs = [
                 progress_category="runtime",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "crt/string_range_800CA78C.c",
                 mw_version="GC/1.3",
                 progress_category="runtime",
@@ -4320,8 +4320,8 @@ config.libs = [
                 progress_category="sdk",
             ),
             Object(
-                CodeCandidate,
-                "dolphin/sdk_candidate_800CED58.c",
+                Matching,
+                "dolphin/sdk_residual_800CED58.c",
                 mw_version="GC/1.2.5n",
                 progress_category="sdk",
             ),
@@ -4642,7 +4642,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/gs_range_801653CC_prefix.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -7136,8 +7136,8 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
-                "game/battle/battle_main_candidate_801EF4B0.c",
+                Matching,
+                "game/battle/battle_main_residual_801EF4B0.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O4,s", "-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
                 progress_category="game",
@@ -7356,7 +7356,7 @@ config.libs = [
                 progress_category="game",
             ),
             Object(
-                CodeCandidate,
+                Matching,
                 "game/battle/battle_grid_residual_801C3E3C.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-use_lmw_stmw on", "-sdata 8", "-sdata2 8"],
@@ -10215,8 +10215,8 @@ config.libs = [
                 progress_category="hsd",
             ),
             Object(
-                CodeCandidate,
-                "hsd/hsd_mobj_candidate_801A6DDC.c",
+                Matching,
+                "hsd/hsd_mobj_residual_801A6DDC.c",
                 mw_version="GC/1.3",
                 extra_cflags=["-O1"],
                 progress_category="hsd",
