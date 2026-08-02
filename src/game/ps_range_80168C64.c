@@ -89,6 +89,8 @@ extern f32 lbl_8047D634; /* 3.0f */
 extern f32 lbl_8047D638; /* 1.0f */
 extern f32 lbl_8047D63C; /* 0.5f */
 extern f32 lbl_8047D640; /* 2.0f */
+extern f32 lbl_8047D644;
+extern f32 lbl_8047D648; /* 0.5f */
 extern f64 lbl_8047D660; /* int->float bias (0x4330000000000000) */
 extern f64 lbl_8047D668; /* signed int->float bias */
 extern f32 lbl_8047D690; /* 255.0f */
@@ -2656,8 +2658,327 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         break;
                     }
 
-                    /* ---- 0xF0: SPAWN_GENERATOR via table (verified @ 0x80170364) ---- */
-                    case 0xF0: {
+                    case 0xBD: {
+                        f32 magnitude;
+
+                        stream = getFloat(stream, &scratch[0]);
+                        stream = getFloat(stream, &scratch[1]);
+                        if (pp->peopleObj != NULL &&
+                            (((PSGeneratorState*)pp->peopleObj)->generatorFlags &
+                             0x200) != 0) {
+                            f32 scale =
+                                (((PSGeneratorState*)pp->peopleObj)->generatorData[3] +
+                                 ((PSGeneratorState*)pp->peopleObj)->generatorData[4] +
+                                 ((PSGeneratorState*)pp->peopleObj)->generatorData[5]) /
+                                3.0f;
+                            scratch[0] *= scale;
+                            scratch[1] *= scale;
+                        }
+                        scratch[0] += scratch[1] * fn_801ADC7C();
+                        magnitude = sqrtf(pp->velocityX * pp->velocityX +
+                                          pp->velocityY * pp->velocityY +
+                                          pp->velocityZ * pp->velocityZ);
+                        if (magnitude > lbl_8047D644) {
+                            scratch[0] /= magnitude;
+                            pp->velocityX *= scratch[0];
+                            pp->velocityY *= scratch[0];
+                            pp->velocityZ *= scratch[0];
+                        }
+                        break;
+                    }
+
+                    case 0xBE:
+                        stream = getFloat(stream, &scratch[0]);
+                        pp->velocityX *= scratch[0];
+                        stream = getFloat(stream, &scratch[0]);
+                        pp->velocityY *= scratch[0];
+                        stream = getFloat(stream, &scratch[0]);
+                        pp->velocityZ *= scratch[0];
+                        break;
+
+                    case 0xBF:
+                        pp->flags |= (((*stream++ + pp->cameraSlot) & 7) << 12) |
+                                     0x8000;
+                        break;
+
+                    case 0xC0:
+                    case 0xC1:
+                    case 0xC2:
+                    case 0xC3:
+                    case 0xC4:
+                    case 0xC5:
+                    case 0xC6:
+                    case 0xC7:
+                    case 0xC8:
+                    case 0xC9:
+                    case 0xCA:
+                    case 0xCB:
+                    case 0xCC:
+                    case 0xCD:
+                    case 0xCE:
+                    case 0xCF: {
+                        if (pp->color1Timer != 0) {
+                            s32 scale = ((u32)pp->color1Countdown << 16) /
+                                        pp->color1Timer;
+                            pp->color1.r = (u8)(((pp->color1Target.r << 16) +
+                                scale * (pp->color1.r - pp->color1Target.r)) >> 16);
+                            pp->color1.g = (u8)(((pp->color1Target.g << 16) +
+                                scale * (pp->color1.g - pp->color1Target.g)) >> 16);
+                            pp->color1.b = (u8)(((pp->color1Target.b << 16) +
+                                scale * (pp->color1.b - pp->color1Target.b)) >> 16);
+                            pp->color1.a = (u8)(((pp->color1Target.a << 16) +
+                                scale * (pp->color1.a - pp->color1Target.a)) >> 16);
+                        }
+                        stream = getTime(stream, &pp->color1Timer);
+                        pp->color1Target = pp->color1;
+                        if (opcode & 1) {
+                            pp->color1Target.r = *stream++;
+                        }
+                        if (opcode & 2) {
+                            pp->color1Target.g = *stream++;
+                        }
+                        if (opcode & 4) {
+                            pp->color1Target.b = *stream++;
+                        }
+                        if (opcode & 8) {
+                            pp->color1Target.a = *stream++;
+                        }
+                        if (pp->color1Timer == 0) {
+                            pp->color1 = pp->color1Target;
+                            pp->color1Countdown = 0;
+                        } else {
+                            pp->color1Countdown = pp->color1Timer;
+                        }
+                        break;
+                    }
+
+                    case 0xD0:
+                    case 0xD1:
+                    case 0xD2:
+                    case 0xD3:
+                    case 0xD4:
+                    case 0xD5:
+                    case 0xD6:
+                    case 0xD7:
+                    case 0xD8:
+                    case 0xD9:
+                    case 0xDA:
+                    case 0xDB:
+                    case 0xDC:
+                    case 0xDD:
+                    case 0xDE:
+                    case 0xDF: {
+                        if (pp->color2Timer != 0) {
+                            s32 scale = ((u32)pp->color2Countdown << 16) /
+                                        pp->color2Timer;
+                            pp->color2.r = (u8)(((pp->color2Target.r << 16) +
+                                scale * (pp->color2.r - pp->color2Target.r)) >> 16);
+                            pp->color2.g = (u8)(((pp->color2Target.g << 16) +
+                                scale * (pp->color2.g - pp->color2Target.g)) >> 16);
+                            pp->color2.b = (u8)(((pp->color2Target.b << 16) +
+                                scale * (pp->color2.b - pp->color2Target.b)) >> 16);
+                            pp->color2.a = (u8)(((pp->color2Target.a << 16) +
+                                scale * (pp->color2.a - pp->color2Target.a)) >> 16);
+                        }
+                        stream = getTime(stream, &pp->color2Timer);
+                        pp->color2Target = pp->color2;
+                        if (opcode & 1) {
+                            pp->color2Target.r = *stream++;
+                        }
+                        if (opcode & 2) {
+                            pp->color2Target.g = *stream++;
+                        }
+                        if (opcode & 4) {
+                            pp->color2Target.b = *stream++;
+                        }
+                        if (opcode & 8) {
+                            pp->color2Target.a = *stream++;
+                        }
+                        if (pp->color2Timer == 0) {
+                            pp->color2 = pp->color2Target;
+                            pp->color2Countdown = 0;
+                        } else {
+                            pp->color2Countdown = pp->color2Timer;
+                        }
+                        break;
+                    }
+
+                    case 0xE0: {
+                        if (pp->color1Timer != 0) {
+                            s32 scale = ((u32)pp->color1Countdown << 16) /
+                                        pp->color1Timer;
+                            pp->color1.r = (u8)(((pp->color1Target.r << 16) +
+                                scale * (pp->color1.r - pp->color1Target.r)) >> 16);
+                            pp->color1.g = (u8)(((pp->color1Target.g << 16) +
+                                scale * (pp->color1.g - pp->color1Target.g)) >> 16);
+                            pp->color1.b = (u8)(((pp->color1Target.b << 16) +
+                                scale * (pp->color1.b - pp->color1Target.b)) >> 16);
+                            pp->color1.a = (u8)(((pp->color1Target.a << 16) +
+                                scale * (pp->color1.a - pp->color1Target.a)) >> 16);
+                        }
+                        if (pp->color2Timer != 0) {
+                            s32 scale = ((u32)pp->color2Countdown << 16) /
+                                        pp->color2Timer;
+                            pp->color2.r = (u8)(((pp->color2Target.r << 16) +
+                                scale * (pp->color2.r - pp->color2Target.r)) >> 16);
+                            pp->color2.g = (u8)(((pp->color2Target.g << 16) +
+                                scale * (pp->color2.g - pp->color2Target.g)) >> 16);
+                            pp->color2.b = (u8)(((pp->color2Target.b << 16) +
+                                scale * (pp->color2.b - pp->color2Target.b)) >> 16);
+                            pp->color2.a = (u8)(((pp->color2Target.a << 16) +
+                                scale * (pp->color2.a - pp->color2Target.a)) >> 16);
+                        }
+                        scratch[0] = (s8)stream[0] * 2 * fn_801ADC7C();
+                        pp->color1Target.r = U8ClampAdd(pp->color1Target.r,
+                                                       scratch[0]);
+                        pp->color2Target.r = U8ClampAdd(pp->color2Target.r,
+                                                       scratch[0]);
+                        scratch[0] = (s8)stream[1] * 2 * fn_801ADC7C();
+                        pp->color1Target.g = U8ClampAdd(pp->color1Target.g,
+                                                       scratch[0]);
+                        pp->color2Target.g = U8ClampAdd(pp->color2Target.g,
+                                                       scratch[0]);
+                        scratch[0] = (s8)stream[2] * 2 * fn_801ADC7C();
+                        pp->color1Target.b = U8ClampAdd(pp->color1Target.b,
+                                                       scratch[0]);
+                        pp->color2Target.b = U8ClampAdd(pp->color2Target.b,
+                                                       scratch[0]);
+                        scratch[0] = (s8)stream[3] * 2 * fn_801ADC7C();
+                        pp->color1Target.a = U8ClampAdd(pp->color1Target.a,
+                                                       scratch[0]);
+                        pp->color2Target.a = U8ClampAdd(pp->color2Target.a,
+                                                       scratch[0]);
+                        stream += 4;
+                        if (pp->color1Timer == 0) {
+                            pp->color1 = pp->color1Target;
+                        }
+                        pp->color1Countdown = pp->color1Timer;
+                        if (pp->color2Timer == 0) {
+                            pp->color2 = pp->color2Target;
+                        }
+                        pp->color2Countdown = pp->color2Timer;
+                        break;
+                    }
+
+                    case 0xE2:
+                        pp->flags |= 0x8;
+                        break;
+
+                    case 0xE3:
+                        pp->pad0B = *stream++;
+                        break;
+
+                    case 0xE4: {
+                        u8 mode = *stream++ & 3;
+
+                        if (mode == 0) {
+                            pp->flags &= ~0x40000;
+                        } else if (mode == 1) {
+                            pp->flags |= 0x40000;
+                        } else if (mode == 2) {
+                            pp->flags ^= 0x40000;
+                        } else if (fn_801ADC7C() < lbl_8047D648) {
+                            pp->flags &= ~0x40000;
+                        } else {
+                            pp->flags |= 0x40000;
+                        }
+                        break;
+                    }
+
+                    case 0xE5: {
+                        u8 mode = *stream++ & 3;
+
+                        if (mode == 0) {
+                            pp->flags &= ~0x80000;
+                        } else if (mode == 1) {
+                            pp->flags |= 0x80000;
+                        } else if (mode == 2) {
+                            pp->flags ^= 0x80000;
+                        } else if (fn_801ADC7C() < lbl_8047D648) {
+                            pp->flags &= ~0x80000;
+                        } else {
+                            pp->flags |= 0x80000;
+                        }
+                        break;
+                    }
+
+                    case 0xE6:
+                        pp->flags |= 0x200000;
+                        break;
+
+                    case 0xE7:
+                        pp->flags &= ~0x200000;
+                        break;
+
+                    case 0xE8:
+                        stream = getFloat(stream, &pp->alphaScale);
+                        if (pp->alphaScale < lbl_8047D630) {
+                            pp->flags &= ~0x100000;
+                        } else {
+                            pp->flags |= 0x100000;
+                        }
+                        break;
+
+                    case 0xEA: {
+                        u8 mask;
+
+                        if (pp->sizeXTimer != 0) {
+                            s32 scale = ((u32)pp->sizeXCountdown << 16) /
+                                        pp->sizeXTimer;
+                            pp->sizeXCurrent = (u8)(((pp->sizeXStart << 16) +
+                                scale * (pp->sizeXCurrent - pp->sizeXStart)) >> 16);
+                            pp->sizeYCurrent = (u8)(((pp->sizeYStart << 16) +
+                                scale * (pp->sizeYCurrent - pp->sizeYStart)) >> 16);
+                        }
+                        stream = getTime(stream, &pp->sizeXTimer);
+                        mask = *stream++;
+                        pp->sizeXStart = pp->sizeXCurrent;
+                        if (mask & 1) {
+                            pp->sizeXStart = *stream++;
+                        }
+                        if (mask & 8) {
+                            pp->sizeYStart = *stream++;
+                        }
+                        if (pp->sizeXTimer == 0) {
+                            pp->sizeXCurrent = pp->sizeXStart;
+                            pp->sizeXCountdown = 0;
+                        } else {
+                            pp->sizeXCountdown = pp->sizeXTimer;
+                        }
+                        break;
+                    }
+
+                    case 0xEB: {
+                        u8 mask;
+
+                        if (pp->sizeYTimer != 0) {
+                            s32 scale = ((u32)pp->sizeYCountdown << 16) /
+                                        pp->sizeYTimer;
+                            pp->sizeXTarget = (u8)(((pp->sizeXTargetFinal << 16) +
+                                scale * (pp->sizeXTarget - pp->sizeXTargetFinal)) >> 16);
+                            pp->sizeYTarget = (u8)(((pp->sizeYTargetFinal << 16) +
+                                scale * (pp->sizeYTarget - pp->sizeYTargetFinal)) >> 16);
+                        }
+                        stream = getTime(stream, &pp->sizeYTimer);
+                        mask = *stream++;
+                        pp->sizeXTargetFinal = pp->sizeXTarget;
+                        if (mask & 1) {
+                            pp->sizeXTargetFinal = *stream++;
+                        }
+                        if (mask & 8) {
+                            pp->sizeYTargetFinal = *stream++;
+                        }
+                        if (pp->sizeYTimer == 0) {
+                            pp->sizeXTarget = pp->sizeXTargetFinal;
+                            pp->sizeYCountdown = 0;
+                        } else {
+                            pp->sizeYCountdown = pp->sizeYTimer;
+                        }
+                        break;
+                    }
+
+                    /* ---- 0xF1: SPAWN_GENERATOR via table (verified @ 0x80170364) ---- */
+                    case 0xF1: {
                         PSParticle* gen;
                         u16 tblIdx = ((u16)stream[0] << 8) | stream[1];
                         u8 loopArg = stream[2];
