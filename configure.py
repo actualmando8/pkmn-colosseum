@@ -488,7 +488,7 @@ config.libs = [
                     + (
                         ["-use_lmw_stmw on"]
                         if path
-                        in ["crt/printf.c", "crt/printf_candidate_800C8864.c"]
+                        in ["crt/printf.c", "crt/printf_residual_800C8864.c"]
                         else []
                     ),
                     progress_category="runtime",
@@ -496,7 +496,7 @@ config.libs = [
                 for status, path in [
                     (CodeCandidate, "crt/printf.c"),
                     (Matching, "crt/printf_exact_800C87F8.c"),
-                    (CodeCandidate, "crt/printf_candidate_800C8864.c"),
+                    (Matching, "crt/printf_residual_800C8864.c"),
                 ]
             ],  # PR414_CRT_PRINTF
             Object(
@@ -11279,11 +11279,6 @@ config.libs = [
             ),
             Object(
                 DataCandidate,
-                "game/data/data_80313D9C.c",
-                progress_category="game",
-            ),
-            Object(
-                DataCandidate,
                 "game/data/data_80313F48.c",
                 progress_category="game",
             ),
@@ -11710,6 +11705,11 @@ config.libs = [
             Object(
                 Matching,
                 "game/data/sdata2_8047C3A0.c",
+                progress_category="game",
+            ),
+            Object(
+                Matching,
+                "game/data/sdata2_8047C418.c",
                 progress_category="game",
             ),
             Object(
