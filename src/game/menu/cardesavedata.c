@@ -303,122 +303,228 @@ u32 fn_80080310(void* output, const u8* packed, void* auxiliary)
 s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
                 s32 value, const char* text, s32 subindex)
 {
-    u8* object = (u8*)*object_ref;
+#define object (*(u8**)object_ref)
     u32 field = descriptor[0];
+    const u8* table = lbl_80268DC0;
     s32 i;
+    s32 j;
     u8* record;
     u16 half;
 
     switch (field) {
     case 0:
         *(s32*)object = value;
-        return value >= 0 && value < 2;
+        if (*(s32*)object < 0 || *(s32*)object >= 2) {
+            return 0;
+        }
+        break;
     case 1:
         object[4] = (u8)value;
-        return value > 0 && value < 6;
+        if (object[4] == 0 || object[4] >= 6) {
+            return 0;
+        }
+        break;
     case 2:
         object[5] = (u8)value;
-        return value > 0 && value < 4;
+        if (object[5] == 0 || object[5] >= 4) {
+            return 0;
+        }
+        break;
     case 3:
         object[6] = (u8)value;
-        return value > 0 && value < 10;
+        if (object[6] == 0 || object[6] >= 10) {
+            return 0;
+        }
+        break;
     case 4:
         object[7] = (u8)value;
-        return value >= 0 && value <= 12;
+        if (object[7] == 0) {
+            return 0;
+        }
+        break;
     case 5:
         object[8] = (u8)value;
-        return 1;
+        break;
     case 6:
         GScharCpy(object + 0x0A, text);
-        return 1;
+        break;
     case 7:
         object[0x24] = (s8)(value - 1);
-        return value >= 0 && value < 6;
+        if (value < 0 || value >= 6) {
+            return 0;
+        }
+        break;
     case 8:
         object[0x25] = (u8)value;
-        return 1;
+        break;
     case 9:
         object[0x26] = (s8)(value - 1);
-        return (s8)object[0x26] >= 0 && (s8)object[0x26] < 5;
+        if ((s8)object[0x26] < 0 || (s8)object[0x26] >= 5) {
+            return 0;
+        }
+        break;
     case 10:
         GScharCpy(object + 0x28, text);
-        return 1;
+        break;
     case 11:
         GScharCpy(object + 0x38, text);
-        return 1;
+        break;
     case 12:
         GScharCpy(object + 0x48, text);
-        return 1;
+        break;
     case 13:
         object[0x58] = (s8)value;
-        return value >= 1 && value <= 3;
+        if (value < 1 || value > 3) {
+            return 0;
+        }
+        break;
     case 14:
         object[0x59] = (s8)value;
-        return value >= 1 && value <= 6;
+        if (value < 1 || value > 6) {
+            return 0;
+        }
+        break;
     case 15:
         object[0x5A] = (s8)value;
-        return value >= 1 && value <= 5;
+        if (value < 1 || value > 5) {
+            return 0;
+        }
+        break;
     case 16:
+        object[0x5B] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 17:
+        object[0x5C] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 18:
+        object[0x5D] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 19:
+        object[0x5E] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 20:
+        object[0x5F] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 21:
+        object[0x60] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 22:
+        object[0x61] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 23:
+        object[0x62] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 24:
-        object[0x5B + field - 16] = (s8)(value - 1);
-        return value >= 0 && value <= 9;
+        object[0x63] = (s8)(value - 1);
+        if (value < 0 || value > 9) {
+            return 0;
+        }
+        break;
     case 25:
+        half = (u16)value;
+        *(u16*)(object + 0x64) = half;
+        for (i = 0; i < 0x2F; i++) {
+            for (j = 0; j < 7; j++) {
+                if (((const u16*)(table + 0x384))[i * 7 + j] == half) {
+                    return 1;
+                }
+            }
+        }
+        return 0;
     case 26:
+        half = (u16)value;
+        *(u16*)(object + 0x66) = half;
+        for (i = 0; i < 0x2F; i++) {
+            for (j = 0; j < 7; j++) {
+                if (((const u16*)(table + 0x384))[i * 7 + j] == half) {
+                    return 1;
+                }
+            }
+        }
+        return 0;
     case 27:
         half = (u16)value;
-        *(u16*)(object + 0x64 + (field - 25) * 2) = half;
+        *(u16*)(object + 0x68) = half;
         for (i = 0; i < 0x2F; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0x384))[i] == half) {
-                return 1;
+            for (j = 0; j < 7; j++) {
+                if (((const u16*)(table + 0x384))[i * 7 + j] == half) {
+                    return 1;
+                }
             }
         }
         return 0;
     case 28:
         object[0x6A] = (u8)value;
-        return value >= 0 && value <= 0x24;
+        if (value < 0 || value > 0x24) {
+            return 0;
+        }
+        break;
     case 29:
         object[0x6B] = (u8)value;
-        return value >= 0 && value <= 0x24;
+        if (value < 0 || value > 0x24) {
+            return 0;
+        }
+        break;
     case 30:
         object[0x6C] = (u8)value;
-        return value >= 0 && value <= 0x24;
+        if (value < 0 || value > 0x24) {
+            return 0;
+        }
+        break;
     case 31:
         GScharCpy(object + 0x6E, text);
-        return 1;
+        break;
     case 32:
         GScharCpy(object + 0x182, text);
-        return 1;
+        break;
     case 33:
         GScharCpy(object + 0x296, text);
-        return 1;
+        break;
     case 34:
         GScharCpy(object + 0xCA, text);
-        return 1;
+        break;
     case 35:
         GScharCpy(object + 0x1DE, text);
-        return 1;
+        break;
     case 36:
         GScharCpy(object + 0x2F2, text);
-        return 1;
+        break;
     case 37:
         GScharCpy(object + 0x126, text);
-        return 1;
+        break;
     case 38:
         GScharCpy(object + 0x23A, text);
-        return 1;
+        break;
     case 39:
         GScharCpy(object + 0x34E, text);
-        return 1;
+        break;
     case 40:
         GScharCpy(object + 0x3AC + index * 0x28, text);
-        return 1;
+        break;
     case 41:
         record = object + 0x3AC + index * 0x28;
         if (value == 2) {
@@ -428,31 +534,38 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
         } else {
             record[0x0C] = 0;
         }
-        return 1;
+        break;
     case 42:
         record = object + 0x3AC + index * 0x28;
         record[0x0D + subindex] = (s8)value;
-        return value >= 0 && value <= 0x24;
+        if (value < 0 || value > 0x24) {
+            return 0;
+        }
+        break;
     case 43:
         record = object + 0x3AC + index * 0x28;
         half = (u16)value;
         *(u16*)(record + 0x12 + subindex * 2) = half;
         for (i = 0; i < 0x2F; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0x384))[i] == half) {
-                return 1;
+            for (j = 0; j < 7; j++) {
+                if (((const u16*)(table + 0x384))[i * 7 + j] == half) {
+                    return 1;
+                }
             }
         }
         return 0;
     case 44:
         *(u32*)(object + 0x3C8 + index * 0x28) = (u32)value;
-        return 1;
+        break;
     case 45:
         record = object + 0x3AC + index * 0x28;
         half = (u16)value;
         *(u16*)(record + 0x20) = half;
         for (i = 0; i < 0x13; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0x618))[i] == half) {
-                return 1;
+            for (j = 0; j < 4; j++) {
+                if (((const u16*)(table + 0x618))[i * 4 + j] == half) {
+                    return 1;
+                }
             }
         }
         return 0;
@@ -468,41 +581,52 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
     case 47:
         record = object + 0x3AC + index * 0x28;
         record[0x24] = (u8)value;
-        for (i = 0; i < 0x24; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0x6B0))[i] == (u8)value) {
-                return 1;
+        for (i = 0; i < 4; i++) {
+            for (j = 0; j < 9; j++) {
+                if (((const u16*)(table + 0x6B0))[i * 9 + j] ==
+                    (u8)value) {
+                    return 1;
+                }
             }
         }
         return 0;
     case 48:
         record = object + index * 0x2A;
         *(u16*)(record + 0x514) = (u16)value;
-        for (i = 0; i < 0x183; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0x6F0))[i] == (u8)value) {
-                return 1;
+        for (i = 0; i < 0x2B; i++) {
+            for (j = 0; j < 9; j++) {
+                if (((const u16*)(table + 0x6F0))[i * 9 + j] ==
+                    (u8)value) {
+                    return 1;
+                }
             }
         }
         return 0;
     case 49:
         record = object + index * 0x2A;
         record[0x516] = (u8)value;
-        for (i = 0; i < 0x1E; i++) {
-            if ((lbl_80268DC0 + 0x9F8)[i] == (u8)value) {
-                return 1;
+        for (i = 0; i < 3; i++) {
+            for (j = 0; j < 10; j++) {
+                if ((table + 0x9F8)[i * 10 + j] == (u8)value) {
+                    return 1;
+                }
             }
         }
         return 0;
     case 50:
         record = object + index * 0x2A;
         record[0x517] = (u8)value;
-        return 1;
+        break;
     case 51:
         record = object + index * 0x2A;
         half = (u16)value;
         *(u16*)(record + 0x518 + subindex * 2) = half;
-        for (i = 0; i < 0x163; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0xA18))[i] == (u8)value) {
-                return 1;
+        for (i = 0; i < 0x47; i++) {
+            for (j = 0; j < 5; j++) {
+                if (((const u16*)(table + 0xA18))[i * 5 + j] ==
+                    (u8)value) {
+                    return 1;
+                }
             }
         }
         return 0;
@@ -511,74 +635,76 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
         half = (u16)value;
         *(u16*)(record + 0x520) = half;
         for (i = 0; i < 0x2F; i++) {
-            if (((const u16*)(lbl_80268DC0 + 0x384))[i] == half) {
-                return 1;
+            for (j = 0; j < 7; j++) {
+                if (((const u16*)(table + 0x384))[i * 7 + j] == half) {
+                    return 1;
+                }
             }
         }
         return 0;
     case 53:
         record = object + index * 0x2A;
         record[0x522] = (value >= 0 && value < 2) ? (s8)value : -1;
-        return 1;
+        break;
     case 54:
         record = object + index * 0x2A;
         record[0x523] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
-        return 1;
+        break;
     case 55:
         record = object + index * 0x2A;
         record[0x524] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
-        return 1;
+        break;
     case 56:
         record = object + index * 0x2A;
         record[0x525] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
-        return 1;
+        break;
     case 57:
         record = object + index * 0x2A;
         record[0x526] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
-        return 1;
+        break;
     case 58:
         record = object + index * 0x2A;
         record[0x527] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
-        return 1;
+        break;
     case 59:
         record = object + index * 0x2A;
         record[0x528] = (value >= 0 && value <= 0x1F) ? (s8)value : -1;
-        return 1;
+        break;
     case 60:
         record = object + index * 0x2A;
         *(s16*)(record + 0x52A) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 61:
         record = object + index * 0x2A;
         *(s16*)(record + 0x52C) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 62:
         record = object + index * 0x2A;
         *(s16*)(record + 0x52E) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 63:
         record = object + index * 0x2A;
         *(s16*)(record + 0x530) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 64:
         record = object + index * 0x2A;
         *(s16*)(record + 0x532) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 65:
         record = object + index * 0x2A;
         *(s16*)(record + 0x534) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 66:
         record = object + index * 0x2A;
         *(s16*)(record + 0x536) =
             (value >= 0 && value <= 0xFF) ? (s16)value : -1;
-        return 1;
+        break;
     case 67:
         record = object + index * 0x2A;
         if (value == 2) {
@@ -588,12 +714,12 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
         } else {
             record[0x538] = 0;
         }
-        return 1;
+        break;
     case 68:
         record = object + index * 0x2A;
         record[0x539] = (value & 0x20) ? -1 : (s8)(value - 1);
         for (i = 0; i < 0x1A; i++) {
-            if (((const s8*)(lbl_80268DC0 + 0xCE0))[i] ==
+            if (((const s8*)(table + 0xCE0))[i] ==
                 (s8)record[0x539]) {
                 return 1;
             }
@@ -602,33 +728,38 @@ s32 fn_8008102C(void** object_ref, const u32* descriptor, s32 index,
     case 69:
         record = object + index * 0x2A;
         record[0x53A] = (u8)value;
-        return record[0x53A] < 4;
+        if (record[0x53A] >= 4) {
+            return 0;
+        }
+        break;
     case 70:
         record = object + index * 0x2A;
         record[0x53B] = (u8)value;
-        if (record[0x53B] < 5) {
-            return 1;
+        if (record[0x53B] >= 5) {
+            record[0x53B] = 0;
+            return 0;
         }
-        record[0x53B] = 0;
-        return 0;
+        break;
     case 71:
         record = object + index * 0x2A;
         record[0x53C] = (u8)value;
-        return 1;
+        break;
     case 73:
         *(u32*)(object + 0xAFC) = (u32)value;
         for (i = 0; i < 0x2B; i++) {
-            if (((const u32*)(lbl_80268DC0 + 0xCFC))[i] == (u32)value) {
+            if (((const u32*)(table + 0xCFC))[i] == (u32)value) {
                 return 1;
             }
         }
         return 0;
     case 74:
         GScharCpy(object + 0xB00, text);
-        return 1;
+        break;
     default:
         return 0;
     }
+#undef object
+    return 1;
 }
 
 typedef struct CardEGridEntry {
