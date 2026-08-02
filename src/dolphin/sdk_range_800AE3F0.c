@@ -3490,8 +3490,11 @@ void __GXInitGX(void) {
     fn_800BA5BC(5, white);
     GXInvalidateTexAll();
 
-    gx->nextTexRgn = 0;
-    gx->nextTexRgnCI = 0;
+    {
+        GXData* gxState = gx;
+        gxState->nextTexRgn = 0;
+        gxState->nextTexRgnCI = 0;
+    }
     fn_800BB2E4(fn_800B5C5C);
     fn_800BB2F8(__GXDefaultTlutRegionCallback);
 
@@ -3545,7 +3548,7 @@ void __GXInitGX(void) {
     fn_800BCEF4(0, 0);
     fn_800BD044(1, 1);
     fn_800BD07C(rmode->field_rendering,
-                rmode->viHeight == 2 * rmode->xfbHeight);
+                rmode->viHeight == 2 * rmode->xfbHeight ? 1 : 0);
 
     fn_800B959C(0, 0, rmode->fbWidth, rmode->efbHeight);
     fn_800B96BC(rmode->fbWidth, rmode->efbHeight);
