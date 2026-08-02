@@ -2549,7 +2549,7 @@ game/gs_math_util_exact_800E0D24.c:
 	.sdata2     start:0x8047CB40 end:0x8047CB48
 
 game/data/sdata2_8047CB48.c:
-	.sdata2     start:0x8047CB48 end:0x8047CB88
+	.sdata2     start:0x8047CB48 end:0x8047CB58
 
 game/gs_range_800E0DDC_r58_prefix.c:
 	.text       start:0x800E0DDC end:0x800E0E14
@@ -2565,6 +2565,10 @@ game/gs_mem.c:
 
 game/gs_model_main.c:
 	.text       start:0x800E3604 end:0x800E3928
+	.sdata2     start:0x8047CB58 end:0x8047CB60
+
+game/data/sdata2_8047CB60.c:
+	.sdata2     start:0x8047CB60 end:0x8047CB88
 
 game/gs_model_main_exact_800E3928.c:
 	.text       start:0x800E3928 end:0x800E4AC0
