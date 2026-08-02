@@ -1731,19 +1731,6 @@ void psSetupTevCommon(void) {
     fn_800BC52C(2, 0, 0);
 }
 
-u8 U8ClampAdd(u8 cur, f32 delta) {
-    f32 value = (f32)cur + delta;
-
-    if (value < 0.0f) {
-        value = 0.0f;
-    }
-    if (value > lbl_8047D690) {
-        value = lbl_8047D690;
-    }
-
-    return (u8)value;
-}
-
 void HSD_MTXSRT(void* dst, void* scale, void* rot, void* trans, void* order) {
     HSD_MtxSRT(dst, scale, rot, trans, order);
 }
@@ -2919,6 +2906,111 @@ PSParticle* psInterpretParticle0(PSParticle* pp, PSParticle* parentCtx) {
                         }
                         break;
 
+                    case 0xE9: {
+                        s32 count;
+                        s32 mask;
+                        f32 random;
+
+                        if (pp->color1Timer != 0) {
+                            s32 scale = ((s32)pp->color1Countdown << 16) /
+                                        pp->color1Timer;
+                            pp->color1.r = (u8)(((pp->color1Target.r << 16) +
+                                scale * (pp->color1.r - pp->color1Target.r)) >> 16);
+                            pp->color1.g = (u8)(((pp->color1Target.g << 16) +
+                                scale * (pp->color1.g - pp->color1Target.g)) >> 16);
+                            pp->color1.b = (u8)(((pp->color1Target.b << 16) +
+                                scale * (pp->color1.b - pp->color1Target.b)) >> 16);
+                            pp->color1.a = (u8)(((pp->color1Target.a << 16) +
+                                scale * (pp->color1.a - pp->color1Target.a)) >> 16);
+                        }
+                        if (pp->color2Timer != 0) {
+                            s32 scale = ((s32)pp->color2Countdown << 16) /
+                                        pp->color2Timer;
+                            pp->color2.r = (u8)(((pp->color2Target.r << 16) +
+                                scale * (pp->color2.r - pp->color2Target.r)) >> 16);
+                            pp->color2.g = (u8)(((pp->color2Target.g << 16) +
+                                scale * (pp->color2.g - pp->color2Target.g)) >> 16);
+                            pp->color2.b = (u8)(((pp->color2Target.b << 16) +
+                                scale * (pp->color2.b - pp->color2Target.b)) >> 16);
+                            pp->color2.a = (u8)(((pp->color2Target.a << 16) +
+                                scale * (pp->color2.a - pp->color2Target.a)) >> 16);
+                        }
+
+                        count = stream[1];
+                        mask = stream[0];
+                        stream += 2;
+                        if (count != 0) {
+                            random = (f32)(s32)
+                                ((count + 1) * fn_801ADC7C()) /
+                                (f32)count;
+                        } else {
+                            random = fn_801ADC7C();
+                        }
+                        scratch[1] = random;
+
+                        if (mask & 1) {
+                            scratch[0] = (s8)*stream++ * 2 * scratch[1];
+                            if (mask & 0x10) {
+                                pp->color1Target.r = U8ClampAdd(
+                                    pp->color1Target.r, scratch[0]);
+                            }
+                            if (mask & 0x20) {
+                                pp->color2Target.r = U8ClampAdd(
+                                    pp->color2Target.r, scratch[0]);
+                            }
+                        }
+                        if (mask & 2) {
+                            scratch[0] = (s8)*stream++ * 2 * scratch[1];
+                            if (mask & 0x10) {
+                                pp->color1Target.g = U8ClampAdd(
+                                    pp->color1Target.g, scratch[0]);
+                            }
+                            if (mask & 0x20) {
+                                pp->color2Target.g = U8ClampAdd(
+                                    pp->color2Target.g, scratch[0]);
+                            }
+                        }
+                        if (mask & 4) {
+                            scratch[0] = (s8)*stream++ * 2 * scratch[1];
+                            if (mask & 0x10) {
+                                pp->color1Target.b = U8ClampAdd(
+                                    pp->color1Target.b, scratch[0]);
+                            }
+                            if (mask & 0x20) {
+                                pp->color2Target.b = U8ClampAdd(
+                                    pp->color2Target.b, scratch[0]);
+                            }
+                        }
+                        if (mask & 8) {
+                            if (count != 0) {
+                                scratch[1] = (s8)*stream++ * 2 *
+                                    (s32)((count + 1) * fn_801ADC7C()) /
+                                    (f32)count;
+                            } else {
+                                scratch[1] = (s8)*stream++ * 2 *
+                                    fn_801ADC7C();
+                            }
+                            if (mask & 0x10) {
+                                pp->color1Target.a = U8ClampAdd(
+                                    pp->color1Target.a, scratch[1]);
+                            }
+                            if (mask & 0x20) {
+                                pp->color2Target.a = U8ClampAdd(
+                                    pp->color2Target.a, scratch[1]);
+                            }
+                        }
+
+                        if (pp->color1Timer == 0) {
+                            pp->color1 = pp->color1Target;
+                        }
+                        pp->color1Countdown = pp->color1Timer;
+                        if (pp->color2Timer == 0) {
+                            pp->color2 = pp->color2Target;
+                        }
+                        pp->color2Countdown = pp->color2Timer;
+                        break;
+                    }
+
                     case 0xEA: {
                         u8 mask;
 
@@ -3257,6 +3349,19 @@ u8* getFloat(u8* stream, f32* out) {
     lbl_8047B178.bytes[3] = *stream++;
     *out = lbl_8047B178.value;
     return stream;
+}
+
+u8 U8ClampAdd(u8 cur, f32 delta) {
+    f32 value = (f32)cur + delta;
+
+    if (value < 0.0f) {
+        value = 0.0f;
+    }
+    if (value > lbl_8047D690) {
+        value = lbl_8047D690;
+    }
+
+    return (u8)value;
 }
 
 /*
