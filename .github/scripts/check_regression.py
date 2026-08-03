@@ -18,7 +18,8 @@ def fmap(path):
         for f in fns:
             n = f.get("name")
             if n:
-                m[n] = float(f.get("fuzzy_match_percent", 0) or 0)
+                score = f.get("fuzzy_match_percent")
+                m[n] = 100.0 if score is None else float(score)
     return m
 
 

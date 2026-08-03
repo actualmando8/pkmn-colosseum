@@ -10,7 +10,7 @@ extern void fn_801B0880(void*, u32);
 void modelShadowPrepare__FP8_GSmodelb(GSmodel* model, BOOL enable)
 {
     u32 i;
-    BOOL found = FALSE;
+    u8 found = FALSE;
 
     for (i = 0; i < 6; i++) {
         if (lbl_80401490[i].model == model) {

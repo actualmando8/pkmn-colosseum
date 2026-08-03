@@ -173,14 +173,16 @@ typedef struct GSmodelAnimEndedInfo {
     do {                                                                      \
         HSD_JObj* dirty_jobj = (jobj_);                                        \
         s32 dirty;                                                            \
+        u32 flags;                                                            \
         if (!(dirty_jobj->flags & JOBJ_MTX_INDEP_SRT)) {                      \
             if (dirty_jobj != NULL) {                                         \
                 if (dirty_jobj == NULL) {                                     \
                     __assert(lbl_8047CC68, 0x25D, lbl_8047CC70);              \
                 }                                                             \
                 dirty = 0;                                                    \
-                if (!(dirty_jobj->flags & JOBJ_USER_DEF_MTX)) {               \
-                    if (dirty_jobj->flags & JOBJ_MTX_DIRTY) {                 \
+                flags = dirty_jobj->flags;                                    \
+                if (!(flags & JOBJ_USER_DEF_MTX)) {                           \
+                    if (flags & JOBJ_MTX_DIRTY) {                             \
                         dirty = 1;                                            \
                     }                                                         \
                 }                                                             \

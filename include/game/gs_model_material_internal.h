@@ -38,9 +38,10 @@ static inline u16 GSmodelAcquireMaterials(GSmodel* model)
                     s32 partMaterialCount = fn_800EE758(part);
                     s32 materialIndex;
 
-                    for (materialIndex = 0; materialIndex < partMaterialCount;
-                         materialIndex++) {
-                        *dst++ = fn_800EE6B4(part, materialIndex);
+                    for (materialIndex = 0; materialIndex < partMaterialCount;) {
+                        *dst = fn_800EE6B4(part, materialIndex);
+                        materialIndex++;
+                        dst++;
                     }
                     fn_800EE828(part);
                 }
@@ -50,8 +51,9 @@ static inline u16 GSmodelAcquireMaterials(GSmodel* model)
         }
     }
 
+    count = model->materialCount;
     model->modulationRefCount++;
-    return model->materialCount;
+    return count;
 }
 
 #endif

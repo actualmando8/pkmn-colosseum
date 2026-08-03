@@ -105,6 +105,7 @@ void modelCalculateBlendModel__FP8_GSmodelf(GSmodel* model, f32 unused)
     GSmtx rotate_y;
     GSmtx rotate_z;
     GSmtx scale;
+    GSmtx* matrix;
 
     (void)unused;
     lbl_8047ABA0 = 0;
@@ -118,14 +119,15 @@ void modelCalculateBlendModel__FP8_GSmodelf(GSmodel* model, f32 unused)
     if (jobj != NULL && HSD_JObjMtxIsDirty(jobj)) {
         fn_8019D9DC(jobj);
     }
+    matrix = (GSmtx*)jobj->matrix;
     fn_800E0560(translation, &model->position);
     GSmtxMakeXRotation(rotate_x, model->rotation.x);
     GSmtxMakeYRotation(rotate_y, model->rotation.y);
     GSmtxMakeZRotation(rotate_z, model->rotation.z);
     fn_800E042C(scale, &model->scale);
-    fn_800E0290(jobj->matrix, jobj->matrix, scale);
-    fn_800E0290(jobj->matrix, jobj->matrix, translation);
-    fn_800E0290(jobj->matrix, jobj->matrix, rotate_x);
-    fn_800E0290(jobj->matrix, jobj->matrix, rotate_y);
-    fn_800E0290(jobj->matrix, jobj->matrix, rotate_z);
+    fn_800E0290(*matrix, *matrix, scale);
+    fn_800E0290(*matrix, *matrix, translation);
+    fn_800E0290(*matrix, *matrix, rotate_x);
+    fn_800E0290(*matrix, *matrix, rotate_y);
+    fn_800E0290(*matrix, *matrix, rotate_z);
 }

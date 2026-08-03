@@ -53,9 +53,6 @@ s32 floorCheckFightKind(u32 id) {
 #pragma pop
 
 /* 0x801123D4 | 0x32C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_801123D4(u32 floorDataEntry, u32 loadMode) {
     extern void GSscene_SetMode(s32);
     extern void fn_800D36B4(void*);
@@ -191,7 +188,6 @@ void fn_801123D4(u32 floorDataEntry, u32 loadMode) {
         }
     }
 }
-#pragma pop
 
 /* 0x80112700 | 0x4C */
 #pragma push
@@ -668,15 +664,17 @@ void floorInitMap(u32 group, u32 floorId)
     FloorSceneData* data;
     void* archive;
     void* object;
+    const char* strings;
     u32 baseId;
     u32 index;
 
+    strings = lbl_80272088;
     if (floorId == 0) {
         return;
     }
     archive = GSresGetResource(group, floorId);
     data = HSD_ArchiveGetPublicAddress(
-        archive, lbl_80272088 + 0x28);
+        archive, strings + 0x28);
     if (data == NULL) {
         return;
     }
@@ -687,8 +685,8 @@ void floorInitMap(u32 group, u32 floorId)
             u32 resourceId = baseId | index;
             object = floorOpenObject(resourceId);
             if (object == NULL) {
-                GSlogWrite(lbl_80272088 + 0x64, lbl_8035B878, index);
-                GSlogWrite(lbl_80272088 + 0x88);
+                GSlogWrite(strings + 0x64, lbl_8035B878, index);
+                GSlogWrite(strings + 0x88);
                 continue;
             }
             fn_800F9210(group, resourceId);
@@ -738,11 +736,13 @@ void floorInitMap(u32 group, u32 floorId)
         }
     }
 
-    object = GSresGetResource(group, floorReadMakeCameraResID(floorId));
+    baseId = floorReadMakeCameraResID(floorId);
+    object = GSresGetResource(group, baseId);
     if (object != NULL) {
         cameraSetGScamera(object);
     }
-    object = GSresGetResource(group, floorReadMakeFogResID(floorId));
+    baseId = floorReadMakeFogResID(floorId);
+    object = GSresGetResource(group, baseId);
     fn_800D2B90(object);
 }
 
@@ -917,9 +917,6 @@ void fn_801139BC(void) {
 #pragma pop
 
 /* 0x80113A0C | 0x178 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void _floorUpdate__FUi14FloorEnterMode(u32 floorId, s32 enterMode) {
     extern void fn_801171C8(void);
     extern void fn_80117D14(void);
@@ -967,12 +964,8 @@ void _floorUpdate__FUi14FloorEnterMode(u32 floorId, s32 enterMode) {
         }
     }
 }
-#pragma pop
 
 /* 0x80113B84 | 0x18C */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void _floorInitialize__FUi14FloorEnterMode(void* floor, s32 enterMode) {
     extern void heroMoveInit(void*, void*);
     extern u8 fn_800FF548(void);
@@ -1029,7 +1022,6 @@ void _floorInitialize__FUi14FloorEnterMode(void* floor, s32 enterMode) {
     fn_800F7D38(1, 0, 0);
     fn_800F7C8C(1, 0, 0);
 }
-#pragma pop
 
 /* 0x80113D10 | 0x24 */
 #pragma push
