@@ -132,9 +132,6 @@ s32 GScolsys2Sun(void* origin, void* dir) {
 #pragma pop
 
 /* 0x80111DF8 | 0x134 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u32 fn_80111DF8(void) {
     FloorArchiveResourceLists* lists;
     void* floor;
@@ -175,12 +172,8 @@ u32 fn_80111DF8(void) {
     }
     return (modelCount + lightCount) * 0x74;
 }
-#pragma pop
 
 /* 0x80111F2C | 0x150 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80111F2C(u8* state) {
     FloorArchiveResourceLists* lists;
     void* floor;
@@ -228,12 +221,8 @@ void fn_80111F2C(u8* state) {
         }
     }
 }
-#pragma pop
 
 /* 0x8011207C | 0x1E4 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_8011207C(u8* state, u32 stateSize) {
     extern void GSmodelPopState(void*, void*);
     extern void GSlightPopState(void*, void*);
@@ -307,12 +296,8 @@ void fn_8011207C(u8* state, u32 stateSize) {
         }
     }
 }
-#pragma pop
 
 /* 0x80112260 | 0x120 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_80112260(s32 visible) {
     FloorArchiveResourceLists* lists;
     void* floor;
@@ -351,4 +336,3 @@ void fn_80112260(s32 visible) {
         }
     }
 }
-#pragma pop

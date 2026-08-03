@@ -2458,7 +2458,7 @@ void fn_80119BD0(u32 arg1, u32 arg2, u32 arg5, u8* arg6) {
     u32 index;
     s32 handle;
 
-    while ((node != NULL ? *(u8**)(node + 0x0C) : NULL) != NULL) {
+    while ((node == NULL ? NULL : *(u8**)(node + 0x0C)) != NULL) {
         if (node == NULL) {
             node = NULL;
         } else {

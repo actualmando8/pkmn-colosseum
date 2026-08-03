@@ -97,7 +97,6 @@ extern void  psRemoveGenerator(void);
 extern void  psRemoveAppSRT(void);
 extern void  GSmodelFreeAllShadowTextures(void);
 extern void  fn_80112780(void);
-extern u16   _toolentryAlloc__FUl(u32 size);
 extern void* fn_800E27B0(u16 handle);
 extern void  fn_800E24B0(u16 handle);
 extern void  fn_800E209C(u16 handle);
@@ -251,11 +250,9 @@ void fn_800FF81C(void* tablePtr, u32 tableCount) {
 #pragma pop
 
 /* 0x800FF828 | 0x148 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800FF828(u32 contextCount, u32 baseCount, u32 extCount1,
                  u32 extCount2) {
+    extern u32 _toolentryAlloc__FUl(u32 size);
     u16 handle;
     u32 resourceCount;
     u32 i;
@@ -298,10 +295,10 @@ void fn_800FF828(u32 contextCount, u32 baseCount, u32 extCount1,
         }
     }
 }
-#pragma pop
 
 /* 0x800FF970 | 0x11B4 */
 void fn_800FF970(void) {
+    extern u16 _toolentryAlloc__FUl(u32 size);
     GSFloorResource* res;
     GSFloorResHandler* handler;
     void* entry;

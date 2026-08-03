@@ -110,9 +110,6 @@ found:
     defined(GS_FLOOR_DATA_RESIDUAL_PREFIX_800FF178_ONLY)
 
 /* 0x800FF178 | 0x128 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800FF178(u8 priority, u32 floorId, void* callback) {
     GSFloorResource* resource;
     GSFloorResource* current;
@@ -174,12 +171,8 @@ void fn_800FF178(u8 priority, u32 floorId, void* callback) {
         lbl_8047ACCC = resource;
     }
 }
-#pragma pop
 
 /* 0x800FF2A0 | 0x120 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800FF2A0(u8 priority, u32 floorId, void* callback) {
     GSFloorResource* resource;
     GSFloorResource* current;
@@ -241,12 +234,8 @@ void fn_800FF2A0(u8 priority, u32 floorId, void* callback) {
         lbl_8047ACCC = resource;
     }
 }
-#pragma pop
 
 /* 0x800FF3C0 | 0x114 */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 void fn_800FF3C0(u8 priority, u32 floorId, void* callback) {
     GSFloorResource* resource;
     GSFloorResource* current;
@@ -308,7 +297,6 @@ void fn_800FF3C0(u8 priority, u32 floorId, void* callback) {
         lbl_8047ACCC = resource;
     }
 }
-#pragma pop
 
 #endif
 

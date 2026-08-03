@@ -267,9 +267,6 @@ s32 fn_8010C54C(u16 param1, u8 mode) {
 #pragma pop
 
 /* 0x8010C650 | 0xFC */
-#pragma push
-#pragma optimization_level 0
-#pragma optimizewithasm off
 u16 fn_8010C650(u16 typeA, u16* arr, u16 count) {
     u16 i;
     u16 countA = 0;
@@ -307,7 +304,6 @@ u16 fn_8010C650(u16 typeA, u16* arr, u16 count) {
     }
     return 0x42;
 }
-#pragma pop
 
 /* 0x8010C74C | 0x30 */
 #pragma push
