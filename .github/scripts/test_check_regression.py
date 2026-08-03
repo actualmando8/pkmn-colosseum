@@ -84,6 +84,20 @@ class RegressionCleanupTests(unittest.TestCase):
                 self.base, self.head, self.manifest, "approved-base"
             )
 
+    def test_omitted_fuzzy_score_is_an_exact_match(self):
+        self.base.write_text(json.dumps(report({"target": 53.396824})))
+        self.head.write_text(
+            json.dumps(
+                {
+                    "units": [
+                        {"functions": [{"name": "target", "size": "252"}]}
+                    ]
+                }
+            )
+        )
+        self.assertEqual(check_regression.check(self.base, self.head), 0)
+        self.assertEqual(check_regression.fmap(self.head)["target"], 100.0)
+
 
 if __name__ == "__main__":
     unittest.main()
