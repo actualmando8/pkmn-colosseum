@@ -79,10 +79,10 @@ void* wazaSequenceCameraGetPattern__Fbi(u8 shortTable, s32 flags) {
         }
     }
 
-    for (i = 0; i < count; i++) {
-        end += table[i].duration;
+    for (i = 0; i < count; i++, table++) {
+        end += table->duration;
         if (frame < end) {
-            return &table[i];
+            return table;
         }
     }
 
@@ -184,7 +184,6 @@ void fn_801D2D28(void) {
     extern BOOL cameraMoveEndCheckSpecial(s32);
     extern f32 lbl_8047E1E0;
     u8* sequence;
-    u8* camera;
     u8* model;
     CameraFovKey* key;
     Vec target;
@@ -199,9 +198,8 @@ void fn_801D2D28(void) {
         return;
     }
 
-    camera = lbl_8047B3F0;
-    if (camera != NULL && *(u32*)(camera + 0x18) != 0 &&
-        *(u32*)(camera + 0x20) != 0) {
+    if ((u8*)lbl_8047B3F0 != NULL && *(u32*)((u8*)lbl_8047B3F0 + 0x18) != 0 &&
+        *(u32*)((u8*)lbl_8047B3F0 + 0x20) != 0) {
         return;
     }
 
@@ -210,20 +208,20 @@ void fn_801D2D28(void) {
     model = *(u8**)(sequence + 0x24);
     key = (CameraFovKey*)(*(u8**)(sequence + 0x2C) +
                           *(u16*)(sequence + 0x32) * 0xD4);
-    if (camera != NULL) {
-        partId = *(u32*)((u8*)key + 0x4C + camera[0x17] * 4);
+    if ((u8*)lbl_8047B3F0 != NULL) {
+        partId = *(u32*)((u8*)key + 0x4C + ((u8*)lbl_8047B3F0)[0x17] * 4);
     } else {
         partId = *(u32*)((u8*)key + 0x54);
     }
     part = GSmodelGetPart(model, partId);
     if (part != NULL) {
         GSpartGetTransform(part, &target, NULL, NULL);
-        if (camera != NULL && *(u16*)(camera + 0x2E) == 3 &&
-            (*(u16*)(camera + 0x2C) == 0x154 ||
-             *(u16*)(camera + 0x2C) == 0x6E)) {
+        if ((u8*)lbl_8047B3F0 != NULL && *(u16*)((u8*)lbl_8047B3F0 + 0x2E) == 3 &&
+            (*(u16*)((u8*)lbl_8047B3F0 + 0x2C) == 0x154 ||
+             *(u16*)((u8*)lbl_8047B3F0 + 0x2C) == 0x6E)) {
             GSscene_GetCameraPositionVector(&origin);
         } else {
-            GSmodelGetPosition(model, &origin);
+            GSmodelGetPosition(*(u8**)((u8*)lbl_8047B3EC + 0x24), &origin);
         }
         fn_800E0168(&target, &target, &origin);
         cameraMoveTargetOfs(7, &target, lbl_8047E1E0);
@@ -506,20 +504,20 @@ void _wazaSequenceCameraSelectMotion__FP13ModelSequenceP12WazaSequenceP24wazaSeq
             *motion = 5;
             return;
         }
-        if ((flags & 8) != 0) {
-            option0 = 1;
+        option0 = (u8)((flags >> 3) & 1);
+        if (option0 != 0) {
             count++;
         }
-        if ((flags & 0x10) != 0) {
-            option1 = 1;
+        option1 = (u8)((flags >> 4) & 1);
+        if (option1 != 0) {
             count++;
         }
-        if ((flags & 0x20) != 0) {
-            option2 = 1;
+        option2 = (u8)((flags >> 5) & 1);
+        if (option2 != 0) {
             count++;
         }
-        if ((flags & 0x40) != 0) {
-            option3 = 1;
+        option3 = (u8)((flags >> 6) & 1);
+        if (option3 != 0) {
             count++;
         }
     }
@@ -621,21 +619,31 @@ void _wazaSequenceCameraCalculateParams__FP13ModelSequenceiP24wazaSequenceCamera
     GSmodelGetRotation(model, &rotation);
     *(f32*)(params + 0x14) = rotation.y;
     mode = *(s32*)(sequence + 0x10);
-    if (mode == -2 || mode == -1) {
+    switch (mode) {
+    case -2:
         sizeScale = lbl_8047E288;
         distanceScale = lbl_8047E240;
-    } else if (mode == 1) {
+        break;
+    case -1:
+        sizeScale = lbl_8047E288;
+        distanceScale = lbl_8047E240;
+        break;
+    case 1:
         sizeScale = lbl_8047E28C;
         distanceScale = lbl_8047E244;
-    } else if (mode == 2) {
+        break;
+    case 2:
         sizeScale = lbl_8047E290;
         distanceScale = lbl_8047E248;
-    } else if (mode == 3) {
+        break;
+    case 3:
         sizeScale = lbl_8047E294;
         distanceScale = lbl_8047E24C;
-    } else {
+        break;
+    default:
         sizeScale = lbl_8047E298;
         distanceScale = lbl_8047E1F4;
+        break;
     }
 
     if (flags & 1) {

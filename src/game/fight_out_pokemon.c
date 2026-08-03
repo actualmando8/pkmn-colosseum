@@ -69,7 +69,6 @@ u16 figthOutPokemonGetSoubiItemBuff(void* ctx) {
     extern u16 pokemonGetSoubiItemBuff();
     void* d6Data;
     void* ccData;
-    u16 typeId;
     u8 result;
 
     d6Data = pokemonGetStatus(ctx, 0, 0xD6, 0);
@@ -79,8 +78,7 @@ u16 figthOutPokemonGetSoubiItemBuff(void* ctx) {
         ccData = pokemonGetStatus(d6Data, 0, 0xCC, 0);
     }
     if (ccData == NULL) { return 0; }
-    typeId = fn_80119ED0(0x3D);
-    if (typeId == 0x7C || typeId == 0xC8) {
+    if (fn_80119ED0(0x3D) == 0x7C || fn_80119ED0(0x3D) == 0xC8) {
         void* data;
 
         if (d6Data == NULL) {
@@ -106,7 +104,6 @@ u32 fightOutPokemonGetSoubiItemSoubiDataId(void* ctx) {
     extern u32 pokemonGetSoubiItemSoubiDataId();
     void* d6Data;
     void* ccData;
-    u16 typeId;
     u8 result;
 
     d6Data = pokemonGetStatus(ctx, 0, 0xD6, 0);
@@ -116,8 +113,7 @@ u32 fightOutPokemonGetSoubiItemSoubiDataId(void* ctx) {
         ccData = pokemonGetStatus(d6Data, 0, 0xCC, 0);
     }
     if (ccData == NULL) { return 0; }
-    typeId = fn_80119ED0(0x3D);
-    if (typeId == 0x7C || typeId == 0xC8) {
+    if (fn_80119ED0(0x3D) == 0x7C || fn_80119ED0(0x3D) == 0xC8) {
         void* data;
 
         if (d6Data == NULL) {
@@ -616,19 +612,21 @@ void* fightOutPokemonCreateFightActionUseItem(void* ctx, void* p2, u32 p3,
     extern void fightActionBiosSetBuffDataId();
     void* e5Data;
     void* feData;
+    u16 itemDataId = (u16)p6;
 
     e5Data = pokemonGetStatus(ctx, 0, 0xE5, 0);
     if (e5Data == NULL) { return NULL; }
-    fightItemCreate(e5Data, (u16)p6, p7, p8);
+    fightItemCreate(e5Data, itemDataId, p7, p8);
     fn_80142B24(e5Data, 0, 0x21, 0, (u32)p9);
     feData = pokemonGetStatus(ctx, 0, 0xFE, 0);
-    if (feData == NULL) {
-        return NULL;
-    }
-    if ((u8)fightActionCreate((FightAction*)feData, p2, ctx, p3,
+    if (feData != NULL &&
+        (u8)fightActionCreate((FightAction*)feData, p2, ctx, p3,
                               p4, p5) == 1) {
         fightActionBiosSetBuffDataId((FightAction*)feData, p6);
     } else {
+        feData = NULL;
+    }
+    if (feData == NULL) {
         return NULL;
     }
     return feData;

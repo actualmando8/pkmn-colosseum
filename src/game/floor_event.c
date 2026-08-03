@@ -214,7 +214,7 @@ extern void GSmodelSetAnimRate(void*, f32);
 extern void GSmodelSetAnimType(void*, u32);
 extern void GSmodelStartAnimation(void*);
 extern void _threadSwitch(void);
-extern u32 GSmodelIsAnimating(void*);
+extern u8 GSmodelIsAnimating(void*);
 extern void* GSmodelGetPart(void*, u8);
 extern void GSpartGetTransform(void*, void*, u32, u32);
 extern void GSpartFree(void*);
@@ -1588,6 +1588,34 @@ s32 floorEventGetTresure(u8 type, u32 item, s32 count)
     return result;
 }
 
+static inline void* floorEventFindTresureEntry(u32 param)
+{
+    u32 type = param & 0x7FFF0000;
+    u32 target;
+    u32 found = 0;
+    u32 index;
+    u8* entry = 0;
+
+    if (type != 0x7FFF0000) {
+        return 0;
+    }
+
+    target = param & 0x1FF;
+    for (index = 0; index < *(u32*)lbl_80478EB8; index++) {
+        entry = (u8*)lbl_80478EBC + index * 0x1C;
+        if (*(u16*)(entry + 4) == (u32)fn_800FF56C()) {
+            if (target == found++) {
+                break;
+            }
+        }
+    }
+
+    if (index == *(u32*)lbl_80478EB8) {
+        return 0;
+    }
+    return entry;
+}
+
 typedef struct FloorTreasureEntry {
     u8 flags;
     u8 count;
@@ -1604,17 +1632,15 @@ s32 floorEventCtrlTresure(void* character, u32 param, u8 mode)
 {
     FloorTreasureEntry* entry;
     FloorTreasureEntry* displayEntry;
-    u8 displayType;
 
-    entry = (FloorTreasureEntry*)floorEventGetTresureList(param);
+    entry = (FloorTreasureEntry*)floorEventFindTresureEntry(param);
     if (entry == 0) {
         return -1;
     }
 
-    displayType = (entry->flags >> 5) & 7;
     switch (mode) {
     case 0:
-        switch (displayType) {
+        switch ((entry->flags >> 5) & 7) {
         case 1:
             fn_8018B76C(character, param, 2, 0, 1);
             fn_8018C7C8(character, param, 1);
@@ -1627,7 +1653,7 @@ s32 floorEventCtrlTresure(void* character, u32 param, u8 mode)
         break;
 
     case 1:
-        switch (displayType) {
+        switch ((entry->flags >> 5) & 7) {
         case 1:
             fn_8018B76C(character, param, 0, 0, 1);
         case 2:
@@ -1642,13 +1668,13 @@ s32 floorEventCtrlTresure(void* character, u32 param, u8 mode)
             return 0;
         }
 
-        if (displayType == 1) {
+        if (((entry->flags >> 5) & 7) == 1) {
             fn_8018B76C(character, param, 1, 0, 0);
             fn_80166A28(0x3C2);
             peopleWaitSyncMotion(character, param, 1);
         }
 
-        displayEntry = (FloorTreasureEntry*)floorEventGetTresureList(param);
+        displayEntry = (FloorTreasureEntry*)floorEventFindTresureEntry(param);
         if (displayEntry != 0) {
             switch ((displayEntry->flags >> 5) & 7) {
             case 1:
@@ -1716,6 +1742,26 @@ typedef struct FloorDoorEntry {
     u32 resourceId;
 } FloorDoorEntry;
 
+static inline void floorEventStartAnim(void* model, s16 animation, f32 frame)
+{
+    if (model != 0) {
+        GSmodelSetAnimIndex(model, animation);
+        GSmodelSetAnimFrame(model, frame);
+        GSmodelSetAnimRate(model, lbl_8047CFA4);
+        GSmodelSetAnimType(model, 0);
+        GSmodelStartAnimation(model);
+    }
+}
+
+static inline void floorEventWaitAnim(void* model)
+{
+    if (model != 0) {
+        while (GSmodelIsAnimating(model) != 0) {
+            _threadSwitch();
+        }
+    }
+}
+
 /* 0x80116958 | 0x3D8 */
 s32 floorEventCtrlDoor(void* floor, u32 index, u8 mode)
 {
@@ -1772,6 +1818,8 @@ s32 floorEventCtrlDoor(void* floor, u32 index, u8 mode)
         animation = door->openAnim;
         switch (door->doorType) {
         case 1:
+            sound = 0x44;
+            break;
         case 2:
             sound = 0x44;
             break;
@@ -1797,6 +1845,8 @@ s32 floorEventCtrlDoor(void* floor, u32 index, u8 mode)
         animation = door->closeAnim;
         switch (door->doorType) {
         case 1:
+            sound = 0x44;
+            break;
         case 2:
             sound = 0x44;
             break;
@@ -1863,7 +1913,7 @@ s32 floorEventCtrlElevator(void* floor, u32 index, u16 command,
     void* part;
     u32 floorGroup;
     s16 animation = -1;
-    f32 frame = 0.0f;
+    f32 frame = lbl_8047CFA0;
 
     if (index >= *(u32*)lbl_80478EC8) {
         return -1;
@@ -1879,22 +1929,19 @@ s32 floorEventCtrlElevator(void* floor, u32 index, u16 command,
 
     floorGroup = floorDataBiosGetGroupID(floorDataBiosGetPtr((u32)floor));
 
-    if (command == 1 || command == 2 ||
-        command == 0x81 || command == 0x82) {
+    switch (command) {
+    case 1:
+    case 2:
+    case 0x81:
+    case 0x82:
         animation = elevator->openAnim;
         if (animation >= 0) {
-            GSmodelSetAnimIndex(model, animation);
-            GSmodelSetAnimFrame(model, frame);
-            GSmodelSetAnimRate(model, 0.5f);
-            GSmodelSetAnimType(model, 0);
-            GSmodelStartAnimation(model);
+            floorEventStartAnim(model, animation, frame);
         }
         if (command & 0x80) {
             fn_80166A28(0x44);
         }
-        while (GSmodelIsAnimating(model) != 0) {
-            _threadSwitch();
-        }
+        floorEventWaitAnim(model);
 
         part = GSmodelGetPart(model, elevator->partIndex);
         GSpartGetTransform(part, &position, 0, 0);
@@ -1902,7 +1949,7 @@ s32 floorEventCtrlElevator(void* floor, u32 index, u16 command,
         if (command & 1) {
             fn_8018AACC(group, person, 1, &position);
             peopleMoveCheck(group, person, 1);
-            fn_8018805C(group, person, 0.0f, 0.5f);
+            fn_8018805C(group, person, lbl_8047CFA0, lbl_8047CFA4);
             peopleMoveCheck(group, person, 1);
         } else {
             fn_80184470(group, person);
@@ -1910,32 +1957,28 @@ s32 floorEventCtrlElevator(void* floor, u32 index, u16 command,
             GSpartGetTransform(part, &position, 0, 0);
             GSpartFree(part);
             fn_8018C0A8(group, person, &position);
-            position.z += 25.0f;
+            position.z += lbl_8047CFA8;
             fn_8018AACC(group, person, 1, &position);
             peopleMoveCheck(group, person, 1);
         }
 
         animation = elevator->closeAnim;
         if (animation >= 0) {
-            GSmodelSetAnimIndex(model, animation);
-            GSmodelSetAnimFrame(model, frame);
-            GSmodelSetAnimRate(model, 0.5f);
-            GSmodelSetAnimType(model, 0);
-            GSmodelStartAnimation(model);
+            floorEventStartAnim(model, animation, frame);
         }
         if (command & 0x80) {
             fn_80166A28(0x44);
         }
-        while (GSmodelIsAnimating(model) != 0) {
-            _threadSwitch();
-        }
-    } else if (command == 0xC0) {
-        while (GSmodelIsAnimating(model) != 0) {
-            _threadSwitch();
-        }
+        floorEventWaitAnim(model);
+        break;
+
+    case 0xC0:
+        floorEventWaitAnim(model);
         fn_801669BC(0x45);
         fn_80166A28(0x46);
-    } else {
+        break;
+
+    default:
         if (command & 4) {
             animation = elevator->alternateAnimA;
         } else if (command & 8) {
@@ -1956,17 +1999,14 @@ s32 floorEventCtrlElevator(void* floor, u32 index, u16 command,
             frame -= 1.0f;
         }
 
-        GSmodelSetAnimIndex(model, animation);
-        GSmodelSetAnimFrame(model, frame);
-        GSmodelSetAnimRate(model, 0.5f);
-        GSmodelSetAnimType(model, 0);
-        GSmodelStartAnimation(model);
+        floorEventStartAnim(model, animation, frame);
 
         if (command & 0x40) {
             floorEventCtrlElevator(floor, index, 0xC0, group, person);
         } else if (command & 0x80) {
             fn_80166A28(0x45);
         }
+        break;
     }
 
     GSmodelGetFrameCount(model, &frame, 0);
