@@ -171,6 +171,7 @@ found:
 
 s32 fn_800E209C(u16 handle)
 {
+    const char* messages = lbl_80270658;
     GSmemEntry* entry;
     GSmemBlock* before;
     GSmemBlock* after;
@@ -178,30 +179,30 @@ s32 fn_800E209C(u16 handle)
     s32 result = 0;
 
     if (handle == 0) {
-        GSlogWrite(lbl_80270658 + 0x5A4, handle);
+        GSlogWrite(messages + 0x5A4, handle);
         lbl_8047AB3C = 1;
         return 1;
     }
 
     entry = GSmemEntryFromHandle(handle);
     if (entry->handle != handle) {
-        GSlogWrite(lbl_80270658 + 0x5A4, handle);
+        GSlogWrite(messages + 0x5A4, handle);
         lbl_8047AB3C = 1;
         return 1;
     }
     if (entry->refCount != 0) {
-        GSlogWrite(lbl_80270658 + 0x5C8, handle);
+        GSlogWrite(messages + 0x5C8, handle);
         result = 8;
     }
 
     if (lbl_8047AB28 == 1) {
         if (!GSmemGuardsAreValid(entry)) {
-            GSlogWrite(lbl_80270658 + 0x5FC, handle);
+            GSlogWrite(messages + 0x5FC, handle);
             lbl_8047AB3C = 7;
             result = 7;
         }
         if (entry->pad != GSmemChecksum(entry)) {
-            GSlogWrite(lbl_80270658 + 0x62C, handle);
+            GSlogWrite(messages + 0x62C, handle);
             lbl_8047AB3C = 6;
         }
     }
@@ -253,22 +254,23 @@ s32 fn_800E209C(u16 handle)
 
 s32 fn_800E24B0(u16 handle)
 {
+    const char* messages = lbl_80270658;
     GSmemEntry* entry;
     s32 result = 0;
 
     if (handle == 0) {
-        GSlogWrite(lbl_80270658 + 0x660, handle);
+        GSlogWrite(messages + 0x660, handle);
         lbl_8047AB3C = 1;
         return 1;
     }
     entry = GSmemEntryFromHandle(handle);
     if (entry->handle != handle) {
-        GSlogWrite(lbl_80270658 + 0x660, handle);
+        GSlogWrite(messages + 0x660, handle);
         lbl_8047AB3C = 1;
         return 1;
     }
     if (entry->refCount == 0) {
-        GSlogWrite(lbl_80270658 + 0x684, handle);
+        GSlogWrite(messages + 0x684, handle);
         lbl_8047AB3C = 5;
         return 5;
     }
@@ -276,7 +278,7 @@ s32 fn_800E24B0(u16 handle)
     lbl_8047AB3C = 0;
     if (lbl_8047AB28 == 1) {
         if (!GSmemGuardsAreValid(entry)) {
-            GSlogWrite(lbl_80270658 + 0x5FC, handle);
+            GSlogWrite(messages + 0x5FC, handle);
             lbl_8047AB3C = 7;
             result = 7;
             GSmemClearGuards(entry);
@@ -294,21 +296,22 @@ s32 fn_800E24B0(u16 handle)
 
 void* fn_800E27B0(u16 handle)
 {
+    const char* messages = lbl_80270658;
     GSmemEntry* entry;
 
     if (handle == 0) {
-        GSlogWrite(lbl_80270658 + 0x6D0, handle);
+        GSlogWrite(messages + 0x6D0, handle);
         lbl_8047AB3C = 1;
         return NULL;
     }
     entry = GSmemEntryFromHandle(handle);
     if (entry->handle != handle) {
-        GSlogWrite(lbl_80270658 + 0x6D0, handle);
+        GSlogWrite(messages + 0x6D0, handle);
         lbl_8047AB3C = 1;
         return NULL;
     }
     if (entry->refCount == 0xFFFF) {
-        GSlogWrite(lbl_80270658 + 0x6F4, handle);
+        GSlogWrite(messages + 0x6F4, handle);
         lbl_8047AB3C = 4;
         return NULL;
     }
@@ -316,12 +319,12 @@ void* fn_800E27B0(u16 handle)
     lbl_8047AB3C = 0;
     if (lbl_8047AB28 == 1) {
         if (!GSmemGuardsAreValid(entry)) {
-            GSlogWrite(lbl_80270658 + 0x5FC, handle);
+            GSlogWrite(messages + 0x5FC, handle);
             lbl_8047AB3C = 7;
             GSmemClearGuards(entry);
         }
         if (entry->refCount == 0 && entry->pad != GSmemChecksum(entry)) {
-            GSlogWrite(lbl_80270658 + 0x62C, handle);
+            GSlogWrite(messages + 0x62C, handle);
             lbl_8047AB3C = 6;
         }
     }
@@ -342,11 +345,12 @@ s32 fn_800E2AF8(void)
 
 static u16 fn_800E2DB0(void* address, u32 size)
 {
-    GSmemBlock* block;
+    GSmemBlock* block = lbl_8047AB30;
     GSmemBlock* suffix;
     GSmemEntry* entry;
     GSmemEntry* previousEntry;
     u8* allocation = address;
+    u32 alignedSize;
     u32 allocationSize;
     u32 prefixSize;
     u32 suffixSize;
@@ -355,16 +359,17 @@ static u16 fn_800E2DB0(void* address, u32 size)
         return 0;
     }
 
-    allocationSize = (((size + 0x1F) & ~0x1F) + 3) & ~3;
+    alignedSize = (size + 0x1F) & ~0x1F;
     if (lbl_8047AB28 != 0) {
         allocation -= 4;
-        allocationSize += 8;
+        allocationSize = ((alignedSize + 3) & ~3) + 8;
+    } else {
+        allocationSize = (alignedSize + 3) & ~3;
     }
     if (allocationSize < sizeof(GSmemBlock)) {
         allocationSize = sizeof(GSmemBlock);
     }
 
-    block = lbl_8047AB30;
     while (block != NULL) {
         if (allocation >= (u8*)block &&
             allocation <= (u8*)block + block->size) {
@@ -372,8 +377,11 @@ static u16 fn_800E2DB0(void* address, u32 size)
         }
         block = block->next;
     }
-    if (block == NULL ||
-        allocation + allocationSize > (u8*)block + block->size) {
+    if (block == NULL) {
+        lbl_8047AB3C = 2;
+        return 0;
+    }
+    if (allocation + allocationSize > (u8*)block + block->size) {
         lbl_8047AB3C = 2;
         return 0;
     }

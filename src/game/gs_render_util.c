@@ -89,7 +89,7 @@ extern u16 lbl_8047AA68;  /* render obj array low16 tag */
 extern u32 lbl_8047AA6C;  /* render obj array base pointer */
 extern f32 lbl_8047C994;  /* SDA float constant */
 extern f32 lbl_8047C9C0;  /* SDA float constant */
-extern f32 lbl_80478ACC;   /* f32 threshold constant, abs accessed via lis/lfs */
+extern f32 lbl_80478ACC[];   /* f32 threshold constant, abs accessed via lis/lfs */
 extern f32 lbl_8047C998;   /* SDA float 0.0 constant */
 extern f32 lbl_8047AA78;   /* SDA float temp */
 extern double lbl_8047C9A0; /* double 1.0 constant, SDA2 */
@@ -203,14 +203,14 @@ void fn_800D1070(u32 dtUnk) {
                 fn_800E0168(tmp, (u8*)obj + 0x70, (u8*)obj + 0x100);
                 {
                     f32 ax = tmp[0];
-                    if (ax < lbl_8047C998) ax = -ax;
-                    if (ax < lbl_80478ACC) {
+                    ax = ax > lbl_8047C998 ? ax : -ax;
+                    if (ax < lbl_80478ACC[0]) {
                         f32 ay = tmp[1];
-                        if (ay < lbl_8047C998) ay = -ay;
-                        if (ay < lbl_80478ACC) {
+                        ay = ay > lbl_8047C998 ? ay : -ay;
+                        if (ay < lbl_80478ACC[0]) {
                             f32 az = tmp[2];
-                            if (az < lbl_8047C998) az = -az;
-                            if (az < lbl_80478ACC) {
+                            az = az > lbl_8047C998 ? az : -az;
+                            if (az < lbl_80478ACC[0]) {
                                 f32 v = *(f32*)((u8*)obj + 0x100);
                                 *(f32*)((u8*)obj + 0x100) = (f32)(v + lbl_8047C9A0);
                             }
@@ -521,14 +521,14 @@ void* fn_800D1B3C(void* obj) {
             fn_800E0168(tmp, &c->eye, &c->interest);
             {
                 f32 ax = tmp[0];
-                if (ax < lbl_8047C998) ax = -ax;
-                if (ax < lbl_80478ACC) {
+                ax = ax > lbl_8047C998 ? ax : -ax;
+                if (ax < lbl_80478ACC[0]) {
                     f32 ay = tmp[1];
-                    if (ay < lbl_8047C998) ay = -ay;
-                    if (ay < lbl_80478ACC) {
+                    ay = ay > lbl_8047C998 ? ay : -ay;
+                    if (ay < lbl_80478ACC[0]) {
                         f32 az = tmp[2];
-                        if (az < lbl_8047C998) az = -az;
-                        if (az < lbl_80478ACC) {
+                        az = az > lbl_8047C998 ? az : -az;
+                        if (az < lbl_80478ACC[0]) {
                             f32 v = c->interest.x;
                             c->interest.x = (f32)(v + lbl_8047C9A0);
                         }
@@ -573,14 +573,14 @@ void fn_800D1D00(void* obj) {
         fn_800E0168(tmp, &c->eye, &c->interest);
         {
             f32 ax = tmp[0];
-            if (ax < lbl_8047C998) ax = -ax;
-            if (ax < lbl_80478ACC) {
+            ax = ax > lbl_8047C998 ? ax : -ax;
+            if (ax < lbl_80478ACC[0]) {
                 f32 ay = tmp[1];
-                if (ay < lbl_8047C998) ay = -ay;
-                if (ay < lbl_80478ACC) {
+                ay = ay > lbl_8047C998 ? ay : -ay;
+                if (ay < lbl_80478ACC[0]) {
                     f32 az = tmp[2];
-                    if (az < lbl_8047C998) az = -az;
-                    if (az < lbl_80478ACC) {
+                    az = az > lbl_8047C998 ? az : -az;
+                    if (az < lbl_80478ACC[0]) {
                         f32 v = c->interest.x;
                         c->interest.x = (f32)(v + lbl_8047C9A0);
                     }
@@ -760,14 +760,14 @@ void _cameraLoadCameraMatrix__FP9_GScamera12GSgfxLayerID(void) {
             fn_800E0168(tmp, &c->eye, &c->interest);
             {
                 f32 ax = tmp[0];
-                if (ax < lbl_8047C998) ax = -ax;
-                if (ax < lbl_80478ACC) {
+                ax = ax > lbl_8047C998 ? ax : -ax;
+                if (ax < lbl_80478ACC[0]) {
                     f32 ay = tmp[1];
-                    if (ay < lbl_8047C998) ay = -ay;
-                    if (ay < lbl_80478ACC) {
+                    ay = ay > lbl_8047C998 ? ay : -ay;
+                    if (ay < lbl_80478ACC[0]) {
                         f32 az = tmp[2];
-                        if (az < lbl_8047C998) az = -az;
-                        if (az < lbl_80478ACC) {
+                        az = az > lbl_8047C998 ? az : -az;
+                        if (az < lbl_80478ACC[0]) {
                             f32 v = c->interest.x;
                             c->interest.x = (f32)(v + lbl_8047C9A0);
                         }
@@ -840,14 +840,14 @@ void fn_800D258C(void* obj) {
         fn_800E0168(tmp, &c->eye, &c->interest);
         {
             f32 ax = tmp[0];
-            if (ax < lbl_8047C998) ax = -ax;
-            if (ax < lbl_80478ACC) {
+            ax = ax > lbl_8047C998 ? ax : -ax;
+            if (ax < lbl_80478ACC[0]) {
                 f32 ay = tmp[1];
-                if (ay < lbl_8047C998) ay = -ay;
-                if (ay < lbl_80478ACC) {
+                ay = ay > lbl_8047C998 ? ay : -ay;
+                if (ay < lbl_80478ACC[0]) {
                     f32 az = tmp[2];
-                    if (az < lbl_8047C998) az = -az;
-                    if (az < lbl_80478ACC) {
+                    az = az > lbl_8047C998 ? az : -az;
+                    if (az < lbl_80478ACC[0]) {
                         f32 v = c->interest.x;
                         c->interest.x = (f32)(v + lbl_8047C9A0);
                     }
@@ -856,8 +856,8 @@ void fn_800D258C(void* obj) {
         }
         fn_800E0218(c->viewMtx, &c->eye, &c->upVector, &c->interest);
     } else {
-        f32 tmp1[3][4];
         f32 tmp2[3][4];
+        f32 tmp1[3][4];
         f32 tmp3[3][4];
         GSmtxMakeXRotation(c->viewMtx, -c->rotation.x);
         GSmtxMakeYRotation(tmp1, -c->rotation.y);

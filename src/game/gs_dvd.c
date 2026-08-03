@@ -363,21 +363,24 @@ u8 *fn_80167864(void)
 u8 *fn_801678E4(void)
 {
     BOOL enabled;
+    u8 *entry;
     u32 i;
     u32 offset;
-    u8 *entry;
     u8 *result;
 
     enabled = OSDisableInterrupts();
     entry = lbl_8047B0CC;
     result = 0;
-    for (i = 0; i < lbl_8047B0D0; i++, entry += 0xD0) {
+    i = 0;
+    while (i < lbl_8047B0D0) {
         if (*entry != 1) {
             offset = i * 0xD0;
             lbl_8047B0CC[offset] = 1;
             result = &lbl_8047B0CC[offset];
             break;
         }
+        entry += 0xD0;
+        i++;
     }
     OSRestoreInterrupts(enabled);
     return result;
@@ -386,21 +389,24 @@ u8 *fn_801678E4(void)
 u8 *fn_80167964(void)
 {
     BOOL enabled;
+    u8 *entry;
     u32 i;
     u32 offset;
-    u8 *entry;
     u8 *result;
 
     enabled = OSDisableInterrupts();
     entry = lbl_8047B0DC;
     result = 0;
-    for (i = 0; i < lbl_8047B0E0; i++, entry += 0x14) {
+    i = 0;
+    while (i < lbl_8047B0E0) {
         if (*entry != 1) {
             offset = i * 0x14;
             lbl_8047B0DC[offset] = 1;
             result = &lbl_8047B0DC[offset];
             break;
         }
+        entry += 0x14;
+        i++;
     }
     OSRestoreInterrupts(enabled);
     return result;

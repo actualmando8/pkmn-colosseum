@@ -117,7 +117,7 @@ static FSYSSubEntry* FSYSFileEntry_GetSubEntry(FSYSFileEntry* entry) {
  * @param nameHash    The name hash / resource ID of the file to check
  * @return            1 if the file is fully loaded, 0 otherwise
  * =================================================================== */
-extern FSYSSlot* fn_8017D410(u32 fileHandle, u32 mode);
+extern FSYSSlot* fn_8017D410(u32 fileHandle, s32 mode);
 
 #pragma push
 #pragma optimization_level 0

@@ -929,7 +929,7 @@ void* windowGetKeyInfo(void) {
 /* 0x80105634 | 0x298 */
 s32 fn_80105634(u8* window, u8* sprite) {
     u32 colors[2];
-    f32 alpha = (f32)(((u32)window[0x8B] * sprite[0x67]) / 255);
+    f32 alpha = (f32)((window[0x8B] * sprite[0x67]) / 65025);
     s16 id = *(s16*)(sprite + 0x06);
 
     colors[0] = lbl_8047CDF0;

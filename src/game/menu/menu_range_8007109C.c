@@ -3481,11 +3481,15 @@ void fn_80077ED4(void)
     extern void fn_80092C90(u32, void*, void*);
     extern s32 fn_80093610(u32);
     extern void fn_80093698(u32);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
 
     void* pokemon;
     void* name;
     void* backup;
     u32 i;
+    f32 elapsed;
+    f32 limit;
     u32 resource = 0x104F1000;
 
     name = heroBiosGetNamePtr(lbl_803F6F18);
@@ -3498,7 +3502,12 @@ void fn_80077ED4(void)
         fn_80166A28(0x4C7);
         fn_801CB834(resource, 4, 0, 0);
         scriptWaitSyncMotion(resource, 1);
-        MenuWaitMotionInterval();
+        limit = lbl_8047C0E4;
+        elapsed = lbl_8047C0E0;
+        while (elapsed < limit) {
+            _threadSwitch();
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        }
         msgctrlSetValue(0x4D, (u32)name);
         menuSetEnablePort(1);
         winMsgOpenField(0x44B0, 1, 0);
@@ -3548,7 +3557,12 @@ void fn_80077ED4(void)
             fn_80166A28(0x4C7);
             fn_801CB834(resource, 4, 0, 0);
             scriptWaitSyncMotion(resource, 1);
-            MenuWaitMotionInterval();
+            limit = lbl_8047C0E4;
+            elapsed = lbl_8047C0E0;
+            while (elapsed < limit) {
+                _threadSwitch();
+                elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+            }
             msgctrlSetValue(0x4D, (u32)name);
             menuSetEnablePort(1);
             winMsgOpenField(0x44B0, 1, 0);
@@ -4215,15 +4229,28 @@ u32 fn_8007B6D8(GbaBootContext* context) {
 void fn_80078390(void)
 {
     void* name;
-    u8 sex;
+    s32 sex;
     s8 answer;
+    f32 elapsed;
+    f32 limit;
     u32 resource = 0x104F1000;
 
     sex = heroBiosGetSexDataId(lbl_803F6F18);
     name = heroBiosGetNamePtr(lbl_803F6F18);
 
     if ((*(u32*)(lbl_803F6E40 + 8) & 8) != 0) {
-        MenuOpenHeroField(name, 0x43CB, 0x43CD, sex);
+        msgctrlSetValue(0x4D, (u32)name);
+        switch ((u8)sex) {
+        case 0:
+            menuSetEnablePort(1);
+            winMsgOpenField(0x43CB, 1, 0);
+            break;
+        case 1:
+            menuSetEnablePort(1);
+            winMsgOpenField(0x43CD, 1, 0);
+            break;
+        }
+        winMsgClose(1);
         menuSetEnablePort(1);
         winMsgOpen(2, 0x44CF, 1, 0);
         winMsgClose(1);
@@ -4231,7 +4258,18 @@ void fn_80078390(void)
         return;
     }
 
-    MenuOpenHeroField(name, 0x43C7, 0x43C9, sex);
+    msgctrlSetValue(0x4D, (u32)name);
+    switch ((u8)sex) {
+    case 0:
+        menuSetEnablePort(1);
+        winMsgOpenField(0x43C7, 1, 0);
+        break;
+    case 1:
+        menuSetEnablePort(1);
+        winMsgOpenField(0x43C9, 1, 0);
+        break;
+    }
+    winMsgClose(1);
     fadeSet(3, lbl_8047C100);
     fadeCheck(1);
     fn_801CB834(resource, 2, 0, 0);
@@ -4251,7 +4289,12 @@ void fn_80078390(void)
         fn_80166A28(0x4C7);
         fn_801CB834(resource, 4, 0, 0);
         scriptWaitSyncMotion(resource, 1);
-        MenuWaitMotionInterval();
+        limit = lbl_8047C0E4;
+    elapsed = lbl_8047C0E0;
+        while (elapsed < limit) {
+            _threadSwitch();
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        }
         msgctrlSetValue(0x4D, (u32)name);
         menuSetEnablePort(1);
         winMsgOpenField(0x44B0, 1, 0);
@@ -4265,7 +4308,12 @@ void fn_80078390(void)
     fn_80166A28(0x4C7);
     fn_801CB834(resource, 5, 0, 0);
     scriptWaitSyncMotion(resource, 1);
-    MenuWaitMotionInterval();
+    limit = lbl_8047C0E4;
+    elapsed = lbl_8047C0E0;
+    while (elapsed < limit) {
+        _threadSwitch();
+        elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+    }
     msgctrlSetValue(0x4D, (u32)name);
     menuSetEnablePort(1);
     winMsgOpen(2, 0x43B0, 1, 0);
@@ -4279,7 +4327,12 @@ void fn_80078390(void)
         fn_80166A28(0x4C7);
         fn_801CB834(resource, 4, 0, 0);
         scriptWaitSyncMotion(resource, 1);
-        MenuWaitMotionInterval();
+        limit = lbl_8047C0E4;
+        elapsed = lbl_8047C0E0;
+        while (elapsed < limit) {
+            _threadSwitch();
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        }
         menuSetEnablePort(1);
         winMsgOpenField(0x44B0, 1, 0);
         winMsgClose(1);
@@ -4311,9 +4364,13 @@ void fn_800788BC(void* backup)
     extern void heroPokemonGetCelebi(void*, u32);
     extern s32 fn_801D0748(u32, u32, u32);
     extern void fn_80165668(u32, u32, u32);
+    extern s32 fn_800D37CC(void);
+    extern u32 fn_800D3088(void);
 
     MenuSaveSnapshot* savedataBackup = backup;
     void* hero;
+    f32 elapsed;
+    f32 limit;
     u32 resource = 0x104F1000;
 
     winMsgOpenField(0x43A1, 1, 0);
@@ -4341,7 +4398,12 @@ void fn_800788BC(void* backup)
         fn_80166A28(0x4C7);
         fn_801CB834(resource, 4, 0, 0);
         scriptWaitSyncMotion(resource, 1);
-        MenuWaitMotionInterval();
+        limit = lbl_8047C0E4;
+        elapsed = lbl_8047C0E0;
+        while (elapsed < limit) {
+            _threadSwitch();
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        }
         winMsgOpenField(0x43AC, 1, 0);
         winMsgClose(1);
         lbl_8047A620 = 0;
@@ -4351,7 +4413,12 @@ void fn_800788BC(void* backup)
     fn_80166A28(0x4C7);
     fn_801CB834(resource, 5, 0, 0);
     scriptWaitSyncMotion(resource, 1);
-    MenuWaitMotionInterval();
+    limit = lbl_8047C0E4;
+    elapsed = lbl_8047C0E0;
+    while (elapsed < limit) {
+        _threadSwitch();
+        elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+    }
 
     *savedataBackup =
         *(MenuSaveSnapshot*)savedataGetStatus(0, 0);
@@ -4363,7 +4430,12 @@ void fn_800788BC(void* backup)
         fn_80166A28(0x4C7);
         fn_801CB834(resource, 4, 0, 0);
         scriptWaitSyncMotion(resource, 1);
-        MenuWaitMotionInterval();
+        limit = lbl_8047C0E4;
+        elapsed = lbl_8047C0E0;
+        while (elapsed < limit) {
+            _threadSwitch();
+            elapsed += (f32)fn_800D3088() / (f32)fn_800D37CC();
+        }
         *(MenuSaveSnapshot*)savedataGetStatus(0, 0) =
             *savedataBackup;
         winMsgOpenField(0x43AC, 1, 0);
@@ -4915,6 +4987,63 @@ u8 fn_80079EF4(s32 arg0, u32 value) {
 }
 #pragma pop
 
+
+extern void fn_8007B350(GbaBootContext* context, u32 channel,
+                        const u8* device_code, u32 region, const u8* name,
+                        u32 variant, u32 flags);
+extern u32 lbl_8047A640;
+extern const u8 lbl_802EE508[];
+extern u8 lbl_80478930;
+
+/*
+ * Re-open the GBA link prompt.  Every call site passes the same context,
+ * channel, device code, region, name table and variant; only the prompt
+ * flags change.
+ */
+#define OPEN_LINK_PROMPT(flags_)                                  \
+    fn_8007B350((GbaBootContext*)lbl_803F7A30, 1,                 \
+                (const u8*)&lbl_8047A640, 0x4A, lbl_802EE508,     \
+                lbl_80478930, (flags_))
+
+/* Reply code for a request that never reached the link. */
+static inline s32 fn_8007AB10_initial_result(u32 code) {
+    switch (code) {
+    case 1:
+        return 2;
+    case 3:
+        return 4;
+    case 6:
+        return 7;
+    case 8:
+        return 4;
+    case 10:
+        return 11;
+    case 12:
+        return 4;
+    case 16:
+        return 19;
+    }
+    return 0;
+}
+
+/* Reply code for a request the link answered with event 2. */
+static inline s32 fn_8007AB10_event2_result(u32 code) {
+    switch (code) {
+    case 1:
+        return 17;
+    case 3:
+        return 16;
+    case 6:
+        return 16;
+    case 8:
+        return 16;
+    case 10:
+        return 11;
+    case 12:
+        return 4;
+    }
+    return 0;
+}
 
 s32 fn_8007AB10(u32 code, u32* state) {
     u32 event;

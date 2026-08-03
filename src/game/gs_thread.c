@@ -5612,19 +5612,77 @@ asm void fn_800F1A0C(void) {
 #include "src/game/gs_thread_fn_800F1A0C.inc"
 }
 #else
-s32 fn_800F1A0C(arg0)
-    u8 *arg0;
-{
-    u8 leftDesc;
-    u8 rightDesc;
+s32 fn_800F1A0C(void* obj) {
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
+    u32 def;
     u32 leftValue;
     u32 rightValue;
+    u32 result;
 
-    GS_VM_READ_U8(arg0, leftDesc);
-    GS_VM_READ_U8(arg0, rightDesc);
-    GS_VM_RESOLVE_FIXED(arg0, leftDesc, leftValue);
-    GS_VM_RESOLVE_FIXED(arg0, rightDesc, rightValue);
-    GS_VM_PUSH(arg0, GS_VM_OPERAND_TRUTH(leftDesc, leftValue) || GS_VM_OPERAND_TRUTH(rightDesc, rightValue));
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
+    {
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+    }
+    def = lbl_8047E710;
+    if (leftDesc == 0) {
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
+    } else {
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
+        } else {
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
+            } else {
+                u32 rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (rightDesc == 0) {
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
+    } else {
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
+        } else {
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
+            } else {
+                u32 rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
+            }
+        }
+    }
+    /* OR */
+    result = GS_VM_OPERAND_TRUTH(leftDesc, leftValue) ||
+             GS_VM_OPERAND_TRUTH(rightDesc, rightValue);
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 
@@ -5638,19 +5696,77 @@ asm void fn_800F1E38(void) {
 #include "src/game/gs_thread_fn_800F1E38.inc"
 }
 #else
-s32 fn_800F1E38(arg0)
-    u8 *arg0;
-{
-    u8 leftDesc;
-    u8 rightDesc;
+s32 fn_800F1E38(void* obj) {
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 leftDesc;
+    u32 rightDesc;
+    u32 idx;
+    u32 def;
     u32 leftValue;
     u32 rightValue;
+    u32 result;
 
-    GS_VM_READ_U8(arg0, leftDesc);
-    GS_VM_READ_U8(arg0, rightDesc);
-    GS_VM_RESOLVE_FIXED(arg0, leftDesc, leftValue);
-    GS_VM_RESOLVE_FIXED(arg0, rightDesc, rightValue);
-    GS_VM_PUSH(arg0, GS_VM_OPERAND_TRUTH(leftDesc, leftValue) && GS_VM_OPERAND_TRUTH(rightDesc, rightValue));
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
+    {
+        u8* ip = ctx->ip;
+        leftDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        rightDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+    }
+    def = lbl_8047E710;
+    if (leftDesc == 0) {
+        GSlogWritef((const char*)(errBase+0x28), (u32)(leftDesc & 0xFFFF));
+        leftValue = def;
+    } else {
+        idx = leftDesc & 0xFFFF;
+        if (leftDesc & 0x80) {
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); leftValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; leftValue = ctx->stack[ctx->stackCount]; }
+        } else {
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) leftValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else leftValue = (u32)&ctx->globals[fieldIdx];
+            } else {
+                u32 rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) leftValue = rawptr;
+                else leftValue = *(u32*)rawptr;
+            }
+        }
+    }
+    def = lbl_8047E710;
+    if (rightDesc == 0) {
+        GSlogWritef((const char*)(errBase+0x28), (u32)(rightDesc & 0xFFFF));
+        rightValue = def;
+    } else {
+        idx = rightDesc & 0xFFFF;
+        if (rightDesc & 0x80) {
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); rightValue = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; rightValue = ctx->stack[ctx->stackCount]; }
+        } else {
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) rightValue = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rightValue = (u32)&ctx->globals[fieldIdx];
+            } else {
+                u32 rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) rightValue = rawptr;
+                else rightValue = *(u32*)rawptr;
+            }
+        }
+    }
+    /* AND */
+    result = GS_VM_OPERAND_TRUTH(leftDesc, leftValue) &&
+             GS_VM_OPERAND_TRUTH(rightDesc, rightValue);
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = result; }
     return 1;
 }
 
@@ -5662,39 +5778,47 @@ asm void fn_800F2264(void) {
 #include "src/game/gs_thread_fn_800F2264.inc"
 }
 #else
-s32 fn_800F2264(arg0)
-    u8 *arg0;
-{
-    u8 srcDesc;
-    u8 dstDesc;
-    u16 count;
+s32 fn_800F2264(void* obj) {
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 srcDesc;
+    u32 dstDesc;
+    u32 count;
     u32 srcIndex;
     u32 dstIndex;
-    u32 *src;
-    u32 *dst;
+    u32* src;
+    u32* dst;
     u32 i;
 
-    GS_VM_READ_U8(arg0, srcDesc);
-    GS_VM_READ_U8(arg0, dstDesc);
-    GS_VM_READ_U16(arg0, count);
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
+    srcDesc = (u32)*ctx->ip++;
+    dstDesc = (u32)*ctx->ip++;
+    count = *(u16*)ctx->ip;
+    ctx->ip += 2;
     if (dstDesc & 0x80) {
-        GSlogWritef((const char *)lbl_80271068 + 0x48);
+        GSlogWritef((const char*)(errBase+0x48));
         return 1;
     }
     if (srcDesc & 0x80) {
-        GS_VM_STACK_COUNT(arg0) -= count;
-        src = &GS_VM_STACK(arg0)[GS_VM_STACK_COUNT(arg0)];
+        ctx->stackCount = ctx->stackCount - count;
+        src = &ctx->stack[ctx->stackCount];
     } else {
-        GS_VM_POP(arg0, srcIndex);
-        src = (srcDesc & 0x40) ? (GS_VM_STACK(arg0) + GS_VM_FRAME(arg0) + srcIndex) : (GS_VM_GLOBALS(arg0) + srcIndex);
+        if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); srcIndex = ctx->stack[0]; }
+        else { ctx->stackCount = ctx->stackCount - 1; srcIndex = ctx->stack[ctx->stackCount]; }
+        if (srcDesc & 0x40) src = &ctx->stack[ctx->frame + srcIndex];
+        else src = &ctx->globals[srcIndex];
     }
-    GS_VM_POP(arg0, dstIndex);
-    dst = (dstDesc & 0x40) ? (GS_VM_STACK(arg0) + GS_VM_FRAME(arg0) + dstIndex) : (GS_VM_GLOBALS(arg0) + dstIndex);
+    if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); dstIndex = ctx->stack[0]; }
+    else { ctx->stackCount = ctx->stackCount - 1; dstIndex = ctx->stack[ctx->stackCount]; }
+    if (dstDesc & 0x40) dst = &ctx->stack[ctx->frame + dstIndex];
+    else dst = &ctx->globals[dstIndex];
     for (i = 0; i < count; i++) {
         dst[i] = src[i];
     }
     for (i = 0; i < count; i++) {
-        GS_VM_PUSH(arg0, dst[i]);
+        if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
+        else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = dst[i]; }
     }
     return 1;
 }
@@ -5709,20 +5833,51 @@ asm void fn_800F24F4(void) {
 #include "src/game/gs_thread_fn_800F24F4.inc"
 }
 #else
-s32 fn_800F24F4(arg0)
-    u8 *arg0;
-{
-    u8 srcDesc;
-    u8 dstDesc;
+s32 fn_800F24F4(void* obj) {
+    GSVMCtx* ctx;
+    u8* errBase;
+    u32 srcDesc;
+    u32 dstDesc;
+    u32 idx;
+    u32 def;
     u32 value;
     u32 converted;
     u32 dstIndex;
-    u32 *dst;
+    u32* dst;
     f32 tmp;
 
-    GS_VM_READ_U8(arg0, srcDesc);
-    GS_VM_READ_U8(arg0, dstDesc);
-    GS_VM_RESOLVE_FIXED(arg0, srcDesc, value);
+    ctx = (GSVMCtx*)obj;
+    errBase = (u8*)lbl_80271068;
+    {
+        u8* ip = ctx->ip;
+        srcDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+        dstDesc = (u32)*ip; ip++;
+        ctx->ip = ip;
+    }
+    def = lbl_8047E710;
+    if (srcDesc == 0) {
+        GSlogWritef((const char*)(errBase+0x28), (u32)(srcDesc & 0xFFFF));
+        value = def;
+    } else {
+        idx = srcDesc & 0xFFFF;
+        if (srcDesc & 0x80) {
+            if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); value = ctx->stack[0]; }
+            else { ctx->stackCount = ctx->stackCount - 1; value = ctx->stack[ctx->stackCount]; }
+        } else {
+            u32 fieldIdx = idx & 0x3F;
+            if (idx & 0x20) {
+                if (idx & 0x40) value = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else value = (u32)&ctx->globals[fieldIdx];
+            } else {
+                u32 rawptr;
+                if (idx & 0x40) rawptr = (u32)&ctx->stack[ctx->frame + fieldIdx];
+                else rawptr = (u32)&ctx->globals[fieldIdx];
+                if (idx & 0x100) value = rawptr;
+                else value = *(u32*)rawptr;
+            }
+        }
+    }
     converted = value;
     if ((srcDesc & 0x3F) != (dstDesc & 0x3F)) {
         if ((srcDesc & 0x3F) == 2) {
@@ -5733,15 +5888,18 @@ s32 fn_800F24F4(arg0)
         }
     }
     if (dstDesc == 0) {
-        GSlogWritef((const char *)lbl_80271068 + 0x84, (u16)dstDesc);
+        GSlogWritef((const char*)(errBase+0x84), (u32)(dstDesc & 0xFFFF));
     } else if (dstDesc & 0x80) {
-        GSlogWritef((const char *)lbl_80271068 + 0xA0);
+        GSlogWritef((const char*)(errBase+0xA0));
     } else {
-        GS_VM_POP(arg0, dstIndex);
-        dst = (dstDesc & 0x40) ? (GS_VM_STACK(arg0) + GS_VM_FRAME(arg0) + dstIndex) : (GS_VM_GLOBALS(arg0) + dstIndex);
+        if (ctx->stackCount <= 0) { GSlogWritef((const char*)(errBase+0x14)); dstIndex = ctx->stack[0]; }
+        else { ctx->stackCount = ctx->stackCount - 1; dstIndex = ctx->stack[ctx->stackCount]; }
+        if (dstDesc & 0x40) dst = &ctx->stack[ctx->frame + dstIndex];
+        else dst = &ctx->globals[dstIndex];
         *dst = converted;
     }
-    GS_VM_PUSH(arg0, converted);
+    if (ctx->stackCount > 0x40) { GSlogWritef((const char*)errBase); }
+    else { ctx->stackCount = ctx->stackCount + 1; ctx->stack[ctx->stackCount-1] = converted; }
     return 1;
 }
 
